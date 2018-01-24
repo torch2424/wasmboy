@@ -53,38 +53,25 @@ export class Wasmboy extends Component {
         console.log('Not growing memory...');
       }
 
-      // Call the initialize function on our wasm instance
-      instance.exports.init(10);
+      // Load our backup file
+      fetch('backup.gb')
+      .then(blob => {
+        return blob.arrayBuffer();
+      })
+      .then(bytes => {
+        const byteArray = new Uint8Array(bytes);
+        console.log('Opcode array: ', byteArray);
 
-      const testingOpcode = 9;
-      if (!instance.exports.handleOpcode(9)) {
-          console.log('Error, opcode not recognized: ', testingOpcode);
-      }
+        //https://gist.github.com/scottferg/3886608
+        // Every gameboy cartridge has an offset of 0x134
+        const startOpcode = byteArray[0x134];
+        console.log('Start opcode', parseInt(byteArray[0x134], 16));
 
-      // Testing returning values with wasm
-      var returnVal = instance.exports.storeTest();
-      console.log('Returning values from storeTest() in wasm: ', returnVal);
-
-      // Get value from memory of wasm
-      var wasmMem = new Uint32Array(memory.buffer);
-      console.log('Wasm Memory: ', wasmMem);
-
-      // Try to insert into memory from JS, and check it from within wasm
-      wasmMem[1] = 24;
-      console.log("loadTest()", instance.exports.loadTest());
-
-
-      // Show the memory on our canvas
-      const canvas = document.querySelector('#canvas').getContext("2d");
-      canvas.font = "16px Arial";
-      canvas.fillText('Please see console for most wasm testing results', 5, 20);
-      canvas.fillText('Wasm memory strinigified below:', 5, 75);
-      canvas.fillText(JSON.stringify(wasmMem, null, 4), 5, 100);
+        if (!instance.exports.handleOpcode(startOpcode)) {
+            console.log('Error, opcode not recognized: ', startOpcode.toString(16));
+        }
+      });
     });
-
-
-
-    // Registers Module
   }
 
 	render() {
