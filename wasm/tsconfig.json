@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noEmitOnError": true,
+    "strictNullChecks": true,
+    "experimentalDecorators": true,
+    "target": "es5",
+    "module": "commonjs",
+    "downlevelIteration": true,
+    "preserveConstEnums": true,
+    "noLib": true,
+    "types": [],
+    "rootDirs": [
+      "./portable"
+    ],
+    "allowJs": true
+  },
+  "files": [
+    "./portable.d.ts",
+    "./portable.js",
+    "./portable/heap.js"
+  ],
+  "include": [
+    "./**/*.ts"
+  ]
+}
