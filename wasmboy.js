@@ -31,7 +31,6 @@ export class Wasmboy extends Component {
     fetch('dist/wasm/index.untouched.wasm')
     .then(response => response.arrayBuffer())
     .then(binary => {
-
       // Log we got the wasm module loaded
       console.log('wasmboy wasm instantiated');
 
@@ -45,8 +44,9 @@ export class Wasmboy extends Component {
       // Grow our wasm memory to what we need if not already
       console.log('Growing Memory if needed...');
       console.log('Current memory size:', memory.buffer.byteLength);
-      if (memory.buffer.byteLength < 0) {
-        console.log('Growing memory...')
+      // Gameboy has a memory size of 65536
+      if (memory.buffer.byteLength < 65536) {
+        console.log('Growing memory...');
         memory.grow(1);
         console.log('New memory size:', memory.buffer.byteLength);
       } else {
@@ -55,6 +55,11 @@ export class Wasmboy extends Component {
 
       // Call the initialize function on our wasm instance
       instance.exports.init(10);
+
+      const testingOpcode = 9;
+      if (!instance.exports.handleOpcode(9)) {
+          console.log('Error, opcode not recognized: ', testingOpcode);
+      }
 
       // Testing returning values with wasm
       var returnVal = instance.exports.storeTest();
@@ -77,6 +82,9 @@ export class Wasmboy extends Component {
       canvas.fillText(JSON.stringify(wasmMem, null, 4), 5, 100);
     });
 
+
+
+    // Registers Module
   }
 
 	render() {

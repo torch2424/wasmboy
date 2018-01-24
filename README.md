@@ -3,6 +3,10 @@ Gameboy Emulator written in Web Assembly, Shell in Preact
 
 using [awesome gbdev](https://github.com/avivace/awesome-gbdev) for reference material.
 
+**Notes:**
+
+Assembly script does not support Imports or exports outside of function exports
+
 ### CLI Commands
 
 ``` bash
