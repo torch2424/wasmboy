@@ -49,16 +49,17 @@ function registerHL(): void {
     Decode Opcodes
 ***********************/
 
-// Take in any opcode, and decode it
-export function handleOpcode(opcode: u8): boolean {
+// Take in any opcode, and decode it, and return the program counter
+// Setting return value to i32 instead of u16, as we want to return a negative number on error
+export function handleOpcode(opcode: u8): i32 {
   switch(opcode) {
     case 10:
       break;
     default:
       // Return false, error handling the opcode
-      return false;
+      return -1;
   }
 
-  // Reutrn true, opcode is handled correctly!
-  return true;
+  // Reutrn the program counter to get the next position!
+  return programCounter;
 }
