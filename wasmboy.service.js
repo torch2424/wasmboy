@@ -41,6 +41,10 @@ export class Wasmboy {
 
     const decodeLoop = () => {
       // Get our opcode
+      // From: https://github.com/Baekalfen/PyBoy/blob/master/PyBoy.pdf , we see that an opcode can at most be 4 bytes
+      // Therfore, we will pass all 4 bytes, and then the the wasm module should be able to do what it needs, wether or Not
+      // it needs all 4
+      // TODO
       const opcode = this.gameBytes[localProgramCounterPosition];
 
       if(!opcode) {
