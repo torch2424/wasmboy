@@ -41,21 +41,31 @@ export class Wasmboy {
 
     const decodeLoop = () => {
       // Get our opcode
-      // From: https://github.com/Baekalfen/PyBoy/blob/master/PyBoy.pdf , we see that an opcode can at most be 4 bytes
-      // Therfore, we will pass all 4 bytes, and then the the wasm module should be able to do what it needs, wether or Not
-      // it needs all 4
-      // TODO
+      // opcodes are at most 3 bytes: https://gbatemp.net/threads/what-size-are-gameboy-opcodes.467282/
+      // Therefore, we will pass all 3 bytes, and then the the wasm module should be able to do what it needs, wether or Not
+      // it needs all 3
       const opcode = this.gameBytes[localProgramCounterPosition];
+      const dataByteOne = this.gameBytes[localProgramCounterPosition + 1];
+      const dataByteTwo = this.gameBytes[localProgramCounterPosition + 2];
 
       if(!opcode) {
         console.log('No Opcode found at programCounter position');
         return;
       }
 
-      console.log('Decoding Opcode: ', opcode.toString(16));
+      console.log(
+        'Decoding Opcode: ',
+        opcode.toString(16),
+        dataByteOne.toString(16),
+        dataByteTwo.toString(16)
+      );
 
       // Returns the program counter position for next instruction to be fetched
-      const nextProgramCounterPosition = this.wasmInstance.exports.handleOpcode(opcode);
+      const nextProgramCounterPosition = this.wasmInstance.exports.handleOpcode(
+        opcode,
+        dataByteOne,
+        dataByteTwo
+      );
 
       // Function will return < 0 if the opcode was not recognized
       if (nextProgramCounterPosition < 0x0000) {

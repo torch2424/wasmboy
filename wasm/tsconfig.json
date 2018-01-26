@@ -7,21 +7,19 @@
     "noEmitOnError": true,
     "strictNullChecks": true,
     "experimentalDecorators": true,
-    "target": "es5",
+    "target": "esnext",
     "module": "commonjs",
     "downlevelIteration": true,
     "preserveConstEnums": true,
     "noLib": true,
     "types": [],
     "rootDirs": [
-      "./portable"
+      "."
     ],
     "allowJs": true
   },
   "files": [
-    "./portable.d.ts",
-    "./portable.js",
-    "./portable/heap.js"
+    "./assembly.d.ts"
   ],
   "include": [
     "./**/*.ts"
