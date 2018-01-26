@@ -14,6 +14,8 @@ let registerA: u8 = 0,
     registerL: u8 = 0,
     registerF: u8 = 0;
 
+// TODO: Improve this with a modern bitshifting way:
+// https://stackoverflow.com/questions/101439/the-most-efficient-way-to-implement-an-integer-based-power-function-powint-int
 function _exponent(numberValue: u8, exponentValue: u8): u8 {
   let result: u8 = numberValue;
   for (let i: u8 = 1; i < exponentValue; i++) {
