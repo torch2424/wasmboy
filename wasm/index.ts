@@ -39,12 +39,40 @@ function _setFlagBit(flagBit: u8, flagValue: u8): u8 {
   return registerF;
 }
 
-function _checkAndSetHalfCarryFlag(value: u8, amountToAdd: u8): void {
-  // Knock off higher bits to check for seven
-  let bitwiseValueOfSeven = value | 7;
-  if( bitwiseValueOfSeven === 7 && amountToAdd >= 1) {
-    _setFlagBit(5, 1);
+// Overload the set flag bit for ease of use
+function _setZeroFlag(value: u8): void {
+  _setFlagBit(7, value);
+}
+
+function _setSubtractFlag(value: u8): void {
+  _setFlagBit(6, value)
+}
+
+// Must be run before the register actually performs the add
+// amountToAdd i16, since max number can be an u8
+function _checkAndSetHalfCarryFlag(value: u8, amountToAdd: i16): void {
+  // Knock off higher bits, then check for the value
+  let lastNibbleOfAmountToAdd: i8 = <i8>(amountToAdd << 12) >> 12;
+  if(amountToAdd > 0) {
+    let lastThreeBitsOfValue = (value << 5) >> 5;
+    // Set if going to set the 4th bit
+    let result: u8 = lastThreeBitsOfValue + <u8>lastNibbleOfAmountToAdd;
+    if(result > 7) {
+      _setFlagBit(5, 1);
+    }
+  } else if (amountToAdd < 0) {
+    // set if NOT going to borrow form bit 4
+    let lastNibbleOfValue = (value << 4) >> 4;
+    lastNibbleOfAmountToAdd = lastNibbleOfAmountToAdd * -1;
+    let result: i8 = <i8>lastNibbleOfValue - lastNibbleOfAmountToAdd;
+    if(result < 8) {
+      _setFlagBit(5, 1);
+    }
   }
+}
+
+function _setCarryFlag(value: u8): void {
+  _setFlagBit(4, value)
 }
 
 // 16-bit registers
@@ -106,38 +134,56 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i32 
   switch(opcode) {
     case 0x00:
       // NOP
+      // 1  4
       // No Operation
-      programCounter += 1;
       break;
     case 0x01:
       // LD BC,d16
       registerB = dataByteOne;
       registerC = dataByteTwo;
-      programCounter += 3;
+      programCounter += 2;
     case 0x02:
       // LD (BC),A
+      // 3  12
       // () means load into address pointed by BC
       // TODO: Ensure store is hitting right values: https://github.com/AssemblyScript/assemblyscript/wiki/Built-in-functions
       store<u8>(_concatenateBytes(registerB, registerC), registerA);
-      programCounter += 1;
     case 0x03:
+      // INC BC
+      // 1  8
       let BC: u16 = _concatenateBytes(registerB, registerC);
       BC++;
       _splitBytes((<u16>BC), registerB, registerC);
-      programCounter += 1;
     case 0x04:
+      // INC B
+      // 1  4
+      // Z 0 H -
       _checkAndSetHalfCarryFlag(registerB, 1);
       registerB += 1;
       if (registerB == 0) {
         // User parseint and radix to get correct bits
-        _setFlagBit(7, 0);
+        _setZeroFlag(0)
       }
-      _setFlagBit(6, 0);
-      programCounter += 1;
+      _setSubtractFlag(0)
+    case 0x05:
+      // DEC B
+      // 1  4
+      // Z 1 H -
+      _checkAndSetHalfCarryFlag(registerB, -1);
+      registerB -= 1;
+      if (registerB == 0) {
+        // User parseint and radix to get correct bits
+        _setZeroFlag(0)
+      }
+      _setSubtractFlag(1)
     default:
       // Return false, error handling the opcode
       return -1;
   }
+
+  // Always implement the program counter by one
+  // Any other value can just sub tract or add however much offset
+  programCounter += 1;
 
   // Return the program counter to get the next position!
   return programCounter;
