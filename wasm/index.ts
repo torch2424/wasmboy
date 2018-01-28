@@ -71,6 +71,10 @@ function _checkAndSetHalfCarryFlag(value: u8, amountToAdd: i16): void {
   }
 }
 
+function _setHalfCarryFlag(value: u8): void {
+  _setFlagBit(5, value);
+}
+
 function _setCarryFlag(value: u8): void {
   _setFlagBit(4, value)
 }
@@ -162,9 +166,9 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i32 
       registerB += 1;
       if (registerB == 0) {
         // User parseint and radix to get correct bits
-        _setZeroFlag(0)
+        _setZeroFlag(0);
       }
-      _setSubtractFlag(0)
+      _setSubtractFlag(0);
     case 0x05:
       // DEC B
       // 1  4
@@ -173,9 +177,34 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i32 
       registerB -= 1;
       if (registerB == 0) {
         // User parseint and radix to get correct bits
-        _setZeroFlag(0)
+        _setZeroFlag(0);
       }
-      _setSubtractFlag(1)
+      _setSubtractFlag(1);
+    case 0x06:
+      // LD B,d8
+      // 2  8
+      registerB = dataByteOne;
+    case 0x07:
+      // RLCA
+      // 1  4
+      // 0 0 0 C
+      // Rotate left: https://stackoverflow.com/questions/19204750/how-do-i-perform-a-circular-rotation-of-a-byte
+      // Check for the carry
+      if((registerA & 0x80) === 0x80) {
+        _setCarryFlag(1);
+      } else {
+        _setCarryFlag(0);
+      }
+      registerA = (registerA << 1) | (registerA >> 7)
+      // Set all other flags to zero
+      _setZeroFlag(0);
+      _setSubtractFlag(0);
+      _setHalfCarryFlag(0);
+    case 0x08:
+      // LD (a16),SP
+      // 3  20
+      // Load the stack pointer into the 16 bit address represented by the two data bytes
+      store<u16>(_concatenateBytes(dataByteOne, dataByteTwo), stackPointer);
     default:
       // Return false, error handling the opcode
       return -1;
