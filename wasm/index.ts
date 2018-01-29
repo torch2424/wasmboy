@@ -806,6 +806,7 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
 }
 
 // TODO: Handle CB Opcodes
-function handleCbOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i32 {
-  return 0;
+function handleCbOpcode(cbOpcode: u8): void {
+  // Increase program counter, as all CB codes take two bytes
+  programCounter += 1;
 }
