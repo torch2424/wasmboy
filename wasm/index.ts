@@ -680,7 +680,7 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     }
 
     if(_getSubtractFlag() > 0) {
-      adjustedRegister = registerA - adjustment;
+      adjustedRegister = registerA - <u8>adjustment;
     } else {
       if ((registerA >> 3) > 0) {
         adjustment = adjustment | 0x06;
@@ -688,7 +688,7 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
       if(registerA > 0x99) {
         adjustment = adjustment | 0x60;
       }
-      adjustedRegister = registerA + adjustment;
+      adjustedRegister = registerA + <u8>adjustment;
     }
 
     // Now set our flags to the correct values
@@ -715,7 +715,7 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     } else {
       numberOfCycles = 8;
     }
-    programCounter += 1;
+    // No program counter on relative jump
   } else if(_isOpcode(opcode, 0x29)) {
 
     // ADD HL,HL
@@ -784,6 +784,17 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     _setSubtractFlag(1);
     _setHalfCarryFlag(1);
     numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x30)) {
+
+    // JR NC,r8
+    // 2 12 / 8
+    if (_getCarryFlag() === 0) {
+      _relativeJump(dataByteOne);
+      numberOfCycles = 12;
+    } else {
+      numberOfCycles = 8;
+    }
+    // No programCounter on relative jump
   }
 
   // Always implement the program counter by one
