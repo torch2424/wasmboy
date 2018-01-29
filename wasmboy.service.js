@@ -34,19 +34,14 @@ export class Wasmboy {
     // https://gist.github.com/scottferg/3886608
     // Every gameboy cartridge has an offset of 0x134
 
-
-    // Loop through the op codes as the program couunter states
-    // Program Counter always starts at 0x0000
-    let localProgramCounterPosition = 0x0000;
-
     const decodeLoop = () => {
       // Get our opcode
       // opcodes are at most 3 bytes: https://gbatemp.net/threads/what-size-are-gameboy-opcodes.467282/
       // Therefore, we will pass all 3 bytes, and then the the wasm module should be able to do what it needs, wether or Not
       // it needs all 3
-      const opcode = this.gameBytes[localProgramCounterPosition];
-      const dataByteOne = this.gameBytes[localProgramCounterPosition + 1];
-      const dataByteTwo = this.gameBytes[localProgramCounterPosition + 2];
+      const opcode = this.gameBytes[this.wasmInstance.exports.getProgramCounter()];
+      const dataByteOne = this.gameBytes[this.wasmInstance.exports.getProgramCounter() + 1];
+      const dataByteTwo = this.gameBytes[this.wasmInstance.exports.getProgramCounter() + 2];
 
       if(!opcode) {
         console.log('No Opcode found at programCounter position');
@@ -61,18 +56,17 @@ export class Wasmboy {
       );
 
       // Returns the program counter position for next instruction to be fetched
-      const nextProgramCounterPosition = this.wasmInstance.exports.handleOpcode(
+      const numberOfCycles = this.wasmInstance.exports.handleOpcode(
         opcode,
         dataByteOne,
         dataByteTwo
       );
 
       // Function will return < 0 if the opcode was not recognized
-      if (nextProgramCounterPosition < 0x0000) {
+      if (numberOfCycles < 0x0000) {
         console.log('Error! Opcode not recognized');
       } else {
-        console.log('Fetching next opcode at position: ', nextProgramCounterPosition);
-        localProgramCounterPosition = nextProgramCounterPosition
+        console.log('Fetching next opcode at position: ', this.wasmInstance.exports.getProgramCounter());
         requestAnimationFrame(decodeLoop);
       }
     }
