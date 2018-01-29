@@ -1,4 +1,5 @@
 // https://github.com/AssemblyScript/assemblyscript/wiki/Built-in-functions
+// https://github.com/nakardo/node-gameboy/blob/master/lib/cpu/opcodes.js
 // NOTE: Code is very verbose, and will have some copy pasta'd lines.
 // Reason being, I want the code to be very accessible for errors later on.
 // Also, the benefit on splitting into functions is organizarion, and keeping things DRY.
