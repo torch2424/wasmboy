@@ -1,10 +1,14 @@
 // https://github.com/AssemblyScript/assemblyscript/wiki/Built-in-functions
 // https://github.com/nakardo/node-gameboy/blob/master/lib/cpu/opcodes.js
+
+
 // NOTE: Code is very verbose, and will have some copy pasta'd lines.
 // Reason being, I want the code to be very accessible for errors later on.
 // Also, the benefit on splitting into functions is organizarion, and keeping things DRY.
 // But since I highly doubt the GB CPU will be changing, DRY is no longer an issue
 // And the verbosity / ease of use is more important, imo.
+
+// NOTE: Commands like SUB B, or AND C, without a second parameter, actually refer SUB A, B or AND A, C
 
 /***********************
     Utility
@@ -38,7 +42,7 @@ function _rotateByteRight(value: u8): u8 {
 
 // Wrapper funcstions around load/store for assemblyscript offset to gb mem offset
 // TODO: Ensure store is hitting right values: https://github.com/AssemblyScript/assemblyscript/wiki/Built-in-functions
-function _eightBitStoreIntoGBMemory(offset: u8, value: u8): void {
+function _eightBitStoreIntoGBMemory(offset: u16, value: u8): void {
   store<u8>(offset, value);
 }
 
@@ -142,7 +146,7 @@ function _checkAndSetEightBitHalfCarryFlag(value: u8, amountToAdd: i16): void {
 }
 
 function _checkAndSetEightBitCarryFlag(value: u8, amountToAdd: i16): void {
-  const result: i16 = value + amountToAdd;
+  let result: i16 = <i16>value + amountToAdd;
   if ((result >> 8) > 0) {
     _setCarryFlag(1);
   } else {
@@ -796,7 +800,772 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
       numberOfCycles = 8;
     }
     // No programCounter on relative jump
+  } else if(_isOpcode(opcode, 0x31)) {
+    // LD SP,d16
+    // 3 12
+    stackPointer = _concatenateBytes(dataByteOne, dataByteTwo);
+    programCounter += 2;
+    numberOfCycles = 12;
+  } else if(_isOpcode(opcode, 0x32)) {
+    // LD (HL-),A
+    // 1 8
+    let registerHL = _concatenateBytes(registerH, registerL);
+    _eightBitStoreIntoGBMemory(registerHL, registerA);
+    registerHL -= 1;
+    _splitBytes(registerHL, registerH, registerL);
+    numberOfCycles = 8;
+  } else if(_isOpcode(opcode, 0x33)) {
+    // INC SP
+    // 1 8
+    stackPointer += 1;
+    numberOfCycles = 8;
+  } else if(_isOpcode(opcode, 0x34)) {
+
+    // INC (HL)
+    // 1  12
+    // Z 0 H -
+    let registerHL: u16 = _concatenateBytes(registerH, registerL);
+    let valueAtHL: u8 = _eightBitLoadFromGBMemory(registerHL);
+    _checkAndSetEightBitHalfCarryFlag(<u8>valueAtHL, -1);
+    valueAtHL += 1;
+    if (valueAtHL === 0) {
+      // User parseint and radix to get correct bits
+      _setZeroFlag(0);
+    }
+    _setSubtractFlag(0);
+    _eightBitStoreIntoGBMemory(registerHL, <u8>valueAtHL);
+    numberOfCycles = 12;
+  } else if(_isOpcode(opcode, 0x35)) {
+
+    // DEC (HL)
+    // 1  12
+    // Z 1 H -
+    let registerHL: u16 = _concatenateBytes(registerH, registerL);
+    let valueAtHL: u8 = _eightBitLoadFromGBMemory(registerHL);
+    _checkAndSetEightBitHalfCarryFlag(<u8>valueAtHL, -1);
+    valueAtHL -= 1;
+    if (valueAtHL === 0) {
+      // User parseint and radix to get correct bits
+      _setZeroFlag(0);
+    }
+    _setSubtractFlag(1);
+    _eightBitStoreIntoGBMemory(registerHL, <u8>valueAtHL);
+    numberOfCycles = 12;
+  } else if(_isOpcode(opcode, 0x36)) {
+    // LD (HL),d8
+    // 2  12
+    _eightBitStoreIntoGBMemory(_concatenateBytes(registerH, registerL), dataByteOne);
+    programCounter += 1;
+    numberOfCycles = 12;
+  } else if(_isOpcode(opcode, 0x37)) {
+    // SCF
+    // 1  4
+    // - 0 0 1
+    // Simply set the carry flag
+    _setSubtractFlag(0);
+    _setHalfCarryFlag(0);
+    _setCarryFlag(1);
+  } else if(_isOpcode(opcode, 0x38)) {
+
+    // JR C,r8
+    // 2 12/8
+    if (_getCarryFlag() === 1) {
+      _relativeJump(dataByteOne);
+      numberOfCycles = 12;
+    } else {
+      numberOfCycles = 8;
+    }
+    // No programCounter on relative jump
+  } else if(_isOpcode(opcode, 0x39)) {
+
+    // ADD HL,SP
+    // 1 8
+    // - 0 H C
+    let registerHL: u16 = _concatenateBytes(registerH, registerL);
+    _checkAndSetSixteenBitFlagsAddOverflow(<u16>registerHL, stackPointer);
+    let result: u16 = <u16>(registerHL + stackPointer);
+    _splitBytes(<u16>result, registerH, registerL);
+    _setSubtractFlag(0);
+    numberOfCycles = 8;
+  } else if(_isOpcode(opcode, 0x3A)) {
+
+    // LD A,(HL-)
+    // 1 8
+    let registerHL: u16 = _concatenateBytes(registerH, registerL);
+    registerA = _eightBitLoadFromGBMemory(registerHL);
+    registerHL -= 1;
+    _splitBytes(registerHL, registerH, registerL);
+    numberOfCycles = 8;
+  } else if(_isOpcode(opcode, 0x3B)) {
+    // DEC SP
+    // 1 8
+    stackPointer -= 1;
+    numberOfCycles = 8;
+  } else if(_isOpcode(opcode, 0x3C)) {
+
+    // INC A
+    // 1  4
+    // Z 0 H -
+    _checkAndSetEightBitHalfCarryFlag(registerA, 1);
+    registerA += 1;
+    if (registerA === 0) {
+      // User parseint and radix to get correct bits
+      _setZeroFlag(0);
+    }
+    _setSubtractFlag(0);
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x3D)) {
+
+    // DEC A
+    // 1  4
+    // Z 1 H -
+    _checkAndSetEightBitHalfCarryFlag(registerA, -1);
+    registerA -= 1;
+    if (registerA === 0) {
+      // User parseint and radix to get correct bits
+      _setZeroFlag(0);
+    }
+    _setSubtractFlag(1);
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x3E)) {
+
+    // LD A,d8
+    // 2 8
+    registerA = dataByteOne;
+    programCounter += 1;
+    numberOfCycles = 8;
+  } else if(_isOpcode(opcode, 0x3F)) {
+
+    // CCF
+    // 1 4
+    // - 0 0 C
+    _setSubtractFlag(0);
+    _setHalfCarryFlag(0);
+    if(_getCarryFlag() > 0) {
+      _setCarryFlag(0);
+    } else {
+      _setCarryFlag(1);
+    }
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x40)) {
+    // LD B,B
+    // 1 4
+    // Load B into B, Do nothing
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x41)) {
+
+    // LD B,C
+    // 1 4
+    registerB = registerC;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x42)) {
+
+    // LD B,D
+    // 1 4
+    registerB = registerD;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x43)) {
+
+    // LD B,E
+    // 1 4
+    registerB = registerE;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x44)) {
+
+    // LD B,H
+    // 1 4
+    registerB = registerH;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x45)) {
+
+    // LD B,L
+    // 1 4
+    registerB = registerL;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x46)) {
+
+    // LD B,(HL)
+    // 1 8
+    registerB = _eightBitLoadFromGBMemory(_concatenateBytes(registerH, registerL));
+    numberOfCycles = 8;
+  } else if(_isOpcode(opcode, 0x47)) {
+
+    // LD B,A
+    // 1 4
+    registerB = registerA;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x48)) {
+
+    // LD C,B
+    // 1 4
+    registerC = registerB;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x49)) {
+
+    // LD C,C
+    // 1 4
+    // Do nothing
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x4A)) {
+
+    // LD C,D
+    // 1 4
+    registerC = registerD;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x4B)) {
+
+    // LD C,E
+    // 1 4
+    registerC = registerE;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x4C)) {
+
+    // LD C,H
+    // 1 4
+    registerC = registerH;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x4D)) {
+
+    // LD C,L
+    // 1 4
+    registerC = registerL;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x4E)) {
+
+    // LD C,(HL)
+    // 1 8
+    registerC = _eightBitLoadFromGBMemory(_concatenateBytes(registerH, registerL));
+    numberOfCycles = 8;
+  } else if(_isOpcode(opcode, 0x4F)) {
+
+    // LD C,A
+    // 1 4
+    registerC = registerA;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x50)) {
+
+    // LD D,B
+    // 1 4
+    registerD = registerB;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x51)) {
+
+    // LD D,C
+    // 1 4
+    registerD = registerC;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x52)) {
+
+    // LD D,D
+    // 1 4
+    // Do Nothing
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x53)) {
+
+    // LD D,E
+    // 1 4
+    registerD = registerE;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x54)) {
+
+    // LD D,H
+    // 1 4
+    registerD = registerH;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x55)) {
+
+    // LD D,L
+    // 1 4
+    registerD = registerL;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x56)) {
+
+    // LD D,(HL)
+    // 1 8
+    registerD = _eightBitLoadFromGBMemory(_concatenateBytes(registerH, registerL));
+    numberOfCycles = 8;
+  } else if(_isOpcode(opcode, 0x57)) {
+
+    // LD D,A
+    // 1 4
+    registerD = registerA;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x58)) {
+
+    // LD E,B
+    // 1 4
+    registerE = registerB;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x59)) {
+
+    // LD E,C
+    // 1 4
+    registerE = registerC;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x5A)) {
+
+    // LD E,D
+    // 1 4
+    registerE = registerD;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x5B)) {
+
+    // LD E,E
+    // 1 4
+    // Do Nothing
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x5C)) {
+
+    // LD E,H
+    // 1 4
+    registerE = registerH;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x5D)) {
+
+    // LD E,L
+    // 1 4
+    registerE = registerL;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x5E)) {
+
+    // LD E,(HL)
+    // 1 4
+    registerE = _eightBitLoadFromGBMemory(_concatenateBytes(registerH, registerL));
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x5F)) {
+
+    // LD E,A
+    // 1 4
+    registerE = registerA;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x60)) {
+
+    // LD H,B
+    // 1 4
+    registerH = registerB;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x61)) {
+
+    // LD H,C
+    // 1 4
+    registerH = registerC;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x62)) {
+
+    // LD H,D
+    // 1 4
+    registerH = registerD;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x63)) {
+
+    // LD H,E
+    // 1 4
+    registerH = registerE;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x64)) {
+
+    // LD H,H
+    // 1 4
+    registerH = registerH;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x65)) {
+
+    // LD H,L
+    // 1 4
+    registerH = registerL;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x66)) {
+
+    // LD H,(HL)
+    // 1 8
+    registerH = _eightBitLoadFromGBMemory(_concatenateBytes(registerH, registerL));
+    numberOfCycles = 8;
+  } else if(_isOpcode(opcode, 0x67)) {
+
+    // LD H,A
+    // 1 4
+    registerH = registerA;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x68)) {
+
+    // LD L,B
+    // 1 4
+    registerL = registerB;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x69)) {
+
+    // LD L,C
+    // 1 4
+    registerL = registerC;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x6A)) {
+
+    // LD L,D
+    // 1 4
+    registerL = registerD;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x6B)) {
+
+    // LD L,E
+    // 1 4
+    registerL = registerE;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x6C)) {
+
+    // LD L,H
+    // 1 4
+    registerL = registerH;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x6D)) {
+
+    // LD L,L
+    // 1 4
+    registerL = registerL;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x6E)) {
+
+    // LD L,(HL)
+    // 1 8
+    registerL = _eightBitLoadFromGBMemory(_concatenateBytes(registerH, registerL));
+    numberOfCycles = 8;
+  } else if(_isOpcode(opcode, 0x6F)) {
+
+    // LD L,A
+    // 1 4
+    registerL = registerA;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x70)) {
+
+    // LD (HL),B
+    // 1 8
+    _eightBitStoreIntoGBMemory(_concatenateBytes(registerH, registerL), registerB);
+    numberOfCycles = 8;
+  } else if(_isOpcode(opcode, 0x71)) {
+
+    // LD (HL),C
+    // 1 8
+    _eightBitStoreIntoGBMemory(_concatenateBytes(registerH, registerL), registerC);
+    numberOfCycles = 8;
+  } else if(_isOpcode(opcode, 0x72)) {
+
+    // LD (HL),D
+    // 1 8
+    _eightBitStoreIntoGBMemory(_concatenateBytes(registerH, registerL), registerD);
+    numberOfCycles = 8;
+  } else if(_isOpcode(opcode, 0x73)) {
+
+    // LD (HL),E
+    // 1 8
+    _eightBitStoreIntoGBMemory(_concatenateBytes(registerH, registerL), registerE);
+    numberOfCycles = 8;
+  } else if(_isOpcode(opcode, 0x74)) {
+
+    // LD (HL),H
+    // 1 8
+    _eightBitStoreIntoGBMemory(_concatenateBytes(registerH, registerL), registerH);
+    numberOfCycles = 8;
+  } else if(_isOpcode(opcode, 0x75)) {
+
+    // LD (HL),L
+    // 1 8
+    _eightBitStoreIntoGBMemory(_concatenateBytes(registerH, registerL), registerL);
+    numberOfCycles = 8;
+  } else if(_isOpcode(opcode, 0x76)) {
+
+    // HALT
+    // 1 4
+    // Enter CPU very low power mode?
+    // TODO
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x77)) {
+
+    // LD (HL),A
+    // 1 8
+    _eightBitStoreIntoGBMemory(_concatenateBytes(registerH, registerL), registerA);
+    numberOfCycles = 8;
+  } else if(_isOpcode(opcode, 0x78)) {
+
+    // LD A,B
+    // 1 4
+    registerA = registerB;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x79)) {
+
+    // LD A,C
+    // 1 4
+    registerA = registerC;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x7A)) {
+
+    // LD A,D
+    // 1 4
+    registerA = registerD;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x7B)) {
+
+    // LD A,E
+    // 1 4
+    registerA = registerE;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x7C)) {
+
+    // LD A,H
+    // 1 4
+    registerA = registerH;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x7D)) {
+
+    // LD A,L
+    // 1 4
+    registerA = registerL;
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x7E)) {
+
+    // LD A,(HL)
+    // 1 4
+    registerA = _eightBitLoadFromGBMemory(_concatenateBytes(registerH, registerL));
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x7F)) {
+
+    // LD A,A
+    // 1 4
+    // Do Nothing
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x80)) {
+    // ADD A,B
+    // 1 4
+    // Z 0 H C
+    _checkAndSetEightBitHalfCarryFlag(registerA, registerB);
+    _checkAndSetEightBitCarryFlag(registerA, registerB);
+    registerA += registerB;
+    if (registerA === 0) {
+      // User parseint and radix to get correct bits
+      _setZeroFlag(0);
+    }
+    _setSubtractFlag(0);
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x81)) {
+    // ADD A,C
+    // 1 4
+    // Z 0 H C
+    _checkAndSetEightBitHalfCarryFlag(registerA, registerC);
+    _checkAndSetEightBitCarryFlag(registerA, registerC);
+    registerA += registerC;
+    if (registerA === 0) {
+      // User parseint and radix to get correct bits
+      _setZeroFlag(0);
+    }
+    _setSubtractFlag(0);
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x82)) {
+    // ADD A,D
+    // 1 4
+    // Z 0 H C
+    _checkAndSetEightBitHalfCarryFlag(registerA, registerD);
+    _checkAndSetEightBitCarryFlag(registerA, registerD);
+    registerA += registerD;
+    if (registerA === 0) {
+      // User parseint and radix to get correct bits
+      _setZeroFlag(0);
+    }
+    _setSubtractFlag(0);
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x83)) {
+    // ADD A,E
+    // 1 4
+    // Z 0 H C
+    _checkAndSetEightBitHalfCarryFlag(registerA, registerE);
+    _checkAndSetEightBitCarryFlag(registerA, registerE);
+    registerA += registerE;
+    if (registerA === 0) {
+      // User parseint and radix to get correct bits
+      _setZeroFlag(0);
+    }
+    _setSubtractFlag(0);
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x84)) {
+    // ADD A,H
+    // 1 4
+    // Z 0 H C
+    _checkAndSetEightBitHalfCarryFlag(registerA, registerH);
+    _checkAndSetEightBitCarryFlag(registerA, registerH);
+    registerA += registerH;
+    if (registerA === 0) {
+      // User parseint and radix to get correct bits
+      _setZeroFlag(0);
+    }
+    _setSubtractFlag(0);
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x85)) {
+    // ADD A,L
+    // 1 4
+    // Z 0 H C
+    _checkAndSetEightBitHalfCarryFlag(registerA, registerL);
+    _checkAndSetEightBitCarryFlag(registerA, registerL);
+    registerA += registerL;
+    if (registerA === 0) {
+      // User parseint and radix to get correct bits
+      _setZeroFlag(0);
+    }
+    _setSubtractFlag(0);
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x86)) {
+    // ADD A,(HL)
+    // 1 8
+    // Z 0 H C
+    let valueAtHL: u8 = _eightBitLoadFromGBMemory(_concatenateBytes(registerH, registerL));
+    _checkAndSetEightBitHalfCarryFlag(registerA, <i16>valueAtHL);
+    _checkAndSetEightBitCarryFlag(registerA, <i16>valueAtHL);
+    registerA += <u8>valueAtHL;
+    if (registerA === 0) {
+      // User parseint and radix to get correct bits
+      _setZeroFlag(0);
+    }
+    _setSubtractFlag(0);
+    numberOfCycles = 8;
+  } else if(_isOpcode(opcode, 0x87)) {
+    // ADD A,A
+    // 1 4
+    // Z 0 H C
+    _checkAndSetEightBitHalfCarryFlag(registerA, registerA);
+    _checkAndSetEightBitCarryFlag(registerA, registerA);
+    registerA += registerA;
+    if (registerA === 0) {
+      // User parseint and radix to get correct bits
+      _setZeroFlag(0);
+    }
+    _setSubtractFlag(0);
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x88)) {
+    // ADC A,B
+    // 1 4
+    // Z 0 H C
+    let totalToAdd: u8 = _getCarryFlag() + registerB;
+    _checkAndSetEightBitHalfCarryFlag(registerA, <i16>totalToAdd);
+    _checkAndSetEightBitCarryFlag(registerA, <i16>totalToAdd);
+    registerA += <u8>totalToAdd;
+    if (registerA === 0) {
+      // User parseint and radix to get correct bits
+      _setZeroFlag(0);
+    }
+    _setSubtractFlag(0);
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x89)) {
+    // ADC A,C
+    // 1 4
+    // Z 0 H C
+    let totalToAdd: u8 = _getCarryFlag() + registerC;
+    _checkAndSetEightBitHalfCarryFlag(registerA, <i16>totalToAdd);
+    _checkAndSetEightBitCarryFlag(registerA, <i16>totalToAdd);
+    registerA += <u8>totalToAdd;
+    if (registerA === 0) {
+      // User parseint and radix to get correct bits
+      _setZeroFlag(0);
+    }
+    _setSubtractFlag(0);
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x8A)) {
+    // ADC A,D
+    // 1 4
+    // Z 0 H C
+    let totalToAdd: u8 = _getCarryFlag() + registerD;
+    _checkAndSetEightBitHalfCarryFlag(registerA, <i16>totalToAdd);
+    _checkAndSetEightBitCarryFlag(registerA, <i16>totalToAdd);
+    registerA += <u8>totalToAdd;
+    if (registerA === 0) {
+      // User parseint and radix to get correct bits
+      _setZeroFlag(0);
+    }
+    _setSubtractFlag(0);
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x8B)) {
+    // ADC A,E
+    // 1 4
+    // Z 0 H C
+    let totalToAdd: u8 = _getCarryFlag() + registerE;
+    _checkAndSetEightBitHalfCarryFlag(registerA, <i16>totalToAdd);
+    _checkAndSetEightBitCarryFlag(registerA, <i16>totalToAdd);
+    registerA += <u8>totalToAdd;
+    if (registerA === 0) {
+      // User parseint and radix to get correct bits
+      _setZeroFlag(0);
+    }
+    _setSubtractFlag(0);
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x8C)) {
+    // ADC A,H
+    // 1 4
+    // Z 0 H C
+    let totalToAdd: u8 = _getCarryFlag() + registerH;
+    _checkAndSetEightBitHalfCarryFlag(registerA, <i16>totalToAdd);
+    _checkAndSetEightBitCarryFlag(registerA, <i16>totalToAdd);
+    registerA += <u8>totalToAdd;
+    if (registerA === 0) {
+      // User parseint and radix to get correct bits
+      _setZeroFlag(0);
+    }
+    _setSubtractFlag(0);
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x8D)) {
+    // ADC A,L
+    // 1 4
+    // Z 0 H C
+    let totalToAdd: u8 = _getCarryFlag() + registerL;
+    _checkAndSetEightBitHalfCarryFlag(registerA, <i16>totalToAdd);
+    _checkAndSetEightBitCarryFlag(registerA, <i16>totalToAdd);
+    registerA += <u8>totalToAdd;
+    if (registerA === 0) {
+      // User parseint and radix to get correct bits
+      _setZeroFlag(0);
+    }
+    _setSubtractFlag(0);
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x8E)) {
+    // ADC A,(HL)
+    // 1 8
+    // Z 0 H C
+    let valueAtHL: u8 = _eightBitLoadFromGBMemory(_concatenateBytes(registerH, registerL));
+    let totalToAdd: u8 = _getCarryFlag() + <u8>valueAtHL;
+    _checkAndSetEightBitHalfCarryFlag(registerA, <i16>totalToAdd);
+    _checkAndSetEightBitCarryFlag(registerA, <i16>totalToAdd);
+    registerA += <u8>totalToAdd;
+    if (registerA === 0) {
+      // User parseint and radix to get correct bits
+      _setZeroFlag(0);
+    }
+    _setSubtractFlag(0);
+    numberOfCycles = 8;
+  } else if(_isOpcode(opcode, 0x8F)) {
+    // ADC A,A
+    // 1 4
+    // Z 0 H C
+    let totalToAdd: u8 = _getCarryFlag() + registerB;
+    _checkAndSetEightBitHalfCarryFlag(registerA, <i16>totalToAdd);
+    _checkAndSetEightBitCarryFlag(registerA, <i16>totalToAdd);
+    registerA += <u8>totalToAdd;
+    if (registerA === 0) {
+      // User parseint and radix to get correct bits
+      _setZeroFlag(0);
+    }
+    _setSubtractFlag(0);
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0x90)) {
+
+    // SUB B
+    // 1  4
+    // Z 1 H C
+    let negativeRegister: i16 = registerB * -1;
+    _checkAndSetEightBitHalfCarryFlag(registerA, <i16>negativeRegister);
+    _checkAndSetEightBitCarryFlag(registerA, <i16>negativeRegister);
+    registerC -= registerB;
+    if (registerC === 0) {
+      // User parseint and radix to get correct bits
+      _setZeroFlag(0);
+    }
+    _setSubtractFlag(1);
+    numberOfCycles = 4;
   }
+
 
   // Always implement the program counter by one
   // Any other value can just subtract or add however much offset before reaching this line
