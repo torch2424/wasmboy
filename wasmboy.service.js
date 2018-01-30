@@ -83,31 +83,32 @@ export class Wasmboy {
 
       // Get our wasm instance from our request
       this.wasmInstance = this.wasmModuleRequest.then((binary) => {
+        WebAssembly.instantiate(binary, {}).then((instantiatedWasm) => {
 
-        // Log we got the wasm module loaded
-        console.log('wasmboy wasm instantiated');
+          const instance = instantiatedWasm.instance;
+          const module = instantiatedWasm.module;
+          // Log we got the wasm module loaded
+          console.log('wasmboy wasm module instance instantiated', instance);
 
-        // Create the wasm module, and get it's instance
-        const module = new WebAssembly.Module(binary);
-        const instance = new WebAssembly.Instance(module, {});
+          // Get our memory from our wasm instance
+          const memory = instance.exports.memory;
 
-        // Get our memory from our wasm instance
-        const memory = instance.exports.memory;
+          // Grow our wasm memory to what we need if not already
+          console.log('Growing Memory if needed...');
+          console.log('Current memory size:', memory.buffer.byteLength);
+          // Gameboy has a memory size of 65536
+          if (memory.buffer.byteLength < 65536) {
+            console.log('Growing memory...');
+            memory.grow(1);
+            console.log('New memory size:', memory.buffer.byteLength);
+          } else {
+            console.log('Not growing memory...');
+          }
 
-        // Grow our wasm memory to what we need if not already
-        console.log('Growing Memory if needed...');
-        console.log('Current memory size:', memory.buffer.byteLength);
-        // Gameboy has a memory size of 65536
-        if (memory.buffer.byteLength < 65536) {
-          console.log('Growing memory...');
-          memory.grow(1);
-          console.log('New memory size:', memory.buffer.byteLength);
-        } else {
-          console.log('Not growing memory...');
-        }
+          this.wasmInstance = instance;
+          resolve(this.wasmInstance);
 
-        this.wasmInstance = instance;
-        resolve(this.wasmInstance);
+        });
       });
     });
   }
