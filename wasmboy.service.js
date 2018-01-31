@@ -50,12 +50,8 @@ export class Wasmboy {
         return;
       }
 
-      console.log(
-        'Decoding Opcode: ',
-        opcode.toString(16),
-        dataByteOne.toString(16),
-        dataByteTwo.toString(16)
-      );
+
+      console.log(`Decoding: Opcode 0x${opcode.toString(16)}, Possible Data Byte One 0x${dataByteOne.toString(16)}, Possible Data Byte Two 0x${dataByteTwo.toString(16)}`)
 
       // Returns the program counter position for next instruction to be fetched
       const numberOfCycles = this.wasmInstance.exports.handleOpcode(
@@ -125,6 +121,10 @@ export class Wasmboy {
           }
 
           this.wasmInstance = instance;
+
+          // TODO: remove debug logging memory
+          console.log(this.wasmInstance.exports.memory.buffer);
+
           resolve(this.wasmInstance);
 
         });
