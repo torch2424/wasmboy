@@ -5,6 +5,7 @@ import fetch from 'unfetch'
 import Promise from 'promise-polyfill';
 
 import { Wasmboy } from './wasmboy.service';
+import { CpuDebugComponent } from './cpudebug.component';
 
 export class WasmboyComponent extends Component {
 
@@ -30,7 +31,7 @@ export class WasmboyComponent extends Component {
 
     this.state.wasmBoy = new Wasmboy();
     this.state.wasmBoy
-    .loadGame('game.gb')
+    .loadGame('tetris.gb')
     .then(() => {
       this.state.wasmBoy.startGame();
     });
@@ -44,6 +45,7 @@ export class WasmboyComponent extends Component {
           width="640"
           height="480">
         </canvas>
+        <CpuDebugComponent></CpuDebugComponent>
       </div>
 		);
 	}

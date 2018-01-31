@@ -11,6 +11,8 @@ export class Wasmboy {
     .then(response => response.arrayBuffer());
     this.wasmInstance = undefined;
     this.gameBytes = undefined;
+    this.debugSpeed = 1000;
+    this.decodeTimeout = undefined;
   }
 
   // Finish request for wasm module, and fetch game
@@ -32,7 +34,7 @@ export class Wasmboy {
   // Function to start the game
   startGame() {
     // https://gist.github.com/scottferg/3886608
-    // Every gameboy cartridge has an offset of 0x134
+    // Every gameboy cartridge has an offset of 0x100
 
     const decodeLoop = () => {
       // Get our opcode
@@ -43,7 +45,7 @@ export class Wasmboy {
       const dataByteOne = this.gameBytes[this.wasmInstance.exports.getProgramCounter() + 1];
       const dataByteTwo = this.gameBytes[this.wasmInstance.exports.getProgramCounter() + 2];
 
-      if(!opcode) {
+      if(opcode === undefined) {
         console.log('No Opcode found at programCounter position');
         return;
       }
@@ -62,15 +64,30 @@ export class Wasmboy {
         dataByteTwo
       );
 
+      // TODO: Remove Debug
+      this._debug();
+
       // Function will return < 0 if the opcode was not recognized
       if (numberOfCycles < 0x0000) {
         console.log('Error! Opcode not recognized');
       } else {
-        console.log('Fetching next opcode at position: ', this.wasmInstance.exports.getProgramCounter());
-        requestAnimationFrame(decodeLoop);
+        console.log('Fetching next opcode at position, Decimal: ',
+          this.wasmInstance.exports.getProgramCounter(),
+          ` Hex: 0x${this.wasmInstance.exports.getProgramCounter().toString(16)}`);
+
+        // Run the next decode loop according to timing
+        // TODO
+        if(this.decodeTimeout) {
+          clearTimeout(this.decodeTimeout);
+        }
+        this.decodeTimeout = setTimeout(() => {
+            decodeLoop();
+        }, this.debugSpeed);
       }
     }
-    requestAnimationFrame(decodeLoop);
+    this.decodeTimeout = setTimeout(() => {
+        decodeLoop();
+    }, this.debugSpeed);
   }
 
   // Private funciton to returna promise to our wasmModule
@@ -127,5 +144,48 @@ export class Wasmboy {
         resolve(this.gameBytes);
       });
     });
+  }
+
+  // Private funciton to debug wasm
+  _debug() {
+    // Print out all of our info
+    const cpuDebugDiv = document.getElementById('cpu-debug-info');
+    if(cpuDebugDiv) {
+      const createSectionWithText = (text, value) => {
+        const sectionDiv = document.createElement("div");
+        const sectionContent = document.createTextNode(`${text}: ${value.toString(2)} | 0x${value.toString(16)} | ${value}`);
+        sectionDiv.appendChild(sectionContent);
+        return sectionDiv;
+      }
+
+      // Clear the cpu Debug Div
+      // https://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript
+      while (cpuDebugDiv.firstChild) {
+          cpuDebugDiv.removeChild(cpuDebugDiv.firstChild);
+      }
+
+      // Try to get our decode speed
+      const cpuSpeedSlider = document.getElementById('cpu-debug-speed');
+      if(cpuSpeedSlider) {
+        this.debugSpeed = cpuSpeedSlider.value;
+      }
+
+      const sections = [];
+      sections.push(createSectionWithText('Decode Speed:', this.debugSpeed));
+      sections.push(createSectionWithText('Register A', this.wasmInstance.exports._debugGetRegisterA()));
+      sections.push(createSectionWithText('Register B', this.wasmInstance.exports._debugGetRegisterB()));
+      sections.push(createSectionWithText('Register C', this.wasmInstance.exports._debugGetRegisterC()));
+      sections.push(createSectionWithText('Register D', this.wasmInstance.exports._debugGetRegisterD()));
+      sections.push(createSectionWithText('Register E', this.wasmInstance.exports._debugGetRegisterE()));
+      sections.push(createSectionWithText('Register H', this.wasmInstance.exports._debugGetRegisterH()));
+      sections.push(createSectionWithText('Register L', this.wasmInstance.exports._debugGetRegisterL()));
+      sections.push(createSectionWithText('Register F', this.wasmInstance.exports._debugGetRegisterF()));
+      sections.push(createSectionWithText('Program Counter', this.wasmInstance.exports.getProgramCounter()));
+      sections.push(createSectionWithText('Stack pointer', this.wasmInstance.exports._debugGetStackPointer()));
+
+      sections.forEach((section) => {
+        cpuDebugDiv.appendChild(section);
+      });
+    }
   }
 }

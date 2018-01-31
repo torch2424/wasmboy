@@ -5,7 +5,6 @@ using [awesome gbdev](https://github.com/avivace/awesome-gbdev) for reference ma
 
 shout out: https://github.com/djhworld/gomeboycolor/blob/master/src/cpu/cpu.go
 
-
 https://github.com/nakardo/node-gameboy/blob/master/lib/cpu/opcodes.js
 
 http://pastraiser.com/cpu/gameboy/gameboy_opcodes.html
@@ -15,6 +14,12 @@ https://rednex.github.io/rgbds/gbz80.7.html
 **Notes:**
 
 Assembly script does not support Imports or exports outside of function exports
+
+### Things I've Learned:
+
+* It's better to code an emulator by abstracting assembly commands into functions, rather than by Opcode operation
+
+* Gameboy Opcodes are difficult till about 0x40
 
 ### CLI Commands
 

@@ -162,7 +162,8 @@ function _checkAndSetEightBitCarryFlag(value: u8, amountToAdd: i16): void {
 
 // 16-bit registers
 let stackPointer: u16 = 0;
-let programCounter: u16 = 0;
+// Boot rom from 0x00 to 0x99, all games start at 0x100
+let programCounter: u16 = 0x100;
 
 // Function to get the program counter externally, to get the next set of opcode/bytes
 export function getProgramCounter(): u16 {
@@ -211,6 +212,44 @@ function _checkAndSetSixteenBitFlagsAddOverflow(valueOne: u16, valueTwo: u16): v
     _setHalfCarryFlag(0);
   }
 }
+
+// Temporary Registers
+let interruptsEnabled: boolean = false;
+
+function _setInterrupts(value: boolean): void {
+  interruptsEnabled = value;
+}
+
+// CPU Debugging
+export function _debugGetRegisterA(): u8 {
+  return registerA;
+}
+export function _debugGetRegisterB(): u8 {
+  return registerB;
+}
+export function _debugGetRegisterC(): u8 {
+  return registerC;
+}
+export function _debugGetRegisterD(): u8 {
+  return registerD;
+}
+export function _debugGetRegisterE(): u8 {
+  return registerE;
+}
+export function _debugGetRegisterH(): u8 {
+  return registerH;
+}
+export function _debugGetRegisterL(): u8 {
+  return registerL;
+}
+export function _debugGetRegisterF(): u8 {
+  return registerL;
+}
+export function _debugGetStackPointer(): u16 {
+  return stackPointer;
+}
+
+
 
 /***********************
     Memory
@@ -2438,7 +2477,365 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     } else {
       numberOfCycles = 8;
     }
+  } else if(_isOpcode(opcode, 0xD1)) {
+
+    // POP DE
+    // 1  12
+    let registerDE = _concatenateBytes(registerD, registerE);
+    registerDE = _sixteenBitLoadFromGBMemory(stackPointer);
+    stackPointer += 2;
+    _splitBytes(registerDE, registerD, registerE);
+    numberOfCycles = 12;
+  } else if(_isOpcode(opcode, 0xD2)) {
+
+    // JP NC,a16
+    // 3  16/12
+    if (_getCarryFlag() === 0) {
+      programCounter = _concatenateBytes(dataByteOne, dataByteTwo);
+      numberOfCycles = 16;
+    } else {
+      numberOfCycles = 12;
+    }
+    programCounter += 2;
+  } /* No Opcode for: 0xD3 */ else if(_isOpcode(opcode, 0xD4)) {
+
+    // CALL NC,a16
+    // 3  24/12
+    if (_getCarryFlag() === 0) {
+      stackPointer -= 2;
+      _sixteenBitStoreIntoGBMemory(stackPointer, programCounter + 3);
+      programCounter = _sixteenBitLoadFromGBMemory(programCounter + 1);
+      numberOfCycles = 24;
+    } else {
+      numberOfCycles = 12;
+    }
+    programCounter += 2;
+  } else if(_isOpcode(opcode, 0xD5)) {
+
+    // PUSH DE
+    // 1 16
+    let registerDE = _concatenateBytes(registerD, registerE);
+    stackPointer -= 2;
+    _sixteenBitStoreIntoGBMemory(stackPointer, registerDE);
+    numberOfCycles = 16;
+  } else if(_isOpcode(opcode, 0xD6)) {
+
+    // SUB d8
+    // 2  8
+    // Z 1 H C
+    let negativeDataByte: i16 = dataByteOne * -1;
+    _checkAndSetEightBitHalfCarryFlag(registerA, <i16>negativeDataByte);
+    _checkAndSetEightBitCarryFlag(registerA, <i16>negativeDataByte);
+    registerA -= dataByteOne;
+    if (registerA === 0) {
+
+      _setZeroFlag(0);
+    }
+    _setSubtractFlag(1);
+    programCounter += 1;
+    numberOfCycles = 8;
+  } else if(_isOpcode(opcode, 0xD7)) {
+
+    // RST 10H
+    // 1 16
+    stackPointer -= 2;
+    _sixteenBitStoreIntoGBMemory(stackPointer, programCounter + 1);
+    programCounter = 0x10;
+    numberOfCycles = 16;
+  } else if(_isOpcode(opcode, 0xD8)) {
+
+    // RET C
+    // 1  20/8
+    if (_getCarryFlag() === 1) {
+      programCounter = _sixteenBitLoadFromGBMemory(stackPointer);
+      stackPointer += 2;
+      numberOfCycles = 20;
+    } else {
+      numberOfCycles = 8;
+    }
+  } else if(_isOpcode(opcode, 0xD9)) {
+
+    // RETI
+    // 1  16
+    programCounter = _sixteenBitLoadFromGBMemory(stackPointer);
+    // Enable interrupts
+    _setInterrupts(true);
+    stackPointer += 2;
+    numberOfCycles = 16;
+  } else if(_isOpcode(opcode, 0xDA)) {
+
+    // JP C,a16
+    // 3 16/12
+    if (_getCarryFlag() === 1) {
+      programCounter = _concatenateBytes(dataByteOne, dataByteTwo);
+      numberOfCycles = 16;
+    } else {
+      numberOfCycles = 12;
+    }
+    programCounter += 2;
+  } /* No Opcode for: 0xDB */else if(_isOpcode(opcode, 0xDC)) {
+
+    // CALL C,a16
+    // 3  24/12
+    if (_getCarryFlag() === 1) {
+      stackPointer -= 2;
+      _sixteenBitStoreIntoGBMemory(stackPointer, programCounter + 3);
+      programCounter = _sixteenBitLoadFromGBMemory(programCounter + 1);
+      numberOfCycles = 24;
+    } else {
+      numberOfCycles = 12;
+    }
+    programCounter += 2;
+  } /* No Opcode for: 0xDD */else if(_isOpcode(opcode, 0xDE)) {
+
+    // SBC A,d8
+    // 2 8
+    // Z 1 H C
+    let totalValue = dataByteOne + _getCarryFlag();
+    let negativeTotalValue: i16 = <i16>totalValue * -1;
+    _checkAndSetEightBitHalfCarryFlag(registerA, <i16>totalValue);
+    _checkAndSetEightBitCarryFlag(registerA, <i16>totalValue);
+    registerA -= <u8>totalValue;
+    if (registerA === 0) {
+
+      _setZeroFlag(0);
+    }
+    _setSubtractFlag(1);
+    programCounter += 1;
+    numberOfCycles = 8;
+  } else if(_isOpcode(opcode, 0xDF)) {
+    // RST 18H
+    // 1 16
+    stackPointer -= 2;
+    _sixteenBitStoreIntoGBMemory(stackPointer, programCounter + 1);
+    programCounter = 0x18;
+    numberOfCycles = 16;
+  } else if(_isOpcode(opcode, 0xE0)) {
+
+    // LDH (a8),A
+    // 2  12
+
+    // Store value in high RAM ($FF00 + a8)
+    _eightBitStoreIntoGBMemory(0xFF00 + dataByteOne, registerA);
+    programCounter += 1;
+    numberOfCycles = 12;
+  } else if(_isOpcode(opcode, 0xE1)) {
+
+    // POP HL
+    // 1  12
+    let registerHL = _concatenateBytes(registerH, registerL);
+    registerHL = _sixteenBitLoadFromGBMemory(stackPointer);
+    stackPointer += 2;
+    _splitBytes(registerHL, registerH, registerL);
+    numberOfCycles = 12;
+  } else if(_isOpcode(opcode, 0xE2)) {
+
+    // LD (C),A
+    // 2  8
+
+    // Store value in high RAM ($FF00 + register c)
+    _eightBitStoreIntoGBMemory(0xFF00 + registerC, registerA);
+    programCounter += 2;
+    numberOfCycles = 8;
+  } /* No Opcode for: 0xE3, 0xE4 */ else if(_isOpcode(opcode, 0xE5)) {
+
+    // PUSH HL
+    // 1 16
+    let registerHL = _concatenateBytes(registerH, registerL);
+    stackPointer -= 2;
+    _sixteenBitStoreIntoGBMemory(stackPointer, registerHL);
+    numberOfCycles = 16;
+  } else if(_isOpcode(opcode, 0xE6)) {
+
+    // AND d8
+    // 2  8
+    // Z 0 1 0
+    registerA = (registerA & dataByteOne);
+    if (registerA === 0) {
+
+      _setZeroFlag(0);
+    }
+    _setSubtractFlag(0);
+    _setHalfCarryFlag(1);
+    _setCarryFlag(0);
+    programCounter += 1;
+    numberOfCycles = 8;
+  } else if(_isOpcode(opcode, 0xE7)) {
+
+    // RST 20H
+    // 1 16
+    stackPointer -= 2;
+    _sixteenBitStoreIntoGBMemory(stackPointer, programCounter + 1);
+    programCounter = 0x20;
+    numberOfCycles = 16;
+  } else if(_isOpcode(opcode, 0xE8)) {
+
+    // ADD SP, r8
+    // 2 16
+    // 0 0 H C
+    _checkAndSetSixteenBitFlagsAddOverflow(stackPointer, <u16>dataByteOne);
+    stackPointer += dataByteOne;
+    _setZeroFlag(0);
+    _setSubtractFlag(0);
+    programCounter += 1;
+    numberOfCycles = 16;
+  } else if(_isOpcode(opcode, 0xE9)) {
+
+    // JP (HL)
+    // 1 4
+    programCounter = _concatenateBytes(registerH, registerL);
+    numberOfCycles = 4;
+  } else if(_isOpcode(opcode, 0xEA)) {
+
+    // LD (a16),A
+    // 3 16
+    _eightBitStoreIntoGBMemory(_concatenateBytes(dataByteOne, dataByteTwo), registerA);
+    programCounter += 2;
+    numberOfCycles = 16;
+  } /* No Opcode for: 0xEB, 0xEC, 0xED */ else if(_isOpcode(opcode, 0xEE)) {
+
+    // XOR d8
+    // 2 8
+    // Z 0 0 0
+    registerA = registerA ^ dataByteOne;
+    if(registerA === 0) {
+      _setZeroFlag(1);
+    } else {
+      _setZeroFlag(0);
+    }
+    _setSubtractFlag(0);
+    _setHalfCarryFlag(0);
+    _setCarryFlag(0);
+  } else if(_isOpcode(opcode, 0xEF)) {
+
+    // RST 28H
+    // 1 16
+    stackPointer -= 2;
+    _sixteenBitStoreIntoGBMemory(stackPointer, programCounter + 1);
+    programCounter = 0x28;
+    numberOfCycles = 16;
+  } else if(_isOpcode(opcode, 0xF0)) {
+
+    // LDH A,(a8)
+    // 2 12
+    registerA = _eightBitLoadFromGBMemory(0xFF00 + dataByteOne);
+    programCounter += 1;
+    numberOfCycles = 12;
+  } else if(_isOpcode(opcode, 0xF1)) {
+
+    // POP AF
+    // 1 12
+    // Z N H C (But No work require, flags are already set)
+    let registerAF = _concatenateBytes(registerA, registerF);
+    registerAF = _sixteenBitLoadFromGBMemory(stackPointer);
+    stackPointer += 2;
+    _splitBytes(registerAF, registerA, registerF);
+    numberOfCycles = 12;
+  } else if(_isOpcode(opcode, 0xF2)) {
+
+    // LD A,(C)
+    // 2 8
+    registerA = _eightBitLoadFromGBMemory(0xFF00 + registerC);
+    programCounter += 1;
+    numberOfCycles = 8;
+  } else if(_isOpcode(opcode, 0xF3)) {
+
+    // DI
+    // 1 4
+    _setInterrupts(false);
+    numberOfCycles = 4;
+  } /* No Opcode for: 0xF4 */ else if(_isOpcode(opcode, 0xF5)) {
+
+    // PUSH AF
+    // 1 16
+    let registerAF = _concatenateBytes(registerA, registerF);
+    stackPointer -= 2;
+    _sixteenBitStoreIntoGBMemory(stackPointer, registerAF);
+    numberOfCycles = 16;
+  } else if(_isOpcode(opcode, 0xF6)) {
+
+    // OR d8
+    // 2 8
+    // Z 0 0 0
+    registerA = (registerA | dataByteOne);
+    if (registerA === 0) {
+
+      _setZeroFlag(0);
+    }
+    _setSubtractFlag(0);
+    _setHalfCarryFlag(0);
+    _setCarryFlag(0);
+    programCounter += 1;
+    numberOfCycles = 8;
+  } else if(_isOpcode(opcode, 0xF7)) {
+
+    // RST 30H
+    // 1 16
+    stackPointer -= 2;
+    _sixteenBitStoreIntoGBMemory(stackPointer, programCounter + 1);
+    programCounter = 0x30;
+    numberOfCycles = 16;
+  } else if(_isOpcode(opcode, 0xF8)) {
+
+    // LD HL,SP+r8
+    // 2 12
+    // 0 0 H C
+
+    // First, let's handle flags
+    _setZeroFlag(0);
+    _setSubtractFlag(0);
+    _checkAndSetSixteenBitFlagsAddOverflow(stackPointer, dataByteOne);
+    let registerHL = stackPointer + dataByteOne;
+    _splitBytes(registerHL, registerH, registerL);
+    programCounter += 1;
+    numberOfCycles = 12;
+  } else if(_isOpcode(opcode, 0xF9)) {
+
+    // LD SP,HL
+    // 1 8
+    stackPointer = _concatenateBytes(registerH, registerL);
+    numberOfCycles = 8;
+  } else if(_isOpcode(opcode, 0xFA)) {
+
+    // LD A,(a16)
+    // 3 16
+    registerA = _eightBitLoadFromGBMemory(_concatenateBytes(dataByteOne, dataByteTwo));
+    programCounter += 2;
+    numberOfCycles = 16;
+  } else if(_isOpcode(opcode, 0xFB)) {
+
+    // EI
+    // 1 4
+    _setInterrupts(true);
+    numberOfCycles = 4;
+  } /* No Opcode for: 0xFC, 0xFD */ else if(_isOpcode(opcode, 0xFE)) {
+
+    // CP d8
+    // 2 8
+    // Z 1 H C
+    let negativeDataByte: i16 = dataByteOne * -1;
+    _checkAndSetEightBitHalfCarryFlag(registerA, <i16>negativeDataByte);
+    _checkAndSetEightBitCarryFlag(registerA, <i16>negativeDataByte);
+    let tempResult: i16 = <i16>registerA + <i16>negativeDataByte;
+    if (registerA === 0) {
+
+      _setZeroFlag(0);
+    }
+    _setSubtractFlag(1);
+    programCounter += 1;
+    numberOfCycles = 8;
+  } else if(_isOpcode(opcode, 0xFF)) {
+
+    // RST 38H
+    // 1 16
+    stackPointer -= 2;
+    _sixteenBitStoreIntoGBMemory(stackPointer, programCounter + 1);
+    programCounter = 0x38;
+    numberOfCycles = 16;
   }
+
+
+  /* No Opcode for:  */
 
 
   // Always implement the program counter by one
