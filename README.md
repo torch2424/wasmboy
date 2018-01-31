@@ -15,6 +15,8 @@ https://rednex.github.io/rgbds/gbz80.7.html
 
 Assembly script does not support Imports or exports outside of function exports
 
+This all hugely depends on: https://github.com/AssemblyScript/assemblyscript/wiki/Status-and-Roadmap
+
 ### Things I've Learned:
 
 * It's better to code an emulator by abstracting assembly commands into functions, rather than by Opcode operation

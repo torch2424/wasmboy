@@ -85,8 +85,15 @@ export class Wasmboy {
         }, this.debugSpeed);
       }
     }
+
+    // Run the decodeLoop
     this.decodeTimeout = setTimeout(() => {
-        decodeLoop();
+        this.wasmInstance.exports._debugSetRegisterA(0xF0);
+        this._debug();
+        setTimeout(() => {
+          this.wasmInstance.exports._debuggingPassBy();
+          this._debug();
+        }, this.debugSpeed);
     }, this.debugSpeed);
   }
 
