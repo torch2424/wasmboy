@@ -2855,10 +2855,6 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
 // Logic Instructions
 // NOTE: Only CB table uses these for now, was mostly me realizing that I messed up, trying to be all cute and verbose :p
 // NOTE: TODO: Refactor honestly shouldn't take that long, and may happen once assembly script is improved
-export function _debuggingPassBy(): void {
-    registerA = _rotateRegisterLeft(registerA);
-}
-
 function _rotateRegisterLeft(register: u8): u8 {
 
   // RLC register 8-bit

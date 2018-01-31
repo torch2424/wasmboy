@@ -11,6 +11,8 @@ http://pastraiser.com/cpu/gameboy/gameboy_opcodes.html
 
 https://rednex.github.io/rgbds/gbz80.7.html
 
+list of games that cn show if they rom bank or not (CTRL+F for tetris): https://ladecadence.net/trastero/listado%20juegos%20gameboy.html
+
 **Notes:**
 
 Assembly script does not support Imports or exports outside of function exports
