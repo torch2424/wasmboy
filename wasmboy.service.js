@@ -174,16 +174,16 @@ export class Wasmboy {
 
       const sections = [];
       sections.push(createSectionWithText('Decode Speed:', this.debugSpeed));
-      sections.push(createSectionWithText('Register A', this.wasmInstance.exports._debugGetRegisterA()));
-      sections.push(createSectionWithText('Register B', this.wasmInstance.exports._debugGetRegisterB()));
-      sections.push(createSectionWithText('Register C', this.wasmInstance.exports._debugGetRegisterC()));
-      sections.push(createSectionWithText('Register D', this.wasmInstance.exports._debugGetRegisterD()));
-      sections.push(createSectionWithText('Register E', this.wasmInstance.exports._debugGetRegisterE()));
-      sections.push(createSectionWithText('Register H', this.wasmInstance.exports._debugGetRegisterH()));
-      sections.push(createSectionWithText('Register L', this.wasmInstance.exports._debugGetRegisterL()));
-      sections.push(createSectionWithText('Register F', this.wasmInstance.exports._debugGetRegisterF()));
+      sections.push(createSectionWithText('Register A', this.wasmInstance.exports.getRegisterA()));
+      sections.push(createSectionWithText('Register B', this.wasmInstance.exports.getRegisterB()));
+      sections.push(createSectionWithText('Register C', this.wasmInstance.exports.getRegisterC()));
+      sections.push(createSectionWithText('Register D', this.wasmInstance.exports.getRegisterD()));
+      sections.push(createSectionWithText('Register E', this.wasmInstance.exports.getRegisterE()));
+      sections.push(createSectionWithText('Register H', this.wasmInstance.exports.getRegisterH()));
+      sections.push(createSectionWithText('Register L', this.wasmInstance.exports.getRegisterL()));
+      sections.push(createSectionWithText('Register F', this.wasmInstance.exports.getRegisterF()));
       sections.push(createSectionWithText('Program Counter', this.wasmInstance.exports.getProgramCounter()));
-      sections.push(createSectionWithText('Stack pointer', this.wasmInstance.exports._debugGetStackPointer()));
+      sections.push(createSectionWithText('Stack pointer', this.wasmInstance.exports.getStackPointer()));
 
       sections.forEach((section) => {
         cpuDebugDiv.appendChild(section);

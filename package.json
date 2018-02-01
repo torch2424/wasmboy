@@ -9,7 +9,8 @@
     "dev": "preact watch",
     "lint": "eslint src",
     "wasm:watch": "npx watch \"npm run wasm:build\" wasm",
-    "wasm:build": "mkdir -p dist/wasm && asc wasm/index.ts -b dist/wasm/index.untouched.wasm -t dist/wasm/index.untouched.wast --validate"
+    "wasm:build": "mkdir -p dist/wasm && asc wasm/index.ts -b dist/wasm/index.untouched.wasm -t dist/wasm/index.untouched.wast --validate",
+    "wasm:testexports": "mkdir -p dist/wasm && asc wasm/cpu/index.ts -b dist/wasm/index.untouched.wasm -t dist/wasm/index.untouched.wast --validate"
   },
   "eslintConfig": {
     "extends": "eslint-config-synacor"
