@@ -35,8 +35,10 @@ export class Cpu {
 
   // Current number of cycles, shouldn't execeed max number of cycles
   static currentCycles: i32 = 0;
-  // TODO: Export this Constant
+  // TODO: Export these Constants
+  static CLOCK_SPEED: i32 = 4194304;
   static MAX_CYCLES_PER_FRAME : i32 = 69905;
+
 
   static interruptsEnabled: boolean = false;
 }

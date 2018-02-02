@@ -1,6 +1,6 @@
 // Imports
 import { Cpu, relativeJump, setInterrupts } from './index';
-import { handleCbOpcode } from './cbOpcodes'
+import { handleCbOpcode } from './cbOpcodes';
 import {
   setZeroFlag,
   getZeroFlag,
@@ -28,6 +28,9 @@ import {
   eightBitLoadFromGBMemory,
   sixteenBitLoadFromGBMemory
 } from '../memory/index';
+import {
+  updateTimers
+} from '../timers/index';
 
 // Private funciton to check if an opcode is a value
 // this is to get out of switch statements, and not have the dangling break; per javascript syntax
@@ -44,6 +47,7 @@ function isOpcode(opcode: u8, value: u8): boolean {
 export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
   let numberOfCycles: i8 = executeOpcode(opcode, dataByteOne, dataByteTwo);
   Cpu.currentCycles += numberOfCycles;
+  updateTimers(numberOfCycles);
   if(Cpu.currentCycles > Cpu.MAX_CYCLES_PER_FRAME) {
     Cpu.currentCycles = 0;
   }
