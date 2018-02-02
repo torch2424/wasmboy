@@ -17,7 +17,7 @@ import {
   rotateByteLeft,
   rotateByteRight,
   concatenateBytes
-} from './helpers';
+} from '../helpers/index';
 import {
   eightBitStoreIntoGBMemory,
   sixteenBitStoreIntoGBMemory,

@@ -1,5 +1,6 @@
 import { Cpu } from '../cpu/index';
 import { eightBitLoadFromGBMemory, eightBitStoreIntoGBMemory } from '../memory/index';
+import { requestTimerInterrupt } from '../interrupts/index';
 
 class Timers {
   static memoryLocationTIMA: u16 = 0xFF05; // Timer Modulator
@@ -35,6 +36,7 @@ export function updateTimers(numberOfCycles: u8): void {
         // Store Timer Modulator inside of TIMA
         eightBitStoreIntoGBMemory(Timers.memoryLocationTIMA, eightBitLoadFromGBMemory(Timers.memoryLocationTMA));
         // Fire off timer interrupt
+        requestTimerInterrupt();
       } else {
         eightBitStoreIntoGBMemory(Timers.memoryLocationTIMA, tima + 1);
       }

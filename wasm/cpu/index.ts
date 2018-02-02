@@ -38,9 +38,6 @@ export class Cpu {
   // TODO: Export these Constants
   static CLOCK_SPEED: i32 = 4194304;
   static MAX_CYCLES_PER_FRAME : i32 = 69905;
-
-
-  static interruptsEnabled: boolean = false;
 }
 
 export function initialize(includeBootRom: boolean): void {
@@ -88,8 +85,4 @@ export function relativeJump(value: u8): void {
   // Undo programCounter offset at end
   Cpu.programCounter -= 1;
   // programCounter += 1; ?
-}
-
-export function setInterrupts(value: boolean): void {
-  Cpu.interruptsEnabled = value;
 }
