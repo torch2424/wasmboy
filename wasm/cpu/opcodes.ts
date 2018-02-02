@@ -79,7 +79,8 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // 1  8
     let BC: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC);
     BC++;
-    splitBytes((<u16>BC), Cpu.registerB, Cpu.registerC);
+    Cpu.registerB = splitHighByte((<u16>BC));
+    Cpu.registerC = splitLowByte((<u16>BC));
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0x04)) {
 
@@ -148,7 +149,8 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     let registerBC: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC);
     checkAndSetSixteenBitFlagsAddOverflow(<u16>registerHL, <u16>registerBC);
     let result: u16 = <u16>(registerHL + registerBC);
-    splitBytes(<u16>result, Cpu.registerH, Cpu.registerL);
+    Cpu.registerH = splitHighByte(<u16>result);
+    Cpu.registerL = splitLowByte(<u16>result);
     setSubtractFlag(0);
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0x0A)) {
@@ -164,7 +166,8 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // 1  8
     let registerBC = concatenateBytes(Cpu.registerB, Cpu.registerC);
     registerBC -= 1;
-    splitBytes(registerBC, Cpu.registerB, Cpu.registerC);
+    Cpu.registerB = splitHighByte(registerBC);
+    Cpu.registerC = splitLowByte(registerBC);
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0x0C)) {
 
@@ -244,7 +247,8 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // 1 8
     let registerDE = concatenateBytes(Cpu.registerD, Cpu.registerE);
     registerDE += 1;
-    splitBytes(registerDE, Cpu.registerD, Cpu.registerE);
+    Cpu.registerD = splitHighByte(registerDE);
+    Cpu.registerE = splitLowByte(registerDE);
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0x14)) {
 
@@ -317,7 +321,8 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     let registerDE: u16 = concatenateBytes(Cpu.registerD, Cpu.registerE);
     checkAndSetSixteenBitFlagsAddOverflow(<u16>registerHL, <u16>registerDE);
     let result: u16 = <u16>(registerHL + registerDE);
-    splitBytes(<u16>result, Cpu.registerH, Cpu.registerL);
+    Cpu.registerH = splitHighByte(<u16>result);
+    Cpu.registerL = splitLowByte(<u16>result);
     setSubtractFlag(0);
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0x1A)) {
@@ -332,7 +337,8 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // 1 8
     let registerDE = concatenateBytes(Cpu.registerD, Cpu.registerE);
     registerDE -= 1;
-    splitBytes(registerDE, Cpu.registerD, Cpu.registerE);
+    Cpu.registerD = splitHighByte(registerDE);
+    Cpu.registerE = splitLowByte(registerDE);
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0x1C)) {
 
@@ -408,7 +414,9 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
 
     // LD HL,d16
     // 3  12
-    splitBytes(concatenateBytes(dataByteOne, dataByteTwo), Cpu.registerH, Cpu.registerL);
+    let sixeteenBitDataByte = concatenateBytes(dataByteOne, dataByteTwo);
+    Cpu.registerH = splitHighByte(sixeteenBitDataByte);
+    Cpu.registerL = splitLowByte(sixeteenBitDataByte);
     numberOfCycles = 12;
     Cpu.programCounter += 1;
   } else if(isOpcode(opcode, 0x22)) {
@@ -418,7 +426,8 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     let registerHL = concatenateBytes(Cpu.registerH, Cpu.registerL);
     sixteenBitStoreIntoGBMemory(registerHL, Cpu.registerA);
     registerHL += 1;
-    splitBytes(registerHL, Cpu.registerH, Cpu.registerL);
+    Cpu.registerH = splitHighByte(registerHL);
+    Cpu.registerL = splitLowByte(registerHL);
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0x23)) {
 
@@ -426,7 +435,8 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // 1  8
     let registerHL = concatenateBytes(Cpu.registerH, Cpu.registerL);
     registerHL += 1;
-    splitBytes(registerHL, Cpu.registerH, Cpu.registerL);
+    Cpu.registerH = splitHighByte(registerHL);
+    Cpu.registerL = splitLowByte(registerHL);
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0x24)) {
 
@@ -521,7 +531,8 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     let registerHL = concatenateBytes(Cpu.registerH, Cpu.registerL);
     checkAndSetSixteenBitFlagsAddOverflow(registerHL, registerHL);
     registerHL = registerHL * 2;
-    splitBytes(registerHL, Cpu.registerH, Cpu.registerL);
+    Cpu.registerH = splitHighByte(registerHL);
+    Cpu.registerL = splitLowByte(registerHL);
     setSubtractFlag(0);
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0x2A)) {
@@ -538,7 +549,8 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // 1 8
     let registerHL = concatenateBytes(Cpu.registerH, Cpu.registerL);
     registerHL += -1;
-    splitBytes(registerHL, Cpu.registerH, Cpu.registerL);
+    Cpu.registerH = splitHighByte(registerHL);
+    Cpu.registerL = splitLowByte(registerHL);
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0x2C)) {
 
@@ -604,7 +616,8 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     let registerHL = concatenateBytes(Cpu.registerH, Cpu.registerL);
     eightBitStoreIntoGBMemory(registerHL, Cpu.registerA);
     registerHL -= 1;
-    splitBytes(registerHL, Cpu.registerH, Cpu.registerL);
+    Cpu.registerH = splitHighByte(registerHL);
+    Cpu.registerL = splitLowByte(registerHL);
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0x33)) {
     // INC SP
@@ -676,7 +689,8 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     let registerHL: u16 = concatenateBytes(Cpu.registerH, Cpu.registerL);
     checkAndSetSixteenBitFlagsAddOverflow(<u16>registerHL, Cpu.stackPointer);
     let result: u16 = <u16>(registerHL + Cpu.stackPointer);
-    splitBytes(<u16>result, Cpu.registerH, Cpu.registerL);
+    Cpu.registerH = splitHighByte(<u16>result);
+    Cpu.registerL = splitLowByte(<u16>result);
     setSubtractFlag(0);
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0x3A)) {
@@ -686,7 +700,8 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     let registerHL: u16 = concatenateBytes(Cpu.registerH, Cpu.registerL);
     Cpu.registerA = eightBitLoadFromGBMemory(registerHL);
     registerHL -= 1;
-    splitBytes(registerHL, Cpu.registerH, Cpu.registerL);
+    Cpu.registerH = splitHighByte(registerHL);
+    Cpu.registerL = splitLowByte(registerHL);
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0x3B)) {
     // DEC SP
@@ -2068,7 +2083,8 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     let registerBC = concatenateBytes(Cpu.registerB, Cpu.registerC);
     registerBC = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
     Cpu.stackPointer += 2;
-    splitBytes(registerBC, Cpu.registerB, Cpu.registerC);
+    Cpu.registerB = splitHighByte(registerBC);
+    Cpu.registerC = splitLowByte(registerBC);
     numberOfCycles = 12;
   } else if(isOpcode(opcode, 0xC2)) {
 
@@ -2231,7 +2247,8 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     let registerDE = concatenateBytes(Cpu.registerD, Cpu.registerE);
     registerDE = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
     Cpu.stackPointer += 2;
-    splitBytes(registerDE, Cpu.registerD, Cpu.registerE);
+    Cpu.registerD = splitHighByte(registerDE);
+    Cpu.registerE = splitLowByte(registerDE);
     numberOfCycles = 12;
   } else if(isOpcode(opcode, 0xD2)) {
 
@@ -2373,7 +2390,8 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     let registerHL = concatenateBytes(Cpu.registerH, Cpu.registerL);
     registerHL = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
     Cpu.stackPointer += 2;
-    splitBytes(registerHL, Cpu.registerH, Cpu.registerL);
+    Cpu.registerH = splitHighByte(registerHL);
+    Cpu.registerL = splitLowByte(registerHL);
     numberOfCycles = 12;
   } else if(isOpcode(opcode, 0xE2)) {
 
@@ -2476,7 +2494,8 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     let registerAF = concatenateBytes(Cpu.registerA, Cpu.registerF);
     registerAF = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
     Cpu.stackPointer += 2;
-    splitBytes(registerAF, Cpu.registerA, Cpu.registerF);
+    Cpu.registerA = splitHighByte(registerAF);
+    Cpu.registerF = splitLowByte(registerAF);
     numberOfCycles = 12;
   } else if(isOpcode(opcode, 0xF2)) {
 
@@ -2533,7 +2552,8 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     setSubtractFlag(0);
     checkAndSetSixteenBitFlagsAddOverflow(Cpu.stackPointer, dataByteOne);
     let registerHL = Cpu.stackPointer + dataByteOne;
-    splitBytes(registerHL, Cpu.registerH, Cpu.registerL);
+    Cpu.registerH = splitHighByte(registerHL);
+    Cpu.registerL = splitLowByte(registerHL);
     Cpu.programCounter += 1;
     numberOfCycles = 12;
   } else if(isOpcode(opcode, 0xF9)) {
