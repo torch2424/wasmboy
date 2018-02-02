@@ -100,8 +100,8 @@ function _getCurrentCycleCounterFrequency(): i16 {
   // If we notice the current max cycle count changes, reset the cyclecounter
   if(cycleCount != Timers.currentMaxCycleCount) {
     Timers.cycleCounter = 0;
-    Timers.currentMaxCycleCount = cycleCount;
+    Timers.currentMaxCycleCount = <i16>cycleCount;
   }
 
-  return cycleCount;
+  return <i16>cycleCount;
 }

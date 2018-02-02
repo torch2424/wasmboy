@@ -47,7 +47,7 @@ function isOpcode(opcode: u8, value: u8): boolean {
 export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
   let numberOfCycles: i8 = executeOpcode(opcode, dataByteOne, dataByteTwo);
   Cpu.currentCycles += numberOfCycles;
-  updateTimers(numberOfCycles);
+  updateTimers(<u8>numberOfCycles);
   if(Cpu.currentCycles > Cpu.MAX_CYCLES_PER_FRAME) {
     Cpu.currentCycles = 0;
   }
