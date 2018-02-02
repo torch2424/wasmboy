@@ -29,6 +29,14 @@ export class Wasmboy {
         this._fetchGameAsByteArray(pathToGame)
       ]).then((responses) => {
         // Responses already bound to this, simple resolve parent paromise
+
+        // Load the game data into actual memory
+        // for(let i = 0; i < 0x7FFF; i++) {
+        //   if(this.gameBytes[i]) {
+        //       //this.wasmByteMemory[i] = this.gameBytes[i];
+        //   }
+        // }
+
         resolve();
       })
     });
@@ -51,17 +59,42 @@ export class Wasmboy {
         const numberOfCycles = this._executeOpcode();
         if(numberOfCycles) {
           this._currentCycles += numberOfCycles;
-          // Timers (Handled by Wasm)
-          // graphics
-          // Do Intterupts
         } else {
           error = true;
         }
       }
 
-      console.log('TODO: RENDER CANVAS!');
-      this._debug();
-      //requestAnimationFrame(emulationLoop);
+      // Render
+      //console.log("Rendering!", this.wasmByteMemory);
+      let canvas = document.getElementById('canvas');
+      let ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#000000";
+      ctx.fillRect(0, 0, 200, 200);
+      // Draw the pixels
+      // 160x144
+      for(let y = 0; y < 166; y++) {
+        for (let x = 0; x < 144; x++) {
+
+          const color = this.wasmByteMemory[0x10000 + (x * (y + 1))]
+          if (color) {
+            let fillStyle = false;
+            if(color === 1) {
+              fillStyle = "#FFFFFF";
+            } else if (color === 2) {
+              fillStyle = "#D3D3D3";
+            } else if (color === 3) {
+              fillStyle = "#A9A9A9";
+            } else {
+              fillStyle = "#000000";
+            }
+            ctx.fillStyle = fillStyle;
+            ctx.fillRect(x,y,1,1);
+          }
+        }
+      }
+      //this._debug();
+      requestAnimationFrame(emulationLoop);
     }
     requestAnimationFrame(emulationLoop);
   }
@@ -136,7 +169,7 @@ export class Wasmboy {
     const dataByteTwo = this.gameBytes[this.wasmInstance.exports.getProgramCounter() + 2];
 
     if(opcode === undefined) {
-      console.log('ERROR! No Opcode found at programCounter position');
+      console.log('ERROR! No Opcode found at programCounter position: ', this.wasmInstance.exports.getProgramCounter().toString(16));
       return false;
     }
 

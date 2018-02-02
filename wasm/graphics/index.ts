@@ -203,7 +203,7 @@ function _getTileAddress(memoryLocation: u16, tileId: u8): u16 {
 }
 
 // TODO: Make not specifc to a single palette
-function _getColorFromPallete(memoryLocation: u16, colorId: u8): u8 {
+function _getColorFromPalette(memoryLocation: u16, colorId: u8): u8 {
   let paletteByte: u8 = eightBitLoadFromGBMemory(memoryLocation);
   let color: u8 = 0;
 
@@ -312,7 +312,7 @@ function _renderTiles(lcdControl: u8): void {
     }
 
     // Get our color from our palette
-    let pixelWithColor = _getColorFromPallete(Graphics.memoryLocationBackgroundPalette, paletteColorId);
+    let pixelWithColor = _getColorFromPalette(Graphics.memoryLocationBackgroundPalette, paletteColorId);
 
     // Finally save to memory
     setPixelOnFrame(pixelColumn, pixelRow, pixelWithColor + 1);

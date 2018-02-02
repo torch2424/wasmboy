@@ -31,7 +31,7 @@ export class WasmboyComponent extends Component {
 
     this.state.wasmBoy = new Wasmboy();
     this.state.wasmBoy
-    .loadGame('pokemonred.gb')
+    .loadGame('tetris.gb')
     .then(() => {
       this.state.wasmBoy.startGame();
     });
