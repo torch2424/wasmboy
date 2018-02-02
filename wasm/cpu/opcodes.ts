@@ -39,13 +39,23 @@ function isOpcode(opcode: u8, value: u8): boolean {
   return false;
 }
 
+// Public function to handle an opcode, wraps around execute opcode for timers and things
+// http://www.codeslinger.co.uk/pages/projects/gameboy/beginning.html
+export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
+  let numberOfCycles: i8 = executeOpcode(opcode, dataByteOne, dataByteTwo);
+  Cpu.currentCycles += numberOfCycles;
+  if(Cpu.currentCycles > Cpu.MAX_CYCLES_PER_FRAME) {
+    Cpu.currentCycles = 0;
+  }
+  return numberOfCycles;
+}
 
 // Take in any opcode, and decode it, and return the number of cycles
 // Program counter can be gotten from getProgramCounter();
 // Setting return value to i32 instead of u16, as we want to return a negative number on error
 // https://rednex.github.io/rgbds/gbz80.7.html
 // http://pastraiser.com/cpu/gameboy/gameboyopcodes.html
-export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
+function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
 
   // Initialize our number of cycles
   // Return -1 if no opcode was found, representing an error

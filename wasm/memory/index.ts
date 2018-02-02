@@ -23,14 +23,22 @@ const memorySpriteInformationTableEnd = 0xFE9F;
 // Zero Page, 0xFF80 -> 0xFFFE
 // Intterupt Enable Flag, 0xFFFF
 
+let howManyStores: i32 = 0;
+
+export function debugHowManyStoresCalled(): i32 {
+  return howManyStores;
+}
+
 // Wrapper funcstions around load/store for assemblyscript offset to gb mem offset
-// TODO: Ensure store is hitting right values: https://github.com/AssemblyScript/assemblyscript/wiki/Built-in-functions
+// NOTE: Confirmed that memory is working with both Eight and sixteenbit store :), tested in CPU initialize
 export function eightBitStoreIntoGBMemory(offset: u16, value: u8): void {
   store<u8>(offset, value);
+  howManyStores = <i32>offset;
 }
 
 export function sixteenBitStoreIntoGBMemory(offset: u16, value: u16): void {
   store<u16>(offset, value);
+  howManyStores += 1;
 }
 
 export function eightBitLoadFromGBMemory(offset: u16): u8 {
