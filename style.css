@@ -6,3 +6,9 @@ html, body {
 h1 {
 	text-align: center;
 }
+
+.canvas-container {
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+}

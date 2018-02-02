@@ -16,7 +16,7 @@ export class CpuDebugComponent extends Component {
 	render() {
 		return (
       <div>
-        <h1>CPU Debug:</h1>
+        <h2>CPU Debug:</h2>
 
         <h3>Decode Speed:</h3>
         <input type="range" min="0" max="1000" value="1000" class="slider" id="cpu-debug-speed" />

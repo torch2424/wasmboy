@@ -40,11 +40,13 @@ export class WasmboyComponent extends Component {
 	render() {
 		return (
       <div>
-  			<canvas id="canvas"
-          style="border: 1px solid black;"
-          width="640"
-          height="480">
-        </canvas>
+        <div class="canvas-container">
+    			<canvas id="canvas"
+            style="border: 1px solid black;"
+            width="640"
+            height="480">
+          </canvas>
+        </div>
         <CpuDebugComponent></CpuDebugComponent>
       </div>
 		);
