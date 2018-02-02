@@ -34,6 +34,9 @@ import {
   setInterrupts,
   checkInterrupts
 } from '../interrupts/index';
+import {
+  updateGraphics
+} from '../graphics/index'
 
 // Private funciton to check if an opcode is a value
 // this is to get out of switch statements, and not have the dangling break; per javascript syntax
@@ -53,7 +56,7 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
 
   // Check other Gameboy components
   updateTimers(<u8>numberOfCycles);
-  // Graphics
+  updateGraphics(<u8>numberOfCycles);
   checkInterrupts();
 
 

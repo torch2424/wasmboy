@@ -89,10 +89,11 @@ export class Wasmboy {
           // Grow our wasm memory to what we need if not already
           console.log('Growing Memory if needed...');
           console.log('Current memory size:', memory.buffer.byteLength);
-          // Gameboy has a memory size of 65536
-          if (memory.buffer.byteLength < 65536) {
+          // Gameboy has a memory size of 0xFFFF
+          // + (256 * 256) bits of data for graphics another 0xFFFF
+          if (memory.buffer.byteLength < 0xFFFF + 0xFFFF) {
             console.log('Growing memory...');
-            memory.grow(1);
+            memory.grow(2);
             console.log('New memory size:', memory.buffer.byteLength);
           } else {
             console.log('Not growing memory...');

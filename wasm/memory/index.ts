@@ -23,22 +23,26 @@ const memorySpriteInformationTableEnd = 0xFE9F;
 // Zero Page, 0xFF80 -> 0xFFFE
 // Intterupt Enable Flag, 0xFFFF
 
-let howManyStores: i32 = 0;
 
-export function debugHowManyStoresCalled(): i32 {
-  return howManyStores;
+// also need to store current frame in memory to be read by JS
+const memoryFrameDataStart = 0x10000;
+export function setPixelOnFrame(x: u8, y: u8, color: u8): void {
+  // Currently only supports 160x144
+  // Storing in X, then y
+  // So need an offset
+  let offset = memoryFrameDataStart + (x * (y + 1));
+  store<u8>(offset, color);
 }
+
 
 // Wrapper funcstions around load/store for assemblyscript offset to gb mem offset
 // NOTE: Confirmed that memory is working with both Eight and sixteenbit store :), tested in CPU initialize
 export function eightBitStoreIntoGBMemory(offset: u16, value: u8): void {
   store<u8>(offset, value);
-  howManyStores = <i32>offset;
 }
 
 export function sixteenBitStoreIntoGBMemory(offset: u16, value: u16): void {
   store<u16>(offset, value);
-  howManyStores += 1;
 }
 
 export function eightBitLoadFromGBMemory(offset: u16): u8 {
