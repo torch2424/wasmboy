@@ -31,11 +31,11 @@ export class Wasmboy {
         // Responses already bound to this, simple resolve parent paromise
 
         // Load the game data into actual memory
-        // for(let i = 0; i < 0x7FFF; i++) {
-        //   if(this.gameBytes[i]) {
-        //       //this.wasmByteMemory[i] = this.gameBytes[i];
-        //   }
-        // }
+        for(let i = 0; i < 0x7FFF; i++) {
+          if(this.gameBytes[i]) {
+              this.wasmByteMemory[i] = this.gameBytes[i];
+          }
+        }
 
         resolve();
       })
@@ -57,7 +57,7 @@ export class Wasmboy {
       let error = false;
       while(this._currentCycles < this._maxCycles && !error) {
         const numberOfCycles = this._executeOpcode();
-        if(numberOfCycles) {
+        if(numberOfCycles !== false && numberOfCycles > 0) {
           this._currentCycles += numberOfCycles;
         } else {
           error = true;
@@ -65,7 +65,7 @@ export class Wasmboy {
       }
 
       // Render
-      //console.log("Rendering!", this.wasmByteMemory);
+      console.log("Rendering!", this.wasmByteMemory);
       let canvas = document.getElementById('canvas');
       let ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -73,10 +73,11 @@ export class Wasmboy {
       ctx.fillRect(0, 0, 200, 200);
       // Draw the pixels
       // 160x144
-      for(let y = 0; y < 166; y++) {
+      for(let y = 0; y < 160; y++) {
         for (let x = 0; x < 144; x++) {
 
-          const color = this.wasmByteMemory[0x10000 + (x * (y + 1))]
+          const pixelIndex = 0x10000 + (x * (y + 1));
+          const color = this.wasmByteMemory[pixelIndex];
           if (color) {
             let fillStyle = false;
             if(color === 1) {
@@ -91,12 +92,23 @@ export class Wasmboy {
             ctx.fillStyle = fillStyle;
             ctx.fillRect(x,y,1,1);
           }
+
+          // Log the current pixel
+          //console.log(`Pixel: X:${x} Y:${y} Index:0x${pixelIndex.toString(16)} Color:${color}`);
         }
       }
-      //this._debug();
-      requestAnimationFrame(emulationLoop);
+      this._debug();
+      //requestAnimationFrame(emulationLoop);
     }
-    requestAnimationFrame(emulationLoop);
+    requestAnimationFrame(() => {
+        // Run about 60 frames
+        let  i;
+        for(i = 0; i < 20; i++) {
+          emulationLoop();
+        }
+
+        console.log(`Debug: DONE! Rendered ${i} frames`);
+    });
   }
 
   // Private funciton to returna promise to our wasmModule
@@ -152,7 +164,6 @@ export class Wasmboy {
         return blob.arrayBuffer();
       }).then(bytes => {
         const byteArray = new Uint8Array(bytes);
-        console.log('Opcode array: ', byteArray);
         this.gameBytes = byteArray;
         resolve(this.gameBytes);
       });
@@ -164,9 +175,10 @@ export class Wasmboy {
     // opcodes are at most 3 bytes: https://gbatemp.net/threads/what-size-are-gameboy-opcodes.467282/
     // Therefore, we will pass all 3 bytes, and then the the wasm module should be able to do what it needs, wether or Not
     // it needs all 3
-    const opcode = this.gameBytes[this.wasmInstance.exports.getProgramCounter()];
-    const dataByteOne = this.gameBytes[this.wasmInstance.exports.getProgramCounter() + 1];
-    const dataByteTwo = this.gameBytes[this.wasmInstance.exports.getProgramCounter() + 2];
+    // TODO: NOTE: Reember we are laoding game into byte memory
+    const opcode = this.wasmByteMemory[this.wasmInstance.exports.getProgramCounter()];
+    const dataByteOne = this.wasmByteMemory[this.wasmInstance.exports.getProgramCounter() + 1];
+    const dataByteTwo = this.wasmByteMemory[this.wasmInstance.exports.getProgramCounter() + 2];
 
     if(opcode === undefined) {
       console.log('ERROR! No Opcode found at programCounter position: ', this.wasmInstance.exports.getProgramCounter().toString(16));
