@@ -14,8 +14,6 @@ class WasmBoy {
     this.wasmInstance = undefined;
     this.wasmByteMemory = undefined;
     this.gameBytes = undefined;
-    this.debugSpeed = 1000;
-    this.decodeTimeout = undefined;
   }
 
   // Finish request for wasm module, and fetch game
@@ -50,29 +48,15 @@ class WasmBoy {
     // TODO: Offload as much of this as possible to WASM
     // Feeding wasm bytes is probably going to slow things down, would be nice to just place the game in wasm memory
     // And read from there
-    const emulationLoop = (debug) => {
-
-
-      if(debug) {
-        const numberOfCycles = this._executeOpcode(debug);
-        setTimeout(() => {
-          emulationLoop(true);
-          this._debug();
-        }, 1000);
-        return;
-      }
-
+    const emulationLoop = () => {
 
       // http://www.codeslinger.co.uk/pages/projects/gameboy/beginning.html
       // Run the Decode Loop
       let error = false;
       while(this._currentCycles < this._maxCycles && !error) {
-        const numberOfCycles = this._executeOpcode(debug);
+        const numberOfCycles = this._executeOpcode();
         if(numberOfCycles !== false && numberOfCycles > 0) {
           this._currentCycles += numberOfCycles;
-          if(numberOfCycles % 16 === 0) {
-            console.log(`Wasm Logs: 0x${this.wasmInstance.exports.getCurrentLogValue().toString(16)} ${this.wasmInstance.exports.getCurrentLogId()}`);
-          }
         } else {
           error = true;
         }
@@ -114,19 +98,24 @@ class WasmBoy {
         }
       }
 
-      //requestAnimationFrame(emulationLoop);
+      console.log('Rendering Next Frame');
+      this._debug();
+      requestAnimationFrame(emulationLoop);
     }
 
 
     requestAnimationFrame(() => {
         // Run about 60 frames
         // Currently loops at 233, 235, 238. All codes ar corret. Unsure about handling
-        let numberOfFrames = 500;
+        // Wierd bug where program counter is inside of 0x237 loop, but
+        // No matter how many frames, will then endter the 0x261 loop
+        let numberOfFrames = 1;
         for(let i = 0; i < numberOfFrames; i++) {
           emulationLoop();
         }
 
         console.log(`Debug: DONE! Rendered ${numberOfFrames} frames`);
+        console.log(`Wasm Logs: 0x${this.wasmInstance.exports.getCurrentLogValue().toString(16)} ${this.wasmInstance.exports.getCurrentLogId()}`);
         this._debug();
     });
 
@@ -195,7 +184,7 @@ class WasmBoy {
     });
   }
 
-  _executeOpcode(debug) {
+  _executeOpcode() {
     // Get our opcode
     // opcodes are at most 3 bytes: https://gbatemp.net/threads/what-size-are-gameboy-opcodes.467282/
     // Therefore, we will pass all 3 bytes, and then the the wasm module should be able to do what it needs, wether or Not
@@ -207,10 +196,6 @@ class WasmBoy {
     // To verfiy
     const dataByteOne = this.wasmByteMemory[this.wasmInstance.exports.getProgramCounter() + 1];
     const dataByteTwo = this.wasmByteMemory[this.wasmInstance.exports.getProgramCounter() + 2];
-
-    if(debug) {
-      console.log(`Opcode: 0x${opcode.toString(16)} dataByteOne: 0x${dataByteOne.toString(16)} dataByteTwo: 0x${dataByteTwo.toString(16)}`)
-    }
 
     if(opcode === undefined) {
       console.log('ERROR! No Opcode found at programCounter position: ', this.wasmInstance.exports.getProgramCounter().toString(16));
@@ -241,7 +226,7 @@ class WasmBoy {
   }
 
   // Private funciton to debug wasm
-  _debug(opcodeMessage) {
+  _debug(shouldShowLogs) {
     // Print out all of our info
     const cpuDebugDiv = document.getElementById('cpu-debug-info');
     if(cpuDebugDiv) {
@@ -261,12 +246,6 @@ class WasmBoy {
       // https://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript
       while (cpuDebugDiv.firstChild) {
           cpuDebugDiv.removeChild(cpuDebugDiv.firstChild);
-      }
-
-      // Try to get our decode speed
-      const cpuSpeedSlider = document.getElementById('cpu-debug-speed');
-      if(cpuSpeedSlider) {
-        this.debugSpeed = cpuSpeedSlider.value;
       }
 
       const sections = [];
@@ -292,8 +271,11 @@ class WasmBoy {
         }
       });
 
-      console.log('Memory Changes: ', memChanges);
-      console.log('Current Memory: ', this.wasmByteMemory);
+      if(shouldShowLogs) {
+        console.log(`Wasm Logs: 0x${this.wasmInstance.exports.getCurrentLogValue().toString(16)} ${this.wasmInstance.exports.getCurrentLogId()}`);
+        console.log('Memory Changes: ', memChanges);
+        console.log('Current Memory: ', this.wasmByteMemory);
+      }
 
       sections.forEach((section) => {
         cpuDebugDiv.appendChild(section);
