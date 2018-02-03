@@ -29,7 +29,7 @@ export class WasmboyComponent extends Component {
     this.state.initialized = true;
 
     WasmBoyService
-    .loadGame('tetris.gb')
+    .loadGame('DMG_ROM.gb')
     .then(() => {
       WasmBoyService.startGame();
     });

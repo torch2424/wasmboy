@@ -14,6 +14,11 @@ class WasmBoy {
     this.wasmInstance = undefined;
     this.wasmByteMemory = undefined;
     this.gameBytes = undefined;
+    this.opcodesRun = [];
+
+    this.debugState = {
+      currentOpcode: undefined
+    }
   }
 
   // Finish request for wasm module, and fetch game
@@ -39,10 +44,47 @@ class WasmBoy {
     });
   }
 
+  // TODO: move this
+  breakOut() {
+    // Keep stepping until highest opcode increases
+    const currentOpcode = this.debugState.currentOpcode;
+    this.stepOpcodes();
+    if (Math.abs(currentOpcode - this.debugState.currentOpcode) > 4) {
+      this.breakOut();
+    }
+  }
+
+  // TODO: Move this
+  breakPoint() {
+    // Set our opcode breakpoint
+    const breakPoint = 0x55;
+    if(this.wasmInstance.exports.getProgramCounter() !== breakPoint) {
+      this.stepOpcodes(true);
+      this.breakPoint();
+    } else {
+      this._render();
+      this._debug();
+    }
+  }
+
+  // TODO: move this
+  stepOpcodes(skipDebugOutput) {
+    if(skipDebugOutput) {
+      this._executeOpcode(false, true);
+      return;
+    }
+    this._executeOpcode(true, true);
+    console.log(`Wasm Logs: 0x${this.wasmInstance.exports.getCurrentLogValue().toString(16)} ${this.wasmInstance.exports.getCurrentLogId()}`);
+    this._render();
+    this._debug();
+  }
+
+
   // Function to start the game
   startGame() {
 
-    this.wasmInstance.exports.initialize();
+    // TODO: Don't initialize if running boot rom
+    //this.wasmInstance.exports.initialize();
     console.log(`Starting programCounter position: 0x${this.wasmInstance.exports.getProgramCounter().toString(16)}`);
 
     // TODO: Offload as much of this as possible to WASM
@@ -62,45 +104,12 @@ class WasmBoy {
         }
       }
 
-      // Render
-      //console.log(`Wasm Logs: 0x${this.wasmInstance.exports.getCurrentLogValue().toString(16)}`);
-      //console.log("Rendering!", this.wasmByteMemory);
-      let canvas = document.getElementById('canvas');
-      let ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      // Draw the pixels
-      // 160x144
-      for(let y = 0; y < 144; y++) {
-        for (let x = 0; x < 160; x++) {
+      // Render the display
+      this._render();
 
-          const pixelIndex = 0x10000 + (y * 160) + x;
-          const color = this.wasmByteMemory[pixelIndex];
-          if (color) {
-            let fillStyle = false;
-            if(color === 1) {
-              fillStyle = "#FFFFFF";
-            } else if (color === 2) {
-              fillStyle = "#D3D3D3";
-            } else if (color === 3) {
-              fillStyle = "#A9A9A9";
-            } else {
-              fillStyle = "#000000";
-            }
-            ctx.fillStyle = fillStyle;
-            ctx.fillRect(x, y, 1, 1);
-          } else {
-            ctx.fillStyle = "#0000f4";
-            ctx.fillRect(x, y, 1, 1);
-          }
-
-          // Log the current pixel
-          //console.log(`Pixel: X:${x} Y:${y} Index:0x${pixelIndex.toString(16)} Color:${color}`);
-        }
-      }
-
-      console.log('Rendering Next Frame');
-      this._debug();
-      requestAnimationFrame(emulationLoop);
+      //console.log('Rendering Next Frame');
+      //this._debug();
+      //requestAnimationFrame(emulationLoop);
     }
 
 
@@ -109,20 +118,16 @@ class WasmBoy {
         // Currently loops at 233, 235, 238. All codes ar corret. Unsure about handling
         // Wierd bug where program counter is inside of 0x237 loop, but
         // No matter how many frames, will then endter the 0x261 loop
-        let numberOfFrames = 1;
+        let numberOfFrames = 0;
         for(let i = 0; i < numberOfFrames; i++) {
           emulationLoop();
         }
 
         console.log(`Debug: DONE! Rendered ${numberOfFrames} frames`);
         console.log(`Wasm Logs: 0x${this.wasmInstance.exports.getCurrentLogValue().toString(16)} ${this.wasmInstance.exports.getCurrentLogId()}`);
+        console.log('opcodes run:', this.opcodesRun);
         this._debug();
     });
-
-    // setTimeout(() => {
-    //   emulationLoop(true);
-    //   this._debug();
-    // }, 1000);
   }
 
   // Private funciton to returna promise to our wasmModule
@@ -184,7 +189,7 @@ class WasmBoy {
     });
   }
 
-  _executeOpcode() {
+  _executeOpcode(showOpcodeInfo, saveCurrentOpcode) {
     // Get our opcode
     // opcodes are at most 3 bytes: https://gbatemp.net/threads/what-size-are-gameboy-opcodes.467282/
     // Therefore, we will pass all 3 bytes, and then the the wasm module should be able to do what it needs, wether or Not
@@ -200,6 +205,15 @@ class WasmBoy {
     if(opcode === undefined) {
       console.log('ERROR! No Opcode found at programCounter position: ', this.wasmInstance.exports.getProgramCounter().toString(16));
       return false;
+    }
+
+    if(showOpcodeInfo) {
+      console.log(`opcode: 0x${opcode.toString(16)}, dataByteOne: 0x${dataByteOne.toString(16)}, dataByteTwo: ${dataByteTwo.toString(16)}, programCounter: ${this.wasmInstance.exports.getProgramCounter().toString(16)}`);
+    }
+
+    if(saveCurrentOpcode) {
+      // Set our currentOpcode
+      this.debugState.currentOpcode = opcode;
     }
 
     // Returns the program counter position for next instruction to be fetched
@@ -218,11 +232,42 @@ class WasmBoy {
     return numberOfCycles;
   }
 
-  // TODO: remove this
-  stepOpcodes() {
-    this._executeOpcode(true);
-    console.log(`Wasm Logs: 0x${this.wasmInstance.exports.getCurrentLogValue().toString(16)} ${this.wasmInstance.exports.getCurrentLogId()}`);
-    this._debug();
+  _render() {
+    // Render
+    //console.log(`Wasm Logs: 0x${this.wasmInstance.exports.getCurrentLogValue().toString(16)}`);
+    //console.log("Rendering!", this.wasmByteMemory);
+    let canvas = document.getElementById('canvas');
+    let ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Draw the pixels
+    // 160x144
+    for(let y = 0; y < 144; y++) {
+      for (let x = 0; x < 160; x++) {
+
+        const pixelIndex = 0x10000 + (y * 160) + x;
+        const color = this.wasmByteMemory[pixelIndex];
+        if (color) {
+          let fillStyle = false;
+          if(color === 1) {
+            fillStyle = "#FFFFFF";
+          } else if (color === 2) {
+            fillStyle = "#D3D3D3";
+          } else if (color === 3) {
+            fillStyle = "#A9A9A9";
+          } else {
+            fillStyle = "#000000";
+          }
+          ctx.fillStyle = fillStyle;
+          ctx.fillRect(x, y, 1, 1);
+        } else {
+          ctx.fillStyle = "#0000f4";
+          ctx.fillRect(x, y, 1, 1);
+        }
+
+        // Log the current pixel
+        //console.log(`Pixel: X:${x} Y:${y} Index:0x${pixelIndex.toString(16)} Color:${color}`);
+      }
+    }
   }
 
   // Private funciton to debug wasm

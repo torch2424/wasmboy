@@ -518,7 +518,8 @@ export function handleCbOpcode(cbOpcode: u8): i8 {
   }
 
   // Increase program counter, as all CB codes take two bytes
-  Cpu.programCounter += 2;
+  // Program counter will really increase by two since opcodes handles the other
+  Cpu.programCounter += 1;
 
   // Finally our number of cycles
   // Set if we handled the opcode

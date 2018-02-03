@@ -7,7 +7,7 @@ class Graphics {
   static scanlineCycleCounter: i16 = 0x00;
   static MAX_CYCLES_PER_SCANLINE: i16 = 456;
   static MIN_CYCLES_SPRITES_LCD_MODE: i16 = 376;
-  static MIN_CYCLES_TRANSFER_DATA_LCD_MODE: i16 = 376;
+  static MIN_CYCLES_TRANSFER_DATA_LCD_MODE: i16 = 249;
 
   // LCD
   static memoryLocationScanlineRegister: u16 = 0xFF44;
@@ -186,7 +186,6 @@ function _drawScanline(): void {
 
   // Check if the background is enabled
   if (checkBitOnByte(0, lcdControl)) {
-
     // Get our scrollX and scrollY
     let scrollX: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationScrollX);
     let scrollY: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationScrollY);

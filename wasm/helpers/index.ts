@@ -5,8 +5,10 @@ class Log {
 
 // Set the current log
 export function consoleLog(valueToSet: i32, logId: i32): void {
-  Log.logValue = valueToSet;
-  Log.logId = logId;
+  if(valueToSet > Log.logValue) {
+    Log.logValue = valueToSet;
+    Log.logId = logId;
+  }
 }
 
 // General console.log function, can poll from js

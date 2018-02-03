@@ -78,6 +78,10 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
   // Return -1 if no opcode was found, representing an error
   let numberOfCycles: i8 = -1;
 
+  // Always implement the program counter by one
+  // Any other value can just subtract or add however much offset before reaching this line
+  Cpu.programCounter += 1;
+
   // Get our concatenated databyte one and dataByteTwo
   // Doing this here, because for some odd reason, these are swapped ONLY
   // When concatenated :p
@@ -94,8 +98,9 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
 
     // LD BC,d16
     // 3  12
-    Cpu.registerB = dataByteOne;
-    Cpu.registerC = dataByteTwo;
+
+    Cpu.registerB = splitHighByte(concatenatedDataByte);
+    Cpu.registerC = splitLowByte(concatenatedDataByte);
     Cpu.programCounter += 2;
     numberOfCycles = 12;
   } else if(isOpcode(opcode, 0x02)) {
@@ -268,8 +273,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
 
     // LD DE,d16
     // 3  12
-    Cpu.registerD = dataByteOne;
-    Cpu.registerE = dataByteTwo;
+    Cpu.registerD = splitHighByte(concatenatedDataByte);
+    Cpu.registerE = splitLowByte(concatenatedDataByte);
     Cpu.programCounter += 2;
     numberOfCycles = 12;
   } else if(isOpcode(opcode, 0x12)) {
@@ -353,7 +358,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
 
     relativeJump(dataByteOne);
     numberOfCycles = 12;
-    Cpu.programCounter += 2;
+    // Relative Jump Function Handles programcounter
   } else if(isOpcode(opcode, 0x19)) {
 
     // ADD HL,DE
@@ -450,10 +455,11 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     if (getZeroFlag() === 0) {
       relativeJump(dataByteOne);
       numberOfCycles = 12;
+      // Relative Jump Funciton handles program counter
     } else {
       numberOfCycles = 8;
+      Cpu.programCounter += 1;
     }
-    Cpu.programCounter += 2;
   } else if(isOpcode(opcode, 0x21)) {
 
     // LD HL,d16
@@ -565,10 +571,11 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     if(getZeroFlag() > 0) {
       relativeJump(dataByteOne);
       numberOfCycles = 12;
+      // Relative Jump funciton handles pogram counter
     } else {
       numberOfCycles = 8;
+      Cpu.programCounter += 1;
     }
-    Cpu.programCounter += 2;
   } else if(isOpcode(opcode, 0x29)) {
 
     // ADD HL,HL
@@ -648,10 +655,11 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     if (getCarryFlag() === 0) {
       relativeJump(dataByteOne);
       numberOfCycles = 12;
+      // Relative Jump function handles program counter
     } else {
       numberOfCycles = 8;
+      Cpu.programCounter += 1;
     }
-    Cpu.programCounter += 2;
   } else if(isOpcode(opcode, 0x31)) {
     // LD SP,d16
     // 3 12
@@ -727,10 +735,11 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     if (getCarryFlag() === 1) {
       relativeJump(dataByteOne);
       numberOfCycles = 12;
+      // Relative jUmp Funciton handles program counter
     } else {
       numberOfCycles = 8;
+      Cpu.programCounter += 1;
     }
-    Cpu.programCounter += 2;
   } else if(isOpcode(opcode, 0x39)) {
 
     // ADD HL,SP
@@ -2212,27 +2221,25 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     } else {
       numberOfCycles = 12;
     }
-    Cpu.programCounter -= 1;
   } else if(isOpcode(opcode, 0xC3)) {
 
     // JP a16
     // 3  16
     Cpu.programCounter = concatenatedDataByte;
     numberOfCycles = 16;
-    Cpu.programCounter -= 1;
   } else if(isOpcode(opcode, 0xC4)) {
 
     // CALL NZ,a16
     // 3  24/12
     if (getZeroFlag() === 0) {
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 3);
-      Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.programCounter + 1);
+      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
+      Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.programCounter);
       numberOfCycles = 24;
     } else {
       numberOfCycles = 12;
+      Cpu.programCounter += 2;
     }
-    Cpu.programCounter += 2;
   } else if(isOpcode(opcode, 0xC5)) {
 
     // PUSH BC
@@ -2262,7 +2269,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // RST 00H
     // 1 16
     Cpu.stackPointer -= 2;
-    sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 1);
+    sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
     Cpu.programCounter = 0x00;
     numberOfCycles = 16;
   } else if(isOpcode(opcode, 0xC8)) {
@@ -2293,7 +2300,6 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     } else {
       numberOfCycles = 12;
     }
-    Cpu.programCounter -= 1;
   } else if(isOpcode(opcode, 0xCB)) {
     // PREFIX CB
     // 1  4
@@ -2307,22 +2313,21 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // 3  24/12
     if (getZeroFlag() === 1) {
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 3);
-      Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.programCounter + 1);
+      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
+      Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.programCounter);
       numberOfCycles = 24;
     } else {
+      Cpu.programCounter += 2;
       numberOfCycles = 12;
     }
-    Cpu.programCounter += 2;
   } else if(isOpcode(opcode, 0xCD)) {
 
     // CALL a16
     // 3  24
     Cpu.stackPointer -= 2;
-    sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 3);
-    Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.programCounter + 1);
+    sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
+    Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.programCounter);
     numberOfCycles = 24;
-    Cpu.programCounter += 2;
   } else if(isOpcode(opcode, 0xCE)) {
 
     // ADC A,d8
@@ -2344,7 +2349,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // RST 08H
     // 1 16
     Cpu.stackPointer -= 2;
-    sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 1);
+    sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
     Cpu.programCounter = 0x08;
     numberOfCycles = 16;
   } else if(isOpcode(opcode, 0xD0)) {
@@ -2376,22 +2381,22 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
       Cpu.programCounter = concatenatedDataByte;
       numberOfCycles = 16;
     } else {
+      Cpu.programCounter += 2;
       numberOfCycles = 12;
     }
-    Cpu.programCounter -= 1;
   } /* No Opcode for: 0xD3 */ else if(isOpcode(opcode, 0xD4)) {
 
     // CALL NC,a16
     // 3  24/12
     if (getCarryFlag() === 0) {
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 3);
-      Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.programCounter + 1);
+      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
+      Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.programCounter);
       numberOfCycles = 24;
     } else {
+      Cpu.programCounter += 2;
       numberOfCycles = 12;
     }
-    Cpu.programCounter += 2;
   } else if(isOpcode(opcode, 0xD5)) {
 
     // PUSH DE
@@ -2422,7 +2427,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // RST 10H
     // 1 16
     Cpu.stackPointer -= 2;
-    sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 1);
+    sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
     Cpu.programCounter = 0x10;
     numberOfCycles = 16;
   } else if(isOpcode(opcode, 0xD8)) {
@@ -2453,22 +2458,22 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
       Cpu.programCounter = concatenatedDataByte;
       numberOfCycles = 16;
     } else {
+      Cpu.programCounter += 2
       numberOfCycles = 12;
     }
-    Cpu.programCounter -= 1;
   } /* No Opcode for: 0xDB */else if(isOpcode(opcode, 0xDC)) {
 
     // CALL C,a16
     // 3  24/12
     if (getCarryFlag() === 1) {
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 3);
-      Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.programCounter + 1);
+      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
+      Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.programCounter);
       numberOfCycles = 24;
     } else {
+      Cpu.programCounter += 2;
       numberOfCycles = 12;
     }
-    Cpu.programCounter += 2;
   } /* No Opcode for: 0xDD */else if(isOpcode(opcode, 0xDE)) {
 
     // SBC A,d8
@@ -2491,7 +2496,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // RST 18H
     // 1 16
     Cpu.stackPointer -= 2;
-    sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 1);
+    sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
     Cpu.programCounter = 0x18;
     numberOfCycles = 16;
   } else if(isOpcode(opcode, 0xE0)) {
@@ -2517,10 +2522,11 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
 
     // LD (C),A
     // 2  8
+    // NOTE: Table says 2 Program counter,
+    // But stepping through the boot rom, should be one
 
     // Store value in high RAM ($FF00 + register c)
     eightBitStoreIntoGBMemory(0xFF00 + Cpu.registerC, Cpu.registerA);
-    Cpu.programCounter += 2;
     numberOfCycles = 8;
   } /* No Opcode for: 0xE3, 0xE4 */ else if(isOpcode(opcode, 0xE5)) {
 
@@ -2551,7 +2557,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // RST 20H
     // 1 16
     Cpu.stackPointer -= 2;
-    sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 1);
+    sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
     Cpu.programCounter = 0x20;
     numberOfCycles = 16;
   } else if(isOpcode(opcode, 0xE8)) {
@@ -2574,7 +2580,6 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // 1 4
     Cpu.programCounter = concatenateBytes(Cpu.registerH, Cpu.registerL);
     numberOfCycles = 4;
-    Cpu.programCounter -= 1;
   } else if(isOpcode(opcode, 0xEA)) {
 
     // LD (a16),A
@@ -2601,7 +2606,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // RST 28H
     // 1 16
     Cpu.stackPointer -= 2;
-    sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 1);
+    sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
     Cpu.programCounter = 0x28;
     numberOfCycles = 16;
   } else if(isOpcode(opcode, 0xF0)) {
@@ -2664,7 +2669,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // RST 30H
     // 1 16
     Cpu.stackPointer -= 2;
-    sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 1);
+    sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
     Cpu.programCounter = 0x30;
     numberOfCycles = 16;
   } else if(isOpcode(opcode, 0xF8)) {
@@ -2725,18 +2730,12 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // RST 38H
     // 1 16
     Cpu.stackPointer -= 2;
-    sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 1);
+    sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
     Cpu.programCounter = 0x38;
     numberOfCycles = 16;
   }
 
-
-  /* No Opcode for:  */
-
-
-  // Always implement the program counter by one
-  // Any other value can just subtract or add however much offset before reaching this line
-  Cpu.programCounter += 1;
+  // NOTE: Moved Program Counter to top, because program counter state should be considered Before doing calls
 
   // Return the number of cycles
   return numberOfCycles;

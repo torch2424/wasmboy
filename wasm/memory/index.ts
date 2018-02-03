@@ -1,5 +1,7 @@
 // TODO: Finish Memory!
 
+import { consoleLog } from '../helpers/index';
+
 class Memory {
 
   // https://github.com/AntonioND/giibiiadvance/blob/master/docs/TCAGBD.pdf
