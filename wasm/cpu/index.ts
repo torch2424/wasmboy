@@ -83,6 +83,6 @@ export function relativeJump(value: u8): void {
   Cpu.programCounter += relativeJumpOffset;
   // TODO: Increase or decrease programCounter?
   // Undo programCounter offset at end
-  Cpu.programCounter -= 1;
+  Cpu.programCounter += 1;
   // programCounter += 1; ?
 }

@@ -114,7 +114,7 @@ function _dmaTransfer(sourceAddressOffset: u8): void {
 
   let sourceAddress: u16 = (<u16>sourceAddressOffset << 8);
 
-  for(let i = 0; i < 0xA0; i++) {
+  for(let i: u16 = 0; i < 0xA0; i++) {
     eightBitStoreIntoGBMemorySkipTraps(Memory.spriteInformationTableStart, eightBitLoadFromGBMemory(sourceAddress + i));
   }
 }

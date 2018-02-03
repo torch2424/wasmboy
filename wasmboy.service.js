@@ -36,7 +36,6 @@ export class Wasmboy {
               this.wasmByteMemory[i] = this.gameBytes[i];
           }
         }
-
         resolve();
       })
     });
@@ -108,7 +107,7 @@ export class Wasmboy {
     requestAnimationFrame(() => {
         // Run about 60 frames
         let  i;
-        let numberOfFrames = 1;
+        let numberOfFrames = 60;
         for(i = 0; i < numberOfFrames; i++) {
           emulationLoop();
         }
