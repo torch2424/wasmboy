@@ -1,3 +1,23 @@
+class Log {
+  static logValue: i32 = 0;
+  static logId: i32 = 0;
+}
+
+// Set the current log
+export function consoleLog(valueToSet: i32, logId: i32): void {
+  Log.logValue = valueToSet;
+  Log.logId = logId;
+}
+
+// General console.log function, can poll from js
+export function getCurrentLogValue(): i32 {
+  return Log.logValue;
+}
+
+export function getCurrentLogId(): i32 {
+  return Log.logId;
+}
+
 // Grouped registers
 // possible overload these later to performace actions
 // AF, BC, DE, HL

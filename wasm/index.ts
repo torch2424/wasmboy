@@ -4,6 +4,7 @@ import { Cpu } from './cpu/index';
 // Public Exports
 export { initialize } from './cpu/index';
 export { handleOpcode } from './cpu/opcodes';
+export { getCurrentLogValue, getCurrentLogId } from './helpers/index';
 
 export function getRegisterA(): u8 {
   return Cpu.registerA;

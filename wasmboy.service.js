@@ -59,13 +59,17 @@ export class Wasmboy {
         const numberOfCycles = this._executeOpcode();
         if(numberOfCycles !== false && numberOfCycles > 0) {
           this._currentCycles += numberOfCycles;
+          if(numberOfCycles % 16 === 0) {
+            console.log(`Wasm Logs: 0x${this.wasmInstance.exports.getCurrentLogValue().toString(16)} ${this.wasmInstance.exports.getCurrentLogId()}`);
+          }
         } else {
           error = true;
         }
       }
 
       // Render
-      console.log("Rendering!", this.wasmByteMemory);
+      //console.log(`Wasm Logs: 0x${this.wasmInstance.exports.getCurrentLogValue().toString(16)}`);
+      //console.log("Rendering!", this.wasmByteMemory);
       let canvas = document.getElementById('canvas');
       let ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -73,8 +77,8 @@ export class Wasmboy {
       ctx.fillRect(0, 0, 200, 200);
       // Draw the pixels
       // 160x144
-      for(let y = 0; y < 160; y++) {
-        for (let x = 0; x < 144; x++) {
+      for(let y = 0; y < 144; y++) {
+        for (let x = 0; x < 160; x++) {
 
           const pixelIndex = 0x10000 + (x * (y + 1));
           const color = this.wasmByteMemory[pixelIndex];
@@ -97,13 +101,13 @@ export class Wasmboy {
           //console.log(`Pixel: X:${x} Y:${y} Index:0x${pixelIndex.toString(16)} Color:${color}`);
         }
       }
-      this._debug();
+      //this._debug();
       //requestAnimationFrame(emulationLoop);
     }
     requestAnimationFrame(() => {
         // Run about 60 frames
         let  i;
-        for(i = 0; i < 20; i++) {
+        for(i = 0; i < 1; i++) {
           emulationLoop();
         }
 

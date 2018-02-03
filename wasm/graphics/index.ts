@@ -1,6 +1,6 @@
 import { eightBitLoadFromGBMemory, eightBitStoreIntoGBMemory, sixteenBitLoadFromGBMemory, setPixelOnFrame } from '../memory/index';
 import { requestVBlankInterrupt, requestLcdInterrupt } from '../interrupts/index';
-import { checkBitOnByte, setBitOnByte, resetBitOnByte } from '../helpers/index';
+import { consoleLog, checkBitOnByte, setBitOnByte, resetBitOnByte } from '../helpers/index';
 
 class Graphics {
   // Count the number of cycles to keep synced with cpu cycles
@@ -268,6 +268,8 @@ function _renderTiles(lcdControl: u8): void {
   // Find the scanline we are currently processing on the tile
   // (from the 8x8)
   let tileRow: u16 = ((pixelRow / 8) * 32);
+
+  consoleLog(tileRow, 25);
 
   for (let i: u8 = 0; i < 160; i++) {
 
