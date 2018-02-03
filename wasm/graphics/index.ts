@@ -22,13 +22,11 @@ class Graphics {
   static memoryLocationWindowX: u16 = 0xFF4B;
   static memoryLocationWindowY: u16 = 0xFF4A;
 
-  // Tile Maps (TODO: Dont seperate Background and window :p)
-  static memoryLocationWindowTileMapDisplaySelectZeroStart: u16 = 0x9800;
-  static memoryLocationWindowTileMapDisplaySelectOneStart: u16 = 0x9C00;
-  static memoryLocationBackgroundAndWindowTileDataSelectZeroStart: u16 = 0x8800;
-  static memoryLocationBackgroundAndWindowTileDataSelectOneStart: u16 = 0x8000;
-  static memoryLocationBackgroundTileMapDisplaySelectZeroStart: u16 = 0x9800;
-  static memoryLocationBackgroundTileMapDisplaySelectOneStart: u16 = 0x9C00;
+  // Tile Maps And Data (TODO: Dont seperate Background and window :p)
+  static memoryLocationTileMapSelectZeroStart: u16 = 0x9800;
+  static memoryLocationTileMapSelectOneStart: u16 = 0x9C00;
+  static memoryLocationTileDataSelectZeroStart: u16 = 0x8800;
+  static memoryLocationTileDataSelectOneStart: u16 = 0x8000;
 
   // Palettes
   static memoryLocationBackgroundPalette: u16 = 0xFF47;
@@ -172,10 +170,43 @@ function _drawScanline(): void {
   // Bit 2 - OBJ (Sprite) Size (0=8x8, 1=8x16)
   // Bit 1 - OBJ (Sprite) Display Enable (0=Off, 1=On)
   // Bit 0 - BG Display (for CGB see below) (0=Off, 1=On)
+
+  // Get our lcd control, see above for usage
   let lcdControl = eightBitLoadFromGBMemory(Graphics.memoryLocationLcdControl);
-  if (checkBitOnByte(0, lcdControl)) {
-    _renderTiles(lcdControl);
+
+  // Get our scanline register
+  let scanlineRegister = eightBitLoadFromGBMemory(Graphics.memoryLocationScanlineRegister);
+
+  // Get our seleted tile data memory location
+  let tileDataMemoryLocation = Graphics.memoryLocationTileDataSelectZeroStart;
+  if(checkBitOnByte(4, lcdControl)) {
+    tileDataMemoryLocation = Graphics.memoryLocationTileDataSelectOneStart;
   }
+
+
+  // Check if the background is enabled
+  if (checkBitOnByte(0, lcdControl)) {
+    //_renderTiles(lcdControl);
+
+    // Get our scrollX and scrollY
+    let scrollX: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationScrollX);
+    let scrollY: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationScrollY);
+
+    // Get our map memory location
+    let tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectZeroStart;
+    if (checkBitOnByte(3, lcdControl)) {
+      tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectOneStart;
+    }
+
+    // Finally, pass everything to draw the background
+    _renderBackground(scanlineRegister, scrollX, scrollX, tileDataMemoryLocation, tileMapMemoryLocation);
+  }
+
+  // Check if the window is enabled, and we are currently
+  // Drawing lines on the window
+  // if(checkBitOnByte(5, lcdControl)) {
+  // TODO: Draw the window
+  // }
 
   // if (checkBitOnByte(1, lcdControl)) {
   //   //TODO: Render Sprites
@@ -183,29 +214,39 @@ function _drawScanline(): void {
 }
 
 
-function _getTileAddress(memoryLocation: u16, tileId: u8): u16 {
+function _getTileDataAddress(tileDataMemoryLocation: u16, tileIdFromTileMap: u8): u16 {
 
+  // Watch this part of The ultimate gameboy talk: https://youtu.be/HyzD8pNlpwI?t=30m50s
+  // A line of 8 pixels on a single tile, is represented by 2 bytes.
+  // since a single tile is 8x8 pixels, 8 * 2 = 16 bytes
   let sizeOfTileInMemory: u8 = 16;
   let tileDataAddress: u16 = 0;
 
-  // Check if data location zero
-  if(memoryLocation === Graphics.memoryLocationBackgroundAndWindowTileDataSelectZeroStart) {
+  // Get the tile ID's tile addess from tile data.
+  // For instance, let's say our first line of tile data represents tiles for letters:
+  // a b c d e f g
+  // And we have tileId 0x02. That means we want the tile for the 'c' character
+  // Since each tile is 16 bytes, it would be the starting tileDataAddress + (tileId * tileSize), to skip over tiles we dont want
+  // The whole signed thing is weird, and has something to do how the second set of tile data is stored :p
+  if(tileDataMemoryLocation === Graphics.memoryLocationTileDataSelectZeroStart) {
     // Treat the tile Id as a signed int, and add an offset of 128
     // if the tileId was 0 then the tile would be in memory region 0x9000-0x900F
-    let signedTileId: i8 = <i8>tileId;
-    tileDataAddress = memoryLocation + ((tileId + 128) * sizeOfTileInMemory);
+    let signedTileId: i8 = <i8>tileIdFromTileMap;
+    tileDataAddress = tileDataMemoryLocation + ((tileIdFromTileMap + 128) * sizeOfTileInMemory);
   } else {
     // if the background layout gave us the tileId 0, then the tile data would be between 0x8000-0x800F.
-    tileDataAddress = memoryLocation + (tileId * sizeOfTileInMemory);
+    tileDataAddress = tileDataMemoryLocation + (tileIdFromTileMap * sizeOfTileInMemory);
   }
 
   return tileDataAddress;
 }
 
 // TODO: Make not specifc to a single palette
-function _getColorFromPalette(memoryLocation: u16, colorId: u8): u8 {
-  let paletteByte: u8 = eightBitLoadFromGBMemory(memoryLocation);
+function _getColorFromPalette(paletteMemoryLocation: u16, colorId: u8): u8 {
+  let paletteByte: u8 = eightBitLoadFromGBMemory(paletteMemoryLocation);
   let color: u8 = 0;
+
+  consoleLog(paletteByte, 34);
 
   // Shift our paletteByte, 2 times for each color ID
   paletteByte = (paletteByte >> (colorId * 2))
@@ -217,107 +258,94 @@ function _getColorFromPalette(memoryLocation: u16, colorId: u8): u8 {
   return paletteByte;
 }
 
-function _isUsingWindow(lcdControl: u8): boolean {
-  if(checkBitOnByte(5, lcdControl)) {
-    return true;
-  } else {
-    return false;
-  }
-}
+function _renderBackground(scanlineRegister: u8, scrollX: u8, scrollY: u8, tileDataMemoryLocation: u16, tileMapMemoryLocation: u16): void {
 
-// Currently rendering 160x144, instead of the full 256x256 in memory
-function _renderTiles(lcdControl: u8): void {
+  // NOTE: Camera is reffering to what you can see inside the 160x144 viewport of the entire rendered 256x256 map.
 
-  // Get our Scroll and Window
-  let scrollX: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationScrollX);
-  let scrollY: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationScrollY);
-  let windowX: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationWindowX);
-  let windowY: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationWindowY);
+  // Get our current pixel y positon on the 160x144 camera (Row that the scanline draws across)
+  // this is done by getting the current scroll Y position,
+  // and adding it do what Y Value the scanline is drawing on the camera.
+  let pixelYPositionInMap: u8 = scanlineRegister + scrollY;
 
-  // First determine what tile data we are using
-  let tileDataLocation: u16 = Graphics.memoryLocationBackgroundAndWindowTileDataSelectZeroStart;
-  if(checkBitOnByte(4, lcdControl)) {
-    tileDataLocation = Graphics.memoryLocationBackgroundAndWindowTileDataSelectOneStart;
-  }
-
-  // Check which window or background memory map we are using
-  let backgroundAndWindowMemory: u16 = 0;
-  if(_isUsingWindow(lcdControl)) {
-    if(checkBitOnByte(6, lcdControl)) {
-      backgroundAndWindowMemory = Graphics.memoryLocationWindowTileMapDisplaySelectOneStart;
-    } else {
-      backgroundAndWindowMemory = Graphics.memoryLocationWindowTileMapDisplaySelectZeroStart;
-    }
-  } else {
-    if(checkBitOnByte(3, lcdControl)) {
-      backgroundAndWindowMemory = Graphics.memoryLocationBackgroundTileMapDisplaySelectOneStart;
-    } else {
-      backgroundAndWindowMemory = Graphics.memoryLocationBackgroundTileMapDisplaySelectZeroStart;
-    }
-  }
-
-  // Get our scanline, adjusted for scroll and window
-  let pixelRow: u8 = 0;
-
-  if(_isUsingWindow(lcdControl)) {
-    pixelRow = eightBitLoadFromGBMemory(Graphics.memoryLocationScanlineRegister) - windowY;
-  } else {
-    pixelRow = eightBitLoadFromGBMemory(Graphics.memoryLocationScanlineRegister) + scrollY;
-  }
-
-  // Find the scanline we are currently processing on the tile
-  // (from the 8x8)
-  let tileRow: u16 = ((pixelRow / 8) * 32);
-
-  consoleLog(tileRow, 25);
-
+  // Loop through x to draw the line like a CRT
   for (let i: u8 = 0; i < 160; i++) {
 
-    // Get our adjusted X (Column) position
-    let pixelColumn: u8 = i + scrollX;
+    // Get our Current X position of our pixel on the on the 160x144 camera
+    // this is done by getting the current scroll X position,
+    // and adding it do what X Value the scanline is drawing on the camera.
+    let pixelXPositionInMap: u8 = i + scrollX;
 
-    // Compensate for the window as needed;
-    if(_isUsingWindow(lcdControl) && i >= windowX) {
-      pixelColumn - windowX;
-    }
+    // Divide our pixel position by 8 to get our tile.
+    // Since, there are 256x256 pixels, and 32x32 tiles.
+    // 256 / 8 = 32.
+    // Also, bitshifting by 3, do do a division by 8
+    let tileXPositionInMap: u8 = pixelXPositionInMap >> 3;
+    let tileYPositionInMap: u8 = pixelYPositionInMap >> 3;
 
-    // Get our tile Column (from the 8x8)
-    let tileColumn: u16 = pixelColumn / 8;
+    // Get our tile address on the tileMap
+    // NOTE: (tileMap represents where each tile is displayed on the screen)
+    // NOTE: (tile map represents the entire map, now just what is within the "camera")
+    // For instance, if we have y pixel 144. 144 / 8 = 18. 18 * 32 = line address in map memory.
+    // And we have x pixel 160. 160 / 8 = 20.
+    // * 32, because remember, this is NOT only for the camera, the actual map is 32x32. Therefore, the next tile line of the map, is 32 byte offset.
+    // Think like indexing a 2d array, as a 1d array and it make sense :)
+    let tileMapAddress: u16 = tileMapMemoryLocation + (tileYPositionInMap * 32) + tileXPositionInMap;
+    // Get the tile Id on the Tile Map
+    let tileIdFromTileMap: u8 = eightBitLoadFromGBMemory(tileMapAddress);
 
-    // Get the tileId from the Memory Map
-    let tileIdInMemoryMap: u8 = eightBitLoadFromGBMemory(backgroundAndWindowMemory + tileRow + tileColumn);
-    let tileAddress = _getTileAddress(tileDataLocation, tileIdInMemoryMap);
+    // Now get our tileDataAddress for the corresponding tileID we found in the map
+    // Read the comments in _getTileDataAddress() to see what's going on.
+    // tl;dr if we had the tile map of "a b c d", and wanted tileId 2.
+    // This funcitons returns the start of memory locaiton for the tile 'c'.
+    let tileDataAddress: u16 = _getTileDataAddress(tileDataMemoryLocation, tileIdFromTileMap);
 
-    // Get the y position in the actual tile in memory
-    let tilePixelY: u8 = pixelRow % 8;
-    tilePixelY = tilePixelY * 2;
+    // Now we can process the the individual bytes that represent the pixel on a tile
 
-    // Finally get both bytes of data for the pixels and their colors
-    let pixelColorByteOne: u8 = eightBitLoadFromGBMemory(tileAddress + tilePixelY);
-    let pixelColorByteTwo: u8 = eightBitLoadFromGBMemory(tileAddress + tilePixelY + 1);
+    // Get the y pixel of the 8 by 8 tile.
+    // Simply modulo the scanline.
+    // For instance, let's say we are printing the first line of pixels on our camera,
+    // And the first line of pixels on our tile.
+    // yPixel = 1. 1 % 8 = 1.
+    // And for the last line
+    // yPixel = 144. 144 % 8 = 0.
+    // 0 Represents last line of pixels in a tile, 1 represents first. 1 2 3 4 5 6 7 0.
+    // Because remember, we are counting lines on the display NOT including zero
+    let pixelYInTile: u8 = pixelYPositionInMap % 8;
+    // Remember to represent a single line of 8 pixels on a tile, we need two bytes.
+    // Therefore, we need to times our modulo by 2, to get the correct line of pixels on the tile.
+    // Again, think like you had to map a 2d array as a 1d.
+    let byteOneForLineOfTilePixels: u8 = eightBitLoadFromGBMemory(tileDataAddress + (pixelYInTile * 2))
+    let byteTwoForLineOfTilePixels: u8 = eightBitLoadFromGBMemory(tileDataAddress + (pixelYInTile * 2) + 1);
 
-    // Get the bit that represents our current singular pixel
-    // Module represents what exact pixel of the 8
-    // Then subtracting 7 to reverse the byte, and then -1 to get the full reverse
-    let colorBit: i8 = <i8>(pixelColumn % 8);
-    colorBit -= 7;
-    colorBit = colorBit * -1;
+    // Same logic as pixelYInTile.
+    // However, We need to reverse our byte,
+    // As pixel 0 is on byte 7, and pixel 1 is on byte 6, etc...
+    // Therefore, is pixelX was 2, then really is need to be 5
+    // So 2 - 7 = -5, * 1 = 5
+    let reversedPixelXInTile: u8 = pixelXPositionInMap % 8;
+    let pixelXInTile: u8 = (reversedPixelXInTile - 7) * -1;
 
-    // Get both bits at bit position to find the value of the color
+    // Now we can get the color for that pixel
+    // Colors are represented by getting X position of Byteone, and Y positon of Byte Two
+    // To Get the color Id.
+    // For example, the result of the color id is 0000 00[xPixelByteOne][xPixelByteTwo]
     let paletteColorId: u8 = 0;
-    if (checkBitOnByte(<u8>colorBit, pixelColorByteOne)) {
+    if (checkBitOnByte(<u8>pixelXInTile, byteOneForLineOfTilePixels)) {
+      // Byte one represents the second bit in our color id, so bit shift
       paletteColorId += 1;
       paletteColorId << 1;
     }
-    if (checkBitOnByte(<u8>colorBit, pixelColorByteTwo)) {
+    if (checkBitOnByte(<u8>pixelXInTile, byteTwoForLineOfTilePixels)) {
       paletteColorId += 1;
     }
 
-    // Get our color from our palette
-    let pixelWithColor = _getColorFromPalette(Graphics.memoryLocationBackgroundPalette, paletteColorId);
+    // Now get the colorId from the pallete, to get our final color
+    // Developers could change colorIds to represents different colors
+    // in their palette, thus we need to grab the color from there
+    let pixelColorInTileFromPalette: u8 = _getColorFromPalette(Graphics.memoryLocationBackgroundPalette, paletteColorId);
 
-    // Finally save to memory
-    setPixelOnFrame(pixelColumn, pixelRow, pixelWithColor + 1);
+    // FINALLY, RENDER THAT PIXEL!
+    // Only rendering camera for now, so coordinates are for the camera.
+    setPixelOnFrame(i, scanlineRegister, pixelColorInTileFromPalette + 1);
   }
-
 }
