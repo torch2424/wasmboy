@@ -81,8 +81,7 @@ export function relativeJump(value: u8): void {
   // Need to convert the value to i8, since in this case, u8 can be negative
   let relativeJumpOffset: i8 = <i8> value;
   Cpu.programCounter += relativeJumpOffset;
-  // TODO: Increase or decrease programCounter?
-  // Undo programCounter offset at end
-  Cpu.programCounter -= 1;
-  // programCounter += 1; ?
+  // Tested that you do indeed, need to have the program counter increase by 2 after
+  // Realtive jump, using bgb debugger
+  Cpu.programCounter += 1;
 }

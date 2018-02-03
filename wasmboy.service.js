@@ -201,11 +201,11 @@ class WasmBoy {
     // it needs all 3
     // TODO: NOTE: Reember we are laoding game into byte memory
     const opcode = this.wasmByteMemory[this.wasmInstance.exports.getProgramCounter()];
-    // NOTE: For some odd reason, dataBytes are backwords.
+    // NOTE: For some odd reason, dataBytes are backwords ONLY when concatenated.
     // See and test: http://gbdev.gg8.se/wiki/articles/Gameboy_Bootstrap_ROM
     // To verfiy
-    const dataByteOne = this.wasmByteMemory[this.wasmInstance.exports.getProgramCounter() + 2];
-    const dataByteTwo = this.wasmByteMemory[this.wasmInstance.exports.getProgramCounter() + 1];
+    const dataByteOne = this.wasmByteMemory[this.wasmInstance.exports.getProgramCounter() + 1];
+    const dataByteTwo = this.wasmByteMemory[this.wasmInstance.exports.getProgramCounter() + 2];
 
     if(debug) {
       console.log(`Opcode: 0x${opcode.toString(16)} dataByteOne: 0x${dataByteOne.toString(16)} dataByteTwo: 0x${dataByteTwo.toString(16)}`)
