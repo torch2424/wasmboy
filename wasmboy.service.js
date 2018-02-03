@@ -118,16 +118,16 @@ class WasmBoy {
     }
 
 
-    // requestAnimationFrame(() => {
-    //     // Run about 60 frames
-    //     let numberOfFrames = 120;
-    //     for(let i = 0; i < numberOfFrames; i++) {
-    //       emulationLoop();
-    //     }
-    //
-    //     console.log(`Debug: DONE! Rendered ${numberOfFrames} frames`);
-    //     this._debug();
-    // });
+    requestAnimationFrame(() => {
+        // Run about 60 frames
+        let numberOfFrames = 1;
+        for(let i = 0; i < numberOfFrames; i++) {
+          emulationLoop();
+        }
+
+        console.log(`Debug: DONE! Rendered ${numberOfFrames} frames`);
+        this._debug();
+    });
 
     // setTimeout(() => {
     //   emulationLoop(true);
@@ -225,7 +225,7 @@ class WasmBoy {
 
     // Function will return < 0 if the opcode was not recognized
     if (numberOfCycles < 0x0000) {
-      console.log('Error! Opcode not recognized');
+      console.log(`Error! Opcode not recognized! Opcode: 0x${opcode.toString(16)}`);
       return false;
     }
 

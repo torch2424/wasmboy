@@ -350,7 +350,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // 2  12
     relativeJump(dataByteOne);
     numberOfCycles = 12;
-    // No Cpu.programCounter on relative jump Handle in Realtive Jump Function!
+    Cpu.programCounter += 2;
   } else if(isOpcode(opcode, 0x19)) {
 
     // ADD HL,DE
@@ -450,7 +450,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     } else {
       numberOfCycles = 8;
     }
-    // No Cpu.programCounter on relative jump Handle in Realtive Jump Function!
+    Cpu.programCounter += 2;
   } else if(isOpcode(opcode, 0x21)) {
 
     // LD HL,d16
@@ -565,7 +565,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     } else {
       numberOfCycles = 8;
     }
-    // No program counter on relative jump
+    Cpu.programCounter += 2;
   } else if(isOpcode(opcode, 0x29)) {
 
     // ADD HL,HL
@@ -648,7 +648,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     } else {
       numberOfCycles = 8;
     }
-    // No Cpu.programCounter on relative jump Handle in Realtive Jump Function!
+    Cpu.programCounter += 2;
   } else if(isOpcode(opcode, 0x31)) {
     // LD SP,d16
     // 3 12
@@ -727,7 +727,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     } else {
       numberOfCycles = 8;
     }
-    // No Cpu.programCounter on relative jump Handle in Realtive Jump Function!
+    Cpu.programCounter += 2;
   } else if(isOpcode(opcode, 0x39)) {
 
     // ADD HL,SP

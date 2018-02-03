@@ -83,5 +83,5 @@ export function relativeJump(value: u8): void {
   Cpu.programCounter += relativeJumpOffset;
   // Tested that you do indeed, need to have the program counter increase by 2 after
   // Realtive jump, using bgb debugger
-  Cpu.programCounter += 1;
+  // Need to do programCounter += 2 no matter the result, so done in opcodes.ts
 }
