@@ -1,5 +1,5 @@
 import { Cpu } from '../cpu/index';
-import { eightBitLoadFromGBMemory, eightBitStoreIntoGBMemory, sixteenBitStoreIntoGBMemory } from '../memory/index';
+import { eightBitLoadFromGBMemory, eightBitStoreIntoGBMemorySkipTraps, sixteenBitStoreIntoGBMemorySkipTraps } from '../memory/index';
 import { setBitOnByte, resetBitOnByte, checkBitOnByte } from '../helpers/index';
 
 class Interrupts {
@@ -21,11 +21,11 @@ function _handleInterrupt(bitPosition: u8): void {
   // Disable the bit on the interruptRequest
   let interruptRequest = eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptRequest);
   interruptRequest = resetBitOnByte(bitPosition, interruptRequest);
-  eightBitStoreIntoGBMemory(Interrupts.memoryLocationInterruptRequest, interruptRequest);
+  eightBitStoreIntoGBMemorySkipTraps(Interrupts.memoryLocationInterruptRequest, interruptRequest);
 
   // Push the programCounter onto the stacks
   Cpu.stackPointer -= 2;
-  sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
+  sixteenBitStoreIntoGBMemorySkipTraps(Cpu.stackPointer, Cpu.programCounter);
 
   // Jump to the correct interrupt location
   // http://www.codeslinger.co.uk/pages/projects/gameboy/interupts.html
@@ -47,7 +47,7 @@ function _requestInterrupt(bitPosition: u8): void {
   // Pass to set the correct interrupt bit on interruptRequest
   interruptRequest = setBitOnByte(bitPosition, interruptRequest);
 
-  eightBitStoreIntoGBMemory(Interrupts.memoryLocationInterruptRequest, interruptRequest);
+  eightBitStoreIntoGBMemorySkipTraps(Interrupts.memoryLocationInterruptRequest, interruptRequest);
 }
 
 export function setInterrupts(value: boolean): void {

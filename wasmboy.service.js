@@ -45,7 +45,7 @@ export class Wasmboy {
   // Function to start the game
   startGame() {
 
-    this.wasmInstance.exports.initialize();
+    //this.wasmInstance.exports.initialize();
     console.log(`Starting programCounter position: 0x${this.wasmInstance.exports.getProgramCounter().toString(16)}`);
 
     // TODO: Offload as much of this as possible to WASM
@@ -73,14 +73,12 @@ export class Wasmboy {
       let canvas = document.getElementById('canvas');
       let ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "#000000";
-      ctx.fillRect(0, 0, 200, 200);
       // Draw the pixels
       // 160x144
       for(let y = 0; y < 144; y++) {
         for (let x = 0; x < 160; x++) {
 
-          const pixelIndex = 0x10000 + (x * (y + 1));
+          const pixelIndex = 0x10000 + (y * 160) + x;
           const color = this.wasmByteMemory[pixelIndex];
           if (color) {
             let fillStyle = false;
@@ -94,7 +92,10 @@ export class Wasmboy {
               fillStyle = "#000000";
             }
             ctx.fillStyle = fillStyle;
-            ctx.fillRect(x,y,1,1);
+            ctx.fillRect(x, y, 1, 1);
+          } else {
+            ctx.fillStyle = "#0000f4";
+            ctx.fillRect(x, y, 1, 1);
           }
 
           // Log the current pixel
@@ -107,11 +108,13 @@ export class Wasmboy {
     requestAnimationFrame(() => {
         // Run about 60 frames
         let  i;
-        for(i = 0; i < 1; i++) {
+        let numberOfFrames = 1;
+        for(i = 0; i < numberOfFrames; i++) {
           emulationLoop();
         }
 
-        console.log(`Debug: DONE! Rendered ${i} frames`);
+        console.log(`Debug: DONE! Rendered ${numberOfFrames} frames`);
+        this._debug();
     });
   }
 

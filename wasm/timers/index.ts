@@ -1,5 +1,5 @@
 import { Cpu } from '../cpu/index';
-import { eightBitLoadFromGBMemory, eightBitStoreIntoGBMemory } from '../memory/index';
+import { eightBitLoadFromGBMemory, eightBitStoreIntoGBMemorySkipTraps } from '../memory/index';
 import { requestTimerInterrupt } from '../interrupts/index';
 
 class Timers {
@@ -34,11 +34,11 @@ export function updateTimers(numberOfCycles: u8): void {
       let tima = eightBitLoadFromGBMemory(Timers.memoryLocationTIMA);
       if(tima == 255) {
         // Store Timer Modulator inside of TIMA
-        eightBitStoreIntoGBMemory(Timers.memoryLocationTIMA, eightBitLoadFromGBMemory(Timers.memoryLocationTMA));
+        eightBitStoreIntoGBMemorySkipTraps(Timers.memoryLocationTIMA, eightBitLoadFromGBMemory(Timers.memoryLocationTMA));
         // Fire off timer interrupt
         requestTimerInterrupt();
       } else {
-        eightBitStoreIntoGBMemory(Timers.memoryLocationTIMA, tima + 1);
+        eightBitStoreIntoGBMemorySkipTraps(Timers.memoryLocationTIMA, tima + 1);
       }
     }
   }
@@ -58,7 +58,7 @@ function _checkDividerRegister(numberOfCycles: u8):void {
     } else {
       dividerRegister += 1;
     }
-    eightBitStoreIntoGBMemory(Timers.memoryLocationDividerRegister, dividerRegister);
+    eightBitStoreIntoGBMemorySkipTraps(Timers.memoryLocationDividerRegister, dividerRegister);
   }
 }
 

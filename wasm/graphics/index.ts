@@ -1,4 +1,4 @@
-import { eightBitLoadFromGBMemory, eightBitStoreIntoGBMemory, sixteenBitLoadFromGBMemory, setPixelOnFrame } from '../memory/index';
+import { eightBitLoadFromGBMemory, eightBitStoreIntoGBMemorySkipTraps, sixteenBitLoadFromGBMemory, setPixelOnFrame } from '../memory/index';
 import { requestVBlankInterrupt, requestLcdInterrupt } from '../interrupts/index';
 import { consoleLog, checkBitOnByte, setBitOnByte, resetBitOnByte } from '../helpers/index';
 
@@ -60,14 +60,14 @@ function _setLcdStatus(): void {
   if(!_isLcdEnabled()) {
     // Reset scanline cycle counter
     Graphics.scanlineCycleCounter = 0;
-    eightBitStoreIntoGBMemory(Graphics.memoryLocationScanlineRegister, 0);
+    eightBitStoreIntoGBMemorySkipTraps(Graphics.memoryLocationScanlineRegister, 0);
 
     // Set to mode 1
     lcdStatus = resetBitOnByte(1, lcdStatus);
     lcdStatus = setBitOnByte(0, lcdStatus);
 
     // Store the status in memory
-    eightBitStoreIntoGBMemory(Graphics.memoryLocationLcdStatus, lcdStatus);
+    eightBitStoreIntoGBMemorySkipTraps(Graphics.memoryLocationLcdStatus, lcdStatus);
   }
 
   // Get our current scanline, and lcd mode
@@ -121,7 +121,7 @@ function _setLcdStatus(): void {
   }
 
   // Finally, save our status
-  eightBitStoreIntoGBMemory(Graphics.memoryLocationLcdStatus, lcdStatus);
+  eightBitStoreIntoGBMemorySkipTraps(Graphics.memoryLocationLcdStatus, lcdStatus);
 }
 
 export function updateGraphics(numberOfCycles: u8): void {
@@ -155,7 +155,7 @@ export function updateGraphics(numberOfCycles: u8): void {
       }
 
       // Store our scanline
-      eightBitStoreIntoGBMemory(Graphics.memoryLocationScanlineRegister, scanlineRegister);
+      eightBitStoreIntoGBMemorySkipTraps(Graphics.memoryLocationScanlineRegister, scanlineRegister);
     }
   }
 }
@@ -186,7 +186,6 @@ function _drawScanline(): void {
 
   // Check if the background is enabled
   if (checkBitOnByte(0, lcdControl)) {
-    //_renderTiles(lcdControl);
 
     // Get our scrollX and scrollY
     let scrollX: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationScrollX);
@@ -245,8 +244,6 @@ function _getTileDataAddress(tileDataMemoryLocation: u16, tileIdFromTileMap: u8)
 function _getColorFromPalette(paletteMemoryLocation: u16, colorId: u8): u8 {
   let paletteByte: u8 = eightBitLoadFromGBMemory(paletteMemoryLocation);
   let color: u8 = 0;
-
-  consoleLog(paletteByte, 34);
 
   // Shift our paletteByte, 2 times for each color ID
   paletteByte = (paletteByte >> (colorId * 2))
