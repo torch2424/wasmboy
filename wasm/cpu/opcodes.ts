@@ -15,6 +15,7 @@ import {
   checkAndSetSixteenBitFlagsAddOverflow
 } from './flags'
 import {
+  consoleLog,
   rotateByteLeft,
   rotateByteRight,
   concatenateBytes,
@@ -116,7 +117,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitHalfCarryFlag(Cpu.registerB, 1);
     Cpu.registerB += 1;
     if (Cpu.registerB === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -129,7 +131,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitHalfCarryFlag(Cpu.registerB, -1);
     Cpu.registerB -= 1;
     if (Cpu.registerB == 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -203,7 +206,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitHalfCarryFlag(Cpu.registerC, 1);
     Cpu.registerC += 1;
     if (Cpu.registerC === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -216,7 +220,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitHalfCarryFlag(Cpu.registerC, -1);
     Cpu.registerC -= 1;
     if (Cpu.registerC === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -284,7 +289,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitHalfCarryFlag(Cpu.registerD, 1);
     Cpu.registerD += 1;
     if (Cpu.registerD === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -297,7 +303,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitHalfCarryFlag(Cpu.registerD, -1);
     Cpu.registerD -= 1;
     if (Cpu.registerD === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -374,7 +381,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitHalfCarryFlag(Cpu.registerE, 1);
     Cpu.registerE += 1;
     if (Cpu.registerE === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -387,7 +395,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitHalfCarryFlag(Cpu.registerE, -1);
     Cpu.registerE -= 1;
     if (Cpu.registerE === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -472,7 +481,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitHalfCarryFlag(Cpu.registerH, 1);
     Cpu.registerH += 1;
     if (Cpu.registerH === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -485,7 +495,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitHalfCarryFlag(Cpu.registerH, -1);
     Cpu.registerH -= 1;
     if (Cpu.registerH === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -586,7 +597,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitHalfCarryFlag(Cpu.registerL, 1);
     Cpu.registerL += 1;
     if (Cpu.registerL === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -599,7 +611,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitHalfCarryFlag(Cpu.registerL, -1);
     Cpu.registerL -= 1;
     if (Cpu.registerL === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -660,7 +673,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitHalfCarryFlag(<u8>valueAtHL, -1);
     valueAtHL += 1;
     if (valueAtHL === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -676,7 +690,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitHalfCarryFlag(<u8>valueAtHL, -1);
     valueAtHL -= 1;
     if (valueAtHL === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -742,7 +757,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitHalfCarryFlag(Cpu.registerA, 1);
     Cpu.registerA += 1;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -755,7 +771,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitHalfCarryFlag(Cpu.registerA, -1);
     Cpu.registerA -= 1;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -1172,7 +1189,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, Cpu.registerB);
     Cpu.registerA += Cpu.registerB;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1185,7 +1203,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, Cpu.registerC);
     Cpu.registerA += Cpu.registerC;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1198,7 +1217,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, Cpu.registerD);
     Cpu.registerA += Cpu.registerD;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1211,7 +1231,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, Cpu.registerE);
     Cpu.registerA += Cpu.registerE;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1224,7 +1245,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, Cpu.registerH);
     Cpu.registerA += Cpu.registerH;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1237,7 +1259,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, Cpu.registerL);
     Cpu.registerA += Cpu.registerL;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1251,7 +1274,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>valueAtHL);
     Cpu.registerA += <u8>valueAtHL;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1264,7 +1288,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, Cpu.registerA);
     Cpu.registerA += Cpu.registerA;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1278,7 +1303,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalToAdd);
     Cpu.registerA += <u8>totalToAdd;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1292,7 +1318,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalToAdd);
     Cpu.registerA += <u8>totalToAdd;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1306,7 +1333,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalToAdd);
     Cpu.registerA += <u8>totalToAdd;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1320,7 +1348,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalToAdd);
     Cpu.registerA += <u8>totalToAdd;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1334,7 +1363,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalToAdd);
     Cpu.registerA += <u8>totalToAdd;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1348,7 +1378,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalToAdd);
     Cpu.registerA += <u8>totalToAdd;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1363,7 +1394,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalToAdd);
     Cpu.registerA += <u8>totalToAdd;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1377,7 +1409,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalToAdd);
     Cpu.registerA += <u8>totalToAdd;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1392,7 +1425,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
     Cpu.registerA -= Cpu.registerB;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -1407,7 +1441,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
     Cpu.registerA -= Cpu.registerC;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -1422,7 +1457,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
     Cpu.registerA -= Cpu.registerD;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -1437,7 +1473,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
     Cpu.registerA -= Cpu.registerE;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -1452,7 +1489,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
     Cpu.registerA -= Cpu.registerH;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -1467,7 +1505,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
     Cpu.registerA -= Cpu.registerL;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -1483,7 +1522,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
     Cpu.registerA -= <u8>valueAtHL;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -1498,7 +1538,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
     Cpu.registerA -= Cpu.registerA;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -1514,7 +1555,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalValue);
     Cpu.registerA -= <u8>totalValue;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -1530,7 +1572,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalValue);
     Cpu.registerA -= <u8>totalValue;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -1546,7 +1589,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalValue);
     Cpu.registerA -= <u8>totalValue;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -1562,7 +1606,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalValue);
     Cpu.registerA -= <u8>totalValue;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -1578,7 +1623,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalValue);
     Cpu.registerA -= <u8>totalValue;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -1594,7 +1640,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalValue);
     Cpu.registerA -= <u8>totalValue;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -1610,7 +1657,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalValue);
     Cpu.registerA -= <u8>totalValue;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -1626,7 +1674,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalValue);
     Cpu.registerA -= <u8>totalValue;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -1638,7 +1687,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Z 0 1 0
     Cpu.registerA = (Cpu.registerA & Cpu.registerB);
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1652,7 +1702,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Z 0 1 0
     Cpu.registerA = (Cpu.registerA & Cpu.registerC);
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1666,7 +1717,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Z 0 1 0
     Cpu.registerA = (Cpu.registerA & Cpu.registerD);
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1680,7 +1732,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Z 0 1 0
     Cpu.registerA = (Cpu.registerA & Cpu.registerE);
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1694,7 +1747,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Z 0 1 0
     Cpu.registerA = (Cpu.registerA & Cpu.registerH);
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1708,7 +1762,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Z 0 1 0
     Cpu.registerA = (Cpu.registerA & Cpu.registerL);
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1723,7 +1778,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     let valueAtHL: u8 = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
     Cpu.registerA = (Cpu.registerA & <u8>valueAtHL);
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1737,7 +1793,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Z 0 1 0
     // Don't & Yourself, does nothing
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1751,7 +1808,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Z 0 0 0
     Cpu.registerA = Cpu.registerA ^ Cpu.registerB;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1765,7 +1823,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Z 0 0 0
     Cpu.registerA = Cpu.registerA ^ Cpu.registerC;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1779,7 +1838,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Z 0 0 0
     Cpu.registerA = Cpu.registerA ^ Cpu.registerD;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1793,7 +1853,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Z 0 0 0
     Cpu.registerA = Cpu.registerA ^ Cpu.registerE;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1807,7 +1868,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Z 0 0 0
     Cpu.registerA = Cpu.registerA ^ Cpu.registerH;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1821,7 +1883,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Z 0 0 0
     Cpu.registerA = Cpu.registerA ^ Cpu.registerL;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1836,7 +1899,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     let valueAtHL: u8 = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
     Cpu.registerA = Cpu.registerA ^ <u8>valueAtHL;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1849,8 +1913,10 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // 1  4
     // Z 0 0 0
     Cpu.registerA = Cpu.registerA ^ Cpu.registerA;
+    consoleLog(Cpu.registerA, 20);
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1864,7 +1930,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Z 0 0 0
     Cpu.registerA = Cpu.registerA | Cpu.registerB;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1878,7 +1945,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Z 0 0 0
     Cpu.registerA = Cpu.registerA | Cpu.registerC;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1892,7 +1960,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Z 0 0 0
     Cpu.registerA = Cpu.registerA | Cpu.registerD;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1906,7 +1975,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Z 0 0 0
     Cpu.registerA = Cpu.registerA | Cpu.registerE;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1920,7 +1990,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Z 0 0 0
     Cpu.registerA = Cpu.registerA | Cpu.registerH;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1934,7 +2005,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Z 0 0 0
     Cpu.registerA = Cpu.registerA | Cpu.registerL;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1949,7 +2021,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     let valueAtHL: u8 = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
     Cpu.registerA = Cpu.registerA | <u8>valueAtHL;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1963,7 +2036,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Z 0 0 0
     Cpu.registerA = Cpu.registerA | Cpu.registerA;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -1980,7 +2054,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
     let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeRegister;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -1995,7 +2070,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
     let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeRegister;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -2010,7 +2086,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
     let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeRegister;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -2025,7 +2102,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
     let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeRegister;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -2040,7 +2118,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
     let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeRegister;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -2055,7 +2134,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
     let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeRegister;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -2071,7 +2151,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
     let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeRegister;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -2086,7 +2167,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
     let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeRegister;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -2122,14 +2204,14 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     } else {
       numberOfCycles = 12;
     }
-    Cpu.programCounter += 2;
+    Cpu.programCounter -= 1;
   } else if(isOpcode(opcode, 0xC3)) {
 
     // JP a16
     // 3  16
     Cpu.programCounter = concatenateBytes(dataByteOne, dataByteTwo);
     numberOfCycles = 16;
-    Cpu.programCounter += 2;
+    Cpu.programCounter -= 1;
   } else if(isOpcode(opcode, 0xC4)) {
 
     // CALL NZ,a16
@@ -2160,7 +2242,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, dataByteOne);
     Cpu.registerA += dataByteOne;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -2202,7 +2285,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     } else {
       numberOfCycles = 12;
     }
-    Cpu.programCounter += 2;
+    Cpu.programCounter -= 1;
   } else if(isOpcode(opcode, 0xCB)) {
     // PREFIX CB
     // 1  4
@@ -2242,7 +2325,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalToAdd);
     Cpu.registerA += <u8>totalToAdd;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -2286,7 +2370,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     } else {
       numberOfCycles = 12;
     }
-    Cpu.programCounter += 2;
+    Cpu.programCounter -= 1;
   } /* No Opcode for: 0xD3 */ else if(isOpcode(opcode, 0xD4)) {
 
     // CALL NC,a16
@@ -2318,7 +2402,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeDataByte);
     Cpu.registerA -= dataByteOne;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -2362,7 +2447,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     } else {
       numberOfCycles = 12;
     }
-    Cpu.programCounter += 2;
+    Cpu.programCounter -= 1;
   } /* No Opcode for: 0xDB */else if(isOpcode(opcode, 0xDC)) {
 
     // CALL C,a16
@@ -2387,7 +2472,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalValue);
     Cpu.registerA -= <u8>totalValue;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
@@ -2443,7 +2529,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Z 0 1 0
     Cpu.registerA = (Cpu.registerA & dataByteOne);
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -2476,6 +2563,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // 1 4
     Cpu.programCounter = concatenateBytes(Cpu.registerH, Cpu.registerL);
     numberOfCycles = 4;
+    Cpu.programCounter -= 1;
   } else if(isOpcode(opcode, 0xEA)) {
 
     // LD (a16),A
@@ -2551,7 +2639,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Z 0 0 0
     Cpu.registerA = (Cpu.registerA | dataByteOne);
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
@@ -2611,7 +2700,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeDataByte);
     let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeDataByte;
     if (Cpu.registerA === 0) {
-
+      setZeroFlag(1);
+    } else {
       setZeroFlag(0);
     }
     setSubtractFlag(1);

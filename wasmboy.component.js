@@ -4,7 +4,7 @@ import { Component } from 'preact';
 import fetch from 'unfetch'
 import Promise from 'promise-polyfill';
 
-import { Wasmboy } from './wasmboy.service';
+import { WasmBoyService } from './wasmboy.service';
 import { CpuDebugComponent } from './cpudebug.component';
 
 export class WasmboyComponent extends Component {
@@ -13,8 +13,7 @@ export class WasmboyComponent extends Component {
 		super();
 		// set our state to if we are initialized or not
 		this.state = {
-			initialized: false,
-      wasmBoy: undefined
+			initialized: false
 		};
 	}
 
@@ -29,11 +28,10 @@ export class WasmboyComponent extends Component {
     if(this.state.initialized) return;
     this.state.initialized = true;
 
-    this.state.wasmBoy = new Wasmboy();
-    this.state.wasmBoy
-    .loadGame('DMG_ROM.gb')
+    WasmBoyService
+    .loadGame('tetris.gb')
     .then(() => {
-      this.state.wasmBoy.startGame();
+      WasmBoyService.startGame();
     });
   }
 

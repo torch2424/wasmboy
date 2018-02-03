@@ -3,7 +3,7 @@ import Promise from 'promise-polyfill';
 
 // TODO: Handle rejects
 
-export class Wasmboy {
+class WasmBoy {
 
   // Start the request to our wasm module
   constructor() {
@@ -44,18 +44,30 @@ export class Wasmboy {
   // Function to start the game
   startGame() {
 
-    //this.wasmInstance.exports.initialize();
+    this.wasmInstance.exports.initialize();
     console.log(`Starting programCounter position: 0x${this.wasmInstance.exports.getProgramCounter().toString(16)}`);
 
     // TODO: Offload as much of this as possible to WASM
     // Feeding wasm bytes is probably going to slow things down, would be nice to just place the game in wasm memory
     // And read from there
-    const emulationLoop = () => {
+    const emulationLoop = (debug) => {
+
+
+      if(debug) {
+        const numberOfCycles = this._executeOpcode(debug);
+        setTimeout(() => {
+          emulationLoop(true);
+          this._debug();
+        }, 1000);
+        return;
+      }
+
+
       // http://www.codeslinger.co.uk/pages/projects/gameboy/beginning.html
       // Run the Decode Loop
       let error = false;
       while(this._currentCycles < this._maxCycles && !error) {
-        const numberOfCycles = this._executeOpcode();
+        const numberOfCycles = this._executeOpcode(debug);
         if(numberOfCycles !== false && numberOfCycles > 0) {
           this._currentCycles += numberOfCycles;
           if(numberOfCycles % 16 === 0) {
@@ -101,20 +113,26 @@ export class Wasmboy {
           //console.log(`Pixel: X:${x} Y:${y} Index:0x${pixelIndex.toString(16)} Color:${color}`);
         }
       }
-      //this._debug();
+
       //requestAnimationFrame(emulationLoop);
     }
-    requestAnimationFrame(() => {
-        // Run about 60 frames
-        let  i;
-        let numberOfFrames = 60;
-        for(i = 0; i < numberOfFrames; i++) {
-          emulationLoop();
-        }
 
-        console.log(`Debug: DONE! Rendered ${numberOfFrames} frames`);
-        this._debug();
-    });
+
+    // requestAnimationFrame(() => {
+    //     // Run about 60 frames
+    //     let numberOfFrames = 120;
+    //     for(let i = 0; i < numberOfFrames; i++) {
+    //       emulationLoop();
+    //     }
+    //
+    //     console.log(`Debug: DONE! Rendered ${numberOfFrames} frames`);
+    //     this._debug();
+    // });
+
+    // setTimeout(() => {
+    //   emulationLoop(true);
+    //   this._debug();
+    // }, 1000);
   }
 
   // Private funciton to returna promise to our wasmModule
@@ -176,15 +194,22 @@ export class Wasmboy {
     });
   }
 
-  _executeOpcode() {
+  _executeOpcode(debug) {
     // Get our opcode
     // opcodes are at most 3 bytes: https://gbatemp.net/threads/what-size-are-gameboy-opcodes.467282/
     // Therefore, we will pass all 3 bytes, and then the the wasm module should be able to do what it needs, wether or Not
     // it needs all 3
     // TODO: NOTE: Reember we are laoding game into byte memory
     const opcode = this.wasmByteMemory[this.wasmInstance.exports.getProgramCounter()];
-    const dataByteOne = this.wasmByteMemory[this.wasmInstance.exports.getProgramCounter() + 1];
-    const dataByteTwo = this.wasmByteMemory[this.wasmInstance.exports.getProgramCounter() + 2];
+    // NOTE: For some odd reason, dataBytes are backwords.
+    // See and test: http://gbdev.gg8.se/wiki/articles/Gameboy_Bootstrap_ROM
+    // To verfiy
+    const dataByteOne = this.wasmByteMemory[this.wasmInstance.exports.getProgramCounter() + 2];
+    const dataByteTwo = this.wasmByteMemory[this.wasmInstance.exports.getProgramCounter() + 1];
+
+    if(debug) {
+      console.log(`Opcode: 0x${opcode.toString(16)} dataByteOne: 0x${dataByteOne.toString(16)} dataByteTwo: 0x${dataByteTwo.toString(16)}`)
+    }
 
     if(opcode === undefined) {
       console.log('ERROR! No Opcode found at programCounter position: ', this.wasmInstance.exports.getProgramCounter().toString(16));
@@ -205,6 +230,13 @@ export class Wasmboy {
     }
 
     return numberOfCycles;
+  }
+
+  // TODO: remove this
+  stepOpcodes() {
+    this._executeOpcode(true);
+    console.log(`Wasm Logs: 0x${this.wasmInstance.exports.getCurrentLogValue().toString(16)} ${this.wasmInstance.exports.getCurrentLogId()}`);
+    this._debug();
   }
 
   // Private funciton to debug wasm
@@ -268,3 +300,5 @@ export class Wasmboy {
     }
   }
 }
+
+export const WasmBoyService = new WasmBoy();
