@@ -120,7 +120,8 @@ class WasmBoy {
 
     requestAnimationFrame(() => {
         // Run about 60 frames
-        let numberOfFrames = 1;
+        // Currently loops at 233, 235, 238. All codes ar corret. Unsure about handling
+        let numberOfFrames = 500;
         for(let i = 0; i < numberOfFrames; i++) {
           emulationLoop();
         }

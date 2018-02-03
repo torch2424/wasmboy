@@ -15,6 +15,8 @@ export { setZeroFlag, getZeroFlag } from './flags';
 
 import { eightBitStoreIntoGBMemory, eightBitLoadFromGBMemory } from '../memory/index';
 
+import { consoleLog } from '../helpers/index';
+
 // Everything Static as class instances just aren't quite there yet
 // https://github.com/AssemblyScript/assemblyscript/blob/master/tests/compiler/showcase.ts
 export class Cpu {
@@ -80,6 +82,13 @@ export function initialize(includeBootRom: boolean): void {
 export function relativeJump(value: u8): void {
   // Need to convert the value to i8, since in this case, u8 can be negative
   let relativeJumpOffset: i8 = <i8> value;
+
+  // Decrement relativeJumpOffset if negative
+  // TODO: Experiment bug fix:
+  if(relativeJumpOffset < 0) {
+    relativeJumpOffset -= 1;
+  }
+
   Cpu.programCounter += relativeJumpOffset;
   // Tested that you do indeed, need to have the program counter increase by 2 after
   // Realtive jump, using bgb debugger

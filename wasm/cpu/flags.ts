@@ -1,4 +1,5 @@
 import { Cpu } from './index';
+import { consoleLog } from '../helpers/index';
 
 // TODO: Improve this with a modern bitshifting way:
 // https://stackoverflow.com/questions/101439/the-most-efficient-way-to-implement-an-integer-based-power-function-powint-int
@@ -101,7 +102,8 @@ export function checkAndSetEightBitCarryFlag(value: u8, amountToAdd: i16): void 
 }
 
 // Function to handle 16 bit addition overflow, and set the carry flags accordingly
-export function checkAndSetSixteenBitFlagsAddOverflow(valueOne: u16, valueTwo: u16): void {
+// i32 to support passing signed immedita values
+export function checkAndSetSixteenBitFlagsAddOverflow(valueOne: i32, valueTwo: i32): void {
   // To check for Carry flag (bit 16), knock off all bits below
   let result: i32 = valueOne + valueTwo;
   if((result >> 15) > 0) {

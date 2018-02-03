@@ -348,6 +348,9 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
 
     // JR r8
     // 2  12
+    // NOTE: Discoved dataByte is signed
+    // However the relaitve Jump Function handles this
+
     relativeJump(dataByteOne);
     numberOfCycles = 12;
     Cpu.programCounter += 2;
@@ -1919,7 +1922,6 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // 1  4
     // Z 0 0 0
     Cpu.registerA = Cpu.registerA ^ Cpu.registerA;
-    consoleLog(Cpu.registerA, 20);
     if (Cpu.registerA === 0) {
       setZeroFlag(1);
     } else {
@@ -2403,7 +2405,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // SUB d8
     // 2  8
     // Z 1 H C
-    let negativeDataByte: i16 = dataByteOne * -1;
+    let negativeDataByte: i16 = <i16>dataByteOne * -1;
     checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeDataByte);
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeDataByte);
     Cpu.registerA -= dataByteOne;
@@ -2557,8 +2559,11 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // ADD SP, r8
     // 2 16
     // 0 0 H C
-    checkAndSetSixteenBitFlagsAddOverflow(Cpu.stackPointer, <u16>dataByteOne);
-    Cpu.stackPointer += dataByteOne;
+    // NOTE: Discoved dataByte is signed
+    let signedDataByteOne: i8 = <i8>dataByteOne;
+
+    checkAndSetSixteenBitFlagsAddOverflow(Cpu.stackPointer, signedDataByteOne);
+    Cpu.stackPointer += signedDataByteOne;
     setZeroFlag(0);
     setSubtractFlag(0);
     Cpu.programCounter += 1;
@@ -2667,11 +2672,13 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // LD HL,SP+r8
     // 2 12
     // 0 0 H C
+    // NOTE: Discoved dataByte is signed
+    let signedDataByteOne: i8 = <i8>dataByteOne;
 
     // First, let's handle flags
     setZeroFlag(0);
     setSubtractFlag(0);
-    checkAndSetSixteenBitFlagsAddOverflow(Cpu.stackPointer, dataByteOne);
+    checkAndSetSixteenBitFlagsAddOverflow(Cpu.stackPointer, signedDataByteOne);
     let registerHL = Cpu.stackPointer + dataByteOne;
     Cpu.registerH = splitHighByte(registerHL);
     Cpu.registerL = splitLowByte(registerHL);
@@ -2701,7 +2708,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // CP d8
     // 2 8
     // Z 1 H C
-    let negativeDataByte: i16 = dataByteOne * -1;
+    let negativeDataByte: i16 = <i16>dataByteOne * -1;
     checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeDataByte);
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeDataByte);
     let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeDataByte;
