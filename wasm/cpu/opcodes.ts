@@ -17,7 +17,9 @@ import {
 import {
   consoleLog,
   rotateByteLeft,
+  rotateByteLeftThroughCarry,
   rotateByteRight,
+  rotateByteRightThroughCarry,
   concatenateBytes,
   splitHighByte,
   splitLowByte
@@ -336,9 +338,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     if((Cpu.registerA & 0x80) === 0x80) {
       hasHighbit = true;
     }
-    Cpu.registerA = rotateByteLeft(Cpu.registerA);
+    Cpu.registerA = rotateByteLeftThroughCarry(Cpu.registerA);
     // OR the carry flag to the end
-    Cpu.registerA = Cpu.registerA | getCarryFlag();
     if(hasHighbit) {
       setCarryFlag(1);
     } else {
@@ -433,9 +434,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     if((Cpu.registerA & 0x01) === 0x01) {
       hasLowBit = true;
     }
-    Cpu.registerA = rotateByteRight(Cpu.registerA);
-    // OR the carry flag to the end
-    Cpu.registerA = Cpu.registerA | (getCarryFlag() << 7);
+    Cpu.registerA = rotateByteRightThroughCarry(Cpu.registerA);
+
     if(hasLowBit) {
       setCarryFlag(1);
     } else {
@@ -2070,7 +2070,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeRegister);
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
     let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeRegister;
-    if (Cpu.registerA === 0) {
+    if (tempResult === 0) {
       setZeroFlag(1);
     } else {
       setZeroFlag(0);
@@ -2086,7 +2086,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeRegister);
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
     let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeRegister;
-    if (Cpu.registerA === 0) {
+    if (tempResult === 0) {
       setZeroFlag(1);
     } else {
       setZeroFlag(0);
@@ -2102,7 +2102,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeRegister);
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
     let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeRegister;
-    if (Cpu.registerA === 0) {
+    if (tempResult === 0) {
       setZeroFlag(1);
     } else {
       setZeroFlag(0);
@@ -2118,7 +2118,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeRegister);
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
     let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeRegister;
-    if (Cpu.registerA === 0) {
+    if (tempResult === 0) {
       setZeroFlag(1);
     } else {
       setZeroFlag(0);
@@ -2134,7 +2134,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeRegister);
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
     let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeRegister;
-    if (Cpu.registerA === 0) {
+    if (tempResult === 0) {
       setZeroFlag(1);
     } else {
       setZeroFlag(0);
@@ -2150,7 +2150,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeRegister);
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
     let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeRegister;
-    if (Cpu.registerA === 0) {
+    if (tempResult === 0) {
       setZeroFlag(1);
     } else {
       setZeroFlag(0);
@@ -2167,7 +2167,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeRegister);
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
     let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeRegister;
-    if (Cpu.registerA === 0) {
+    if (tempResult === 0) {
       setZeroFlag(1);
     } else {
       setZeroFlag(0);
@@ -2183,7 +2183,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeRegister);
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
     let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeRegister;
-    if (Cpu.registerA === 0) {
+    if (tempResult === 0) {
       setZeroFlag(1);
     } else {
       setZeroFlag(0);
@@ -2717,7 +2717,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeDataByte);
     checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeDataByte);
     let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeDataByte;
-    if (Cpu.registerA === 0) {
+    if (tempResult === 0) {
       setZeroFlag(1);
     } else {
       setZeroFlag(0);

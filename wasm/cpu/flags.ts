@@ -1,28 +1,16 @@
 import { Cpu } from './index';
 import { consoleLog } from '../helpers/index';
 
-// TODO: Improve this with a modern bitshifting way:
-// https://stackoverflow.com/questions/101439/the-most-efficient-way-to-implement-an-integer-based-power-function-powint-int
-// TODO: Make a lookup table from bit -> byte representation
-function _exponent(numberValue: u8, exponentValue: u8): u8 {
-  let result: u8 = numberValue;
-  for (let i: u8 = 1; i < exponentValue; i++) {
-    result = result * numberValue;
-  }
-  return result;
-}
-
 
 // Set flag bit on on register F. For instance set zero flag to zero -> (7, 0)
 function setFlagBit(flagBit: u8, flagValue: u8): u8 {
 
-  let bitwiseOperand: u8 = 0x00;
+  let bitwiseOperand: u8 = 0x01 << flagBit;
   if(flagValue > 0) {
-    bitwiseOperand += _exponent(2, flagBit);
     Cpu.registerF = Cpu.registerF | bitwiseOperand;
   } else {
-    bitwiseOperand = 0xFF;
-    bitwiseOperand -= _exponent(2, flagBit);
+    // XOR out the two ones
+    bitwiseOperand = 0xFF ^ bitwiseOperand;
     Cpu.registerF = Cpu.registerF & bitwiseOperand;
   }
 
@@ -48,35 +36,35 @@ export function setCarryFlag(value: u8): void {
 
 // Getters for flags
 export function getZeroFlag(): u8 {
-  return Cpu.registerF & _exponent(2, 7);
+  return (Cpu.registerF >> 7) & 0x01;
 }
 
 export function getSubtractFlag(): u8 {
-  return Cpu.registerF & _exponent(2, 6);
+  return (Cpu.registerF >> 6) & 0x01;
 }
 
 export function getHalfCarryFlag(): u8 {
-  return Cpu.registerF & _exponent(2, 5);
+  return (Cpu.registerF >> 5) & 0x01;
 }
 
 export function getCarryFlag(): u8 {
-  return Cpu.registerF & _exponent(2, 4);
+  return (Cpu.registerF >> 4) & 0x01;
 }
 
 // Must be run before the register actually performs the add
 // amountToAdd i16, since max number can be an u8
 export function checkAndSetEightBitHalfCarryFlag(value: u8, amountToAdd: i16): void {
-  let result: i16 = <i16>value + amountToAdd;
   if(amountToAdd > 0) {
     // https://robdor.com/2016/08/10/gameboy-emulator-half-carry-flag/
-    if((result & 0x10) === 0x10) {
+    let result = (((value & 0xf) + (<u8>amountToAdd & 0xf)) & 0x10)
+    if(result === 0x10) {
       setHalfCarryFlag(1);
     } else {
       setHalfCarryFlag(0);
     }
-  } else if (amountToAdd < 0) {
-    // Taken from Sub of https://github.com/nakardo/node-gameboy/blob/master/lib/Cpu/opcodes.js
-    if (((<i16>value ^ amountToAdd ^ result) & 0x10) != 0) {
+  } else {
+    // From: https://www.reddit.com/r/EmuDev/comments/4clh23/trouble_with_halfcarrycarry_flag/
+    if((value & 0x0F) - <u8>(abs(amountToAdd) & 0x0F) < 0) {
       setHalfCarryFlag(1);
     } else {
       setHalfCarryFlag(0);
@@ -93,7 +81,7 @@ export function checkAndSetEightBitCarryFlag(value: u8, amountToAdd: i16): void 
       setCarryFlag(0);
     }
   } else {
-    if(abs(amountToAdd) > result) {
+    if(abs(amountToAdd) > value) {
       setCarryFlag(1);
     } else {
       setCarryFlag(0);

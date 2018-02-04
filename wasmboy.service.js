@@ -14,7 +14,6 @@ class WasmBoy {
     this.wasmInstance = undefined;
     this.wasmByteMemory = undefined;
     this.gameBytes = undefined;
-    this.opcodesRun = [];
 
     this.debugState = {
       currentOpcode: undefined
@@ -29,41 +28,68 @@ class WasmBoy {
       // Vaguely trying an IFFIE Pattern and diving our instance, and game fetch
       Promise.all([
         this._getWasmInstance(),
+        this._fetchGameAsByteArray('DMG_ROM.gb'),
         this._fetchGameAsByteArray(pathToGame)
       ]).then((responses) => {
-        // Responses already bound to this, simple resolve parent paromise
+        // Responses already bound to this, simple resolve parent promise
+        // Set our gamebytes
+        const biosBytes = responses[1];
+        this.gameBytes = responses[2];
 
         // Load the game data into actual memory
         for(let i = 0; i < 0x7FFF; i++) {
-          if(this.gameBytes[i]) {
+
+          // Load the bios, then the game
+          if(i < 0x100) {
+            this.wasmByteMemory[i] = biosBytes[i];
+          } else if(this.gameBytes[i]) {
               this.wasmByteMemory[i] = this.gameBytes[i];
           }
         }
+
+        console.log(this.wasmByteMemory);
         resolve();
       })
     });
   }
 
   // TODO: move this
-  breakOut() {
+  runNumberOfOpcodes(numberOfOpcodes, opcodeToStop) {
     // Keep stepping until highest opcode increases
-    const currentOpcode = this.debugState.currentOpcode;
-    this.stepOpcodes();
-    if (Math.abs(currentOpcode - this.debugState.currentOpcode) > 4) {
-      this.breakOut();
+    let opcodesToRun = 1000;
+    if(numberOfOpcodes) {
+      opcodesToRun = numberOfOpcodes
     }
+    for(let i = 0; i < opcodesToRun; i++) {
+      this.stepOpcodes(true);
+      if(opcodeToStop && opcodeToStop === this.wasmInstance.exports.getProgramCounter()) {
+        i = opcodesToRun;
+      }
+    }
+    this._debug();
   }
 
   // TODO: Move this
-  breakPoint() {
+  breakPoint(skipInitialStep) {
     // Set our opcode breakpoint
-    const breakPoint = 0x55;
+    // Jumping to line 30, until A is 0x34
+    const breakPoint = 0x30;
+
+    if(!skipInitialStep) {
+      this.runNumberOfOpcodes(1, breakPoint);
+    }
+
     if(this.wasmInstance.exports.getProgramCounter() !== breakPoint) {
-      this.stepOpcodes(true);
-      this.breakPoint();
+      requestAnimationFrame(() => {
+        this.runNumberOfOpcodes(1000, breakPoint);
+        this.breakPoint(true);
+      });
     } else {
       this._render();
-      this._debug();
+      requestAnimationFrame(() => {
+        this._debug();
+        console.log('Reached Breakpoint!');
+      })
     }
   }
 
@@ -76,7 +102,7 @@ class WasmBoy {
     this._executeOpcode(true, true);
     console.log(`Wasm Logs: 0x${this.wasmInstance.exports.getCurrentLogValue().toString(16)} ${this.wasmInstance.exports.getCurrentLogId()}`);
     this._render();
-    this._debug();
+    this._debug(true);
   }
 
 
@@ -103,13 +129,22 @@ class WasmBoy {
           error = true;
         }
       }
+      // Reset our cycles
+      this._currentCycles = 0;
+
+      if(error) {
+        return false;
+      }
 
       // Render the display
+      console.log('Rendering Next Frame');
       this._render();
+      this._debug();
 
-      //console.log('Rendering Next Frame');
-      //this._debug();
-      //requestAnimationFrame(emulationLoop);
+      requestAnimationFrame(() => {
+          //emulationLoop();
+      });
+      return true;
     }
 
 
@@ -118,15 +153,18 @@ class WasmBoy {
         // Currently loops at 233, 235, 238. All codes ar corret. Unsure about handling
         // Wierd bug where program counter is inside of 0x237 loop, but
         // No matter how many frames, will then endter the 0x261 loop
-        let numberOfFrames = 0;
+        let numberOfFrames = 2;
         for(let i = 0; i < numberOfFrames; i++) {
+          console.log('Starting with loop #', i);
           emulationLoop();
+          console.log('Done with loop #', i);
         }
 
         console.log(`Debug: DONE! Rendered ${numberOfFrames} frames`);
         console.log(`Wasm Logs: 0x${this.wasmInstance.exports.getCurrentLogValue().toString(16)} ${this.wasmInstance.exports.getCurrentLogId()}`);
-        console.log('opcodes run:', this.opcodesRun);
-        this._debug();
+        setTimeout(() => {
+          this._debug();
+        }, 500);
     });
   }
 
@@ -183,8 +221,7 @@ class WasmBoy {
         return blob.arrayBuffer();
       }).then(bytes => {
         const byteArray = new Uint8Array(bytes);
-        this.gameBytes = byteArray;
-        resolve(this.gameBytes);
+        resolve(byteArray);
       });
     });
   }
@@ -216,7 +253,7 @@ class WasmBoy {
       this.debugState.currentOpcode = opcode;
     }
 
-    // Returns the program counter position for next instruction to be fetched
+    // Returns the number of cycles the instruction took
     const numberOfCycles = this.wasmInstance.exports.handleOpcode(
       opcode,
       dataByteOne,
@@ -272,6 +309,7 @@ class WasmBoy {
 
   // Private funciton to debug wasm
   _debug(shouldShowLogs) {
+
     // Print out all of our info
     const cpuDebugDiv = document.getElementById('cpu-debug-info');
     if(cpuDebugDiv) {

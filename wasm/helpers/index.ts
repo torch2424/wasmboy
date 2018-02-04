@@ -1,3 +1,5 @@
+import { getCarryFlag } from '../cpu/flags';
+
 class Log {
   static logValue: i32 = 0;
   static logId: i32 = 0;
@@ -5,10 +7,8 @@ class Log {
 
 // Set the current log
 export function consoleLog(valueToSet: i32, logId: i32): void {
-  if(valueToSet > Log.logValue) {
-    Log.logValue = valueToSet;
-    Log.logId = logId;
-  }
+  Log.logValue = valueToSet;
+  Log.logId = logId;
 }
 
 // General console.log function, can poll from js
@@ -45,11 +45,25 @@ export function rotateByteLeft(value: u8): u8 {
   return (value << 1) | (value >> 7);
 }
 
+export function rotateByteLeftThroughCarry(value: u8): u8 {
+  // Example: https://github.com/nakardo/node-gameboy/blob/master/lib/cpu/opcodes.js
+  // Through carry meaning, instead of raotating the bit that gets dropped off, but the carry there instead
+  value = (value << 1) | getCarryFlag();
+  return value;
+}
+
 export function rotateByteRight(value: u8): u8 {
   // Rotate right
   // 4-bit example:
   // 1010 -> 0101 | 0000
   return (value >> 1) | (value << 7);
+}
+
+export function rotateByteRightThroughCarry(value: u8): u8 {
+  // Example: https://github.com/nakardo/node-gameboy/blob/master/lib/cpu/opcodes.js
+  // Through carry meaning, instead of raotating the bit that gets dropped off, put the carry there instead
+  value = (value >> 1) | (getCarryFlag() << 7);
+  return value;
 }
 
 export function setBitOnByte(bitPosition: u8, byte: u8): u8 {

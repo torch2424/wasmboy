@@ -14,8 +14,11 @@ import {
   checkAndSetSixteenBitFlagsAddOverflow
 } from './flags'
 import {
+  consoleLog,
   rotateByteLeft,
+  rotateByteLeftThroughCarry,
   rotateByteRight,
+  rotateByteRightThroughCarry,
   concatenateBytes
 } from '../helpers/index';
 import {
@@ -87,9 +90,7 @@ function rotateRegisterLeftThroughCarry(register: u8): u8 {
   if((register & 0x80) === 0x80) {
     hasHighbit = true;
   }
-  register = rotateByteLeft(register);
-  // OR the carry flag to the end
-  register = register | getCarryFlag();
+  register = rotateByteLeftThroughCarry(register);
 
   if(hasHighbit) {
     setCarryFlag(1);
@@ -117,9 +118,7 @@ function rotateRegisterRightThroughCarry(register: u8): u8 {
   if((register & 0x01) === 0x01) {
     hasLowBit = true;
   }
-  register = rotateByteRight(register);
-  // OR the carry flag to the end
-  register = register | (getCarryFlag() << 7);
+  register = rotateByteRightThroughCarry(register);
 
   if(hasLowBit) {
     setCarryFlag(1);
@@ -307,11 +306,9 @@ export function handleCbOpcode(cbOpcode: u8): i8 {
   let instructionRegisterValue: u8 = 0;
   let instructionRegisterResult: u8 = 0;
 
-  // Get our register number by subtracting 0x07 while cb opcode is above 0x07
-  let registerNumber = cbOpcode;
-  while (registerNumber > 0x07) {
-    registerNumber -= 0x07;
-  }
+  // Get our register number by modulo 0x08 (number of registers)
+  // cbOpcode % 0x08
+  let registerNumber = cbOpcode % 0x08;
 
   // NOTE: registerNumber = register on CB table. Cpu.registerB = 0, Cpu.registerC = 1....Cpu.registerA = 7
   if(registerNumber === 0) {

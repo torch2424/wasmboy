@@ -21,7 +21,7 @@ export class CpuDebugComponent extends Component {
 
         <button onclick={() => {WasmBoyService.stepOpcodes();}}>Step Opcode</button>
 
-        <button onclick={() => {WasmBoyService.breakOut();}}>Break out Opcode loop</button>
+        <button onclick={() => {WasmBoyService.runNumberOfOpcodes();}}>Run Hardcoded number of opcodes loop</button>
 
         <button onclick={() => {WasmBoyService.breakPoint();}}>Run Until hardcoded breakpoint</button>
 
