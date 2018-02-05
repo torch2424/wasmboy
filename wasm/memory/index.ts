@@ -30,17 +30,21 @@ class Memory {
   // Hardware I/O, 0xFF00 -> 0xFF7F
   // Zero Page, 0xFF80 -> 0xFFFE
   // Intterupt Enable Flag, 0xFFFF
-
 }
 
 
 // also need to store current frame in memory to be read by JS
 const memoryFrameDataStart = 0x10000;
-export function setPixelOnFrame(x: u8, y: u8, color: u8): void {
+export function setPixelOnFrame(x: u16, y: u16, color: u8): void {
   // Currently only supports 160x144
   // Storing in X, then y
   // So need an offset
-  let offset = memoryFrameDataStart + (y * 160) + x;
+
+  // Store our x and y to allow them to get really large
+  let largeY: i32 = y;
+  let largeX: i32 = x;
+
+  let offset: i32 = memoryFrameDataStart + (largeY * 160) + largeX;
   store<u8>(offset, color);
 }
 

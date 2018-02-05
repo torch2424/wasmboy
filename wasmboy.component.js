@@ -5,7 +5,7 @@ import fetch from 'unfetch'
 import Promise from 'promise-polyfill';
 
 import { WasmBoyService } from './wasmboy.service';
-import { CpuDebugComponent } from './cpudebug.component';
+import { DebugComponent } from './debug.component';
 
 export class WasmboyComponent extends Component {
 
@@ -45,7 +45,7 @@ export class WasmboyComponent extends Component {
             height="480">
           </canvas>
         </div>
-        <CpuDebugComponent></CpuDebugComponent>
+        <DebugComponent></DebugComponent>
       </div>
 		);
 	}

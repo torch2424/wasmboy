@@ -56,7 +56,7 @@ class WasmBoy {
   // TODO: move this
   runNumberOfOpcodes(numberOfOpcodes, opcodeToStop) {
     // Keep stepping until highest opcode increases
-    let opcodesToRun = 1000;
+    let opcodesToRun = 2000;
     if(numberOfOpcodes) {
       opcodesToRun = numberOfOpcodes
     }
@@ -66,14 +66,14 @@ class WasmBoy {
         i = opcodesToRun;
       }
     }
+    this._render();
     this._debug();
   }
 
   // TODO: Move this
   breakPoint(skipInitialStep) {
     // Set our opcode breakpoint
-    // Jumping to line 30, until A is 0x34
-    const breakPoint = 0x30;
+    const breakPoint = 0x80;
 
     if(!skipInitialStep) {
       this.runNumberOfOpcodes(1, breakPoint);
@@ -81,7 +81,7 @@ class WasmBoy {
 
     if(this.wasmInstance.exports.getProgramCounter() !== breakPoint) {
       requestAnimationFrame(() => {
-        this.runNumberOfOpcodes(1000, breakPoint);
+        this.runNumberOfOpcodes(10000, breakPoint);
         this.breakPoint(true);
       });
     } else {
@@ -108,6 +108,12 @@ class WasmBoy {
 
   // Function to start the game
   startGame() {
+
+    // Set our canvas and our context
+    this.canvas = document.getElementById('canvas');
+    this.canvasContext = canvas.getContext('2d');
+    this.canvasContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.canvasContext.scale(3, 3);
 
     // TODO: Don't initialize if running boot rom
     //this.wasmInstance.exports.initialize();
@@ -137,34 +143,18 @@ class WasmBoy {
       }
 
       // Render the display
-      console.log('Rendering Next Frame');
+      //console.log('Rendering Frame');
       this._render();
-      this._debug();
 
       requestAnimationFrame(() => {
-          //emulationLoop();
+          emulationLoop();
       });
       return true;
     }
 
 
     requestAnimationFrame(() => {
-        // Run about 60 frames
-        // Currently loops at 233, 235, 238. All codes ar corret. Unsure about handling
-        // Wierd bug where program counter is inside of 0x237 loop, but
-        // No matter how many frames, will then endter the 0x261 loop
-        let numberOfFrames = 2;
-        for(let i = 0; i < numberOfFrames; i++) {
-          console.log('Starting with loop #', i);
-          emulationLoop();
-          console.log('Done with loop #', i);
-        }
-
-        console.log(`Debug: DONE! Rendered ${numberOfFrames} frames`);
-        console.log(`Wasm Logs: 0x${this.wasmInstance.exports.getCurrentLogValue().toString(16)} ${this.wasmInstance.exports.getCurrentLogId()}`);
-        setTimeout(() => {
-          this._debug();
-        }, 500);
+      emulationLoop();
     });
   }
 
@@ -270,15 +260,11 @@ class WasmBoy {
   }
 
   _render() {
-    // Render
-    //console.log(`Wasm Logs: 0x${this.wasmInstance.exports.getCurrentLogValue().toString(16)}`);
-    //console.log("Rendering!", this.wasmByteMemory);
-    let canvas = document.getElementById('canvas');
-    let ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    console.log('Rendering...');
     // Draw the pixels
     // 160x144
-    for(let y = 0; y < 144; y++) {
+    // TODO: Maybe set y back to 144?, works with 143
+    for(let y = 0; y < 143; y++) {
       for (let x = 0; x < 160; x++) {
 
         const pixelIndex = 0x10000 + (y * 160) + x;
@@ -294,15 +280,13 @@ class WasmBoy {
           } else {
             fillStyle = "#000000";
           }
-          ctx.fillStyle = fillStyle;
-          ctx.fillRect(x, y, 1, 1);
+          this.canvasContext.fillStyle = fillStyle;
+          this.canvasContext.fillRect(x, y, 1, 1);
         } else {
-          ctx.fillStyle = "#0000f4";
-          ctx.fillRect(x, y, 1, 1);
+          // TODO: Remove this testing code:
+          this.canvasContext.fillStyle = "#f30000";
+          this.canvasContext.fillRect(x, y, 1, 1);
         }
-
-        // Log the current pixel
-        //console.log(`Pixel: X:${x} Y:${y} Index:0x${pixelIndex.toString(16)} Color:${color}`);
       }
     }
   }
@@ -310,20 +294,41 @@ class WasmBoy {
   // Private funciton to debug wasm
   _debug(shouldShowLogs) {
 
+    // Log memory changes
+    const memChanges = [];
+    this.wasmByteMemory.forEach((element, index) => {
+      if(element !== 0) {
+        memChanges.push({
+          value: element,
+          index: '0x' + index.toString(16)
+        })
+      }
+    });
+
+    if(shouldShowLogs) {
+      console.log(`Wasm Logs: 0x${this.wasmInstance.exports.getCurrentLogValue().toString(16)} ${this.wasmInstance.exports.getCurrentLogId()}`);
+      console.log('Memory Changes: ', memChanges);
+      console.log('Current Memory: ', this.wasmByteMemory);
+    }
+
     // Print out all of our info
     const cpuDebugDiv = document.getElementById('cpu-debug-info');
-    if(cpuDebugDiv) {
-      const createSectionWithText = (text, value) => {
-        const sectionDiv = document.createElement("div");
-        let sectionContent;
-        if(value) {
-            sectionContent = document.createTextNode(`${text}: ${value.toString(2)} | 0x${value.toString(16)} | ${value}`);
-        } else {
-          sectionContent = document.createTextNode(`${text}`);
-        }
-        sectionDiv.appendChild(sectionContent);
-        return sectionDiv;
+    const ppuDebugDiv = document.getElementById('ppu-debug-info');
+
+    const createSectionWithText = (text, value) => {
+      const sectionDiv = document.createElement("div");
+      let sectionContent;
+      if(value) {
+          sectionContent = document.createTextNode(`${text}: ${value.toString(2)} | 0x${value.toString(16)} | ${value}`);
+      } else {
+        sectionContent = document.createTextNode(`${text}`);
       }
+      sectionDiv.appendChild(sectionContent);
+      return sectionDiv;
+    }
+
+
+    if(cpuDebugDiv) {
 
       // Clear the cpu Debug Div
       // https://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript
@@ -332,6 +337,8 @@ class WasmBoy {
       }
 
       const sections = [];
+
+      // CPU
       sections.push(createSectionWithText('Register A', this.wasmInstance.exports.getRegisterA()));
       sections.push(createSectionWithText('Register B', this.wasmInstance.exports.getRegisterB()));
       sections.push(createSectionWithText('Register C', this.wasmInstance.exports.getRegisterC()));
@@ -343,27 +350,35 @@ class WasmBoy {
       sections.push(createSectionWithText('Program Counter', this.wasmInstance.exports.getProgramCounter()));
       sections.push(createSectionWithText('Stack pointer', this.wasmInstance.exports.getStackPointer()));
 
-      // Log memory changes
-      const memChanges = [];
-      this.wasmByteMemory.forEach((element, index) => {
-        if(element !== 0) {
-          memChanges.push({
-            value: element,
-            index: '0x' + index.toString(16)
-          })
-        }
-      });
-
-      if(shouldShowLogs) {
-        console.log(`Wasm Logs: 0x${this.wasmInstance.exports.getCurrentLogValue().toString(16)} ${this.wasmInstance.exports.getCurrentLogId()}`);
-        console.log('Memory Changes: ', memChanges);
-        console.log('Current Memory: ', this.wasmByteMemory);
-      }
-
       sections.forEach((section) => {
         cpuDebugDiv.appendChild(section);
       });
     }
+
+    if(ppuDebugDiv) {
+
+      // Clear the cpu Debug Div
+      // https://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript
+      while (ppuDebugDiv.firstChild) {
+          ppuDebugDiv.removeChild(ppuDebugDiv.firstChild);
+      }
+
+      const sections = [];
+
+      // PPU
+      sections.push(createSectionWithText('scanlineRegister', this.wasmByteMemory[0xFF44]));
+      sections.push(createSectionWithText('LCD Status', this.wasmByteMemory[0xFF41]));
+      sections.push(createSectionWithText('LCD Control', this.wasmByteMemory[0xFF40]));
+      sections.push(createSectionWithText('Scroll X', this.wasmByteMemory[0xFF43]));
+      sections.push(createSectionWithText('Scroll Y', this.wasmByteMemory[0xFF42]));
+      sections.push(createSectionWithText('Window X', this.wasmByteMemory[0xFF4B]));
+      sections.push(createSectionWithText('Window Y', this.wasmByteMemory[0xFF4A]));
+
+      sections.forEach((section) => {
+        ppuDebugDiv.appendChild(section);
+      });
+    }
+
   }
 }
 

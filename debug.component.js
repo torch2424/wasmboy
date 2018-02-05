@@ -1,7 +1,7 @@
 import { Component } from 'preact';
 import { WasmBoyService } from './wasmboy.service';
 
-export class CpuDebugComponent extends Component {
+export class DebugComponent extends Component {
 
   constructor() {
 		super();
@@ -17,7 +17,9 @@ export class CpuDebugComponent extends Component {
 	render() {
 		return (
       <div>
-        <h2>CPU Debug:</h2>
+        <h2>Debugger:</h2>
+
+        <button onclick={() => {WasmBoyService._debug();}}>Update Current Debug Info</button>
 
         <button onclick={() => {WasmBoyService.stepOpcodes();}}>Step Opcode</button>
 
@@ -27,6 +29,10 @@ export class CpuDebugComponent extends Component {
 
         <h3>Cpu Info:</h3>
         <div id="cpu-debug-info">
+        </div>
+
+        <h3>PPU Info:</h3>
+        <div id="ppu-debug-info">
         </div>
       </div>
 		);

@@ -1,6 +1,6 @@
 import { eightBitLoadFromGBMemory, eightBitStoreIntoGBMemorySkipTraps, sixteenBitLoadFromGBMemory, setPixelOnFrame } from '../memory/index';
 import { requestVBlankInterrupt, requestLcdInterrupt } from '../interrupts/index';
-import { consoleLog, checkBitOnByte, setBitOnByte, resetBitOnByte } from '../helpers/index';
+import { consoleLog, consoleLogLargest, checkBitOnByte, setBitOnByte, resetBitOnByte } from '../helpers/index';
 
 class Graphics {
   // Count the number of cycles to keep synced with cpu cycles
@@ -10,9 +10,13 @@ class Graphics {
   static MIN_CYCLES_TRANSFER_DATA_LCD_MODE: i16 = 249;
 
   // LCD
+  // scanlineRegister also known as LY
+  // See: http://bgb.bircd.org/pandocs.txt , and search " LY "
   static memoryLocationScanlineRegister: u16 = 0xFF44;
   static memoryLocationCoincidenceCompare: u16 = 0xFF45;
+  // Also known at STAT
   static memoryLocationLcdStatus: u16 = 0xFF41;
+  // Also known as LCDC
   static memoryLocationLcdControl: u16 = 0xFF40;
 
   // Window
@@ -47,9 +51,9 @@ function _isLcdEnabled(): boolean {
 }
 
 function _setLcdStatus(): void {
-  // LCD bits Explanation
+  // LCD Status (0xFF41) bits Explanation
   // 0                0                    000                    0             00
-  //      |Coicedence Interrupt|     |Mode Interrupts|  |coincidence flag|    | Mode |
+  //       |Coicedence Interrupt|     |Mode Interrupts|  |coincidence flag|    | Mode |
   // Modes:
   // 0 or 00: H-Blank
   // 1 or 01: V-Blank
@@ -117,7 +121,7 @@ function _setLcdStatus(): void {
       requestLcdInterrupt();
     }
   } else {
-    lcdStatus = resetBitOnByte(3, lcdStatus);
+    lcdStatus = resetBitOnByte(2, lcdStatus);
   }
 
   // Finally, save our status
@@ -197,7 +201,7 @@ function _drawScanline(): void {
     }
 
     // Finally, pass everything to draw the background
-    _renderBackground(scanlineRegister, scrollX, scrollX, tileDataMemoryLocation, tileMapMemoryLocation);
+    _renderBackground(scanlineRegister, scrollX, scrollY, tileDataMemoryLocation, tileMapMemoryLocation);
   }
 
   // Check if the window is enabled, and we are currently
@@ -212,7 +216,7 @@ function _drawScanline(): void {
 }
 
 
-function _getTileDataAddress(tileDataMemoryLocation: u16, tileIdFromTileMap: u8): u16 {
+function _getTileDataAddress(tileDataMemoryLocation: u16, tileIdFromTileMap: u16): u16 {
 
   // Watch this part of The ultimate gameboy talk: https://youtu.be/HyzD8pNlpwI?t=30m50s
   // A line of 8 pixels on a single tile, is represented by 2 bytes.
@@ -229,7 +233,7 @@ function _getTileDataAddress(tileDataMemoryLocation: u16, tileIdFromTileMap: u8)
   if(tileDataMemoryLocation === Graphics.memoryLocationTileDataSelectZeroStart) {
     // Treat the tile Id as a signed int, and add an offset of 128
     // if the tileId was 0 then the tile would be in memory region 0x9000-0x900F
-    let signedTileId: i8 = <i8>tileIdFromTileMap;
+    let signedTileId: i16 = <i16>tileIdFromTileMap;
     tileDataAddress = tileDataMemoryLocation + ((tileIdFromTileMap + 128) * sizeOfTileInMemory);
   } else {
     // if the background layout gave us the tileId 0, then the tile data would be between 0x8000-0x800F.
@@ -245,7 +249,7 @@ function _getColorFromPalette(paletteMemoryLocation: u16, colorId: u8): u8 {
   let color: u8 = 0;
 
   // Shift our paletteByte, 2 times for each color ID
-  paletteByte = (paletteByte >> (colorId * 2))
+  paletteByte = (paletteByte >> (colorId * 2));
 
   // And off any extra bytes
   paletteByte = paletteByte & 0x03;
@@ -254,29 +258,31 @@ function _getColorFromPalette(paletteMemoryLocation: u16, colorId: u8): u8 {
   return paletteByte;
 }
 
-function _renderBackground(scanlineRegister: u8, scrollX: u8, scrollY: u8, tileDataMemoryLocation: u16, tileMapMemoryLocation: u16): void {
+function _renderBackground(scanlineRegister: u8, scrollX: u16, scrollY: u16, tileDataMemoryLocation: u16, tileMapMemoryLocation: u16): void {
 
   // NOTE: Camera is reffering to what you can see inside the 160x144 viewport of the entire rendered 256x256 map.
 
   // Get our current pixel y positon on the 160x144 camera (Row that the scanline draws across)
   // this is done by getting the current scroll Y position,
   // and adding it do what Y Value the scanline is drawing on the camera.
-  let pixelYPositionInMap: u8 = scanlineRegister + scrollY;
+  let pixelYPositionInMap: u16 = <u16>scanlineRegister + scrollY;
 
   // Loop through x to draw the line like a CRT
-  for (let i: u8 = 0; i < 160; i++) {
+  for (let i: u16 = 0; i < 160; i++) {
 
     // Get our Current X position of our pixel on the on the 160x144 camera
     // this is done by getting the current scroll X position,
     // and adding it do what X Value the scanline is drawing on the camera.
-    let pixelXPositionInMap: u8 = i + scrollX;
+    let pixelXPositionInMap: u16 = i + scrollX;
 
     // Divide our pixel position by 8 to get our tile.
     // Since, there are 256x256 pixels, and 32x32 tiles.
     // 256 / 8 = 32.
     // Also, bitshifting by 3, do do a division by 8
-    let tileXPositionInMap: u8 = pixelXPositionInMap >> 3;
-    let tileYPositionInMap: u8 = pixelYPositionInMap >> 3;
+    // Need to use u16s, as they will be used to compute an address, which will cause weird errors and overflows
+    let tileXPositionInMap: u16 = pixelXPositionInMap >> 3;
+    let tileYPositionInMap: u16 = pixelYPositionInMap >> 3;
+
 
     // Get our tile address on the tileMap
     // NOTE: (tileMap represents where each tile is displayed on the screen)
@@ -286,6 +292,7 @@ function _renderBackground(scanlineRegister: u8, scrollX: u8, scrollY: u8, tileD
     // * 32, because remember, this is NOT only for the camera, the actual map is 32x32. Therefore, the next tile line of the map, is 32 byte offset.
     // Think like indexing a 2d array, as a 1d array and it make sense :)
     let tileMapAddress: u16 = tileMapMemoryLocation + (tileYPositionInMap * 32) + tileXPositionInMap;
+
     // Get the tile Id on the Tile Map
     let tileIdFromTileMap: u8 = eightBitLoadFromGBMemory(tileMapAddress);
 
@@ -306,7 +313,7 @@ function _renderBackground(scanlineRegister: u8, scrollX: u8, scrollY: u8, tileD
     // yPixel = 144. 144 % 8 = 0.
     // 0 Represents last line of pixels in a tile, 1 represents first. 1 2 3 4 5 6 7 0.
     // Because remember, we are counting lines on the display NOT including zero
-    let pixelYInTile: u8 = pixelYPositionInMap % 8;
+    let pixelYInTile: u16 = pixelYPositionInMap % 8;
     // Remember to represent a single line of 8 pixels on a tile, we need two bytes.
     // Therefore, we need to times our modulo by 2, to get the correct line of pixels on the tile.
     // Again, think like you had to map a 2d array as a 1d.
@@ -318,8 +325,8 @@ function _renderBackground(scanlineRegister: u8, scrollX: u8, scrollY: u8, tileD
     // As pixel 0 is on byte 7, and pixel 1 is on byte 6, etc...
     // Therefore, is pixelX was 2, then really is need to be 5
     // So 2 - 7 = -5, * 1 = 5
-    let reversedPixelXInTile: u8 = pixelXPositionInMap % 8;
-    let pixelXInTile: u8 = (reversedPixelXInTile - 7) * -1;
+    let reversedPixelXInTile: i16 = <i16>pixelXPositionInMap % 8;
+    let pixelXInTile: u8 = <u8>((reversedPixelXInTile - 7) * -1);
 
     // Now we can get the color for that pixel
     // Colors are represented by getting X position of Byteone, and Y positon of Byte Two

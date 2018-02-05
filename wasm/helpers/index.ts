@@ -11,6 +11,12 @@ export function consoleLog(valueToSet: i32, logId: i32): void {
   Log.logId = logId;
 }
 
+export function consoleLogLargest(valueToSet: i32, logId: i32): void {
+  if(valueToSet > Log.logValue) {
+    consoleLog(valueToSet, logId);
+  }
+}
+
 // General console.log function, can poll from js
 export function getCurrentLogValue(): i32 {
   return Log.logValue;
