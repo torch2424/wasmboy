@@ -39,21 +39,39 @@ import {
 } from '../interrupts/index';
 import {
   updateGraphics
-} from '../graphics/index'
+} from '../graphics/index';
 
-// Private funciton to check if an opcode is a value
-// this is to get out of switch statements, and not have the dangling break; per javascript syntax
-// And allow repeated variable names, for when we are concatenating registers
-function isOpcode(opcode: u8, value: u8): boolean {
-  if(opcode === value) {
-    return true;
+// Public funciton to run opcodes until a frame should be rendered.
+export function update(): i8 {
+
+  let error: boolean = false;
+  while(Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME) {
+    // Get the opcode, and additional bytes to be handled
+    const opcode: u8 = eightBitLoadFromGBMemory(Cpu.programCounter);
+    const dataByteOne: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 1);
+    const dataByteTwo: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 2);
+
+    const numberOfCycles = emulationLoop(opcode, dataByteOne, dataByteTwo);
+
+    if(numberOfCycles > 0) {
+      Cpu.currentCycles += numberOfCycles;
+    } else {
+      error = true;
+    }
   }
-  return false;
+
+  if(error) {
+    return -1;
+  } else {
+    // Reset our currentCycles
+    Cpu.currentCycles = 0;
+    return 1;
+  }
 }
 
-// Public function to handle an opcode, wraps around execute opcode for timers and things
+// Function to execute an opcode, and update other gameboy hardware.
 // http://www.codeslinger.co.uk/pages/projects/gameboy/beginning.html
-export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
+function emulationLoop(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
   let numberOfCycles: i8 = executeOpcode(opcode, dataByteOne, dataByteTwo);
   Cpu.currentCycles += numberOfCycles;
 
@@ -67,6 +85,16 @@ export function handleOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     Cpu.currentCycles = 0;
   }
   return numberOfCycles;
+}
+
+// Private funciton to check if an opcode is a value
+// this is to get out of switch statements, and not have the dangling break; per javascript syntax
+// And allow repeated variable names, for when we are concatenating registers
+function isOpcode(opcode: u8, value: u8): boolean {
+  if(opcode === value) {
+    return true;
+  }
+  return false;
 }
 
 // Take in any opcode, and decode it, and return the number of cycles
