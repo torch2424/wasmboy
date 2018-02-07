@@ -8,21 +8,18 @@ class WasmBoyLib {
     //TODO: Don't hardcode our module path
     this.wasmModuleRequest = fetch('../dist/wasm/index.untouched.wasm')
     .then(response => response.arrayBuffer());
-    this._maxCycles = 69905;
-    this._currentCycles = 0;
     this.wasmInstance = undefined;
     this.wasmByteMemory = undefined;
     this.gameBytes = undefined;
-
-    this.debugState = {
-      currentOpcode: undefined
-    }
+    this.paused = false;
+    this.ready = false;
   }
 
   // Finish request for wasm module, and fetch game
   loadGame(canvasElement, pathToGame) {
     // Getting started with wasm
     // http://webassembly.org/getting-started/js-api/
+    this.ready = false;
     return new Promise((resolve, reject) => {
 
       // Attempt to bind and get the canvas element context
@@ -30,7 +27,7 @@ class WasmBoyLib {
         this.canvasElement = canvasElement;
         this.canvasContext = this.canvasElement.getContext('2d');
         this.canvasContext.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
-        //this.canvasContext.scale(3, 3);
+        this.canvasContext.scale(this.canvasElement.width / 160, this.canvasElement.height / 144);
       } catch(error) {
         reject(error);
       }
@@ -54,6 +51,7 @@ class WasmBoyLib {
               this.wasmByteMemory[i] = this.gameBytes[i];
           }
         }
+        this.ready = true;
         resolve();
       }).catch((error) => {
         reject(error);
@@ -61,90 +59,60 @@ class WasmBoyLib {
     });
   }
 
+  pauseGame() {
+    this.paused = true;
+  }
+
+  resumeGame() {
+    // Simply offload to start game
+    this.startGame();
+  }
+
   // Function to start the game
   startGame() {
-
-    // TODO: Don't initialize if running boot rom
-    // this.wasmInstance.exports.initialize();
-
-    // Offload as much of this as possible to WASM
-    // Feeding wasm bytes is probably going to slow things down, would be nice to just place the game in wasm memory
-    // And read from there
-    const emulationLoop = () => {
-
-      // Update (Execute a frame)
-      const response = this.wasmInstance.exports.update();
-
-      if(response > 0) {
-        // Render the display
-        this._render();
-
-        // Run another frame
-        requestAnimationFrame(() => {
-            emulationLoop();
-        });
-        return true;
-      } else {
-        console.log('Wasmboy Crashed! Unknown upcode...');
-      }
+    if (!this.ready) {
+      return false;
     }
 
+    // Un-pause the game
+    this.paused = false;
 
     requestAnimationFrame(() => {
-      emulationLoop();
+      this._emulationLoop();
     });
+
+    return true;
   }
 
-  // TODO: move this
-  runNumberOfOpcodes(numberOfOpcodes, opcodeToStop) {
-    // Keep stepping until highest opcode increases
-    let opcodesToRun = 2000;
-    if(numberOfOpcodes) {
-      opcodesToRun = numberOfOpcodes
-    }
-    for(let i = 0; i < opcodesToRun; i++) {
-      this.stepOpcodes(true);
-      if(opcodeToStop && opcodeToStop === this.wasmInstance.exports.getProgramCounter()) {
-        i = opcodesToRun;
+  render() {
+    // Draw the pixels
+    // 160x144
+    // TODO: Maybe set y back to 144?, works with 143
+    for(let y = 0; y < 143; y++) {
+      for (let x = 0; x < 160; x++) {
+
+        const pixelIndex = 0x10000 + (y * 160) + x;
+        const color = this.wasmByteMemory[pixelIndex];
+        if (color) {
+          let fillStyle = false;
+          if(color === 1) {
+            fillStyle = "#FFFFFF";
+          } else if (color === 2) {
+            fillStyle = "#D3D3D3";
+          } else if (color === 3) {
+            fillStyle = "#A9A9A9";
+          } else {
+            fillStyle = "#000000";
+          }
+          this.canvasContext.fillStyle = fillStyle;
+          this.canvasContext.fillRect(x, y, 1, 1);
+        } else {
+          // TODO: Remove this testing code:
+          this.canvasContext.fillStyle = "#f30000";
+          this.canvasContext.fillRect(x, y, 1, 1);
+        }
       }
     }
-    this._render();
-    this._debug();
-  }
-
-  // TODO: Move this
-  breakPoint(skipInitialStep) {
-    // Set our opcode breakpoint
-    const breakPoint = 0x80;
-
-    if(!skipInitialStep) {
-      this.runNumberOfOpcodes(1, breakPoint);
-    }
-
-    if(this.wasmInstance.exports.getProgramCounter() !== breakPoint) {
-      requestAnimationFrame(() => {
-        this.runNumberOfOpcodes(10000, breakPoint);
-        this.breakPoint(true);
-      });
-    } else {
-      this._render();
-      requestAnimationFrame(() => {
-        this._debug();
-        console.log('Reached Breakpoint!');
-      })
-    }
-  }
-
-  // TODO: move this
-  stepOpcodes(skipDebugOutput) {
-    if(skipDebugOutput) {
-      this._executeOpcode(false, true);
-      return;
-    }
-    this._executeOpcode(true, true);
-    console.log(`Wasm Logs: 0x${this.wasmInstance.exports.getCurrentLogValue().toString(16)} ${this.wasmInstance.exports.getCurrentLogId()}`);
-    this._render();
-    this._debug(true);
   }
 
   // Private funciton to returna promise to our wasmModule
@@ -205,35 +173,31 @@ class WasmBoyLib {
     });
   }
 
-  _render() {
-    console.log('Rendering...');
-    // Draw the pixels
-    // 160x144
-    // TODO: Maybe set y back to 144?, works with 143
-    for(let y = 0; y < 143; y++) {
-      for (let x = 0; x < 160; x++) {
+  _emulationLoop() {
 
-        const pixelIndex = 0x10000 + (y * 160) + x;
-        const color = this.wasmByteMemory[pixelIndex];
-        if (color) {
-          let fillStyle = false;
-          if(color === 1) {
-            fillStyle = "#FFFFFF";
-          } else if (color === 2) {
-            fillStyle = "#D3D3D3";
-          } else if (color === 3) {
-            fillStyle = "#A9A9A9";
-          } else {
-            fillStyle = "#000000";
-          }
-          this.canvasContext.fillStyle = fillStyle;
-          this.canvasContext.fillRect(x, y, 1, 1);
-        } else {
-          // TODO: Remove this testing code:
-          this.canvasContext.fillStyle = "#f30000";
-          this.canvasContext.fillRect(x, y, 1, 1);
-        }
+    // TODO: Don't initialize if running boot rom
+    // this.wasmInstance.exports.initialize();
+
+    // Offload as much of this as possible to WASM
+    // Feeding wasm bytes is probably going to slow things down, would be nice to just place the game in wasm memory
+    // And read from there
+
+    // Update (Execute a frame)
+    const response = this.wasmInstance.exports.update();
+
+    if(response > 0) {
+      // Render the display
+      this.render();
+
+      // Run another frame
+      if(!this.paused) {
+        requestAnimationFrame(() => {
+            this._emulationLoop();
+        });
       }
+      return true;
+    } else {
+      console.log('Wasmboy Crashed! Unknown upcode...');
     }
   }
 }

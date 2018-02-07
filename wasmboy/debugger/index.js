@@ -8,28 +8,79 @@ export class WasmBoyDebugger extends Component {
 		super();
 		// set our state to if we are initialized or not
 		this.state = {
-      registers: {},
+      cpu: {},
       ppu: {}
     };
 	}
+
+  stepOpcode(skipDebugOutput) {
+    if(skipDebugOutput) {
+      WasmBoy.wasmInstance.exports.emulationStep();
+      return;
+    }
+    WasmBoy.wasmInstance.exports.emulationStep();
+    console.log(`Wasm Logs: 0x${WasmBoy.wasmInstance.exports.getCurrentLogValue().toString(16)} ${WasmBoy.wasmInstance.exports.getCurrentLogId()}`);
+    WasmBoy.render();
+    this.updateDebugInfo();
+  }
+
+  runNumberOfOpcodes(numberOfOpcodes, stopAtOpcode) {
+    // Keep stepping until highest opcode increases
+    let opcodesToRun = 2000;
+    if(numberOfOpcodes) {
+      opcodesToRun = numberOfOpcodes
+    }
+    for(let i = 0; i < opcodesToRun; i++) {
+      this.stepOpcode(true);
+      if(stopAtOpcode && stopAtOpcode === WasmBoy.wasmInstance.exports.getProgramCounter()) {
+        i = opcodesToRun;
+      }
+    }
+    WasmBoy.render();
+    this.updateDebugInfo();
+  }
+
+  breakPoint(skipInitialStep) {
+    // Set our opcode breakpoint
+    const breakPoint = 0x80;
+
+    if(!skipInitialStep) {
+      this.runNumberOfOpcodes(1, breakPoint);
+    }
+
+    if(WasmBoy.wasmInstance.exports.getProgramCounter() !== breakPoint) {
+      requestAnimationFrame(() => {
+        this.runNumberOfOpcodes(10000, breakPoint);
+        this.breakPoint(true);
+      });
+    } else {
+      WasmBoy.render();
+      requestAnimationFrame(() => {
+        this.updateDebugInfo();
+        console.log('Reached Breakpoint!');
+      });
+    }
+  }
 
   updateDebugInfo() {
 
     // Create our new state object
     const state = {
-      registers: {},
+      cpu: {},
       ppu: {}
     };
 
     // Update CPU State
-    state.registers['A'] = WasmBoy.wasmInstance.exports.getRegisterA();
-    state.registers['F'] = WasmBoy.wasmInstance.exports.getRegisterF();
-    state.registers['B'] = WasmBoy.wasmInstance.exports.getRegisterB();
-    state.registers['C'] = WasmBoy.wasmInstance.exports.getRegisterC();
-    state.registers['D'] = WasmBoy.wasmInstance.exports.getRegisterD();
-    state.registers['E'] = WasmBoy.wasmInstance.exports.getRegisterE();
-    state.registers['H'] = WasmBoy.wasmInstance.exports.getRegisterH();
-    state.registers['L'] = WasmBoy.wasmInstance.exports.getRegisterL();
+    state.cpu['Program Counter'] = WasmBoy.wasmInstance.exports.getProgramCounter();
+    state.cpu['Register A'] = WasmBoy.wasmInstance.exports.getRegisterA();
+    state.cpu['Register F'] = WasmBoy.wasmInstance.exports.getRegisterF();
+    state.cpu['Register B'] = WasmBoy.wasmInstance.exports.getRegisterB();
+    state.cpu['Register C'] = WasmBoy.wasmInstance.exports.getRegisterC();
+    state.cpu['Register D'] = WasmBoy.wasmInstance.exports.getRegisterD();
+    state.cpu['Register E'] = WasmBoy.wasmInstance.exports.getRegisterE();
+    state.cpu['Register H'] = WasmBoy.wasmInstance.exports.getRegisterH();
+    state.cpu['Register L'] = WasmBoy.wasmInstance.exports.getRegisterL();
+    state.cpu = Object.assign({}, state.cpu);
 
     // Update PPU State
     state.ppu['Scanline Register (LY) - 0xFF44'] = WasmBoy.wasmByteMemory[0xFF44];
@@ -53,14 +104,14 @@ export class WasmBoyDebugger extends Component {
 
         <button onclick={() => {this.updateDebugInfo()}}>Update Current Debug Info</button>
 
-        <button onclick={() => {WasmBoy.stepOpcodes();}}>Step Opcode</button>
+        <button onclick={() => {this.stepOpcode();}}>Step Opcode</button>
 
-        <button onclick={() => {WasmBoy.runNumberOfOpcodes();}}>Run Hardcoded number of opcodes loop</button>
+        <button onclick={() => {this.runNumberOfOpcodes();}}>Run Hardcoded number of opcodes loop</button>
 
-        <button onclick={() => {WasmBoy.breakPoint();}}>Run Until hardcoded breakpoint</button>
+        <button onclick={() => {this.breakPoint();}}>Run Until hardcoded breakpoint</button>
 
         <h3>Cpu Info:</h3>
-        <NumberBaseTable object={this.state.registers}></NumberBaseTable>
+        <NumberBaseTable object={this.state.cpu}></NumberBaseTable>
 
         <h3>PPU Info:</h3>
         <NumberBaseTable object={this.state.ppu}></NumberBaseTable>

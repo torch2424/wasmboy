@@ -12,6 +12,7 @@ export class NumberBaseTable extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    console.log(nextProps);
     this.setState({
       object: nextProps.object
     });
@@ -24,11 +25,21 @@ export class NumberBaseTable extends Component {
 
      let binaryString = '';
      for(let i = 0; i < hexString.length; i++) {
-       let valueAtIncrementer = parseInt(hexString.charAt(i), 16);
-       binaryString = valueAtIncrementer + binaryString + ' ';
+       let valueAtIncrementer = parseInt(hexString.charAt(i), 16).toString(2);
+       let paddedValueAtIncrementer = valueAtIncrementer;
+       // Pad to 4 bits
+       while(paddedValueAtIncrementer.length < 4) {
+         paddedValueAtIncrementer = '0' + paddedValueAtIncrementer
+       }
+
+       binaryString += paddedValueAtIncrementer;
+
+       if(i !== hexString.length - 1) {
+         binaryString += ' ';
+       }
      }
 
-     return binaryString.toString(2);
+     return binaryString;
   }
 
   getTableCellsForValueWithBase(valueBase) {
@@ -52,6 +63,26 @@ export class NumberBaseTable extends Component {
     return tableCells;
   }
 
+  getTableCellsForObjectKeys() {
+    if(!this.state.object) {
+      return (
+        <div></div>
+      )
+    }
+
+    const objectKeysAsTableCells = [];
+
+    Object.keys(this.state.object).forEach((key) => {
+      objectKeysAsTableCells.push((
+        <th>
+          {key}
+        </th>
+      ))
+    });
+
+    return objectKeysAsTableCells;
+  }
+
   render() {
 
     if(!this.state.object || Object.keys(this.state.object).length < 1) {
@@ -61,21 +92,25 @@ export class NumberBaseTable extends Component {
     }
 
     return (
-      <div>
-        <table>
+      <div className="number-base-table-container">
+        <table className="number-base-table">
           <tr>
-            {Object.keys(this.state.object)}
+            <th>Value Base</th>
+            {this.getTableCellsForObjectKeys()}
           </tr>
 
           <tr>
+            <td>Hexadecimal:</td>
             {this.getTableCellsForValueWithBase(16)}
           </tr>
 
           <tr>
+            <td>Decimal:</td>
             {this.getTableCellsForValueWithBase(10)}
           </tr>
 
           <tr>
+            <td>Binary:</td>
             {this.getTableCellsForValueWithBase(2)}
           </tr>
         </table>

@@ -1,6 +1,6 @@
 import './style';
 import { Component } from 'preact';
-import { WasmBoy, WasmBoyDebugger } from './wasmboy/index.js';
+import { WasmBoy, WasmBoyDebugger, WasmBoySystemControls } from './wasmboy/index.js';
 
 export default class App extends Component {
 
@@ -11,7 +11,7 @@ export default class App extends Component {
 		// Load our game
 		WasmBoy.loadGame(canvasElement, 'tetris.gb')
     .then(() => {
-      WasmBoy.startGame();
+      console.log('Wasmboy Ready!');
     });
 	}
 
@@ -26,6 +26,7 @@ export default class App extends Component {
             height="480">
           </canvas>
         </div>
+				<WasmBoySystemControls></WasmBoySystemControls>
 				<WasmBoyDebugger></WasmBoyDebugger>
 			</div>
 		);

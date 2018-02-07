@@ -47,11 +47,11 @@ export function update(): i8 {
   let error: boolean = false;
   while(Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME) {
     // Get the opcode, and additional bytes to be handled
-    const opcode: u8 = eightBitLoadFromGBMemory(Cpu.programCounter);
-    const dataByteOne: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 1);
-    const dataByteTwo: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 2);
+    let opcode: u8 = eightBitLoadFromGBMemory(Cpu.programCounter);
+    let dataByteOne: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 1);
+    let dataByteTwo: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 2);
 
-    const numberOfCycles = emulationLoop(opcode, dataByteOne, dataByteTwo);
+    let numberOfCycles = emulationStep(opcode, dataByteOne, dataByteTwo);
 
     if(numberOfCycles > 0) {
       Cpu.currentCycles += numberOfCycles;
@@ -71,7 +71,7 @@ export function update(): i8 {
 
 // Function to execute an opcode, and update other gameboy hardware.
 // http://www.codeslinger.co.uk/pages/projects/gameboy/beginning.html
-function emulationLoop(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
+export function emulationStep(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
   let numberOfCycles: i8 = executeOpcode(opcode, dataByteOne, dataByteTwo);
   Cpu.currentCycles += numberOfCycles;
 

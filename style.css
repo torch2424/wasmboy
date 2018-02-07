@@ -7,8 +7,40 @@ h1 {
 	text-align: center;
 }
 
-.canvas-container {
+.wasmboy__canvas-container {
 	margin-left: auto;
 	margin-right: auto;
 	text-align: center;
+}
+
+.number-base-table-container {
+	width: 100%;
+	min-width: 1024px;
+	overflow-x: auto;
+}
+
+.number-base-table {
+	table-layout: fixed;
+	border-collapse: collapse;
+	width: 100%;
+}
+
+.number-base-table th {
+    height: 50px;
+		font-weight: bold;
+		background-color: #CADCF9;
+}
+
+.number-base-table td {
+	width: 75px;
+}
+
+.number-base-table tr:hover {
+	background-color: #f5f5f5;
+}
+
+.number-base-table th, .number-base-table td, .number-base-table tr {
+	text-align: left;
+	border: 1px solid black;
+	padding: 5px;
 }
