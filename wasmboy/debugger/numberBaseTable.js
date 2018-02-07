@@ -12,7 +12,6 @@ export class NumberBaseTable extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log(nextProps);
     this.setState({
       object: nextProps.object
     });

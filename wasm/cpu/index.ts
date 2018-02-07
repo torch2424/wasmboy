@@ -1,7 +1,3 @@
-// https://github.com/AssemblyScript/assemblyscript/wiki/Built-in-functions
-// https://github.com/nakardo/node-gameboy/blob/master/lib/cpu/opcodes.js
-
-
 // NOTE: Code is very verbose, and will have some copy pasta'd lines.
 // Reason being, I want the code to be very accessible for errors later on.
 // Also, the benefit on splitting into functions is organizarion, and keeping things DRY.
@@ -9,6 +5,10 @@
 // And the verbosity / ease of use is more important, imo.
 
 // NOTE: Commands like SUB B, or AND C, without a second parameter, actually refer SUB A, B or AND A, C
+
+// Resources:
+// https://github.com/AssemblyScript/assemblyscript/wiki/Built-in-functions
+// https://github.com/nakardo/node-gameboy/blob/master/lib/cpu/opcodes.js
 
 
 export { setZeroFlag, getZeroFlag } from './flags';
@@ -37,7 +37,6 @@ export class Cpu {
 
   // Current number of cycles, shouldn't execeed max number of cycles
   static currentCycles: i32 = 0;
-  // TODO: Export these Constants
   static CLOCK_SPEED: i32 = 4194304;
   static MAX_CYCLES_PER_FRAME : i32 = 69905;
 }

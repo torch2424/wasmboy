@@ -45,22 +45,27 @@ import {
 export function update(): i8 {
 
   let error: boolean = false;
-  while(Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME) {
+  let numberOfCycles: i8 = -1;
+  while(!error && Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME) {
     // Get the opcode, and additional bytes to be handled
     let opcode: u8 = eightBitLoadFromGBMemory(Cpu.programCounter);
     let dataByteOne: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 1);
     let dataByteTwo: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 2);
 
-    let numberOfCycles = emulationStep(opcode, dataByteOne, dataByteTwo);
-
-    if(numberOfCycles > 0) {
+    numberOfCycles = emulationStep(opcode, dataByteOne, dataByteTwo);
+    if (numberOfCycles > 0) {
       Cpu.currentCycles += numberOfCycles;
     } else {
+      consoleLog(opcode, -1);
       error = true;
     }
   }
 
-  if(error) {
+  // Reset our currentCycles
+  Cpu.currentCycles = 0;
+
+  if (error === true) {
+    Cpu.programCounter -= 1;
     return -1;
   } else {
     // Reset our currentCycles
@@ -73,17 +78,12 @@ export function update(): i8 {
 // http://www.codeslinger.co.uk/pages/projects/gameboy/beginning.html
 export function emulationStep(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
   let numberOfCycles: i8 = executeOpcode(opcode, dataByteOne, dataByteTwo);
-  Cpu.currentCycles += numberOfCycles;
 
   // Check other Gameboy components
   updateTimers(<u8>numberOfCycles);
   updateGraphics(<u8>numberOfCycles);
   checkInterrupts();
 
-
-  if(Cpu.currentCycles > Cpu.MAX_CYCLES_PER_FRAME) {
-    Cpu.currentCycles = 0;
-  }
   return numberOfCycles;
 }
 
@@ -145,10 +145,10 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
 
     // INC BC
     // 1  8
-    let BC: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC);
-    BC++;
-    Cpu.registerB = splitHighByte((<u16>BC));
-    Cpu.registerC = splitLowByte((<u16>BC));
+    let registerBC: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC);
+    registerBC++;
+    Cpu.registerB = splitHighByte((<u16>registerBC));
+    Cpu.registerC = splitLowByte((<u16>registerBC));
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0x04)) {
 
@@ -171,7 +171,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Z 1 H -
     checkAndSetEightBitHalfCarryFlag(Cpu.registerB, -1);
     Cpu.registerB -= 1;
-    if (Cpu.registerB == 0) {
+    if (Cpu.registerB === 0) {
       setZeroFlag(1);
     } else {
       setZeroFlag(0);
@@ -756,6 +756,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     setSubtractFlag(0);
     setHalfCarryFlag(0);
     setCarryFlag(1);
+    numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x38)) {
 
     // JR C,r8
@@ -2629,6 +2630,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     setSubtractFlag(0);
     setHalfCarryFlag(0);
     setCarryFlag(0);
+    numberOfCycles = 8;
   } else if(isOpcode(opcode, 0xEF)) {
 
     // RST 28H
@@ -2764,6 +2766,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
   }
 
   // NOTE: Moved Program Counter to top, because program counter state should be considered Before doing calls
+
 
   // Return the number of cycles
   return numberOfCycles;

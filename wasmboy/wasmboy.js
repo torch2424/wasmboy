@@ -34,23 +34,19 @@ class WasmBoyLib {
 
       Promise.all([
         this._getWasmInstance(),
-        this._fetchGameAsByteArray('DMG_ROM.gb'),
         this._fetchGameAsByteArray(pathToGame)
       ]).then((responses) => {
         // Responses already bound to this, simple resolve parent promise
         // Set our gamebytes
-        const biosBytes = responses[1];
-        this.gameBytes = responses[2];
+        this.gameBytes = responses[1];
 
         // Load the game data into actual memory
         for(let i = 0; i < 0x7FFF; i++) {
-          // Load the bios, then the game
-          if(i < 0x100) {
-            this.wasmByteMemory[i] = biosBytes[i];
-          } else if(this.gameBytes[i]) {
-              this.wasmByteMemory[i] = this.gameBytes[i];
+          if (this.gameBytes[i]) {
+            this.wasmByteMemory[i] = this.gameBytes[i];
           }
         }
+
         this.ready = true;
         resolve();
       }).catch((error) => {
@@ -59,17 +55,15 @@ class WasmBoyLib {
     });
   }
 
-  pauseGame() {
-    this.paused = true;
+  // Function to start the game
+  startGame() {
+    // TODO: Don't initialize if running boot rom
+    this.wasmInstance.exports.initialize();
+
+    return this.resumeGame();
   }
 
   resumeGame() {
-    // Simply offload to start game
-    this.startGame();
-  }
-
-  // Function to start the game
-  startGame() {
     if (!this.ready) {
       return false;
     }
@@ -80,8 +74,10 @@ class WasmBoyLib {
     requestAnimationFrame(() => {
       this._emulationLoop();
     });
+  }
 
-    return true;
+  pauseGame() {
+    this.paused = true;
   }
 
   render() {
@@ -174,10 +170,6 @@ class WasmBoyLib {
   }
 
   _emulationLoop() {
-
-    // TODO: Don't initialize if running boot rom
-    // this.wasmInstance.exports.initialize();
-
     // Offload as much of this as possible to WASM
     // Feeding wasm bytes is probably going to slow things down, would be nice to just place the game in wasm memory
     // And read from there
@@ -197,7 +189,9 @@ class WasmBoyLib {
       }
       return true;
     } else {
-      console.log('Wasmboy Crashed! Unknown upcode...');
+      console.log('Wasmboy Crashed!');
+        console.log(`Program Counter: 0x${this.wasmInstance.exports.getProgramCounter().toString(16)}`)
+        console.log(`Opcode: 0x${this.wasmByteMemory[this.wasmInstance.exports.getProgramCounter()].toString(16)}`);
     }
   }
 }

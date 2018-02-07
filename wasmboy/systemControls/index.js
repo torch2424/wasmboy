@@ -13,8 +13,9 @@ export class WasmBoySystemControls extends Component {
   render() {
     return (
       <div className="system-controls">
-        <button onclick={() => {WasmBoy.startGame();}}>Start/Resume Game</button>
+        <button onclick={() => {WasmBoy.startGame();}}>Start Game</button>
         <button onclick={() => {WasmBoy.pauseGame();}}>Pause Game</button>
+        <button onclick={() => {WasmBoy.resumeGame();}}>Resume Game</button>
       </div>
     )
   }
