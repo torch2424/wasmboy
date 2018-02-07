@@ -1,25 +1,41 @@
 # wasmBoy
-Gameboy Emulator written in Web Assembly, Shell in Preact
+Gameboy Emulator written in Web Assembly using [AssemblyScript](https://github.com/AssemblyScript/assemblyscript), Debugger/Shell in Preact
 
-using [awesome gbdev](https://github.com/avivace/awesome-gbdev) for reference material.
+![WasmBoy Alpha Screenshot](./docs/alphaScreenshot.png)
 
-shout out: https://github.com/djhworld/gomeboycolor/blob/master/src/cpu/cpu.go
+---
+# THIS IS A WIP
+---
 
-https://github.com/nakardo/node-gameboy/blob/master/lib/cpu/opcodes.js
+# Features
 
-http://pastraiser.com/cpu/gameboy/gameboy_opcodes.html
+* As of February 6th, 2018, it runs the [Boot Rom](http://gbdev.gg8.se/wiki/articles/Gameboy_Bootstrap_ROM)!
 
-https://rednex.github.io/rgbds/gbz80.7.html
+* That's about it haha!
 
-list of games that cn show if they rom bank or not (CTRL+F for 32 in ROM Column): https://docs.google.com/spreadsheets/d/1cOS__xEj8bBT7cqEDgJcYStKuFAS8mMA4uErx9kA40M/edit#gid=1827536881
+# Roadmap
 
-**Notes:**
+The project doe quality and performance also depends on the [AssemblyScript Roadmap](https://github.com/AssemblyScript/assemblyscript/wiki/Status-and-Roadmap)
 
-Assembly script does not support Imports or exports outside of function exports
+And please see [Issue #3](https://github.com/torch2424/wasmBoy/issues/3)
 
-This all hugely depends on: https://github.com/AssemblyScript/assemblyscript/wiki/Status-and-Roadmap
+# Resources
 
-### Things I've Learned:
+* [awesome gbdev](https://github.com/avivace/awesome-gbdev) for reference material, and getting help from the awesome discord community
+
+* [node-gameboy](https://github.com/nakardo/node-gameboy) and [gomeboycolor](https://github.com/djhworld/gomeboycolor) for comparison for when I'm **REALLY** stuck.
+
+* [Codeslinger's Guide for General HOW-TO](http://www.codeslinger.co.uk/pages/projects/gameboy.html)
+
+* [tomek's Retrospective for General Roadmap](http://blog.rekawek.eu/2017/02/09/coffee-gb/)
+
+* [Opcode Table](http://pastraiser.com/cpu/gameboy/gameboy_opcodes.html)
+
+* [Opcode Instructions](https://rednex.github.io/rgbds/gbz80.7.html)
+
+* [Spreadsheet of Game that Do or Do Not Rom Bank](https://docs.google.com/spreadsheets/d/1cOS__xEj8bBT7cqEDgJcYStKuFAS8mMA4uErx9kA40M/edit#gid=1827536881)
+
+### Random Things I've Learned:
 
 * It's better to code an emulator by abstracting assembly commands into functions, rather than by Opcode operation
 
