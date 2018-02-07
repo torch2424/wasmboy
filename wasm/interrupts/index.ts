@@ -1,12 +1,16 @@
 import { Cpu } from '../cpu/index';
 import { eightBitLoadFromGBMemory, eightBitStoreIntoGBMemorySkipTraps, sixteenBitStoreIntoGBMemorySkipTraps } from '../memory/index';
-import { setBitOnByte, resetBitOnByte, checkBitOnByte } from '../helpers/index';
+import { consoleLogTwo, setBitOnByte, resetBitOnByte, checkBitOnByte } from '../helpers/index';
 
 class Interrupts {
   static memoryLocationInterruptEnabled: u16 = 0xFFFF;
   static memoryLocationInterruptRequest: u16 = 0xFF0F;
 
   static masterInterruptSwitch: boolean = false;
+  // According to mooneye, interruptsa re not handled until AFTER
+  // Next instruction
+  // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown
+  static masterInterruptSwitchDelay: boolean = false;
 
   static bitPositionVBlankInterrupt: u8 = 0;
   static bitPositionLcdInterrupt: u8 = 1;
@@ -15,6 +19,7 @@ class Interrupts {
 }
 
 function _handleInterrupt(bitPosition: u8): void {
+
   // Disable the master switch
   setInterrupts(false);
 
@@ -56,10 +61,12 @@ export function setInterrupts(value: boolean): void {
 
 export function checkInterrupts(): void {
   if(Interrupts.masterInterruptSwitch) {
+
     let interruptRequest = eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptRequest);
     let interruptEnabled = eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptEnabled);
 
     if(interruptRequest > 0) {
+
       // Check our interrupts
       if (checkBitOnByte(Interrupts.bitPositionVBlankInterrupt, interruptRequest) &&
         checkBitOnByte(Interrupts.bitPositionVBlankInterrupt, interruptEnabled)) {

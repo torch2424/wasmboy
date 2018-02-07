@@ -48,7 +48,7 @@ export class WasmBoyDebugger extends Component {
   breakPoint(skipInitialStep) {
     // Set our opcode breakpoint
     // CALL C012 has the bug
-    const breakPoint = 0xC091;
+    const breakPoint = 0xC2C0;
 
     if(!skipInitialStep) {
       this.runNumberOfOpcodes(1, breakPoint);
@@ -71,7 +71,9 @@ export class WasmBoyDebugger extends Component {
   updateDebugInfo() {
 
     // Log our wasmLogs
-    console.log(`Wasm Logs: 0x${WasmBoy.wasmInstance.exports.getCurrentLogValue().toString(16)} ${WasmBoy.wasmInstance.exports.getCurrentLogId()}`);
+    console.log(`Wasm Log One: 0x${WasmBoy.wasmInstance.exports.getCurrentLogValue(1).toString(16)} ${WasmBoy.wasmInstance.exports.getCurrentLogId(1)}`);
+
+    console.log(`Wasm Log Two: 0x${WasmBoy.wasmInstance.exports.getCurrentLogValue(2).toString(16)} ${WasmBoy.wasmInstance.exports.getCurrentLogId(2)}`);
 
     // Log our memory
     console.log(`WasmBoy Memory`, WasmBoy.wasmByteMemory);

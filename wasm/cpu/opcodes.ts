@@ -16,6 +16,7 @@ import {
 } from './flags'
 import {
   consoleLog,
+  consoleLogTwo,
   rotateByteLeft,
   rotateByteLeftThroughCarry,
   rotateByteRight,
@@ -40,6 +41,9 @@ import {
 import {
   updateGraphics
 } from '../graphics/index';
+import {
+  clearBottomBitsOfFlagRegister
+} from './blarggFixes'
 
 // Public funciton to run opcodes until a frame should be rendered.
 export function update(): i8 {
@@ -76,6 +80,9 @@ export function emulationStep(): i8 {
   let dataByteOne: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 1);
   let dataByteTwo: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 2);
   let numberOfCycles: i8 = executeOpcode(opcode, dataByteOne, dataByteTwo);
+
+  // blarggFixes
+  clearBottomBitsOfFlagRegister();
 
   // Check other Gameboy components
   updateTimers(<u8>numberOfCycles);
@@ -2252,6 +2259,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
       Cpu.programCounter = concatenatedDataByte;
       numberOfCycles = 16;
     } else {
+      Cpu.programCounter += 2;
       numberOfCycles = 12;
     }
   } else if(isOpcode(opcode, 0xC3)) {
@@ -2331,6 +2339,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
       Cpu.programCounter = concatenatedDataByte;
       numberOfCycles = 16;
     } else {
+      Cpu.programCounter += 2;
       numberOfCycles = 12;
     }
   } else if(isOpcode(opcode, 0xCB)) {
@@ -2491,7 +2500,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
       Cpu.programCounter = concatenatedDataByte;
       numberOfCycles = 16;
     } else {
-      Cpu.programCounter += 2
+      Cpu.programCounter += 2;
       numberOfCycles = 12;
     }
   } /* No Opcode for: 0xDB */else if(isOpcode(opcode, 0xDC)) {
@@ -2719,7 +2728,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     setZeroFlag(0);
     setSubtractFlag(0);
     checkAndSetSixteenBitFlagsAddOverflow(Cpu.stackPointer, signedDataByteOne);
-    let registerHL = Cpu.stackPointer + dataByteOne;
+    let registerHL = Cpu.stackPointer + signedDataByteOne;
     Cpu.registerH = splitHighByte(registerHL);
     Cpu.registerL = splitLowByte(registerHL);
     Cpu.programCounter += 1;
