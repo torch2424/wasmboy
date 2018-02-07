@@ -87,6 +87,10 @@ function _checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolean): bo
     return false;
   }
 
+  if(offset === 0xFF42) {
+    consoleLog(value, offset);
+  }
+
   // Be sure to copy everything in EchoRam to Work Ram
   if(offset >= Memory.echoRamStart && offset < Memory.spriteInformationTableStart) {
     // TODO: Also write to Work Ram

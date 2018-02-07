@@ -14,11 +14,17 @@ export class WasmBoyDebugger extends Component {
 	}
 
   stepOpcode(skipDebugOutput) {
+    const numberOfCycles = WasmBoy.wasmInstance.exports.emulationStep();
+
+    if(numberOfCycles <= 0) {
+      console.error('Opcode not recognized! Check wasm logs.');
+      this.updateDebugInfo();
+      throw new Error();
+    }
+
     if(skipDebugOutput) {
-      WasmBoy.wasmInstance.exports.emulationStep();
       return;
     }
-    WasmBoy.wasmInstance.exports.emulationStep();
     WasmBoy.render();
     this.updateDebugInfo();
   }
@@ -41,7 +47,8 @@ export class WasmBoyDebugger extends Component {
 
   breakPoint(skipInitialStep) {
     // Set our opcode breakpoint
-    const breakPoint = 0x26B;
+    // CALL C012 has the bug
+    const breakPoint = 0xC091;
 
     if(!skipInitialStep) {
       this.runNumberOfOpcodes(1, breakPoint);
@@ -66,6 +73,9 @@ export class WasmBoyDebugger extends Component {
     // Log our wasmLogs
     console.log(`Wasm Logs: 0x${WasmBoy.wasmInstance.exports.getCurrentLogValue().toString(16)} ${WasmBoy.wasmInstance.exports.getCurrentLogId()}`);
 
+    // Log our memory
+    console.log(`WasmBoy Memory`, WasmBoy.wasmByteMemory);
+
     // Create our new state object
     const state = {
       cpu: {},
@@ -74,6 +84,8 @@ export class WasmBoyDebugger extends Component {
 
     // Update CPU State
     state.cpu['Program Counter'] = WasmBoy.wasmInstance.exports.getProgramCounter();
+    state.cpu['Next Opcode'] = WasmBoy.wasmByteMemory[WasmBoy.wasmInstance.exports.getProgramCounter()];
+    state.cpu['Stack Pointer'] = WasmBoy.wasmInstance.exports.getStackPointer();
     state.cpu['Register A'] = WasmBoy.wasmInstance.exports.getRegisterA();
     state.cpu['Register F'] = WasmBoy.wasmInstance.exports.getRegisterF();
     state.cpu['Register B'] = WasmBoy.wasmInstance.exports.getRegisterB();
@@ -83,7 +95,6 @@ export class WasmBoyDebugger extends Component {
     state.cpu['Register H'] = WasmBoy.wasmInstance.exports.getRegisterH();
     state.cpu['Register L'] = WasmBoy.wasmInstance.exports.getRegisterL();
     state.cpu = Object.assign({}, state.cpu);
-    console.log('Debugger CPU:', state.cpu);
 
     // Update PPU State
     state.ppu['Scanline Register (LY) - 0xFF44'] = WasmBoy.wasmByteMemory[0xFF44];
@@ -93,7 +104,6 @@ export class WasmBoyDebugger extends Component {
     state.ppu['Scroll Y - 0xFF42'] = WasmBoy.wasmByteMemory[0xFF42];
     state.ppu['Window X - 0xFF4B'] = WasmBoy.wasmByteMemory[0xFF4B];
     state.ppu['Window Y - 0xFF4A'] = WasmBoy.wasmByteMemory[0xFF4A];
-    console.log('Debugger PPU:', state.ppu);
 
     // Clone our state, that it is immutable and will cause change detection
     this.setState(state);

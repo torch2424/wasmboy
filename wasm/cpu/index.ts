@@ -53,7 +53,7 @@ export function initialize(includeBootRom: boolean): void {
   Cpu.registerD = 0x00;
   Cpu.registerE = 0xD8;
   Cpu.registerH = 0x01;
-  Cpu.registerL = 0xD8;
+  Cpu.registerL = 0x4D;
   Cpu.stackPointer = 0xFFFE;
   eightBitStoreIntoGBMemory(0xFF10, 0x80);
   eightBitStoreIntoGBMemory(0xFF11, 0xBF);

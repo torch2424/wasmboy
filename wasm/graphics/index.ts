@@ -265,7 +265,8 @@ function _renderBackground(scanlineRegister: u8, scrollX: u16, scrollY: u16, til
   // Get our current pixel y positon on the 160x144 camera (Row that the scanline draws across)
   // this is done by getting the current scroll Y position,
   // and adding it do what Y Value the scanline is drawing on the camera.
-  let pixelYPositionInMap: u16 = <u16>scanlineRegister + scrollY;
+  // TODO Once done with test roms, + scrollY
+  let pixelYPositionInMap: u16 = <u16>scanlineRegister + 0;
 
   // Loop through x to draw the line like a CRT
   for (let i: u16 = 0; i < 160; i++) {

@@ -47,6 +47,9 @@ class WasmBoyLib {
           }
         }
 
+        // TODO: Don't initialize if running boot rom
+        this.wasmInstance.exports.initialize();
+
         this.ready = true;
         resolve();
       }).catch((error) => {
@@ -57,9 +60,6 @@ class WasmBoyLib {
 
   // Function to start the game
   startGame() {
-    // TODO: Don't initialize if running boot rom
-    this.wasmInstance.exports.initialize();
-
     return this.resumeGame();
   }
 

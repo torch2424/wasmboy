@@ -47,16 +47,10 @@ export function update(): i8 {
   let error: boolean = false;
   let numberOfCycles: i8 = -1;
   while(!error && Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME) {
-    // Get the opcode, and additional bytes to be handled
-    let opcode: u8 = eightBitLoadFromGBMemory(Cpu.programCounter);
-    let dataByteOne: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 1);
-    let dataByteTwo: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 2);
-
-    numberOfCycles = emulationStep(opcode, dataByteOne, dataByteTwo);
+    numberOfCycles = emulationStep();
     if (numberOfCycles > 0) {
       Cpu.currentCycles += numberOfCycles;
     } else {
-      consoleLog(opcode, -1);
       error = true;
     }
   }
@@ -76,13 +70,21 @@ export function update(): i8 {
 
 // Function to execute an opcode, and update other gameboy hardware.
 // http://www.codeslinger.co.uk/pages/projects/gameboy/beginning.html
-export function emulationStep(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
+export function emulationStep(): i8 {
+  // Get the opcode, and additional bytes to be handled
+  let opcode: u8 = eightBitLoadFromGBMemory(Cpu.programCounter);
+  let dataByteOne: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 1);
+  let dataByteTwo: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 2);
   let numberOfCycles: i8 = executeOpcode(opcode, dataByteOne, dataByteTwo);
 
   // Check other Gameboy components
   updateTimers(<u8>numberOfCycles);
   updateGraphics(<u8>numberOfCycles);
   checkInterrupts();
+
+  if(numberOfCycles <= 0) {
+    consoleLog(opcode, 1);
+  }
 
   return numberOfCycles;
 }
@@ -383,7 +385,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // JR r8
     // 2  12
     // NOTE: Discoved dataByte is signed
-    // However the relaitve Jump Function handles this
+    // However the relative Jump Function handles this
 
     relativeJump(dataByteOne);
     numberOfCycles = 12;
@@ -623,6 +625,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     let registerHL = concatenateBytes(Cpu.registerH, Cpu.registerL);
     Cpu.registerA = eightBitLoadFromGBMemory(registerHL);
     registerHL += 1;
+    Cpu.registerH = splitHighByte(registerHL);
+    Cpu.registerL = splitLowByte(registerHL);
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0x2B)) {
 
@@ -2630,6 +2634,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     setSubtractFlag(0);
     setHalfCarryFlag(0);
     setCarryFlag(0);
+    Cpu.programCounter += 1;
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0xEF)) {
 

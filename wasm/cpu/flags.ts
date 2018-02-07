@@ -63,8 +63,9 @@ export function checkAndSetEightBitHalfCarryFlag(value: u8, amountToAdd: i16): v
       setHalfCarryFlag(0);
     }
   } else {
-    // From: https://www.reddit.com/r/EmuDev/comments/4clh23/trouble_with_halfcarrycarry_flag/
-    if((value & 0x0F) - <u8>(abs(amountToAdd) & 0x0F) < 0) {
+    // From: https://github.com/djhworld/gomeboycolor/blob/master/src/cpu/cpu.go
+    // CTRL+F "subBytes(a, b byte)"
+    if((value & 0x0F) < <u8>(abs(amountToAdd) & 0x0F)) {
       setHalfCarryFlag(1);
     } else {
       setHalfCarryFlag(0);
