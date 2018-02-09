@@ -53,8 +53,9 @@ export function setPixelOnFrame(x: u16, y: u16, color: u8): void {
 // NOTE: Confirmed that memory is working with both Eight and sixteenbit store :), tested in CPU initialize
 export function eightBitStoreIntoGBMemory(offset: u16, value: u8): void {
   if(_checkWriteTraps(offset, <u16>value, true)) {
-    store<u8>(offset, value);
+    //store<u8>(offset, value);
   }
+  store<u8>(offset, value);
 }
 
 export function sixteenBitStoreIntoGBMemory(offset: u16, value: u16): void {

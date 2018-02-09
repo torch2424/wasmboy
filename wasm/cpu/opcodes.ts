@@ -188,7 +188,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // 1  8
     // () means load into address pointed by BC
     let registerBC: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC)
-    sixteenBitStoreIntoGBMemory(registerBC, Cpu.registerA);
+    eightBitStoreIntoGBMemory(registerBC, Cpu.registerA);
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0x03)) {
 
@@ -363,7 +363,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // LD (DE),A
     // 1 8
     let registerDE: u16 = concatenateBytes(Cpu.registerD, Cpu.registerE);
-    sixteenBitStoreIntoGBMemory(registerDE, Cpu.registerA);
+    eightBitStoreIntoGBMemory(registerDE, Cpu.registerA);
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0x13)) {
 
@@ -779,6 +779,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
+
     eightBitStoreIntoGBMemory(registerHL, <u8>valueAtHL);
     numberOfCycles = 12;
   } else if(isOpcode(opcode, 0x35)) {
