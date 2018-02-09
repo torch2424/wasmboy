@@ -620,7 +620,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     if(getSubtractFlag() > 0) {
       adjustedRegister = Cpu.registerA - <u8>adjustment;
     } else {
-      if ((Cpu.registerA >> 3) > 0) {
+      if ((Cpu.registerA & 0x0F) > 0x09) {
         adjustment = adjustment | 0x06;
       }
       if(Cpu.registerA > 0x99) {
@@ -642,6 +642,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     }
     setHalfCarryFlag(0);
 
+    Cpu.registerA = <u8>adjustedRegister;
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x28)) {
 
