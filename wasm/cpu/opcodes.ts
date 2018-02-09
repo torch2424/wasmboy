@@ -15,6 +15,16 @@ import {
   checkAndSetSixteenBitFlagsAddOverflow
 } from './flags'
 import {
+  addARegister,
+  addAThroughCarryRegister,
+  subARegister,
+  subAThroughCarryRegister,
+  andARegister,
+  xorARegister,
+  orARegister,
+  cpARegister
+} from './instructions';
+import {
   consoleLog,
   consoleLogTwo,
   rotateByteLeft,
@@ -43,9 +53,6 @@ import {
 import {
   updateGraphics
 } from '../graphics/index';
-import {
-  clearBottomBitsOfFlagRegister
-} from './blarggFixes'
 
 // Public funciton to run opcodes until a frame should be rendered.
 export function update(): i8 {
@@ -91,7 +98,6 @@ export function emulationStep(): i8 {
   } else {
     // if we were halted, and interrupts were disabled but interrupts are pending, stop waiting
     if(Cpu.isHalted && !areInterruptsEnabled() && areInterruptsPending()) {
-      consoleLogTwo(0x2, 44);
       Cpu.isHalted = false;
       Cpu.isStopped = false;
 
@@ -113,8 +119,8 @@ export function emulationStep(): i8 {
     }
   }
 
-  // blarggFixes
-  clearBottomBitsOfFlagRegister();
+  // blarggFixes, don't allow register F to have the bottom nibble
+  Cpu.registerF = Cpu.registerF & 0xF0;
 
   // Check other Gameboy components
   updateTimers(<u8>numberOfCycles);
@@ -1281,331 +1287,141 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // ADD A,B
     // 1 4
     // Z 0 H C
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, Cpu.registerB);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, Cpu.registerB);
-    Cpu.registerA += Cpu.registerB;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
+    addARegister(Cpu.registerB);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x81)) {
     // ADD A,C
     // 1 4
     // Z 0 H C
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, Cpu.registerC);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, Cpu.registerC);
-    Cpu.registerA += Cpu.registerC;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
+    addARegister(Cpu.registerC);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x82)) {
     // ADD A,D
     // 1 4
     // Z 0 H C
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, Cpu.registerD);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, Cpu.registerD);
-    Cpu.registerA += Cpu.registerD;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
+    addARegister(Cpu.registerD);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x83)) {
     // ADD A,E
     // 1 4
     // Z 0 H C
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, Cpu.registerE);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, Cpu.registerE);
-    Cpu.registerA += Cpu.registerE;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
+    addARegister(Cpu.registerE);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x84)) {
     // ADD A,H
     // 1 4
     // Z 0 H C
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, Cpu.registerH);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, Cpu.registerH);
-    Cpu.registerA += Cpu.registerH;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
+    addARegister(Cpu.registerH);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x85)) {
     // ADD A,L
     // 1 4
     // Z 0 H C
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, Cpu.registerL);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, Cpu.registerL);
-    Cpu.registerA += Cpu.registerL;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
+    addARegister(Cpu.registerL);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x86)) {
     // ADD A,(HL)
     // 1 8
     // Z 0 H C
     let valueAtHL: u8 = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>valueAtHL);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>valueAtHL);
-    Cpu.registerA += <u8>valueAtHL;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
+    addARegister(<u8>valueAtHL);
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0x87)) {
     // ADD A,A
     // 1 4
     // Z 0 H C
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, Cpu.registerA);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, Cpu.registerA);
-    Cpu.registerA += Cpu.registerA;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
+    addARegister(Cpu.registerA);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x88)) {
     // ADC A,B
     // 1 4
     // Z 0 H C
-    let totalToAdd: u8 = getCarryFlag() + Cpu.registerB;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>totalToAdd);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalToAdd);
-    Cpu.registerA += <u8>totalToAdd;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
+    addAThroughCarryRegister(Cpu.registerB);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x89)) {
     // ADC A,C
     // 1 4
     // Z 0 H C
-    let totalToAdd: u8 = getCarryFlag() + Cpu.registerC;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>totalToAdd);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalToAdd);
-    Cpu.registerA += <u8>totalToAdd;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
+    addAThroughCarryRegister(Cpu.registerC);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x8A)) {
     // ADC A,D
     // 1 4
     // Z 0 H C
-    let totalToAdd: u8 = getCarryFlag() + Cpu.registerD;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>totalToAdd);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalToAdd);
-    Cpu.registerA += <u8>totalToAdd;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
+    addAThroughCarryRegister(Cpu.registerD);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x8B)) {
     // ADC A,E
     // 1 4
     // Z 0 H C
-    let totalToAdd: u8 = getCarryFlag() + Cpu.registerE;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>totalToAdd);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalToAdd);
-    Cpu.registerA += <u8>totalToAdd;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
+    addAThroughCarryRegister(Cpu.registerE);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x8C)) {
     // ADC A,H
     // 1 4
     // Z 0 H C
-    let totalToAdd: u8 = getCarryFlag() + Cpu.registerH;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>totalToAdd);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalToAdd);
-    Cpu.registerA += <u8>totalToAdd;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
+    addAThroughCarryRegister(Cpu.registerH);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x8D)) {
     // ADC A,L
     // 1 4
     // Z 0 H C
-    let totalToAdd: u8 = getCarryFlag() + Cpu.registerL;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>totalToAdd);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalToAdd);
-    Cpu.registerA += <u8>totalToAdd;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
+    addAThroughCarryRegister(Cpu.registerL);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x8E)) {
     // ADC A,(HL)
     // 1 8
     // Z 0 H C
     let valueAtHL: u8 = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
-    let totalToAdd: u8 = getCarryFlag() + <u8>valueAtHL;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>totalToAdd);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalToAdd);
-    Cpu.registerA += <u8>totalToAdd;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
+    addAThroughCarryRegister(<u8>valueAtHL);
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0x8F)) {
     // ADC A,A
     // 1 4
     // Z 0 H C
-    let totalToAdd: u8 = getCarryFlag() + Cpu.registerB;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>totalToAdd);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalToAdd);
-    Cpu.registerA += <u8>totalToAdd;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
+    addAThroughCarryRegister(Cpu.registerA);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x90)) {
 
     // SUB B
     // 1  4
     // Z 1 H C
-    let negativeRegister: i16 = Cpu.registerB * -1;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    Cpu.registerA -= Cpu.registerB;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
+    subARegister(Cpu.registerB);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x91)) {
 
     // SUB C
     // 1  4
     // Z 1 H C
-    let negativeRegister: i16 = Cpu.registerC * -1;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    Cpu.registerA -= Cpu.registerC;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
+    subARegister(Cpu.registerC);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x92)) {
 
     // SUB D
     // 1  4
     // Z 1 H C
-    let negativeRegister: i16 = Cpu.registerD * -1;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    Cpu.registerA -= Cpu.registerD;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
+    subARegister(Cpu.registerD);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x93)) {
 
     // SUB E
     // 1  4
     // Z 1 H C
-    let negativeRegister: i16 = Cpu.registerE * -1;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    Cpu.registerA -= Cpu.registerE;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
+    subARegister(Cpu.registerE);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x94)) {
 
     // SUB H
     // 1  4
     // Z 1 H C
-    let negativeRegister: i16 = Cpu.registerH * -1;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    Cpu.registerA -= Cpu.registerH;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
+    subARegister(Cpu.registerH);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x95)) {
 
     // SUB L
     // 1  4
     // Z 1 H C
-    let negativeRegister: i16 = Cpu.registerL * -1;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    Cpu.registerA -= Cpu.registerL;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
+    subARegister(Cpu.registerL);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x96)) {
 
@@ -1613,258 +1429,113 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // 1  8
     // Z 1 H C
     let valueAtHL: u8 = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
-    let negativeRegister: i16 = <i16>valueAtHL * -1;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    Cpu.registerA -= <u8>valueAtHL;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
+    subARegister(<u8>valueAtHL);
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0x97)) {
 
     // SUB A
     // 1  4
     // Z 1 H C
-    let negativeRegister: i16 = Cpu.registerA * -1;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    Cpu.registerA -= Cpu.registerA;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
+    subARegister(Cpu.registerA);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x98)) {
 
     // SBC A,B
     // 1  4
     // Z 1 H C
-    let totalValue = Cpu.registerB + getCarryFlag();
-    let negativeTotalValue: i16 = <i16>totalValue * -1;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>totalValue);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalValue);
-    Cpu.registerA -= <u8>totalValue;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
+    subAThroughCarryRegister(Cpu.registerB);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x99)) {
 
     // SBC A,C
     // 1  4
     // Z 1 H C
-    let totalValue = Cpu.registerC + getCarryFlag();
-    let negativeTotalValue: i16 = <i16>totalValue * -1;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>totalValue);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalValue);
-    Cpu.registerA -= <u8>totalValue;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
+    subAThroughCarryRegister(Cpu.registerC);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x9A)) {
 
     // SBC A,D
     // 1  4
     // Z 1 H C
-    let totalValue = Cpu.registerD + getCarryFlag();
-    let negativeTotalValue: i16 = <i16>totalValue * -1;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>totalValue);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalValue);
-    Cpu.registerA -= <u8>totalValue;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
+    subAThroughCarryRegister(Cpu.registerD);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x9B)) {
 
     // SBC A,E
     // 1  4
     // Z 1 H C
-    let totalValue = Cpu.registerE + getCarryFlag();
-    let negativeTotalValue: i16 = <i16>totalValue * -1;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>totalValue);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalValue);
-    Cpu.registerA -= <u8>totalValue;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
+    subAThroughCarryRegister(Cpu.registerE);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x9C)) {
 
     // SBC A,H
     // 1  4
     // Z 1 H C
-    let totalValue = Cpu.registerH + getCarryFlag();
-    let negativeTotalValue: i16 = <i16>totalValue * -1;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>totalValue);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalValue);
-    Cpu.registerA -= <u8>totalValue;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
+    subAThroughCarryRegister(Cpu.registerH);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x9D)) {
 
     // SBC A,L
     // 1  4
     // Z 1 H C
-    let totalValue = Cpu.registerL + getCarryFlag();
-    let negativeTotalValue: i16 = <i16>totalValue * -1;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>totalValue);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalValue);
-    Cpu.registerA -= <u8>totalValue;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
+    subAThroughCarryRegister(Cpu.registerL);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x9E)) {
 
     // SBC A,(HL)
     // 1  8
     // Z 1 H C
-    let totalValue = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL)) + getCarryFlag();
-    let negativeTotalValue: i16 = <i16>totalValue * -1;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>totalValue);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalValue);
-    Cpu.registerA -= <u8>totalValue;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
+    let valueAtHL: u8 = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
+    subAThroughCarryRegister(<u8>valueAtHL);
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0x9F)) {
 
     // SBC A,A
     // 1  4
     // Z 1 H C
-    let totalValue = Cpu.registerA + getCarryFlag();
-    let negativeTotalValue: i16 = <i16>totalValue * -1;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>totalValue);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalValue);
-    Cpu.registerA -= <u8>totalValue;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
+    subAThroughCarryRegister(Cpu.registerA);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xA0)) {
 
     // AND B
     // 1  4
     // Z 0 1 0
-    Cpu.registerA = (Cpu.registerA & Cpu.registerB);
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    setHalfCarryFlag(1);
-    setCarryFlag(0);
+    andARegister(Cpu.registerB);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xA1)) {
 
     // AND C
     // 1  4
     // Z 0 1 0
-    Cpu.registerA = (Cpu.registerA & Cpu.registerC);
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    setHalfCarryFlag(1);
-    setCarryFlag(0);
+    andARegister(Cpu.registerC);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xA2)) {
 
     // AND D
     // 1  4
     // Z 0 1 0
-    Cpu.registerA = (Cpu.registerA & Cpu.registerD);
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    setHalfCarryFlag(1);
-    setCarryFlag(0);
+    andARegister(Cpu.registerD);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xA3)) {
 
     // AND E
     // 1  4
     // Z 0 1 0
-    Cpu.registerA = (Cpu.registerA & Cpu.registerE);
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    setHalfCarryFlag(1);
-    setCarryFlag(0);
+    andARegister(Cpu.registerE);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xA4)) {
 
     // AND H
     // 1  4
     // Z 0 1 0
-    Cpu.registerA = (Cpu.registerA & Cpu.registerH);
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    setHalfCarryFlag(1);
-    setCarryFlag(0);
+    andARegister(Cpu.registerH);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xA5)) {
 
     // AND L
     // 1  4
     // Z 0 1 0
-    Cpu.registerA = (Cpu.registerA & Cpu.registerL);
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    setHalfCarryFlag(1);
-    setCarryFlag(0);
+    andARegister(Cpu.registerL);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xA6)) {
 
@@ -1872,120 +1543,57 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // 1  8
     // Z 0 1 0
     let valueAtHL: u8 = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
-    Cpu.registerA = (Cpu.registerA & <u8>valueAtHL);
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    setHalfCarryFlag(1);
-    setCarryFlag(0);
+    andARegister(<u8>valueAtHL);
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0xA7)) {
 
     // AND A
     // 1  4
     // Z 0 1 0
-    // Don't & Yourself, does nothing
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    setHalfCarryFlag(1);
-    setCarryFlag(0);
+    // NOTE: & Yourself, does nothing
+    andARegister(Cpu.registerA);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xA8)) {
 
     // XOR B
     // 1  4
     // Z 0 0 0
-    Cpu.registerA = Cpu.registerA ^ Cpu.registerB;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    setHalfCarryFlag(0);
-    setCarryFlag(0);
+    xorARegister(Cpu.registerB);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xA9)) {
 
     // XOR C
     // 1  4
     // Z 0 0 0
-    Cpu.registerA = Cpu.registerA ^ Cpu.registerC;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    setHalfCarryFlag(0);
-    setCarryFlag(0);
+    xorARegister(Cpu.registerC);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xAA)) {
 
     // XOR D
     // 1  4
     // Z 0 0 0
-    Cpu.registerA = Cpu.registerA ^ Cpu.registerD;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    setHalfCarryFlag(0);
-    setCarryFlag(0);
+    xorARegister(Cpu.registerD);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xAB)) {
 
     // XOR E
     // 1  4
     // Z 0 0 0
-    Cpu.registerA = Cpu.registerA ^ Cpu.registerE;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    setHalfCarryFlag(0);
-    setCarryFlag(0);
+    xorARegister(Cpu.registerE);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xAC)) {
 
     // XOR H
     // 1  4
     // Z 0 0 0
-    Cpu.registerA = Cpu.registerA ^ Cpu.registerH;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    setHalfCarryFlag(0);
-    setCarryFlag(0);
+    xorARegister(Cpu.registerH);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xAD)) {
 
     // XOR L
     // 1  4
     // Z 0 0 0
-    Cpu.registerA = Cpu.registerA ^ Cpu.registerL;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    setHalfCarryFlag(0);
-    setCarryFlag(0);
+    xorARegister(Cpu.registerL);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xAE)) {
 
@@ -1993,120 +1601,56 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // 1  8
     // Z 0 0 0
     let valueAtHL: u8 = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
-    Cpu.registerA = Cpu.registerA ^ <u8>valueAtHL;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    setHalfCarryFlag(0);
-    setCarryFlag(0);
+    xorARegister(<u8>valueAtHL);
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0xAF)) {
 
     // XOR A
     // 1  4
     // Z 0 0 0
-    Cpu.registerA = Cpu.registerA ^ Cpu.registerA;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    setHalfCarryFlag(0);
-    setCarryFlag(0);
+    xorARegister(Cpu.registerA);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xB0)) {
 
     // OR B
     // 1  4
     // Z 0 0 0
-    Cpu.registerA = Cpu.registerA | Cpu.registerB;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    setHalfCarryFlag(0);
-    setCarryFlag(0);
+    orARegister(Cpu.registerB);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xB1)) {
 
     // OR C
     // 1  4
     // Z 0 0 0
-    Cpu.registerA = Cpu.registerA | Cpu.registerC;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    setHalfCarryFlag(0);
-    setCarryFlag(0);
+    orARegister(Cpu.registerC);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xB2)) {
 
     // OR D
     // 1  4
     // Z 0 0 0
-    Cpu.registerA = Cpu.registerA | Cpu.registerD;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    setHalfCarryFlag(0);
-    setCarryFlag(0);
+    orARegister(Cpu.registerD);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xB3)) {
 
     // OR E
     // 1  4
     // Z 0 0 0
-    Cpu.registerA = Cpu.registerA | Cpu.registerE;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    setHalfCarryFlag(0);
-    setCarryFlag(0);
+    orARegister(Cpu.registerE);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xB4)) {
 
     // OR H
     // 1  4
     // Z 0 0 0
-    Cpu.registerA = Cpu.registerA | Cpu.registerH;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    setHalfCarryFlag(0);
-    setCarryFlag(0);
+    orARegister(Cpu.registerH);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xB5)) {
 
     // OR L
     // 1  4
     // Z 0 0 0
-    Cpu.registerA = Cpu.registerA | Cpu.registerL;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    setHalfCarryFlag(0);
-    setCarryFlag(0);
+    orARegister(Cpu.registerL);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xB6)) {
 
@@ -2114,126 +1658,56 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // 1  8
     // Z 0 0 0
     let valueAtHL: u8 = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
-    Cpu.registerA = Cpu.registerA | <u8>valueAtHL;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    setHalfCarryFlag(0);
-    setCarryFlag(0);
+    orARegister(<u8>valueAtHL);
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0xB7)) {
 
     // OR A
     // 1  4
     // Z 0 0 0
-    Cpu.registerA = Cpu.registerA | Cpu.registerA;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    setHalfCarryFlag(0);
-    setCarryFlag(0);
+    orARegister(Cpu.registerA);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xB8)) {
 
     // CP B
     // 1  4
     // Z 1 H C
-    let negativeRegister: i16 = Cpu.registerB * -1;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeRegister;
-    if (tempResult === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
+    cpARegister(Cpu.registerB);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xB9)) {
 
     // CP C
     // 1  4
     // Z 1 H C
-    let negativeRegister: i16 = Cpu.registerC * -1;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeRegister;
-    if (tempResult === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
+    cpARegister(Cpu.registerC);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xBA)) {
 
     // CP D
     // 1  4
     // Z 1 H C
-    let negativeRegister: i16 = Cpu.registerD * -1;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeRegister;
-    if (tempResult === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
+    cpARegister(Cpu.registerD);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xBB)) {
 
     // CP E
     // 1  4
     // Z 1 H C
-    let negativeRegister: i16 = Cpu.registerE * -1;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeRegister;
-    if (tempResult === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
+    cpARegister(Cpu.registerE);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xBC)) {
 
     // CP H
     // 1  4
     // Z 1 H C
-    let negativeRegister: i16 = Cpu.registerH * -1;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeRegister;
-    if (tempResult === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
+    cpARegister(Cpu.registerH);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xBD)) {
 
     // CP L
     // 1  4
     // Z 1 H C
-    let negativeRegister: i16 = Cpu.registerL * -1;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeRegister;
-    if (tempResult === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
+    cpARegister(Cpu.registerL);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xBE)) {
 
@@ -2241,32 +1715,14 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // 1  8
     // Z 1 H C
     let valueAtHL: u8 = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
-    let negativeRegister: i16 = <i16>valueAtHL * -1;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeRegister;
-    if (tempResult === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
+    cpARegister(<u8>valueAtHL);
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0xBF)) {
 
     // CP A
     // 1  4
     // Z 1 H C
-    let negativeRegister: i16 = Cpu.registerA * -1;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
-    let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeRegister;
-    if (tempResult === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
+    cpARegister(Cpu.registerA);
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xC0)) {
 
@@ -2332,15 +1788,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // ADD A,d8
     // 2 8
     // Z 0 H C
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, dataByteOne);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, dataByteOne);
-    Cpu.registerA += dataByteOne;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
+    addARegister(dataByteOne);
     Cpu.programCounter += 1;
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xC7)) {
@@ -2413,16 +1861,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // ADC A,d8
     // 2  8
     // Z 0 H C
-    let totalToAdd: u8 = getCarryFlag() + dataByteOne;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>totalToAdd);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalToAdd);
-    Cpu.registerA += <u8>totalToAdd;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
+    addAThroughCarryRegister(dataByteOne);
+    Cpu.programCounter += 1;
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0xCF)) {
 
@@ -2490,16 +1930,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // SUB d8
     // 2  8
     // Z 1 H C
-    let negativeDataByte: i16 = <i16>dataByteOne * -1;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeDataByte);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeDataByte);
-    Cpu.registerA -= dataByteOne;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
+    subARegister(dataByteOne);
     Cpu.programCounter += 1;
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0xD7)) {
@@ -2559,17 +1990,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // SBC A,d8
     // 2 8
     // Z 1 H C
-    let totalValue = dataByteOne + getCarryFlag();
-    let negativeTotalValue: i16 = <i16>totalValue * -1;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>totalValue);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>totalValue);
-    Cpu.registerA -= <u8>totalValue;
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
+    subAThroughCarryRegister(dataByteOne);
     Cpu.programCounter += 1;
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0xDF)) {
@@ -2621,15 +2042,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // AND d8
     // 2  8
     // Z 0 1 0
-    Cpu.registerA = (Cpu.registerA & dataByteOne);
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    setHalfCarryFlag(1);
-    setCarryFlag(0);
+    andARegister(dataByteOne);
     Cpu.programCounter += 1;
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0xE7)) {
@@ -2672,15 +2085,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // XOR d8
     // 2 8
     // Z 0 0 0
-    Cpu.registerA = Cpu.registerA ^ dataByteOne;
-    if(Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    setHalfCarryFlag(0);
-    setCarryFlag(0);
+    xorARegister(dataByteOne);
     Cpu.programCounter += 1;
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0xEF)) {
@@ -2735,15 +2140,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // OR d8
     // 2 8
     // Z 0 0 0
-    Cpu.registerA = (Cpu.registerA | dataByteOne);
-    if (Cpu.registerA === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    setHalfCarryFlag(0);
-    setCarryFlag(0);
+    orARegister(dataByteOne);
     Cpu.programCounter += 1;
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0xF7)) {
@@ -2795,16 +2192,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // CP d8
     // 2 8
     // Z 1 H C
-    let negativeDataByte: i16 = <i16>dataByteOne * -1;
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeDataByte);
-    checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeDataByte);
-    let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeDataByte;
-    if (tempResult === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
+    cpARegister(dataByteOne);
     Cpu.programCounter += 1;
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0xFF)) {

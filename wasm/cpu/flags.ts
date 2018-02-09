@@ -54,10 +54,10 @@ export function getCarryFlag(): u8 {
 // Must be run before the register actually performs the add
 // amountToAdd i16, since max number can be an u8
 export function checkAndSetEightBitHalfCarryFlag(value: u8, amountToAdd: i16): void {
-  if(amountToAdd > 0) {
+  if(amountToAdd >= 0) {
     // https://robdor.com/2016/08/10/gameboy-emulator-half-carry-flag/
-    let result = (((value & 0xf) + (<u8>amountToAdd & 0xf)) & 0x10)
-    if(result === 0x10) {
+    let result: u8 = (((<u8>value & 0x0F) + (<u8>amountToAdd & 0xF)) & 0x10)
+    if(result !== 0x00) {
       setHalfCarryFlag(1);
     } else {
       setHalfCarryFlag(0);
@@ -65,7 +65,7 @@ export function checkAndSetEightBitHalfCarryFlag(value: u8, amountToAdd: i16): v
   } else {
     // From: https://github.com/djhworld/gomeboycolor/blob/master/src/cpu/cpu.go
     // CTRL+F "subBytes(a, b byte)"
-    if((value & 0x0F) < <u8>(abs(amountToAdd) & 0x0F)) {
+    if(<u8>(abs(amountToAdd) & 0x0F) > (value & 0x0F)) {
       setHalfCarryFlag(1);
     } else {
       setHalfCarryFlag(0);
@@ -74,9 +74,9 @@ export function checkAndSetEightBitHalfCarryFlag(value: u8, amountToAdd: i16): v
 }
 
 export function checkAndSetEightBitCarryFlag(value: u8, amountToAdd: i16): void {
-  let result: i16 = <i16>value + amountToAdd;
-  if (amountToAdd > 0) {
-    if ((result >> 8) > 0) {
+  if (amountToAdd >= 0) {
+    let result: u8 = value + <u8>amountToAdd;
+    if (value > result) {
       setCarryFlag(1);
     } else {
       setCarryFlag(0);

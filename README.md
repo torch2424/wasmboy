@@ -13,6 +13,23 @@ Gameboy Emulator written in Web Assembly using [AssemblyScript](https://github.c
 
 * That's about it haha!
 
+# Tests
+
+### Blargg's CPU Tests
+
+
+* [x] 01 - special
+* [x] 02 - interrupt
+* [x] 03 - op sp,hl
+* [ ] 04 - op r, imm
+* [x] 05 - op rp
+* [x] 06 - ld r,r
+* [x] 07 - jr,jp,call,ret,rst
+* [x] 08 - misc instrs
+* [x] 09 - op r,r
+* [ ] 10 - bit ops
+* [ ] 11 - op a,(hl)
+
 # Roadmap
 
 The project doe quality and performance also depends on the [AssemblyScript Roadmap](https://github.com/AssemblyScript/assemblyscript/wiki/Status-and-Roadmap)
