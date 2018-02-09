@@ -93,13 +93,11 @@ export function checkAndSetEightBitCarryFlag(value: u8, amountToAdd: i16): void 
 // Function to handle 16 bit addition overflow, and set the carry flags accordingly
 // i32 on valueTwo to support passing signed immedaite values
 export function checkAndSetSixteenBitFlagsAddOverflow(valueOne: u16, valueTwo: i32, useStackPointerBits: boolean): void {
-  // Logic from : https://github.com/nakardo/node-gameboy/blob/master/lib/cpu/opcodes.js
-  // CTRL+F add_sp_n
-  // CTRL+F ADD_HL_n
-
   // need to differentiate between HL and SP
   // HL carries are at 11 and 15, SP carries are at 3 and 7 :p
   if(useStackPointerBits) {
+    // Logic from : https://github.com/nakardo/node-gameboy/blob/master/lib/cpu/opcodes.js
+    // CTRL+F add_sp_n
     // using the stack pointer bits means we can safely assume the value is signed
     let signedValueOne: i32 = <i32>valueOne;
     let result: i32 = signedValueOne + <i32>valueTwo;
@@ -118,6 +116,8 @@ export function checkAndSetSixteenBitFlagsAddOverflow(valueOne: u16, valueTwo: i
       setCarryFlag(0);
     }
   } else {
+    // Logic from: https://github.com/djhworld/gomeboycolor/blob/master/src/cpu/cpu.go
+    // CTRL+F addWords
     // Value two is not signed
     let result: u16 = valueOne + <u16>valueTwo;
 
