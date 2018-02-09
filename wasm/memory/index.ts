@@ -53,9 +53,8 @@ export function setPixelOnFrame(x: u16, y: u16, color: u8): void {
 // NOTE: Confirmed that memory is working with both Eight and sixteenbit store :), tested in CPU initialize
 export function eightBitStoreIntoGBMemory(offset: u16, value: u8): void {
   if(_checkWriteTraps(offset, <u16>value, true)) {
-    //store<u8>(offset, value);
+    store<u8>(offset, value);
   }
-  store<u8>(offset, value);
 }
 
 export function sixteenBitStoreIntoGBMemory(offset: u16, value: u16): void {
@@ -73,11 +72,21 @@ export function sixteenBitStoreIntoGBMemorySkipTraps(offset: u16, value: u16): v
 }
 
 export function eightBitLoadFromGBMemory(offset: u16): u8 {
-  return load<u8>(offset);
+  if (_checkReadTraps(offset)) {
+    return load<u8>(offset);
+  } else {
+    // TODO: Find what read trap should return
+    return 0x00;
+  }
 }
 
 export function sixteenBitLoadFromGBMemory(offset: u16): u16 {
-  return load<u16>(offset);
+  if (_checkReadTraps(offset)) {
+    return load<u16>(offset);
+  } else {
+    // TODO: Find what read trap should return
+    return 0x00;
+  }
 }
 
 // Internal function to trap any modify data trying to be written
@@ -124,4 +133,12 @@ function _dmaTransfer(sourceAddressOffset: u8): void {
   for(let i: u16 = 0; i < 0xA0; i++) {
     eightBitStoreIntoGBMemorySkipTraps(Memory.spriteInformationTableStart, eightBitLoadFromGBMemory(sourceAddress + i));
   }
+}
+
+function _checkReadTraps(offset: u16): boolean {
+  // TODO: Remove this joypad hack
+  if(offset === 0xFF00) {
+    eightBitStoreIntoGBMemorySkipTraps(0xFF00, 0xFF);
+  }
+  return true;
 }

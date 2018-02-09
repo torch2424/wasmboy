@@ -772,15 +772,20 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     let registerHL: u16 = concatenateBytes(Cpu.registerH, Cpu.registerL);
     let valueAtHL: u8 = eightBitLoadFromGBMemory(registerHL);
     checkAndSetEightBitHalfCarryFlag(<u8>valueAtHL, 1);
-    valueAtHL += 1;
+    consoleLog(valueAtHL, 99);
+    if(valueAtHL === 0xFF) {
+      valueAtHL = 0;
+    } else {
+      valueAtHL += 1;
+    }
     if (valueAtHL === 0) {
       setZeroFlag(1);
     } else {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
-
     eightBitStoreIntoGBMemory(registerHL, <u8>valueAtHL);
+    consoleLogTwo(valueAtHL, 99);
     numberOfCycles = 12;
   } else if(isOpcode(opcode, 0x35)) {
 
