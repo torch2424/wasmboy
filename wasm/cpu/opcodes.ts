@@ -36,7 +36,9 @@ import {
 } from '../timers/index';
 import {
   setInterrupts,
-  checkInterrupts
+  checkInterrupts,
+  areInterruptsEnabled,
+  areInterruptsPending
 } from '../interrupts/index';
 import {
   updateGraphics
@@ -52,7 +54,7 @@ export function update(): i8 {
   let numberOfCycles: i8 = -1;
   while(!error && Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME) {
     numberOfCycles = emulationStep();
-    if (numberOfCycles > 0) {
+    if (numberOfCycles >= 0) {
       Cpu.currentCycles += numberOfCycles;
     } else {
       error = true;
@@ -76,17 +78,49 @@ export function update(): i8 {
 // http://www.codeslinger.co.uk/pages/projects/gameboy/beginning.html
 export function emulationStep(): i8 {
   // Get the opcode, and additional bytes to be handled
-  let opcode: u8 = eightBitLoadFromGBMemory(Cpu.programCounter);
-  let dataByteOne: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 1);
-  let dataByteTwo: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 2);
-  let numberOfCycles: i8 = executeOpcode(opcode, dataByteOne, dataByteTwo);
+  // Number of cycles defaults to 4, because while we're halted, we run 4 cycles (according to matt :))
+  let numberOfCycles: i8 = 4;
+  let opcode: u8 = 0;
+
+  // Cpu Halting best explained: https://www.reddit.com/r/EmuDev/comments/5ie3k7/infinite_loop_trying_to_pass_blarggs_interrupt/
+  if(!Cpu.isHalted && !Cpu.isStopped) {
+    opcode = eightBitLoadFromGBMemory(Cpu.programCounter);
+    let dataByteOne: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 1);
+    let dataByteTwo: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 2);
+    numberOfCycles = executeOpcode(opcode, dataByteOne, dataByteTwo);
+  } else {
+    // if we were halted or stopped, and interrupts were diabled, stop waiting
+    // CTRL+F "low-power" on gameboy cpu manual
+    // http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf
+    if(Cpu.isHalted && !areInterruptsEnabled() && areInterruptsPending()) {
+      consoleLogTwo(0x2, 44);
+      Cpu.isHalted = false;
+      Cpu.isStopped = false;
+
+      // Need to run the next opcode twice, it's a bug menitoned in
+      // The CPU manual mentioned above, HOWEVER, TODO: This does not happen in GBC mode
+      // E.g
+      // 0x76 - halt
+      // FA 34 12 - ld a,(1234)
+      // Becomes
+      // FA FA 34 ld a,(34FA)
+      // 12 ld (de),a
+      opcode = eightBitLoadFromGBMemory(Cpu.programCounter);
+      let dataByteOne: u8 = eightBitLoadFromGBMemory(Cpu.programCounter);
+      let dataByteTwo: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 1);
+      numberOfCycles = executeOpcode(opcode, dataByteOne, dataByteTwo);
+      Cpu.programCounter -= 1;
+    }
+  }
 
   // blarggFixes
   clearBottomBitsOfFlagRegister();
 
   // Check other Gameboy components
   updateTimers(<u8>numberOfCycles);
-  updateGraphics(<u8>numberOfCycles);
+  if(!Cpu.isStopped) {
+    updateGraphics(<u8>numberOfCycles);
+  }
   checkInterrupts();
 
   if(numberOfCycles <= 0) {
@@ -304,8 +338,10 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
 
     // STOP 0
     // 2 4
-    // Enter CPU very low power mode?
-    // TODO
+    // Enter CPU very low power mode. Also used to switch between double and normal speed CPU modes in GBC.
+    // Meaning Don't Decode anymore opcodes , or updated the LCD until joypad interrupt (or when button is pressed if I am wrong)
+    // See HALT
+    Cpu.isStopped = true;
     Cpu.programCounter += 1;
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x11)) {
@@ -1182,8 +1218,10 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
 
     // HALT
     // 1 4
-    // Enter CPU very low power mode?
-    // TODO
+    // Enter CPU very low power mode
+    // Meaning Don't Decode anymore opcodes until an interrupt occurs
+    // Still need to do timers and things
+    Cpu.isHalted = true;
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x77)) {
 

@@ -9,7 +9,9 @@ export class WasmBoyDebugger extends Component {
 		// set our state to if we are initialized or not
 		this.state = {
       cpu: {},
-      ppu: {}
+      ppu: {},
+      timers: {},
+      interrupts: {}
     };
 	}
 
@@ -48,7 +50,7 @@ export class WasmBoyDebugger extends Component {
   breakPoint(skipInitialStep) {
     // Set our opcode breakpoint
     // CALL C012 has the bug
-    const breakPoint = 0xC2C0;
+    const breakPoint = 0x50;
 
     if(!skipInitialStep) {
       this.runNumberOfOpcodes(1, breakPoint);
@@ -81,7 +83,9 @@ export class WasmBoyDebugger extends Component {
     // Create our new state object
     const state = {
       cpu: {},
-      ppu: {}
+      ppu: {},
+      timers: {},
+      interrupts: {}
     };
 
     // Update CPU State
@@ -107,6 +111,21 @@ export class WasmBoyDebugger extends Component {
     state.ppu['Window X - 0xFF4B'] = WasmBoy.wasmByteMemory[0xFF4B];
     state.ppu['Window Y - 0xFF4A'] = WasmBoy.wasmByteMemory[0xFF4A];
 
+    // Update Timers State
+    state.timers['TIMA - 0xFF05'] = WasmBoy.wasmByteMemory[0xFF05];
+    state.timers['TMA - 0xFF06'] = WasmBoy.wasmByteMemory[0xFF06];
+    state.timers['TIMC/TAC - 0xFF07'] = WasmBoy.wasmByteMemory[0xFF07];
+    state.timers['DIV/Divider Register - 0xFF04'] = WasmBoy.wasmByteMemory[0xFF04];
+
+    // Update interrupts state
+    if(WasmBoy.wasmInstance.exports.areInterruptsEnabled()) {
+      state.interrupts['Interrupt Master Switch'] = WasmBoy.wasmByteMemory[0x01];
+    } else {
+      state.interrupts['Interrupt Master Switch'] = WasmBoy.wasmByteMemory[0x00];
+    }
+    state.interrupts['IE/Interrupt Enabled - 0xFFFF'] = WasmBoy.wasmByteMemory[0xFFFF];
+    state.interrupts['IF/Interrupt Request - 0xFF0F'] = WasmBoy.wasmByteMemory[0xFF0F];
+
     // Clone our state, that it is immutable and will cause change detection
     this.setState(state);
   }
@@ -131,6 +150,12 @@ export class WasmBoyDebugger extends Component {
 
         <h3>PPU Info:</h3>
         <NumberBaseTable object={this.state.ppu}></NumberBaseTable>
+
+        <h3>Timer Info:</h3>
+        <NumberBaseTable object={this.state.timers}></NumberBaseTable>
+
+        <h3>Interrupt Info:</h3>
+        <NumberBaseTable object={this.state.interrupts}></NumberBaseTable>
       </div>
 		);
 	}

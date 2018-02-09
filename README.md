@@ -35,6 +35,8 @@ And please see [Issue #3](https://github.com/torch2424/wasmBoy/issues/3)
 
 * [Spreadsheet of Game that Do or Do Not Rom Bank](https://docs.google.com/spreadsheets/d/1cOS__xEj8bBT7cqEDgJcYStKuFAS8mMA4uErx9kA40M/edit#gid=1827536881)
 
+* [Sound Emulation - GhostSonit's reply](https://www.reddit.com/r/EmuDev/comments/5gkwi5/gb_apu_sound_emulation/)
+
 ### Random Things I've Learned:
 
 * It's better to code an emulator by abstracting assembly commands into functions, rather than by Opcode operation

@@ -265,8 +265,14 @@ function _renderBackground(scanlineRegister: u8, scrollX: u16, scrollY: u16, til
   // Get our current pixel y positon on the 160x144 camera (Row that the scanline draws across)
   // this is done by getting the current scroll Y position,
   // and adding it do what Y Value the scanline is drawing on the camera.
-  // TODO Once done with test roms, + scrollY
-  let pixelYPositionInMap: u16 = <u16>scanlineRegister + 0;
+  let pixelYPositionInMap: u16 = <u16>scanlineRegister + scrollY;
+
+  // Gameboy camera will "wrap" around the background map,
+  // meaning that if the pixelValue is 350, then we need to subtract 256 (decimal) to get it's actual value
+  // pixel values (scrollX and scrollY) range from 0x00 - 0xFF
+  if(pixelYPositionInMap >= 0x100) {
+    pixelYPositionInMap -= 0x100;
+  }
 
   // Loop through x to draw the line like a CRT
   for (let i: u16 = 0; i < 160; i++) {
@@ -275,6 +281,11 @@ function _renderBackground(scanlineRegister: u8, scrollX: u16, scrollY: u16, til
     // this is done by getting the current scroll X position,
     // and adding it do what X Value the scanline is drawing on the camera.
     let pixelXPositionInMap: u16 = i + scrollX;
+
+    // This is to compensate wrapping, same as above
+    if(pixelXPositionInMap >= 0x100) {
+      pixelXPositionInMap -= 0x100;
+    }
 
     // Divide our pixel position by 8 to get our tile.
     // Since, there are 256x256 pixels, and 32x32 tiles.

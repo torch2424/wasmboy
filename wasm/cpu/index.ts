@@ -39,6 +39,12 @@ export class Cpu {
   static currentCycles: i32 = 0;
   static CLOCK_SPEED: i32 = 4194304;
   static MAX_CYCLES_PER_FRAME : i32 = 69905;
+
+  // HALT and STOP instructions need to stop running opcodes, but simply check timers
+  // https://github.com/nakardo/node-gameboy/blob/master/lib/cpu/opcodes.js
+  // Matt said is should work to, so it must work!
+  static isHalted: boolean = false;
+  static isStopped: boolean = false;
 }
 
 export function initialize(includeBootRom: boolean): void {

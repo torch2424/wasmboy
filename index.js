@@ -12,6 +12,8 @@ export default class App extends Component {
 		WasmBoy.loadGame(canvasElement, 'blarggsCpu/02-interrupts.gb')
     .then(() => {
       console.log('Wasmboy Ready!');
+			// TODO: Remove this degub code
+			//WasmBoy.startGame();
     });
 	}
 

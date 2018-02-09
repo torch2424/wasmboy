@@ -1,11 +1,12 @@
 import { Cpu } from '../cpu/index';
 import { eightBitLoadFromGBMemory, eightBitStoreIntoGBMemorySkipTraps } from '../memory/index';
 import { requestTimerInterrupt } from '../interrupts/index';
+import { consoleLogTwo } from '../helpers/index';
 
 class Timers {
   static memoryLocationTIMA: u16 = 0xFF05; // Timer Modulator
   static memoryLocationTMA: u16 = 0xFF06; // Timer Counter (Actual Time Value)
-  static memoryLocationTIMC: u16 = 0xFF07; // Timer Controller
+  static memoryLocationTIMC: u16 = 0xFF07; // Timer Controller (A.K.A TAC)
   static memoryLocationDividerRegister: u16 = 0xFF04; // DividerRegister likes to count
 
   // Cycle counter. This is used to determine if we should increment the REAL timer
@@ -26,7 +27,7 @@ export function updateTimers(numberOfCycles: u8): void {
     // Add our cycles our cycle counter
     Timers.cycleCounter += numberOfCycles;
 
-    if(Timers.cycleCounter < _getCurrentCycleCounterFrequency()) {
+    if(Timers.cycleCounter > _getCurrentCycleCounterFrequency()) {
       // Reset our cycle counters
       Timers.cycleCounter = 0;
 

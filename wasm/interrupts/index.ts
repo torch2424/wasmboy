@@ -4,10 +4,10 @@ import { consoleLogTwo, setBitOnByte, resetBitOnByte, checkBitOnByte } from '../
 
 class Interrupts {
   static memoryLocationInterruptEnabled: u16 = 0xFFFF;
-  static memoryLocationInterruptRequest: u16 = 0xFF0F;
+  static memoryLocationInterruptRequest: u16 = 0xFF0F; // A.K.A interrupt Flag (IF)
 
   static masterInterruptSwitch: boolean = false;
-  // According to mooneye, interruptsa re not handled until AFTER
+  // According to mooneye, interrupts are not handled until AFTER
   // Next instruction
   // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown
   static masterInterruptSwitchDelay: boolean = false;
@@ -47,6 +47,10 @@ function _handleInterrupt(bitPosition: u8): void {
 }
 
 function _requestInterrupt(bitPosition: u8): void {
+
+  // If the CPU was halted, now is the time to un-halt
+  Cpu.isHalted = false;
+
   let interruptRequest = eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptRequest);
 
   // Pass to set the correct interrupt bit on interruptRequest
@@ -58,6 +62,25 @@ function _requestInterrupt(bitPosition: u8): void {
 export function setInterrupts(value: boolean): void {
   Interrupts.masterInterruptSwitch = value;
 }
+
+// Helper function to check if interrupts are enabled
+export function areInterruptsEnabled(): boolean {
+  return Interrupts.masterInterruptSwitch;
+}
+
+// Useful fo determining the HALT bug
+export function areInterruptsPending(): boolean {
+  let interruptRequest = eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptRequest);
+  let interruptEnabled = eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptEnabled);
+
+  if((interruptRequest & interruptEnabled) !== 0) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+// Helper function to get if interrupts are pending but the switch is not set
 
 export function checkInterrupts(): void {
   if(Interrupts.masterInterruptSwitch) {
@@ -83,6 +106,8 @@ export function checkInterrupts(): void {
       } else if (checkBitOnByte(Interrupts.bitPositionJoypadInterrupt, interruptRequest) &&
         checkBitOnByte(Interrupts.bitPositionJoypadInterrupt, interruptEnabled)) {
 
+          // If the CPU was stopped, now is the time to un-stop
+          Cpu.isStopped = false;
           _handleInterrupt(Interrupts.bitPositionJoypadInterrupt);
       }
     }
