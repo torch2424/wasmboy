@@ -82,23 +82,23 @@ export function emulationStep(): i8 {
   let numberOfCycles: i8 = 4;
   let opcode: u8 = 0;
 
-  // Cpu Halting best explained: https://www.reddit.com/r/EmuDev/comments/5ie3k7/infinite_loop_trying_to_pass_blarggs_interrupt/
+  // Cpu Halting best explained: https://www.reddit.com/r/EmuDev/comments/5ie3k7/infinite_loop_trying_to_pass_blarggs_interrupt/db7xnbe/
   if(!Cpu.isHalted && !Cpu.isStopped) {
     opcode = eightBitLoadFromGBMemory(Cpu.programCounter);
     let dataByteOne: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 1);
     let dataByteTwo: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 2);
     numberOfCycles = executeOpcode(opcode, dataByteOne, dataByteTwo);
   } else {
-    // if we were halted or stopped, and interrupts were diabled, stop waiting
-    // CTRL+F "low-power" on gameboy cpu manual
-    // http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf
+    // if we were halted, and interrupts were disabled but interrupts are pending, stop waiting
     if(Cpu.isHalted && !areInterruptsEnabled() && areInterruptsPending()) {
       consoleLogTwo(0x2, 44);
       Cpu.isHalted = false;
       Cpu.isStopped = false;
 
       // Need to run the next opcode twice, it's a bug menitoned in
-      // The CPU manual mentioned above, HOWEVER, TODO: This does not happen in GBC mode
+      // The reddit comment mentioned above, HOWEVER, TODO: This does not happen in GBC mode, see cpu manual
+      // CTRL+F "low-power" on gameboy cpu manual
+      // http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf
       // E.g
       // 0x76 - halt
       // FA 34 12 - ld a,(1234)
