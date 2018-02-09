@@ -1,6 +1,6 @@
 // TODO: Finish Memory!
 
-import { consoleLog } from '../helpers/index';
+import { consoleLog, consoleLogTwo } from '../helpers/index';
 
 class Memory {
 
@@ -85,10 +85,6 @@ function _checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolean): bo
   // Do not allow writing into cartridge area.
   if(offset < Memory.videoRamStart) {
     return false;
-  }
-
-  if(offset === 0xFF42) {
-    consoleLog(value, offset);
   }
 
   // Be sure to copy everything in EchoRam to Work Ram

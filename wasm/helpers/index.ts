@@ -51,7 +51,7 @@ export function getCurrentLogId(logIdNumber: i32): i32 {
 // AF, BC, DE, HL
 export function concatenateBytes(highByte: u8, lowByte: u8): u16 {
   //https://stackoverflow.com/questions/38298412/convert-two-bytes-into-signed-16-bit-integer-in-javascript
-  let highByteExpanded: u16 = highByte;
+  let highByteExpanded: u16 = <u16>highByte;
   return (((highByteExpanded & 0xFF) << 8) | (lowByte & 0xFF))
 }
 

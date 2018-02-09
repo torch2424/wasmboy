@@ -56,7 +56,7 @@ export function getCarryFlag(): u8 {
 export function checkAndSetEightBitHalfCarryFlag(value: u8, amountToAdd: i16): void {
   if(amountToAdd >= 0) {
     // https://robdor.com/2016/08/10/gameboy-emulator-half-carry-flag/
-    let result: u8 = (((<u8>value & 0x0F) + (<u8>amountToAdd & 0xF)) & 0x10)
+    let result: u8 = (((<u8>value & 0x0F) + (<u8>amountToAdd & 0x0F)) & 0x10)
     if(result !== 0x00) {
       setHalfCarryFlag(1);
     } else {

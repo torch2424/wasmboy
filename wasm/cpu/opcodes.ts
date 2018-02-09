@@ -185,11 +185,11 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
   } else if(isOpcode(opcode, 0x02)) {
 
     // LD (BC),A
-    // 3  12
+    // 1  8
     // () means load into address pointed by BC
-    sixteenBitStoreIntoGBMemory(concatenateBytes(Cpu.registerB, Cpu.registerC), Cpu.registerA);
-    Cpu.programCounter += 2;
-    numberOfCycles = 12;
+    let registerBC: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC)
+    sixteenBitStoreIntoGBMemory(registerBC, Cpu.registerA);
+    numberOfCycles = 8;
   } else if(isOpcode(opcode, 0x03)) {
 
     // INC BC
@@ -276,8 +276,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
 
     // LD A,(BC)
     // 1 8
-    let bytesAtBC: u8 = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerB, Cpu.registerC));
-    Cpu.registerA = <u8>bytesAtBC;
+    let registerBC: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC)
+    Cpu.registerA = eightBitLoadFromGBMemory(registerBC);
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0x0B)) {
 
@@ -362,7 +362,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
 
     // LD (DE),A
     // 1 8
-    sixteenBitStoreIntoGBMemory(concatenateBytes(Cpu.registerD, Cpu.registerE), Cpu.registerA);
+    let registerDE: u16 = concatenateBytes(Cpu.registerD, Cpu.registerE);
+    sixteenBitStoreIntoGBMemory(registerDE, Cpu.registerA);
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0x13)) {
 
@@ -456,7 +457,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
 
     // LD A,(DE)
     // 1 8
-    Cpu.registerA = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerD, Cpu.registerE));
+    let registerDE: u16 = concatenateBytes(Cpu.registerD, Cpu.registerE);
+    Cpu.registerA = eightBitLoadFromGBMemory(registerDE);
     numberOfCycles = 8;
   } else if(isOpcode(opcode, 0x1B)) {
 
@@ -769,7 +771,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Z 0 H -
     let registerHL: u16 = concatenateBytes(Cpu.registerH, Cpu.registerL);
     let valueAtHL: u8 = eightBitLoadFromGBMemory(registerHL);
-    checkAndSetEightBitHalfCarryFlag(<u8>valueAtHL, -1);
+    checkAndSetEightBitHalfCarryFlag(<u8>valueAtHL, 1);
     valueAtHL += 1;
     if (valueAtHL === 0) {
       setZeroFlag(1);

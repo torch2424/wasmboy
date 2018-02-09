@@ -147,82 +147,82 @@ export function handleCbOpcode(cbOpcode: u8): i8 {
   } else if (cbOpcode <= 0x87) {
     // Res 0,register 8-bit
     // - - - -
-    instructionRegisterResult = setBitOnRegister(0, 1, instructionRegisterValue);
+    instructionRegisterResult = setBitOnRegister(0, 0, instructionRegisterValue);
     handledOpcode = true;
   } else if (cbOpcode <= 0x8F) {
     // Res 1,register 8-bit
     // - - - -
-    instructionRegisterResult = setBitOnRegister(1, 1, instructionRegisterValue);
+    instructionRegisterResult = setBitOnRegister(1, 0, instructionRegisterValue);
     handledOpcode = true;
   } else if (cbOpcode <= 0x97) {
     // Res 2,register 8-bit
     // - - - -
-    instructionRegisterResult = setBitOnRegister(2, 1, instructionRegisterValue);
+    instructionRegisterResult = setBitOnRegister(2, 0, instructionRegisterValue);
     handledOpcode = true;
   } else if (cbOpcode <= 0x9F) {
     // Res 3,register 8-bit
     // - - - -
-    instructionRegisterResult = setBitOnRegister(3, 1, instructionRegisterValue);
+    instructionRegisterResult = setBitOnRegister(3, 0, instructionRegisterValue);
     handledOpcode = true;
   } else if (cbOpcode <= 0xA7) {
     // Res 4,register 8-bit
     // - - - -
-    instructionRegisterResult = setBitOnRegister(4, 1, instructionRegisterValue);
+    instructionRegisterResult = setBitOnRegister(4, 0, instructionRegisterValue);
     handledOpcode = true;
   } else if (cbOpcode <= 0xAF) {
     // Res 5,register 8-bit
     // - - - -
-    instructionRegisterResult = setBitOnRegister(5, 1, instructionRegisterValue);
+    instructionRegisterResult = setBitOnRegister(5, 0, instructionRegisterValue);
     handledOpcode = true;
   } else if (cbOpcode <= 0xB7) {
     // Res 6,register 8-bit
     // - - - -
-    instructionRegisterResult = setBitOnRegister(6, 1, instructionRegisterValue);
+    instructionRegisterResult = setBitOnRegister(6, 0, instructionRegisterValue);
     handledOpcode = true;
   } else if (cbOpcode <= 0xBF) {
     // Res 7,register 8-bit
     // - - - -
-    instructionRegisterResult = setBitOnRegister(7, 1, instructionRegisterValue);
+    instructionRegisterResult = setBitOnRegister(7, 0, instructionRegisterValue);
     handledOpcode = true;
   } else if (cbOpcode <= 0xC7) {
     // SET 0,register 8-bit
     // - - - -
-    instructionRegisterResult = setBitOnRegister(0, 0, instructionRegisterValue);
+    instructionRegisterResult = setBitOnRegister(0, 1, instructionRegisterValue);
     handledOpcode = true;
   } else if (cbOpcode <= 0xCF) {
     // SET 1,register 8-bit
     // - - - -
-    instructionRegisterResult = setBitOnRegister(1, 0, instructionRegisterValue);
+    instructionRegisterResult = setBitOnRegister(1, 1, instructionRegisterValue);
     handledOpcode = true;
   } else if (cbOpcode <= 0xD7) {
     // SET 2,register 8-bit
     // - - - -
-    instructionRegisterResult = setBitOnRegister(2, 0, instructionRegisterValue);
+    instructionRegisterResult = setBitOnRegister(2, 1, instructionRegisterValue);
     handledOpcode = true;
   } else if (cbOpcode <= 0xDF) {
     // SET 3,register 8-bit
     // - - - -
-    instructionRegisterResult = setBitOnRegister(3, 0, instructionRegisterValue);
+    instructionRegisterResult = setBitOnRegister(3, 1, instructionRegisterValue);
     handledOpcode = true;
   } else if (cbOpcode <= 0xE7) {
     // SET 4,register 8-bit
     // - - - -
-    instructionRegisterResult = setBitOnRegister(4, 0, instructionRegisterValue);
+    instructionRegisterResult = setBitOnRegister(4, 1, instructionRegisterValue);
     handledOpcode = true;
   } else if (cbOpcode <= 0xEF) {
     // SET 5,register 8-bit
     // - - - -
-    instructionRegisterResult = setBitOnRegister(5, 0, instructionRegisterValue);
+    instructionRegisterResult = setBitOnRegister(5, 1, instructionRegisterValue);
     handledOpcode = true;
   } else if (cbOpcode <= 0xF7) {
     // SET 6,register 8-bit
     // - - - -
-    instructionRegisterResult = setBitOnRegister(6, 0, instructionRegisterValue);
+    instructionRegisterResult = setBitOnRegister(6, 1, instructionRegisterValue);
     handledOpcode = true;
   } else if (cbOpcode <= 0xFF) {
     // SET 7,register 8-bit
     // - - - -
-    instructionRegisterResult = setBitOnRegister(7, 0, instructionRegisterValue);
+    instructionRegisterResult = setBitOnRegister(7, 1, instructionRegisterValue);
     handledOpcode = true;
   }
 
