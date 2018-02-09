@@ -91,20 +91,48 @@ export function checkAndSetEightBitCarryFlag(value: u8, amountToAdd: i16): void 
 }
 
 // Function to handle 16 bit addition overflow, and set the carry flags accordingly
-// i32 to support passing signed immedita values
-export function checkAndSetSixteenBitFlagsAddOverflow(valueOne: i32, valueTwo: i32): void {
-  // To check for Carry flag (bit 16), knock off all bits below
-  let result: i32 = valueOne + valueTwo;
-  if((result >> 15) > 0) {
-    setCarryFlag(1);
-  } else {
-    setCarryFlag(0);
-  }
+// i32 on valueTwo to support passing signed immedaite values
+export function checkAndSetSixteenBitFlagsAddOverflow(valueOne: u16, valueTwo: i32, useStackPointerBits: boolean): void {
+  // Logic from : https://github.com/nakardo/node-gameboy/blob/master/lib/cpu/opcodes.js
+  // CTRL+F add_sp_n
+  // CTRL+F ADD_HL_n
 
-  // To check for half carry flag (bit 15), by XOR'ing valyes, and and'ing the bit in question
-  if ( ((result ^ valueOne ^ valueTwo) & 0x1000) === 0x1000 ) {
-    setHalfCarryFlag(1);
+  // need to differentiate between HL and SP
+  // HL carries are at 11 and 15, SP carries are at 3 and 7 :p
+  if(useStackPointerBits) {
+    // using the stack pointer bits means we can safely assume the value is signed
+    let signedValueOne: i32 = <i32>valueOne;
+    let result: i32 = signedValueOne + <i32>valueTwo;
+
+    let flagXor: i32 = signedValueOne ^ valueTwo ^ result;
+
+    if((flagXor & 0x10) !== 0) {
+      setHalfCarryFlag(1);
+    } else {
+      setHalfCarryFlag(0);
+    }
+
+    if((flagXor & 0x100) !== 0) {
+      setCarryFlag(1);
+    } else {
+      setCarryFlag(0);
+    }
   } else {
-    setHalfCarryFlag(0);
+    // Value two is not signed
+    let result: u16 = valueOne + <u16>valueTwo;
+
+    // Check the carry flag by allowing the overflow
+    if(result < valueOne) {
+      setCarryFlag(1);
+    } else {
+      setCarryFlag(0);
+    }
+
+    // To check for half carry flag (bit 15), by XOR'ing valyes, and and'ing the bit in question
+    if ( ((valueOne ^ <u16>valueTwo ^ <u16>result) & 0x1000) !== 0x00 ) {
+      setHalfCarryFlag(1);
+    } else {
+      setHalfCarryFlag(0);
+    }
   }
 }

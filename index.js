@@ -9,7 +9,7 @@ export default class App extends Component {
 		// Get our canvas element
 		const canvasElement = document.querySelector(".wasmboy__canvas-container__canvas");
 		// Load our game
-		WasmBoy.loadGame(canvasElement, 'blarggsCpu/02-interrupts.gb')
+		WasmBoy.loadGame(canvasElement, 'blarggsCpu/03-op sp,hl.gb')
     .then(() => {
       console.log('Wasmboy Ready!');
 			// TODO: Remove this degub code

@@ -260,7 +260,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // - 0 H C
     let registerHL: u16 = concatenateBytes(Cpu.registerH, Cpu.registerL);
     let registerBC: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC);
-    checkAndSetSixteenBitFlagsAddOverflow(<u16>registerHL, <u16>registerBC);
+    checkAndSetSixteenBitFlagsAddOverflow(<u16>registerHL, <u16>registerBC, false);
     let result: u16 = <u16>(registerHL + registerBC);
     Cpu.registerH = splitHighByte(<u16>result);
     Cpu.registerL = splitLowByte(<u16>result);
@@ -440,7 +440,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // - 0 H C
     let registerHL: u16 = concatenateBytes(Cpu.registerH, Cpu.registerL);
     let registerDE: u16 = concatenateBytes(Cpu.registerD, Cpu.registerE);
-    checkAndSetSixteenBitFlagsAddOverflow(<u16>registerHL, <u16>registerDE);
+    checkAndSetSixteenBitFlagsAddOverflow(<u16>registerHL, <u16>registerDE, false);
     let result: u16 = <u16>(registerHL + registerDE);
     Cpu.registerH = splitHighByte(<u16>result);
     Cpu.registerL = splitLowByte(<u16>result);
@@ -655,7 +655,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // 1  8
     // - 0 H C
     let registerHL = concatenateBytes(Cpu.registerH, Cpu.registerL);
-    checkAndSetSixteenBitFlagsAddOverflow(registerHL, registerHL);
+    checkAndSetSixteenBitFlagsAddOverflow(registerHL, registerHL, false);
     registerHL = registerHL * 2;
     Cpu.registerH = splitHighByte(registerHL);
     Cpu.registerL = splitLowByte(registerHL);
@@ -822,7 +822,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // 1 8
     // - 0 H C
     let registerHL: u16 = concatenateBytes(Cpu.registerH, Cpu.registerL);
-    checkAndSetSixteenBitFlagsAddOverflow(<u16>registerHL, Cpu.stackPointer);
+    checkAndSetSixteenBitFlagsAddOverflow(<u16>registerHL, Cpu.stackPointer, false);
     let result: u16 = <u16>(registerHL + Cpu.stackPointer);
     Cpu.registerH = splitHighByte(<u16>result);
     Cpu.registerL = splitLowByte(<u16>result);
@@ -2648,7 +2648,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // NOTE: Discoved dataByte is signed
     let signedDataByteOne: i8 = <i8>dataByteOne;
 
-    checkAndSetSixteenBitFlagsAddOverflow(Cpu.stackPointer, signedDataByteOne);
+    checkAndSetSixteenBitFlagsAddOverflow(Cpu.stackPointer, signedDataByteOne, true);
     Cpu.stackPointer += signedDataByteOne;
     setZeroFlag(0);
     setSubtractFlag(0);
@@ -2765,7 +2765,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // First, let's handle flags
     setZeroFlag(0);
     setSubtractFlag(0);
-    checkAndSetSixteenBitFlagsAddOverflow(Cpu.stackPointer, signedDataByteOne);
+    checkAndSetSixteenBitFlagsAddOverflow(Cpu.stackPointer, signedDataByteOne, true);
     let registerHL = Cpu.stackPointer + signedDataByteOne;
     Cpu.registerH = splitHighByte(registerHL);
     Cpu.registerL = splitLowByte(registerHL);

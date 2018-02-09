@@ -50,7 +50,7 @@ export class WasmBoyDebugger extends Component {
   breakPoint(skipInitialStep) {
     // Set our opcode breakpoint
     // CALL C012 has the bug
-    const breakPoint = 0x50;
+    const breakPoint = 0xdef9;
 
     if(!skipInitialStep) {
       this.runNumberOfOpcodes(1, breakPoint);
@@ -89,8 +89,8 @@ export class WasmBoyDebugger extends Component {
     };
 
     // Update CPU State
-    state.cpu['Program Counter'] = WasmBoy.wasmInstance.exports.getProgramCounter();
-    state.cpu['Next Opcode'] = WasmBoy.wasmByteMemory[WasmBoy.wasmInstance.exports.getProgramCounter()];
+    state.cpu['Program Counter (PC)'] = WasmBoy.wasmInstance.exports.getProgramCounter();
+    state.cpu['Opcode at PC'] = WasmBoy.wasmByteMemory[WasmBoy.wasmInstance.exports.getProgramCounter()];
     state.cpu['Stack Pointer'] = WasmBoy.wasmInstance.exports.getStackPointer();
     state.cpu['Register A'] = WasmBoy.wasmInstance.exports.getRegisterA();
     state.cpu['Register F'] = WasmBoy.wasmInstance.exports.getRegisterF();
