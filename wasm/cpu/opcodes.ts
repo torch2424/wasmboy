@@ -773,6 +773,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     let valueAtHL: u8 = eightBitLoadFromGBMemory(registerHL);
     checkAndSetEightBitHalfCarryFlag(<u8>valueAtHL, 1);
     consoleLog(valueAtHL, 99);
+    // TODO: Fix all valueAtHL to overflow 0xFF
     if(valueAtHL === 0xFF) {
       valueAtHL = 0;
     } else {
