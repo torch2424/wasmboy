@@ -770,15 +770,14 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // 1  12
     // Z 0 H -
     let registerHL: u16 = concatenateBytes(Cpu.registerH, Cpu.registerL);
-    let valueAtHL: u8 = eightBitLoadFromGBMemory(registerHL);
-    checkAndSetEightBitHalfCarryFlag(<u8>valueAtHL, 1);
-    consoleLog(valueAtHL, 99);
-    // TODO: Fix all valueAtHL to overflow 0xFF
-    if(valueAtHL === 0xFF) {
-      valueAtHL = 0;
-    } else {
-      valueAtHL += 1;
-    }
+    let valueAtHL: u8 = <u8>eightBitLoadFromGBMemory(registerHL);
+    // Creating a varible for this to fix assemblyscript overflow bug
+    // Requires explicit casting
+    // https://github.com/AssemblyScript/assemblyscript/issues/26
+    let incrementer: u8 = 1;
+    checkAndSetEightBitHalfCarryFlag(<u8>valueAtHL, <i16>incrementer);
+    valueAtHL = <u8>valueAtHL + <u8>incrementer;
+
     if (valueAtHL === 0) {
       setZeroFlag(1);
     } else {
@@ -786,7 +785,6 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     }
     setSubtractFlag(0);
     eightBitStoreIntoGBMemory(registerHL, <u8>valueAtHL);
-    consoleLogTwo(valueAtHL, 99);
     numberOfCycles = 12;
   } else if(isOpcode(opcode, 0x35)) {
 
@@ -795,8 +793,10 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Z 1 H -
     let registerHL: u16 = concatenateBytes(Cpu.registerH, Cpu.registerL);
     let valueAtHL: u8 = eightBitLoadFromGBMemory(registerHL);
+    // NOTE: This opcode may not overflow correctly,
+    // Please see previous opcode
     checkAndSetEightBitHalfCarryFlag(<u8>valueAtHL, -1);
-    valueAtHL -= 1;
+    valueAtHL -= <u8>1;
     if (valueAtHL === 0) {
       setZeroFlag(1);
     } else {
@@ -827,7 +827,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     if (getCarryFlag() === 1) {
       relativeJump(dataByteOne);
       numberOfCycles = 12;
-      // Relative jUmp Funciton handles program counter
+      // Relative Jump Funciton handles program counter
     } else {
       numberOfCycles = 8;
       Cpu.programCounter += 1;
