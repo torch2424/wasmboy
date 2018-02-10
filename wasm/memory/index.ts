@@ -1,4 +1,6 @@
 // TODO: Finish Memory!
+// WasmBoy memory map:
+// https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
 
 import { consoleLog, consoleLogTwo } from '../helpers/index';
 
@@ -30,6 +32,17 @@ class Memory {
   // Hardware I/O, 0xFF00 -> 0xFF7F
   // Zero Page, 0xFF80 -> 0xFFFE
   // Intterupt Enable Flag, 0xFFFF
+
+  // Rom/Ram banking
+  // http://gbdev.gg8.se/wiki/articles/Memory_Bank_Controllers#MBC3_.28max_2MByte_ROM_and.2For_32KByte_RAM_and_Timer.29
+  // http://www.codeslinger.co.uk/pages/projects/gameboy/banking.html
+  static currentRomBank: u8 = 1;
+  static currentRamBank: u8 = 0;
+  static isMBC1: boolean = false;
+  static isMBC2: boolean = false;
+  static isMBC3: boolean = false;
+  static isMBC4: boolean = false;
+  static isMBC5: boolean = false;
 }
 
 
