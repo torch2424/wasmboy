@@ -54,6 +54,8 @@ And please see [Issue #3](https://github.com/torch2424/wasmBoy/issues/3)
 
 * [Sound Emulation - GhostSonit's reply](https://www.reddit.com/r/EmuDev/comments/5gkwi5/gb_apu_sound_emulation/)
 
+* [Awesome Wiki on the Gamelad project](https://github.com/Dooskington/GameLad/wiki)
+
 ### Random Things I've Learned:
 
 * It's better to code an emulator by abstracting assembly commands into functions, rather than by Opcode operation
