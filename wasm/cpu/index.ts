@@ -48,6 +48,9 @@ export class Cpu {
   // Matt said is should work to, so it must work!
   static isHalted: boolean = false;
   static isStopped: boolean = false;
+
+  // Debugging properties
+  static previousOpcode: u8 = 0x00;
 }
 
 export function initialize(includeBootRom: u8): void {

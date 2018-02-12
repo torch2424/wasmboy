@@ -46,3 +46,7 @@ export function getProgramCounter(): u16 {
 export function getStackPointer(): u16 {
   return Cpu.stackPointer;
 }
+
+export function getPreviousOpcode(): u8 {
+  return Cpu.previousOpcode;
+}

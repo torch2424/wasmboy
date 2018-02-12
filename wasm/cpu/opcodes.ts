@@ -95,6 +95,7 @@ export function emulationStep(): i8 {
     let dataByteOne: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 1);
     let dataByteTwo: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 2);
     numberOfCycles = executeOpcode(opcode, dataByteOne, dataByteTwo);
+    Cpu.previousOpcode = opcode;
   } else {
     // if we were halted, and interrupts were disabled but interrupts are pending, stop waiting
     if(Cpu.isHalted && !areInterruptsEnabled() && areInterruptsPending()) {
@@ -347,7 +348,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Enter CPU very low power mode. Also used to switch between double and normal speed CPU modes in GBC.
     // Meaning Don't Decode anymore opcodes , or updated the LCD until joypad interrupt (or when button is pressed if I am wrong)
     // See HALT
-    Cpu.isStopped = true;
+    // TODO: This breaks Blarggs CPU tests, find out what should end a STOP
+    //Cpu.isStopped = true;
     Cpu.programCounter += 1;
     numberOfCycles = 4;
   } else if(isOpcode(opcode, 0x11)) {
