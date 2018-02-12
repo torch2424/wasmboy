@@ -7,7 +7,6 @@ import {
 } from '../helpers/index';
 
 export function handleBanking(offset: u16, value: u16): void {
-
       // Is rom Only does not bank
       if(Memory.isRomOnly) {
         return;
