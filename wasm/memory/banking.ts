@@ -105,3 +105,24 @@ export function handleBanking(offset: u16, value: u16): void {
         // TODO: MBC3 Latch Clock Data
       }
 }
+
+export function getRomBankAddress(gameboyOffset: u32): u32 {
+  let currentRomBank: u16 = Memory.currentRomBank;
+  if(!Memory.isMBC5 && currentRomBank === 0) {
+    currentRomBank = 1;
+  }
+
+  // Adjust our gameboy offset relative to zero for the gameboy memory map
+  let romBankOffset: u32 = gameboyOffset - Memory.switchableCartridgeRomLocation;
+
+  let romBankSize: u32 = 0x4000;
+  let currentRomBankAddress: u32 = (0x4000 * currentRomBank) + romBankOffset;
+  return currentRomBankAddress;
+}
+
+export function getRamBankAddress(gameboyOffset: u32): u32 {
+  // Adjust our gameboy offset relative to zero for the gameboy memory map
+  let ramBankOffset: u32 = gameboyOffset - Memory.cartridgeRamLocation;
+  let currentRamBankAddress: u32 = (0x2000 * Memory.currentRamBank) + ramBankOffset;
+  return currentRamBankAddress;
+}
