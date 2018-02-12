@@ -1,6 +1,20 @@
-import { eightBitLoadFromGBMemory, eightBitStoreIntoGBMemorySkipTraps, sixteenBitLoadFromGBMemory, setPixelOnFrame } from '../memory/index';
-import { requestVBlankInterrupt, requestLcdInterrupt } from '../interrupts/index';
-import { consoleLog, consoleLogLargest, checkBitOnByte, setBitOnByte, resetBitOnByte } from '../helpers/index';
+import {
+  eightBitLoadFromGBMemory,
+  eightBitStoreIntoGBMemorySkipTraps,
+  sixteenBitLoadFromGBMemory,
+  setPixelOnFrame
+} from '../memory/index';
+import {
+  requestVBlankInterrupt,
+  requestLcdInterrupt
+} from '../interrupts/index';
+import {
+  consoleLog,
+  consoleLogTwo,
+  checkBitOnByte,
+  setBitOnByte,
+  resetBitOnByte
+} from '../helpers/index';
 
 class Graphics {
   // Count the number of cycles to keep synced with cpu cycles
@@ -216,7 +230,7 @@ function _drawScanline(): void {
 }
 
 
-function _getTileDataAddress(tileDataMemoryLocation: u16, tileIdFromTileMap: u16): u16 {
+function _getTileDataAddress(tileDataMemoryLocation: u16, tileIdFromTileMap: u8): u16 {
 
   // Watch this part of The ultimate gameboy talk: https://youtu.be/HyzD8pNlpwI?t=30m50s
   // A line of 8 pixels on a single tile, is represented by 2 bytes.
@@ -231,10 +245,16 @@ function _getTileDataAddress(tileDataMemoryLocation: u16, tileIdFromTileMap: u16
   // Since each tile is 16 bytes, it would be the starting tileDataAddress + (tileId * tileSize), to skip over tiles we dont want
   // The whole signed thing is weird, and has something to do how the second set of tile data is stored :p
   if(tileDataMemoryLocation === Graphics.memoryLocationTileDataSelectZeroStart) {
-    // Treat the tile Id as a signed int, and add an offset of 128
+    // Treat the tile Id as a signed int, subtract an offset of 128
     // if the tileId was 0 then the tile would be in memory region 0x9000-0x900F
-    let signedTileId: i16 = <i16>tileIdFromTileMap;
-    tileDataAddress = tileDataMemoryLocation + ((tileIdFromTileMap + 128) * sizeOfTileInMemory);
+    // NOTE: Assemblyscript, Can't cast to i16, need to make negative manually
+    let convertedTileIdFromTileMap = <i16>tileIdFromTileMap;
+    let signedTileId: i16 = tileIdFromTileMap + 128;
+    if (checkBitOnByte(7, tileIdFromTileMap)) {
+      signedTileId = convertedTileIdFromTileMap - 128;
+    }
+    let tileIdAddress: i16 = signedTileId * sizeOfTileInMemory;
+    tileDataAddress = tileDataMemoryLocation + <u16>tileIdAddress;
   } else {
     // if the background layout gave us the tileId 0, then the tile data would be between 0x8000-0x800F.
     tileDataAddress = tileDataMemoryLocation + (tileIdFromTileMap * sizeOfTileInMemory);
