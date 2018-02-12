@@ -205,7 +205,7 @@ function _getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: u32): u32 {
     wasmboyOffset = gameboyOffset + Memory.gameBytesLocation;
   } else if(gameboyOffset >= Memory.switchableCartridgeRomLocation && gameboyOffset < Memory.videoRamLocation) {
     // Cartridge ROM - Switchable Banks 1-xx
-    // 0x0000 -> 0x018000
+    // 0x4000 -> (0x018000 + 0x4000)
     // TODO: Rom banking
     wasmboyOffset = gameboyOffset + Memory.gameBytesLocation;
   } else if (gameboyOffset >= Memory.videoRamLocation && gameboyOffset < Memory.cartridgeRamLocation) {
@@ -217,7 +217,7 @@ function _getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: u32): u32 {
     // 0xA000 -> 0x818000
     // TODO: Ram Banking
     wasmboyOffset = (gameboyOffset - Memory.cartridgeRamLocation) + Memory.gameRamBanksLocation;
-  } else if(gameboyOffset >= Memory.internalRamBankOneLocation) {
+  } else if(gameboyOffset >= Memory.internalRamBankZeroLocation) {
     // NOTE / TODO: Switchable Internal Ram Banks?
     // 0xC000 -> 0x0000
     wasmboyOffset = gameboyOffset - Memory.videoRamLocation;
