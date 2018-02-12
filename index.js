@@ -9,12 +9,14 @@ export default class App extends Component {
 		// Get our canvas element
 		const canvasElement = document.querySelector(".wasmboy__canvas-container__canvas");
 		// Load our game
-		WasmBoy.loadGame(canvasElement, 'tetris.gb')
-    .then(() => {
-      console.log('Wasmboy Ready!');
-			// TODO: Remove this degub code
-			//WasmBoy.startGame();
-    });
+		WasmBoy.initialize(canvasElement, '../dist/wasm/index.untouched.wasm').then(() => {
+			WasmBoy.loadGame('drmario.gb')
+	    .then(() => {
+	      console.log('Wasmboy Ready!');
+				// TODO: Remove this debug code
+				// WasmBoy.startGame();
+	    });
+		});
 	}
 
 	render() {
