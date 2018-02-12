@@ -257,7 +257,8 @@ function _getTileDataAddress(tileDataMemoryLocation: u16, tileIdFromTileMap: u8)
     tileDataAddress = tileDataMemoryLocation + <u16>tileIdAddress;
   } else {
     // if the background layout gave us the tileId 0, then the tile data would be between 0x8000-0x800F.
-    tileDataAddress = tileDataMemoryLocation + (tileIdFromTileMap * sizeOfTileInMemory);
+    let sixteenBitTileIdFromTileMap: u16 = <u16>tileIdFromTileMap;
+    tileDataAddress = tileDataMemoryLocation + <u16>(sixteenBitTileIdFromTileMap * sizeOfTileInMemory);
   }
 
   return tileDataAddress;
