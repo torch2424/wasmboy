@@ -116,20 +116,18 @@ export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u
       // Byte one represents the second bit in our color id, so bit shift
       paletteColorId += 1;
       paletteColorId = (paletteColorId << 1);
-      consoleLog(paletteColorId, pixelXInTile);
     }
     if (checkBitOnByte(<u8>pixelXInTile, byteTwoForLineOfTilePixels)) {
       paletteColorId += 1;
-      consoleLogTwo(paletteColorId, pixelXInTile);
     }
 
     // Now get the colorId from the pallete, to get our final color
     // Developers could change colorIds to represents different colors
     // in their palette, thus we need to grab the color from there
-    let pixelColorInTileFromPalette: u8 = getColorFromPalette(Graphics.memoryLocationBackgroundPalette, paletteColorId);
+    let pixelColorInTileFromPalette: u8 = getColorFromPalette(paletteColorId, Graphics.memoryLocationBackgroundPalette);
 
     // FINALLY, RENDER THAT PIXEL!
     // Only rendering camera for now, so coordinates are for the camera.
-    setPixelOnFrame(i, scanlineRegister, pixelColorInTileFromPalette + 1);
+    setPixelOnFrame(i, scanlineRegister, pixelColorInTileFromPalette);
   }
 }

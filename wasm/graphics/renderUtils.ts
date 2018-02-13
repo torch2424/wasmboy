@@ -49,7 +49,7 @@ export function getTileDataAddress(tileDataMemoryLocation: u16, tileIdFromTileMa
 }
 
 // TODO: Make not specifc to a single palette
-export function getColorFromPalette(paletteMemoryLocation: u16, colorId: u8): u8 {
+export function getColorFromPalette(colorId: u8, paletteMemoryLocation: u16): u8 {
   let paletteByte: u8 = eightBitLoadFromGBMemory(paletteMemoryLocation);
   let color: u8 = 0;
 

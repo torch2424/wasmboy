@@ -30,7 +30,7 @@ export function renderWindow(scanlineRegister: u8, tileDataMemoryLocation: u16, 
   // NOTE: Camera is reffering to what you can see inside the 160x144 viewport of the entire rendered 256x256 map.
 
   // First ensure that the scanline is greater than our window
-  if(scanlineRegister <= windowY) {
+  if(scanlineRegister <= <u8>windowY) {
     // Window is not within the current camera view
     return;
   }
@@ -124,10 +124,10 @@ export function renderWindow(scanlineRegister: u8, tileDataMemoryLocation: u16, 
     // Now get the colorId from the pallete, to get our final color
     // Developers could change colorIds to represents different colors
     // in their palette, thus we need to grab the color from there
-    let pixelColorInTileFromPalette: u8 = getColorFromPalette(Graphics.memoryLocationBackgroundPalette, paletteColorId);
+    let pixelColorInTileFromPalette: u8 = getColorFromPalette(paletteColorId, Graphics.memoryLocationBackgroundPalette);
 
     // FINALLY, RENDER THAT PIXEL!
     // Only rendering camera for now, so coordinates are for the camera.
-    setPixelOnFrame(i, scanlineRegister, pixelColorInTileFromPalette + 1);
+    setPixelOnFrame(i, scanlineRegister, pixelColorInTileFromPalette);
   }
 }

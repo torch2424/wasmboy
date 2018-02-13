@@ -9,6 +9,9 @@ import {
 import {
   renderWindow
 } from './window';
+import {
+  renderSprites
+} from './sprites';
 // Assembly script really not feeling the reexport
 import {
   eightBitLoadFromGBMemory
@@ -44,7 +47,7 @@ export class Graphics {
   // Also known as LCDC
   static memoryLocationLcdControl: u16 = 0xFF40;
 
-  // Window
+  // Scroll and Window
   // TODO -7 on windowX, and export to be used
   static memoryLocationScrollX: u16 = 0xFF43;
   static memoryLocationScrollY: u16 = 0xFF42;
@@ -56,6 +59,9 @@ export class Graphics {
   static memoryLocationTileMapSelectOneStart: u16 = 0x9C00;
   static memoryLocationTileDataSelectZeroStart: u16 = 0x8800;
   static memoryLocationTileDataSelectOneStart: u16 = 0x8000;
+
+  // Sprites
+  static memoryLocationSpriteAttributesTable: u16 = 0xFE00;
 
   // Palettes
   static memoryLocationBackgroundPalette: u16 = 0xFF47;
@@ -158,7 +164,8 @@ function _drawScanline(): void {
     renderWindow(scanlineRegister, tileDataMemoryLocation, tileMapMemoryLocation);
   }
 
-  // if (checkBitOnByte(1, lcdControl)) {
-  //   //TODO: Render Sprites
-  // }
+  if (checkBitOnByte(1, lcdControl)) {
+    // Sprites are enabled, render them!
+    renderSprites(scanlineRegister, checkBitOnByte(2, lcdControl));
+  }
 }
