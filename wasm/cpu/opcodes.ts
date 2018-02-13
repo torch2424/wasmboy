@@ -1,7 +1,7 @@
 // Imports
 import {
   Cpu,
-  relativeJump 
+  relativeJump
 } from './index';
 import {
   handleCbOpcode

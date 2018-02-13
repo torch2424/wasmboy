@@ -67,20 +67,13 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
         currentSpriteLine -= <i16>spriteHeight;
         currentSpriteLine = currentSpriteLine * -1;
       }
-
-      // Double the line as each line is represented by two bytes
+      // Each line of a tile takes two bytes of memory
       currentSpriteLine = currentSpriteLine * 2;
 
       // Get our sprite tile address, need to also add the current sprite line to get the correct bytes
-      if(i === 0) {
-        consoleLog(spriteTileId, 0x67);
-      }
       let spriteTileAddressStart: i32 = <i32>getTileDataAddress(Graphics.memoryLocationTileDataSelectOneStart, spriteTileId);
       spriteTileAddressStart = spriteTileAddressStart + currentSpriteLine;
       let spriteTileAddress: u16 = <u16>spriteTileAddressStart;
-      if(i === 0) {
-        consoleLog(spriteTileAddress, 0x68);
-      }
       let spriteDataByteOneForLineOfTilePixels: u8 = eightBitLoadFromGBMemory(spriteTileAddress);
       let spriteDataByteTwoForLineOfTilePixels: u8 = eightBitLoadFromGBMemory(spriteTileAddress + 1);
 
