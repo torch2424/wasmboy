@@ -1,6 +1,11 @@
 // Imports
-import { Cpu, relativeJump } from './index';
-import { handleCbOpcode } from './cbOpcodes';
+import {
+  Cpu,
+  relativeJump 
+} from './index';
+import {
+  handleCbOpcode
+} from './cbOpcodes';
 import {
   setZeroFlag,
   getZeroFlag,

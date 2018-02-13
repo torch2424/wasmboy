@@ -3,6 +3,7 @@
 *.gb
 *.gbc
 *.sav
+*.rtc
 
 dist/
 

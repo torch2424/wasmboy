@@ -1,7 +1,16 @@
-import { Cpu } from '../cpu/index';
-import { eightBitLoadFromGBMemory, eightBitStoreIntoGBMemorySkipTraps } from '../memory/index';
-import { requestTimerInterrupt } from '../interrupts/index';
-import { consoleLogTwo } from '../helpers/index';
+import {
+  Cpu 
+} from '../cpu/index';
+import {
+  eightBitLoadFromGBMemory, 
+  eightBitStoreIntoGBMemorySkipTraps 
+} from '../memory/index';
+import {
+  requestTimerInterrupt 
+} from '../interrupts/index';
+import {
+  consoleLogTwo 
+} from '../helpers/index';
 
 class Timers {
   static memoryLocationTIMA: u16 = 0xFF05; // Timer Modulator

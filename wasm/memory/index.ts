@@ -6,10 +6,12 @@ export {
   initializeCartridge,
   setPixelOnFrame
 } from './memory';
+
 export {
   eightBitLoadFromGBMemory,
   sixteenBitLoadFromGBMemory
 } from './load';
+
 export {
   eightBitStoreIntoGBMemory,
   sixteenBitStoreIntoGBMemory,

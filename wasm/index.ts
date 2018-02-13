@@ -1,11 +1,24 @@
+
 // Imports
-import { Cpu } from './cpu/index';
+import {
+Cpu 
+} from './cpu/index';
 
 // Public Exports
-export { initialize } from './cpu/index';
-export { update, emulationStep } from './cpu/opcodes';
-export { areInterruptsEnabled } from './interrupts/index';
-export { getCurrentLogValue, getCurrentLogId } from './helpers/index';
+export {
+initialize 
+} from './cpu/index';
+export {
+  update, 
+  emulationStep 
+} from './cpu/opcodes';
+export {
+  areInterruptsEnabled 
+} from './interrupts/index';
+export {
+  getCurrentLogValue, 
+  getCurrentLogId 
+} from './helpers/index';
 
 export function getRegisterA(): u8 {
   return Cpu.registerA;

@@ -1,6 +1,17 @@
-import { Cpu } from '../cpu/index';
-import { eightBitLoadFromGBMemory, eightBitStoreIntoGBMemorySkipTraps, sixteenBitStoreIntoGBMemorySkipTraps } from '../memory/index';
-import { consoleLogTwo, setBitOnByte, resetBitOnByte, checkBitOnByte } from '../helpers/index';
+import {
+  Cpu 
+} from '../cpu/index';
+import {
+  eightBitLoadFromGBMemory, 
+  eightBitStoreIntoGBMemorySkipTraps, 
+  sixteenBitStoreIntoGBMemorySkipTraps 
+} from '../memory/index';
+import {
+  consoleLogTwo, 
+  setBitOnByte, 
+  resetBitOnByte, 
+  checkBitOnByte 
+} from '../helpers/index';
 
 class Interrupts {
   static memoryLocationInterruptEnabled: u16 = 0xFFFF;

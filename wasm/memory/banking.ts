@@ -1,5 +1,7 @@
 // Function to handle rom/rambanking
-import { Memory } from './memory';
+import {
+Memory 
+} from './memory';
 import {
   consoleLog,
   consoleLogTwo,

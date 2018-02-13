@@ -1,4 +1,6 @@
-import { getCarryFlag } from '../cpu/flags';
+import {
+  getCarryFlag 
+} from '../cpu/flags';
 
 class Log {
   static logValueOne: i32 = 0;

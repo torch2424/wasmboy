@@ -1,5 +1,7 @@
 // Imports
-import { Cpu } from './index';
+import {
+  Cpu 
+} from './index';
 import {
   setZeroFlag,
   getZeroFlag,

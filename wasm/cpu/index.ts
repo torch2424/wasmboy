@@ -11,13 +11,17 @@
 // https://github.com/nakardo/node-gameboy/blob/master/lib/cpu/opcodes.js
 
 
-export { setZeroFlag, getZeroFlag } from './flags';
+export {
+  setZeroFlag,
+  getZeroFlag
+} from './flags';
 
 import {
   eightBitStoreIntoGBMemory,
   eightBitLoadFromGBMemory,
   initializeCartridge
 } from '../memory/index';
+
 import { consoleLog } from '../helpers/index';
 
 // Everything Static as class instances just aren't quite there yet
