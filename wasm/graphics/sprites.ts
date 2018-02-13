@@ -29,9 +29,12 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
     // Sprites occupy 4 bytes in the sprite attribute table
     let spriteTableIndex: u16 = i * 4;
     // Y positon is offset by 16, X position is offset by 8
-    let spriteYPosition: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex) - 16;
-    let spriteXPosition: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 1) - 8;
-    let spriteTileLocation: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 2);
+    // TODO: Why is OAM entry zero???
+    let spriteYPosition: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex);
+    spriteYPosition -= 16;
+    let spriteXPosition: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 1);
+    spriteXPosition -= 8;
+    let spriteTileId: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 2);
     let spriteAttributes: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 3);
 
     // TODO: Check sprite Priority
@@ -65,9 +68,19 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
         currentSpriteLine = currentSpriteLine * -1;
       }
 
-      // Get our sprite tile address
-      let spriteTileAddress: u16 = (Graphics.memoryLocationTileDataSelectOneStart + (spriteTileLocation * 16));
-      spriteTileAddress = <u16>(<i16>spriteTileAddress + currentSpriteLine);
+      // Double the line as each line is represented by two bytes
+      currentSpriteLine = currentSpriteLine * 2;
+
+      // Get our sprite tile address, need to also add the current sprite line to get the correct bytes
+      if(i === 0) {
+        consoleLog(spriteTileId, 0x67);
+      }
+      let spriteTileAddressStart: i32 = <i32>getTileDataAddress(Graphics.memoryLocationTileDataSelectOneStart, spriteTileId);
+      spriteTileAddressStart = spriteTileAddressStart + currentSpriteLine;
+      let spriteTileAddress: u16 = <u16>spriteTileAddressStart;
+      if(i === 0) {
+        consoleLog(spriteTileAddress, 0x68);
+      }
       let spriteDataByteOneForLineOfTilePixels: u8 = eightBitLoadFromGBMemory(spriteTileAddress);
       let spriteDataByteTwoForLineOfTilePixels: u8 = eightBitLoadFromGBMemory(spriteTileAddress + 1);
 

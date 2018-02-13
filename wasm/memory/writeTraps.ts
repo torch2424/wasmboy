@@ -58,9 +58,12 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
 
 function _dmaTransfer(sourceAddressOffset: u8): void {
 
-  let sourceAddress: u16 = (<u16>sourceAddressOffset << 8);
+  let sourceAddress: u16 = <u16>sourceAddressOffset;
+  sourceAddress = (sourceAddress << 8);
 
   for(let i: u16 = 0; i < 0xA0; i++) {
-    eightBitStoreIntoGBMemorySkipTraps(Memory.spriteInformationTableLocation, eightBitLoadFromGBMemory(sourceAddress + i));
+    let spriteInformationByte: u8 = eightBitLoadFromGBMemory(sourceAddress + i);
+    let spriteInformationAddress: u16 = Memory.spriteInformationTableLocation + i;
+    eightBitStoreIntoGBMemorySkipTraps(spriteInformationAddress, spriteInformationByte);
   }
 }
