@@ -21,9 +21,13 @@ import {
   resetBitOnByte
 } from '../helpers/index';
 
-export function renderBackground(scanlineRegister: u8, scrollX: u16, scrollY: u16, tileDataMemoryLocation: u16, tileMapMemoryLocation: u16): void {
+export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u16, tileMapMemoryLocation: u16): void {
 
   // NOTE: Camera is reffering to what you can see inside the 160x144 viewport of the entire rendered 256x256 map.
+
+  // Get our scrollX and scrollY (u16 to play nice with assemblyscript)
+  let scrollX: u16 = <u16>eightBitLoadFromGBMemory(Graphics.memoryLocationScrollX);
+  let scrollY: u16 = <u16>eightBitLoadFromGBMemory(Graphics.memoryLocationScrollY);
 
   // Get our current pixel y positon on the 160x144 camera (Row that the scanline draws across)
   // this is done by getting the current scroll Y position,
@@ -111,10 +115,12 @@ export function renderBackground(scanlineRegister: u8, scrollX: u16, scrollY: u1
     if (checkBitOnByte(<u8>pixelXInTile, byteOneForLineOfTilePixels)) {
       // Byte one represents the second bit in our color id, so bit shift
       paletteColorId += 1;
-      paletteColorId << 1;
+      paletteColorId = (paletteColorId << 1);
+      consoleLog(paletteColorId, pixelXInTile);
     }
     if (checkBitOnByte(<u8>pixelXInTile, byteTwoForLineOfTilePixels)) {
       paletteColorId += 1;
+      consoleLogTwo(paletteColorId, pixelXInTile);
     }
 
     // Now get the colorId from the pallete, to get our final color

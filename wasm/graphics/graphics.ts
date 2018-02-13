@@ -6,6 +6,9 @@ import {
 import {
   renderBackground
 } from './background';
+import {
+  renderWindow
+} from './window';
 // Assembly script really not feeling the reexport
 import {
   eightBitLoadFromGBMemory
@@ -130,9 +133,6 @@ function _drawScanline(): void {
 
   // Check if the background is enabled
   if (checkBitOnByte(0, lcdControl)) {
-    // Get our scrollX and scrollY
-    let scrollX: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationScrollX);
-    let scrollY: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationScrollY);
 
     // Get our map memory location
     let tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectZeroStart;
@@ -141,14 +141,22 @@ function _drawScanline(): void {
     }
 
     // Finally, pass everything to draw the background
-    renderBackground(scanlineRegister, scrollX, scrollY, tileDataMemoryLocation, tileMapMemoryLocation);
+    renderBackground(scanlineRegister, tileDataMemoryLocation, tileMapMemoryLocation);
   }
 
   // Check if the window is enabled, and we are currently
   // Drawing lines on the window
-  // if(checkBitOnByte(5, lcdControl)) {
-  // TODO: Draw the window
-  // }
+  if(checkBitOnByte(5, lcdControl)) {
+
+    // Get our map memory location
+    let tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectZeroStart;
+    if (checkBitOnByte(6, lcdControl)) {
+      tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectOneStart;
+    }
+
+    // Finally, pass everything to draw the background
+    renderWindow(scanlineRegister, tileDataMemoryLocation, tileMapMemoryLocation);
+  }
 
   // if (checkBitOnByte(1, lcdControl)) {
   //   //TODO: Render Sprites
