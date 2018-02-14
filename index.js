@@ -1,6 +1,7 @@
 import './style';
 import { Component } from 'preact';
-import { WasmBoy, WasmBoyDebugger, WasmBoySystemControls } from './lib/index.js';
+import { WasmBoy } from './lib/index';
+import { WasmBoyDebugger, WasmBoySystemControls } from './debugger/index';
 
 export default class App extends Component {
 

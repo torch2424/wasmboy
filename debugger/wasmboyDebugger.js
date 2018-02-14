@@ -1,5 +1,5 @@
 import { Component } from 'preact';
-import { WasmBoy } from '../wasmboy';
+import { WasmBoy } from '../lib/wasmboy';
 import { NumberBaseTable } from './numberBaseTable';
 
 export class WasmBoyDebugger extends Component {

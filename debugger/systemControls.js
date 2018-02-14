@@ -1,5 +1,5 @@
 import { Component } from 'preact';
-import { WasmBoy } from '../wasmboy';
+import { WasmBoy } from '../lib/wasmboy';
 
 export class WasmBoySystemControls extends Component {
 
