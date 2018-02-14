@@ -26,7 +26,7 @@ class Interrupts {
   static bitPositionVBlankInterrupt: u8 = 0;
   static bitPositionLcdInterrupt: u8 = 1;
   static bitPositionTimerInterrupt: u8 = 2;
-  static bitPositionJoypadInterrupt: u8 = 3;
+  static bitPositionJoypadInterrupt: u8 = 4;
 }
 
 function _handleInterrupt(bitPosition: u8): void {
@@ -116,7 +116,7 @@ export function checkInterrupts(): void {
           _handleInterrupt(Interrupts.bitPositionTimerInterrupt);
       } else if (checkBitOnByte(Interrupts.bitPositionJoypadInterrupt, interruptRequest) &&
         checkBitOnByte(Interrupts.bitPositionJoypadInterrupt, interruptEnabled)) {
-          
+
           _handleInterrupt(Interrupts.bitPositionJoypadInterrupt);
       }
     }

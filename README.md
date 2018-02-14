@@ -9,32 +9,29 @@ Gameboy Emulator written in Web Assembly using [AssemblyScript](https://github.c
 
 # Features
 
-* As of February 6th, 2018, it runs the [Boot Rom](http://gbdev.gg8.se/wiki/articles/Gameboy_Bootstrap_ROM)!
+* Passes all of Blargg's Cpu Tests
 
-* That's about it haha!
+* Can render a good amount of games, but with MANY graphical glitches.
+
+* Joypad emulation with keyboard, and gamepad support
+
+* Debugger that can be updated with a button click, or hard coded to do stuff like breakpoints
 
 # Tests
 
 ### Blargg's CPU Tests
 
+![Passing Blargg Cpu tests](./docs/blarggCpuTest.png)
 
-* [x] 01 - special
-* [x] 02 - interrupt
-* [x] 03 - op sp,hl
-* [x] 04 - op r, imm
-* [x] 05 - op rp
-* [x] 06 - ld r,r
-* [x] 07 - jr,jp,call,ret,rst
-* [x] 08 - misc instrs
-* [x] 09 - op r,r
-* [x] 10 - bit ops
-* [ ] 11 - op a,(hl)
+# Screenshots
+
+![Tetris with some graphical bugs probably](./docs/brokenTetris.png)
 
 # Roadmap
 
-The project doe quality and performance also depends on the [AssemblyScript Roadmap](https://github.com/AssemblyScript/assemblyscript/wiki/Status-and-Roadmap)
+The project doe quality and performance also depends on the [AssemblyScript Roadmap](https://github.com/AssemblyScript/assemblyscript/wiki/Status-and-Roadmap).
 
-And please see [Issue #3](https://github.com/torch2424/wasmBoy/issues/3)
+The Wasmboy library is being recorded at [Issue #3](https://github.com/torch2424/wasmBoy/issues/3)
 
 # Resources
 
@@ -61,6 +58,8 @@ And please see [Issue #3](https://github.com/torch2424/wasmBoy/issues/3)
 * It's better to code an emulator by abstracting assembly commands into functions, rather than by Opcode operation
 
 * Gameboy Opcodes are difficult till about 0x40
+
+* All kinds of stuff, I tend to comment a lot so read those :)
 
 ### CLI Commands
 

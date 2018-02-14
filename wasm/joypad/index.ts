@@ -220,9 +220,9 @@ function _pressJoypadButton(buttonId: u8): void {
     }
 
     // Finally, request the interrupt, if the button state actually changed
-    // if (shouldRequestInterrupt) {
-    //   requestJoypadInterrupt();
-    // }
+    if (shouldRequestInterrupt) {
+      requestJoypadInterrupt();
+    }
   }
 }
 
