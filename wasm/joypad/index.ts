@@ -58,67 +58,74 @@ export function getJoypadState(): u8 {
   // Get the joypad register
   let joypadRegister: u8 = eightBitLoadFromGBMemorySkipTraps(Joypad.memoryLocationJoypadRegister);
 
-  // Flip all the bits, so that 0 does not mean pressed
+  // Flip all the bits
   joypadRegister = joypadRegister ^ 0xFF;
 
   // Check the button type buttons
   if(!checkBitOnByte(4, joypadRegister)) {
+
+    // Set the top 4 bits to on
+    joypadRegister = joypadRegister | 0xF0;
+
     // A
     if (Joypad.a) {
-      setBitOnByte(0, joypadRegister);
+      joypadRegister = resetBitOnByte(0, joypadRegister);
     } else {
-      resetBitOnByte(0, joypadRegister);
+      joypadRegister = setBitOnByte(0, joypadRegister);
     }
 
     // B
     if (Joypad.b) {
-      setBitOnByte(1, joypadRegister);
+      joypadRegister = resetBitOnByte(1, joypadRegister);
     } else {
-      resetBitOnByte(1, joypadRegister);
+      joypadRegister = setBitOnByte(1, joypadRegister);
     }
 
     // Select
     if (Joypad.select) {
-      setBitOnByte(2, joypadRegister);
+      joypadRegister = resetBitOnByte(2, joypadRegister);
     } else {
-      resetBitOnByte(2, joypadRegister);
+      joypadRegister = setBitOnByte(2, joypadRegister);
     }
 
     // Start
     if (Joypad.start) {
-      setBitOnByte(3, joypadRegister);
+      joypadRegister = resetBitOnByte(3, joypadRegister);
     } else {
-      resetBitOnByte(3, joypadRegister);
+      joypadRegister = setBitOnByte(3, joypadRegister);
     }
   } else if (!checkBitOnByte(5, joypadRegister)) {
     // D-pad buttons
 
+    // Set the top 4 bits to on
+    joypadRegister = joypadRegister | 0xF0;
+
     // Up
     if (Joypad.up) {
-      setBitOnByte(2, joypadRegister);
+      joypadRegister = resetBitOnByte(2, joypadRegister);
     } else {
-      resetBitOnByte(2, joypadRegister);
+      joypadRegister = setBitOnByte(2, joypadRegister);
     }
 
     // Right
     if (Joypad.right) {
-      setBitOnByte(1, joypadRegister);
+      joypadRegister = resetBitOnByte(0, joypadRegister);
     } else {
-      resetBitOnByte(1, joypadRegister);
+      joypadRegister = setBitOnByte(0, joypadRegister);
     }
 
     // Down
     if (Joypad.down) {
-      setBitOnByte(3, joypadRegister);
+      joypadRegister = resetBitOnByte(3, joypadRegister);
     } else {
-      resetBitOnByte(3, joypadRegister);
+      joypadRegister = setBitOnByte(3, joypadRegister);
     }
 
     // Left
     if (Joypad.left) {
-      setBitOnByte(0, joypadRegister);
+      joypadRegister = resetBitOnByte(1, joypadRegister);
     } else {
-      resetBitOnByte(0, joypadRegister);
+      joypadRegister = setBitOnByte(1, joypadRegister);
     }
   }
 
@@ -126,6 +133,7 @@ export function getJoypadState(): u8 {
 }
 
 export function setJoypadState(up: i8, right: i8, down: i8, left: i8, a: i8, b: i8, select: i8, start: i8): void {
+
   if (up > 0) {
     _pressJoypadButton(0);
   } else {
@@ -186,11 +194,11 @@ function _pressJoypadButton(buttonId: u8): void {
     isButtonStateChanging = true;
   }
 
+  // Set our joypad state
+  _setJoypadButtonStateFromButtonId(buttonId, true);
+
   // If the button state is changing, check for an interrupt
   if (isButtonStateChanging) {
-    // Set our joypad state
-    _setJoypadButtonStateFromButtonId(buttonId, true);
-
     // Determine if it is a button or a dpad button
     let isDpadTypeButton = false;
     if (buttonId <= 3) {
@@ -212,9 +220,9 @@ function _pressJoypadButton(buttonId: u8): void {
     }
 
     // Finally, request the interrupt, if the button state actually changed
-    if (shouldRequestInterrupt) {
-      requestJoypadInterrupt();
-    }
+    // if (shouldRequestInterrupt) {
+    //   requestJoypadInterrupt();
+    // }
   }
 }
 

@@ -11,7 +11,8 @@ import {
   eightBitLoadFromGBMemory
 } from '../memory/load';
 import {
-  setPixelOnFrame
+  setPixelOnFrame,
+  getPixelOnFrame
 } from '../memory/memory';
 import {
   consoleLog,
@@ -37,7 +38,8 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
     let spriteTileId: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 2);
     let spriteAttributes: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 3);
 
-    // TODO: Check sprite Priority
+    // Check sprite Priority
+    let isSpritePriorityBehindWindowAndBackground: boolean = checkBitOnByte(7, spriteAttributes);
 
     // Check if we should flip the sprite on the x or y axis
     let flipSpriteY: boolean = checkBitOnByte(6, spriteAttributes);
@@ -102,11 +104,20 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
         // Get our color ID from the current sprite pallete
         let spritePixelColorFromPalette: u8 = getColorFromPalette(spriteColorId, spritePaletteLocation);
 
-        // Find our actual X pixel location on the gameboy "camera" view
-        let spriteXPixelLocationInCameraView: u8 = spriteXPosition + (7 - <u8>tilePixel);
+        // White is transparent for sprites, so don't draw if white
+        if (spritePixelColorFromPalette !== 0) {
+          // Find our actual X pixel location on the gameboy "camera" view
+          let spriteXPixelLocationInCameraView: u8 = spriteXPosition + (7 - <u8>tilePixel);
 
-        // Finally set the pixel!
-        setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, spritePixelColorFromPalette);
+          // Now that we have our coordinates, check sprite priority
+          if (!isSpritePriorityBehindWindowAndBackground ||
+            getPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister) < 2) {
+            // Finally set the pixel!
+            setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, spritePixelColorFromPalette);
+          }
+        }
+
+        // Done!
       }
     }
   }
