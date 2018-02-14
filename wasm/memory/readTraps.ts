@@ -2,14 +2,18 @@ import {
   eightBitStoreIntoGBMemorySkipTraps
 } from './store';
 import {
+  getJoypadState
+} from '../joypad/index'
+import {
   consoleLog,
   consoleLogTwo
 } from '../helpers/index';
 
-export function checkReadTraps(offset: u16): boolean {
-  // TODO: Remove this joypad hack
+// Returns -1 if no trap found, otherwise returns a value that should be fed for the address
+export function checkReadTraps(offset: u16): i32 {
   if(offset === 0xFF00) {
-    eightBitStoreIntoGBMemorySkipTraps(0xFF00, 0xFF);
+    return getJoypadState();
   }
-  return true;
+
+  return -1;
 }

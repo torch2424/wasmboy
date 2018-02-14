@@ -11,20 +11,22 @@ import {
 } from '../helpers/index';
 
 export function eightBitLoadFromGBMemory(offset: u16): u8 {
-  if (checkReadTraps(offset)) {
+  if (checkReadTraps(offset) < 0) {
     return _eightBitLoadFromWasmBoyMemory(offset);
   } else {
-    // TODO: Find what read trap should return
-    return 0x00;
+    return <u8>checkReadTraps(offset);
   }
 }
 
+export function eightBitLoadFromGBMemorySkipTraps(offset: u16): u8 {
+  return _eightBitLoadFromWasmBoyMemory(offset);
+}
+
 export function sixteenBitLoadFromGBMemory(offset: u16): u16 {
-  if (checkReadTraps(offset)) {
+  if (checkReadTraps(offset) < 0) {
     return _sixteenBitLoadFromWasmBoyMemory(offset);
   } else {
-    // TODO: Find what read trap should return
-    return 0x00;
+    return <u16>checkReadTraps(offset);
   }
 }
 

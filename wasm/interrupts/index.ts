@@ -1,16 +1,16 @@
 import {
-  Cpu 
+  Cpu
 } from '../cpu/index';
 import {
-  eightBitLoadFromGBMemory, 
-  eightBitStoreIntoGBMemorySkipTraps, 
-  sixteenBitStoreIntoGBMemorySkipTraps 
+  eightBitLoadFromGBMemory,
+  eightBitStoreIntoGBMemorySkipTraps,
+  sixteenBitStoreIntoGBMemorySkipTraps
 } from '../memory/index';
 import {
-  consoleLogTwo, 
-  setBitOnByte, 
-  resetBitOnByte, 
-  checkBitOnByte 
+  consoleLogTwo,
+  setBitOnByte,
+  resetBitOnByte,
+  checkBitOnByte
 } from '../helpers/index';
 
 class Interrupts {
@@ -116,9 +116,7 @@ export function checkInterrupts(): void {
           _handleInterrupt(Interrupts.bitPositionTimerInterrupt);
       } else if (checkBitOnByte(Interrupts.bitPositionJoypadInterrupt, interruptRequest) &&
         checkBitOnByte(Interrupts.bitPositionJoypadInterrupt, interruptEnabled)) {
-
-          // If the CPU was stopped, now is the time to un-stop
-          Cpu.isStopped = false;
+          
           _handleInterrupt(Interrupts.bitPositionJoypadInterrupt);
       }
     }

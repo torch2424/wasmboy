@@ -1,23 +1,26 @@
 
 // Imports
 import {
-Cpu 
+Cpu
 } from './cpu/index';
 
 // Public Exports
 export {
-initialize 
+initialize
 } from './cpu/index';
 export {
-  update, 
-  emulationStep 
+  update,
+  emulationStep
 } from './cpu/opcodes';
 export {
-  areInterruptsEnabled 
+  areInterruptsEnabled
 } from './interrupts/index';
 export {
-  getCurrentLogValue, 
-  getCurrentLogId 
+  setJoypadState
+} from './joypad/index'; 
+export {
+  getCurrentLogValue,
+  getCurrentLogId
 } from './helpers/index';
 
 export function getRegisterA(): u8 {
