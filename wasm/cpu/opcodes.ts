@@ -692,7 +692,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // DEC HL
     // 1 8
     let registerHL = concatenateBytes(Cpu.registerH, Cpu.registerL);
-    registerHL += -1;
+    registerHL -= 1;
     Cpu.registerH = splitHighByte(registerHL);
     Cpu.registerL = splitLowByte(registerHL);
     numberOfCycles = 8;
