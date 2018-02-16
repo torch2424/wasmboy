@@ -12,6 +12,10 @@ import {
 import {
   renderSprites
 } from './sprites';
+// TODO: Dcode fixed the Assemblyscript bug where the index imports didn't work, can undo all of these now :)
+import {
+  storeFrameToBeRendered
+} from '../memory/index';
 // Assembly script really not feeling the reexport
 import {
   eightBitLoadFromGBMemory
@@ -99,6 +103,8 @@ export function updateGraphics(numberOfCycles: u8): void {
       if(scanlineRegister === 144) {
         // Draw the scanline
         _drawScanline();
+        // Store the frame to be rendered
+        storeFrameToBeRendered();
         // Request a VBlank interrupt
         requestVBlankInterrupt();
       } else if (scanlineRegister > 153) {
