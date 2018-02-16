@@ -27,6 +27,10 @@ import { consoleLog } from '../helpers/index';
 // Everything Static as class instances just aren't quite there yet
 // https://github.com/AssemblyScript/assemblyscript/blob/master/tests/compiler/showcase.ts
 export class Cpu {
+
+  // Clock Speed to determine all kinds of other values
+  static clockSpeed: i32 = 4194304;
+
   // 8-bit Cpu.registers
   static registerA: u8 = 0;
   static registerB: u8 = 0;

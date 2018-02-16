@@ -1,15 +1,15 @@
 import {
-  Cpu 
+  Cpu
 } from '../cpu/index';
 import {
-  eightBitLoadFromGBMemory, 
-  eightBitStoreIntoGBMemorySkipTraps 
+  eightBitLoadFromGBMemory,
+  eightBitStoreIntoGBMemorySkipTraps
 } from '../memory/index';
 import {
-  requestTimerInterrupt 
+  requestTimerInterrupt
 } from '../interrupts/index';
 import {
-  consoleLogTwo 
+  consoleLogTwo
 } from '../helpers/index';
 
 class Timers {
@@ -55,13 +55,13 @@ export function updateTimers(numberOfCycles: u8): void {
 }
 
 // Function to update our divider register
-function _checkDividerRegister(numberOfCycles: u8):void {
+function _checkDividerRegister(numberOfCycles: u8): void {
   // CLOCK_SPEED / 16382
 
   // Every 256 clock cycles need to increment
   Timers.dividerRegisterCycleCounter += numberOfCycles;
 
-  if(Timers.dividerRegisterCycleCounter >= 256) {
+  if(Timers.dividerRegisterCycleCounter >= 255) {
     let dividerRegister = eightBitLoadFromGBMemory(Timers.memoryLocationDividerRegister);
     if(dividerRegister === 255) {
       dividerRegister = 0;

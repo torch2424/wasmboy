@@ -91,13 +91,14 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
 
         // Get the color Id of our sprite, similar to renderBackground()
         // With the first byte, and second byte lined up method thing
+        // Yes, the second byte comes before the first, see ./background.ts
         let spriteColorId: u8 = 0;
-        if (checkBitOnByte(<u8>spritePixelXInTile, spriteDataByteOneForLineOfTilePixels)) {
+        if (checkBitOnByte(<u8>spritePixelXInTile, spriteDataByteTwoForLineOfTilePixels)) {
           // Byte one represents the second bit in our color id, so bit shift
           spriteColorId += 1;
           spriteColorId = (spriteColorId << 1);
         }
-        if (checkBitOnByte(<u8>spritePixelXInTile, spriteDataByteTwoForLineOfTilePixels)) {
+        if (checkBitOnByte(<u8>spritePixelXInTile, spriteDataByteOneForLineOfTilePixels)) {
           spriteColorId += 1;
         }
 

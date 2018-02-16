@@ -108,16 +108,17 @@ export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u
     let pixelXInTile: u8 = <u8>((reversedPixelXInTile - 7) * -1);
 
     // Now we can get the color for that pixel
-    // Colors are represented by getting X position of Byteone, and Y positon of Byte Two
+    // Colors are represented by getting X position of ByteTwo, and X positon of Byte One
     // To Get the color Id.
-    // For example, the result of the color id is 0000 00[xPixelByteOne][xPixelByteTwo]
+    // For example, the result of the color id is 0000 00[xPixelByteTwo][xPixelByteOne]
+    // See: How to draw a tile/sprite from memory: http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html
     let paletteColorId: u8 = 0;
-    if (checkBitOnByte(<u8>pixelXInTile, byteOneForLineOfTilePixels)) {
+    if (checkBitOnByte(<u8>pixelXInTile, byteTwoForLineOfTilePixels)) {
       // Byte one represents the second bit in our color id, so bit shift
       paletteColorId += 1;
       paletteColorId = (paletteColorId << 1);
     }
-    if (checkBitOnByte(<u8>pixelXInTile, byteTwoForLineOfTilePixels)) {
+    if (checkBitOnByte(<u8>pixelXInTile, byteOneForLineOfTilePixels)) {
       paletteColorId += 1;
     }
 

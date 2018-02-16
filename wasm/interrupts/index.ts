@@ -95,7 +95,7 @@ export function areInterruptsPending(): boolean {
 
 // Helper function to get if interrupts are pending but the switch is not set
 
-export function checkInterrupts(): u8 {
+export function checkInterrupts(): i8 {
 
   // Boolean to track if interrupts were handled
   // Interrupt handling requires 20 cycles
