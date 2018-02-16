@@ -22,7 +22,7 @@ import {
   initializeCartridge
 } from '../memory/index';
 
-import { consoleLog } from '../helpers/index';
+import { consoleLog, log } from '../helpers/index';
 
 // Everything Static as class instances just aren't quite there yet
 // https://github.com/AssemblyScript/assemblyscript/blob/master/tests/compiler/showcase.ts
@@ -62,6 +62,7 @@ export class Cpu {
 }
 
 export function initialize(includeBootRom: u8): void {
+  log("initializing (includeBootRom=$0)", 1, includeBootRom);
   // TODO: depending on the boot rom, initialization may be different
   // From: http://www.codeslinger.co.uk/pages/projects/gameboy/hardware.html
   // All values default to zero in memory, so not setting them yet
