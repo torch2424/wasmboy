@@ -3,8 +3,10 @@ import {
   Graphics
 } from './graphics';
 // Assembly script really not feeling the reexport
+// using Skip Traps, because LCD has unrestricted access
+// http://gbdev.gg8.se/wiki/articles/Video_Display#LCD_OAM_DMA_Transfers
 import {
-  eightBitLoadFromGBMemory
+  eightBitLoadFromGBMemorySkipTraps
 } from '../memory/load';
 import {
   consoleLog,
@@ -50,7 +52,7 @@ export function getTileDataAddress(tileDataMemoryLocation: u16, tileIdFromTileMa
 
 // TODO: Make not specifc to a single palette
 export function getColorFromPalette(colorId: u8, paletteMemoryLocation: u16): u8 {
-  let paletteByte: u8 = eightBitLoadFromGBMemory(paletteMemoryLocation);
+  let paletteByte: u8 = eightBitLoadFromGBMemorySkipTraps(paletteMemoryLocation);
   let color: u8 = 0;
 
   // Shift our paletteByte, 2 times for each color ID

@@ -55,12 +55,14 @@ function _handleInterrupt(bitPosition: u8): void {
     // JoyPad
     Cpu.programCounter = 0x60;
   }
+
+  // If the CPU was halted, now is the time to un-halt
+  // Should be done here when the jump occurs according to:
+  // https://www.reddit.com/r/EmuDev/comments/6fmjch/gb_glitches_in_links_awakening_and_pok%C3%A9mon_gold/
+  Cpu.isHalted = false;
 }
 
 function _requestInterrupt(bitPosition: u8): void {
-
-  // If the CPU was halted, now is the time to un-halt
-  Cpu.isHalted = false;
 
   let interruptRequest = eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptRequest);
 
@@ -93,7 +95,13 @@ export function areInterruptsPending(): boolean {
 
 // Helper function to get if interrupts are pending but the switch is not set
 
-export function checkInterrupts(): void {
+export function checkInterrupts(): i8 {
+
+  // Boolean to track if interrupts were handled
+  // Interrupt handling requires 20 cycles
+  // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
+  let wasInterruptHandled: boolean = false;
+
   if(Interrupts.masterInterruptSwitch) {
 
     let interruptRequest = eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptRequest);
@@ -106,20 +114,31 @@ export function checkInterrupts(): void {
         checkBitOnByte(Interrupts.bitPositionVBlankInterrupt, interruptEnabled)) {
 
         _handleInterrupt(Interrupts.bitPositionVBlankInterrupt);
+        wasInterruptHandled = true;
       } else if (checkBitOnByte(Interrupts.bitPositionLcdInterrupt, interruptRequest) &&
         checkBitOnByte(Interrupts.bitPositionLcdInterrupt, interruptEnabled)) {
 
           _handleInterrupt(Interrupts.bitPositionLcdInterrupt);
+          wasInterruptHandled = true;
       } else if (checkBitOnByte(Interrupts.bitPositionTimerInterrupt, interruptRequest) &&
         checkBitOnByte(Interrupts.bitPositionTimerInterrupt, interruptEnabled)) {
 
           _handleInterrupt(Interrupts.bitPositionTimerInterrupt);
+          wasInterruptHandled = true;
       } else if (checkBitOnByte(Interrupts.bitPositionJoypadInterrupt, interruptRequest) &&
         checkBitOnByte(Interrupts.bitPositionJoypadInterrupt, interruptEnabled)) {
 
           _handleInterrupt(Interrupts.bitPositionJoypadInterrupt);
+          wasInterruptHandled = true;
       }
     }
+  }
+
+  // Interrupt handling requires 20 cycles
+  if(wasInterruptHandled) {
+    return 20;
+  } else {
+    return 0;
   }
 }
 

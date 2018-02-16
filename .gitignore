@@ -4,6 +4,7 @@
 *.gbc
 *.sav
 *.rtc
+*.sym
 
 dist/
 

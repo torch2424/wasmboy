@@ -2,6 +2,9 @@ import {
   Memory
 } from './memory';
 import {
+  Graphics
+} from '../graphics/graphics';
+import {
   handleBanking
 } from './banking';
 import {
@@ -10,6 +13,7 @@ import {
 } from './store';
 import {
   eightBitLoadFromGBMemory,
+  eightBitLoadFromGBMemorySkipTraps,
   sixteenBitLoadFromGBMemory
 } from './load';
 import {
@@ -27,6 +31,16 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
     return false;
   }
 
+  // Check the graphics mode to see if we can write to VRAM
+  // http://gbdev.gg8.se/wiki/articles/Video_Display#Accessing_VRAM_and_OAM
+  if(offset >= Memory.videoRamLocation && offset < Memory.cartridgeRamLocation) {
+    // Can only read/write from VRAM During Modes 0 - 2
+    // See graphics/lcd.ts
+    if (Graphics.currentLcdMode > 2) {
+      return false;
+    }
+  }
+
   // Be sure to copy everything in EchoRam to Work Ram
   if(offset >= Memory.echoRamLocation && offset < Memory.spriteInformationTableLocation) {
     // TODO: Also write to Work Ram
@@ -34,6 +48,17 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
       eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
     } else {
       sixteenBitStoreIntoGBMemorySkipTraps(offset, value);
+    }
+  }
+
+  // Also check for individal writes
+  // Can only read/write from OAM During Modes 0 - 1
+  // See graphics/lcd.ts
+  if(offset >= Memory.spriteInformationTableLocation && offset <= Memory.spriteInformationTableLocationEnd) {
+    // Can only read/write from OAM During Mode 2
+    // See graphics/lcd.ts
+    if (Graphics.currentLcdMode !== 2) {
+      return false;
     }
   }
 
@@ -47,11 +72,19 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
     return false;
   }
 
-  // Do the direct memory access transfer for spriteInformationTable
-  if (offset === 0xFF46) {
-    _dmaTransfer(<u8>value) ;
+  // reset the current scanline if the game tries to write to it
+  if (offset === 0xFF44) {
+    eightBitStoreIntoGBMemorySkipTraps(offset, 0);
+    return false;
   }
 
+  // Do the direct memory access transfer for spriteInformationTable
+  // Check the graphics mode to see if we can write to VRAM
+  // http://gbdev.gg8.se/wiki/articles/Video_Display#Accessing_VRAM_and_OAM
+  if (offset === 0xFF46) {
+    // otherwise, performa the DMA transfer
+    _dmaTransfer(<u8>value) ;
+  }
 
   return true;
 }
@@ -62,7 +95,7 @@ function _dmaTransfer(sourceAddressOffset: u8): void {
   sourceAddress = (sourceAddress << 8);
 
   for(let i: u16 = 0; i < 0xA0; i++) {
-    let spriteInformationByte: u8 = eightBitLoadFromGBMemory(sourceAddress + i);
+    let spriteInformationByte: u8 = eightBitLoadFromGBMemorySkipTraps(sourceAddress + i);
     let spriteInformationAddress: u16 = Memory.spriteInformationTableLocation + i;
     eightBitStoreIntoGBMemorySkipTraps(spriteInformationAddress, spriteInformationByte);
   }

@@ -7,8 +7,10 @@ import {
   getColorFromPalette
 } from './renderUtils'
 // Assembly script really not feeling the reexport
+// using Skip Traps, because LCD has unrestricted access
+// http://gbdev.gg8.se/wiki/articles/Video_Display#LCD_OAM_DMA_Transfers
 import {
-  eightBitLoadFromGBMemory
+  eightBitLoadFromGBMemorySkipTraps
 } from '../memory/load';
 import {
   setPixelOnFrame
@@ -26,8 +28,8 @@ export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u
   // NOTE: Camera is reffering to what you can see inside the 160x144 viewport of the entire rendered 256x256 map.
 
   // Get our scrollX and scrollY (u16 to play nice with assemblyscript)
-  let scrollX: u16 = <u16>eightBitLoadFromGBMemory(Graphics.memoryLocationScrollX);
-  let scrollY: u16 = <u16>eightBitLoadFromGBMemory(Graphics.memoryLocationScrollY);
+  let scrollX: u16 = <u16>eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationScrollX);
+  let scrollY: u16 = <u16>eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationScrollY);
 
   // Get our current pixel y positon on the 160x144 camera (Row that the scanline draws across)
   // this is done by getting the current scroll Y position,
@@ -73,7 +75,7 @@ export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u
     let tileMapAddress: u16 = tileMapMemoryLocation + (tileYPositionInMap * 32) + tileXPositionInMap;
 
     // Get the tile Id on the Tile Map
-    let tileIdFromTileMap: u8 = eightBitLoadFromGBMemory(tileMapAddress);
+    let tileIdFromTileMap: u8 = eightBitLoadFromGBMemorySkipTraps(tileMapAddress);
 
     // Now get our tileDataAddress for the corresponding tileID we found in the map
     // Read the comments in _getTileDataAddress() to see what's going on.
@@ -96,8 +98,8 @@ export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u
     // Remember to represent a single line of 8 pixels on a tile, we need two bytes.
     // Therefore, we need to times our modulo by 2, to get the correct line of pixels on the tile.
     // Again, think like you had to map a 2d array as a 1d.
-    let byteOneForLineOfTilePixels: u8 = eightBitLoadFromGBMemory(tileDataAddress + (pixelYInTile * 2))
-    let byteTwoForLineOfTilePixels: u8 = eightBitLoadFromGBMemory(tileDataAddress + (pixelYInTile * 2) + 1);
+    let byteOneForLineOfTilePixels: u8 = eightBitLoadFromGBMemorySkipTraps(tileDataAddress + (pixelYInTile * 2))
+    let byteTwoForLineOfTilePixels: u8 = eightBitLoadFromGBMemorySkipTraps(tileDataAddress + (pixelYInTile * 2) + 1);
 
     // Same logic as pixelYInTile.
     // However, We need to reverse our byte,
@@ -108,16 +110,17 @@ export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u
     let pixelXInTile: u8 = <u8>((reversedPixelXInTile - 7) * -1);
 
     // Now we can get the color for that pixel
-    // Colors are represented by getting X position of Byteone, and Y positon of Byte Two
+    // Colors are represented by getting X position of ByteTwo, and X positon of Byte One
     // To Get the color Id.
-    // For example, the result of the color id is 0000 00[xPixelByteOne][xPixelByteTwo]
+    // For example, the result of the color id is 0000 00[xPixelByteTwo][xPixelByteOne]
+    // See: How to draw a tile/sprite from memory: http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html
     let paletteColorId: u8 = 0;
-    if (checkBitOnByte(<u8>pixelXInTile, byteOneForLineOfTilePixels)) {
+    if (checkBitOnByte(<u8>pixelXInTile, byteTwoForLineOfTilePixels)) {
       // Byte one represents the second bit in our color id, so bit shift
       paletteColorId += 1;
       paletteColorId = (paletteColorId << 1);
     }
-    if (checkBitOnByte(<u8>pixelXInTile, byteTwoForLineOfTilePixels)) {
+    if (checkBitOnByte(<u8>pixelXInTile, byteOneForLineOfTilePixels)) {
       paletteColorId += 1;
     }
 

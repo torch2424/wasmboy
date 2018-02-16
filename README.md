@@ -49,6 +49,8 @@ The Wasmboy library is being recorded at [Issue #3](https://github.com/torch2424
 
 * [Spreadsheet of Game that Do or Do Not Rom Bank](https://docs.google.com/spreadsheets/d/1cOS__xEj8bBT7cqEDgJcYStKuFAS8mMA4uErx9kA40M/edit#gid=1827536881)
 
+* [How Does Digital Audio Even?](https://www.youtube.com/watch?v=1RIA9U5oXro)
+
 * [Sound Emulation - GhostSonit's reply](https://www.reddit.com/r/EmuDev/comments/5gkwi5/gb_apu_sound_emulation/)
 
 * [Awesome Wiki on the Gamelad project](https://github.com/Dooskington/GameLad/wiki)
@@ -84,3 +86,9 @@ npm run serve
 ```
 
 For detailed explanation on how things work, checkout the [CLI Readme](https://github.com/developit/preact-cli/blob/master/README.md).
+
+### Special Thanks
+
+* [awesome gb-dev communitty](https://github.com/avivace/awesome-gbdev), too many rad dudes to name!
+
+* [dcodeIO for building and fixing bugs with AssemblyScript](https://github.com/AssemblyScript/assemblyscript). And for being awesome!

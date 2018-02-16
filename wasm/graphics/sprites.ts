@@ -7,8 +7,10 @@ import {
   getColorFromPalette
 } from './renderUtils'
 // Assembly script really not feeling the reexport
+// using Skip Traps, because LCD has unrestricted access
+// http://gbdev.gg8.se/wiki/articles/Video_Display#LCD_OAM_DMA_Transfers
 import {
-  eightBitLoadFromGBMemory
+  eightBitLoadFromGBMemorySkipTraps
 } from '../memory/load';
 import {
   setPixelOnFrame,
@@ -31,12 +33,12 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
     let spriteTableIndex: u16 = i * 4;
     // Y positon is offset by 16, X position is offset by 8
     // TODO: Why is OAM entry zero???
-    let spriteYPosition: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex);
+    let spriteYPosition: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex);
     spriteYPosition -= 16;
-    let spriteXPosition: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 1);
+    let spriteXPosition: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 1);
     spriteXPosition -= 8;
-    let spriteTileId: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 2);
-    let spriteAttributes: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 3);
+    let spriteTileId: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 2);
+    let spriteAttributes: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 3);
 
     // Check sprite Priority
     let isSpritePriorityBehindWindowAndBackground: boolean = checkBitOnByte(7, spriteAttributes);
@@ -58,7 +60,7 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
     }
 
     // Find if our sprite is on the current scanline
-    if(scanlineRegister >= spriteYPosition && scanlineRegister <= (spriteYPosition + spriteHeight)) {
+    if(scanlineRegister >= spriteYPosition && scanlineRegister < (spriteYPosition + spriteHeight)) {
       // Then we need to draw the current sprite
 
       // Find which line on the sprite we are on
@@ -76,8 +78,8 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
       let spriteTileAddressStart: i32 = <i32>getTileDataAddress(Graphics.memoryLocationTileDataSelectOneStart, spriteTileId);
       spriteTileAddressStart = spriteTileAddressStart + currentSpriteLine;
       let spriteTileAddress: u16 = <u16>spriteTileAddressStart;
-      let spriteDataByteOneForLineOfTilePixels: u8 = eightBitLoadFromGBMemory(spriteTileAddress);
-      let spriteDataByteTwoForLineOfTilePixels: u8 = eightBitLoadFromGBMemory(spriteTileAddress + 1);
+      let spriteDataByteOneForLineOfTilePixels: u8 = eightBitLoadFromGBMemorySkipTraps(spriteTileAddress);
+      let spriteDataByteTwoForLineOfTilePixels: u8 = eightBitLoadFromGBMemorySkipTraps(spriteTileAddress + 1);
 
       // Iterate over the width of our sprite to found our individual pixels
       for(let tilePixel: i8 = 7; tilePixel >= 0; tilePixel--) {
@@ -91,27 +93,31 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
 
         // Get the color Id of our sprite, similar to renderBackground()
         // With the first byte, and second byte lined up method thing
+        // Yes, the second byte comes before the first, see ./background.ts
         let spriteColorId: u8 = 0;
-        if (checkBitOnByte(<u8>spritePixelXInTile, spriteDataByteOneForLineOfTilePixels)) {
+        if (checkBitOnByte(<u8>spritePixelXInTile, spriteDataByteTwoForLineOfTilePixels)) {
           // Byte one represents the second bit in our color id, so bit shift
           spriteColorId += 1;
           spriteColorId = (spriteColorId << 1);
         }
-        if (checkBitOnByte(<u8>spritePixelXInTile, spriteDataByteTwoForLineOfTilePixels)) {
+        if (checkBitOnByte(<u8>spritePixelXInTile, spriteDataByteOneForLineOfTilePixels)) {
           spriteColorId += 1;
         }
 
-        // Get our color ID from the current sprite pallete
-        let spritePixelColorFromPalette: u8 = getColorFromPalette(spriteColorId, spritePaletteLocation);
+        // ColorId zero (last two bits of pallette) are transparent
+        // http://gbdev.gg8.se/wiki/articles/Video_Display
+        if (spriteColorId !== 0) {
 
-        // White is transparent for sprites, so don't draw if white
-        if (spritePixelColorFromPalette !== 0) {
+          // Get our color ID from the current sprite pallete
+          let spritePixelColorFromPalette: u8 = getColorFromPalette(spriteColorId, spritePaletteLocation);
+
           // Find our actual X pixel location on the gameboy "camera" view
           let spriteXPixelLocationInCameraView: u8 = spriteXPosition + (7 - <u8>tilePixel);
 
           // Now that we have our coordinates, check sprite priority
+          // Remember, set pixel on frame increases the value by one!
           if (!isSpritePriorityBehindWindowAndBackground ||
-            getPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister) < 2) {
+            getPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister) <= 1) {
             // Finally set the pixel!
             setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, spritePixelColorFromPalette);
           }

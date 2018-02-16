@@ -5,7 +5,8 @@
 export {
   initializeCartridge,
   setPixelOnFrame,
-  getPixelOnFrame
+  getPixelOnFrame,
+  storeFrameToBeRendered
 } from './memory';
 
 export {

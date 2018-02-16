@@ -38,6 +38,8 @@ export class Memory {
 
   static spriteInformationTableLocation: u16 = 0xFE00;
 
+  static spriteInformationTableLocationEnd: u16 = 0xFE9F;
+
   static unusableMemoryLocation: u16 = 0xFEA0;
   static unusableMemoryEndLocation: u16 = 0xFEFF;
 
@@ -49,10 +51,13 @@ export class Memory {
   // Wasmboy Memory Map
   // ----------------------------------
   static gameBoyInternalMemoryLocation: u32 = 0x000000;
-  static pixelMapOutputLocation: u32 = 0x008000;
+  static videoOutputLocation: u32 = 0x008000;
+  static currentFrameVideoOutputLocation: u32 = Memory.videoOutputLocation;
+  static frameInProgressVideoOutputLocation: u32 = Memory.currentFrameVideoOutputLocation + (160 * 144);
+  static soundOutputLocation: u32 = 0x033400;
   // Passed in Game backup or ROM from the user
-  static gameBytesLocation: u32 = 0x018000;
-  static gameRamBanksLocation: u32 = 0x818000;
+  static gameBytesLocation: u32 = 0x043400;
+  static gameRamBanksLocation: u32 = 0x843400;
 
   // ----------------------------------
   // Rom/Ram Banking
@@ -97,7 +102,6 @@ export function initializeCartridge(): void {
   }
 }
 
-
 // Also need to store current frame in memory to be read by JS
 export function setPixelOnFrame(x: u16, y: u16, color: u8): void {
   // Currently only supports 160x144
@@ -108,7 +112,8 @@ export function setPixelOnFrame(x: u16, y: u16, color: u8): void {
   let largeY: i32 = y;
   let largeX: i32 = x;
 
-  let offset: i32 = Memory.pixelMapOutputLocation + (largeY * 160) + largeX;
+  let offset: i32 = Memory.frameInProgressVideoOutputLocation + (largeY * 160) + largeX;
+
   // Add one to the color, that way you don't ge the default zero
   store<u8>(offset, color + 1);
 }
@@ -123,7 +128,17 @@ export function getPixelOnFrame(x: u16, y: u16): u8 {
   let largeY: i32 = y;
   let largeX: i32 = x;
 
-  let offset: i32 = Memory.pixelMapOutputLocation + (largeY * 160) + largeX;
-  // Add one to the color, that way you don't ge the default zero
+  let offset: i32 = Memory.frameInProgressVideoOutputLocation + (largeY * 160) + largeX;
+
+  // Added one to the color, that way you don't ge the default zero
   return load<u8>(offset);
+}
+
+// V-Blank occured, move our frame in progress to our render frame 
+export function storeFrameToBeRendered(): void {
+  for(let y: u32 = 0; y < 144; y++) {
+    for (let x: u32 = 0; x < 160; x++) {
+      store<u8>(Memory.currentFrameVideoOutputLocation + x + (y * 160), getPixelOnFrame(<u16>x, <u16>y))
+    }
+  }
 }

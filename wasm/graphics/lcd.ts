@@ -20,6 +20,8 @@ import {
   resetBitOnByte
 } from '../helpers/index';
 
+
+
 export function isLcdEnabled(): boolean {
   return checkBitOnByte(7, eightBitLoadFromGBMemory(Graphics.memoryLocationLcdControl));
 }
@@ -43,9 +45,11 @@ export function setLcdStatus(): void {
     // Set to mode 1
     lcdStatus = resetBitOnByte(1, lcdStatus);
     lcdStatus = setBitOnByte(0, lcdStatus);
+    Graphics.currentLcdMode = 1;
 
     // Store the status in memory
     eightBitStoreIntoGBMemorySkipTraps(Graphics.memoryLocationLcdStatus, lcdStatus);
+    return;
   }
 
   // Get our current scanline, and lcd mode
@@ -97,6 +101,9 @@ export function setLcdStatus(): void {
   } else {
     lcdStatus = resetBitOnByte(2, lcdStatus);
   }
+
+  // Save our lcd mode
+  Graphics.currentLcdMode = newLcdMode;
 
   // Finally, save our status
   eightBitStoreIntoGBMemorySkipTraps(Graphics.memoryLocationLcdStatus, lcdStatus);
