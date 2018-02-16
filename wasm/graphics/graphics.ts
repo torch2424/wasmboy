@@ -96,6 +96,8 @@ export function updateGraphics(numberOfCycles: u8): void {
 
       // Check if we've reached the last scanline
       if(scanlineRegister === 144) {
+        // Draw the scanline
+        _drawScanline();
         // Request a VBlank interrupt
         requestVBlankInterrupt();
       } else if (scanlineRegister > 153) {

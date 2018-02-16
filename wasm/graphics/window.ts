@@ -30,7 +30,7 @@ export function renderWindow(scanlineRegister: u8, tileDataMemoryLocation: u16, 
   // NOTE: Camera is reffering to what you can see inside the 160x144 viewport of the entire rendered 256x256 map.
 
   // First ensure that the scanline is greater than our window
-  if(scanlineRegister <= <u8>windowY) {
+  if(scanlineRegister < <u8>windowY) {
     // Window is not within the current camera view
     return;
   }

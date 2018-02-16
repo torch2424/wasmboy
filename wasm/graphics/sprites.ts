@@ -58,7 +58,7 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
     }
 
     // Find if our sprite is on the current scanline
-    if(scanlineRegister >= spriteYPosition && scanlineRegister <= (spriteYPosition + spriteHeight)) {
+    if(scanlineRegister >= spriteYPosition && scanlineRegister < (spriteYPosition + spriteHeight)) {
       // Then we need to draw the current sprite
 
       // Find which line on the sprite we are on
@@ -111,8 +111,9 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
           let spriteXPixelLocationInCameraView: u8 = spriteXPosition + (7 - <u8>tilePixel);
 
           // Now that we have our coordinates, check sprite priority
+          // Remember, set pixel on frame increases the value by one!
           if (!isSpritePriorityBehindWindowAndBackground ||
-            getPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister) < 2) {
+            getPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister) <= 1) {
             // Finally set the pixel!
             setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, spritePixelColorFromPalette);
           }

@@ -47,6 +47,12 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
     return false;
   }
 
+  // reset the current scanline if the game tries to write to it
+  if (offset === 0xFF44) {
+    eightBitStoreIntoGBMemorySkipTraps(offset, 0);
+    return false;
+  }
+
   // Do the direct memory access transfer for spriteInformationTable
   if (offset === 0xFF46) {
     _dmaTransfer(<u8>value) ;

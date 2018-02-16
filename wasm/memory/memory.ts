@@ -108,7 +108,7 @@ export function setPixelOnFrame(x: u16, y: u16, color: u8): void {
   let largeX: i32 = x;
 
   let offset: i32 = Memory.pixelMapOutputLocation + (largeY * 160) + largeX;
-  
+
   // Add one to the color, that way you don't ge the default zero
   store<u8>(offset, color + 1);
 }
@@ -124,6 +124,7 @@ export function getPixelOnFrame(x: u16, y: u16): u8 {
   let largeX: i32 = x;
 
   let offset: i32 = Memory.pixelMapOutputLocation + (largeY * 160) + largeX;
-  // Add one to the color, that way you don't ge the default zero
+
+  // Added one to the color, that way you don't ge the default zero
   return load<u8>(offset);
 }
