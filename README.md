@@ -86,3 +86,9 @@ npm run serve
 ```
 
 For detailed explanation on how things work, checkout the [CLI Readme](https://github.com/developit/preact-cli/blob/master/README.md).
+
+### Special Thanks
+
+* [awesome gb-dev communitty](https://github.com/avivace/awesome-gbdev), too many rad dudes to name!
+
+* [dcodeIO for building and fixing bugs with AssemblyScript](https://github.com/AssemblyScript/assemblyscript). And for being awesome!
