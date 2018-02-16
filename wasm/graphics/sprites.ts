@@ -102,11 +102,13 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
           spriteColorId += 1;
         }
 
-        // Get our color ID from the current sprite pallete
-        let spritePixelColorFromPalette: u8 = getColorFromPalette(spriteColorId, spritePaletteLocation);
+        // ColorId zero (last two bits of pallette) are transparent
+        // http://gbdev.gg8.se/wiki/articles/Video_Display
+        if (spriteColorId !== 0) {
 
-        // White is transparent for sprites, so don't draw if white
-        if (spritePixelColorFromPalette !== 0) {
+          // Get our color ID from the current sprite pallete
+          let spritePixelColorFromPalette: u8 = getColorFromPalette(spriteColorId, spritePaletteLocation);
+
           // Find our actual X pixel location on the gameboy "camera" view
           let spriteXPixelLocationInCameraView: u8 = spriteXPosition + (7 - <u8>tilePixel);
 
