@@ -97,7 +97,6 @@ export function initializeCartridge(): void {
   }
 }
 
-
 // Also need to store current frame in memory to be read by JS
 export function setPixelOnFrame(x: u16, y: u16, color: u8): void {
   // Currently only supports 160x144
@@ -109,6 +108,7 @@ export function setPixelOnFrame(x: u16, y: u16, color: u8): void {
   let largeX: i32 = x;
 
   let offset: i32 = Memory.pixelMapOutputLocation + (largeY * 160) + largeX;
+  
   // Add one to the color, that way you don't ge the default zero
   store<u8>(offset, color + 1);
 }

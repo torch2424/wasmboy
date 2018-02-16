@@ -114,11 +114,9 @@ export function renderWindow(scanlineRegister: u8, tileDataMemoryLocation: u16, 
       // Byte one represents the second bit in our color id, so bit shift
       paletteColorId += 1;
       paletteColorId = (paletteColorId << 1);
-      consoleLog(paletteColorId, pixelXInTile);
     }
     if (checkBitOnByte(<u8>pixelXInTile, byteTwoForLineOfTilePixels)) {
       paletteColorId += 1;
-      consoleLogTwo(paletteColorId, pixelXInTile);
     }
 
     // Now get the colorId from the pallete, to get our final color

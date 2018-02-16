@@ -9,7 +9,7 @@
     "dev": "preact watch",
     "lint": "eslint src",
     "wasm:watch": "npx watch \"npm run wasm:build\" wasm",
-    "wasm:build": "asc wasm/index.ts -b dist/wasm/index.untouched.wasm -t dist/wasm/index.untouched.wast --validate && echo \"Done!\""
+    "wasm:build": "npx asc wasm/index.ts -b dist/wasm/index.untouched.wasm -t dist/wasm/index.untouched.wast --validate && echo \"Done!\""
   },
   "eslintConfig": {
     "extends": "eslint-config-synacor"
@@ -24,6 +24,7 @@
     "unfetch": "^3.0.0"
   },
   "devDependencies": {
+    "assemblyscript": "github:AssemblyScript/assemblyscript",
     "eslint": "^4.5.0",
     "eslint-config-synacor": "^1.1.0",
     "if-env": "^1.0.0",

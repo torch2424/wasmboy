@@ -133,7 +133,9 @@ export function emulationStep(): i8 {
   if(!Cpu.isStopped) {
     updateGraphics(<u8>numberOfCycles);
   }
-  checkInterrupts();
+  // Interrupt Handling requires 20 cycles
+  // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
+  numberOfCycles += checkInterrupts();
 
   if(numberOfCycles <= 0) {
     consoleLog(opcode, 1);
