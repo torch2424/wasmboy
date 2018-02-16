@@ -46,6 +46,7 @@ export class Graphics {
   static memoryLocationLcdStatus: u16 = 0xFF41;
   // Also known as LCDC
   static memoryLocationLcdControl: u16 = 0xFF40;
+  static currentLcdMode: u8 = 0;
 
   // Scroll and Window
   // TODO -7 on windowX, and export to be used

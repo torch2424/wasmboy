@@ -38,6 +38,8 @@ export class Memory {
 
   static spriteInformationTableLocation: u16 = 0xFE00;
 
+  static spriteInformationTableLocationEnd: u16 = 0xFE9F;
+
   static unusableMemoryLocation: u16 = 0xFEA0;
   static unusableMemoryEndLocation: u16 = 0xFEFF;
 
