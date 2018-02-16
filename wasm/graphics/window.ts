@@ -7,8 +7,10 @@ import {
   getColorFromPalette
 } from './renderUtils'
 // Assembly script really not feeling the reexport
+// using Skip Traps, because LCD has unrestricted access
+// http://gbdev.gg8.se/wiki/articles/Video_Display#LCD_OAM_DMA_Transfers
 import {
-  eightBitLoadFromGBMemory
+  eightBitLoadFromGBMemorySkipTraps
 } from '../memory/load';
 import {
   setPixelOnFrame
@@ -24,8 +26,8 @@ import {
 export function renderWindow(scanlineRegister: u8, tileDataMemoryLocation: u16, tileMapMemoryLocation: u16): void {
 
   // Get our windowX and windowY
-  let windowX: u16 = <u16>eightBitLoadFromGBMemory(Graphics.memoryLocationWindowX);
-  let windowY: u16 = <u16>eightBitLoadFromGBMemory(Graphics.memoryLocationWindowY);
+  let windowX: u16 = <u16>eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationWindowX);
+  let windowY: u16 = <u16>eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationWindowY);
 
   // NOTE: Camera is reffering to what you can see inside the 160x144 viewport of the entire rendered 256x256 map.
 
@@ -71,7 +73,7 @@ export function renderWindow(scanlineRegister: u8, tileDataMemoryLocation: u16, 
     let tileMapAddress: u16 = tileMapMemoryLocation + (tileYPositionInMap * 32) + tileXPositionInMap;
 
     // Get the tile Id on the Tile Map
-    let tileIdFromTileMap: u8 = eightBitLoadFromGBMemory(tileMapAddress);
+    let tileIdFromTileMap: u8 = eightBitLoadFromGBMemorySkipTraps(tileMapAddress);
 
     // Now get our tileDataAddress for the corresponding tileID we found in the map
     // Read the comments in _getTileDataAddress() to see what's going on.
@@ -94,8 +96,8 @@ export function renderWindow(scanlineRegister: u8, tileDataMemoryLocation: u16, 
     // Remember to represent a single line of 8 pixels on a tile, we need two bytes.
     // Therefore, we need to times our modulo by 2, to get the correct line of pixels on the tile.
     // Again, think like you had to map a 2d array as a 1d.
-    let byteOneForLineOfTilePixels: u8 = eightBitLoadFromGBMemory(tileDataAddress + (pixelYInTile * 2))
-    let byteTwoForLineOfTilePixels: u8 = eightBitLoadFromGBMemory(tileDataAddress + (pixelYInTile * 2) + 1);
+    let byteOneForLineOfTilePixels: u8 = eightBitLoadFromGBMemorySkipTraps(tileDataAddress + (pixelYInTile * 2))
+    let byteTwoForLineOfTilePixels: u8 = eightBitLoadFromGBMemorySkipTraps(tileDataAddress + (pixelYInTile * 2) + 1);
 
     // Same logic as pixelYInTile.
     // However, We need to reverse our byte,

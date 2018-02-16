@@ -7,8 +7,10 @@ import {
   getColorFromPalette
 } from './renderUtils'
 // Assembly script really not feeling the reexport
+// using Skip Traps, because LCD has unrestricted access
+// http://gbdev.gg8.se/wiki/articles/Video_Display#LCD_OAM_DMA_Transfers
 import {
-  eightBitLoadFromGBMemory
+  eightBitLoadFromGBMemorySkipTraps
 } from '../memory/load';
 import {
   setPixelOnFrame,
@@ -31,12 +33,12 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
     let spriteTableIndex: u16 = i * 4;
     // Y positon is offset by 16, X position is offset by 8
     // TODO: Why is OAM entry zero???
-    let spriteYPosition: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex);
+    let spriteYPosition: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex);
     spriteYPosition -= 16;
-    let spriteXPosition: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 1);
+    let spriteXPosition: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 1);
     spriteXPosition -= 8;
-    let spriteTileId: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 2);
-    let spriteAttributes: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 3);
+    let spriteTileId: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 2);
+    let spriteAttributes: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 3);
 
     // Check sprite Priority
     let isSpritePriorityBehindWindowAndBackground: boolean = checkBitOnByte(7, spriteAttributes);
@@ -76,8 +78,8 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
       let spriteTileAddressStart: i32 = <i32>getTileDataAddress(Graphics.memoryLocationTileDataSelectOneStart, spriteTileId);
       spriteTileAddressStart = spriteTileAddressStart + currentSpriteLine;
       let spriteTileAddress: u16 = <u16>spriteTileAddressStart;
-      let spriteDataByteOneForLineOfTilePixels: u8 = eightBitLoadFromGBMemory(spriteTileAddress);
-      let spriteDataByteTwoForLineOfTilePixels: u8 = eightBitLoadFromGBMemory(spriteTileAddress + 1);
+      let spriteDataByteOneForLineOfTilePixels: u8 = eightBitLoadFromGBMemorySkipTraps(spriteTileAddress);
+      let spriteDataByteTwoForLineOfTilePixels: u8 = eightBitLoadFromGBMemorySkipTraps(spriteTileAddress + 1);
 
       // Iterate over the width of our sprite to found our individual pixels
       for(let tilePixel: i8 = 7; tilePixel >= 0; tilePixel--) {

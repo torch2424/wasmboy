@@ -32,9 +32,9 @@ export function checkReadTraps(offset: u16): i32 {
   // Can only read/write from OAM During Modes 0 - 1
   // See graphics/lcd.ts
   if(offset >= Memory.spriteInformationTableLocation && offset <= Memory.spriteInformationTableLocationEnd) {
-    // Can only read/write from OAM During Modes 0 - 1
+    // Can only read/write from OAM During Mode 2
     // See graphics/lcd.ts
-    if (Graphics.currentLcdMode > 1) {
+    if (Graphics.currentLcdMode !== 2) {
       return 0xFF;
     }
   }
