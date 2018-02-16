@@ -1,5 +1,5 @@
 import {
-  getCarryFlag 
+  getCarryFlag
 } from '../cpu/flags';
 
 class Log {
@@ -114,4 +114,12 @@ export function checkBitOnByte(bitPosition: u8, byte: u8): boolean {
   } else {
     return false;
   }
+}
+
+namespace env {
+  export declare function log(message: string, numArgs: i32, arg0: i32, arg1: i32, arg2: i32, arg3: i32, arg4: i32, arg5: i32): void;
+}
+
+export function log(message: string, numArgs: i32 = 0, arg0: i32 = 0, arg1: i32 = 0, arg2: i32 = 0, arg3: i32 = 0, arg4: i32 = 0, arg5: i32 = 0): void {
+  env.log(message, numArgs, arg0, arg1, arg2, arg3, arg4, arg5);
 }
