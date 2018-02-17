@@ -134,7 +134,7 @@ export function getPixelOnFrame(x: u16, y: u16): u8 {
   return load<u8>(offset);
 }
 
-// V-Blank occured, move our frame in progress to our render frame 
+// V-Blank occured, move our frame in progress to our render frame
 export function storeFrameToBeRendered(): void {
   for(let y: u32 = 0; y < 144; y++) {
     for (let x: u32 = 0; x < 160; x++) {

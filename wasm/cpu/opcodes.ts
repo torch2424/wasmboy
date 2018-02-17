@@ -564,7 +564,7 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // LD (HL+),A
     // 1 8
     let registerHL = concatenateBytes(Cpu.registerH, Cpu.registerL);
-    sixteenBitStoreIntoGBMemory(registerHL, Cpu.registerA);
+    eightBitStoreIntoGBMemory(registerHL, Cpu.registerA);
     registerHL += 1;
     Cpu.registerH = splitHighByte(registerHL);
     Cpu.registerL = splitLowByte(registerHL);
