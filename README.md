@@ -92,3 +92,5 @@ For detailed explanation on how things work, checkout the [CLI Readme](https://g
 * [awesome gb-dev communitty](https://github.com/avivace/awesome-gbdev), too many rad dudes to name!
 
 * [dcodeIO for building and fixing bugs with AssemblyScript](https://github.com/AssemblyScript/assemblyscript). And for being awesome!
+
+* [r/emudev](https://www.reddit.com/r/EmuDev/), especially to [binjimint](https://www.reddit.com/r/EmuDev/comments/7y2bux/gameboy_gb_graphical_bugs_game_writes_zeroes_into/dudlj3w/) for helping me find that bug not even Blargg's cpu tests could find.
