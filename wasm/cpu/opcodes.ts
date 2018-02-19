@@ -58,6 +58,9 @@ import {
 import {
   updateGraphics
 } from '../graphics/index';
+import {
+  updateSound
+} from '../sound/index'
 
 // Public funciton to run opcodes until a frame should be rendered.
 export function update(): i8 {
@@ -136,6 +139,8 @@ export function emulationStep(): i8 {
   // Interrupt Handling requires 20 cycles
   // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
   numberOfCycles += checkInterrupts();
+  // Update Sound
+  updateSound(<u8>numberOfCycles);
 
   if(numberOfCycles <= 0) {
     consoleLog(opcode, 1);

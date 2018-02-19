@@ -10,6 +10,17 @@ import {
   updateSquareChannelsLengths,
   updateSquareChannelsEnvelopes
 } from './square';
+import {
+  isChannelEnabledOnLeftOutput,
+  isChannelEnabledOnRightOutput
+} from './register';
+import {
+  Cpu
+} from '../cpu/index';
+import {
+  eightBitLoadFromGBMemory,
+  setLeftAndRightOutputForAudioQueue
+} from '../memory/index';
 
 export class Sound {
   //Channel 1
@@ -74,13 +85,22 @@ export class Sound {
 
   // Need to count how often we need to increment our frame sequencer
   // Which you can read about below
-  static cycleCounter: u16 = 0x0000;
-  static maxCycles: u16 = 8192;
+  static frameSequenceCycleCounter: u16 = 0x0000;
+  static maxFrameSequenceCycles: u16 = 8192;
+
+  // Also need to downsample our audio to average audio qualty
+  // https://www.reddit.com/r/EmuDev/comments/5gkwi5/gb_apu_sound_emulation/
+  // Want to do 48000hz, so CpuRate / Sound Rate ~ 87 cycles
+  static downSampleCycleCounter: u8 = 0x00;
+  static maxDownSampleCycles: u8 = 87;
 
   // Frame sequencer controls what should be updated and and ticked
   // Everyt time the sound is updated :) It is updated everytime the
   // Cycle counter reaches the max cycle
   static frameSequencer: u8 = 0x00;
+
+  // Our current sample umber we are passing back to the wasmboy memory map
+  static audioQueueIndex: u8 = 0x00;
 }
 
 // Function for updating sound
@@ -88,9 +108,9 @@ export function updateSound(numberOfCycles: u8): void {
   // APU runs at 4194304 / 512
   // Or Cpu.clockSpeed / 512
   // Which means, we need to update once every 8192 cycles :)
-  Sound.cycleCounter += <u16>numberOfCycles;
-  if(Sound.cycleCounter >= Sound.maxCycles) {
-    Sound.cycleCounter = 0;
+  Sound.frameSequenceCycleCounter += <u16>numberOfCycles;
+  if(Sound.frameSequenceCycleCounter >= Sound.maxFrameSequenceCycles) {
+    Sound.frameSequenceCycleCounter = 0;
 
     // Check our frame sequencer
     // https://gist.github.com/drhelius/3652407
@@ -121,7 +141,62 @@ export function updateSound(numberOfCycles: u8): void {
   }
 
   // Update all of our channels
+  // Volume is a value between 0 (super negative and loud af) and 15 (super positive and loud af)
   let channel1OutputVolume: u8 = updateSquareChannel(1);
+  let channel2OutputVolume: u8 = updateSquareChannel(2);
 
   // Do Some downsampling magic
+  Sound.downSampleCycleCounter += numberOfCycles;
+  if(Sound.downSampleCycleCounter >= Sound.maxDownSampleCycles) {
+    Sound.downSampleCycleCounter = 0;
+
+    // Do Some Cool mixing
+    // NR50 FF24 ALLL BRRR Vin L enable, Left vol, Vin R enable, Right vol
+    // NR51 FF25 NW21 NW21 Left enables, Right enables
+    // NR52 FF26 P--- NW21 Power control/status, Channel length statuses
+    // NW21 = 4 bits on byte
+    // 3 -> Channel 4, 2 -> Channel 3, 1 -> Channel 2, 0 -> Channel 1
+
+    // Matt's Proccess
+    // I push out 1024 samples at a time and use 96000 hz sampling rate, so I guess i'm a bit less than one frame,
+    // but I let the queue fill up with 4 x 1024 samples before I start waiting for the audio
+
+    // TODO: Vin Mixing
+
+    // Simply get the left/right volume, add up the values, and put into memory!
+    let registerNR50 = eightBitLoadFromGBMemory(Sound.memoryLocationNR50);
+    // Want bits 6-4
+    let leftVolume = (registerNR50 >> 4);
+    leftVolume = leftVolume & 0x07;
+    // Want bits 0-2
+    let rightVolume = registerNR50;
+    rightVolume = rightVolume & 0x07;
+
+    // Find the channel for the left volume
+    // TODO: Other Channels
+    if (isChannelEnabledOnLeftOutput(1)) {
+      leftVolume += channel1OutputVolume;
+    }
+    if(isChannelEnabledOnLeftOutput(2)) {
+      leftVolume += channel2OutputVolume;
+    }
+
+    // Find the channel for the right volume
+    // TODO: Other Channels
+    if (isChannelEnabledOnRightOutput(1)) {
+      rightVolume += channel1OutputVolume;
+    }
+    if(isChannelEnabledOnRightOutput(2)) {
+      rightVolume += channel2OutputVolume;
+    }
+
+    // Set our volumes in memory
+    setLeftAndRightOutputForAudioQueue(leftVolume, rightVolume, Sound.audioQueueIndex);
+    Sound.audioQueueIndex += 1;
+
+    // We want out audio queue to be as large as a frame, therefore reset the audioQueueIndex when Cpu.current cycles exceeds the max cycles
+    if((Cpu.currentCycles + numberOfCycles) >= Cpu.MAX_CYCLES_PER_FRAME) {
+      Sound.audioQueueIndex = 0;
+    }
+  }
 }

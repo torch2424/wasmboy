@@ -324,12 +324,12 @@ export function updateSquareChannelsEnvelopes(): void {
 // Since there are no 2d arrays, we will use a byte to represent duty cycles (wave form from percentages)
 function isDutyCycleClockWithinDutyWaveFormForChannel(channelNumber: i8, dutyCycleClock: u8): boolean {
   // Get our current Duty
-  let duty = getChannelDuty(channelNumber);
+  let duty: u8 = getChannelDuty(channelNumber);
 
   // Get our Wave Form According to the Duty
   // Default to a duty of 0
   // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
-  let waveform = 0x01;
+  let waveform: u8 = 0x01;
   if (duty === 0x01) {
     waveform = 0x81;
   } else if (duty === 0x02) {

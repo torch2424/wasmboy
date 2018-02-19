@@ -1,4 +1,5 @@
 export {
+  updateSound,
   Sound
 } from './sound';
 
