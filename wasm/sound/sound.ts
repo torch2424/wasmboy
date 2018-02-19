@@ -3,8 +3,11 @@
 // https://gist.github.com/drhelius/3652407
 
 // TODO: Memory management for Sound registers
-// May just want to redirect read/write traps to here
-// As it requires a lot of logic
+
+import {
+  updateSquareChannelsLengths,
+  updateSquareChannelsEnvelopes
+} from './square';
 
 export class Sound {
   //Channel 1
@@ -91,14 +94,19 @@ export function updateSound(numberOfCycles: u8): void {
     // https://gist.github.com/drhelius/3652407
     if (Sound.frameSequencer === 0) {
       // Update Length on Channels
+      updateSquareChannelsLengths();
     } /* Do Nothing on one */ else if(Sound.frameSequencer === 2) {
       // Update Sweep and Length on Channels
+      updateSquareChannelsLengths();
     } /* Do Nothing on three */ else if(Sound.frameSequencer === 4) {
       // Update Length on Channels
+      updateSquareChannelsLengths();
     } /* Do Nothing on three */ else if(Sound.frameSequencer === 6) {
       // Update Sweep and Length on Channels
+      updateSquareChannelsLengths();
     } else if(Sound.frameSequencer === 7) {
       // Update Envelope on channels
+      updateSquareChannelsEnvelopes();
     }
 
     // Update our frame sequencer
