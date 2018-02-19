@@ -149,6 +149,7 @@ export function setLeftAndRightOutputForAudioQueue(leftVolume: u8, rightVolume: 
   let audioQueueOffset = Memory.soundOutputLocation + <u16>(audioQueueIndex * 2);
 
   // Store our volumes
-  store<u8>(audioQueueOffset, leftVolume);
-  store<u8>(audioQueueOffset, rightVolume);
+  // +1 that way we don't have empty data to ensure that the value is set
+  store<u8>(audioQueueOffset, leftVolume + 1);
+  store<u8>(audioQueueOffset + 1, rightVolume + 1);
 }

@@ -97,17 +97,17 @@ export function isChannelDacEnabled(channelNumber: i8): boolean {
 }
 
 export function isChannelEnabledOnLeftOutput(channelNumber: i8): boolean {
-  let registerNR52: u8 = eightBitLoadFromGBMemory(Sound.memoryLocationNR52);
+  let registerNR51: u8 = eightBitLoadFromGBMemory(Sound.memoryLocationNR51);
   // Left channel in the higher bits
   let bitNumberOfChannel: u8 = (<u8>channelNumber - 1) + 4;
-  return checkBitOnByte(bitNumberOfChannel, registerNR52);
+  return checkBitOnByte(bitNumberOfChannel, registerNR51);
 }
 
 export function isChannelEnabledOnRightOutput(channelNumber: i8): boolean {
-  let registerNR52: u8 = eightBitLoadFromGBMemory(Sound.memoryLocationNR52);
+  let registerNR51: u8 = eightBitLoadFromGBMemory(Sound.memoryLocationNR51);
   // Left channel in the higher bits
   let bitNumberOfChannel: u8 = (<u8>channelNumber - 1);
-  return checkBitOnByte(bitNumberOfChannel, registerNR52);
+  return checkBitOnByte(bitNumberOfChannel, registerNR51);
 }
 
 // Function to get 1st register of a channel

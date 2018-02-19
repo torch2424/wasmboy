@@ -21,6 +21,10 @@ import {
   eightBitLoadFromGBMemory,
   setLeftAndRightOutputForAudioQueue
 } from '../memory/index';
+import {
+  consoleLog,
+  consoleLogTwo
+} from '../helpers/index';
 
 export class Sound {
   //Channel 1
@@ -142,8 +146,9 @@ export function updateSound(numberOfCycles: u8): void {
 
   // Update all of our channels
   // Volume is a value between 0 (super negative and loud af) and 15 (super positive and loud af)
-  let channel1OutputVolume: u8 = updateSquareChannel(1);
-  let channel2OutputVolume: u8 = updateSquareChannel(2);
+  // Setting to an i8, that way  we can do some fun stuff like sub tract 7 to get the actual volume modifier
+  let channel1Sample: i8 = updateSquareChannel(1);
+  let channel2Sample: i8 = updateSquareChannel(2);
 
   // Do Some downsampling magic
   Sound.downSampleCycleCounter += numberOfCycles;
@@ -166,32 +171,43 @@ export function updateSound(numberOfCycles: u8): void {
     // Simply get the left/right volume, add up the values, and put into memory!
     let registerNR50 = eightBitLoadFromGBMemory(Sound.memoryLocationNR50);
     // Want bits 6-4
-    let leftVolume = (registerNR50 >> 4);
-    leftVolume = leftVolume & 0x07;
+    let leftMixerVolume: u8 = (registerNR50 >> 4);
+    leftMixerVolume = leftMixerVolume & 0x07;
     // Want bits 0-2
-    let rightVolume = registerNR50;
-    rightVolume = rightVolume & 0x07;
+    let rightMixerVolume: u8 = registerNR50;
+    rightMixerVolume = rightMixerVolume & 0x07;
+
+    // Get our channel volume for left/right
+    let leftChannelSample: i8 = 0;
+    let rightChannelSample: i8 = 0;
 
     // Find the channel for the left volume
     // TODO: Other Channels
     if (isChannelEnabledOnLeftOutput(1)) {
-      leftVolume += channel1OutputVolume;
+      leftChannelSample += channel1Sample;
     }
     if(isChannelEnabledOnLeftOutput(2)) {
-      leftVolume += channel2OutputVolume;
+      // TODO
+      //leftChannelVolume += channel2OutputVolumeModifier;
     }
 
     // Find the channel for the right volume
     // TODO: Other Channels
     if (isChannelEnabledOnRightOutput(1)) {
-      rightVolume += channel1OutputVolume;
+      rightChannelSample += channel1Sample;
     }
     if(isChannelEnabledOnRightOutput(2)) {
-      rightVolume += channel2OutputVolume;
+      rightChannelSample += channel2Sample;
     }
 
+    // TODO: Clip our volumes to -7 and 7, or something like that
+
+    // Finally multiple our volumes by the mixer volume
+    //TODO
+
     // Set our volumes in memory
-    setLeftAndRightOutputForAudioQueue(leftVolume, rightVolume, Sound.audioQueueIndex);
+    // TODO: Right CHannel
+    setLeftAndRightOutputForAudioQueue(<u8>leftChannelSample + 7, 7, Sound.audioQueueIndex);
     Sound.audioQueueIndex += 1;
 
     // We want out audio queue to be as large as a frame, therefore reset the audioQueueIndex when Cpu.current cycles exceeds the max cycles

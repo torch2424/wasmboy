@@ -17,7 +17,10 @@ import {
   eightBitLoadFromGBMemory
 } from '../memory/index';
 import {
-  checkBitOnByte
+  checkBitOnByte,
+  consoleLog,
+  consoleLogTwo,
+  log
 } from '../helpers/index';
 
 class Square {
@@ -54,10 +57,11 @@ class Square {
   // Final Output Volume
   static channel1OutputVolume: u8 = 0;
   static channel2OutputVolume: u8 = 0;
+
+  static triggered: u32 = 0;
 }
 
-// TODO: Return volume
-export function updateSquareChannel(channelNumber: i8): u8 {
+export function updateSquareChannel(channelNumber: i8): i8 {
 
   // Channel 1
   if(channelNumber === 1) {
@@ -78,18 +82,30 @@ export function updateSquareChannel(channelNumber: i8): u8 {
       }
     }
 
+    // Set to 0 for zero sound
     Square.channel1OutputVolume = 0;
 
     // Finally to set our output volume, the channel must be enabled,
     // Our channel DAC must be enabled, and we must be in an active state
     // Of our duty cycle
-    if(Square.channel1IsEnabled &&
-      isChannelDacEnabled(1) &&
-      isDutyCycleClockWithinDutyWaveFormForChannel(1, Square.channel1DutyCycleClock)) {
+
+    // TODO: Channel Enabled
+    if(isChannelDacEnabled(1)) {
         Square.channel1OutputVolume = Square.channel1CurrentVolume;
     }
 
-    return Square.channel1OutputVolume;
+    // Get the current sampleValue
+    let squareSample: i8 = 1;
+    if (!isDutyCycleClockWithinDutyWaveFormForChannel(1, Square.channel1DutyCycleClock)) {
+      squareSample = squareSample * -1;
+    }
+
+    if(Square.channel1OutputVolume !== 0) {
+      consoleLog(0x01, 88);
+      consoleLogTwo(squareSample, 88);
+    }
+
+    return squareSample * <i8>Square.channel1OutputVolume;
   } else {
     // Channel 2
     // See above for explanation of what's going on
@@ -104,15 +120,17 @@ export function updateSquareChannel(channelNumber: i8): u8 {
       }
     }
 
+    // Set to 7 for zero sound
     Square.channel2OutputVolume = 0;
 
-    if(Square.channel2IsEnabled &&
-      isChannelDacEnabled(2) &&
+    // TODO: Channel enabled
+    if(isChannelDacEnabled(2) &&
       isDutyCycleClockWithinDutyWaveFormForChannel(2, Square.channel2DutyCycleClock)) {
         Square.channel2OutputVolume = Square.channel2CurrentVolume;
     }
 
-    return Square.channel2OutputVolume;
+    // TODO Return correct volume
+    return 0;
   }
 }
 
