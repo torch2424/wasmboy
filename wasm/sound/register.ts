@@ -71,6 +71,13 @@ export function getChannelEnvelopeAddMode(channelNumber: i8): boolean {
   return checkBitOnByte(3, soundRegister)
 }
 
+export function getChannelStartingVolume(channelNumber: i8): u8 {
+  // Simply need to get the top 4 bits of register 2
+  let startingVolume: u8 = getRegister2OfChannel(channelNumber);
+  startingVolume = (startingVolume >> 4);
+  return (startingVolume & 0x0F);
+}
+
 export function isChannelDacEnabled(channelNumber: i8): boolean {
   // DAC power is controlled by the upper 5 bits of NRx2 (top bit of NR30 for wave channel).
   // If these bits are not all clear, the DAC is on, otherwise it's off and outputs 0 volts.

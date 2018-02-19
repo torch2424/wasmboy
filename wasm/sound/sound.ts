@@ -5,6 +5,8 @@
 // TODO: Memory management for Sound registers
 
 import {
+  updateSquareChannel,
+  updateSquareChannelSweep,
   updateSquareChannelsLengths,
   updateSquareChannelsEnvelopes
 } from './square';
@@ -68,7 +70,7 @@ export class Sound {
   static memoryLocationNR52: u16 = 0xFF26;
 
   // $FF30 -- $FF3F is the load register space for the 4-bit samples for channel 3
-  static memoryLocationChannel3LoadRegisterStart: 0xFF30;
+  static memoryLocationChannel3LoadRegisterStart: u16 = 0xFF30;
 
   // Need to count how often we need to increment our frame sequencer
   // Which you can read about below
@@ -97,12 +99,14 @@ export function updateSound(numberOfCycles: u8): void {
       updateSquareChannelsLengths();
     } /* Do Nothing on one */ else if(Sound.frameSequencer === 2) {
       // Update Sweep and Length on Channels
+      updateSquareChannelSweep();
       updateSquareChannelsLengths();
     } /* Do Nothing on three */ else if(Sound.frameSequencer === 4) {
       // Update Length on Channels
       updateSquareChannelsLengths();
     } /* Do Nothing on three */ else if(Sound.frameSequencer === 6) {
       // Update Sweep and Length on Channels
+      updateSquareChannelSweep();
       updateSquareChannelsLengths();
     } else if(Sound.frameSequencer === 7) {
       // Update Envelope on channels
@@ -117,6 +121,7 @@ export function updateSound(numberOfCycles: u8): void {
   }
 
   // Update all of our channels
+  let channel1OutputVolume: u8 = updateSquareChannel(1);
 
   // Do Some downsampling magic
 }

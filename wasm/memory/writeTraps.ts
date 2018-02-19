@@ -5,6 +5,10 @@ import {
   Graphics
 } from '../graphics/graphics';
 import {
+  Sound,
+  triggerSquareChannel
+} from '../Sound/index';
+import {
   handleBanking
 } from './banking';
 import {
@@ -17,6 +21,7 @@ import {
   sixteenBitLoadFromGBMemory
 } from './load';
 import {
+  checkBitOnByte,
   consoleLog,
   consoleLogTwo
 } from '../helpers/index';
@@ -69,6 +74,26 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
   // Trap our divider register from our timers
   if(offset === 0xFF04) {
     eightBitStoreIntoGBMemorySkipTraps(offset, 0);
+    return false;
+  }
+
+  // Check our NRx4 registers to trap our trigger bits
+  if(offset === Sound.memoryLocationNR14 && checkBitOnByte(7, <u8>value)) {
+    // Write the value skipping traps, and then trigger
+    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+    triggerSquareChannel(1);
+    return false;
+  } else if(offset === Sound.memoryLocationNR24 && checkBitOnByte(7, <u8>value)) {
+    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+    triggerSquareChannel(2);
+    return false;
+  } else if(offset === Sound.memoryLocationNR34 && checkBitOnByte(7, <u8>value)) {
+    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+    // TODO: Trigger the wave channel
+    return false;
+  } else if(offset === Sound.memoryLocationNR44 && checkBitOnByte(7, <u8>value)) {
+    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+    // TODO: Trigger the noise channel
     return false;
   }
 
