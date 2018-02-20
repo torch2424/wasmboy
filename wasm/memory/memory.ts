@@ -2,8 +2,6 @@
 // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
 
 import {
-  consoleLog,
-  consoleLogTwo,
   checkBitOnByte
 } from '../helpers/index';
 import {

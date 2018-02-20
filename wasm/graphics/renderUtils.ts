@@ -9,8 +9,6 @@ import {
   eightBitLoadFromGBMemorySkipTraps
 } from '../memory/load';
 import {
-  consoleLog,
-  consoleLogTwo,
   checkBitOnByte,
   setBitOnByte,
   resetBitOnByte

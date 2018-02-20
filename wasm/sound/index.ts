@@ -1,4 +1,5 @@
 export {
+  initializeSound,
   updateSound,
   Sound
 } from './sound';

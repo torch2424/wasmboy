@@ -2,52 +2,6 @@ import {
   getCarryFlag
 } from '../cpu/flags';
 
-class Log {
-  static logValueOne: i32 = 0;
-  static logIdOne: i32 = 0;
-  static logValueTwo: i32 = 0;
-  static logIdTwo: i32 = 0;
-
-}
-
-// Set the current log
-export function consoleLog(valueToSet: i32, logId: i32): void {
-  Log.logValueOne = valueToSet;
-  Log.logIdOne = logId;
-}
-
-export function consoleLogLargest(valueToSet: i32, logId: i32): void {
-  if(valueToSet > Log.logValueOne) {
-    consoleLog(valueToSet, logId);
-  }
-}
-
-export function consoleLogTwo(valueToSet: i32, logId: i32): void {
-  Log.logValueTwo = valueToSet;
-  Log.logIdTwo = logId;
-}
-
-// General console.log function, can poll from js
-export function getCurrentLogValue(logValueNumber: i32): i32 {
-  if(logValueNumber === 1) {
-    return Log.logValueOne;
-  } else if (logValueNumber === 2) {
-    return Log.logValueTwo;
-  } else {
-    return 0;
-  }
-}
-
-export function getCurrentLogId(logIdNumber: i32): i32 {
-  if(logIdNumber === 1) {
-    return Log.logIdOne;
-  } else if (logIdNumber === 2) {
-    return Log.logIdTwo;
-  } else {
-    return 0;
-  }
-}
-
 // Grouped registers
 // possible overload these later to performace actions
 // AF, BC, DE, HL

@@ -27,8 +27,6 @@ import {
   requestVBlankInterrupt
 } from '../interrupts/index';
 import {
-  consoleLog,
-  consoleLogTwo,
   checkBitOnByte,
   setBitOnByte,
   resetBitOnByte

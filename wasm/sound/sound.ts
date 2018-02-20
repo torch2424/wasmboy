@@ -19,12 +19,9 @@ import {
 } from '../cpu/index';
 import {
   eightBitLoadFromGBMemory,
+  eightBitStoreIntoGBMemory,
   setLeftAndRightOutputForAudioQueue
 } from '../memory/index';
-import {
-  consoleLog,
-  consoleLogTwo
-} from '../helpers/index';
 
 export class Sound {
   //Channel 1
@@ -107,6 +104,42 @@ export class Sound {
   static audioQueueIndex: u8 = 0x00;
 }
 
+// Initialize sound registers
+export function initializeSound(): void {
+  // Channel 1
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR10, 0x80);
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR11, 0xBF);
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR12, 0xF3);
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR13, 0xFF);
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR14, 0xBF);
+
+  // Channel 2
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR21 - 1, 0xFF);
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR21, 0x3F);
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR22, 0x00);
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR23, 0xF3);
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR24, 0xBF);
+
+  // Channel 3
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR30, 0x7F);
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR31, 0xFF);
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR32, 0x9F);
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR33, 0xBF);
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR34, 0xFF);
+
+  // Channel 4
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR41 - 1, 0xFF);
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR41, 0xFF);
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR42, 0x00);
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR43, 0x00);
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR44, 0xBF);
+
+  // Other Sound Registers
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR50, 0x77);
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR51, 0xF3);
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR52, 0xF1);
+}
+
 // Function for updating sound
 export function updateSound(numberOfCycles: u8): void {
   // APU runs at 4194304 / 512
@@ -120,21 +153,21 @@ export function updateSound(numberOfCycles: u8): void {
     // https://gist.github.com/drhelius/3652407
     if (Sound.frameSequencer === 0) {
       // Update Length on Channels
-      updateSquareChannelsLengths();
+      //updateSquareChannelsLengths();
     } /* Do Nothing on one */ else if(Sound.frameSequencer === 2) {
       // Update Sweep and Length on Channels
-      updateSquareChannelSweep();
-      updateSquareChannelsLengths();
+      //updateSquareChannelSweep();
+      //updateSquareChannelsLengths();
     } /* Do Nothing on three */ else if(Sound.frameSequencer === 4) {
       // Update Length on Channels
-      updateSquareChannelsLengths();
+      //updateSquareChannelsLengths();
     } /* Do Nothing on three */ else if(Sound.frameSequencer === 6) {
       // Update Sweep and Length on Channels
-      updateSquareChannelSweep();
-      updateSquareChannelsLengths();
+      //updateSquareChannelSweep();
+      //updateSquareChannelsLengths();
     } else if(Sound.frameSequencer === 7) {
       // Update Envelope on channels
-      updateSquareChannelsEnvelopes();
+      //updateSquareChannelsEnvelopes();
     }
 
     // Update our frame sequencer

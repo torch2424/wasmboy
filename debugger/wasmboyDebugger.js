@@ -74,11 +74,6 @@ export class WasmBoyDebugger extends Component {
 
   updateDebugInfo() {
 
-    // Log our wasmLogs
-    console.log(`Wasm Log One: 0x${WasmBoy.wasmInstance.exports.getCurrentLogValue(1).toString(16)} ${WasmBoy.wasmInstance.exports.getCurrentLogId(1)}`);
-
-    console.log(`Wasm Log Two: 0x${WasmBoy.wasmInstance.exports.getCurrentLogValue(2).toString(16)} ${WasmBoy.wasmInstance.exports.getCurrentLogId(2)}`);
-
     // Log our memory
     console.log(`WasmBoy Memory`, WasmBoy.wasmByteMemory);
 

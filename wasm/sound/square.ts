@@ -18,15 +18,13 @@ import {
 } from '../memory/index';
 import {
   checkBitOnByte,
-  consoleLog,
-  consoleLogTwo,
   log
 } from '../helpers/index';
 
-class Square {
+export class Square {
 
   // Channel Enabled flags
-  static channel1IsEnabled: boolean = false;
+  static channel1IsEnabled: boolean = true;
   static channel2IsEnabled: boolean = false;
 
   // Channel Frequency timers
@@ -57,8 +55,6 @@ class Square {
   // Final Output Volume
   static channel1OutputVolume: u8 = 0;
   static channel2OutputVolume: u8 = 0;
-
-  static triggered: u32 = 0;
 }
 
 export function updateSquareChannel(channelNumber: i8): i8 {
@@ -88,9 +84,9 @@ export function updateSquareChannel(channelNumber: i8): i8 {
     // Finally to set our output volume, the channel must be enabled,
     // Our channel DAC must be enabled, and we must be in an active state
     // Of our duty cycle
-
-    // TODO: Channel Enabled
-    if(isChannelDacEnabled(1)) {
+    if(Square.channel1IsEnabled &&
+    isChannelDacEnabled(1)) {
+        //log("Hello!");
         Square.channel1OutputVolume = Square.channel1CurrentVolume;
     }
 
@@ -98,11 +94,6 @@ export function updateSquareChannel(channelNumber: i8): i8 {
     let squareSample: i8 = 1;
     if (!isDutyCycleClockWithinDutyWaveFormForChannel(1, Square.channel1DutyCycleClock)) {
       squareSample = squareSample * -1;
-    }
-
-    if(Square.channel1OutputVolume !== 0) {
-      consoleLog(0x01, 88);
-      consoleLogTwo(squareSample, 88);
     }
 
     return squareSample * <i8>Square.channel1OutputVolume;
@@ -123,8 +114,8 @@ export function updateSquareChannel(channelNumber: i8): i8 {
     // Set to 7 for zero sound
     Square.channel2OutputVolume = 0;
 
-    // TODO: Channel enabled
-    if(isChannelDacEnabled(2) &&
+    if(Square.channel2IsEnabled &&
+      isChannelDacEnabled(2) &&
       isDutyCycleClockWithinDutyWaveFormForChannel(2, Square.channel2DutyCycleClock)) {
         Square.channel2OutputVolume = Square.channel2CurrentVolume;
     }
@@ -141,7 +132,6 @@ export function triggerSquareChannel(channelNumber: i8): void {
 
   // Channel 1
   if(channelNumber === 1) {
-
     Square.channel1IsEnabled = true;
     if(getChannelLength(1) === 0) {
       Square.channel1LengthCounter = 64;
@@ -173,9 +163,9 @@ export function triggerSquareChannel(channelNumber: i8): void {
     }
 
     // Finally if DAC is off, channel is still disabled
-    if(!isChannelDacEnabled(1)) {
-      Square.channel1IsEnabled = false;
-    }
+    // if(!isChannelDacEnabled(1)) {
+    //   Square.channel1IsEnabled = false;
+    // }
   } else {
     // Channel 2
 
@@ -254,7 +244,7 @@ function isSweepEnabled(): boolean {
   // Get bits 0-2
   let sweepShift: u8 = sweepRegister & 0x07;
 
-  if ((sweepPeriod !== 0 || sweepShift !== 0)) {
+  if ((sweepPeriod !== 0 || sweepShift !== 0) || getChannelFrequency(1) > 0x7FF) {
     return true;
   } else {
     return false;

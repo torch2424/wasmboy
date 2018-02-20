@@ -30,8 +30,7 @@ import {
   cpARegister
 } from './instructions';
 import {
-  consoleLog,
-  consoleLogTwo,
+  log,
   rotateByteLeft,
   rotateByteLeftThroughCarry,
   rotateByteRight,
@@ -143,7 +142,7 @@ export function emulationStep(): i8 {
   updateSound(<u8>numberOfCycles);
 
   if(numberOfCycles <= 0) {
-    consoleLog(opcode, 1);
+    log("Opcade at crash:", 1, opcode);
   }
 
   return numberOfCycles;

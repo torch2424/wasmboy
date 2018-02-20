@@ -84,14 +84,14 @@ export function isChannelDacEnabled(channelNumber: i8): boolean {
   if(channelNumber !== 3) {
     let register2 = getRegister2OfChannel(channelNumber);
     // Clear bottom 3 bits
-    let dacStatus = register2 & 0xF8;
+    let dacStatus = (register2 & 0xF8);
     if (dacStatus > 0) {
       return true;
     } else {
       return false;
     }
   } else {
-    let register3 = getRegister3OfChannel(channelNumber);
+    let register3 = eightBitLoadFromGBMemory(Sound.memoryLocationNR30);
     return checkBitOnByte(7, register3);
   }
 }

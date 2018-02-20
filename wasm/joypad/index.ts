@@ -11,8 +11,6 @@ import {
   requestJoypadInterrupt
 } from '../interrupts/index';
 import {
-  consoleLog,
-  consoleLogTwo,
   checkBitOnByte,
   setBitOnByte,
   resetBitOnByte

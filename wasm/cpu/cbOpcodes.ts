@@ -1,6 +1,6 @@
 // Imports
 import {
-  Cpu 
+  Cpu
 } from './index';
 import {
   rotateRegisterLeft,
@@ -15,7 +15,6 @@ import {
   setBitOnRegister
 } from './instructions';
 import {
-  consoleLog,
   concatenateBytes
 } from '../helpers/index';
 import {

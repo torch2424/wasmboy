@@ -17,11 +17,7 @@ export {
 } from './interrupts/index';
 export {
   setJoypadState
-} from './joypad/index'; 
-export {
-  getCurrentLogValue,
-  getCurrentLogId
-} from './helpers/index';
+} from './joypad/index';
 
 export function getRegisterA(): u8 {
   return Cpu.registerA;

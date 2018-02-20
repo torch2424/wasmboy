@@ -17,8 +17,6 @@ import {
   getPixelOnFrame
 } from '../memory/memory';
 import {
-  consoleLog,
-  consoleLogTwo,
   checkBitOnByte,
   setBitOnByte,
   resetBitOnByte

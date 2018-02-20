@@ -22,7 +22,13 @@ import {
   initializeCartridge
 } from '../memory/index';
 
-import { consoleLog, log } from '../helpers/index';
+import {
+  initializeSound
+} from '../sound/index'
+
+import {
+  log
+} from '../helpers/index';
 
 // Everything Static as class instances just aren't quite there yet
 // https://github.com/AssemblyScript/assemblyscript/blob/master/tests/compiler/showcase.ts
@@ -101,6 +107,9 @@ export function initialize(includeBootRom: u8): void {
 
   // Call our memory to initialize our cartridge type
   initializeCartridge();
+
+  // Initialize our sound registers
+  initializeSound();
 }
 
 // Private function for our relative jumps
