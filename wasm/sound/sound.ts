@@ -104,7 +104,7 @@ export class Sound {
   static frameSequencer: u8 = 0x00;
 
   // Our current sample umber we are passing back to the wasmboy memory map
-  // Needs to be u16 as we weill be passing ~800 samples a frame
+  // Going to pass back 4096 samples and then reset
   static audioQueueIndex: u16 = 0x0000;
 }
 
@@ -245,13 +245,16 @@ export function updateSound(numberOfCycles: u8): void {
     // TODO: Right Channel
     // Add 7 to make the sample unsigned
     setLeftAndRightOutputForAudioQueue(<u8>leftChannelSample + 7, 7, Sound.audioQueueIndex);
-    // TODO: Do the 4096 Sample Strategy, don't try to syn with frames :p
     Sound.audioQueueIndex += 1;
-
-    // We want out audio queue to be as large as a frame, therefore reset the audioQueueIndex when Cpu.current cycles exceeds the max cycles
-    hexLog(2, Cpu.currentCycles, Sound.audioQueueIndex);
-    if((Cpu.currentCycles + numberOfCycles) >= Cpu.MAX_CYCLES_PER_FRAME) {
-      Sound.audioQueueIndex = 0;
-    }
   }
+}
+
+// Funciton to get the current Audio Queue index
+export function getAudioQueueIndex(): u16 {
+  return Sound.audioQueueIndex;
+}
+
+// Function to reset the audio queue
+export function resetAudioQueue(): void {
+  Sound.audioQueueIndex = 0;
 }

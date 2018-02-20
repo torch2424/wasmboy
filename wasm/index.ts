@@ -18,6 +18,10 @@ export {
 export {
   setJoypadState
 } from './joypad/index';
+export {
+  getAudioQueueIndex,
+  resetAudioQueue
+} from './sound/index'
 
 export function getRegisterA(): u8 {
   return Cpu.registerA;
