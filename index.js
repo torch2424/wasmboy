@@ -31,6 +31,7 @@ export default class App extends Component {
             height="480">
           </canvas>
         </div>
+				<div id="audio-wave"></div>
 				<WasmBoySystemControls></WasmBoySystemControls>
 				<WasmBoyDebugger></WasmBoyDebugger>
 			</div>

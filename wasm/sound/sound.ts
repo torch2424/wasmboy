@@ -22,6 +22,9 @@ import {
   eightBitStoreIntoGBMemory,
   setLeftAndRightOutputForAudioQueue
 } from '../memory/index';
+import {
+  hexLog
+} from '../helpers/index';
 
 export class Sound {
   //Channel 1
@@ -91,7 +94,7 @@ export class Sound {
 
   // Also need to downsample our audio to average audio qualty
   // https://www.reddit.com/r/EmuDev/comments/5gkwi5/gb_apu_sound_emulation/
-  // Want to do 48000hz, so CpuRate / Sound Rate ~ 87 cycles
+  // Want to do 48000hz, so CpuRate / Sound Rate, 4194304 / 48000 ~ 87 cycles
   static downSampleCycleCounter: u8 = 0x00;
   static maxDownSampleCycles: u8 = 87;
 
@@ -101,7 +104,8 @@ export class Sound {
   static frameSequencer: u8 = 0x00;
 
   // Our current sample umber we are passing back to the wasmboy memory map
-  static audioQueueIndex: u8 = 0x00;
+  // Needs to be u16 as we weill be passing ~800 samples a frame
+  static audioQueueIndex: u16 = 0x0000;
 }
 
 // Initialize sound registers
@@ -150,6 +154,7 @@ export function updateSound(numberOfCycles: u8): void {
     Sound.frameSequenceCycleCounter = 0;
 
     // Check our frame sequencer
+    // TODO: uncomment
     // https://gist.github.com/drhelius/3652407
     if (Sound.frameSequencer === 0) {
       // Update Length on Channels
@@ -178,8 +183,6 @@ export function updateSound(numberOfCycles: u8): void {
   }
 
   // Update all of our channels
-  // Volume is a value between 0 (super negative and loud af) and 15 (super positive and loud af)
-  // Setting to an i8, that way  we can do some fun stuff like sub tract 7 to get the actual volume modifier
   let channel1Sample: i8 = updateSquareChannel(1);
   let channel2Sample: i8 = updateSquareChannel(2);
 
@@ -239,11 +242,14 @@ export function updateSound(numberOfCycles: u8): void {
     //TODO
 
     // Set our volumes in memory
-    // TODO: Right CHannel
+    // TODO: Right Channel
+    // Add 7 to make the sample unsigned
     setLeftAndRightOutputForAudioQueue(<u8>leftChannelSample + 7, 7, Sound.audioQueueIndex);
+    // TODO: Do the 4096 Sample Strategy, don't try to syn with frames :p
     Sound.audioQueueIndex += 1;
 
     // We want out audio queue to be as large as a frame, therefore reset the audioQueueIndex when Cpu.current cycles exceeds the max cycles
+    hexLog(2, Cpu.currentCycles, Sound.audioQueueIndex);
     if((Cpu.currentCycles + numberOfCycles) >= Cpu.MAX_CYCLES_PER_FRAME) {
       Sound.audioQueueIndex = 0;
     }

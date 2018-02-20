@@ -21,7 +21,8 @@
     "preact": "^8.2.1",
     "preact-compat": "^3.17.0",
     "promise-polyfill": "7.0.0",
-    "unfetch": "^3.0.0"
+    "unfetch": "^3.0.0",
+    "wavesurfer.js": "^2.0.0-beta01"
   },
   "devDependencies": {
     "assemblyscript": "github:AssemblyScript/assemblyscript",

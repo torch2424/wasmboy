@@ -2,7 +2,8 @@
 // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
 
 import {
-  checkBitOnByte
+  checkBitOnByte,
+  hexLog
 } from '../helpers/index';
 import {
   eightBitLoadFromGBMemory
@@ -142,9 +143,9 @@ export function storeFrameToBeRendered(): void {
 }
 
 // Function to set our left and right channels at the correct queue index
-export function setLeftAndRightOutputForAudioQueue(leftVolume: u8, rightVolume: u8, audioQueueIndex: u8): void {
+export function setLeftAndRightOutputForAudioQueue(leftVolume: u8, rightVolume: u8, audioQueueIndex: u16): void {
   // Get our stereo index
-  let audioQueueOffset = Memory.soundOutputLocation + <u16>(audioQueueIndex * 2);
+  let audioQueueOffset = Memory.soundOutputLocation + (audioQueueIndex * 2);
 
   // Store our volumes
   // +1 that way we don't have empty data to ensure that the value is set
