@@ -70,7 +70,7 @@ export class Channel1 {
     eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx4, 0xBF);
   }
 
-  static getSample(numberOfCycles: u8): i8 {
+  static getSample(numberOfCycles: u8): u32 {
 
     // Decrement our channel timer
     Channel1.frequencyTimer -= <i32>numberOfCycles;
@@ -100,12 +100,17 @@ export class Channel1 {
     }
 
     // Get the current sampleValue
-    let sample: i8 = 1;
+    let sample: i32 = 1;
     if (!isDutyCycleClockPositiveOrNegativeForWaveform(1, Channel1.waveFormPositionOnDuty)) {
       sample = sample * -1;
     }
 
-    return sample * <i8>outputVolume;
+
+    sample = sample * outputVolume;
+
+    // Square Waves Can range from -15 - 15. Therefore simply add 15
+    sample = sample + 15;
+    return <u32>sample;
   }
 
   //http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Trigger_Event

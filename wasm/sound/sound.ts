@@ -127,8 +127,9 @@ export function updateSound(numberOfCycles: u8): void {
   }
 
   // Update all of our channels
-  let channel1Sample: i8 = Channel1.getSample(numberOfCycles);
-  let channel2Sample: i8 = Channel2.getSample(numberOfCycles);
+  // All samples will be signed floats (-1.0 to 1.0)
+  let channel1Sample: u32 = Channel1.getSample(numberOfCycles);
+  let channel2Sample: u32 = Channel2.getSample(numberOfCycles);
 
   // Do Some downsampling magic
   Sound.downSampleCycleCounter += numberOfCycles;
@@ -158,8 +159,8 @@ export function updateSound(numberOfCycles: u8): void {
     rightMixerVolume = rightMixerVolume & 0x07;
 
     // Get our channel volume for left/right
-    let leftChannelSample: i8 = 0;
-    let rightChannelSample: i8 = 0;
+    let leftChannelSample: u32 = 0;
+    let rightChannelSample: u32 = 0;
 
     // Find the channel for the left volume
     // TODO: Other Channels
@@ -167,8 +168,7 @@ export function updateSound(numberOfCycles: u8): void {
       leftChannelSample += channel1Sample;
     }
     if (isChannelEnabledOnLeftOutput(Channel2.channelNumber)) {
-      hexLog(2, 77, Channel2.getSample(numberOfCycles));
-      //leftChannelSample += channel2Sample;
+      leftChannelSample += channel2Sample;
     }
 
 
@@ -178,18 +178,20 @@ export function updateSound(numberOfCycles: u8): void {
       rightChannelSample += channel1Sample;
     }
     if (isChannelEnabledOnRightOutput(Channel2.channelNumber)) {
-      //rightChannelSample += channel2Sample;
+      rightChannelSample += channel2Sample;
     }
-
-    // TODO: Clip our volumes to -7 and 7, or something like that
 
     // Finally multiple our volumes by the mixer volume
     //TODO
 
+    // Convert our samples from unsigned 32 to unsigned byte
+    // Reason being, We want to be able to pass in wasm memory as usigned byte. Javascript will handle the conversion back
+    let leftChannelSampleUnsignedByte: u8 = getSampleAsUnsignedByte(leftChannelSample);
+    let rightChannelSampleUnsignedByte: u8 = getSampleAsUnsignedByte(rightChannelSample);
+
     // Set our volumes in memory
-    // TODO: Right Channel
-    // Add 7 to make the sample unsigned
-    setLeftAndRightOutputForAudioQueue(<u8>leftChannelSample + 7, <u8>rightChannelSample + 7, Sound.audioQueueIndex);
+    // +1 so it can not be zero
+    setLeftAndRightOutputForAudioQueue(leftChannelSampleUnsignedByte + 1, rightChannelSampleUnsignedByte + 1, Sound.audioQueueIndex);
     Sound.audioQueueIndex += 1;
   }
 }
@@ -202,4 +204,11 @@ export function getAudioQueueIndex(): u32 {
 // Function to reset the audio queue
 export function resetAudioQueue(): void {
   Sound.audioQueueIndex = 0;
+}
+
+function getSampleAsUnsignedByte(sample: u32): u8 {
+  // TODO: Add we add more samples, figure this out, need to do things like divide by the maximum available and stuff
+  // With Two Channels and no global volume. Max is 60, goal is 254. 60 * 4 should give approximate answer
+  let convertedSample: u8 = <u8>sample * 4;
+  return convertedSample;
 }
