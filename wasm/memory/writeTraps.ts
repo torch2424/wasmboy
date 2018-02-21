@@ -91,7 +91,7 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
     return false;
   } else if(offset === Channel2.memoryLocationNRx4 && checkBitOnByte(7, <u8>value)) {
     eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
-    // TODO: Trigger Channel 2
+    Channel2.trigger();
     return false;
   } else if(offset === Channel3.memoryLocationNRx4 && checkBitOnByte(7, <u8>value)) {
     eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);

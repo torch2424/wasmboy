@@ -4,8 +4,32 @@
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
 
 import {
+  eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemory
 } from '../memory/index';
+import {
+  getChannelStartingVolume,
+  isChannelDacEnabled
+} from './registers';
+import {
+  getChannelFrequency,
+  setChannelFrequency
+} from './frequency';
+import {
+  getChannelLength,
+  isChannelLengthEnabled
+} from './length';
+import {
+  getChannelEnvelopePeriod,
+  getChannelEnvelopeAddMode
+} from './envelope';
+import {
+  isDutyCycleClockPositiveOrNegativeForWaveform
+} from './duty';
+import {
+  checkBitOnByte,
+  hexLog
+} from '../helpers/index';
 
 export class Channel2 {
 
@@ -38,4 +62,93 @@ export class Channel2 {
     eightBitStoreIntoGBMemory(Channel2.memoryLocationNRx3, 0xF3);
     eightBitStoreIntoGBMemory(Channel2.memoryLocationNRx4, 0xBF);
   }
+
+  static getSample(numberOfCycles: u8): i8 {
+
+    // Decrement our channel timer
+    Channel2.frequencyTimer -= <i32>numberOfCycles;
+    if(Channel2.frequencyTimer <= 0) {
+      // Reset our timer
+      // A square channel's frequency timer period is set to (2048-frequency)*4.
+      // Four duty cycles are available, each waveform taking 8 frequency timer clocks to cycle through:
+      Channel2.frequencyTimer = (2048 - getChannelFrequency(Channel2.channelNumber)) * 4;
+      // Also increment our duty cycle
+      // What is duty? https://en.wikipedia.org/wiki/Duty_cycle
+      // Duty cycle for square wave: http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
+      Channel2.waveFormPositionOnDuty += 1;
+      if (Channel2.waveFormPositionOnDuty >= 8) {
+        Channel2.waveFormPositionOnDuty = 0;
+      }
+    }
+
+    // Get our ourput volume, set to zero for silence
+    let outputVolume: u8 = 0;
+
+    // Finally to set our output volume, the channel must be enabled,
+    // Our channel DAC must be enabled, and we must be in an active state
+    // Of our duty cycle
+    if(Channel2.isEnabled &&
+    isChannelDacEnabled(Channel2.channelNumber)) {
+      outputVolume = <u8>Channel2.volume;
+    }
+
+    // Get the current sampleValue
+    let sample: i8 = 1;
+    if (!isDutyCycleClockPositiveOrNegativeForWaveform(1, Channel2.waveFormPositionOnDuty)) {
+      sample = sample * -1;
+    }
+
+    return sample * <i8>outputVolume;
+  }
+
+  //http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Trigger_Event
+  static trigger(): void {
+    Channel2.isEnabled = true;
+    if(getChannelLength(Channel2.channelNumber) === 0) {
+      Channel2.lengthCounter = 64;
+    }
+
+    // Reset our timer
+    // A square channel's frequency timer period is set to (2048-frequency)*4.
+    // Four duty cycles are available, each waveform taking 8 frequency timer clocks to cycle through:
+    Channel2.frequencyTimer = (2048 - getChannelFrequency(Channel2.channelNumber)) * 4;
+
+    Channel2.envelopeCounter = getChannelEnvelopePeriod(Channel2.channelNumber);
+
+    Channel2.volume = getChannelStartingVolume(Channel2.channelNumber);
+
+    // Finally if DAC is off, channel is still disabled
+    if(!isChannelDacEnabled(Channel2.channelNumber)) {
+      Channel2.isEnabled = false;
+    }
+  }
+
+  static updateLength(): void {
+
+    if(Channel2.lengthCounter > 0 && isChannelLengthEnabled(Channel2.channelNumber)) {
+      Channel2.lengthCounter -= 1;
+    }
+
+    if(Channel2.lengthCounter === 0) {
+      Channel2.isEnabled = false;
+    }
+  }
+
+  static updateEnvelope(): void {
+
+    // Obscure behavior
+    // TODO: The volume envelope and sweep timers treat a period of 0 as 8.
+
+    Channel2.envelopeCounter -= 1;
+    if (Channel2.envelopeCounter <= 0) {
+      Channel2.envelopeCounter = getChannelEnvelopePeriod(Channel2.channelNumber);
+
+      if(getChannelEnvelopeAddMode(Channel2.channelNumber) && Channel2.volume < 15) {
+        Channel2.volume += 1;
+      } else if (!getChannelEnvelopeAddMode(Channel2.channelNumber) && Channel2.volume > 0) {
+        Channel2.volume -= 1;
+      }
+    }
+  }
+  // Done!
 }

@@ -96,20 +96,27 @@ export function updateSound(numberOfCycles: u8): void {
     if (Sound.frameSequencer === 0) {
       // Update Length on Channels
       Channel1.updateLength();
+      Channel2.updateLength();
     } /* Do Nothing on one */ else if(Sound.frameSequencer === 2) {
       // Update Sweep and Length on Channels
       Channel1.updateLength();
+      Channel2.updateLength();
+
       Channel1.updateSweep();
     } /* Do Nothing on three */ else if(Sound.frameSequencer === 4) {
       // Update Length on Channels
       Channel1.updateLength();
+      Channel2.updateLength();
     } /* Do Nothing on three */ else if(Sound.frameSequencer === 6) {
       // Update Sweep and Length on Channels
       Channel1.updateLength();
+      Channel2.updateLength();
+
       Channel1.updateSweep();
     } else if(Sound.frameSequencer === 7) {
       // Update Envelope on channels
       Channel1.updateEnvelope();
+      Channel2.updateEnvelope();
     }
 
     // Update our frame sequencer
@@ -121,6 +128,7 @@ export function updateSound(numberOfCycles: u8): void {
 
   // Update all of our channels
   let channel1Sample: i8 = Channel1.getSample(numberOfCycles);
+  let channel2Sample: i8 = Channel2.getSample(numberOfCycles);
 
   // Do Some downsampling magic
   Sound.downSampleCycleCounter += numberOfCycles;
@@ -158,11 +166,19 @@ export function updateSound(numberOfCycles: u8): void {
     if (isChannelEnabledOnLeftOutput(Channel1.channelNumber)) {
       leftChannelSample += channel1Sample;
     }
+    if (isChannelEnabledOnLeftOutput(Channel2.channelNumber)) {
+      hexLog(2, 77, Channel2.getSample(numberOfCycles));
+      //leftChannelSample += channel2Sample;
+    }
+
 
     // Find the channel for the right volume
     // TODO: Other Channels
     if (isChannelEnabledOnRightOutput(Channel1.channelNumber)) {
       rightChannelSample += channel1Sample;
+    }
+    if (isChannelEnabledOnRightOutput(Channel2.channelNumber)) {
+      //rightChannelSample += channel2Sample;
     }
 
     // TODO: Clip our volumes to -7 and 7, or something like that
