@@ -143,7 +143,7 @@ export function storeFrameToBeRendered(): void {
 }
 
 // Function to set our left and right channels at the correct queue index
-export function setLeftAndRightOutputForAudioQueue(leftVolume: u8, rightVolume: u8, audioQueueIndex: u16): void {
+export function setLeftAndRightOutputForAudioQueue(leftVolume: u8, rightVolume: u8, audioQueueIndex: u32): void {
   // Get our stereo index
   let audioQueueOffset = Memory.soundOutputLocation + (audioQueueIndex * 2);
 

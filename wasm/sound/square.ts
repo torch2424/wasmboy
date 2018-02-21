@@ -28,8 +28,8 @@ export class Square {
   static channel2IsEnabled: boolean = false;
 
   // Channel Frequency timers
-  static channel1FrequencyTimer: u16 = 0x00;
-  static channel2FrequencyTimer: u16 = 0x00;
+  static channel1FrequencyTimer: i32 = 0x00;
+  static channel2FrequencyTimer: i32 = 0x00;
 
   // Sweep Counter
   static channel1SweepCounter: u16 = 0x00;
@@ -53,12 +53,12 @@ export class Square {
   static channel2CurrentVolume: u8 = 0;
 }
 
-export function updateSquareChannel(channelNumber: i8): i8 {
+export function updateSquareChannel(channelNumber: i8, numberOfCycles: u8): i8 {
 
   // Channel 1
   if(channelNumber === 1) {
     // Decrement our channel timer
-    Square.channel1FrequencyTimer -= 1;
+    Square.channel1FrequencyTimer -= <i32>numberOfCycles;
     if(Square.channel1FrequencyTimer <= 0) {
       // Reset our timer
       // A square channel's frequency timer period is set to (2048-frequency)*4.
@@ -68,7 +68,7 @@ export function updateSquareChannel(channelNumber: i8): i8 {
       // What is duty? https://en.wikipedia.org/wiki/Duty_cycle
       // Duty cycle for square wave: http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
       Square.channel1DutyCycleClock += 1;
-      if (Square.channel1DutyCycleClock > 8) {
+      if (Square.channel1DutyCycleClock >= 8) {
         Square.channel1DutyCycleClock = 0;
       }
     }
@@ -81,6 +81,7 @@ export function updateSquareChannel(channelNumber: i8): i8 {
     // Of our duty cycle
     if(Square.channel1IsEnabled &&
     isChannelDacEnabled(1)) {
+      // TODO: Get the actual volume
         outputVolume = 7;
     }
 
@@ -89,6 +90,8 @@ export function updateSquareChannel(channelNumber: i8): i8 {
     if (!isDutyCycleClockPositiveOrNegativeForWaveform(1, Square.channel1DutyCycleClock)) {
       squareSample = squareSample * -1;
     }
+
+    //hexLog(5, 77, squareSample, Square.channel1DutyCycleClock, numberOfCycles, Square.channel1FrequencyTimer);
 
     return squareSample * <i8>outputVolume;
 
@@ -311,14 +314,18 @@ function isDutyCycleClockPositiveOrNegativeForWaveform(channelNumber: i8, dutyCy
   let duty: u8 = getChannelDuty(channelNumber);
 
   // Get our Wave Form According to the Duty
-  // Default to a duty of 0
+  // Default to a duty of 1
   // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
+  // 0000 0001
   let waveform: u8 = 0x01;
   if (duty === 0x01) {
+    // 1000 0001
     waveform = 0x81;
   } else if (duty === 0x02) {
+    // 1000 0111
     waveform = 0x87;
   } else if (duty === 0x03) {
+    // 0111 1110
     waveform = 0x7E;
   }
 

@@ -105,7 +105,7 @@ export class Sound {
 
   // Our current sample umber we are passing back to the wasmboy memory map
   // Going to pass back 4096 samples and then reset
-  static audioQueueIndex: u16 = 0x0000;
+  static audioQueueIndex: u32 = 0x0000;
 }
 
 // Initialize sound registers
@@ -183,8 +183,8 @@ export function updateSound(numberOfCycles: u8): void {
   }
 
   // Update all of our channels
-  let channel1Sample: i8 = updateSquareChannel(1);
-  let channel2Sample: i8 = updateSquareChannel(2);
+  let channel1Sample: i8 = updateSquareChannel(1, numberOfCycles);
+  let channel2Sample: i8 = updateSquareChannel(2, numberOfCycles);
 
   // Do Some downsampling magic
   Sound.downSampleCycleCounter += numberOfCycles;
@@ -250,7 +250,7 @@ export function updateSound(numberOfCycles: u8): void {
 }
 
 // Funciton to get the current Audio Queue index
-export function getAudioQueueIndex(): u16 {
+export function getAudioQueueIndex(): u32 {
   return Sound.audioQueueIndex;
 }
 

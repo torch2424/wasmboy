@@ -142,7 +142,7 @@ export function emulationStep(): i8 {
   updateSound(<u8>numberOfCycles);
 
   if(numberOfCycles <= 0) {
-    log("Opcade at crash:", 1, opcode);
+    log("Opcode at crash: $0", 1, opcode);
   }
 
   return numberOfCycles;
