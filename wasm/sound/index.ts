@@ -7,5 +7,14 @@ export {
 } from './sound';
 
 export {
-  triggerSquareChannel
-} from './square';
+  Channel1
+} from './channel1';
+export {
+  Channel2
+} from './channel2';
+export {
+  Channel3
+} from './channel3';
+export {
+  Channel4
+} from './channel4';

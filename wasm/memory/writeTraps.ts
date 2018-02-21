@@ -5,9 +5,17 @@ import {
   Graphics
 } from '../graphics/graphics';
 import {
-  Sound,
-  triggerSquareChannel
-} from '../Sound/index';
+    Channel1
+} from '../sound/index';
+import {
+    Channel2
+} from '../sound/index';
+import {
+    Channel3
+} from '../sound/index';
+import {
+    Channel4
+} from '../sound/index';
 import {
   handleBanking
 } from './banking';
@@ -76,20 +84,20 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
   }
 
   // Check our NRx4 registers to trap our trigger bits
-  if(offset === Sound.memoryLocationNR14 && checkBitOnByte(7, <u8>value)) {
+  if(offset === Channel1.memoryLocationNRx4 && checkBitOnByte(7, <u8>value)) {
     // Write the value skipping traps, and then trigger
     eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
-    triggerSquareChannel(1);
+    Channel1.trigger();
     return false;
-  } else if(offset === Sound.memoryLocationNR24 && checkBitOnByte(7, <u8>value)) {
+  } else if(offset === Channel2.memoryLocationNRx4 && checkBitOnByte(7, <u8>value)) {
     eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
-    triggerSquareChannel(2);
+    // TODO: Trigger Channel 2
     return false;
-  } else if(offset === Sound.memoryLocationNR34 && checkBitOnByte(7, <u8>value)) {
+  } else if(offset === Channel3.memoryLocationNRx4 && checkBitOnByte(7, <u8>value)) {
     eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
     // TODO: Trigger the wave channel
     return false;
-  } else if(offset === Sound.memoryLocationNR44 && checkBitOnByte(7, <u8>value)) {
+  } else if(offset === Channel4.memoryLocationNRx4 && checkBitOnByte(7, <u8>value)) {
     eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
     // TODO: Trigger the noise channel
     return false;

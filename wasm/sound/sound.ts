@@ -2,18 +2,23 @@
 // https://www.youtube.com/watch?v=HyzD8pNlpwI
 // https://gist.github.com/drhelius/3652407
 
-// TODO: Memory management for Sound registers
 
 import {
-  updateSquareChannel,
-  updateSquareChannelSweep,
-  updateSquareChannelsLengths,
-  updateSquareChannelsEnvelopes
-} from './square';
+    Channel1
+} from './channel1';
+import {
+    Channel2
+} from './channel2';
+import {
+    Channel3
+} from './channel3';
+import {
+    Channel4
+} from './channel4';
 import {
   isChannelEnabledOnLeftOutput,
   isChannelEnabledOnRightOutput
-} from './register';
+} from './registers';
 import {
   Cpu
 } from '../cpu/index';
@@ -27,53 +32,6 @@ import {
 } from '../helpers/index';
 
 export class Sound {
-  //Channel 1
-  // Squarewave channel with volume envelope and frequency sweep functions.
-  // NR10 -> Sweep Register R/W
-  static memoryLocationNR10: u16 = 0xFF10;
-  // NR11 -> Sound length/Wave pattern duty (R/W)
-  static memoryLocationNR11: u16 = 0xFF11;
-  // NR12 -> Volume Envelope (R/W)
-  static memoryLocationNR12: u16 = 0xFF12;
-  // NR13 -> Frequency lo (W)
-  static memoryLocationNR13: u16 = 0xFF13;
-  // NR14 -> Frequency hi (R/W)
-  static memoryLocationNR14: u16 = 0xFF14;
-
-  // Channel 2
-  // Squarewave channel with volume envelope functions only.
-  // NR21 -> Sound length/Wave pattern duty (R/W)
-  static memoryLocationNR21: u16 = 0xFF16;
-  // NR22 -> Volume Envelope (R/W)
-  static memoryLocationNR22: u16 = 0xFF17;
-  // NR23 -> Frequency lo (W)
-  static memoryLocationNR23: u16 = 0xFF18;
-  // NR24 -> Frequency hi (R/W)
-  static memoryLocationNR24: u16 = 0xFF19;
-
-  // Channel 3
-  // Voluntary Wave channel with 32 4-bit programmable samples, played in sequence.
-  // NR30 -> Sound on/off (R/W)
-  static memoryLocationNR30: u16 = 0xFF1A;
-  // NR31 -> Sound length (R/W)
-  static memoryLocationNR31: u16 = 0xFF1B;
-  // NR32 -> Select ouput level (R/W)
-  static memoryLocationNR32: u16 = 0xFF1C;
-  // NR33 -> Frequency lower data (W)
-  static memoryLocationNR33: u16 = 0xFF1D;
-  // NR34 -> Frequency higher data (R/W)
-  static memoryLocationNR34: u16 = 0xFF1E;
-
-  // Channel 4
-  // 'white noise' channel with volume envelope functions.
-  // NR41 -> Sound length (R/W)
-  static memoryLocationNR41: u16 = 0xFF20;
-  // NR42 -> Volume Envelope (R/W)
-  static memoryLocationNR42: u16 = 0xFF21;
-  // NR43 -> Polynomial Counter (R/W)
-  static memoryLocationNR43: u16 = 0xFF22;
-  // NR43 -> Counter/consecutive; initial (R/W)
-  static memoryLocationNR44: u16 = 0xFF23;
 
   // Channel control / On-OFF / Volume (RW)
   static memoryLocationNR50: u16 = 0xFF24;
@@ -109,34 +67,14 @@ export class Sound {
 }
 
 // Initialize sound registers
+// From: https://emu-docs.org/Game%20Boy/gb_sound.txt
 export function initializeSound(): void {
-  // Channel 1
-  eightBitStoreIntoGBMemory(Sound.memoryLocationNR10, 0x80);
-  eightBitStoreIntoGBMemory(Sound.memoryLocationNR11, 0xBF);
-  eightBitStoreIntoGBMemory(Sound.memoryLocationNR12, 0xF3);
-  eightBitStoreIntoGBMemory(Sound.memoryLocationNR13, 0xFF);
-  eightBitStoreIntoGBMemory(Sound.memoryLocationNR14, 0xBF);
 
-  // Channel 2
-  eightBitStoreIntoGBMemory(Sound.memoryLocationNR21 - 1, 0xFF);
-  eightBitStoreIntoGBMemory(Sound.memoryLocationNR21, 0x3F);
-  eightBitStoreIntoGBMemory(Sound.memoryLocationNR22, 0x00);
-  eightBitStoreIntoGBMemory(Sound.memoryLocationNR23, 0xF3);
-  eightBitStoreIntoGBMemory(Sound.memoryLocationNR24, 0xBF);
-
-  // Channel 3
-  eightBitStoreIntoGBMemory(Sound.memoryLocationNR30, 0x7F);
-  eightBitStoreIntoGBMemory(Sound.memoryLocationNR31, 0xFF);
-  eightBitStoreIntoGBMemory(Sound.memoryLocationNR32, 0x9F);
-  eightBitStoreIntoGBMemory(Sound.memoryLocationNR33, 0xBF);
-  eightBitStoreIntoGBMemory(Sound.memoryLocationNR34, 0xFF);
-
-  // Channel 4
-  eightBitStoreIntoGBMemory(Sound.memoryLocationNR41 - 1, 0xFF);
-  eightBitStoreIntoGBMemory(Sound.memoryLocationNR41, 0xFF);
-  eightBitStoreIntoGBMemory(Sound.memoryLocationNR42, 0x00);
-  eightBitStoreIntoGBMemory(Sound.memoryLocationNR43, 0x00);
-  eightBitStoreIntoGBMemory(Sound.memoryLocationNR44, 0xBF);
+  // intiialize our channels
+  Channel1.initialize();
+  Channel2.initialize();
+  Channel3.initialize();
+  Channel4.initialize();
 
   // Other Sound Registers
   eightBitStoreIntoGBMemory(Sound.memoryLocationNR50, 0x77);
@@ -183,8 +121,7 @@ export function updateSound(numberOfCycles: u8): void {
   }
 
   // Update all of our channels
-  let channel1Sample: i8 = updateSquareChannel(1, numberOfCycles);
-  let channel2Sample: i8 = updateSquareChannel(2, numberOfCycles);
+  let channel1Sample: i8 = Channel1.getSample(numberOfCycles);
 
   // Do Some downsampling magic
   Sound.downSampleCycleCounter += numberOfCycles;
@@ -219,21 +156,14 @@ export function updateSound(numberOfCycles: u8): void {
 
     // Find the channel for the left volume
     // TODO: Other Channels
-    if (isChannelEnabledOnLeftOutput(1)) {
+    if (isChannelEnabledOnLeftOutput(Channel1.channelNumber)) {
       leftChannelSample += channel1Sample;
-    }
-    if(isChannelEnabledOnLeftOutput(2)) {
-      // TODO
-      //leftChannelVolume += channel2OutputVolumeModifier;
     }
 
     // Find the channel for the right volume
     // TODO: Other Channels
-    if (isChannelEnabledOnRightOutput(1)) {
+    if (isChannelEnabledOnRightOutput(Channel1.channelNumber)) {
       rightChannelSample += channel1Sample;
-    }
-    if(isChannelEnabledOnRightOutput(2)) {
-      rightChannelSample += channel2Sample;
     }
 
     // TODO: Clip our volumes to -7 and 7, or something like that
