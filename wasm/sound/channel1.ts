@@ -28,7 +28,8 @@ import {
   isDutyCycleClockPositiveOrNegativeForWaveform
 } from './duty';
 import {
-  checkBitOnByte
+  checkBitOnByte,
+  hexLog
 } from '../helpers/index';
 
 export class Channel1 {
@@ -95,8 +96,7 @@ export class Channel1 {
     // Of our duty cycle
     if(Channel1.isEnabled &&
     isChannelDacEnabled(Channel1.channelNumber)) {
-      // TODO: Get the actual volume
-        outputVolume = 7;
+      outputVolume = <u8>Channel1.volume;
     }
 
     // Get the current sampleValue

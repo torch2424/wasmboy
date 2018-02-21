@@ -2,7 +2,6 @@
 // https://www.youtube.com/watch?v=HyzD8pNlpwI
 // https://gist.github.com/drhelius/3652407
 
-
 import {
     Channel1
 } from './channel1';
@@ -47,8 +46,8 @@ export class Sound {
 
   // Need to count how often we need to increment our frame sequencer
   // Which you can read about below
-  static frameSequenceCycleCounter: u16 = 0x0000;
-  static maxFrameSequenceCycles: u16 = 8192;
+  static frameSequenceCycleCounter: i16 = 0x0000;
+  static maxFrameSequenceCycles: i16 = 8192;
 
   // Also need to downsample our audio to average audio qualty
   // https://www.reddit.com/r/EmuDev/comments/5gkwi5/gb_apu_sound_emulation/
@@ -87,7 +86,7 @@ export function updateSound(numberOfCycles: u8): void {
   // APU runs at 4194304 / 512
   // Or Cpu.clockSpeed / 512
   // Which means, we need to update once every 8192 cycles :)
-  Sound.frameSequenceCycleCounter += <u16>numberOfCycles;
+  Sound.frameSequenceCycleCounter += <i16>numberOfCycles;
   if(Sound.frameSequenceCycleCounter >= Sound.maxFrameSequenceCycles) {
     Sound.frameSequenceCycleCounter = 0;
 
@@ -96,21 +95,21 @@ export function updateSound(numberOfCycles: u8): void {
     // https://gist.github.com/drhelius/3652407
     if (Sound.frameSequencer === 0) {
       // Update Length on Channels
-      //updateSquareChannelsLengths();
+      Channel1.updateLength();
     } /* Do Nothing on one */ else if(Sound.frameSequencer === 2) {
       // Update Sweep and Length on Channels
-      //updateSquareChannelSweep();
-      //updateSquareChannelsLengths();
+      Channel1.updateLength();
+      Channel1.updateSweep();
     } /* Do Nothing on three */ else if(Sound.frameSequencer === 4) {
       // Update Length on Channels
-      //updateSquareChannelsLengths();
+      Channel1.updateLength();
     } /* Do Nothing on three */ else if(Sound.frameSequencer === 6) {
       // Update Sweep and Length on Channels
-      //updateSquareChannelSweep();
-      //updateSquareChannelsLengths();
+      Channel1.updateLength();
+      Channel1.updateSweep();
     } else if(Sound.frameSequencer === 7) {
       // Update Envelope on channels
-      //updateSquareChannelsEnvelopes();
+      Channel1.updateEnvelope();
     }
 
     // Update our frame sequencer
@@ -174,7 +173,7 @@ export function updateSound(numberOfCycles: u8): void {
     // Set our volumes in memory
     // TODO: Right Channel
     // Add 7 to make the sample unsigned
-    setLeftAndRightOutputForAudioQueue(<u8>leftChannelSample + 7, 7, Sound.audioQueueIndex);
+    setLeftAndRightOutputForAudioQueue(<u8>leftChannelSample + 7, <u8>rightChannelSample + 7, Sound.audioQueueIndex);
     Sound.audioQueueIndex += 1;
   }
 }
