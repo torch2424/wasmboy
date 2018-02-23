@@ -90,12 +90,15 @@ export function handledWriteToSoundRegister(offset: u16, value: u16): boolean {
 
   // Write 0 to the 7th bit of NR52, resets all sound registers, and stops them from receiving writes
   if(offset === Sound.memoryLocationNR52 && !checkBitOnByte(7, <u8>value)) {
-    // Write the value skipping traps, and then trigger
-    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+
     // Reset all registers except NR52
     for (let i: u16 = 0xFF10; i < 0xFF26; i++) {
       eightBitStoreIntoGBMemorySkipTraps(i, 0x00);
     }
+
+    // Write our final value to NR52
+    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+
     return true;
   }
 
