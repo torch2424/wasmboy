@@ -189,13 +189,13 @@ export function getRegister3OfChannel(channelNumber: i8): u8 {
 
 export function setRegister3OfChannel(channelNumber: i8, value: u8): void {
   if (channelNumber === 1) {
-    eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx3, value);
+    eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx3, value);
   } else if (channelNumber === 2) {
-    eightBitStoreIntoGBMemory(Channel2.memoryLocationNRx3, value);
+    eightBitStoreIntoGBMemorySkipTraps(Channel2.memoryLocationNRx3, value);
   } else if (channelNumber === 3) {
-    eightBitStoreIntoGBMemory(Channel3.memoryLocationNRx3, value);
+    eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx3, value);
   } else {
-    eightBitStoreIntoGBMemory(Channel4.memoryLocationNRx3, value);
+    eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx3, value);
   }
 }
 
@@ -215,12 +215,12 @@ export function getRegister4OfChannel(channelNumber: i8): u8 {
 
 export function setRegister4OfChannel(channelNumber: i8, value: u8): void {
   if (channelNumber === 1) {
-    eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx4, value);
+    eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx4, value);
   } else if (channelNumber === 2) {
-    eightBitStoreIntoGBMemory(Channel2.memoryLocationNRx4, value);
+    eightBitStoreIntoGBMemorySkipTraps(Channel2.memoryLocationNRx4, value);
   } else if (channelNumber === 3) {
-    eightBitStoreIntoGBMemory(Channel3.memoryLocationNRx4, value);
+    eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx4, value);
   } else {
-    eightBitStoreIntoGBMemory(Channel4.memoryLocationNRx4, value);
+    eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx4, value);
   }
 }

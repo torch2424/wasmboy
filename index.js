@@ -14,8 +14,6 @@ export default class App extends Component {
 			WasmBoy.loadGame('linksawakening.gb')
 	    .then(() => {
 	      console.log('Wasmboy Ready!');
-				// TODO: Remove this debug code
-				// WasmBoy.startGame();
 	    });
 		});
 	}
