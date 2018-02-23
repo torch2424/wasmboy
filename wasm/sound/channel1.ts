@@ -182,7 +182,6 @@ export class Channel1 {
 
     if(Channel1.lengthCounter > 0 && isChannelLengthEnabled(Channel1.channelNumber)) {
       Channel1.lengthCounter -= 1;
-      hexLog(2, 1, Channel1.lengthCounter)
     }
 
     if(Channel1.lengthCounter === 0) {
