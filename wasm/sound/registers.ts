@@ -18,12 +18,92 @@ import {
     Channel4
 } from './channel4';
 import {
+  setChannelLengthCounter
+} from '../sound/length';
+import {
   eightBitLoadFromGBMemory,
-  eightBitStoreIntoGBMemory
+  eightBitStoreIntoGBMemory,
+  eightBitStoreIntoGBMemorySkipTraps
 } from '../memory/index';
 import {
-  checkBitOnByte
+  checkBitOnByte,
+  hexLog
 } from '../helpers/index';
+
+// TODO: handledReadToSoundRegister
+// http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
+// binji: I have a bool per channel called status that basically keeps track of whether a channel is playing currently. I return that bool in NR52
+
+// Function to check and handle writes to sound registers
+export function handledWriteToSoundRegister(offset: u16, value: u16): boolean {
+
+  // Get our registerNR52
+  let registerNR52: u8 = eightBitLoadFromGBMemory(Sound.memoryLocationNR52);
+
+  if(offset !== Sound.memoryLocationNR52 && !checkBitOnByte(7, registerNR52)) {
+    // Block all writes to any sound register EXCEPT NR52!
+    // This is under the assumption that the check for
+    // offset >= 0xFF10 && offset <= 0xFF26
+    // is done in writeTraps.ts (which it is)
+    // NOTE: Except on DMG, length can still be written (whatever that means)
+    return true;
+  }
+
+  // Set length counter on channels
+  if(offset === Channel1.memoryLocationNRx1) {
+    // Write the value skipping traps, and then trigger
+    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+    setChannelLengthCounter(Channel1.channelNumber);
+    return true;
+  } else if(offset === Channel2.memoryLocationNRx1) {
+    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+
+    setChannelLengthCounter(Channel2.channelNumber);
+    return true;
+  } else if(offset === Channel3.memoryLocationNRx1) {
+    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+    setChannelLengthCounter(Channel3.channelNumber);
+    return true;
+  } else if(offset === Channel4.memoryLocationNRx1) {
+    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+    setChannelLengthCounter(Channel4.channelNumber);
+    return true;
+  }
+
+  // Check our NRx4 registers to trap our trigger bits
+  if(offset === Channel1.memoryLocationNRx4 && checkBitOnByte(7, <u8>value)) {
+    // Write the value skipping traps, and then trigger
+    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+    Channel1.trigger();
+    return true;
+  } else if(offset === Channel2.memoryLocationNRx4 && checkBitOnByte(7, <u8>value)) {
+    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+    Channel2.trigger();
+    return true;
+  } else if(offset === Channel3.memoryLocationNRx4 && checkBitOnByte(7, <u8>value)) {
+    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+    // TODO: Trigger the wave channel
+    return true;
+  } else if(offset === Channel4.memoryLocationNRx4 && checkBitOnByte(7, <u8>value)) {
+    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+    // TODO: Trigger the noise channel
+    return true;
+  }
+
+  // Write 0 to the 7th bit of NR52, resets all sound registers, and stops them from receiving writes
+  if(offset === Sound.memoryLocationNR52 && !checkBitOnByte(7, <u8>value)) {
+    // Write the value skipping traps, and then trigger
+    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+    // Reset all registers except NR52
+    for (let i: u16 = 0xFF10; i < 0xFF26; i++) {
+      eightBitStoreIntoGBMemorySkipTraps(i, 0x00);
+    }
+    return true;
+  }
+
+  // We did not handle the write, return false
+  return false;
+}
 
 export function getChannelStartingVolume(channelNumber: i8): u8 {
   // Simply need to get the top 4 bits of register 2

@@ -1,6 +1,8 @@
 import { Component } from 'preact';
-import { WasmBoy } from '../lib/wasmboy';
 import { NumberBaseTable } from './numberBaseTable';
+import { WasmBoy } from '../lib/wasmboy';
+import { WasmBoyGraphics } from '../lib/wasmboyGraphics'
+import { WasmBoyAudio } from '../lib/wasmboyAudio'
 
 export class WasmBoyDebugger extends Component {
 
@@ -27,7 +29,7 @@ export class WasmBoyDebugger extends Component {
     if(skipDebugOutput) {
       return;
     }
-    WasmBoy.render();
+    WasmBoyGraphics.renderFrame();
     this.updateDebugInfo();
   }
 
@@ -46,13 +48,13 @@ export class WasmBoyDebugger extends Component {
           }
       }
     }
-    WasmBoy.render();
+    WasmBoyGraphics.renderFrame();
     this.updateDebugInfo();
   }
 
   breakPoint(skipInitialStep) {
     // Set our opcode breakpoint
-    const breakPoint = 0x60;
+    const breakPoint = 0x401d;
 
     if(!skipInitialStep) {
       this.runNumberOfOpcodes(1, breakPoint);
@@ -64,7 +66,7 @@ export class WasmBoyDebugger extends Component {
         this.breakPoint(true);
       });
     } else {
-        WasmBoy.render();
+        WasmBoyGraphics.renderFrame();
         requestAnimationFrame(() => {
           this.updateDebugInfo();
           console.log('Reached Breakpoint, that satisfies test inside runNumberOfOpcodes');
@@ -87,7 +89,7 @@ export class WasmBoyDebugger extends Component {
 
     // Update CPU State
     state.cpu['Program Counter (PC)'] = WasmBoy.wasmInstance.exports.getProgramCounter();
-    state.cpu['Opcode at PC'] = WasmBoy.wasmByteMemory[WasmBoy.wasmInstance.exports.getProgramCounter() + 0x018000];
+    state.cpu['Opcode at PC'] = WasmBoy.wasmInstance.exports.getOpcodeAtProgramCounter();
     state.cpu['Previous Opcode'] = WasmBoy.wasmInstance.exports.getPreviousOpcode();
     state.cpu['Stack Pointer'] = WasmBoy.wasmInstance.exports.getStackPointer();
     state.cpu['Register A'] = WasmBoy.wasmInstance.exports.getRegisterA();
@@ -142,6 +144,8 @@ export class WasmBoyDebugger extends Component {
         <button onclick={() => {this.runNumberOfOpcodes();}}>Run Hardcoded number of opcodes loop</button>
 
         <button onclick={() => {this.breakPoint();}}>Run Until hardcoded breakpoint</button>
+
+        <button onclick={() => {WasmBoyAudio.debugSaveCurrentAudioBufferToWav()}}>Save Current Audio buffer to wav</button>
 
         <h3>Cpu Info:</h3>
         <NumberBaseTable object={this.state.cpu}></NumberBaseTable>

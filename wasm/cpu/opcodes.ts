@@ -2029,7 +2029,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // 2  12
 
     // Store value in high RAM ($FF00 + a8)
-    eightBitStoreIntoGBMemory(0xFF00 + dataByteOne, Cpu.registerA);
+    let largeDataByteOne: u16 = dataByteOne;
+    eightBitStoreIntoGBMemory(0xFF00 + largeDataByteOne, Cpu.registerA);
     Cpu.programCounter += 1;
     numberOfCycles = 12;
   } else if(isOpcode(opcode, 0xE1)) {
@@ -2123,7 +2124,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
 
     // LDH A,(a8)
     // 2 12
-    Cpu.registerA = eightBitLoadFromGBMemory(0xFF00 + dataByteOne);
+    let largeDataByteOne: u16 = dataByteOne;
+    Cpu.registerA = eightBitLoadFromGBMemory(0xFF00 + largeDataByteOne);
     Cpu.programCounter += 1;
     numberOfCycles = 12;
   } else if(isOpcode(opcode, 0xF1)) {

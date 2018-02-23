@@ -88,7 +88,9 @@ export function updateSound(numberOfCycles: u8): void {
   // Which means, we need to update once every 8192 cycles :)
   Sound.frameSequenceCycleCounter += <i16>numberOfCycles;
   if(Sound.frameSequenceCycleCounter >= Sound.maxFrameSequenceCycles) {
-    Sound.frameSequenceCycleCounter = 0;
+    // Reset the frameSequenceCycleCounter
+    // Not setting to zero as we do not want to drop cycles
+    Sound.frameSequenceCycleCounter -= Sound.maxFrameSequenceCycles;
 
     // Check our frame sequencer
     // TODO: uncomment
@@ -134,7 +136,10 @@ export function updateSound(numberOfCycles: u8): void {
   // Do Some downsampling magic
   Sound.downSampleCycleCounter += numberOfCycles;
   if(Sound.downSampleCycleCounter >= Sound.maxDownSampleCycles) {
-    Sound.downSampleCycleCounter = 0;
+
+    // Reset the downsample counter
+    // Don't set to zero to catch overflowed cycles
+    Sound.downSampleCycleCounter -= Sound.maxDownSampleCycles;
 
     // Do Some Cool mixing
     // NR50 FF24 ALLL BRRR Vin L enable, Left vol, Vin R enable, Right vol
@@ -182,7 +187,8 @@ export function updateSound(numberOfCycles: u8): void {
     }
 
     // Finally multiple our volumes by the mixer volume
-    //TODO
+    //hexLog(3, 0x01, leftMixerVolume, leftChannelSample);
+    //hexLog(2, 0x02, rightMixerVolume);
 
     // Convert our samples from unsigned 32 to unsigned byte
     // Reason being, We want to be able to pass in wasm memory as usigned byte. Javascript will handle the conversion back

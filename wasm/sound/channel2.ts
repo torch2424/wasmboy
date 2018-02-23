@@ -9,14 +9,14 @@ import {
 } from '../memory/index';
 import {
   getChannelStartingVolume,
-  isChannelDacEnabled
+  isChannelDacEnabled,
+  getRegister2OfChannel
 } from './registers';
 import {
   getChannelFrequency,
   setChannelFrequency
 } from './frequency';
 import {
-  getChannelLength,
   isChannelLengthEnabled
 } from './length';
 import {
@@ -68,10 +68,16 @@ export class Channel2 {
     // Decrement our channel timer
     Channel2.frequencyTimer -= <i32>numberOfCycles;
     if(Channel2.frequencyTimer <= 0) {
+
+      // Get the amount that overflowed so we don't drop cycles
+      let overflowAmount: i32 = abs(Channel2.frequencyTimer);
+
       // Reset our timer
       // A square channel's frequency timer period is set to (2048-frequency)*4.
       // Four duty cycles are available, each waveform taking 8 frequency timer clocks to cycle through:
       Channel2.frequencyTimer = (2048 - getChannelFrequency(Channel2.channelNumber)) * 4;
+      Channel2.frequencyTimer -= overflowAmount;
+
       // Also increment our duty cycle
       // What is duty? https://en.wikipedia.org/wiki/Duty_cycle
       // Duty cycle for square wave: http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
@@ -98,7 +104,6 @@ export class Channel2 {
       sample = sample * -1;
     }
 
-
     sample = sample * outputVolume;
 
     // Square Waves Can range from -15 - 15. Therefore simply add 15
@@ -109,7 +114,7 @@ export class Channel2 {
   //http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Trigger_Event
   static trigger(): void {
     Channel2.isEnabled = true;
-    if(getChannelLength(Channel2.channelNumber) === 0) {
+    if(Channel2.lengthCounter === 0) {
       Channel2.lengthCounter = 64;
     }
 
@@ -129,7 +134,6 @@ export class Channel2 {
   }
 
   static updateLength(): void {
-
     if(Channel2.lengthCounter > 0 && isChannelLengthEnabled(Channel2.channelNumber)) {
       Channel2.lengthCounter -= 1;
     }
@@ -148,10 +152,14 @@ export class Channel2 {
     if (Channel2.envelopeCounter <= 0) {
       Channel2.envelopeCounter = getChannelEnvelopePeriod(Channel2.channelNumber);
 
-      if(getChannelEnvelopeAddMode(Channel2.channelNumber) && Channel2.volume < 15) {
-        Channel2.volume += 1;
-      } else if (!getChannelEnvelopeAddMode(Channel2.channelNumber) && Channel2.volume > 0) {
-        Channel2.volume -= 1;
+      // When the timer generates a clock and the envelope period is NOT zero, a new volume is calculated
+      // NOTE: There is some weiirrdd obscure behavior where zero can equal 8, so watch out for that
+      if(Channel2.envelopeCounter !== 0) {
+        if(getChannelEnvelopeAddMode(Channel2.channelNumber) && Channel2.volume < 15) {
+          Channel2.volume += 1;
+        } else if (!getChannelEnvelopeAddMode(Channel2.channelNumber) && Channel2.volume > 0) {
+          Channel2.volume -= 1;
+        }
       }
     }
   }

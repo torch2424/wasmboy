@@ -17,7 +17,6 @@ import {
   setChannelFrequency
 } from './frequency';
 import {
-  getChannelLength,
   isChannelLengthEnabled
 } from './length';
 import {
@@ -75,10 +74,16 @@ export class Channel1 {
     // Decrement our channel timer
     Channel1.frequencyTimer -= <i32>numberOfCycles;
     if(Channel1.frequencyTimer <= 0) {
+
+      // Get the amount that overflowed so we don't drop cycles
+      let overflowAmount: i32 = abs(Channel1.frequencyTimer);
+
       // Reset our timer
       // A square channel's frequency timer period is set to (2048-frequency)*4.
       // Four duty cycles are available, each waveform taking 8 frequency timer clocks to cycle through:
       Channel1.frequencyTimer = (2048 - getChannelFrequency(Channel1.channelNumber)) * 4;
+      Channel1.frequencyTimer -= overflowAmount;
+
       // Also increment our duty cycle
       // What is duty? https://en.wikipedia.org/wiki/Duty_cycle
       // Duty cycle for square wave: http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
@@ -116,7 +121,7 @@ export class Channel1 {
   //http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Trigger_Event
   static trigger(): void {
     Channel1.isEnabled = true;
-    if(getChannelLength(Channel1.channelNumber) === 0) {
+    if(Channel1.lengthCounter === 0) {
       Channel1.lengthCounter = 64;
     }
 
@@ -177,6 +182,7 @@ export class Channel1 {
 
     if(Channel1.lengthCounter > 0 && isChannelLengthEnabled(Channel1.channelNumber)) {
       Channel1.lengthCounter -= 1;
+      hexLog(2, 1, Channel1.lengthCounter)
     }
 
     if(Channel1.lengthCounter === 0) {
@@ -193,10 +199,15 @@ export class Channel1 {
     if (Channel1.envelopeCounter <= 0) {
       Channel1.envelopeCounter = getChannelEnvelopePeriod(Channel1.channelNumber);
 
-      if(getChannelEnvelopeAddMode(Channel1.channelNumber) && Channel1.volume < 15) {
-        Channel1.volume += 1;
-      } else if (!getChannelEnvelopeAddMode(Channel1.channelNumber) && Channel1.volume > 0) {
-        Channel1.volume -= 1;
+      // When the timer generates a clock and the envelope period is NOT zero, a new volume is calculated
+      // NOTE: There is some weiirrdd obscure behavior where zero can equal 8, so watch out for that
+      // If notes are sustained for too long, this is probably why
+      if(Channel1.envelopeCounter !== 0) {
+        if(getChannelEnvelopeAddMode(Channel1.channelNumber) && Channel1.volume < 15) {
+          Channel1.volume += 1;
+        } else if (!getChannelEnvelopeAddMode(Channel1.channelNumber) && Channel1.volume > 0) {
+          Channel1.volume -= 1;
+        }
       }
     }
   }
