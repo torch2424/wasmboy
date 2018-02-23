@@ -88,14 +88,14 @@ export class Channel2 {
     }
 
     // Get our ourput volume, set to zero for silence
-    let outputVolume: u8 = 0;
+    let outputVolume: i32 = 0;
 
     // Finally to set our output volume, the channel must be enabled,
     // Our channel DAC must be enabled, and we must be in an active state
     // Of our duty cycle
     if(Channel2.isEnabled &&
     isChannelDacEnabled(Channel2.channelNumber)) {
-      outputVolume = <u8>Channel2.volume;
+      outputVolume = Channel2.volume;
     }
 
     // Get the current sampleValue

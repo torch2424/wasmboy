@@ -51,13 +51,11 @@ export function handledWriteToSoundRegister(offset: u16, value: u16): boolean {
 
   // Set length counter on channels
   if(offset === Channel1.memoryLocationNRx1) {
-    // Write the value skipping traps, and then trigger
     eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
     setChannelLengthCounter(Channel1.channelNumber);
     return true;
   } else if(offset === Channel2.memoryLocationNRx1) {
     eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
-
     setChannelLengthCounter(Channel2.channelNumber);
     return true;
   } else if(offset === Channel3.memoryLocationNRx1) {
@@ -86,7 +84,7 @@ export function handledWriteToSoundRegister(offset: u16, value: u16): boolean {
     return true;
   } else if(offset === Channel4.memoryLocationNRx4 && checkBitOnByte(7, <u8>value)) {
     eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
-    // TODO: Trigger the noise channel
+    Channel4.trigger();
     return true;
   }
 

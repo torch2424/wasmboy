@@ -99,26 +99,31 @@ export function updateSound(numberOfCycles: u8): void {
       // Update Length on Channels
       Channel1.updateLength();
       Channel2.updateLength();
+      Channel4.updateLength();
     } /* Do Nothing on one */ else if(Sound.frameSequencer === 2) {
       // Update Sweep and Length on Channels
       Channel1.updateLength();
       Channel2.updateLength();
+      Channel4.updateLength();
 
       Channel1.updateSweep();
     } /* Do Nothing on three */ else if(Sound.frameSequencer === 4) {
       // Update Length on Channels
       Channel1.updateLength();
       Channel2.updateLength();
+      Channel4.updateLength();
     } /* Do Nothing on three */ else if(Sound.frameSequencer === 6) {
       // Update Sweep and Length on Channels
       Channel1.updateLength();
       Channel2.updateLength();
+      Channel4.updateLength();
 
       Channel1.updateSweep();
     } else if(Sound.frameSequencer === 7) {
       // Update Envelope on channels
       Channel1.updateEnvelope();
       Channel2.updateEnvelope();
+      Channel4.updateEnvelope();
     }
 
     // Update our frame sequencer
@@ -129,9 +134,11 @@ export function updateSound(numberOfCycles: u8): void {
   }
 
   // Update all of our channels
-  // All samples will be signed floats (-1.0 to 1.0)
+  // All samples will be returned as 0 to 30
+  // 0 being -1.0, and 30 being 1.0
   let channel1Sample: u32 = Channel1.getSample(numberOfCycles);
   let channel2Sample: u32 = Channel2.getSample(numberOfCycles);
+  let channel4Sample: u32 = Channel4.getSample(numberOfCycles);
 
   // Do Some downsampling magic
   Sound.downSampleCycleCounter += numberOfCycles;
@@ -175,6 +182,9 @@ export function updateSound(numberOfCycles: u8): void {
     if (isChannelEnabledOnLeftOutput(Channel2.channelNumber)) {
       leftChannelSample += channel2Sample;
     }
+    if (isChannelEnabledOnLeftOutput(Channel4.channelNumber)) {
+      leftChannelSample += channel4Sample;
+    }
 
 
     // Find the channel for the right volume
@@ -185,10 +195,16 @@ export function updateSound(numberOfCycles: u8): void {
     if (isChannelEnabledOnRightOutput(Channel2.channelNumber)) {
       rightChannelSample += channel2Sample;
     }
+    if (isChannelEnabledOnRightOutput(Channel4.channelNumber)) {
+      rightChannelSample += channel4Sample;
+    }
 
     // Finally multiple our volumes by the mixer volume
-    //hexLog(3, 0x01, leftMixerVolume, leftChannelSample);
-    //hexLog(2, 0x02, rightMixerVolume);
+    // Mixer volume can be at most 7 + 1
+    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Mixer
+    // TODO: Came out wrong and sounds weird
+    //leftChannelSample = leftChannelSample * (leftMixerVolume + 1);
+    //rightChannelSample = rightChannelSample * (rightMixerVolume + 1);
 
     // Convert our samples from unsigned 32 to unsigned byte
     // Reason being, We want to be able to pass in wasm memory as usigned byte. Javascript will handle the conversion back
@@ -214,7 +230,8 @@ export function resetAudioQueue(): void {
 
 function getSampleAsUnsignedByte(sample: u32): u8 {
   // TODO: Add we add more samples, figure this out, need to do things like divide by the maximum available and stuff
-  // With Two Channels and no global volume. Max is 60, goal is 254. 60 * 4 should give approximate answer
-  let convertedSample: u8 = <u8>sample * 4;
+  // With Three Channels (0 to 30) and no global volume. Max is 90, goal is 254. 90 * 2.8 should give approximate answer
+  let adjustedSample: u32 = sample * 28 / 10;
+  let convertedSample: u8 = <u8>adjustedSample;
   return convertedSample;
 }

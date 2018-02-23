@@ -70,11 +70,15 @@ export class Channel4 {
     Channel4.frequencyTimer -= <i32>numberOfCycles;
     if(Channel4.frequencyTimer <= 0) {
 
+      // Get the amount that overflowed so we don't drop cycles
+      let overflowAmount: i32 = abs(Channel4.frequencyTimer);
+
       // Reset our timer
       Channel4.frequencyTimer = Channel4.getNoiseChannelFrequencyPeriod();
+      Channel4.frequencyTimer -= overflowAmount;
 
       // Declare our sample
-      let sample: i16 = 0;
+      let sample: i32 = 0;
 
       // Do some cool stuff with lfsr
       // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Noise_Channel
@@ -93,28 +97,27 @@ export class Channel4 {
 
       // If the width mode is set, set xor on bit 6, and make lfsr 7 bit
       if(Channel4.isNoiseChannelWidthModeSet()) {
-        // Make 7 bit, by knocking off bits 8 - 16
-        Channel4.linearFeedbackShiftRegister = Channel4.linearFeedbackShiftRegister & 0x40;
-        Channel4.linearFeedbackShiftRegister = Channel4.linearFeedbackShiftRegister | (xorLfsrBitZeroOne << 5);
+        // Make 7 bit, by knocking off lower bits. Want to keeps bits 8 - 16, and then or on 7
+        Channel4.linearFeedbackShiftRegister = Channel4.linearFeedbackShiftRegister & (~0x40);
+        Channel4.linearFeedbackShiftRegister = Channel4.linearFeedbackShiftRegister | (xorLfsrBitZeroOne << 6);
       }
 
       // Wave form output is bit zero of lfsr, INVERTED
-      if (!checkBitOnByte(0, Channel4.linearFeedbackShiftRegister)) {
+      if (!checkBitOnByte(0, <u8>Channel4.linearFeedbackShiftRegister)) {
         sample = 1;
       } else {
         sample = -1;
       }
 
-
       // Get our ourput volume, set to zero for silence
-      let outputVolume: u8 = 0;
+      let outputVolume: i32 = 0;
 
       // Finally to set our output volume, the channel must be enabled,
       // Our channel DAC must be enabled, and we must be in an active state
       // Of our duty cycle
       if(Channel4.isEnabled &&
       isChannelDacEnabled(Channel4.channelNumber)) {
-        outputVolume = <u8>Channel4.volume;
+        outputVolume = Channel4.volume;
       }
 
       sample = sample * outputVolume;
@@ -123,7 +126,8 @@ export class Channel4 {
       sample = sample + 15;
       return <u32>sample;
     } else {
-      return 0;
+      // Return 15 and not zero because 15 is no sound :) see above
+      return 15;
     }
   }
 
