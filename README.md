@@ -91,11 +91,13 @@ npm run serve
 
 For detailed explanation on how things work, checkout the [CLI Readme](https://github.com/developit/preact-cli/blob/master/README.md).
 
-# Building With Rollup
+# Building With Rollup For just the library
 
 **Rollup config based off of: https://github.com/rollup/rollup-starter-lib** and using https://github.com/rollup/rollup-plugin-babel#configuring-babel
 
-Note: preact cli has it's own .babel rc that will conflict with one in the project root directory. thus the babel configuration for rollup is defined in the package.json
+Note: preact cli has it's own .babel rc that will conflict with one in the project root directory. thus the babel configuration for rollup is defined in the package.json.
+
+to test build output, simply change the WasmBoy import statement path within the root level `index.js`
 
 ### Special Thanks
 
