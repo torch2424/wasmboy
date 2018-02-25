@@ -99,11 +99,13 @@ export function updateSound(numberOfCycles: u8): void {
       // Update Length on Channels
       Channel1.updateLength();
       Channel2.updateLength();
+      Channel3.updateLength();
       Channel4.updateLength();
     } /* Do Nothing on one */ else if(Sound.frameSequencer === 2) {
       // Update Sweep and Length on Channels
       Channel1.updateLength();
       Channel2.updateLength();
+      Channel3.updateLength();
       Channel4.updateLength();
 
       Channel1.updateSweep();
@@ -111,11 +113,13 @@ export function updateSound(numberOfCycles: u8): void {
       // Update Length on Channels
       Channel1.updateLength();
       Channel2.updateLength();
+      Channel3.updateLength();
       Channel4.updateLength();
     } /* Do Nothing on three */ else if(Sound.frameSequencer === 6) {
       // Update Sweep and Length on Channels
       Channel1.updateLength();
       Channel2.updateLength();
+      Channel3.updateLength();
       Channel4.updateLength();
 
       Channel1.updateSweep();
@@ -138,6 +142,7 @@ export function updateSound(numberOfCycles: u8): void {
   // 0 being -1.0, and 30 being 1.0
   let channel1Sample: u32 = Channel1.getSample(numberOfCycles);
   let channel2Sample: u32 = Channel2.getSample(numberOfCycles);
+  let channel3Sample: u32 = Channel3.getSample(numberOfCycles);
   let channel4Sample: u32 = Channel4.getSample(numberOfCycles);
 
   // Do Some downsampling magic
@@ -177,26 +182,32 @@ export function updateSound(numberOfCycles: u8): void {
     // Find the channel for the left volume
     // TODO: Other Channels
     if (isChannelEnabledOnLeftOutput(Channel1.channelNumber)) {
-      leftChannelSample += channel1Sample;
+      //leftChannelSample += channel1Sample;
     }
     if (isChannelEnabledOnLeftOutput(Channel2.channelNumber)) {
-      leftChannelSample += channel2Sample;
+      //leftChannelSample += channel2Sample;
+    }
+    if (isChannelEnabledOnLeftOutput(Channel3.channelNumber)) {
+      leftChannelSample += channel3Sample;
     }
     if (isChannelEnabledOnLeftOutput(Channel4.channelNumber)) {
-      leftChannelSample += channel4Sample;
+      //leftChannelSample += channel4Sample;
     }
 
 
     // Find the channel for the right volume
     // TODO: Other Channels
     if (isChannelEnabledOnRightOutput(Channel1.channelNumber)) {
-      rightChannelSample += channel1Sample;
+      //rightChannelSample += channel1Sample;
     }
     if (isChannelEnabledOnRightOutput(Channel2.channelNumber)) {
-      rightChannelSample += channel2Sample;
+      //rightChannelSample += channel2Sample;
+    }
+    if (isChannelEnabledOnRightOutput(Channel3.channelNumber)) {
+      rightChannelSample += channel3Sample;
     }
     if (isChannelEnabledOnRightOutput(Channel4.channelNumber)) {
-      rightChannelSample += channel4Sample;
+      //rightChannelSample += channel4Sample;
     }
 
     // Finally multiple our volumes by the mixer volume
@@ -229,9 +240,8 @@ export function resetAudioQueue(): void {
 }
 
 function getSampleAsUnsignedByte(sample: u32): u8 {
-  // TODO: Add we add more samples, figure this out, need to do things like divide by the maximum available and stuff
-  // With Three Channels (0 to 30) and no global volume. Max is 90, goal is 254. 90 * 2.8 should give approximate answer
-  let adjustedSample: u32 = sample * 28 / 10;
+  // With Four Channels (0 to 30) and no global volume. Max is 120, goal is 254. 120 * 2.1167 should give approximate answer
+  let adjustedSample: u32 = sample * 21 / 10;
   let convertedSample: u8 = <u8>adjustedSample;
   return convertedSample;
 }
