@@ -11,12 +11,12 @@
     "serve": "preact build && preact serve",
     "dev": "preact watch",
     "lint": "eslint src",
-    "wasm:watch": "npx watch \"npm run wasm:build\" wasm",
-    "wasm:build": "npx asc wasm/index.ts -b dist/wasm/index.untouched.wasm -t dist/wasm/index.untouched.wast --optimize --validate --sourceMap --memoryBase 8847360 && echo \"Done!\"",
-    "lib:build": "npx rollup -c",
     "debugger:watch": "npm run dev",
     "debugger:serve": "npm run dev",
-    "debugger:build": "npm run build"
+    "debugger:build": "npm run build",
+    "wasm:watch": "npx watch \"npm run wasm:build\" wasm",
+    "wasm:build": "npx asc wasm/index.ts -b dist/wasm/index.untouched.wasm -t dist/wasm/index.untouched.wast --optimize --validate --sourceMap --memoryBase 8847360 && echo \"Done!\"",
+    "lib:build": "npx rollup -c"
   },
   "babel": {
     "presets": [

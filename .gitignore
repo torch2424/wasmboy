@@ -1,15 +1,19 @@
+# Ignore system files
 **/.DS_Store
 
+# Ignore game files
 *.gb
+!test/testroms/**/*.gb
 *.gbc
+!test/testroms/**/*.gbc
 *.sav
 *.rtc
 *.sym
 
-tests/*
-
+# Ignore build output
 dist/
 
+# Ignore node files
 node_modules
 /build
 /*.log
