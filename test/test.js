@@ -4,28 +4,21 @@ const assert = require('assert');
 // Wasm Boy library
 const WasmBoy = require('../dist/wasmboy.cjs.js').WasmBoy;
 
-
-// Jsdom for lightweight in-browser testing
-const jsdom = require("jsdom");
-const { JSDOM } = jsdom;
-
 // File management
 const fs = require('fs')
 const path = require('path')
 
-// Get our fake dom with canvas element
-const dom = new JSDOM(`<!DOCTYPE html><canvas>></canvas>`);
-const canvasElement = dom.window.document.querySelector("canvas");
-
 // Initialize wasmBoy
-WasmBoy.initialize(canvasElement);
+WasmBoy.initializeHeadless();
 
 // Get our folders under testroms
 const isDirectory = source => fs.lstatSync(source).isDirectory()
 const getDirectories = source =>
-  fs.readdirSync(source).map(name => path.join(source, name)).filter(isDirectory)
+  fs.readdirSync(source).map(name => path.join(source, name)).filter(isDirectory);
 
-getDirectories('./test/testroms').forEach((directory) => {
+const testRomsPath = './test/testroms';
+
+getDirectories(testRomsPath).forEach((directory) => {
   // Get all test roms for the directory
   const files = fs.readdirSync(directory);
   const testRoms = files.filter(function(file) {
@@ -40,19 +33,35 @@ getDirectories('./test/testroms').forEach((directory) => {
       describe(testRom, () => {
 
         // Define our wasmboy instance
-        beforeEach((done) => {
-          WasmBoy.loadGame(testRom).then(() => {
+        // Not using arrow functions, as arrow function timeouts were acting up
+        beforeEach(function(done) {
+
+          // Set a timeout of 5000, takes a while for wasm module to parse
+          this.timeout(5000);
+
+          // Read the test rom a a Uint8Array and pass to wasmBoy
+          const testRomArray = new Uint8Array(fs.readFileSync(`${directory}/${testRom}`));
+
+          WasmBoy.loadGame(testRomArray).then(() => {
             done();
           });
         });
 
-        it('should match the expected output in the .output file. If it does not exist, create the file', (done) => {
+        // Wait 10 seconds for every test
+        const timeToWaitForTestRom = 10000;
+
+        it('should match the expected output in the .output file. If it does not exist, create the file.', function(done) {
+
+          // Set our timeout
+          this.timeout(timeToWaitForTestRom + 1000);
+
           WasmBoy.startGame();
           setTimeout(() => {
-            console.log('Hello!');
             done();
-          }, 10000)
+          }, timeToWaitForTestRom);
         });
+
+        //Done!
       });
     });
   });

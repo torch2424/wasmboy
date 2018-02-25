@@ -1,7 +1,6 @@
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
-import wasm from 'rollup-plugin-wasm';
 import webAssembly from 'rollup-plugin-webassembly';
 import pkg from './package.json';
 
