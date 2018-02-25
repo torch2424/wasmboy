@@ -1,6 +1,6 @@
 import './style';
 import { Component } from 'preact';
-import { WasmBoy, WasmBoyGraphics, WasmBoyAudio } from './dist/wasmboy.umd.js';
+import { WasmBoy, WasmBoyGraphics, WasmBoyAudio } from './lib/wasmboy.js';
 import { WasmBoyDebugger, WasmBoySystemControls } from './debugger/index';
 
 export default class App extends Component {
@@ -11,11 +11,10 @@ export default class App extends Component {
 		const canvasElement = document.querySelector(".wasmboy__canvas-container__canvas");
 
 		// Load our game
-		WasmBoy.initialize(canvasElement, './dist/wasm/index.untouched.wasm').then(() => {
-			WasmBoy.loadGame('./games/linksawakening.gb')
-	    .then(() => {
-	      console.log('Wasmboy Ready!');
-	    });
+		WasmBoy.initialize(canvasElement)
+		WasmBoy.loadGame('./games/linksawakening.gb')
+		.then(() => {
+			console.log('Wasmboy Ready!');
 		});
 	}
 
