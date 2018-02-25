@@ -4,7 +4,6 @@ const assert = require('assert');
 // Wasm Boy library
 const WasmBoy = require('../dist/wasmboy.cjs.js').WasmBoy;
 
-console.log(WasmBoy);
 
 // Jsdom for lightweight in-browser testing
 const jsdom = require("jsdom");
@@ -19,9 +18,7 @@ const dom = new JSDOM(`<!DOCTYPE html><canvas>></canvas>`);
 const canvasElement = dom.window.document.querySelector("canvas");
 
 // Initialize wasmBoy
-// WasmBoy.initialize(canvasElement, './dist/wasm/index.untouched.wasm').then(() => {
-//
-// });
+WasmBoy.initialize(canvasElement);
 
 // Get our folders under testroms
 const isDirectory = source => fs.lstatSync(source).isDirectory()
@@ -30,6 +27,7 @@ const getDirectories = source =>
 
 getDirectories('./test/testroms').forEach((directory) => {
   // Get all test roms for the directory
+  const files = fs.readdirSync(directory);
   const testRoms = files.filter(function(file) {
       return path.extname(file).toLowerCase() === '.gb';
   });
@@ -43,10 +41,10 @@ getDirectories('./test/testroms').forEach((directory) => {
 
         // Define our wasmboy instance
         beforeEach((done) => {
-          Wasmboy.loadGame(testRom).then(() => {
+          WasmBoy.loadGame(testRom).then(() => {
             done();
           });
-        })
+        });
 
         it('should match the expected output in the .output file. If it does not exist, create the file', (done) => {
           WasmBoy.startGame();
@@ -56,15 +54,6 @@ getDirectories('./test/testroms').forEach((directory) => {
           }, 10000)
         });
       });
-    });
-  });
-});
-// Done!
-
-describe('Testing Mocha', () => {
-  describe('#indexOf()', () => {
-    it('should return -1 when the value is not present', () => {
-      assert.equal([1,2,3].indexOf(4), -1);
     });
   });
 });
