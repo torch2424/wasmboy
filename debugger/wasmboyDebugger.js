@@ -1,8 +1,5 @@
 import { Component } from 'preact';
 import { NumberBaseTable } from './numberBaseTable';
-import { WasmBoy } from '../lib/wasmboy';
-import { WasmBoyGraphics } from '../lib/wasmboyGraphics'
-import { WasmBoyAudio } from '../lib/wasmboyAudio'
 
 export class WasmBoyDebugger extends Component {
 
@@ -17,67 +14,67 @@ export class WasmBoyDebugger extends Component {
     };
 	}
 
-  stepOpcode(skipDebugOutput) {
-    const numberOfCycles = WasmBoy.wasmInstance.exports.emulationStep();
+  stepOpcode(wasmboy, wasmboyGraphics, skipDebugOutput) {
+    const numberOfCycles = wasmboy.wasmInstance.exports.emulationStep();
 
     if(numberOfCycles <= 0) {
       console.error('Opcode not recognized! Check wasm logs.');
-      this.updateDebugInfo();
+      this.updateDebugInfo(wasmboy);
       throw new Error();
     }
 
     if(skipDebugOutput) {
       return;
     }
-    WasmBoyGraphics.renderFrame();
-    this.updateDebugInfo();
+    wasmboyGraphics.renderFrame();
+    this.updateDebugInfo(wasmboy);
   }
 
-  runNumberOfOpcodes(numberOfOpcodes, stopAtOpcode, stopOpcodeShouldHaveValue) {
+  runNumberOfOpcodes(wasmboy, wasmboyGraphics, numberOfOpcodes, stopAtOpcode, stopOpcodeShouldHaveValue) {
     // Keep stepping until highest opcode increases
     let opcodesToRun = 2000;
     if(numberOfOpcodes) {
       opcodesToRun = numberOfOpcodes
     }
     for(let i = 0; i < opcodesToRun; i++) {
-      this.stepOpcode(true);
-      if(stopAtOpcode && stopAtOpcode === WasmBoy.wasmInstance.exports.getProgramCounter()) {
+      this.stepOpcode(wasmboy, wasmboyGraphics, true);
+      if(stopAtOpcode && stopAtOpcode === wasmboy.wasmInstance.exports.getProgramCounter()) {
         if(!stopOpcodeShouldHaveValue ||
-          stopOpcodeShouldHaveValue === WasmBoy.wasmByteMemory[WasmBoy.wasmInstance.exports.getProgramCounter()]) {
+          stopOpcodeShouldHaveValue === wasmboy.wasmByteMemory[wasmboy.wasmInstance.exports.getProgramCounter()]) {
             i = opcodesToRun;
           }
       }
     }
-    WasmBoyGraphics.renderFrame();
-    this.updateDebugInfo();
+    wasmboyGraphics.renderFrame();
+    this.updateDebugInfo(wasmboy);
   }
 
-  breakPoint(skipInitialStep) {
+  breakPoint(wasmboy, wasmboyGraphics, skipInitialStep) {
     // Set our opcode breakpoint
     const breakPoint = 0x401d;
 
     if(!skipInitialStep) {
-      this.runNumberOfOpcodes(1, breakPoint);
+      this.runNumberOfOpcodes(wasmboy, wasmboyGraphics, 1, breakPoint);
     }
 
-    if(WasmBoy.wasmInstance.exports.getProgramCounter() !== breakPoint) {
+    if(wasmboy.wasmInstance.exports.getProgramCounter() !== breakPoint) {
       requestAnimationFrame(() => {
-        this.runNumberOfOpcodes(2000, breakPoint, 0x34);
-        this.breakPoint(true);
+        this.runNumberOfOpcodes(wasmboy, wasmboyGraphics, 2000, breakPoint, 0x34);
+        this.breakPoint(wasmboy, wasmboyGraphics, true);
       });
     } else {
-        WasmBoyGraphics.renderFrame();
+        wasmboyGraphics.renderFrame();
         requestAnimationFrame(() => {
-          this.updateDebugInfo();
+          this.updateDebugInfo(wasmboy);
           console.log('Reached Breakpoint, that satisfies test inside runNumberOfOpcodes');
         });
     }
   }
 
-  updateDebugInfo() {
+  updateDebugInfo(wasmboy) {
 
     // Log our memory
-    console.log(`WasmBoy Memory`, WasmBoy.wasmByteMemory);
+    console.log(`[WasmBoy Debugger] Memory:`, wasmboy.wasmByteMemory);
 
     // Create our new state object
     const state = {
@@ -88,43 +85,43 @@ export class WasmBoyDebugger extends Component {
     };
 
     // Update CPU State
-    state.cpu['Program Counter (PC)'] = WasmBoy.wasmInstance.exports.getProgramCounter();
-    state.cpu['Opcode at PC'] = WasmBoy.wasmInstance.exports.getOpcodeAtProgramCounter();
-    state.cpu['Previous Opcode'] = WasmBoy.wasmInstance.exports.getPreviousOpcode();
-    state.cpu['Stack Pointer'] = WasmBoy.wasmInstance.exports.getStackPointer();
-    state.cpu['Register A'] = WasmBoy.wasmInstance.exports.getRegisterA();
-    state.cpu['Register F'] = WasmBoy.wasmInstance.exports.getRegisterF();
-    state.cpu['Register B'] = WasmBoy.wasmInstance.exports.getRegisterB();
-    state.cpu['Register C'] = WasmBoy.wasmInstance.exports.getRegisterC();
-    state.cpu['Register D'] = WasmBoy.wasmInstance.exports.getRegisterD();
-    state.cpu['Register E'] = WasmBoy.wasmInstance.exports.getRegisterE();
-    state.cpu['Register H'] = WasmBoy.wasmInstance.exports.getRegisterH();
-    state.cpu['Register L'] = WasmBoy.wasmInstance.exports.getRegisterL();
+    state.cpu['Program Counter (PC)'] = wasmboy.wasmInstance.exports.getProgramCounter();
+    state.cpu['Opcode at PC'] = wasmboy.wasmInstance.exports.getOpcodeAtProgramCounter();
+    state.cpu['Previous Opcode'] = wasmboy.wasmInstance.exports.getPreviousOpcode();
+    state.cpu['Stack Pointer'] = wasmboy.wasmInstance.exports.getStackPointer();
+    state.cpu['Register A'] = wasmboy.wasmInstance.exports.getRegisterA();
+    state.cpu['Register F'] = wasmboy.wasmInstance.exports.getRegisterF();
+    state.cpu['Register B'] = wasmboy.wasmInstance.exports.getRegisterB();
+    state.cpu['Register C'] = wasmboy.wasmInstance.exports.getRegisterC();
+    state.cpu['Register D'] = wasmboy.wasmInstance.exports.getRegisterD();
+    state.cpu['Register E'] = wasmboy.wasmInstance.exports.getRegisterE();
+    state.cpu['Register H'] = wasmboy.wasmInstance.exports.getRegisterH();
+    state.cpu['Register L'] = wasmboy.wasmInstance.exports.getRegisterL();
     state.cpu = Object.assign({}, state.cpu);
 
     // Update PPU State
-    state.ppu['Scanline Register (LY) - 0xFF44'] = WasmBoy.wasmByteMemory[0xFF44 - 0x8000];
-    state.ppu['LCD Status (STAT) - 0xFF41'] = WasmBoy.wasmByteMemory[0xFF41 - 0x8000];
-    state.ppu['LCD Control (LCDC) - 0xFF40'] = WasmBoy.wasmByteMemory[0xFF40 - 0x8000];
-    state.ppu['Scroll X - 0xFF43'] = WasmBoy.wasmByteMemory[0xFF43 - 0x8000];
-    state.ppu['Scroll Y - 0xFF42'] = WasmBoy.wasmByteMemory[0xFF42 - 0x8000];
-    state.ppu['Window X - 0xFF4B'] = WasmBoy.wasmByteMemory[0xFF4B - 0x8000];
-    state.ppu['Window Y - 0xFF4A'] = WasmBoy.wasmByteMemory[0xFF4A - 0x8000];
+    state.ppu['Scanline Register (LY) - 0xFF44'] = wasmboy.wasmByteMemory[0xFF44 - 0x8000];
+    state.ppu['LCD Status (STAT) - 0xFF41'] = wasmboy.wasmByteMemory[0xFF41 - 0x8000];
+    state.ppu['LCD Control (LCDC) - 0xFF40'] = wasmboy.wasmByteMemory[0xFF40 - 0x8000];
+    state.ppu['Scroll X - 0xFF43'] = wasmboy.wasmByteMemory[0xFF43 - 0x8000];
+    state.ppu['Scroll Y - 0xFF42'] = wasmboy.wasmByteMemory[0xFF42 - 0x8000];
+    state.ppu['Window X - 0xFF4B'] = wasmboy.wasmByteMemory[0xFF4B - 0x8000];
+    state.ppu['Window Y - 0xFF4A'] = wasmboy.wasmByteMemory[0xFF4A - 0x8000];
 
     // Update Timers State
-    state.timers['TIMA - 0xFF05'] = WasmBoy.wasmByteMemory[0xFF05 - 0x8000];
-    state.timers['TMA - 0xFF06'] = WasmBoy.wasmByteMemory[0xFF06 - 0x8000];
-    state.timers['TIMC/TAC - 0xFF07'] = WasmBoy.wasmByteMemory[0xFF07 - 0x8000];
-    state.timers['DIV/Divider Register - 0xFF04'] = WasmBoy.wasmByteMemory[0xFF04 - 0x8000];
+    state.timers['TIMA - 0xFF05'] = wasmboy.wasmByteMemory[0xFF05 - 0x8000];
+    state.timers['TMA - 0xFF06'] = wasmboy.wasmByteMemory[0xFF06 - 0x8000];
+    state.timers['TIMC/TAC - 0xFF07'] = wasmboy.wasmByteMemory[0xFF07 - 0x8000];
+    state.timers['DIV/Divider Register - 0xFF04'] = wasmboy.wasmByteMemory[0xFF04 - 0x8000];
 
     // Update interrupts state
-    if(WasmBoy.wasmInstance.exports.areInterruptsEnabled()) {
+    if(wasmboy.wasmInstance.exports.areInterruptsEnabled()) {
       state.interrupts['Interrupt Master Switch'] = 0x01;
     } else {
       state.interrupts['Interrupt Master Switch'] = 0x00;
     }
-    state.interrupts['IE/Interrupt Enabled - 0xFFFF'] = WasmBoy.wasmByteMemory[0xFFFF - 0x8000];
-    state.interrupts['IF/Interrupt Request - 0xFF0F'] = WasmBoy.wasmByteMemory[0xFF0F - 0x8000];
+    state.interrupts['IE/Interrupt Enabled - 0xFFFF'] = wasmboy.wasmByteMemory[0xFFFF - 0x8000];
+    state.interrupts['IF/Interrupt Request - 0xFF0F'] = wasmboy.wasmByteMemory[0xFF0F - 0x8000];
 
     // Clone our state, that it is immutable and will cause change detection
     this.setState(state);
@@ -132,20 +129,20 @@ export class WasmBoyDebugger extends Component {
 
 
 
-	render() {
+	render(props) {
 		return (
       <div>
         <h2>Debugger:</h2>
 
-        <button onclick={() => {this.updateDebugInfo()}}>Update Current Debug Info</button>
+        <button onclick={() => {this.updateDebugInfo(props.wasmboy)}}>Update Current Debug Info</button>
 
-        <button onclick={() => {this.stepOpcode();}}>Step Opcode</button>
+        <button onclick={() => {this.stepOpcode(props.wasmboy, props.wasmboyGraphics);}}>Step Opcode</button>
 
-        <button onclick={() => {this.runNumberOfOpcodes();}}>Run Hardcoded number of opcodes loop</button>
+        <button onclick={() => {this.runNumberOfOpcodes(props.wasmboy, props.wasmboyGraphics);}}>Run Hardcoded number of opcodes loop</button>
 
-        <button onclick={() => {this.breakPoint();}}>Run Until hardcoded breakpoint</button>
+        <button onclick={() => {this.breakPoint(props.wasmboy, props.wasmboyGraphics);}}>Run Until hardcoded breakpoint</button>
 
-        <button onclick={() => {WasmBoyAudio.debugSaveCurrentAudioBufferToWav()}}>Save Current Audio buffer to wav</button>
+        <button onclick={() => {props.wasmboyAudio.debugSaveCurrentAudioBufferToWav()}}>Save Current Audio buffer to wav</button>
 
         <h3>Cpu Info:</h3>
         <NumberBaseTable object={this.state.cpu}></NumberBaseTable>

@@ -1,6 +1,6 @@
 import './style';
 import { Component } from 'preact';
-import { WasmBoy } from './lib/index';
+import { WasmBoy, WasmBoyGraphics, WasmBoyAudio } from './dist/wasmboy.umd.js';
 import { WasmBoyDebugger, WasmBoySystemControls } from './debugger/index';
 
 export default class App extends Component {
@@ -9,9 +9,10 @@ export default class App extends Component {
 	componentDidMount() {
 		// Get our canvas element
 		const canvasElement = document.querySelector(".wasmboy__canvas-container__canvas");
+
 		// Load our game
-		WasmBoy.initialize(canvasElement, '../dist/wasm/index.untouched.wasm').then(() => {
-			WasmBoy.loadGame('linksawakening.gb')
+		WasmBoy.initialize(canvasElement, './dist/wasm/index.untouched.wasm').then(() => {
+			WasmBoy.loadGame('./games/linksawakening.gb')
 	    .then(() => {
 	      console.log('Wasmboy Ready!');
 	    });
@@ -22,16 +23,15 @@ export default class App extends Component {
 		return (
 			<div>
 				<h1>WasmBoy</h1>
-				<div class="wasmboy__canvas-container">
-    			<canvas class="wasmboy__canvas-container__canvas"
+				<div className="wasmboy__canvas-container">
+    			<canvas className="wasmboy__canvas-container__canvas"
             style="border: 1px solid black;"
             width="640"
             height="480">
           </canvas>
         </div>
-				<div id="audio-wave"></div>
-				<WasmBoySystemControls></WasmBoySystemControls>
-				<WasmBoyDebugger></WasmBoyDebugger>
+				<WasmBoySystemControls wasmboy={WasmBoy}></WasmBoySystemControls>
+				<WasmBoyDebugger wasmboy={WasmBoy} wasmboyGraphics={WasmBoyGraphics} wasmboyAudio={WasmBoyAudio}></WasmBoyDebugger>
 			</div>
 		);
 	}

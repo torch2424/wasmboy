@@ -1,0 +1,32 @@
+import { Component } from 'preact';
+
+export class WasmBoySystemControls extends Component {
+
+  constructor() {
+		super();
+		// set our state to if we are initialized or not
+		this.state = {
+    };
+	}
+
+  // Allow passing a file
+  // https://gist.github.com/AshikNesin/e44b1950f6a24cfcd85330ffc1713513
+  loadGame(wasmboy, event) {
+    wasmboy.loadGame(event.target.files[0])
+    .then(() => {
+      console.log('wasmboy Ready!');
+    });
+  }
+
+  render(props) {
+    return (
+      <div className="system-controls">
+        <input type="file" onChange={(event) => {this.loadGame(props.wasmboy, event)}}></input>
+        <button onclick={() => {props.wasmboy.startGame();}}>Start Game</button>
+        <button onclick={() => {props.wasmboy.pauseGame();}}>Pause Game</button>
+        <button onclick={() => {props.wasmboy.resumeGame();}}>Resume Game</button>
+      </div>
+    )
+  }
+
+}

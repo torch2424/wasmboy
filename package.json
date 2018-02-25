@@ -2,6 +2,9 @@
   "name": "wasmBoy",
   "version": "0.0.0",
   "license": "Apache 2.0",
+  "main": "dist/wasmboy.cjs.js",
+  "module": "dist/wasmboy.esm.js",
+  "browser": "dist/wasmboy.umd.js",
   "scripts": {
     "start": "if-env NODE_ENV=production && npm run -s serve || npm run -s dev",
     "build": "preact build",
@@ -9,7 +12,24 @@
     "dev": "preact watch",
     "lint": "eslint src",
     "wasm:watch": "npx watch \"npm run wasm:build\" wasm",
-    "wasm:build": "npx asc wasm/index.ts -b dist/wasm/index.untouched.wasm -t dist/wasm/index.untouched.wast --validate --memoryBase 8847360 && echo \"Done!\""
+    "wasm:build": "npx asc wasm/index.ts -b dist/wasm/index.untouched.wasm -t dist/wasm/index.untouched.wast --optimize --validate --sourceMap --memoryBase 8847360 && echo \"Done!\"",
+    "lib:build": "npx rollup -c",
+    "debugger:watch": "npm run dev",
+    "debugger:serve": "npm run dev",
+    "debugger:build": "npm run build"
+  },
+  "babel": {
+    "presets": [
+      [
+        "env",
+        {
+          "modules": false
+        }
+      ]
+    ],
+    "plugins": [
+      "external-helpers"
+    ]
   },
   "eslintConfig": {
     "extends": "eslint-config-synacor"
@@ -26,11 +46,17 @@
   "devDependencies": {
     "assemblyscript": "github:AssemblyScript/assemblyscript#31633899f9b54b5f7819ffb4ff365b5a94acdb40",
     "audiobuffer-to-wav": "^1.0.0",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-preset-env": "^1.6.1",
     "eslint": "^4.5.0",
     "eslint-config-synacor": "^1.1.0",
     "if-env": "^1.0.0",
     "mocha": "^5.0.1",
     "preact-cli": "^2.0.0",
+    "rollup": "^0.56.2",
+    "rollup-plugin-babel": "^3.0.3",
+    "rollup-plugin-commonjs": "^8.3.0",
+    "rollup-plugin-node-resolve": "^3.0.3",
     "watch": "^1.0.2"
   }
 }
