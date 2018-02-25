@@ -180,34 +180,33 @@ export function updateSound(numberOfCycles: u8): void {
     let rightChannelSample: u32 = 0;
 
     // Find the channel for the left volume
-    // TODO: Other Channels
     if (isChannelEnabledOnLeftOutput(Channel1.channelNumber)) {
-      //leftChannelSample += channel1Sample;
+      leftChannelSample += channel1Sample;
     }
     if (isChannelEnabledOnLeftOutput(Channel2.channelNumber)) {
-      //leftChannelSample += channel2Sample;
+      leftChannelSample += channel2Sample;
     }
     if (isChannelEnabledOnLeftOutput(Channel3.channelNumber)) {
       leftChannelSample += channel3Sample;
     }
     if (isChannelEnabledOnLeftOutput(Channel4.channelNumber)) {
-      //leftChannelSample += channel4Sample;
+      leftChannelSample += channel4Sample;
     }
 
 
     // Find the channel for the right volume
     // TODO: Other Channels
     if (isChannelEnabledOnRightOutput(Channel1.channelNumber)) {
-      //rightChannelSample += channel1Sample;
+      rightChannelSample += channel1Sample;
     }
     if (isChannelEnabledOnRightOutput(Channel2.channelNumber)) {
-      //rightChannelSample += channel2Sample;
+      rightChannelSample += channel2Sample;
     }
     if (isChannelEnabledOnRightOutput(Channel3.channelNumber)) {
       rightChannelSample += channel3Sample;
     }
     if (isChannelEnabledOnRightOutput(Channel4.channelNumber)) {
-      //rightChannelSample += channel4Sample;
+      rightChannelSample += channel4Sample;
     }
 
     // Finally multiple our volumes by the mixer volume
@@ -242,6 +241,13 @@ export function resetAudioQueue(): void {
 function getSampleAsUnsignedByte(sample: u32): u8 {
   // With Four Channels (0 to 30) and no global volume. Max is 120, goal is 254. 120 * 2.1167 should give approximate answer
   let adjustedSample: u32 = sample * 21 / 10;
+  let convertedSample: u8 = <u8>adjustedSample;
+  return convertedSample;
+}
+
+function getSampleAsUnsignedByteForSingleChannel(sample: u32): u8 {
+  // With One Channels (0 to 30) and no global volume. Max is 30, goal is 254. 30 * 8.4 should give approximate answer
+  let adjustedSample: u32 = sample * 84 / 10;
   let convertedSample: u8 = <u8>adjustedSample;
   return convertedSample;
 }

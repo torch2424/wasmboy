@@ -80,7 +80,7 @@ export function handledWriteToSoundRegister(offset: u16, value: u16): boolean {
     return true;
   } else if(offset === Channel3.memoryLocationNRx4 && checkBitOnByte(7, <u8>value)) {
     eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
-    // TODO: Trigger the wave channel
+    Channel3.trigger();
     return true;
   } else if(offset === Channel4.memoryLocationNRx4 && checkBitOnByte(7, <u8>value)) {
     eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);

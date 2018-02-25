@@ -21,11 +21,10 @@
     "preact": "^8.2.1",
     "preact-compat": "^3.17.0",
     "promise-polyfill": "7.0.0",
-    "unfetch": "^3.0.0",
-    "wavesurfer.js": "^2.0.0-beta01"
+    "unfetch": "^3.0.0"
   },
   "devDependencies": {
-    "assemblyscript": "github:AssemblyScript/assemblyscript",
+    "assemblyscript": "github:AssemblyScript/assemblyscript#31633899f9b54b5f7819ffb4ff365b5a94acdb40",
     "audiobuffer-to-wav": "^1.0.0",
     "eslint": "^4.5.0",
     "eslint-config-synacor": "^1.1.0",

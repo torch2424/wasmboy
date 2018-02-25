@@ -53,7 +53,7 @@ export class Channel3 {
   static isEnabled: boolean = false;
   static frequencyTimer: i32 = 0x00;
   static lengthCounter: i32 = 0x00;
-  static waveTablePosition: i32 = 0x00;
+  static waveTablePosition: u16 = 0x00;
 
   static initialize(): void {
     eightBitStoreIntoGBMemory(Channel3.memoryLocationNRx0, 0x7F);
@@ -106,7 +106,7 @@ export class Channel3 {
     }
 
     // Get our ourput volume, set to zero for silence
-    let outputVolume: i32 = 0;
+    let outputVolume: i16 = 0;
 
     // Finally to set our output volume, the channel must be enabled,
     // Our channel DAC must be enabled, and we must be in an active state
@@ -136,7 +136,7 @@ export class Channel3 {
     }
 
     // Spply out output volume
-    if(outputVolume >= 0) {
+    if(outputVolume > 0) {
       sample = sample / outputVolume;
     } else {
       sample = 0;
