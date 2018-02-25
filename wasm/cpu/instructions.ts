@@ -1,6 +1,6 @@
 // Imports
 import {
-  Cpu 
+  Cpu
 } from './index';
 import {
   setZeroFlag,
@@ -16,8 +16,6 @@ import {
   checkAndSetSixteenBitFlagsAddOverflow
 } from './flags';
 import {
-  consoleLog,
-  consoleLogTwo,
   rotateByteLeft,
   rotateByteLeftThroughCarry,
   rotateByteRight,

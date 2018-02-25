@@ -6,10 +6,6 @@ import {
   getRomBankAddress,
   getRamBankAddress
 } from './banking'
-import {
-  consoleLog,
-  consoleLogTwo
-} from '../helpers/index';
 
 // Private function to translate a offset meant for the gameboy memory map
 // To the wasmboy memory map

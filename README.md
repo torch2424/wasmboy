@@ -43,6 +43,8 @@ The Wasmboy library is being recorded at [Issue #3](https://github.com/torch2424
 
 * [tomek's Retrospective for General Roadmap](http://blog.rekawek.eu/2017/02/09/coffee-gb/)
 
+* [Awesome Wiki on the Gamelad project](https://github.com/Dooskington/GameLad/wiki)
+
 * [Opcode Table](http://pastraiser.com/cpu/gameboy/gameboy_opcodes.html)
 
 * [Opcode Instructions](https://rednex.github.io/rgbds/gbz80.7.html)
@@ -53,7 +55,9 @@ The Wasmboy library is being recorded at [Issue #3](https://github.com/torch2424
 
 * [Sound Emulation - GhostSonit's reply](https://www.reddit.com/r/EmuDev/comments/5gkwi5/gb_apu_sound_emulation/)
 
-* [Awesome Wiki on the Gamelad project](https://github.com/Dooskington/GameLad/wiki)
+* [Gameboy Sound Hardware](http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware)
+
+* [Gameboy Sound Operation](https://gist.github.com/drhelius/3652407)
 
 ### Random Things I've Learned:
 

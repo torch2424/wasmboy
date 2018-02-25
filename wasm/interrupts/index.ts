@@ -7,7 +7,6 @@ import {
   sixteenBitStoreIntoGBMemorySkipTraps
 } from '../memory/index';
 import {
-  consoleLogTwo,
   setBitOnByte,
   resetBitOnByte,
   checkBitOnByte

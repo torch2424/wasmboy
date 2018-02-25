@@ -8,9 +8,6 @@ import {
 import {
   requestTimerInterrupt
 } from '../interrupts/index';
-import {
-  consoleLogTwo
-} from '../helpers/index';
 
 class Timers {
   static memoryLocationTIMA: u16 = 0xFF05; // Timer Modulator
@@ -37,8 +34,10 @@ export function updateTimers(numberOfCycles: u8): void {
     Timers.cycleCounter += numberOfCycles;
 
     if(Timers.cycleCounter > _getCurrentCycleCounterFrequency()) {
+
       // Reset our cycle counters
-      Timers.cycleCounter = 0;
+      // Not setting to zero as we do not want to drop cycles
+      Timers.cycleCounter -= _getCurrentCycleCounterFrequency();
 
       // Update the actual timer counter
       let tima = eightBitLoadFromGBMemory(Timers.memoryLocationTIMA);
@@ -62,6 +61,11 @@ function _checkDividerRegister(numberOfCycles: u8): void {
   Timers.dividerRegisterCycleCounter += numberOfCycles;
 
   if(Timers.dividerRegisterCycleCounter >= 255) {
+
+    // Reset the cycle counter
+    // - 255 to catch any overflow with the cycles
+    Timers.dividerRegisterCycleCounter -= 255;
+
     let dividerRegister = eightBitLoadFromGBMemory(Timers.memoryLocationDividerRegister);
     if(dividerRegister === 255) {
       dividerRegister = 0;

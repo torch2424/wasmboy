@@ -3,6 +3,9 @@
 import {
 Cpu
 } from './cpu/index';
+import {
+  eightBitLoadFromGBMemory
+} from './memory/index'
 
 // Public Exports
 export {
@@ -17,11 +20,11 @@ export {
 } from './interrupts/index';
 export {
   setJoypadState
-} from './joypad/index'; 
+} from './joypad/index';
 export {
-  getCurrentLogValue,
-  getCurrentLogId
-} from './helpers/index';
+  getAudioQueueIndex,
+  resetAudioQueue
+} from './sound/index'
 
 export function getRegisterA(): u8 {
   return Cpu.registerA;
@@ -65,4 +68,8 @@ export function getStackPointer(): u16 {
 
 export function getPreviousOpcode(): u8 {
   return Cpu.previousOpcode;
+}
+
+export function getOpcodeAtProgramCounter(): u8 {
+  return eightBitLoadFromGBMemory(Cpu.programCounter);
 }

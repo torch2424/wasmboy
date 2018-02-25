@@ -6,7 +6,8 @@ export {
   initializeCartridge,
   setPixelOnFrame,
   getPixelOnFrame,
-  storeFrameToBeRendered
+  storeFrameToBeRendered,
+  setLeftAndRightOutputForAudioQueue
 } from './memory';
 
 export {

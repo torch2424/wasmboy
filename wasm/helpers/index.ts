@@ -2,52 +2,6 @@ import {
   getCarryFlag
 } from '../cpu/flags';
 
-class Log {
-  static logValueOne: i32 = 0;
-  static logIdOne: i32 = 0;
-  static logValueTwo: i32 = 0;
-  static logIdTwo: i32 = 0;
-
-}
-
-// Set the current log
-export function consoleLog(valueToSet: i32, logId: i32): void {
-  Log.logValueOne = valueToSet;
-  Log.logIdOne = logId;
-}
-
-export function consoleLogLargest(valueToSet: i32, logId: i32): void {
-  if(valueToSet > Log.logValueOne) {
-    consoleLog(valueToSet, logId);
-  }
-}
-
-export function consoleLogTwo(valueToSet: i32, logId: i32): void {
-  Log.logValueTwo = valueToSet;
-  Log.logIdTwo = logId;
-}
-
-// General console.log function, can poll from js
-export function getCurrentLogValue(logValueNumber: i32): i32 {
-  if(logValueNumber === 1) {
-    return Log.logValueOne;
-  } else if (logValueNumber === 2) {
-    return Log.logValueTwo;
-  } else {
-    return 0;
-  }
-}
-
-export function getCurrentLogId(logIdNumber: i32): i32 {
-  if(logIdNumber === 1) {
-    return Log.logIdOne;
-  } else if (logIdNumber === 2) {
-    return Log.logIdTwo;
-  } else {
-    return 0;
-  }
-}
-
 // Grouped registers
 // possible overload these later to performace actions
 // AF, BC, DE, HL
@@ -118,8 +72,13 @@ export function checkBitOnByte(bitPosition: u8, byte: u8): boolean {
 
 namespace env {
   export declare function log(message: string, numArgs: i32, arg0: i32, arg1: i32, arg2: i32, arg3: i32, arg4: i32, arg5: i32): void;
+  export declare function hexLog(numArgs: i32, arg0: i32, arg1: i32, arg2: i32, arg3: i32, arg4: i32, arg5: i32): void;
 }
 
 export function log(message: string, numArgs: i32 = 0, arg0: i32 = 0, arg1: i32 = 0, arg2: i32 = 0, arg3: i32 = 0, arg4: i32 = 0, arg5: i32 = 0): void {
   env.log(message, numArgs, arg0, arg1, arg2, arg3, arg4, arg5);
+}
+
+export function hexLog(numArgs: i32 = 0, arg0: i32 = 0, arg1: i32 = 0, arg2: i32 = 0, arg3: i32 = 0, arg4: i32 = 0, arg5: i32 = 0): void {
+  env.hexLog(numArgs, arg0, arg1, arg2, arg3, arg4, arg5);
 }

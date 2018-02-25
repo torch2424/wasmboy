@@ -27,8 +27,6 @@ import {
   requestVBlankInterrupt
 } from '../interrupts/index';
 import {
-  consoleLog,
-  consoleLogTwo,
   checkBitOnByte,
   setBitOnByte,
   resetBitOnByte
@@ -92,8 +90,9 @@ export function updateGraphics(numberOfCycles: u8): void {
 
     if (Graphics.scanlineCycleCounter >= Graphics.MAX_CYCLES_PER_SCANLINE) {
 
-      // Reset our cycle counter
-      Graphics.scanlineCycleCounter = 0;
+      // Reset the scanlineCycleCounter
+      // Don't set to zero to catch extra cycles
+      Graphics.scanlineCycleCounter -= Graphics.MAX_CYCLES_PER_SCANLINE;
 
       // Move to next scanline
       let scanlineRegister: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationScanlineRegister);

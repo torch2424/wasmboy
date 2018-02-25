@@ -5,6 +5,9 @@ import {
   Graphics
 } from '../graphics/graphics';
 import {
+  handledWriteToSoundRegister
+} from '../sound/registers';
+import {
   handleBanking
 } from './banking';
 import {
@@ -17,8 +20,7 @@ import {
   sixteenBitLoadFromGBMemory
 } from './load';
 import {
-  consoleLog,
-  consoleLogTwo
+  checkBitOnByte
 } from '../helpers/index';
 
 // Internal function to trap any modify data trying to be written to Gameboy memory
@@ -70,6 +72,13 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
   if(offset === 0xFF04) {
     eightBitStoreIntoGBMemorySkipTraps(offset, 0);
     return false;
+  }
+
+  // Sound
+  if(offset >= 0xFF10 && offset <= 0xFF26) {
+    if(handledWriteToSoundRegister(offset, value)) {
+      return false;
+    }
   }
 
   // reset the current scanline if the game tries to write to it

@@ -2,9 +2,8 @@
 // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
 
 import {
-  consoleLog,
-  consoleLogTwo,
-  checkBitOnByte
+  checkBitOnByte,
+  hexLog
 } from '../helpers/index';
 import {
   eightBitLoadFromGBMemory
@@ -141,4 +140,15 @@ export function storeFrameToBeRendered(): void {
       store<u8>(Memory.currentFrameVideoOutputLocation + x + (y * 160), getPixelOnFrame(<u16>x, <u16>y))
     }
   }
+}
+
+// Function to set our left and right channels at the correct queue index
+export function setLeftAndRightOutputForAudioQueue(leftVolume: u8, rightVolume: u8, audioQueueIndex: u32): void {
+  // Get our stereo index
+  let audioQueueOffset = Memory.soundOutputLocation + (audioQueueIndex * 2);
+
+  // Store our volumes
+  // +1 that way we don't have empty data to ensure that the value is set
+  store<u8>(audioQueueOffset, leftVolume + 1);
+  store<u8>(audioQueueOffset + 1, rightVolume + 1);
 }

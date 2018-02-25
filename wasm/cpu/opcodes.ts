@@ -30,8 +30,7 @@ import {
   cpARegister
 } from './instructions';
 import {
-  consoleLog,
-  consoleLogTwo,
+  log,
   rotateByteLeft,
   rotateByteLeftThroughCarry,
   rotateByteRight,
@@ -58,6 +57,9 @@ import {
 import {
   updateGraphics
 } from '../graphics/index';
+import {
+  updateSound
+} from '../sound/index'
 
 // Public funciton to run opcodes until a frame should be rendered.
 export function update(): i8 {
@@ -136,9 +138,11 @@ export function emulationStep(): i8 {
   // Interrupt Handling requires 20 cycles
   // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
   numberOfCycles += checkInterrupts();
+  // Update Sound
+  updateSound(<u8>numberOfCycles);
 
   if(numberOfCycles <= 0) {
-    consoleLog(opcode, 1);
+    log("Opcode at crash: $0", 1, opcode);
   }
 
   return numberOfCycles;
@@ -2025,7 +2029,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // 2  12
 
     // Store value in high RAM ($FF00 + a8)
-    eightBitStoreIntoGBMemory(0xFF00 + dataByteOne, Cpu.registerA);
+    let largeDataByteOne: u16 = dataByteOne;
+    eightBitStoreIntoGBMemory(0xFF00 + largeDataByteOne, Cpu.registerA);
     Cpu.programCounter += 1;
     numberOfCycles = 12;
   } else if(isOpcode(opcode, 0xE1)) {
@@ -2119,7 +2124,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
 
     // LDH A,(a8)
     // 2 12
-    Cpu.registerA = eightBitLoadFromGBMemory(0xFF00 + dataByteOne);
+    let largeDataByteOne: u16 = dataByteOne;
+    Cpu.registerA = eightBitLoadFromGBMemory(0xFF00 + largeDataByteOne);
     Cpu.programCounter += 1;
     numberOfCycles = 12;
   } else if(isOpcode(opcode, 0xF1)) {

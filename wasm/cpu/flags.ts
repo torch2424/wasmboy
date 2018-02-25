@@ -1,9 +1,6 @@
 import {
-  Cpu 
+  Cpu
 } from './index';
-import {
-  consoleLog 
-} from '../helpers/index';
 
 
 // Set flag bit on on register F. For instance set zero flag to zero -> (7, 0)

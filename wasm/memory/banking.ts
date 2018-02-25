@@ -1,10 +1,8 @@
 // Function to handle rom/rambanking
 import {
-Memory 
+Memory
 } from './memory';
 import {
-  consoleLog,
-  consoleLogTwo,
   checkBitOnByte
 } from '../helpers/index';
 
