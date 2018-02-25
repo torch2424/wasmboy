@@ -47,8 +47,10 @@ getDirectories(testRomsPath).forEach((directory) => {
           });
         });
 
-        // Wait 10 seconds for every test
-        const timeToWaitForTestRom = 10000;
+        // Wait 60 seconds for every test
+        // Stop watch-ed cpu_instructs and it took about 55
+        // So lets see how this goes
+        const timeToWaitForTestRom = 60000;
 
         it('should match the expected output in the .output file. If it does not exist, create the file.', function(done) {
 
@@ -57,6 +59,8 @@ getDirectories(testRomsPath).forEach((directory) => {
 
           WasmBoy.startGame();
           setTimeout(() => {
+            console.log('Hello!');
+            // TODO: Read from byte memory, grab the frame, and do what we need to do :)
             done();
           }, timeToWaitForTestRom);
         });

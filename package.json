@@ -11,7 +11,7 @@
     "serve": "npm run wasm:build && preact build && preact serve",
     "dev": "npm run wasm:build && preact watch",
     "lint": "eslint src",
-    "test": "npm run wasm:build && npx mocha",
+    "test": "npm run wasm:build && npx mocha --exit",
     "debugger:watch": "npm run dev",
     "debugger:serve": "npm run dev",
     "debugger:build": "npm run build",
