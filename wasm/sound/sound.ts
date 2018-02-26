@@ -225,6 +225,12 @@ export function updateSound(numberOfCycles: u8): void {
     // +1 so it can not be zero
     setLeftAndRightOutputForAudioQueue(leftChannelSampleUnsignedByte + 1, rightChannelSampleUnsignedByte + 1, Sound.audioQueueIndex);
     Sound.audioQueueIndex += 1;
+
+    // Don't allow our audioQueueIndex to overflow into other parts of the wasmBoy memory map
+    // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit#gid=0
+    if(Sound.audioQueueIndex >= 0xFFFF) {
+      resetAudioQueue();
+    }
   }
 }
 
