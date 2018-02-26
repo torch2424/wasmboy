@@ -93,7 +93,7 @@ export function setLcdStatus(): void {
   }
 
   // Check for the coincidence flag
-  if(eightBitLoadFromGBMemory(Graphics.memoryLocationScanlineRegister) === eightBitLoadFromGBMemory(Graphics.memoryLocationCoincidenceCompare)) {
+  if(lcdMode !== newLcdMode && newLcdMode === 0 && eightBitLoadFromGBMemory(Graphics.memoryLocationScanlineRegister) === eightBitLoadFromGBMemory(Graphics.memoryLocationCoincidenceCompare)) {
     lcdStatus = setBitOnByte(2, lcdStatus);
     if(checkBitOnByte(6, lcdStatus)) {
       requestLcdInterrupt();
