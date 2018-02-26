@@ -9,7 +9,8 @@ import {
 import {
   setBitOnByte,
   resetBitOnByte,
-  checkBitOnByte
+  checkBitOnByte,
+  hexLog
 } from '../helpers/index';
 
 class Interrupts {
@@ -47,10 +48,11 @@ function _handleInterrupt(bitPosition: u8): void {
   if (bitPosition === Interrupts.bitPositionVBlankInterrupt) {
     Cpu.programCounter = 0x40;
   } else if(bitPosition === Interrupts.bitPositionLcdInterrupt) {
+    //hexLog(2, 1, 6);
     Cpu.programCounter = 0x48;
   } else if(bitPosition === Interrupts.bitPositionTimerInterrupt) {
     Cpu.programCounter = 0x50;
-  } else {
+  } else if(bitPosition === Interrupts.bitPositionJoypadInterrupt) {
     // JoyPad
     Cpu.programCounter = 0x60;
   }

@@ -15,7 +15,8 @@ import {
 import {
   checkBitOnByte,
   setBitOnByte,
-  resetBitOnByte
+  resetBitOnByte,
+  hexLog
 } from '../helpers/index';
 
 
@@ -40,10 +41,11 @@ export function setLcdStatus(): void {
     Graphics.scanlineCycleCounter = 0;
     eightBitStoreIntoGBMemorySkipTraps(Graphics.memoryLocationScanlineRegister, 0);
 
-    // Set to mode 1
+    // Set to mode 0
+    // https://www.reddit.com/r/EmuDev/comments/4w6479/gb_dr_mario_level_generation_issues/
     lcdStatus = resetBitOnByte(1, lcdStatus);
-    lcdStatus = setBitOnByte(0, lcdStatus);
-    Graphics.currentLcdMode = 1;
+    lcdStatus = resetBitOnByte(0, lcdStatus);
+    Graphics.currentLcdMode = 0;
 
     // Store the status in memory
     eightBitStoreIntoGBMemorySkipTraps(Graphics.memoryLocationLcdStatus, lcdStatus);
