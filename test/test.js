@@ -17,7 +17,7 @@ const GAMEBOY_CAMERA_HEIGHT = 144;
 
 // Some Timeouts for specified test roms
 const TEST_ROM_TIMEOUT = {
-  cpu_instrs: 900000
+  cpu_instrs: 60000
 };
 
 // Initialize wasmBoy
