@@ -16,6 +16,7 @@ import {
   setPixelOnFrame
 } from '../memory/memory';
 import {
+  hexLog,
   checkBitOnByte,
   setBitOnByte,
   resetBitOnByte

@@ -80,7 +80,7 @@ export function setLcdStatus(): void {
       lcdStatus = setBitOnByte(1, lcdStatus);
     } else {
       // H-Blank
-      newLcdMode = 2;
+      newLcdMode = 0;
       lcdStatus = resetBitOnByte(0, lcdStatus);
       lcdStatus = resetBitOnByte(1, lcdStatus);
       shouldRequestInterrupt = checkBitOnByte(3, lcdStatus);
