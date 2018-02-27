@@ -96,7 +96,6 @@ export function updateGraphics(numberOfCycles: u8): void {
 
       // Move to next scanline
       let scanlineRegister: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationScanlineRegister);
-      scanlineRegister += 1;
 
       // Check if we've reached the last scanline
       if(scanlineRegister === 144) {
@@ -106,21 +105,25 @@ export function updateGraphics(numberOfCycles: u8): void {
         storeFrameToBeRendered();
         // Request a VBlank interrupt
         requestVBlankInterrupt();
-      } else if (scanlineRegister > 153) {
-        // Check if we overflowed scanlines
-        // if so, reset our scanline number
-        scanlineRegister = 0;
       } else if (scanlineRegister < 144) {
         // Draw the scanline
         _drawScanline();
       }
 
       // Store our scanline
+      if (scanlineRegister > 153) {
+        // Check if we overflowed scanlines
+        // if so, reset our scanline number
+        scanlineRegister = 0;
+      } else {
+        scanlineRegister += 1;
+      }
       eightBitStoreIntoGBMemorySkipTraps(Graphics.memoryLocationScanlineRegister, scanlineRegister);
     }
   }
 }
 
+// TODO: Make this a _drawPixelOnScanline, as values can be updated while drawing a scanline
 function _drawScanline(): void {
   // http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html
   // Bit 7 - LCD Display Enable (0=Off, 1=On)

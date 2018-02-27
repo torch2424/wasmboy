@@ -2,14 +2,36 @@
   "name": "wasmBoy",
   "version": "0.0.0",
   "license": "Apache 2.0",
+  "main": "dist/wasmboy.cjs.js",
+  "module": "dist/wasmboy.esm.js",
+  "browser": "dist/wasmboy.umd.js",
   "scripts": {
-    "start": "if-env NODE_ENV=production && npm run -s serve || npm run -s dev",
-    "build": "preact build",
-    "serve": "preact build && preact serve",
-    "dev": "preact watch",
+    "start": "npx concurrently --kill-others --names \"DEBUGGER,WASM,LIB\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"npm run debugger:watch\" \"npm run wasm:watch\" \"npm run lib:watch\"",
+    "dev": "npm run start",
+    "watch": "npm run start",
+    "build": "npm run wasm:build && npm run lib:build",
+    "test": "npm run build && npx mocha --exit",
     "lint": "eslint src",
+    "debugger:watch": "preact watch",
+    "debugger:serve": "preact build && preact serve",
+    "debugger:build": "preact build",
     "wasm:watch": "npx watch \"npm run wasm:build\" wasm",
-    "wasm:build": "npx asc wasm/index.ts -b dist/wasm/index.untouched.wasm -t dist/wasm/index.untouched.wast --validate --memoryBase 8847360 && echo \"Done!\""
+    "wasm:build": "npx asc wasm/index.ts -b dist/wasm/index.untouched.wasm -t dist/wasm/index.untouched.wast --optimize --validate --sourceMap --memoryBase 8847360 && echo \"Built Wasm!\"",
+    "lib:watch": "npx rollup -c -w",
+    "lib:build": "npx rollup -c"
+  },
+  "babel": {
+    "presets": [
+      [
+        "env",
+        {
+          "modules": false
+        }
+      ]
+    ],
+    "plugins": [
+      "external-helpers"
+    ]
   },
   "eslintConfig": {
     "extends": "eslint-config-synacor"
@@ -21,16 +43,28 @@
     "preact": "^8.2.1",
     "preact-compat": "^3.17.0",
     "promise-polyfill": "7.0.0",
+    "raf": "^3.4.0",
     "unfetch": "^3.0.0"
   },
   "devDependencies": {
     "assemblyscript": "github:AssemblyScript/assemblyscript#31633899f9b54b5f7819ffb4ff365b5a94acdb40",
     "audiobuffer-to-wav": "^1.0.0",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-preset-env": "^1.6.1",
+    "concurrently": "^3.5.1",
     "eslint": "^4.5.0",
     "eslint-config-synacor": "^1.1.0",
     "if-env": "^1.0.0",
+    "jsdom": "^11.6.2",
     "mocha": "^5.0.1",
+    "pngjs-image": "^0.11.7",
     "preact-cli": "^2.0.0",
+    "rollup": "^0.56.2",
+    "rollup-plugin-babel": "^3.0.3",
+    "rollup-plugin-commonjs": "^8.3.0",
+    "rollup-plugin-node-resolve": "^3.0.3",
+    "rollup-plugin-webassembly": "^1.0.3",
+    "wasm-loader": "^1.3.0",
     "watch": "^1.0.2"
   }
 }

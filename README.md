@@ -1,37 +1,113 @@
 # wasmBoy
-Gameboy Emulator written in Web Assembly using [AssemblyScript](https://github.com/AssemblyScript/assemblyscript), Debugger/Shell in Preact
 
-![WasmBoy Alpha Screenshot](./docs/alphaScreenshot.png)
+<!--- Badges -->
+[![Build Status](https://travis-ci.org/torch2424/wasmBoy.svg?branch=master)](https://travis-ci.org/torch2424/wasmBoy)
 
----
-# THIS IS A WIP
----
+<!--- Short Description-->
+🎮👾🕹️ Gameboy Emulator Library written in Web Assembly using [AssemblyScript](https://github.com/AssemblyScript/assemblyscript), Debugger/Shell in Preact 🎮👾🕹️
+
+*🎵 Click the image below for a quick video of a sound test the Alpha version 🎵*
+[![WasmBoy Alpha Sound Test Video](https://img.youtube.com/vi/LqH495sZ6ns/0.jpg)](https://www.youtube.com/watch?v=LqH495sZ6ns)
 
 # Features
 
-* Passes all of Blargg's Cpu Tests
+* Emulates the gameboy and outputs graphics to an HTML5 canvas 🖼️, and audio through the Web Audio API 🔊
+* Importable into other projects as a dependency ♻️
+* Built with Web Assembly 🕸️
+* Keyboard and gamepad input support ⌨️ 🎮
+* Debugger with information of all relevant registers 🐛
 
-* Can render a good amount of games, but with MANY graphical glitches.
-
-* Joypad emulation with keyboard, and gamepad support
-
-* Debugger that can be updated with a button click, or hard coded to do stuff like breakpoints
-
-# Tests
-
-### Blargg's CPU Tests
-
-![Passing Blargg Cpu tests](./docs/blarggCpuTest.png)
+[Please see the Roadmap for upcoming features](#roadmap)
 
 # Screenshots
 
-![Tetris with some graphical bugs probably](./docs/brokenTetris.png)
+**Coming soon!**
+
+For now I would watch the video posted at the top of the readme :)
+
+# Tests
+
+### Blarrg
+
+**cpu_instrs**
+
+![Cpu Instructions all tests passing](./test/testroms/blargg/cpu_instrs.png)
 
 # Roadmap
 
 The project doe quality and performance also depends on the [AssemblyScript Roadmap](https://github.com/AssemblyScript/assemblyscript/wiki/Status-and-Roadmap).
 
 The Wasmboy library is being recorded at [Issue #3](https://github.com/torch2424/wasmBoy/issues/3)
+
+# CLI Commands / Npm Scripts
+
+The project contains three different elements.
+
+* The `debugger` is the container for the wasmBoy library, which is simply a [preact](https://github.com/developit/preact) application, generated with [preact-cli](https://github.com/developit/preact-cli).
+* The `wasm` which is the web assembly module for wasmBoy written in [AssemblyScript](https://github.com/AssemblyScript/assemblyscript).
+* The `lib` which is the importable library of wasmBoy that can be used in other projects.
+
+Each of these uses a different build process. The debugger uses [webpack](https://webpack.js.org/), the wasm uses the AssemblyScript](https://github.com/AssemblyScript/assemblyscript) compiler CLI tool, and the lib uses [Rollup.js](https://rollupjs.org/guide/en).
+
+Commands for each part of the project will be prepended with their element name and a colon, e.g `debugger:[command here]`.
+
+Commands not prepended with a colon are meant for easily building on all of the different parts as a whole.
+
+``` bash
+# Command to serve the project, and watch the debugger, wasm, and lib for changes
+# Uses concurrently: https://github.com/kimmobrunfeldt/concurrently
+# Concurrently helps cleanup the output and organizes all three watchers/servers
+npm start
+
+# Same as npm start
+npm run dev
+
+# Same as npm start
+npm run watch
+
+# Build the wasm module and the lib to be ready to be pushed to npm or released
+npm run build
+
+# Run tests in `test/test.js`
+npm run test
+
+# Watch the debugger (preact) project for changes and livereload
+npm run debugger:watch
+
+# Build the debugger (preact) project and serve it
+npm run debugger:serve
+
+# Build the debugger (preact) project
+npm run debugger:build
+
+# Watch the wasm (AssemblyScript) *.ts files and build on changes
+npm run wasm:watch
+
+# Build the wasm (AssemblyScript) *.ts files, with the correct CLI flags
+npm run wasm:build
+
+# Watch the Wasmboy ES6 Module for changes, and build
+npm run lib:watch
+
+# Build the WasmBoy Es6 module
+npm run lib:build
+```
+
+The debugger application/container for wasmBoy utilizes the [preact-cli](https://github.com/developit/preact-cli/blob/master/README.md). Additional workflow commands and tips can be found there.
+
+# Special Thanks
+
+* [awesome gb-dev communitty](https://github.com/avivace/awesome-gbdev), too many rad dudes to name!
+
+* [dcodeIO for building and fixing bugs with AssemblyScript](https://github.com/AssemblyScript/assemblyscript). And for being awesome!
+
+* [r/emudev](https://www.reddit.com/r/EmuDev/), especially to [binjimint](https://www.reddit.com/r/EmuDev/comments/7y2bux/gameboy_gb_graphical_bugs_game_writes_zeroes_into/dudlj3w/) for helping me find that bug not even Blargg's cpu tests could find.
+
+# Random Tips for new Gameboy EmuDevs:
+
+* It's better to code an emulator by abstracting assembly commands into functions, rather than by Opcode operation
+
+* Gameboy Opcodes are difficult till about 0x40
 
 # Resources
 
@@ -58,43 +134,3 @@ The Wasmboy library is being recorded at [Issue #3](https://github.com/torch2424
 * [Gameboy Sound Hardware](http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware)
 
 * [Gameboy Sound Operation](https://gist.github.com/drhelius/3652407)
-
-### Random Things I've Learned:
-
-* It's better to code an emulator by abstracting assembly commands into functions, rather than by Opcode operation
-
-* Gameboy Opcodes are difficult till about 0x40
-
-* All kinds of stuff, I tend to comment a lot so read those :)
-
-### CLI Commands
-
-``` bash
-# install dependencies
-npm install
-
-# serve with hot reload at localhost:8080
-npm run dev
-
-# Watch wasm/ folder for changes, and rebuild on changes
-npm run wasm:watch
-
-# build for production with minification
-npm run build
-
-# Build the wasm into a wasm module
-npm run wasm:build
-
-# test the production build locally
-npm run serve
-```
-
-For detailed explanation on how things work, checkout the [CLI Readme](https://github.com/developit/preact-cli/blob/master/README.md).
-
-### Special Thanks
-
-* [awesome gb-dev communitty](https://github.com/avivace/awesome-gbdev), too many rad dudes to name!
-
-* [dcodeIO for building and fixing bugs with AssemblyScript](https://github.com/AssemblyScript/assemblyscript). And for being awesome!
-
-* [r/emudev](https://www.reddit.com/r/EmuDev/), especially to [binjimint](https://www.reddit.com/r/EmuDev/comments/7y2bux/gameboy_gb_graphical_bugs_game_writes_zeroes_into/dudlj3w/) for helping me find that bug not even Blargg's cpu tests could find.
