@@ -47,7 +47,7 @@ The project contains three different elements.
 * The `wasm` which is the web assembly module for wasmBoy written in [AssemblyScript](https://github.com/AssemblyScript/assemblyscript).
 * The `lib` which is the importable library of wasmBoy that can be used in other projects.
 
-Each of these uses a different build process. The debugger uses [webpack](https://webpack.js.org/), the wasm uses the AssemblyScript](https://github.com/AssemblyScript/assemblyscript) compiler CLI tool, and the lib uses [Rollup.js](https://rollupjs.org/guide/en).
+Each of these uses a different build process. The debugger uses [webpack](https://webpack.js.org/), the wasm uses the [AssemblyScript](https://github.com/AssemblyScript/assemblyscript) compiler CLI tool, and the lib uses [Rollup.js](https://rollupjs.org/guide/en).
 
 Commands for each part of the project will be prepended with their element name and a colon, e.g `debugger:[command here]`.
 
