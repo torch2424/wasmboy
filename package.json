@@ -6,19 +6,19 @@
   "module": "dist/wasmboy.esm.js",
   "browser": "dist/wasmboy.umd.js",
   "scripts": {
-    "start": "npm run wasm:build && if-env NODE_ENV=production && npm run -s serve || npm run -s dev",
-    "build": "npm run wasm:build && preact build",
-    "serve": "npm run wasm:build && preact build && preact serve",
-    "dev": "npm run wasm:build && preact watch",
-    "lint": "eslint src",
+    "start": "npx concurrently --kill-others \"npm run debugger:watch\" \"npm run wasm:watch\" \"npm run lib:watch\"",
+    "dev": "npm run start",
+    "watch": "npm run start",
+    "build": "npm run wasm:build && npm run lib:build",
     "test": "npm run lib:build && npx mocha --exit",
-    "debugger:watch": "npm run dev",
-    "debugger:serve": "npm run dev",
-    "debugger:build": "npm run build",
+    "lint": "eslint src",
+    "debugger:watch": "preact watch",
+    "debugger:serve": "preact build && preact serve",
+    "debugger:build": "preact build",
     "wasm:watch": "npx watch \"npm run wasm:build\" wasm",
-    "wasm:build": "npx asc wasm/index.ts -b dist/wasm/index.untouched.wasm -t dist/wasm/index.untouched.wast --optimize --validate --sourceMap --memoryBase 8847360 && echo \"Done!\"",
-    "lib:build": "npm run wasm:build && npx rollup -c",
-    "lib:watch": "npx rollup -c -w"
+    "wasm:build": "npx asc wasm/index.ts -b dist/wasm/index.untouched.wasm -t dist/wasm/index.untouched.wast --optimize --validate --sourceMap --memoryBase 8847360 && echo \"Built Wasm!\"",
+    "lib:watch": "npx rollup -c -w",
+    "lib:build": "npx rollup -c"
   },
   "babel": {
     "presets": [
@@ -51,6 +51,7 @@
     "audiobuffer-to-wav": "^1.0.0",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-env": "^1.6.1",
+    "concurrently": "^3.5.1",
     "eslint": "^4.5.0",
     "eslint-config-synacor": "^1.1.0",
     "if-env": "^1.0.0",
