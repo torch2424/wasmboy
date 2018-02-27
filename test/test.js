@@ -192,7 +192,7 @@ getDirectories(testRomsPath).forEach((directory) => {
 
                   image.setAt(x, y, {
                     red: imageDataArray[i],
-                    gren: imageDataArray[i + 1],
+                    green: imageDataArray[i + 1],
                     blue: imageDataArray[i + 2],
                     alpha: imageDataArray[i + 3],
                   });
