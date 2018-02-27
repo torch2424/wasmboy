@@ -55,7 +55,8 @@ Commands not prepended with a colon are meant for easily building on all of the 
 
 ``` bash
 # Command to serve the project, and watch the debugger, wasm, and lib for changes
-# Output will be a bit wonky because it is all run concurrently
+# Uses concurrently: https://github.com/kimmobrunfeldt/concurrently
+# Concurrently helps cleanup the output and organizes all three watchers/servers
 npm start
 
 # Same as npm start

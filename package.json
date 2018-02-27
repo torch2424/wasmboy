@@ -6,7 +6,7 @@
   "module": "dist/wasmboy.esm.js",
   "browser": "dist/wasmboy.umd.js",
   "scripts": {
-    "start": "npx concurrently --kill-others \"npm run debugger:watch\" \"npm run wasm:watch\" \"npm run lib:watch\"",
+    "start": "npx concurrently --kill-others --names \"DEBUGGER,WASM,LIB\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"npm run debugger:watch\" \"npm run wasm:watch\" \"npm run lib:watch\"",
     "dev": "npm run start",
     "watch": "npm run start",
     "build": "npm run wasm:build && npm run lib:build",
