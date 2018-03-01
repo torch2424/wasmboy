@@ -1,6 +1,6 @@
 import './style';
 import { Component } from 'preact';
-import { WasmBoy, WasmBoyGraphics, WasmBoyAudio } from './lib/wasmboy.js';
+import { WasmBoy, WasmBoyGraphics, WasmBoyAudio, WasmBoyMemory } from './lib/wasmboy.js';
 import { WasmBoyDebugger, WasmBoySystemControls } from './debugger/index';
 
 export default class App extends Component {
@@ -15,6 +15,7 @@ export default class App extends Component {
 		WasmBoy.loadGame('./games/linksawakening.gb')
 		.then(() => {
 			console.log('Wasmboy Ready!');
+			WasmBoyMemory.saveCartridgeRam();
 		});
 	}
 
