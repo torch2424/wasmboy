@@ -15,7 +15,6 @@ export default class App extends Component {
 		WasmBoy.loadGame('./games/linksawakening.gb')
 		.then(() => {
 			console.log('Wasmboy Ready!');
-			WasmBoyMemory.saveCartridgeRam();
 		});
 	}
 
