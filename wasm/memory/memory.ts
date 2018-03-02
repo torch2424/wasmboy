@@ -49,14 +49,14 @@ export class Memory {
   // ----------------------------------
   // Wasmboy Memory Map
   // ----------------------------------
-  static gameBoyInternalMemoryLocation: u32 = 0x000000;
-  static videoOutputLocation: u32 = 0x008000;
+  static gameBoyInternalMemoryLocation: u32 = 0x000400;
+  static videoOutputLocation: u32 = 0x028400;
   static currentFrameVideoOutputLocation: u32 = Memory.videoOutputLocation;
   static frameInProgressVideoOutputLocation: u32 = Memory.currentFrameVideoOutputLocation + (160 * 144);
-  static soundOutputLocation: u32 = 0x033400;
+  static soundOutputLocation: u32 = 0x053800;
   // Passed in Game backup or ROM from the user
-  static gameBytesLocation: u32 = 0x043400;
-  static gameRamBanksLocation: u32 = 0x843400;
+  static gameBytesLocation: u32 = 0x073800;
+  static gameRamBanksLocation: u32 = 0x008400;
 
   // ----------------------------------
   // Rom/Ram Banking
@@ -67,6 +67,7 @@ export class Memory {
   static currentRamBank: u16 = 0x00;
   static isRamBankingEnabled: boolean = false;
   static isMBC1RomModeEnabled: boolean = true;
+
   // Cartridge Types
   // http://gbdev.gg8.se/wiki/articles/The_Cartridge_Header
   static isRomOnly: boolean = true;

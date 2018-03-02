@@ -16,7 +16,7 @@
     "debugger:serve": "preact build && preact serve",
     "debugger:build": "preact build",
     "wasm:watch": "npx watch \"npm run wasm:build\" wasm",
-    "wasm:build": "npx asc wasm/index.ts -b dist/wasm/index.untouched.wasm -t dist/wasm/index.untouched.wast --optimize --validate --sourceMap --memoryBase 8847360 && echo \"Built Wasm!\"",
+    "wasm:build": "npx asc wasm/index.ts -b dist/wasm/index.untouched.wasm -t dist/wasm/index.untouched.wast --optimize --validate --sourceMap --memoryBase 8861696 && echo \"Built Wasm!\"",
     "lib:watch": "npx rollup -c -w",
     "lib:build": "npx rollup -c"
   },
