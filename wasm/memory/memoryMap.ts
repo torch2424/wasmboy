@@ -5,7 +5,10 @@ import { Memory } from './memory';
 import {
   getRomBankAddress,
   getRamBankAddress
-} from './banking'
+} from './banking';
+import {
+  hexLog
+} from '../helpers/index';
 
 // Private function to translate a offset meant for the gameboy memory map
 // To the wasmboy memory map
@@ -37,6 +40,7 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: u32): u32 {
     // NOTE / TODO: Switchable Internal Ram Banks?
     // 0xC000 -> 0x000400
     wasmboyOffset = (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation;
+    hexLog(3, 0x14, gameboyOffset, wasmboyOffset);
   }
 
   return wasmboyOffset;

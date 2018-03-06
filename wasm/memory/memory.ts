@@ -54,7 +54,7 @@ export class Memory {
   static currentFrameVideoOutputLocation: u32 = Memory.videoOutputLocation;
   static frameInProgressVideoOutputLocation: u32 = Memory.currentFrameVideoOutputLocation + (160 * 144);
   static soundOutputLocation: u32 = 0x053800;
-  
+
   // Passed in Game backup or ROM from the user
   static gameBytesLocation: u32 = 0x073800;
   static gameRamBanksLocation: u32 = 0x008400;
