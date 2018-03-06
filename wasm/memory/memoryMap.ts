@@ -40,7 +40,6 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: u32): u32 {
     // NOTE / TODO: Switchable Internal Ram Banks?
     // 0xC000 -> 0x000400
     wasmboyOffset = (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation;
-    hexLog(3, 0x14, gameboyOffset, wasmboyOffset);
   }
 
   return wasmboyOffset;
