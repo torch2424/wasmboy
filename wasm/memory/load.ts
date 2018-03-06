@@ -53,7 +53,7 @@ function _eightBitLoadFromWasmBoyMemory(gameboyOffset: u16): u8 {
 }
 
 export function loadBooleanDirectlyFromWasmMemory(offset: u32): boolean {
-  const booleanAsInt: i8 = load<i8>(offset);
+  let booleanAsInt: i8 = load<i8>(offset);
   if(booleanAsInt <= 0) {
     return false;
   }

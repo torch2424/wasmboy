@@ -91,7 +91,7 @@ export class Cpu {
     store<i32>(getSaveStateMemoryOffset(0x0C, Cpu.saveStateSlot), Cpu.currentCycles);
 
     storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x11, Cpu.saveStateSlot), Cpu.isHalted);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x11, Cpu.saveStateSlot), Cpu.isStopped);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x12, Cpu.saveStateSlot), Cpu.isStopped);
   }
 
   // Function to load the save state from memory
@@ -112,7 +112,7 @@ export class Cpu {
     Cpu.currentCycles = load<i32>(getSaveStateMemoryOffset(0x0C, Cpu.saveStateSlot));
 
     Cpu.isHalted = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x11, Cpu.saveStateSlot));
-    Cpu.isStopped = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x11, Cpu.saveStateSlot));
+    Cpu.isStopped = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x12, Cpu.saveStateSlot));
   }
 }
 

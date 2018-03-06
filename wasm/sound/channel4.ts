@@ -5,7 +5,10 @@
 
 import {
   eightBitLoadFromGBMemory,
-  eightBitStoreIntoGBMemory
+  eightBitStoreIntoGBMemory,
+  getSaveStateMemoryOffset,
+  loadBooleanDirectlyFromWasmMemory,
+  storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
 import {
   getChannelStartingVolume,
@@ -55,6 +58,28 @@ export class Channel4 {
   static envelopeCounter: i32 = 0x00;
   static lengthCounter: i32 = 0x00;
   static volume: i32 = 0x00;
+
+  // Save States
+
+  static saveStateSlot: u16 = 10;
+
+  // Function to save the state of the class
+  static saveState(): void {
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x00, Channel4.saveStateSlot), Channel4.isEnabled);
+    store<i32>(getSaveStateMemoryOffset(0x01, Channel4.saveStateSlot), Channel4.frequencyTimer);
+    store<i32>(getSaveStateMemoryOffset(0x05, Channel4.saveStateSlot), Channel4.envelopeCounter);
+    store<i32>(getSaveStateMemoryOffset(0x09, Channel4.saveStateSlot), Channel4.lengthCounter);
+    store<i32>(getSaveStateMemoryOffset(0x0E, Channel4.saveStateSlot), Channel4.volume);
+  }
+
+  // Function to load the save state from memory
+  static loadState(): void {
+    Channel4.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x00, Channel4.saveStateSlot));
+    Channel4.frequencyTimer = load<i32>(getSaveStateMemoryOffset(0x01, Channel4.saveStateSlot));
+    Channel4.envelopeCounter = load<i32>(getSaveStateMemoryOffset(0x05, Channel4.saveStateSlot));
+    Channel4.lengthCounter = load<i32>(getSaveStateMemoryOffset(0x09, Channel4.saveStateSlot));
+    Channel4.volume = load<i32>(getSaveStateMemoryOffset(0x0E, Channel4.saveStateSlot));
+  }
 
   static initialize(): void {
     eightBitStoreIntoGBMemory(Channel4.memoryLocationNRx1 - 1, 0xFF);

@@ -84,7 +84,7 @@ export class Graphics {
   // Function to save the state of the class
   static saveState(): void {
     store<i16>(getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot), Graphics.scanlineCycleCounter);
-    store<u8>(getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot), Graphics.currentLcdMode);
+    store<u8>(getSaveStateMemoryOffset(0x02, Graphics.saveStateSlot), Graphics.currentLcdMode);
   }
 
   // Function to load the save state from memory

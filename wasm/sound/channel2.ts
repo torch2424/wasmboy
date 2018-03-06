@@ -5,7 +5,10 @@
 
 import {
   eightBitLoadFromGBMemory,
-  eightBitStoreIntoGBMemory
+  eightBitStoreIntoGBMemory,
+  getSaveStateMemoryOffset,
+  loadBooleanDirectlyFromWasmMemory,
+  storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
 import {
   getChannelStartingVolume,
@@ -54,6 +57,34 @@ export class Channel2 {
   // Square Wave properties
   static dutyCycle: u8 = 0x00;
   static waveFormPositionOnDuty: u8 = 0x00;
+
+  // Save States
+
+  static saveStateSlot: u16 = 8;
+
+  // Function to save the state of the class
+  static saveState(): void {
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x00, Channel2.saveStateSlot), Channel2.isEnabled);
+    store<i32>(getSaveStateMemoryOffset(0x01, Channel2.saveStateSlot), Channel2.frequencyTimer);
+    store<i32>(getSaveStateMemoryOffset(0x05, Channel2.saveStateSlot), Channel2.envelopeCounter);
+    store<i32>(getSaveStateMemoryOffset(0x09, Channel2.saveStateSlot), Channel2.lengthCounter);
+    store<i32>(getSaveStateMemoryOffset(0x0E, Channel2.saveStateSlot), Channel2.volume);
+
+    store<u8>(getSaveStateMemoryOffset(0x13, Channel2.saveStateSlot), Channel2.dutyCycle);
+    store<u8>(getSaveStateMemoryOffset(0x14, Channel2.saveStateSlot), Channel2.waveFormPositionOnDuty);
+  }
+
+  // Function to load the save state from memory
+  static loadState(): void {
+    Channel2.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x00, Channel2.saveStateSlot));
+    Channel2.frequencyTimer = load<i32>(getSaveStateMemoryOffset(0x01, Channel2.saveStateSlot));
+    Channel2.envelopeCounter = load<i32>(getSaveStateMemoryOffset(0x05, Channel2.saveStateSlot));
+    Channel2.lengthCounter = load<i32>(getSaveStateMemoryOffset(0x09, Channel2.saveStateSlot));
+    Channel2.volume = load<i32>(getSaveStateMemoryOffset(0x0E, Channel2.saveStateSlot));
+
+    Channel2.dutyCycle = load<u8>(getSaveStateMemoryOffset(0x13, Channel2.saveStateSlot));
+    Channel2.waveFormPositionOnDuty = load<u8>(getSaveStateMemoryOffset(0x14, Channel2.saveStateSlot));
+  }
 
   static initialize(): void {
     eightBitStoreIntoGBMemory(Channel2.memoryLocationNRx1 - 1, 0xFF);

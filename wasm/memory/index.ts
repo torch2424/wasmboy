@@ -3,6 +3,7 @@
 // Public exports for our memory "class"
 
 export {
+  Memory,
   initializeCartridge,
   setPixelOnFrame,
   getPixelOnFrame,

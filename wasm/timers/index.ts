@@ -3,13 +3,16 @@ import {
 } from '../cpu/index';
 import {
   eightBitLoadFromGBMemory,
-  eightBitStoreIntoGBMemorySkipTraps
+  eightBitStoreIntoGBMemorySkipTraps,
+  getSaveStateMemoryOffset,
+  loadBooleanDirectlyFromWasmMemory,
+  storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
 import {
   requestTimerInterrupt
 } from '../interrupts/index';
 
-class Timers {
+export class Timers {
   static memoryLocationTIMA: u16 = 0xFF05; // Timer Modulator
   static memoryLocationTMA: u16 = 0xFF06; // Timer Counter (Actual Time Value)
   static memoryLocationTIMC: u16 = 0xFF07; // Timer Controller (A.K.A TAC)
@@ -22,6 +25,22 @@ class Timers {
 
   // Another timer, that doesn't fire intterupts, but jsut counts to 255, and back to zero :p
   static dividerRegisterCycleCounter: i16 = 0x00;
+
+  // Save States
+
+  static saveStateSlot: u16 = 5;
+
+  // Function to save the state of the class
+  static saveState(): void {
+    store<i16>(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot), Timers.cycleCounter);
+    store<i16>(getSaveStateMemoryOffset(0x02, Timers.saveStateSlot), Timers.dividerRegisterCycleCounter);
+  }
+
+  // Function to load the save state from memory
+  static loadState(): void {
+    Timers.cycleCounter = load<i16>(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot));
+    Timers.dividerRegisterCycleCounter = load<i16>(getSaveStateMemoryOffset(0x02, Timers.saveStateSlot));
+  }
 }
 
 export function updateTimers(numberOfCycles: u8): void {
