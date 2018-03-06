@@ -154,3 +154,12 @@ export function setLeftAndRightOutputForAudioQueue(leftVolume: u8, rightVolume: 
   store<u8>(audioQueueOffset, leftVolume + 1);
   store<u8>(audioQueueOffset + 1, rightVolume + 1);
 }
+
+// Function to return an address to store into save state memory
+// this is to regulate our 20 slots
+// https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
+export function getSaveStateMemoryOffset(offset: u16, saveStateSlot: u16): u16 {
+  // 50 byutes per save state memory partiton slot
+  const address: u16 = offset + (50 * saveStateSlot);
+  return address;
+}
