@@ -31,6 +31,7 @@ import {
 } from './instructions';
 import {
   log,
+  hexLog,
   rotateByteLeft,
   rotateByteLeftThroughCarry,
   rotateByteRight,

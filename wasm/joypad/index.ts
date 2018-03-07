@@ -38,7 +38,7 @@ import {
 // SELECT - 6
 // START - 7
 
-class Joypad {
+export class Joypad {
   static up: boolean = false;
   static down: boolean = false;
   static left: boolean = false;
@@ -49,6 +49,19 @@ class Joypad {
   static start: boolean = false;
 
   static memoryLocationJoypadRegister: u16 = 0xFF00;
+
+  // Save States
+  // Not doing anything for Joypad for now
+
+  static saveStateSlot: u16 = 3;
+
+  // Function to save the state of the class
+  static saveState(): void {
+  }
+
+  // Function to load the save state from memory
+  static loadState(): void {
+  }
 }
 
 export function getJoypadState(): u8 {

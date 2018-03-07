@@ -1,11 +1,32 @@
-
 // Imports
 import {
-Cpu
+  Cpu
 } from './cpu/index';
 import {
+  Graphics
+} from './graphics/index';
+import {
+  Interrupts
+} from './interrupts/index';
+import {
+  Joypad
+} from './joypad/index';
+import {
+  Memory
+} from './memory/index';
+import {
+  Timers
+} from './timers/index';
+import {
+  Sound,
+  Channel1,
+  Channel2,
+  Channel3,
+  Channel4
+} from './sound/index';
+import {
   eightBitLoadFromGBMemory
-} from './memory/index'
+} from './memory/index';
 
 // Public Exports
 export {
@@ -24,7 +45,37 @@ export {
 export {
   getAudioQueueIndex,
   resetAudioQueue
-} from './sound/index'
+} from './sound/index';
+
+// Function to save state to memory for all of our classes
+export function saveState(): void {
+  Cpu.saveState();
+  Graphics.saveState();
+  Interrupts.saveState();
+  Joypad.saveState();
+  Memory.saveState();
+  Timers.saveState();
+  Sound.saveState();
+  Channel1.saveState();
+  Channel2.saveState();
+  Channel3.saveState();
+  Channel4.saveState();
+}
+
+// Function to load state from memory for all of our classes
+export function loadState(): void {
+  Cpu.loadState();
+  Graphics.loadState();
+  Interrupts.loadState();
+  Joypad.loadState();
+  Memory.loadState();
+  Timers.loadState();
+  Sound.loadState();
+  Channel1.loadState();
+  Channel2.loadState();
+  Channel3.loadState();
+  Channel4.loadState();
+}
 
 export function getRegisterA(): u8 {
   return Cpu.registerA;

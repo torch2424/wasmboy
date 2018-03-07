@@ -4,7 +4,10 @@ import {
 import {
   eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemorySkipTraps,
-  sixteenBitStoreIntoGBMemorySkipTraps
+  sixteenBitStoreIntoGBMemorySkipTraps,
+  getSaveStateMemoryOffset,
+  loadBooleanDirectlyFromWasmMemory,
+  storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
 import {
   setBitOnByte,
@@ -13,7 +16,7 @@ import {
   hexLog
 } from '../helpers/index';
 
-class Interrupts {
+export class Interrupts {
   static memoryLocationInterruptEnabled: u16 = 0xFFFF;
   static memoryLocationInterruptRequest: u16 = 0xFF0F; // A.K.A interrupt Flag (IF)
 
@@ -27,6 +30,22 @@ class Interrupts {
   static bitPositionLcdInterrupt: u8 = 1;
   static bitPositionTimerInterrupt: u8 = 2;
   static bitPositionJoypadInterrupt: u8 = 4;
+
+  // Save States
+
+  static saveStateSlot: u16 = 2;
+
+  // Function to save the state of the class
+  static saveState(): void {
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x00, Interrupts.saveStateSlot), Interrupts.masterInterruptSwitch);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x01, Interrupts.saveStateSlot), Interrupts.masterInterruptSwitchDelay);
+  }
+
+  // Function to load the save state from memory
+  static loadState(): void {
+    Interrupts.masterInterruptSwitch = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x00, Interrupts.saveStateSlot));
+    Interrupts.masterInterruptSwitchDelay = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x01, Interrupts.saveStateSlot));
+  }
 }
 
 function _handleInterrupt(bitPosition: u8): void {

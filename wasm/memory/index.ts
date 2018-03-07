@@ -3,21 +3,25 @@
 // Public exports for our memory "class"
 
 export {
+  Memory,
   initializeCartridge,
   setPixelOnFrame,
   getPixelOnFrame,
   storeFrameToBeRendered,
-  setLeftAndRightOutputForAudioQueue
+  setLeftAndRightOutputForAudioQueue,
+  getSaveStateMemoryOffset
 } from './memory';
 
 export {
   eightBitLoadFromGBMemory,
-  sixteenBitLoadFromGBMemory
+  sixteenBitLoadFromGBMemory,
+  loadBooleanDirectlyFromWasmMemory
 } from './load';
 
 export {
   eightBitStoreIntoGBMemory,
   sixteenBitStoreIntoGBMemory,
   eightBitStoreIntoGBMemorySkipTraps,
-  sixteenBitStoreIntoGBMemorySkipTraps
+  sixteenBitStoreIntoGBMemorySkipTraps,
+  storeBooleanDirectlyToWasmMemory
 } from './store';

@@ -5,7 +5,10 @@
 
 import {
   eightBitLoadFromGBMemory,
-  eightBitStoreIntoGBMemory
+  eightBitStoreIntoGBMemory,
+  getSaveStateMemoryOffset,
+  loadBooleanDirectlyFromWasmMemory,
+  storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
 import {
   getChannelStartingVolume,
@@ -54,6 +57,26 @@ export class Channel3 {
   static frequencyTimer: i32 = 0x00;
   static lengthCounter: i32 = 0x00;
   static waveTablePosition: u16 = 0x00;
+
+  // Save States
+
+  static saveStateSlot: u16 = 9;
+
+  // Function to save the state of the class
+  static saveState(): void {
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x00, Channel3.saveStateSlot), Channel3.isEnabled);
+    store<i32>(getSaveStateMemoryOffset(0x01, Channel3.saveStateSlot), Channel3.frequencyTimer);
+    store<i32>(getSaveStateMemoryOffset(0x05, Channel3.saveStateSlot), Channel3.lengthCounter);
+    store<u16>(getSaveStateMemoryOffset(0x09, Channel3.saveStateSlot), Channel3.waveTablePosition);
+  }
+
+  // Function to load the save state from memory
+  static loadState(): void {
+    Channel3.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x00, Channel3.saveStateSlot));
+    Channel3.frequencyTimer = load<i32>(getSaveStateMemoryOffset(0x01, Channel3.saveStateSlot));
+    Channel3.lengthCounter = load<i32>(getSaveStateMemoryOffset(0x05, Channel3.saveStateSlot));
+    Channel3.waveTablePosition = load<u16>(getSaveStateMemoryOffset(0x09, Channel3.saveStateSlot));
+  }
 
   static initialize(): void {
     eightBitStoreIntoGBMemory(Channel3.memoryLocationNRx0, 0x7F);

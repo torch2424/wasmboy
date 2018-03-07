@@ -14,15 +14,13 @@ import {
 } from './sprites';
 // TODO: Dcode fixed the Assemblyscript bug where the index imports didn't work, can undo all of these now :)
 import {
-  storeFrameToBeRendered
+  eightBitLoadFromGBMemory,
+  eightBitStoreIntoGBMemorySkipTraps,
+  storeFrameToBeRendered,
+  getSaveStateMemoryOffset,
+  loadBooleanDirectlyFromWasmMemory,
+  storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
-// Assembly script really not feeling the reexport
-import {
-  eightBitLoadFromGBMemory
-} from '../memory/load';
-import {
-  eightBitStoreIntoGBMemorySkipTraps
-} from '../memory/store';
 import {
   requestVBlankInterrupt
 } from '../interrupts/index';
@@ -78,6 +76,22 @@ export class Graphics {
   static colorBlack: u8 = 4;
 
   // Screen data needs to be stored in wasm memory
+
+  // Save States
+
+  static saveStateSlot: u16 = 1;
+
+  // Function to save the state of the class
+  static saveState(): void {
+    store<i16>(getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot), Graphics.scanlineCycleCounter);
+    store<u8>(getSaveStateMemoryOffset(0x02, Graphics.saveStateSlot), Graphics.currentLcdMode);
+  }
+
+  // Function to load the save state from memory
+  static loadState(): void {
+    Graphics.scanlineCycleCounter = load<i16>(getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot));
+    Graphics.currentLcdMode = load<u8>(getSaveStateMemoryOffset(0x02, Graphics.saveStateSlot));
+  }
 }
 
 export function updateGraphics(numberOfCycles: u8): void {

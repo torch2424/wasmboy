@@ -6,8 +6,12 @@ import {
   hexLog
 } from '../helpers/index';
 import {
-  eightBitLoadFromGBMemory
+  eightBitLoadFromGBMemory,
+  loadBooleanDirectlyFromWasmMemory
 } from './load';
+import {
+  storeBooleanDirectlyToWasmMemory
+} from './store';
 import {
   handleBanking
 } from './banking';
@@ -49,14 +53,15 @@ export class Memory {
   // ----------------------------------
   // Wasmboy Memory Map
   // ----------------------------------
-  static gameBoyInternalMemoryLocation: u32 = 0x000000;
-  static videoOutputLocation: u32 = 0x008000;
+  static gameBoyInternalMemoryLocation: u32 = 0x000400;
+  static videoOutputLocation: u32 = 0x028400;
   static currentFrameVideoOutputLocation: u32 = Memory.videoOutputLocation;
   static frameInProgressVideoOutputLocation: u32 = Memory.currentFrameVideoOutputLocation + (160 * 144);
-  static soundOutputLocation: u32 = 0x033400;
+  static soundOutputLocation: u32 = 0x053800;
+
   // Passed in Game backup or ROM from the user
-  static gameBytesLocation: u32 = 0x043400;
-  static gameRamBanksLocation: u32 = 0x843400;
+  static gameBytesLocation: u32 = 0x073800;
+  static gameRamBanksLocation: u32 = 0x008400;
 
   // ----------------------------------
   // Rom/Ram Banking
@@ -67,6 +72,7 @@ export class Memory {
   static currentRamBank: u16 = 0x00;
   static isRamBankingEnabled: boolean = false;
   static isMBC1RomModeEnabled: boolean = true;
+
   // Cartridge Types
   // http://gbdev.gg8.se/wiki/articles/The_Cartridge_Header
   static isRomOnly: boolean = true;
@@ -74,6 +80,40 @@ export class Memory {
   static isMBC2: boolean = false;
   static isMBC3: boolean = false;
   static isMBC5: boolean = false;
+
+  // Save States
+
+  static saveStateSlot: u16 = 4;
+
+  // Function to save the state of the class
+  static saveState(): void {
+    store<u16>(getSaveStateMemoryOffset(0x00, Memory.saveStateSlot), Memory.currentRomBank);
+    store<u16>(getSaveStateMemoryOffset(0x02, Memory.saveStateSlot), Memory.currentRamBank);
+
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x04, Memory.saveStateSlot), Memory.isRamBankingEnabled);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x05, Memory.saveStateSlot), Memory.isMBC1RomModeEnabled);
+
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x06, Memory.saveStateSlot), Memory.isRomOnly);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x07, Memory.saveStateSlot), Memory.isMBC1);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x08, Memory.saveStateSlot), Memory.isMBC2);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x09, Memory.saveStateSlot), Memory.isMBC3);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0A, Memory.saveStateSlot), Memory.isMBC5);
+  }
+
+  // Function to load the save state from memory
+  static loadState(): void {
+    Memory.currentRomBank = load<u16>(getSaveStateMemoryOffset(0x00, Memory.saveStateSlot));
+    Memory.currentRamBank = load<u16>(getSaveStateMemoryOffset(0x02, Memory.saveStateSlot));
+
+    Memory.isRamBankingEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x04, Memory.saveStateSlot));
+    Memory.isMBC1RomModeEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x05, Memory.saveStateSlot));
+
+    Memory.isRomOnly = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x06, Memory.saveStateSlot));
+    Memory.isMBC1 = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x07, Memory.saveStateSlot));
+    Memory.isMBC2 = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x08, Memory.saveStateSlot));
+    Memory.isMBC3 = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x09, Memory.saveStateSlot));
+    Memory.isMBC5 = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0A, Memory.saveStateSlot));
+  }
 }
 
 export function initializeCartridge(): void {
@@ -151,4 +191,13 @@ export function setLeftAndRightOutputForAudioQueue(leftVolume: u8, rightVolume: 
   // +1 that way we don't have empty data to ensure that the value is set
   store<u8>(audioQueueOffset, leftVolume + 1);
   store<u8>(audioQueueOffset + 1, rightVolume + 1);
+}
+
+// Function to return an address to store into save state memory
+// this is to regulate our 20 slots
+// https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
+export function getSaveStateMemoryOffset(offset: u16, saveStateSlot: u16): u16 {
+  // 50 byutes per save state memory partiton slot
+  let address: u16 = offset + (50 * saveStateSlot);
+  return address;
 }

@@ -1,6 +1,14 @@
 import { Component } from 'preact';
 import { NumberBaseTable } from './numberBaseTable';
 
+// Constants for the gameBoyInternalMemoryLocation
+const WASMBOY_MEMORY_GAMEBOY_INTERNAL_MEMORY = 0x000400;
+
+// Function to get a value in gameboy memory, to wasmboy memory
+const getWasmBoyOffsetFromGameBoyOffset = (gameboyOffset) => {
+  return (gameboyOffset - 0x8000) + WASMBOY_MEMORY_GAMEBOY_INTERNAL_MEMORY;
+}
+
 export class WasmBoyDebugger extends Component {
 
   constructor() {
@@ -100,19 +108,19 @@ export class WasmBoyDebugger extends Component {
     state.cpu = Object.assign({}, state.cpu);
 
     // Update PPU State
-    state.ppu['Scanline Register (LY) - 0xFF44'] = wasmboy.wasmByteMemory[0xFF44 - 0x8000];
-    state.ppu['LCD Status (STAT) - 0xFF41'] = wasmboy.wasmByteMemory[0xFF41 - 0x8000];
-    state.ppu['LCD Control (LCDC) - 0xFF40'] = wasmboy.wasmByteMemory[0xFF40 - 0x8000];
-    state.ppu['Scroll X - 0xFF43'] = wasmboy.wasmByteMemory[0xFF43 - 0x8000];
-    state.ppu['Scroll Y - 0xFF42'] = wasmboy.wasmByteMemory[0xFF42 - 0x8000];
-    state.ppu['Window X - 0xFF4B'] = wasmboy.wasmByteMemory[0xFF4B - 0x8000];
-    state.ppu['Window Y - 0xFF4A'] = wasmboy.wasmByteMemory[0xFF4A - 0x8000];
+    state.ppu['Scanline Register (LY) - 0xFF44'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFF44)];
+    state.ppu['LCD Status (STAT) - 0xFF41'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFF41)];
+    state.ppu['LCD Control (LCDC) - 0xFF40'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFF40)];
+    state.ppu['Scroll X - 0xFF43'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFF43)];
+    state.ppu['Scroll Y - 0xFF42'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFF42)];
+    state.ppu['Window X - 0xFF4B'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFF4B)];
+    state.ppu['Window Y - 0xFF4A'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFF4A)];
 
     // Update Timers State
-    state.timers['TIMA - 0xFF05'] = wasmboy.wasmByteMemory[0xFF05 - 0x8000];
-    state.timers['TMA - 0xFF06'] = wasmboy.wasmByteMemory[0xFF06 - 0x8000];
-    state.timers['TIMC/TAC - 0xFF07'] = wasmboy.wasmByteMemory[0xFF07 - 0x8000];
-    state.timers['DIV/Divider Register - 0xFF04'] = wasmboy.wasmByteMemory[0xFF04 - 0x8000];
+    state.timers['TIMA - 0xFF05'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFF05)];
+    state.timers['TMA - 0xFF06'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFF06)];
+    state.timers['TIMC/TAC - 0xFF07'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFF07)];
+    state.timers['DIV/Divider Register - 0xFF04'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFF04)];
 
     // Update interrupts state
     if(wasmboy.wasmInstance.exports.areInterruptsEnabled()) {
@@ -120,8 +128,8 @@ export class WasmBoyDebugger extends Component {
     } else {
       state.interrupts['Interrupt Master Switch'] = 0x00;
     }
-    state.interrupts['IE/Interrupt Enabled - 0xFFFF'] = wasmboy.wasmByteMemory[0xFFFF - 0x8000];
-    state.interrupts['IF/Interrupt Request - 0xFF0F'] = wasmboy.wasmByteMemory[0xFF0F - 0x8000];
+    state.interrupts['IE/Interrupt Enabled - 0xFFFF'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFFFF)];
+    state.interrupts['IF/Interrupt Request - 0xFF0F'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFF0F)];
 
     // Clone our state, that it is immutable and will cause change detection
     this.setState(state);

@@ -24,7 +24,10 @@ import {
 import {
   eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemory,
-  setLeftAndRightOutputForAudioQueue
+  setLeftAndRightOutputForAudioQueue,
+  getSaveStateMemoryOffset,
+  loadBooleanDirectlyFromWasmMemory,
+  storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
 import {
   hexLog
@@ -60,9 +63,29 @@ export class Sound {
   // Cycle counter reaches the max cycle
   static frameSequencer: u8 = 0x00;
 
-  // Our current sample umber we are passing back to the wasmboy memory map
+  // Our current sample number we are passing back to the wasmboy memory map
   // Going to pass back 4096 samples and then reset
   static audioQueueIndex: u32 = 0x0000;
+
+  // Save States
+
+  static saveStateSlot: u16 = 6;
+
+  // Function to save the state of the class
+  static saveState(): void {
+    store<i16>(getSaveStateMemoryOffset(0x00, Sound.saveStateSlot), Sound.frameSequenceCycleCounter);
+    store<u8>(getSaveStateMemoryOffset(0x02, Sound.saveStateSlot), Sound.downSampleCycleCounter);
+    store<u8>(getSaveStateMemoryOffset(0x03, Sound.saveStateSlot), Sound.frameSequencer);
+  }
+
+  // Function to load the save state from memory
+  static loadState(): void {
+    Sound.frameSequenceCycleCounter = load<i16>(getSaveStateMemoryOffset(0x00, Sound.saveStateSlot));
+    Sound.downSampleCycleCounter = load<u8>(getSaveStateMemoryOffset(0x02, Sound.saveStateSlot));
+    Sound.frameSequencer = load<u8>(getSaveStateMemoryOffset(0x03, Sound.saveStateSlot));
+
+    resetAudioQueue();
+  }
 }
 
 // Initialize sound registers

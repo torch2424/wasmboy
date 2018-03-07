@@ -6,7 +6,10 @@
 
 import {
   eightBitLoadFromGBMemory,
-  eightBitStoreIntoGBMemory
+  eightBitStoreIntoGBMemory,
+  getSaveStateMemoryOffset,
+  loadBooleanDirectlyFromWasmMemory,
+  storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
 import {
   getChannelStartingVolume,
@@ -60,6 +63,41 @@ export class Channel1 {
   // Channel 1 Sweep
   static sweepCounter: i32 = 0x00;
   static sweepShadowFrequency: u16 = 0x00;
+
+  // Save States
+
+  static saveStateSlot: u16 = 7;
+
+  // Function to save the state of the class
+  static saveState(): void {
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x00, Channel1.saveStateSlot), Channel1.isEnabled);
+    store<i32>(getSaveStateMemoryOffset(0x01, Channel1.saveStateSlot), Channel1.frequencyTimer);
+    store<i32>(getSaveStateMemoryOffset(0x05, Channel1.saveStateSlot), Channel1.envelopeCounter);
+    store<i32>(getSaveStateMemoryOffset(0x09, Channel1.saveStateSlot), Channel1.lengthCounter);
+    store<i32>(getSaveStateMemoryOffset(0x0E, Channel1.saveStateSlot), Channel1.volume);
+
+    store<u8>(getSaveStateMemoryOffset(0x13, Channel1.saveStateSlot), Channel1.dutyCycle);
+    store<u8>(getSaveStateMemoryOffset(0x14, Channel1.saveStateSlot), Channel1.waveFormPositionOnDuty);
+
+    store<i32>(getSaveStateMemoryOffset(0x19, Channel1.saveStateSlot), Channel1.sweepCounter);
+    store<u16>(getSaveStateMemoryOffset(0x1E, Channel1.saveStateSlot), Channel1.sweepShadowFrequency);
+  }
+
+  // Function to load the save state from memory
+  static loadState(): void {
+    Channel1.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x00, Channel1.saveStateSlot));
+    Channel1.frequencyTimer = load<i32>(getSaveStateMemoryOffset(0x01, Channel1.saveStateSlot));
+    Channel1.envelopeCounter = load<i32>(getSaveStateMemoryOffset(0x05, Channel1.saveStateSlot));
+    Channel1.lengthCounter = load<i32>(getSaveStateMemoryOffset(0x09, Channel1.saveStateSlot));
+    Channel1.volume = load<i32>(getSaveStateMemoryOffset(0x0E, Channel1.saveStateSlot));
+
+    Channel1.dutyCycle = load<u8>(getSaveStateMemoryOffset(0x13, Channel1.saveStateSlot));
+    Channel1.waveFormPositionOnDuty = load<u8>(getSaveStateMemoryOffset(0x14, Channel1.saveStateSlot));
+
+    Channel1.sweepCounter = load<i32>(getSaveStateMemoryOffset(0x19, Channel1.saveStateSlot));
+    Channel1.sweepShadowFrequency = load<u16>(getSaveStateMemoryOffset(0x1E, Channel1.saveStateSlot));
+  }
+
 
   static initialize(): void {
     eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx0, 0x80);

@@ -6,7 +6,10 @@
 <!--- Short Description-->
 🎮👾🕹️ Gameboy Emulator Library written in Web Assembly using [AssemblyScript](https://github.com/AssemblyScript/assemblyscript), Debugger/Shell in Preact 🎮👾🕹️
 
+
 *🎵 Click the image below for a quick video of a sound test the Alpha version 🎵*
+
+
 [![WasmBoy Alpha Sound Test Video](https://img.youtube.com/vi/LqH495sZ6ns/0.jpg)](https://www.youtube.com/watch?v=LqH495sZ6ns)
 
 # Features
@@ -19,9 +22,12 @@
 
 [Please see the Roadmap for upcoming features](#roadmap)
 
-# Screenshots
+# Screenshots & Gifs
 
-**Coming soon!**
+**Save States**
+![wasm boy save state](https://user-images.githubusercontent.com/1448289/37084052-45e35e62-21a6-11e8-96d0-539c5649c197.gif)
+
+**More Coming soon!**
 
 For now I would watch the video posted at the top of the readme :)
 

@@ -5,7 +5,10 @@
 
 import {
   eightBitLoadFromGBMemory,
-  eightBitStoreIntoGBMemory
+  eightBitStoreIntoGBMemory,
+  getSaveStateMemoryOffset,
+  loadBooleanDirectlyFromWasmMemory,
+  storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
 import {
   getChannelStartingVolume,
@@ -44,10 +47,6 @@ export class Channel4 {
   // NR43 -> Counter/consecutive; initial (R/W)
   static memoryLocationNRx4: u16 = 0xFF23;
 
-  // Noise properties
-  // NOTE: Is only 15 bits
-  static linearFeedbackShiftRegister: u16 = 0x00;
-
   // Channel Properties
   static channelNumber: i8 = 4;
   static isEnabled: boolean = false;
@@ -55,6 +54,34 @@ export class Channel4 {
   static envelopeCounter: i32 = 0x00;
   static lengthCounter: i32 = 0x00;
   static volume: i32 = 0x00;
+
+  // Noise properties
+  // NOTE: Is only 15 bits
+  static linearFeedbackShiftRegister: u16 = 0x00;
+
+  // Save States
+
+  static saveStateSlot: u16 = 10;
+
+  // Function to save the state of the class
+  static saveState(): void {
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x00, Channel4.saveStateSlot), Channel4.isEnabled);
+    store<i32>(getSaveStateMemoryOffset(0x01, Channel4.saveStateSlot), Channel4.frequencyTimer);
+    store<i32>(getSaveStateMemoryOffset(0x05, Channel4.saveStateSlot), Channel4.envelopeCounter);
+    store<i32>(getSaveStateMemoryOffset(0x09, Channel4.saveStateSlot), Channel4.lengthCounter);
+    store<i32>(getSaveStateMemoryOffset(0x0E, Channel4.saveStateSlot), Channel4.volume);
+    store<u16>(getSaveStateMemoryOffset(0x13, Channel4.saveStateSlot), Channel4.linearFeedbackShiftRegister);
+  }
+
+  // Function to load the save state from memory
+  static loadState(): void {
+    Channel4.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x00, Channel4.saveStateSlot));
+    Channel4.frequencyTimer = load<i32>(getSaveStateMemoryOffset(0x01, Channel4.saveStateSlot));
+    Channel4.envelopeCounter = load<i32>(getSaveStateMemoryOffset(0x05, Channel4.saveStateSlot));
+    Channel4.lengthCounter = load<i32>(getSaveStateMemoryOffset(0x09, Channel4.saveStateSlot));
+    Channel4.volume = load<i32>(getSaveStateMemoryOffset(0x0E, Channel4.saveStateSlot));
+    Channel4.linearFeedbackShiftRegister = load<u16>(getSaveStateMemoryOffset(0x13, Channel4.saveStateSlot));
+  }
 
   static initialize(): void {
     eightBitStoreIntoGBMemory(Channel4.memoryLocationNRx1 - 1, 0xFF);
