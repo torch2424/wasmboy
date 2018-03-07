@@ -14,14 +14,20 @@ const PNGImage = require('pngjs-image');
 // Define some constants
 const GAMEBOY_CAMERA_WIDTH = 160;
 const GAMEBOY_CAMERA_HEIGHT = 144;
+const WASMBOY_MEMORY_CURRENT_RENDERED_FRAME = 0x028400;
 
 // Some Timeouts for specified test roms
+// Default is 20 seconds, as it runs cpu_instrs in that time
+// on my mid-tier 2015 MBP. and cpu_instrs takes a while :)
+const TEST_ROM_DEFAULT_TIMEOUT = 20000;
 const TEST_ROM_TIMEOUT = {
-  cpu_instrs: 60000
+  cpu_instrs: 20000
 };
 
-// Initialize wasmBoy
-WasmBoy.initializeHeadless();
+// Initialize wasmBoy headless, with a frameskip
+// Frameskip will simply run that many gameboy frames,
+// before calling and waiting for another requestAnimationFrame()
+WasmBoy.initializeHeadless(30);
 
 // Get our folders under testroms
 const isDirectory = source => fs.lstatSync(source).isDirectory()
@@ -47,7 +53,7 @@ getDirectories(testRomsPath).forEach((directory) => {
         // Default: Wait 60 seconds for every test
         // Stop watch-ed cpu_instructs and it took about 55
         // So lets see how this goes
-        let timeToWaitForTestRom = 60000;
+        let timeToWaitForTestRom = TEST_ROM_DEFAULT_TIMEOUT;
 
         // Define our wasmboy instance
         // Not using arrow functions, as arrow function timeouts were acting up
@@ -97,7 +103,7 @@ getDirectories(testRomsPath).forEach((directory) => {
 
                   // Wasm Memory Mapping
                   // See: https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
-                  const pixelIndex = 0x008000 + x + (y * GAMEBOY_CAMERA_WIDTH);
+                  const pixelIndex = WASMBOY_MEMORY_CURRENT_RENDERED_FRAME + x + (y * GAMEBOY_CAMERA_WIDTH);
                   const color = WasmBoy.wasmByteMemory[pixelIndex];
 
                   // Doing graphics using second answer on:
