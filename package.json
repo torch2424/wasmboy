@@ -40,7 +40,7 @@
     "build/*"
   ],
   "dependencies": {
-    "idb-keyval": "^2.3.0",
+    "idb": "^2.1.0",
     "preact": "^8.2.1",
     "preact-compat": "^3.17.0",
     "promise-polyfill": "7.0.0",
