@@ -19,9 +19,9 @@ const WASMBOY_MEMORY_CURRENT_RENDERED_FRAME = 0x028400;
 // Some Timeouts for specified test roms
 // Default is 20 seconds, as it runs cpu_instrs in that time
 // on my mid-tier 2015 MBP. and cpu_instrs takes a while :)
-const TEST_ROM_DEFAULT_TIMEOUT = 20000;
+const TEST_ROM_DEFAULT_TIMEOUT = 30000;
 const TEST_ROM_TIMEOUT = {
-  cpu_instrs: 20000
+  cpu_instrs: 30000
 };
 
 // Initialize wasmBoy headless, with a frameskip
