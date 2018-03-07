@@ -22,9 +22,12 @@
 
 [Please see the Roadmap for upcoming features](#roadmap)
 
-# Screenshots
+# Screenshots & Gifs
 
-**Coming soon!**
+**Save States**
+![wasm boy save state](https://user-images.githubusercontent.com/1448289/37084052-45e35e62-21a6-11e8-96d0-539c5649c197.gif)
+
+**More Coming soon!**
 
 For now I would watch the video posted at the top of the readme :)
 
