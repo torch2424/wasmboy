@@ -33,13 +33,15 @@ export class Timers {
   // Function to save the state of the class
   static saveState(): void {
     store<i16>(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot), Timers.cycleCounter);
-    store<i16>(getSaveStateMemoryOffset(0x02, Timers.saveStateSlot), Timers.dividerRegisterCycleCounter);
+    store<i16>(getSaveStateMemoryOffset(0x02, Timers.saveStateSlot), Timers.currentMaxCycleCount);
+    store<i16>(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot), Timers.dividerRegisterCycleCounter);
   }
 
   // Function to load the save state from memory
   static loadState(): void {
     Timers.cycleCounter = load<i16>(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot));
-    Timers.dividerRegisterCycleCounter = load<i16>(getSaveStateMemoryOffset(0x02, Timers.saveStateSlot));
+    Timers.currentMaxCycleCount = load<i16>(getSaveStateMemoryOffset(0x02, Timers.saveStateSlot));
+    Timers.dividerRegisterCycleCounter = load<i16>(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot));
   }
 }
 

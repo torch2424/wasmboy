@@ -83,6 +83,8 @@ export class Sound {
     Sound.frameSequenceCycleCounter = load<i16>(getSaveStateMemoryOffset(0x00, Sound.saveStateSlot));
     Sound.downSampleCycleCounter = load<u8>(getSaveStateMemoryOffset(0x02, Sound.saveStateSlot));
     Sound.frameSequencer = load<u8>(getSaveStateMemoryOffset(0x03, Sound.saveStateSlot));
+
+    resetAudioQueue();
   }
 }
 
