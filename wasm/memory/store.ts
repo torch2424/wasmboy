@@ -57,8 +57,8 @@ function _eightBitStoreIntoWasmBoyMemory(gameboyOffset: u16, value: u8): void {
 
 export function storeBooleanDirectlyToWasmMemory(offset: u32, value: boolean): void {
   if (value) {
-    store<i8>(offset, 0x01);
+    store<u8>(offset, 0x01);
   } else {
-    store<i8>(offset, -0x01);
+    store<u8>(offset, 0x00);
   }
 }
