@@ -142,3 +142,5 @@ The debugger application/container for wasmBoy utilizes the [preact-cli](https:/
 * [Gameboy Sound Hardware](http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware)
 
 * [Gameboy Sound Operation](https://gist.github.com/drhelius/3652407)
+
+* [Google Material Icons](https://material.io/icons/)
