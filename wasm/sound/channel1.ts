@@ -61,6 +61,7 @@ export class Channel1 {
   static waveFormPositionOnDuty: u8 = 0x00;
 
   // Channel 1 Sweep
+  static isSweepEnabled: boolean = false;
   static sweepCounter: i32 = 0x00;
   static sweepShadowFrequency: u16 = 0x00;
 
@@ -79,8 +80,9 @@ export class Channel1 {
     store<u8>(getSaveStateMemoryOffset(0x13, Channel1.saveStateSlot), Channel1.dutyCycle);
     store<u8>(getSaveStateMemoryOffset(0x14, Channel1.saveStateSlot), Channel1.waveFormPositionOnDuty);
 
-    store<i32>(getSaveStateMemoryOffset(0x19, Channel1.saveStateSlot), Channel1.sweepCounter);
-    store<u16>(getSaveStateMemoryOffset(0x1E, Channel1.saveStateSlot), Channel1.sweepShadowFrequency);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x19, Channel1.saveStateSlot), Channel1.isSweepEnabled);
+    store<i32>(getSaveStateMemoryOffset(0x1A, Channel1.saveStateSlot), Channel1.sweepCounter);
+    store<u16>(getSaveStateMemoryOffset(0x1F, Channel1.saveStateSlot), Channel1.sweepShadowFrequency);
   }
 
   // Function to load the save state from memory
@@ -94,8 +96,9 @@ export class Channel1 {
     Channel1.dutyCycle = load<u8>(getSaveStateMemoryOffset(0x13, Channel1.saveStateSlot));
     Channel1.waveFormPositionOnDuty = load<u8>(getSaveStateMemoryOffset(0x14, Channel1.saveStateSlot));
 
-    Channel1.sweepCounter = load<i32>(getSaveStateMemoryOffset(0x19, Channel1.saveStateSlot));
-    Channel1.sweepShadowFrequency = load<u16>(getSaveStateMemoryOffset(0x1E, Channel1.saveStateSlot));
+    Channel1.isSweepEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x19, Channel1.saveStateSlot));
+    Channel1.sweepCounter = load<i32>(getSaveStateMemoryOffset(0x1A, Channel1.saveStateSlot));
+    Channel1.sweepShadowFrequency = load<u16>(getSaveStateMemoryOffset(0x1F, Channel1.saveStateSlot));
   }
 
 
@@ -173,19 +176,21 @@ export class Channel1 {
     Channel1.volume = getChannelStartingVolume(Channel1.channelNumber);
 
     // Handle Channel Sweep
-    // Getting period and things here, as frequency sweep is specific to the channel 1 square wave
-    let sweepRegister: u8 = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx0);
-    // Get bits 4-6
-    let sweepPeriod: u8 = sweepRegister & 0x70;
-    // Get bits 0-2
-    let sweepShift: u8 = sweepRegister & 0x07;
-
-    // Reset back to the sweep period
-    Channel1.sweepCounter = sweepPeriod;
+    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
     Channel1.sweepShadowFrequency = getChannelFrequency(Channel1.channelNumber);
 
+    // Reset back to the sweep period
+    Channel1.sweepCounter = getSweepPeriod();
+
+    // The internal enabled flag is set if either the sweep period or shift are non-zero, cleared otherwise.
+    if(getSweepPeriod() > 0 && getSweepShift() > 0) {
+      Channel1.isSweepEnabled = true;
+    } else {
+      Channel1.isSweepEnabled = false;
+    }
+
     // If the sweep shift is non-zero, frequency calculation and the overflow check are performed immediately.
-    if(sweepShift > 0) {
+    if(getSweepShift() > 0) {
         calculateSweepAndCheckOverflow();
     }
 
@@ -203,16 +208,15 @@ export class Channel1 {
 
     if (Channel1.sweepCounter <= 0) {
 
-      // Getting period and things here, as frequency sweep is specific to the channel 1 square wave
-      let sweepRegister: u8 = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx0);
-      // Get bits 4-6
-      let sweepPeriod: u8 = sweepRegister & 0x70;
-
       // Reset back to the sweep period
-      Channel1.sweepCounter = sweepPeriod;
+      Channel1.sweepCounter = getSweepPeriod();
 
       // Calculate our sweep
-      calculateSweepAndCheckOverflow();
+      // When it generates a clock and the sweep's internal enabled flag is set and the sweep period is not zero,
+      // a new frequency is calculated and the overflow check is performed.
+      if(Channel1.isSweepEnabled && getSweepPeriod() > 0) {
+        calculateSweepAndCheckOverflow();
+      }
     }
   }
 
@@ -254,61 +258,54 @@ export class Channel1 {
 
 // Sweep Specific functions
 
-function calculateSweepAndCheckOverflow(): void {
-  if(isSweepEnabled()) {
-
-    // Getting period and things here, as frequency sweep is specific to the channel 1 square wave
-    let sweepRegister: u8 = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx0);
-    // Get bits 0-2
-    let sweepShift: u8 = sweepRegister & 0x07;
-
-    let newFrequency: u16 = getNewFrequencyFromSweep();
-    // 7FF is the highest value of the frequency: 111 1111 1111
-    if (newFrequency <= 0x7FF && sweepShift > 0) {
-      setChannelFrequency(Channel1.channelNumber, newFrequency);
-      // Re calculate the new frequency
-      newFrequency = getNewFrequencyFromSweep();
-    }
-
-    // Next check if the new Frequency is above 0x7FF
-    // if So, disable our sweep
-    if (newFrequency > 0x7FF) {
-      Channel1.isEnabled = false;
-    }
-  }
-}
-
-// The internal enabled flag is set if either the sweep period or shift
-// are non-zero, cleared otherwise.
-function isSweepEnabled(): boolean {
+function getSweepPeriod(): u8 {
   let sweepRegister: u8 = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx0);
   // Get bits 4-6
   let sweepPeriod: u8 = sweepRegister & 0x70;
+  sweepPeriod = (sweepPeriod >> 4);
+  return sweepPeriod;
+}
+
+function getSweepShift(): u8 {
+  let sweepRegister: u8 = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx0);
   // Get bits 0-2
   let sweepShift: u8 = sweepRegister & 0x07;
 
-  if ((sweepPeriod !== 0 || sweepShift !== 0) || getChannelFrequency(1) > 0x7FF) {
-    return true;
-  } else {
-    return false;
+  return sweepShift;
+}
+
+function calculateSweepAndCheckOverflow(): void {
+
+  let newFrequency: u16 = getNewFrequencyFromSweep();
+  // 7FF is the highest value of the frequency: 111 1111 1111
+  if (newFrequency <= 0x7FF && getSweepShift() > 0) {
+    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware 
+    // If the new frequency is 2047 or less and the sweep shift is not zero,
+    // this new frequency is written back to the shadow frequency and square 1's frequency in NR13 and NR14,
+    // then frequency calculation and overflow check are run AGAIN immediately using this new value,
+    // but this second new frequency is not written back.
+    Channel1.sweepShadowFrequency = newFrequency;
+    setChannelFrequency(Channel1.channelNumber, newFrequency);
+    // Re calculate the new frequency
+    newFrequency = getNewFrequencyFromSweep();
+  }
+
+  // Next check if the new Frequency is above 0x7FF
+  // if So, disable our sweep
+  if (newFrequency > 0x7FF) {
+    Channel1.isEnabled = false;
   }
 }
 
 // Function to determing a new sweep in the current context
 function getNewFrequencyFromSweep(): u16 {
 
-  // Get our sweep register info
-  let sweepRegister: u8 = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx0);
-  // Get bits 4-6
-  let sweepPeriod: u8 = sweepRegister & 0x70;
-  // Get bits 0-2
-  let sweepShift: u8 = sweepRegister & 0x07;
-
   // Start our new frequency, by making it equal to the "shadow frequency"
   let newFrequency: u16 = Channel1.sweepShadowFrequency;
-  newFrequency = (newFrequency >> sweepShift);
+  newFrequency = (newFrequency >> getSweepShift());
 
   // Check for sweep negation
+  let sweepRegister: u8 = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx0);
   if (checkBitOnByte(3, sweepRegister)) {
     newFrequency = Channel1.sweepShadowFrequency - newFrequency;
   } else {
