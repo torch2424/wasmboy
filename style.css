@@ -7,11 +7,107 @@ h1 {
 	text-align: center;
 }
 
+button {
+	margin-left: 5px;
+	margin-right: 5px;
+}
+
 .wasmboy__canvas-container {
-	margin-left: auto;
-	margin-right: auto;
 	text-align: center;
 }
+
+.wasmboy__canvas-container__canvas {
+
+	border: 1px solid black;
+
+	/* Width and height are 160x144 pixel aspect ratio in vw */
+	width: 50vw;
+	height: 45vw;
+	min-width: 160px;
+	min-height: 144px;
+	max-width: 640px;
+	max-height: 576px;
+}
+
+
+.wasmboy__systemControls {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	text-align: center;
+}
+
+
+.wasmboy__gamepad {
+	position: fixed;
+	pointer-events: none;
+	top: 0;
+	left: 0;
+
+	width: 100vw;
+	height: 90vh;
+	opacity: 0.65;
+
+	/* Shown in media query at bottom */
+	display: none;
+}
+
+.wasmboy__gamepad svg {
+	position: absolute;
+	pointer-events: auto;
+	fill: #b967ff;
+}
+
+#gamepadDpad {
+	left: 0;
+	bottom: 50px;
+
+	width: 175px;
+	height: 175px;
+}
+
+#gamepadSelect {
+	left: calc(50vw - 125px);
+	bottom: 0;
+
+	width: 125px;
+	height: 50px;
+}
+
+#gamepadStart {
+	right: calc(50vw - 125px);
+	bottom: 0;
+
+	width: 125px;
+	height: 50px;
+}
+
+#gamepadB {
+	right: 125px;
+	bottom: 60px;
+
+	width: 110px;
+	height: 110px;
+}
+
+#gamepadA {
+	right: 0px;
+	bottom: 120px;
+
+	width: 110px;
+	height: 110px;
+}
+
+/* Only display on phones */
+@media screen and (max-width: 1024px) {
+	.wasmboy__gamepad {
+		display: block;
+	}
+
+	.wasmboy__debugger {
+		display: none;
+	}
+}
+
 
 .number-base-table-container {
 	width: 100%;
