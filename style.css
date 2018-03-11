@@ -7,28 +7,19 @@ h1 {
 	text-align: center;
 }
 
- /*
-	https://stackoverflow.com/questions/1495407/maintain-the-aspect-ratio-of-a-div-with-css
- */
 .wasmboy__canvas-container {
-	margin-left: auto;
-	margin-right: auto;
 	text-align: center;
+}
 
-	display: flex;
-	flex-direction: column;
+.wasmboy__canvas-container__canvas {
 
+	/* Width and height are 160x144 pixel aspect ratio in vw */
 	width: 50vw;
 	height: 45vw;
 	min-width: 160px;
 	min-height: 144px;
 	max-width: 640px;
 	max-height: 576px;
-}
-
-.wasmboy__canvas-container__canvas {
-	width: 100%;
-	flex: 1;
 }
 
 
