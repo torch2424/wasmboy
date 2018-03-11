@@ -7,6 +7,9 @@
 🎮👾🕹️ Gameboy Emulator Library written in Web Assembly using [AssemblyScript](https://github.com/AssemblyScript/assemblyscript), Debugger/Shell in Preact 🎮👾🕹️
 
 
+[Debugger (Desktop Only) / Demo with support for mobile controls](https://torch2424.github.io/wasmBoy/)
+
+
 *🎵 Click the image below for a quick video of a sound test the Alpha version 🎵*
 
 
