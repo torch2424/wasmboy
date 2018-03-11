@@ -2482,7 +2482,6 @@ var wasmboy_WasmBoyLib = function () {
 
           return blob.arrayBuffer();
         }).then(function (bytes) {
-          console.log(bytes);
           var byteArray = new Uint8Array(bytes);
           resolve(byteArray);
         }).catch(function (error) {
@@ -3132,7 +3131,7 @@ var index_App = function (_Component) {
 		WasmBoyController.addTouchInput('START', startElement, 'BUTTON');
 		WasmBoyController.addTouchInput('SELECT', selectElement, 'BUTTON');
 
-		WasmBoy.loadGame('./games/linksawakeninggg.gb').then(function () {
+		WasmBoy.loadGame('./games/linksawakening.gb').then(function () {
 			console.log('Wasmboy Ready!');
 		}).catch(function (error) {
 			console.log('Load Game Error:', error);
