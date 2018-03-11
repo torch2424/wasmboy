@@ -15,11 +15,17 @@
     "debugger:watch": "preact watch",
     "debugger:serve": "preact build && preact serve",
     "debugger:build": "preact build",
+    "debugger:deploy": "npm run debugger:build && npx gh-pages -d build",
     "wasm:watch": "npx watch \"npm run wasm:build\" wasm",
     "wasm:build": "npx asc wasm/index.ts -b dist/wasm/index.untouched.wasm -t dist/wasm/index.untouched.wast --optimize --validate --sourceMap --memoryBase 8861696 && echo \"Built Wasm!\"",
     "lib:watch": "npx rollup -c -w",
     "lib:build": "npx rollup -c"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "babel": {
     "presets": [
       [
@@ -41,8 +47,6 @@
   ],
   "dependencies": {
     "idb": "^2.1.0",
-    "preact": "^8.2.1",
-    "preact-compat": "^3.17.0",
     "promise-polyfill": "7.0.0",
     "raf": "^3.4.0",
     "responsive-gamepad": "0.0.2",
@@ -56,16 +60,20 @@
     "concurrently": "^3.5.1",
     "eslint": "^4.5.0",
     "eslint-config-synacor": "^1.1.0",
+    "gh-pages": "^1.1.0",
     "if-env": "^1.0.0",
     "jsdom": "^11.6.2",
     "mocha": "^5.0.1",
     "pngjs-image": "^0.11.7",
+    "preact": "^8.2.1",
     "preact-cli": "^2.0.0",
+    "preact-compat": "^3.17.0",
     "rollup": "^0.56.2",
     "rollup-plugin-babel": "^3.0.3",
     "rollup-plugin-commonjs": "^8.3.0",
     "rollup-plugin-node-resolve": "^3.0.3",
     "rollup-plugin-webassembly": "^1.0.3",
+    "uglifyjs-webpack-plugin": "^1.2.3",
     "wasm-loader": "^1.3.0",
     "watch": "^1.0.2"
   }

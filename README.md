@@ -7,6 +7,9 @@
 🎮👾🕹️ Gameboy Emulator Library written in Web Assembly using [AssemblyScript](https://github.com/AssemblyScript/assemblyscript), Debugger/Shell in Preact 🎮👾🕹️
 
 
+[Debugger (Desktop Only) / Demo with support for mobile controls](https://torch2424.github.io/wasmBoy/)
+
+
 *🎵 Click the image below for a quick video of a sound test the Alpha version 🎵*
 
 
@@ -102,6 +105,8 @@ npm run lib:build
 ```
 
 The debugger application/container for wasmBoy utilizes the [preact-cli](https://github.com/developit/preact-cli/blob/master/README.md). Additional workflow commands and tips can be found there.
+
+Using the [gh-pages](https://www.npmjs.com/package/gh-pages) for debugger/demo deployment onto gh-pages.
 
 # Special Thanks
 

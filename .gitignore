@@ -12,6 +12,7 @@
 
 # Ignore build output
 dist/
+build/
 
 # Ignore node files
 node_modules
