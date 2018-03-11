@@ -30,22 +30,75 @@ h1 {
 }
 
 
-.gamepad {
+.wasmboy__gamepad {
 	position: fixed;
 	pointer-events: none;
-	bottom: 0;
+	top: 0;
 	left: 0;
+
+	width: 100vw;
+	height: 100vh;
+	opacity: 0.65;
 
 	/* Shown in media query at bottom */
 	display: none;
 }
 
-.gamepad svg {
+.wasmboy__gamepad svg {
+	position: absolute;
 	pointer-events: auto;
-	width: 50%;
-	height: 20%;
-
 	fill: #b967ff;
+}
+
+#gamepadDpad {
+	left: 0;
+	bottom: 75px;
+
+	width: 145px;
+	height: 145px;
+}
+
+#gamepadSelect {
+	left: calc(50vw - 125px);
+	bottom: 0;
+
+	width: 125px;
+	height: 50px;
+}
+
+#gamepadStart {
+	right: calc(50vw - 125px);
+	bottom: 0;
+
+	width: 125px;
+	height: 50px;
+}
+
+#gamepadB {
+	right: 125px;
+	bottom: 60px;
+
+	width: 100px;
+	height: 100px;
+}
+
+#gamepadA {
+	right: 0px;
+	bottom: 120px;
+
+	width: 100px;
+	height: 100px;
+}
+
+/* Only display on phones */
+@media screen and (max-width: 1024px) {
+	.wasmboy__gamepad {
+		display: block;
+	}
+
+	.wasmboy__debugger {
+		display: none;
+	}
 }
 
 
@@ -79,20 +132,4 @@ h1 {
 	text-align: left;
 	border: 1px solid black;
 	padding: 5px;
-}
-
-
-/* Only display on phones */
-@media screen and (max-width: 1024px) {
-	.gamepad {
-		display: flex;
-		align-items: flex-end;
-		width: 100%;
-		height: 100%;
-		opacity: 0.5;
-	}
-
-	.debugger {
-		display: none;
-	}
 }

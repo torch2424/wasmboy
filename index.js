@@ -52,7 +52,7 @@ export default class App extends Component {
 					<WasmBoyDebugger wasmboy={WasmBoy} wasmboyGraphics={WasmBoyGraphics} wasmboyAudio={WasmBoyAudio}></WasmBoyDebugger>
 				</div>
 
-				<div class="gamepad">
+				<div class="wasmboy__gamepad">
 
 					{/* DPAD */}
 					<svg id="gamepadDpad" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
@@ -61,13 +61,13 @@ export default class App extends Component {
 					</svg>
 
 					{/* Start */}
-					<svg id="gamepadStart" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+					<svg id="gamepadStart" height="24" viewBox="6 5 12 12" width="24" xmlns="http://www.w3.org/2000/svg">
 					    <path d="M19 13H5v-2h14v2z"/>
 					    <path d="M0 0h24v24H0z" fill="none"/>
 					</svg>
 
 					{/* Select */}
-					<svg id="gamepadSelect" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+					<svg id="gamepadSelect" height="24" viewBox="6 5 12 12" width="24" xmlns="http://www.w3.org/2000/svg">
 					    <path d="M19 13H5v-2h14v2z"/>
 					    <path d="M0 0h24v24H0z" fill="none"/>
 					</svg>
