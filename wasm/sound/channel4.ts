@@ -95,6 +95,7 @@ export class Channel4 {
 
     // Decrement our channel timer
     Channel4.frequencyTimer -= <i32>numberOfCycles;
+
     if(Channel4.frequencyTimer <= 0) {
 
       // Get the amount that overflowed so we don't drop cycles
@@ -103,9 +104,6 @@ export class Channel4 {
       // Reset our timer
       Channel4.frequencyTimer = Channel4.getNoiseChannelFrequencyPeriod();
       Channel4.frequencyTimer -= overflowAmount;
-
-      // Declare our sample
-      let sample: i32 = 0;
 
       // Do some cool stuff with lfsr
       // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Noise_Channel
@@ -128,34 +126,34 @@ export class Channel4 {
         Channel4.linearFeedbackShiftRegister = Channel4.linearFeedbackShiftRegister & (~0x40);
         Channel4.linearFeedbackShiftRegister = Channel4.linearFeedbackShiftRegister | (xorLfsrBitZeroOne << 6);
       }
-
-      // Wave form output is bit zero of lfsr, INVERTED
-      if (!checkBitOnByte(0, <u8>Channel4.linearFeedbackShiftRegister)) {
-        sample = 1;
-      } else {
-        sample = -1;
-      }
-
-      // Get our ourput volume, set to zero for silence
-      let outputVolume: i32 = 0;
-
-      // Finally to set our output volume, the channel must be enabled,
-      // Our channel DAC must be enabled, and we must be in an active state
-      // Of our duty cycle
-      if(Channel4.isEnabled &&
-      isChannelDacEnabled(Channel4.channelNumber)) {
-        outputVolume = Channel4.volume;
-      }
-
-      sample = sample * outputVolume;
-
-      // Noise Can range from -15 - 15. Therefore simply add 15
-      sample = sample + 15;
-      return <u32>sample;
-    } else {
-      // Return 15 and not zero because 15 is no sound :) see above
-      return 15;
     }
+
+    // Declare our sample
+    let sample: i32 = 0;
+
+    // Wave form output is bit zero of lfsr, INVERTED
+    if (!checkBitOnByte(0, <u8>Channel4.linearFeedbackShiftRegister)) {
+      sample = 1;
+    } else {
+      sample = -1;
+    }
+
+    // Get our ourput volume, set to zero for silence
+    let outputVolume: i32 = 0;
+
+    // Finally to set our output volume, the channel must be enabled,
+    // Our channel DAC must be enabled, and we must be in an active state
+    // Of our duty cycle
+    if(Channel4.isEnabled &&
+    isChannelDacEnabled(Channel4.channelNumber)) {
+      outputVolume = Channel4.volume;
+    }
+
+    sample = sample * outputVolume;
+
+    // Noise Can range from -15 - 15. Therefore simply add 15
+    sample = sample + 15;
+    return <u32>sample;
   }
 
   //http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Trigger_Event
@@ -183,7 +181,7 @@ export class Channel4 {
 
   static getNoiseChannelFrequencyPeriod(): u16 {
     // Get our divisor from the divisor code
-    let divisor: u16 = Channel4.getNoiseChannelDivisorFromDivisorCode()
+    let divisor: u16 = Channel4.getNoiseChannelDivisorFromDivisorCode();
     let clockShift: u8 = Channel4.getNoiseChannelClockShift();
     return (divisor << clockShift);
   }
