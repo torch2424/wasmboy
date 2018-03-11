@@ -103,6 +103,8 @@ npm run lib:build
 
 The debugger application/container for wasmBoy utilizes the [preact-cli](https://github.com/developit/preact-cli/blob/master/README.md). Additional workflow commands and tips can be found there.
 
+Using the [gh-pages](https://www.npmjs.com/package/gh-pages) for debugger/demo deployment onto gh-pages.
+
 # Special Thanks
 
 * [awesome gb-dev communitty](https://github.com/avivace/awesome-gbdev), too many rad dudes to name!
