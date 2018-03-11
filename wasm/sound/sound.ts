@@ -240,8 +240,8 @@ export function updateSound(numberOfCycles: u8): void {
     //rightChannelSample = rightChannelSample * (rightMixerVolume + 1);
 
     // TODO: Remove this channel isolation debug code
-    leftChannelSample = channel1Sample;
-    rightChannelSample = channel1Sample;
+    //leftChannelSample = channel4Sample;
+    //rightChannelSample = channel4Sample;
 
     // Convert our samples from unsigned 32 to unsigned byte
     // Reason being, We want to be able to pass in wasm memory as usigned byte. Javascript will handle the conversion back
