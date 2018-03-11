@@ -7,11 +7,18 @@ h1 {
 	text-align: center;
 }
 
+button {
+	margin-left: 5px;
+	margin-right: 5px;
+}
+
 .wasmboy__canvas-container {
 	text-align: center;
 }
 
 .wasmboy__canvas-container__canvas {
+
+	border: 1px solid black;
 
 	/* Width and height are 160x144 pixel aspect ratio in vw */
 	width: 50vw;

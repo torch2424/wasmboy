@@ -44,8 +44,7 @@ export default class App extends Component {
 					<WasmBoySystemControls wasmboy={WasmBoy}></WasmBoySystemControls>
 				</div>
 				<div className="wasmboy__canvas-container">
-    			<canvas className="wasmboy__canvas-container__canvas"
-            style="border: 1px solid black;">
+    			<canvas className="wasmboy__canvas-container__canvas">
           </canvas>
         </div>
 				<div class="wasmboy__debugger">
@@ -61,27 +60,31 @@ export default class App extends Component {
 					</svg>
 
 					{/* Start */}
-					<svg id="gamepadStart" height="24" viewBox="6 5 12 12" width="24" xmlns="http://www.w3.org/2000/svg">
+					<svg id="gamepadStart" height="24" viewBox="6 6 12 12" width="24" xmlns="http://www.w3.org/2000/svg">
 					    <path d="M19 13H5v-2h14v2z"/>
 					    <path d="M0 0h24v24H0z" fill="none"/>
+							<text x="21" y="55" transform="scale(0.325)">Start</text>
 					</svg>
 
 					{/* Select */}
-					<svg id="gamepadSelect" height="24" viewBox="6 5 12 12" width="24" xmlns="http://www.w3.org/2000/svg">
+					<svg id="gamepadSelect" height="24" viewBox="6 6 12 12" width="24" xmlns="http://www.w3.org/2000/svg">
 					    <path d="M19 13H5v-2h14v2z"/>
 					    <path d="M0 0h24v24H0z" fill="none"/>
+							<text x="16" y="55" transform="scale(0.325)">Select</text>
 					</svg>
 
 					{/* A */}
 					<svg id="gamepadA" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
 					    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
 					    <path d="M0 0h24v24H0z" fill="none"/>
+							<text x="7.5" y="16.25">A</text>
 					</svg>
 
 					{/* B */}
 					<svg id="gamepadB" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
 					    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
 					    <path d="M0 0h24v24H0z" fill="none"/>
+							<text x="7.5" y="17.25">B</text>
 					</svg>
 				</div>
 
