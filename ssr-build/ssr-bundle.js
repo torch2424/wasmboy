@@ -1720,6 +1720,11 @@ var WASMBOY_SAVE_STATE_SCHEMA = {
 
   // Private function to get the cartridge header
 };var getCartridgeHeader = function getCartridgeHeader(wasmByteMemory) {
+
+  if (!wasmByteMemory) {
+    return false;
+  }
+
   // Header is at 0x0134 - 0x014F
   // http://gbdev.gg8.se/wiki/articles/The_Cartridge_Header
   var headerLength = 0x014F - 0x0134;
@@ -1734,6 +1739,11 @@ var WASMBOY_SAVE_STATE_SCHEMA = {
 
 // Private function to get the caretridge ram
 var getCartridgeRam = function getCartridgeRam(wasmByteMemory) {
+
+  if (!wasmByteMemory) {
+    return false;
+  }
+
   // Depening on the rom type, we will have different ram sizes.
   // Due memory restrictions described in:
   // https://developers.google.com/web/fundamentals/instant-and-offline/web-storage/offline-for-pwa
@@ -1827,6 +1837,10 @@ var memory_WasmBoyMemoryService = function () {
 
     this.wasmInstance = undefined;
     this.wasmByteMemory = undefined;
+    this.loadedCartridgeMemoryState = {
+      ROM: false,
+      RAM: false
+    };
   }
 
   WasmBoyMemoryService.prototype.initialize = function initialize(wasmInstance, wasmByteMemory, includeBootRom) {
@@ -1910,12 +1924,19 @@ var memory_WasmBoyMemoryService = function () {
     this.wasmByteMemory = wasmByteMemory;
   };
 
+  WasmBoyMemoryService.prototype.getLoadedCartridgeMemoryState = function getLoadedCartridgeMemoryState() {
+    return this.loadedCartridgeMemoryState;
+  };
+
   WasmBoyMemoryService.prototype.clearMemory = function clearMemory() {
     // Clear Wasm memory
     // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
     for (var i = 0; i <= this.wasmByteMemory.length; i++) {
       this.wasmByteMemory[i] = 0;
     }
+
+    this.loadedCartridgeMemoryState.ROM = false;
+    this.loadedCartridgeMemoryState.RAM = false;
   };
 
   WasmBoyMemoryService.prototype.loadCartridgeRom = function loadCartridgeRom(gameBytes, bootRom) {
@@ -1929,6 +1950,8 @@ var memory_WasmBoyMemoryService = function () {
 
     // TODO: Handle getting a boot rom
     this.wasmInstance.exports.initialize(0);
+
+    this.loadedCartridgeMemoryState.ROM = true;
   };
 
   // Function to save the cartridge ram
@@ -2010,6 +2033,7 @@ var memory_WasmBoyMemoryService = function () {
         for (var i = 0; i < cartridgeObject.cartridgeRam.length; i++) {
           _this3.wasmByteMemory[MEMORY_ADDRESSES.CARTRIDGE_RAM + i] = cartridgeObject.cartridgeRam[i];
         }
+        _this3.loadedCartridgeMemoryState.RAM = true;
         resolve();
       }).catch(function (error) {
         reject(error);
@@ -2191,31 +2215,31 @@ var wasmboy_WasmBoyLib = function () {
     this.ready = false;
     return new src(function (resolve, reject) {
 
-      // Get our promises
-      var initPromises = [_this._fetchGameAsByteArray(game)];
-      if (!_this.wasmInstance) {
-        initPromises.push(_this._getWasmInstance());
-      } else if (!_this.headless) {
-        initPromises.push(WasmBoyMemory.saveCartridgeRam());
-      }
+      // Pause the game in case it was running, and set to not ready
+      _this.pauseGame();
 
-      src.all(initPromises).then(function (responses) {
+      // raf to ensure the game is not running while we paused
+      raf(function () {
 
-        // Pause the game in case it was running, and set to not ready
-        _this.pauseGame();
-        _this.ready = false;
+        // Get our promises
+        var initPromises = [_this._fetchGameAsByteArray(game), _this._getWasmInstance()];
 
-        // raf to ensure the game is not running while we paused
-        raf(function () {
+        if (!_this.headless && WasmBoyMemory.getLoadedCartridgeMemoryState().RAM) {
+          initPromises.push(WasmBoyMemory.saveCartridgeRam());
+        }
+
+        src.all(initPromises).then(function (responses) {
 
           // Check if we are running headless
           if (_this.headless) {
             WasmBoyMemory.initializeHeadless(_this.wasmInstance, _this.wasmByteMemory);
             // Clear what is currently in memory, then load the cartridge memory
             WasmBoyMemory.clearMemory();
+
             // TODO: Handle passing a boot rom
             WasmBoyMemory.loadCartridgeRom(responses[0], false);
             _this.ready = true;
+
             resolve();
           } else {
             // Finally intialize all of our services
@@ -2224,6 +2248,7 @@ var wasmboy_WasmBoyLib = function () {
 
               // Clear what is currently in memory, then load the carttridge memory
               WasmBoyMemory.clearMemory();
+
               // TODO: Handle passing a boot rom
               WasmBoyMemory.loadCartridgeRom(responses[0], false);
 
@@ -2238,9 +2263,9 @@ var wasmboy_WasmBoyLib = function () {
               reject(error);
             });
           }
+        }).catch(function (error) {
+          reject(error);
         });
-      }).catch(function (error) {
-        reject(error);
       });
     });
   };
@@ -2358,16 +2383,14 @@ var wasmboy_WasmBoyLib = function () {
   };
 
   // Private funciton to returna promise to our wasmModule
+  // This allow will re-load the wasm module, that way we can obtain a new wasm instance
+  // For each time we load a game
 
 
   WasmBoyLib.prototype._getWasmInstance = function _getWasmInstance() {
     var _this6 = this;
 
     return new src(function (resolve, reject) {
-
-      if (_this6.wasmInstance) {
-        resolve(_this6.wasmInstance);
-      }
 
       // Get our wasm instance from our wasmModule
       index_untouched_default()({
@@ -2453,10 +2476,17 @@ var wasmboy_WasmBoyLib = function () {
       } else {
         // Fetch the file
         unfetch_es(game).then(function (blob) {
+          if (!blob.ok) {
+            return src.reject(blob);
+          }
+
           return blob.arrayBuffer();
         }).then(function (bytes) {
+          console.log(bytes);
           var byteArray = new Uint8Array(bytes);
           resolve(byteArray);
+        }).catch(function (error) {
+          reject(error);
         });
       }
     });
@@ -3102,8 +3132,10 @@ var index_App = function (_Component) {
 		WasmBoyController.addTouchInput('START', startElement, 'BUTTON');
 		WasmBoyController.addTouchInput('SELECT', selectElement, 'BUTTON');
 
-		WasmBoy.loadGame('./games/linksawakening.gb').then(function () {
+		WasmBoy.loadGame('./games/linksawakeninggg.gb').then(function () {
 			console.log('Wasmboy Ready!');
+		}).catch(function (error) {
+			console.log('Load Game Error:', error);
 		});
 	};
 
