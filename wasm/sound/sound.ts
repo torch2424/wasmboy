@@ -2,6 +2,13 @@
 // https://www.youtube.com/watch?v=HyzD8pNlpwI
 // https://gist.github.com/drhelius/3652407
 
+// For our wasm -> JS, we will be passing in our -1.0 to 1.0 volume
+// As an unsigned byte. Each channel will give 0 (representing -1.0), to
+// 30 (representing 1.0), and will be added together. in the fucntion
+// getSampleAsUnsignedByte() will do the conversion of getting the total
+// of all the channels, times the (mixer volume + 1), to give us an unsigned
+// byte from 0 (-1.0) to 254 (1.0)
+
 import {
     Channel1
 } from './channel1';
@@ -163,6 +170,7 @@ export function updateSound(numberOfCycles: u8): void {
   // Update all of our channels
   // All samples will be returned as 0 to 30
   // 0 being -1.0, and 30 being 1.0
+  // (see blurb at top)
   let channel1Sample: u32 = Channel1.getSample(numberOfCycles);
   let channel2Sample: u32 = Channel2.getSample(numberOfCycles);
   let channel3Sample: u32 = Channel3.getSample(numberOfCycles);
@@ -192,10 +200,10 @@ export function updateSound(numberOfCycles: u8): void {
     // Simply get the left/right volume, add up the values, and put into memory!
     let registerNR50 = eightBitLoadFromGBMemory(Sound.memoryLocationNR50);
     // Want bits 6-4
-    let leftMixerVolume: u8 = (registerNR50 >> 4);
+    let leftMixerVolume: u32 = (registerNR50 >> 4);
     leftMixerVolume = leftMixerVolume & 0x07;
     // Want bits 0-2
-    let rightMixerVolume: u8 = registerNR50;
+    let rightMixerVolume: u32 = registerNR50;
     rightMixerVolume = rightMixerVolume & 0x07;
 
     // Get our channel volume for left/right
@@ -232,12 +240,12 @@ export function updateSound(numberOfCycles: u8): void {
       rightChannelSample += channel4Sample;
     }
 
-    // Finally multiple our volumes by the mixer volume
+    // Finally multiply our volumes by the mixer volume
     // Mixer volume can be at most 7 + 1
+    // Can be at most 7, because we only have 3 bits, 111 = 7
     // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Mixer
-    // TODO: Came out wrong and sounds weird
-    //leftChannelSample = leftChannelSample * (leftMixerVolume + 1);
-    //rightChannelSample = rightChannelSample * (rightMixerVolume + 1);
+    leftChannelSample = leftChannelSample * (leftMixerVolume + 1);
+    rightChannelSample = rightChannelSample * (rightMixerVolume + 1);
 
     // Convert our samples from unsigned 32 to unsigned byte
     // Reason being, We want to be able to pass in wasm memory as usigned byte. Javascript will handle the conversion back
@@ -272,15 +280,21 @@ export function resetAudioQueue(): void {
 }
 
 function getSampleAsUnsignedByte(sample: u32): u8 {
-  // With Four Channels (0 to 30) and no global volume. Max is 120, goal is 254. 120 * 2.1167 should give approximate answer
-  let adjustedSample: u32 = sample * 21 / 10;
+  // With Four Channels (0 to 30) and no global volume. Max is 120
+  // Max mixer volume is 8. so 120 * 8 = 960
+  // goal is 254 (see blurb at top). 960 / 254 = 3.779527559055118
+  // so, 960 * 1000 / 3779 should give approximate answer
+  let adjustedSample: u32 = sample * 1000 / 3779;
   let convertedSample: u8 = <u8>adjustedSample;
   return convertedSample;
 }
 
 function getSampleAsUnsignedByteForSingleChannel(sample: u32): u8 {
-  // With One Channels (0 to 30) and no global volume. Max is 30, goal is 254. 30 * 8.4 should give approximate answer
-  let adjustedSample: u32 = sample * 84 / 10;
+  // With One Channels (0 to 30) and no global volume. Max is 30
+  // Max mixer volume is 8. so 30 * 8 = 240
+  // goal is 254 (see blurb at top). 240 / 254 = 0.9448818897637795
+  // so, 240 * 1000 / 944 should give approximate answer
+  let adjustedSample: u32 = sample * 1000 / 944;
   let convertedSample: u8 = <u8>adjustedSample;
   return convertedSample;
 }
