@@ -48,7 +48,6 @@
   "dependencies": {
     "idb": "^2.1.0",
     "promise-polyfill": "7.0.0",
-    "raf": "^3.4.0",
     "responsive-gamepad": "0.0.2",
     "unfetch": "^3.0.0"
   },
