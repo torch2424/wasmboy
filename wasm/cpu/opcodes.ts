@@ -59,15 +59,23 @@ import {
   updateGraphics
 } from '../graphics/index';
 import {
+  Sound,
   updateSound
 } from '../sound/index'
 
-// Public funciton to run opcodes until a frame should be rendered.
+// Public funciton to run opcodes until an event occurs.
+// Return values:
+// -1 = error
+// 1 = render a frame
+// 2 = play audio buffer
+// 3 = replace boot rom
 export function update(): i8 {
 
   let error: boolean = false;
   let numberOfCycles: i8 = -1;
-  while(!error && Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME) {
+  while(!error &&
+      Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME &&
+      Sound.audioQueueIndex < Sound.MAX_NUMBER_OF_SAMPLES) {
     numberOfCycles = emulationStep();
     if (numberOfCycles >= 0) {
       Cpu.currentCycles += numberOfCycles;
@@ -76,17 +84,22 @@ export function update(): i8 {
     }
   }
 
-  // Reset our currentCycles
-  Cpu.currentCycles = 0;
-
-  if (error === true) {
-    Cpu.programCounter -= 1;
-    return -1;
-  } else {
+  // Find our exit reason
+  if (Cpu.currentCycles >= Cpu.MAX_CYCLES_PER_FRAME) {
+    // Render a frame
     // Reset our currentCycles
     Cpu.currentCycles = 0;
     return 1;
+  } else if (Sound.audioQueueIndex >= Sound.MAX_NUMBER_OF_SAMPLES) {
+    // Play audio samples
+    // JS will reset queue once it grabs the samples
+    return 2;
   }
+
+  // TODO: Boot ROM handling
+  // There was an error, return -1, and push the program counter back to grab the error opcode
+  Cpu.programCounter -= 1;
+  return -1;
 }
 
 // Function to execute an opcode, and update other gameboy hardware.

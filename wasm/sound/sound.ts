@@ -72,10 +72,11 @@ export class Sound {
 
   // Our current sample number we are passing back to the wasmboy memory map
   // Going to pass back 4096 samples and then reset
+  // NOTE: Giving a really large sample rate gives more latency, but less pops!
+  static MAX_NUMBER_OF_SAMPLES: u32 = 4096;
   static audioQueueIndex: u32 = 0x0000;
 
   // Save States
-
   static saveStateSlot: u16 = 6;
 
   // Function to save the state of the class
