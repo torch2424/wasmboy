@@ -49,9 +49,7 @@ export function rotateByteRightThroughCarry(value: u8): u8 {
 }
 
 export function setBitOnByte(bitPosition: u8, byte: u8): u8 {
-  let byteOfBitToSet: u8 = (0x01 << bitPosition);
-  byte = byte | byteOfBitToSet;
-  return byte;
+  return byte | (0x01 << bitPosition);
 }
 
 export function resetBitOnByte(bitPosition: u8, byte: u8): u8 {
@@ -61,8 +59,7 @@ export function resetBitOnByte(bitPosition: u8, byte: u8): u8 {
 }
 
 export function checkBitOnByte(bitPosition: u8, byte: u8): boolean {
-  let byteOfBitToCheck: u8 = (0x01 << bitPosition);
-  byte = byte & byteOfBitToCheck;
+  byte = byte & (0x01 << bitPosition);
   if(byte > 0) {
     return true;
   } else {

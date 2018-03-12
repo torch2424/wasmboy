@@ -10,10 +10,11 @@ import {
 } from '../helpers/index';
 
 export function eightBitLoadFromGBMemory(offset: u16): u8 {
-  if (checkReadTraps(offset) < 0) {
+  let readTrapResult: i32 = checkReadTraps(offset);
+  if (readTrapResult < 0) {
     return _eightBitLoadFromWasmBoyMemory(offset);
   } else {
-    return <u8>checkReadTraps(offset);
+    return <u8>readTrapResult;
   }
 }
 
@@ -25,10 +26,11 @@ export function sixteenBitLoadFromGBMemory(offset: u16): u16 {
 
   // Get our low byte
   let lowByte: u8 = 0;
-  if (checkReadTraps(offset) < 0) {
+  let lowByteReadTrapResult: i32 = checkReadTraps(offset);
+  if (lowByteReadTrapResult < 0) {
     lowByte = _eightBitLoadFromWasmBoyMemory(offset);
   } else {
-    lowByte = <u8>checkReadTraps(offset);
+    lowByte = <u8>lowByteReadTrapResult;
   }
 
   // Get the next offset for the second byte
@@ -36,10 +38,11 @@ export function sixteenBitLoadFromGBMemory(offset: u16): u16 {
 
   // Get our high byte
   let highByte: u8 = 0;
-  if (checkReadTraps(nextOffset) < 0) {
+  let highByteReadTrapResult: i32 = checkReadTraps(nextOffset);
+  if (highByteReadTrapResult < 0) {
     highByte = _eightBitLoadFromWasmBoyMemory(nextOffset);
   } else {
-    highByte = <u8>checkReadTraps(nextOffset);
+    highByte = <u8>highByteReadTrapResult;
   }
 
   // Concatenate the bytes and return

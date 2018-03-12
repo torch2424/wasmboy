@@ -39,7 +39,5 @@ export function checkReadTraps(offset: u16): i32 {
     return getJoypadState();
   }
 
-
-
   return -1;
 }

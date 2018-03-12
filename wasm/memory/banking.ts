@@ -115,13 +115,11 @@ export function getRomBankAddress(gameboyOffset: u32): u32 {
   let romBankOffset: u32 = gameboyOffset - Memory.switchableCartridgeRomLocation;
 
   let romBankSize: u32 = 0x4000;
-  let currentRomBankAddress: u32 = (0x4000 * currentRomBank) + romBankOffset;
-  return currentRomBankAddress;
+  return <u32>((0x4000 * currentRomBank) + romBankOffset);
 }
 
 export function getRamBankAddress(gameboyOffset: u32): u32 {
   // Adjust our gameboy offset relative to zero for the gameboy memory map
   let ramBankOffset: u32 = gameboyOffset - Memory.cartridgeRamLocation;
-  let currentRamBankAddress: u32 = (0x2000 * Memory.currentRamBank) + ramBankOffset;
-  return currentRamBankAddress;
+  return <u32>((0x2000 * Memory.currentRamBank) + ramBankOffset);
 }
