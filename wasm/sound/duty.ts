@@ -22,19 +22,17 @@ export function isDutyCycleClockPositiveOrNegativeForWaveform(channelNumber: i8,
   // Get our Wave Form According to the Duty
   // Default to a duty of 1
   // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
-  // 0000 0001
-  let waveform: u8 = 0x01;
   if (duty === 0x01) {
     // 1000 0001
-    waveform = 0x81;
+    return checkBitOnByte(waveFormPositionOnDuty, 0x81);
   } else if (duty === 0x02) {
     // 1000 0111
-    waveform = 0x87;
+    return checkBitOnByte(waveFormPositionOnDuty, 0x87);
   } else if (duty === 0x03) {
     // 0111 1110
-    waveform = 0x7E;
+    return checkBitOnByte(waveFormPositionOnDuty, 0x7E);
+  } else {
+    // 0000 0001
+    return checkBitOnByte(waveFormPositionOnDuty, 0x01);
   }
-
-  // Finally check if our duty cycle is an active bit on our byte
-  return checkBitOnByte(waveFormPositionOnDuty, waveform);
 }

@@ -96,9 +96,13 @@ export class Graphics {
 
 export function updateGraphics(numberOfCycles: u8): void {
 
-  setLcdStatus();
+  // Get if the LCD is currently enabled
+  // Doing this for performance
+  let lcdEnabledStatus: boolean = isLcdEnabled();
 
-  if(isLcdEnabled()) {
+  setLcdStatus(lcdEnabledStatus);
+
+  if(lcdEnabledStatus) {
 
     Graphics.scanlineCycleCounter += numberOfCycles;
 

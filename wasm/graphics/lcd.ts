@@ -25,7 +25,8 @@ export function isLcdEnabled(): boolean {
   return checkBitOnByte(7, eightBitLoadFromGBMemory(Graphics.memoryLocationLcdControl));
 }
 
-export function setLcdStatus(): void {
+// Pass in the lcd status for performance
+export function setLcdStatus(lcdEnabledStatus: boolean): void {
   // LCD Status (0xFF41) bits Explanation
   // 0                0                    000                    0             00
   //       |Coicedence Interrupt|     |Mode Interrupts|  |coincidence flag|    | Mode |
@@ -36,7 +37,7 @@ export function setLcdStatus(): void {
   // 3 or 11: Transfering Data to LCD Driver
 
   let lcdStatus: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationLcdStatus);
-  if(!isLcdEnabled()) {
+  if(!lcdEnabledStatus) {
     // Reset scanline cycle counter
     Graphics.scanlineCycleCounter = 0;
     eightBitStoreIntoGBMemorySkipTraps(Graphics.memoryLocationScanlineRegister, 0);
