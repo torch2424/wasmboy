@@ -110,7 +110,7 @@ export class Channel1 {
     eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx4, 0xBF);
   }
 
-  static getSample(numberOfCycles: u8): u32 {
+  static getSample(numberOfCycles: u8): i32 {
 
     // Decrement our channel timer
     Channel1.frequencyTimer -= <i32>numberOfCycles;
@@ -134,7 +134,7 @@ export class Channel1 {
       }
     }
 
-    // Get our ourput volume, set to zero for silence
+    // Get our ourput volume
     let outputVolume: i32 = 0;
 
     // Finally to set our output volume, the channel must be enabled,
@@ -143,6 +143,10 @@ export class Channel1 {
     if(Channel1.isEnabled &&
     isChannelDacEnabled(Channel1.channelNumber)) {
       outputVolume = Channel1.volume;
+    } else {
+      // Return silence
+      // Since range from -15 - 15, or 0 to 30 for our unsigned
+      return 15;
     }
 
     // Get the current sampleValue
@@ -151,12 +155,11 @@ export class Channel1 {
       sample = sample * -1;
     }
 
-
     sample = sample * outputVolume;
 
     // Square Waves Can range from -15 - 15. Therefore simply add 15
     sample = sample + 15;
-    return <u32>sample;
+    return <i32>sample;
   }
 
   //http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Trigger_Event
@@ -279,7 +282,7 @@ function calculateSweepAndCheckOverflow(): void {
   let newFrequency: u16 = getNewFrequencyFromSweep();
   // 7FF is the highest value of the frequency: 111 1111 1111
   if (newFrequency <= 0x7FF && getSweepShift() > 0) {
-    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware 
+    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
     // If the new frequency is 2047 or less and the sweep shift is not zero,
     // this new frequency is written back to the shadow frequency and square 1's frequency in NR13 and NR14,
     // then frequency calculation and overflow check are run AGAIN immediately using this new value,

@@ -11,8 +11,7 @@ import {
 export function getChannelEnvelopePeriod(channelNumber: i8): u8 {
   let soundRegister: u8 = getRegister2OfChannel(channelNumber);
   // Get the bottom 3 bits for the period
-  let channelPeriod: u8 = soundRegister & 0x07;
-  return channelPeriod;
+  return soundRegister & 0x07;
 }
 
 export function getChannelEnvelopeAddMode(channelNumber: i8): boolean {

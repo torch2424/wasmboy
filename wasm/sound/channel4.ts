@@ -91,7 +91,7 @@ export class Channel4 {
     eightBitStoreIntoGBMemory(Channel4.memoryLocationNRx4, 0xBF);
   }
 
-  static getSample(numberOfCycles: u8): u32 {
+  static getSample(numberOfCycles: u8): i32 {
 
     // Decrement our channel timer
     Channel4.frequencyTimer -= <i32>numberOfCycles;
@@ -128,6 +128,21 @@ export class Channel4 {
       }
     }
 
+    // Get our ourput volume, set to zero for silence
+    let outputVolume: i32 = 0;
+
+    // Finally to set our output volume, the channel must be enabled,
+    // Our channel DAC must be enabled, and we must be in an active state
+    // Of our duty cycle
+    if(Channel4.isEnabled &&
+    isChannelDacEnabled(Channel4.channelNumber)) {
+      outputVolume = Channel4.volume;
+    } else {
+      // Return silence
+      // Since range from -15 - 15, or 0 to 30 for our unsigned
+      return 15;
+    }
+
     // Declare our sample
     let sample: i32 = 0;
 
@@ -138,22 +153,11 @@ export class Channel4 {
       sample = -1;
     }
 
-    // Get our ourput volume, set to zero for silence
-    let outputVolume: i32 = 0;
-
-    // Finally to set our output volume, the channel must be enabled,
-    // Our channel DAC must be enabled, and we must be in an active state
-    // Of our duty cycle
-    if(Channel4.isEnabled &&
-    isChannelDacEnabled(Channel4.channelNumber)) {
-      outputVolume = Channel4.volume;
-    }
-
     sample = sample * outputVolume;
 
     // Noise Can range from -15 - 15. Therefore simply add 15
     sample = sample + 15;
-    return <u32>sample;
+    return <i32>sample;
   }
 
   //http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Trigger_Event

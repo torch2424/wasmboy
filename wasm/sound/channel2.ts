@@ -94,7 +94,7 @@ export class Channel2 {
     eightBitStoreIntoGBMemory(Channel2.memoryLocationNRx4, 0xBF);
   }
 
-  static getSample(numberOfCycles: u8): u32 {
+  static getSample(numberOfCycles: u8): i32 {
 
     // Decrement our channel timer
     Channel2.frequencyTimer -= <i32>numberOfCycles;
@@ -118,7 +118,7 @@ export class Channel2 {
       }
     }
 
-    // Get our ourput volume, set to zero for silence
+    // Get our ourput volume
     let outputVolume: i32 = 0;
 
     // Finally to set our output volume, the channel must be enabled,
@@ -127,6 +127,10 @@ export class Channel2 {
     if(Channel2.isEnabled &&
     isChannelDacEnabled(Channel2.channelNumber)) {
       outputVolume = Channel2.volume;
+    } else {
+      // Return silence
+      // Since range from -15 - 15, or 0 to 30 for our unsigned
+      return 15;
     }
 
     // Get the current sampleValue
@@ -139,7 +143,7 @@ export class Channel2 {
 
     // Square Waves Can range from -15 - 15. Therefore simply add 15
     sample = sample + 15;
-    return <u32>sample;
+    return <i32>sample;
   }
 
   //http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Trigger_Event

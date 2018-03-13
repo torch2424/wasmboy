@@ -56,8 +56,8 @@ export class Sound {
 
   // Need to count how often we need to increment our frame sequencer
   // Which you can read about below
-  static frameSequenceCycleCounter: i16 = 0x0000;
-  static maxFrameSequenceCycles: i16 = 8192;
+  static frameSequenceCycleCounter: i32 = 0x0000;
+  static maxFrameSequenceCycles: i32 = 8192;
 
   // Also need to downsample our audio to average audio qualty
   // https://www.reddit.com/r/EmuDev/comments/5gkwi5/gb_apu_sound_emulation/
@@ -73,24 +73,24 @@ export class Sound {
   // Our current sample number we are passing back to the wasmboy memory map
   // Going to pass back 4096 samples and then reset
   // NOTE: Giving a really large sample rate gives more latency, but less pops!
-  static MAX_NUMBER_OF_SAMPLES: u32 = 4096;
-  static audioQueueIndex: u32 = 0x0000;
+  static MAX_NUMBER_OF_SAMPLES: i32 = 4096;
+  static audioQueueIndex: i32 = 0x0000;
 
   // Save States
   static saveStateSlot: u16 = 6;
 
   // Function to save the state of the class
   static saveState(): void {
-    store<i16>(getSaveStateMemoryOffset(0x00, Sound.saveStateSlot), Sound.frameSequenceCycleCounter);
-    store<u8>(getSaveStateMemoryOffset(0x02, Sound.saveStateSlot), Sound.downSampleCycleCounter);
-    store<u8>(getSaveStateMemoryOffset(0x03, Sound.saveStateSlot), Sound.frameSequencer);
+    store<i32>(getSaveStateMemoryOffset(0x00, Sound.saveStateSlot), Sound.frameSequenceCycleCounter);
+    store<u8>(getSaveStateMemoryOffset(0x04, Sound.saveStateSlot), Sound.downSampleCycleCounter);
+    store<u8>(getSaveStateMemoryOffset(0x05, Sound.saveStateSlot), Sound.frameSequencer);
   }
 
   // Function to load the save state from memory
   static loadState(): void {
-    Sound.frameSequenceCycleCounter = load<i16>(getSaveStateMemoryOffset(0x00, Sound.saveStateSlot));
-    Sound.downSampleCycleCounter = load<u8>(getSaveStateMemoryOffset(0x02, Sound.saveStateSlot));
-    Sound.frameSequencer = load<u8>(getSaveStateMemoryOffset(0x03, Sound.saveStateSlot));
+    Sound.frameSequenceCycleCounter = load<i32>(getSaveStateMemoryOffset(0x00, Sound.saveStateSlot));
+    Sound.downSampleCycleCounter = load<u8>(getSaveStateMemoryOffset(0x04, Sound.saveStateSlot));
+    Sound.frameSequencer = load<u8>(getSaveStateMemoryOffset(0x05, Sound.saveStateSlot));
 
     resetAudioQueue();
   }
@@ -117,7 +117,7 @@ export function updateSound(numberOfCycles: u8): void {
   // APU runs at 4194304 / 512
   // Or Cpu.clockSpeed / 512
   // Which means, we need to update once every 8192 cycles :)
-  Sound.frameSequenceCycleCounter += <i16>numberOfCycles;
+  Sound.frameSequenceCycleCounter += <i32>numberOfCycles;
   if(Sound.frameSequenceCycleCounter >= Sound.maxFrameSequenceCycles) {
     // Reset the frameSequenceCycleCounter
     // Not setting to zero as we do not want to drop cycles
@@ -172,10 +172,10 @@ export function updateSound(numberOfCycles: u8): void {
   // All samples will be returned as 0 to 30
   // 0 being -1.0, and 30 being 1.0
   // (see blurb at top)
-  let channel1Sample: u32 = Channel1.getSample(numberOfCycles);
-  let channel2Sample: u32 = Channel2.getSample(numberOfCycles);
-  let channel3Sample: u32 = Channel3.getSample(numberOfCycles);
-  let channel4Sample: u32 = Channel4.getSample(numberOfCycles);
+  let channel1Sample: i32 = Channel1.getSample(numberOfCycles);
+  let channel2Sample: i32 = Channel2.getSample(numberOfCycles);
+  let channel3Sample: i32 = Channel3.getSample(numberOfCycles);
+  let channel4Sample: i32 = Channel4.getSample(numberOfCycles);
 
   // Do Some downsampling magic
   Sound.downSampleCycleCounter += numberOfCycles;
@@ -201,15 +201,15 @@ export function updateSound(numberOfCycles: u8): void {
     // Simply get the left/right volume, add up the values, and put into memory!
     let registerNR50 = eightBitLoadFromGBMemory(Sound.memoryLocationNR50);
     // Want bits 6-4
-    let leftMixerVolume: u32 = (registerNR50 >> 4);
+    let leftMixerVolume: i32 = (registerNR50 >> 4);
     leftMixerVolume = leftMixerVolume & 0x07;
     // Want bits 0-2
-    let rightMixerVolume: u32 = registerNR50;
+    let rightMixerVolume: i32 = registerNR50;
     rightMixerVolume = rightMixerVolume & 0x07;
 
     // Get our channel volume for left/right
-    let leftChannelSample: u32 = 0;
-    let rightChannelSample: u32 = 0;
+    let leftChannelSample: i32 = 0;
+    let rightChannelSample: i32 = 0;
 
     // Find the channel for the left volume
     if (isChannelEnabledOnLeftOutput(Channel1.channelNumber)) {
@@ -271,7 +271,7 @@ export function updateSound(numberOfCycles: u8): void {
 }
 
 // Funciton to get the current Audio Queue index
-export function getAudioQueueIndex(): u32 {
+export function getAudioQueueIndex(): i32 {
   return Sound.audioQueueIndex;
 }
 
@@ -280,22 +280,22 @@ export function resetAudioQueue(): void {
   Sound.audioQueueIndex = 0;
 }
 
-function getSampleAsUnsignedByte(sample: u32): u8 {
+function getSampleAsUnsignedByte(sample: i32): u8 {
   // With Four Channels (0 to 30) and no global volume. Max is 120
   // Max mixer volume is 8. so 120 * 8 = 960
   // goal is 254 (see blurb at top). 960 / 254 = 3.779527559055118
   // so, 960 * 1000 / 3779 should give approximate answer
-  let adjustedSample: u32 = sample * 1000 / 3779;
+  let adjustedSample: i32 = sample * 1000 / 3779;
   let convertedSample: u8 = <u8>adjustedSample;
   return convertedSample;
 }
 
-function getSampleAsUnsignedByteForSingleChannel(sample: u32): u8 {
+function getSampleAsUnsignedByteForSingleChannel(sample: i32): u8 {
   // With One Channels (0 to 30) and no global volume. Max is 30
   // Max mixer volume is 8. so 30 * 8 = 240
   // goal is 254 (see blurb at top). 240 / 254 = 0.9448818897637795
   // so, 240 * 1000 / 944 should give approximate answer
-  let adjustedSample: u32 = sample * 1000 / 944;
+  let adjustedSample: i32 = sample * 1000 / 944;
   let convertedSample: u8 = <u8>adjustedSample;
   return convertedSample;
 }

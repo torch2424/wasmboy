@@ -86,7 +86,7 @@ export class Channel3 {
     eightBitStoreIntoGBMemory(Channel3.memoryLocationNRx4, 0xFF);
   }
 
-  static getSample(numberOfCycles: u8): u32 {
+  static getSample(numberOfCycles: u8): i32 {
 
     // Decrement our channel timer
     Channel3.frequencyTimer -= <i32>numberOfCycles;
@@ -109,6 +109,25 @@ export class Channel3 {
       }
     }
 
+    // Get our ourput volume
+    let outputVolume: i16 = 0;
+    let volumeCode: u8 = 0;
+
+    // Finally to set our output volume, the channel must be enabled,
+    // Our channel DAC must be enabled, and we must be in an active state
+    // Of our duty cycle
+    if(Channel3.isEnabled &&
+    isChannelDacEnabled(Channel3.channelNumber)) {
+      // Get our volume code
+      volumeCode = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx2);
+      volumeCode = (volumeCode >> 5);
+      volumeCode = (volumeCode & 0x0F);
+    } else {
+      // Return silence
+      // Since range from -15 - 15, or 0 to 30 for our unsigned
+      return 15;
+    }
+
     // Get the current sample
     let sample: i16 = 0;
 
@@ -128,34 +147,20 @@ export class Channel3 {
       sample = (sample & 0x0F);
     }
 
-    // Get our ourput volume, set to zero for silence
-    let outputVolume: i16 = 0;
-
-    // Finally to set our output volume, the channel must be enabled,
-    // Our channel DAC must be enabled, and we must be in an active state
-    // Of our duty cycle
-    if(Channel3.isEnabled &&
-    isChannelDacEnabled(Channel3.channelNumber)) {
-      // Get our volume code
-      let volumeCode = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx2);
-      volumeCode = (volumeCode >> 5);
-      volumeCode = (volumeCode & 0x0F);
-
-      // Shift our sample and set our volume depending on the volume code
-      // Since we can't multiply by float, simply divide by 4, 2, 1
-      // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Wave_Channel
-      if(volumeCode <= 0) {
-        sample = (sample >> 4);
-      } else if (volumeCode === 1) {
-        // Dont Shift sample
-        outputVolume = 1;
-      } else if (volumeCode === 2) {
-        sample = (sample >> 1)
-        outputVolume = 2;
-      } else {
-        sample = (sample >> 2)
-        outputVolume = 4;
-      }
+    // Shift our sample and set our volume depending on the volume code
+    // Since we can't multiply by float, simply divide by 4, 2, 1
+    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Wave_Channel
+    if(volumeCode <= 0) {
+      sample = (sample >> 4);
+    } else if (volumeCode === 1) {
+      // Dont Shift sample
+      outputVolume = 1;
+    } else if (volumeCode === 2) {
+      sample = (sample >> 1)
+      outputVolume = 2;
+    } else {
+      sample = (sample >> 2)
+      outputVolume = 4;
     }
 
     // Spply out output volume
@@ -167,7 +172,7 @@ export class Channel3 {
 
     // Square Waves Can range from -15 - 15. Therefore simply add 15
     sample = sample + 15;
-    return <u32>sample;
+    return <i32>sample;
   }
 
   //http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Trigger_Event
