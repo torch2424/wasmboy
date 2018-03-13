@@ -51,8 +51,7 @@ export function sixteenBitLoadFromGBMemory(offset: u16): u16 {
 }
 
 function _eightBitLoadFromWasmBoyMemory(gameboyOffset: u16): u8 {
-  let wasmboyOffset: u32 = getWasmBoyOffsetFromGameBoyOffset(gameboyOffset);
-  return load<u8>(wasmboyOffset);
+  return load<u8>(getWasmBoyOffsetFromGameBoyOffset(gameboyOffset));
 }
 
 export function loadBooleanDirectlyFromWasmMemory(offset: u32): boolean {

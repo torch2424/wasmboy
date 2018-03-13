@@ -19,7 +19,7 @@ export function getTileDataAddress(tileDataMemoryLocation: u16, tileIdFromTileMa
   // Watch this part of The ultimate gameboy talk: https://youtu.be/HyzD8pNlpwI?t=30m50s
   // A line of 8 pixels on a single tile, is represented by 2 bytes.
   // since a single tile is 8x8 pixels, 8 * 2 = 16 bytes
-  let tileDataAddress: u16 = 0;
+
 
   // Get the tile ID's tile addess from tile data.
   // For instance, let's say our first line of tile data represents tiles for letters:
@@ -35,14 +35,11 @@ export function getTileDataAddress(tileDataMemoryLocation: u16, tileIdFromTileMa
     if (checkBitOnByte(7, tileIdFromTileMap)) {
       signedTileId = <i16>tileIdFromTileMap - 128;
     }
-    let tileIdAddress: i16 = signedTileId * 16;
-    tileDataAddress = tileDataMemoryLocation + <u16>tileIdAddress;
+    return tileDataMemoryLocation + <u16>(signedTileId * 16);
   } else {
     // if the background layout gave us the tileId 0, then the tile data would be between 0x8000-0x800F.
-    tileDataAddress = tileDataMemoryLocation + <u16>tileIdFromTileMap * 16;
+    return tileDataMemoryLocation + <u16>tileIdFromTileMap * 16;
   }
-
-  return tileDataAddress;
 }
 
 
