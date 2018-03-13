@@ -33,41 +33,41 @@ import {
 export class Graphics {
   // Count the number of cycles to keep synced with cpu cycles
   static scanlineCycleCounter: i32 = 0x00;
-  static MAX_CYCLES_PER_SCANLINE: i32 = 456;
-  static MIN_CYCLES_SPRITES_LCD_MODE: i32 = 376;
-  static MIN_CYCLES_TRANSFER_DATA_LCD_MODE: i32 = 249;
+  static readonly MAX_CYCLES_PER_SCANLINE: i32 = 456;
+  static readonly MIN_CYCLES_SPRITES_LCD_MODE: i32 = 376;
+  static readonly MIN_CYCLES_TRANSFER_DATA_LCD_MODE: i32 = 249;
 
   // LCD
   // scanlineRegister also known as LY
   // See: http://bgb.bircd.org/pandocs.txt , and search " LY "
-  static memoryLocationScanlineRegister: u16 = 0xFF44;
-  static memoryLocationCoincidenceCompare: u16 = 0xFF45;
+  static readonly memoryLocationScanlineRegister: u16 = 0xFF44;
+  static readonly memoryLocationCoincidenceCompare: u16 = 0xFF45;
   // Also known at STAT
-  static memoryLocationLcdStatus: u16 = 0xFF41;
+  static readonly memoryLocationLcdStatus: u16 = 0xFF41;
   // Also known as LCDC
-  static memoryLocationLcdControl: u16 = 0xFF40;
+  static readonly memoryLocationLcdControl: u16 = 0xFF40;
   static currentLcdMode: u8 = 0;
 
   // Scroll and Window
   // TODO -7 on windowX, and export to be used
-  static memoryLocationScrollX: u16 = 0xFF43;
-  static memoryLocationScrollY: u16 = 0xFF42;
-  static memoryLocationWindowX: u16 = 0xFF4B;
-  static memoryLocationWindowY: u16 = 0xFF4A;
+  static readonly memoryLocationScrollX: u16 = 0xFF43;
+  static readonly memoryLocationScrollY: u16 = 0xFF42;
+  static readonly memoryLocationWindowX: u16 = 0xFF4B;
+  static readonly memoryLocationWindowY: u16 = 0xFF4A;
 
   // Tile Maps And Data (TODO: Dont seperate Background and window :p)
-  static memoryLocationTileMapSelectZeroStart: u16 = 0x9800;
-  static memoryLocationTileMapSelectOneStart: u16 = 0x9C00;
-  static memoryLocationTileDataSelectZeroStart: u16 = 0x8800;
-  static memoryLocationTileDataSelectOneStart: u16 = 0x8000;
+  static readonly memoryLocationTileMapSelectZeroStart: u16 = 0x9800;
+  static readonly memoryLocationTileMapSelectOneStart: u16 = 0x9C00;
+  static readonly memoryLocationTileDataSelectZeroStart: u16 = 0x8800;
+  static readonly memoryLocationTileDataSelectOneStart: u16 = 0x8000;
 
   // Sprites
-  static memoryLocationSpriteAttributesTable: u16 = 0xFE00;
+  static readonly memoryLocationSpriteAttributesTable: u16 = 0xFE00;
 
   // Palettes
-  static memoryLocationBackgroundPalette: u16 = 0xFF47;
-  static memoryLocationSpritePaletteOne: u16 = 0xFF48;
-  static memoryLocationSpritePaletteTwo: u16 = 0xFF49;
+  static readonly memoryLocationBackgroundPalette: u16 = 0xFF47;
+  static readonly memoryLocationSpritePaletteOne: u16 = 0xFF48;
+  static readonly memoryLocationSpritePaletteTwo: u16 = 0xFF49;
 
   // Colors
   static colorWhite: u8 = 1;
@@ -79,7 +79,7 @@ export class Graphics {
 
   // Save States
 
-  static saveStateSlot: u16 = 1;
+  static readonly saveStateSlot: u16 = 1;
 
   // Function to save the state of the class
   static saveState(): void {

@@ -38,18 +38,18 @@ export class Channel1 {
 
   // Squarewave channel with volume envelope and frequency sweep functions.
   // NR10 -> Sweep Register R/W
-  static memoryLocationNRx0: u16 = 0xFF10;
+  static readonly memoryLocationNRx0: u16 = 0xFF10;
   // NR11 -> Sound length/Wave pattern duty (R/W)
-  static memoryLocationNRx1: u16 = 0xFF11;
+  static readonly memoryLocationNRx1: u16 = 0xFF11;
   // NR12 -> Volume Envelope (R/W)
-  static memoryLocationNRx2: u16 = 0xFF12;
+  static readonly memoryLocationNRx2: u16 = 0xFF12;
   // NR13 -> Frequency lo (W)
-  static memoryLocationNRx3: u16 = 0xFF13;
+  static readonly memoryLocationNRx3: u16 = 0xFF13;
   // NR14 -> Frequency hi (R/W)
-  static memoryLocationNRx4: u16 = 0xFF14;
+  static readonly memoryLocationNRx4: u16 = 0xFF14;
 
   // Channel Properties
-  static channelNumber: i8 = 1;
+  static readonly channelNumber: i8 = 1;
   static isEnabled: boolean = false;
   static frequencyTimer: i32 = 0x00;
   static envelopeCounter: i32 = 0x00;
@@ -67,7 +67,7 @@ export class Channel1 {
 
   // Save States
 
-  static saveStateSlot: u16 = 7;
+  static readonly saveStateSlot: u16 = 7;
 
   // Function to save the state of the class
   static saveState(): void {

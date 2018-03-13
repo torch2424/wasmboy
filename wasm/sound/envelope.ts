@@ -9,12 +9,10 @@ import {
 } from '../helpers/index';
 
 export function getChannelEnvelopePeriod(channelNumber: i8): u8 {
-  let soundRegister: u8 = getRegister2OfChannel(channelNumber);
   // Get the bottom 3 bits for the period
-  return soundRegister & 0x07;
+  return getRegister2OfChannel(channelNumber) & 0x07;
 }
 
 export function getChannelEnvelopeAddMode(channelNumber: i8): boolean {
-  let soundRegister: u8 = getRegister2OfChannel(channelNumber);
-  return checkBitOnByte(3, soundRegister)
+  return checkBitOnByte(3, getRegister2OfChannel(channelNumber))
 }

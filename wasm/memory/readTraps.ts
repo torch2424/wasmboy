@@ -8,20 +8,24 @@ import {
   eightBitStoreIntoGBMemorySkipTraps
 } from './store';
 import {
+  Joypad,
   getJoypadState
 } from '../joypad/index'
 
 // Returns -1 if no trap found, otherwise returns a value that should be fed for the address
 export function checkReadTraps(offset: u16): i32 {
 
+  // Cache globals used multiple times for performance
+  let videoRamLocation: u16 = Memory.videoRamLocation;
+
   // Try to break early for most common scenario
-  if (offset < Memory.videoRamLocation) {
+  if (offset < videoRamLocation) {
     return -1;
   }
 
   // Check the graphics mode to see if we can write to VRAM
   // http://gbdev.gg8.se/wiki/articles/Video_Display#Accessing_VRAM_and_OAM
-  if(offset >= Memory.videoRamLocation && offset < Memory.cartridgeRamLocation) {
+  if(offset >= videoRamLocation && offset < Memory.cartridgeRamLocation) {
     // Can only read/write from VRAM During Modes 0 - 2
     // See graphics/lcd.ts
     if (Graphics.currentLcdMode > 2) {
@@ -40,7 +44,7 @@ export function checkReadTraps(offset: u16): i32 {
     }
   }
 
-  if(offset === 0xFF00) {
+  if(offset === Joypad.memoryLocationJoypadRegister) {
     return getJoypadState();
   }
 

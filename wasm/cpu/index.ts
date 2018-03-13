@@ -57,8 +57,8 @@ export class Cpu {
 
   // Current number of cycles, shouldn't execeed max number of cycles
   static currentCycles: i32 = 0;
-  static CLOCK_SPEED: i32 = 4194304;
-  static MAX_CYCLES_PER_FRAME : i32 = 69905;
+  static readonly CLOCK_SPEED: i32 = 4194304;
+  static readonly MAX_CYCLES_PER_FRAME : i32 = 69905;
 
   // HALT and STOP instructions need to stop running opcodes, but simply check timers
   // https://github.com/nakardo/node-gameboy/blob/master/lib/cpu/opcodes.js
@@ -71,7 +71,7 @@ export class Cpu {
 
   // Save States
 
-  static saveStateSlot: u16 = 0;
+  static readonly saveStateSlot: u16 = 0;
 
   // Function to save the state of the class
   static saveState(): void {

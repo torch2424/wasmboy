@@ -55,6 +55,5 @@ export function setChannelLengthCounter(channelNumber: i8): void {
 }
 
 export function isChannelLengthEnabled(channelNumber: i8): boolean {
-  let soundRegister: u8 = getRegister4OfChannel(channelNumber);
-  return checkBitOnByte(6, soundRegister)
+  return checkBitOnByte(6, getRegister4OfChannel(channelNumber))
 }

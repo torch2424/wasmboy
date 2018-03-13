@@ -48,12 +48,12 @@ export class Joypad {
   static select: boolean = false;
   static start: boolean = false;
 
-  static memoryLocationJoypadRegister: u16 = 0xFF00;
+  static readonly memoryLocationJoypadRegister: u16 = 0xFF00;
 
   // Save States
   // Not doing anything for Joypad for now
 
-  static saveStateSlot: u16 = 3;
+  static readonly saveStateSlot: u16 = 3;
 
   // Function to save the state of the class
   static saveState(): void {

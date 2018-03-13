@@ -43,27 +43,27 @@ import {
 export class Sound {
 
   // Channel control / On-OFF / Volume (RW)
-  static memoryLocationNR50: u16 = 0xFF24;
+  static readonly memoryLocationNR50: u16 = 0xFF24;
 
   // 0xFF25 selects which output each channel goes to, Referred to as NR51
-  static memoryLocationNR51: u16 = 0xFF25;
+  static readonly memoryLocationNR51: u16 = 0xFF25;
 
   // Sound on/off
-  static memoryLocationNR52: u16 = 0xFF26;
+  static readonly memoryLocationNR52: u16 = 0xFF26;
 
   // $FF30 -- $FF3F is the load register space for the 4-bit samples for channel 3
-  static memoryLocationChannel3LoadRegisterStart: u16 = 0xFF30;
+  static readonly memoryLocationChannel3LoadRegisterStart: u16 = 0xFF30;
 
   // Need to count how often we need to increment our frame sequencer
   // Which you can read about below
   static frameSequenceCycleCounter: i32 = 0x0000;
-  static maxFrameSequenceCycles: i32 = 8192;
+  static readonly maxFrameSequenceCycles: i32 = 8192;
 
   // Also need to downsample our audio to average audio qualty
   // https://www.reddit.com/r/EmuDev/comments/5gkwi5/gb_apu_sound_emulation/
   // Want to do 48000hz, so CpuRate / Sound Rate, 4194304 / 48000 ~ 87 cycles
   static downSampleCycleCounter: u8 = 0x00;
-  static maxDownSampleCycles: u8 = 87;
+  static readonly maxDownSampleCycles: u8 = 87;
 
   // Frame sequencer controls what should be updated and and ticked
   // Everyt time the sound is updated :) It is updated everytime the
@@ -73,11 +73,11 @@ export class Sound {
   // Our current sample number we are passing back to the wasmboy memory map
   // Going to pass back 4096 samples and then reset
   // NOTE: Giving a really large sample rate gives more latency, but less pops!
-  static MAX_NUMBER_OF_SAMPLES: i32 = 4096;
+  static readonly MAX_NUMBER_OF_SAMPLES: i32 = 4096;
   static audioQueueIndex: i32 = 0x0000;
 
   // Save States
-  static saveStateSlot: u16 = 6;
+  static readonly saveStateSlot: u16 = 6;
 
   // Function to save the state of the class
   static saveState(): void {

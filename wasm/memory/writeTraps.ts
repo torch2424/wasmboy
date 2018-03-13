@@ -27,15 +27,19 @@ import {
 // Follows the Gameboy memory map
 export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolean): boolean {
 
+  // Cache globals used multiple times for performance
+  let videoRamLocation: u16 = Memory.videoRamLocation;
+  let spriteInformationTableLocation: u16 = Memory.spriteInformationTableLocation;
+
   // Handle banking
-  if(offset < Memory.videoRamLocation) {
+  if(offset < videoRamLocation) {
     handleBanking(offset, value);
     return false;
   }
 
   // Check the graphics mode to see if we can write to VRAM
   // http://gbdev.gg8.se/wiki/articles/Video_Display#Accessing_VRAM_and_OAM
-  if(offset >= Memory.videoRamLocation && offset < Memory.cartridgeRamLocation) {
+  if(offset >= videoRamLocation && offset < Memory.cartridgeRamLocation) {
     // Can only read/write from VRAM During Modes 0 - 2
     // See graphics/lcd.ts
     if (Graphics.currentLcdMode > 2) {
@@ -44,7 +48,7 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
   }
 
   // Be sure to copy everything in EchoRam to Work Ram
-  if(offset >= Memory.echoRamLocation && offset < Memory.spriteInformationTableLocation) {
+  if(offset >= Memory.echoRamLocation && offset < spriteInformationTableLocation) {
     // TODO: Also write to Work Ram
     if(isEightBitStore) {
       eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
@@ -56,7 +60,7 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
   // Also check for individal writes
   // Can only read/write from OAM During Modes 0 - 1
   // See graphics/lcd.ts
-  if(offset >= Memory.spriteInformationTableLocation && offset <= Memory.spriteInformationTableLocationEnd) {
+  if(offset >= spriteInformationTableLocation && offset <= Memory.spriteInformationTableLocationEnd) {
     // Can only read/write from OAM During Mode 2
     // See graphics/lcd.ts
     if (Graphics.currentLcdMode !== 2) {

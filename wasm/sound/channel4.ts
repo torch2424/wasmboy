@@ -39,16 +39,16 @@ export class Channel4 {
   // Channel 4
   // 'white noise' channel with volume envelope functions.
   // NR41 -> Sound length (R/W)
-  static memoryLocationNRx1: u16 = 0xFF20;
+  static readonly memoryLocationNRx1: u16 = 0xFF20;
   // NR42 -> Volume Envelope (R/W)
-  static memoryLocationNRx2: u16 = 0xFF21;
+  static readonly memoryLocationNRx2: u16 = 0xFF21;
   // NR43 -> Polynomial Counter (R/W)
-  static memoryLocationNRx3: u16 = 0xFF22;
+  static readonly memoryLocationNRx3: u16 = 0xFF22;
   // NR43 -> Counter/consecutive; initial (R/W)
-  static memoryLocationNRx4: u16 = 0xFF23;
+  static readonly memoryLocationNRx4: u16 = 0xFF23;
 
   // Channel Properties
-  static channelNumber: i8 = 4;
+  static readonly channelNumber: i8 = 4;
   static isEnabled: boolean = false;
   static frequencyTimer: i32 = 0x00;
   static envelopeCounter: i32 = 0x00;
@@ -61,7 +61,7 @@ export class Channel4 {
 
   // Save States
 
-  static saveStateSlot: u16 = 10;
+  static readonly saveStateSlot: u16 = 10;
 
   // Function to save the state of the class
   static saveState(): void {

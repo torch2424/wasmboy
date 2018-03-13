@@ -17,8 +17,8 @@ import {
 } from '../helpers/index';
 
 export class Interrupts {
-  static memoryLocationInterruptEnabled: u16 = 0xFFFF;
-  static memoryLocationInterruptRequest: u16 = 0xFF0F; // A.K.A interrupt Flag (IF)
+  static readonly memoryLocationInterruptEnabled: u16 = 0xFFFF;
+  static readonly memoryLocationInterruptRequest: u16 = 0xFF0F; // A.K.A interrupt Flag (IF)
 
   static masterInterruptSwitch: boolean = false;
   // According to mooneye, interrupts are not handled until AFTER
@@ -26,14 +26,13 @@ export class Interrupts {
   // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown
   static masterInterruptSwitchDelay: boolean = false;
 
-  static bitPositionVBlankInterrupt: u8 = 0;
-  static bitPositionLcdInterrupt: u8 = 1;
-  static bitPositionTimerInterrupt: u8 = 2;
-  static bitPositionJoypadInterrupt: u8 = 4;
+  static readonly bitPositionVBlankInterrupt: u8 = 0;
+  static readonly bitPositionLcdInterrupt: u8 = 1;
+  static readonly bitPositionTimerInterrupt: u8 = 2;
+  static readonly bitPositionJoypadInterrupt: u8 = 4;
 
   // Save States
-
-  static saveStateSlot: u16 = 2;
+  static readonly saveStateSlot: u16 = 2;
 
   // Function to save the state of the class
   static saveState(): void {

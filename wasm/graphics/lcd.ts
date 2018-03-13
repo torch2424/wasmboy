@@ -19,8 +19,6 @@ import {
   hexLog
 } from '../helpers/index';
 
-
-
 export function isLcdEnabled(): boolean {
   return checkBitOnByte(7, eightBitLoadFromGBMemory(Graphics.memoryLocationLcdControl));
 }

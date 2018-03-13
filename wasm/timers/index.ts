@@ -13,10 +13,10 @@ import {
 } from '../interrupts/index';
 
 export class Timers {
-  static memoryLocationTIMA: u16 = 0xFF05; // Timer Modulator
-  static memoryLocationTMA: u16 = 0xFF06; // Timer Counter (Actual Time Value)
-  static memoryLocationTIMC: u16 = 0xFF07; // Timer Controller (A.K.A TAC)
-  static memoryLocationDividerRegister: u16 = 0xFF04; // DividerRegister likes to count
+  static readonly memoryLocationTIMA: u16 = 0xFF05; // Timer Modulator
+  static readonly memoryLocationTMA: u16 = 0xFF06; // Timer Counter (Actual Time Value)
+  static readonly memoryLocationTIMC: u16 = 0xFF07; // Timer Controller (A.K.A TAC)
+  static readonly memoryLocationDividerRegister: u16 = 0xFF04; // DividerRegister likes to count
 
   // Cycle counter. This is used to determine if we should increment the REAL timer
   // I know this is weird, but it's all to make sure the emulation is in sync :p
@@ -28,7 +28,7 @@ export class Timers {
 
   // Save States
 
-  static saveStateSlot: u16 = 5;
+  static readonly saveStateSlot: u16 = 5;
 
   // Function to save the state of the class
   static saveState(): void {
