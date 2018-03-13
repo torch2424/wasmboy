@@ -48,17 +48,10 @@ export function getTileDataAddress(tileDataMemoryLocation: u16, tileIdFromTileMa
   return tileDataAddress;
 }
 
-// TODO: Make not specifc to a single palette
+
 export function getColorFromPalette(colorId: u8, paletteMemoryLocation: u16): u8 {
-  let paletteByte: u8 = eightBitLoadFromGBMemorySkipTraps(paletteMemoryLocation);
-  let color: u8 = 0;
-
   // Shift our paletteByte, 2 times for each color ID
-  paletteByte = (paletteByte >> (colorId * 2));
-
   // And off any extra bytes
-  paletteByte = paletteByte & 0x03;
-
   // Return our Color (00, 01, 10, or 11)
-  return paletteByte;
+  return (eightBitLoadFromGBMemorySkipTraps(paletteMemoryLocation) >> (colorId * 2)) & 0x03;
 }

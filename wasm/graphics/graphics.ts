@@ -114,14 +114,14 @@ export function updateGraphics(numberOfCycles: u8): void {
       // Check if we've reached the last scanline
       if(scanlineRegister === 144) {
         // Draw the scanline
-        _drawScanline();
+        _drawScanline(scanlineRegister);
         // Store the frame to be rendered
         storeFrameToBeRendered();
         // Request a VBlank interrupt
         requestVBlankInterrupt();
       } else if (scanlineRegister < 144) {
         // Draw the scanline
-        _drawScanline();
+        _drawScanline(scanlineRegister);
       }
 
       // Store our scanline
@@ -138,7 +138,7 @@ export function updateGraphics(numberOfCycles: u8): void {
 }
 
 // TODO: Make this a _drawPixelOnScanline, as values can be updated while drawing a scanline
-function _drawScanline(): void {
+function _drawScanline(scanlineRegister: u8): void {
   // http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html
   // Bit 7 - LCD Display Enable (0=Off, 1=On)
   // Bit 6 - Window Tile Map Display Select (0=9800-9BFF, 1=9C00-9FFF)
@@ -151,9 +151,6 @@ function _drawScanline(): void {
 
   // Get our lcd control, see above for usage
   let lcdControl: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationLcdControl);
-
-  // Get our scanline register
-  let scanlineRegister: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationScanlineRegister);
 
   // Get our seleted tile data memory location
   let tileDataMemoryLocation = Graphics.memoryLocationTileDataSelectZeroStart;

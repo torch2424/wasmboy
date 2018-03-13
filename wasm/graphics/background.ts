@@ -13,7 +13,8 @@ import {
   eightBitLoadFromGBMemorySkipTraps
 } from '../memory/load';
 import {
-  setPixelOnFrame
+  Memory,
+  setPixelOnFrameDirectlyToWasmMemory
 } from '../memory/memory';
 import {
   hexLog,
@@ -41,6 +42,10 @@ export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u
   if(pixelYPositionInMap >= 0x100) {
     pixelYPositionInMap -= 0x100;
   }
+
+  // Cache the beginning of our scanlineOffset in wasmboy Memory for performance
+  // https://github.com/AssemblyScript/assemblyscript/issues/40#issuecomment-372479760
+  let scanlineStartOffset: i32 = Memory.frameInProgressVideoOutputLocation + (<i32>scanlineRegister * 160);
 
   // Loop through x to draw the line like a CRT
   for (let i: i32 = 0; i < 160; i++) {
@@ -130,6 +135,6 @@ export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u
 
     // FINALLY, RENDER THAT PIXEL!
     // Only rendering camera for now, so coordinates are for the camera.
-    setPixelOnFrame(i, scanlineRegister, pixelColorInTileFromPalette);
+    setPixelOnFrameDirectlyToWasmMemory(scanlineStartOffset + i, pixelColorInTileFromPalette);
   }
 }

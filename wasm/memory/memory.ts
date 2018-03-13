@@ -153,6 +153,15 @@ export function setPixelOnFrame(x: i32, y: i32, color: u8): void {
   store<u8>(offset, color + 1);
 }
 
+// Also need to store current frame in memory to be read by JS
+// Faster version of setPixel on frame, expects caching to speed up set times
+// https://github.com/AssemblyScript/assemblyscript/issues/40#issuecomment-372479760
+export function setPixelOnFrameDirectlyToWasmMemory(offset: i32, color: u8): void {
+  // Currently only supports 160x144
+  // Add one to the color, that way you don't get the default zero
+  store<u8>(offset, color + 1);
+}
+
 // Need to also get our pixel on the frame for sprite priority
 export function getPixelOnFrame(x: i32, y: i32): u8 {
   // Currently only supports 160x144
