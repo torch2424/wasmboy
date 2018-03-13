@@ -43,6 +43,11 @@ export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u
     pixelYPositionInMap -= 0x100;
   }
 
+  // Moving some scanline variable here, read below for their usage.
+  // Had to move for performance
+  let tileYPositionInMap: i32 = pixelYPositionInMap >> 3;
+  let pixelYInTile: u16 = pixelYPositionInMap % 8;
+
   // Cache the beginning of our scanlineOffset in wasmboy Memory for performance
   // https://github.com/AssemblyScript/assemblyscript/issues/40#issuecomment-372479760
   let scanlineStartOffset: i32 = Memory.frameInProgressVideoOutputLocation + (<i32>scanlineRegister * 160);
@@ -66,7 +71,8 @@ export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u
     // Also, bitshifting by 3, do do a division by 8
     // Need to use u16s, as they will be used to compute an address, which will cause weird errors and overflows
     let tileXPositionInMap: i32 = pixelXPositionInMap >> 3;
-    let tileYPositionInMap: i32 = pixelYPositionInMap >> 3;
+    //let tileYPositionInMap: i32 = pixelYPositionInMap >> 3;
+    // Moved for performance
 
 
     // Get our tile address on the tileMap
@@ -76,16 +82,21 @@ export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u
     // And we have x pixel 160. 160 / 8 = 20.
     // * 32, because remember, this is NOT only for the camera, the actual map is 32x32. Therefore, the next tile line of the map, is 32 byte offset.
     // Think like indexing a 2d array, as a 1d array and it make sense :)
-    let tileMapAddress: u16 = tileMapMemoryLocation + <u16>(tileYPositionInMap * 32) + <u16>tileXPositionInMap;
+    //let tileMapAddress: u16 = tileMapMemoryLocation + <u16>(tileYPositionInMap * 32) + <u16>tileXPositionInMap;
+    // Moved for perofrmance
 
     // Get the tile Id on the Tile Map
-    let tileIdFromTileMap: u8 = eightBitLoadFromGBMemorySkipTraps(tileMapAddress);
+    //let tileIdFromTileMap: u8 = eightBitLoadFromGBMemorySkipTraps(tileMapAddress);
+    // Moved for perofrmance
 
     // Now get our tileDataAddress for the corresponding tileID we found in the map
     // Read the comments in _getTileDataAddress() to see what's going on.
     // tl;dr if we had the tile map of "a b c d", and wanted tileId 2.
     // This funcitons returns the start of memory locaiton for the tile 'c'.
-    let tileDataAddress: u16 = getTileDataAddress(tileDataMemoryLocation, tileIdFromTileMap);
+    let tileDataAddress: u16 = getTileDataAddress(
+      tileDataMemoryLocation,
+      eightBitLoadFromGBMemorySkipTraps(tileMapMemoryLocation + <u16>(tileYPositionInMap * 32) + <u16>tileXPositionInMap)
+    );
 
     // Now we can process the the individual bytes that represent the pixel on a tile
 
@@ -98,7 +109,9 @@ export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u
     // yPixel = 144. 144 % 8 = 0.
     // 0 Represents last line of pixels in a tile, 1 represents first. 1 2 3 4 5 6 7 0.
     // Because remember, we are counting lines on the display NOT including zero
-    let pixelYInTile: u16 = pixelYPositionInMap % 8;
+    // let pixelYInTile: u16 = pixelYPositionInMap % 8;
+    // Moved about for performance
+
     // Remember to represent a single line of 8 pixels on a tile, we need two bytes.
     // Therefore, we need to times our modulo by 2, to get the correct line of pixels on the tile.
     // Again, think like you had to map a 2d array as a 1d.
@@ -131,10 +144,11 @@ export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u
     // Now get the colorId from the pallete, to get our final color
     // Developers could change colorIds to represents different colors
     // in their palette, thus we need to grab the color from there
-    let pixelColorInTileFromPalette: u8 = getColorFromPalette(paletteColorId, Graphics.memoryLocationBackgroundPalette);
+    //let pixelColorInTileFromPalette: u8 = getColorFromPalette(paletteColorId, Graphics.memoryLocationBackgroundPalette);
+    // Moved below for perofrmance
 
     // FINALLY, RENDER THAT PIXEL!
     // Only rendering camera for now, so coordinates are for the camera.
-    setPixelOnFrameDirectlyToWasmMemory(scanlineStartOffset + i, pixelColorInTileFromPalette);
+    setPixelOnFrameDirectlyToWasmMemory(scanlineStartOffset + i, getColorFromPalette(paletteColorId, Graphics.memoryLocationBackgroundPalette));
   }
 }
