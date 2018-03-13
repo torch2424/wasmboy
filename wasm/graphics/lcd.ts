@@ -87,19 +87,21 @@ export function setLcdStatus(): void {
     }
   }
 
-  // Check if we want to request an interrupt, and we JUST changed modes
-  if(shouldRequestInterrupt && (lcdMode !== newLcdMode)) {
-    requestLcdInterrupt();
-  }
-
-  // Check for the coincidence flag
-  if(lcdMode !== newLcdMode && newLcdMode === 0 && eightBitLoadFromGBMemory(Graphics.memoryLocationScanlineRegister) === eightBitLoadFromGBMemory(Graphics.memoryLocationCoincidenceCompare)) {
-    lcdStatus = setBitOnByte(2, lcdStatus);
-    if(checkBitOnByte(6, lcdStatus)) {
+  if (lcdMode !== newLcdMode) {
+    // Check if we want to request an interrupt, and we JUST changed modes
+    if(shouldRequestInterrupt) {
       requestLcdInterrupt();
     }
-  } else {
-    lcdStatus = resetBitOnByte(2, lcdStatus);
+
+    // Check for the coincidence flag
+    if(newLcdMode === 0 && scanlineRegister === eightBitLoadFromGBMemory(Graphics.memoryLocationCoincidenceCompare)) {
+      lcdStatus = setBitOnByte(2, lcdStatus);
+      if(checkBitOnByte(6, lcdStatus)) {
+        requestLcdInterrupt();
+      }
+    } else {
+      lcdStatus = resetBitOnByte(2, lcdStatus);
+    }
   }
 
   // Save our lcd mode

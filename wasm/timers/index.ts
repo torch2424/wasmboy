@@ -61,7 +61,7 @@ export function updateTimers(numberOfCycles: u8): void {
       Timers.cycleCounter -= _getCurrentCycleCounterFrequency();
 
       // Update the actual timer counter
-      let tima = eightBitLoadFromGBMemory(Timers.memoryLocationTIMA);
+      let tima: u8 = eightBitLoadFromGBMemory(Timers.memoryLocationTIMA);
       if(tima == 255) {
         // Store Timer Modulator inside of TIMA
         eightBitStoreIntoGBMemorySkipTraps(Timers.memoryLocationTIMA, eightBitLoadFromGBMemory(Timers.memoryLocationTMA));
@@ -88,23 +88,15 @@ function _checkDividerRegister(numberOfCycles: u8): void {
     Timers.dividerRegisterCycleCounter -= 255;
 
     let dividerRegister = eightBitLoadFromGBMemory(Timers.memoryLocationDividerRegister);
-    if(dividerRegister === 255) {
-      dividerRegister = 0;
-    } else {
-      dividerRegister += 1;
-    }
+    // TODO: Hoping that the overflow will occur correctly here, see this for any weird errors
+    dividerRegister += 1;
     eightBitStoreIntoGBMemorySkipTraps(Timers.memoryLocationDividerRegister, dividerRegister);
   }
 }
 
 function _isTimerEnabled(): boolean {
   // second bit, e.g 000 0100, will be set if the timer is enabled
-  let timc = eightBitLoadFromGBMemory(Timers.memoryLocationTIMC);
-  if((timc & 0x04) > 0) {
-    return true;
-  } else {
-    return false;
-  }
+  return (eightBitLoadFromGBMemory(Timers.memoryLocationTIMC) & 0x04) > 0;
 }
 
 // NOTE: This can be sped up by intercepting writes to memory
@@ -119,7 +111,7 @@ function _getCurrentCycleCounterFrequency(): i32 {
 
   // Returns value equivalent to
   // Cpu.CLOCK_SPEED / timc frequency
-  let cycleCount = 0;
+  let cycleCount: i32 = 0;
   if(timc === 0x00) {
     // TIMC -> 4096
     cycleCount = 1024;
@@ -137,8 +129,8 @@ function _getCurrentCycleCounterFrequency(): i32 {
   // If we notice the current max cycle count changes, reset the cyclecounter
   if(cycleCount != Timers.currentMaxCycleCount) {
     Timers.cycleCounter = 0;
-    Timers.currentMaxCycleCount = <i32>cycleCount;
+    Timers.currentMaxCycleCount = cycleCount;
   }
 
-  return <i32>cycleCount;
+  return cycleCount;
 }
