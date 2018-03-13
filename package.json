@@ -17,7 +17,7 @@
     "debugger:build": "preact build",
     "debugger:deploy": "npm run debugger:build && npx gh-pages -d build",
     "wasm:watch": "npx watch \"npm run wasm:build\" wasm",
-    "wasm:build": "npx asc wasm/index.ts -b dist/wasm/index.untouched.wasm -t dist/wasm/index.untouched.wast -O3z --validate --sourceMap --memoryBase 8861696 && echo \"Built Wasm!\"",
+    "wasm:build": "npx asc wasm/index.ts -b dist/wasm/index.untouched.wasm -t dist/wasm/index.untouched.wast -O3 --validate --sourceMap --memoryBase 8861696 && echo \"Built Wasm!\"",
     "lib:watch": "npx rollup -c -w",
     "lib:build": "npx rollup -c"
   },

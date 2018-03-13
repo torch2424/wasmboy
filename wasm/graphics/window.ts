@@ -42,11 +42,6 @@ export function renderWindow(scanlineRegister: u8, tileDataMemoryLocation: u16, 
   // Get our current pixel y positon on the 160x144 camera (Row that the scanline draws across)
   let pixelYPositionInMap: u16 = <u16>scanlineRegister - windowY;
 
-  // Moving some scanline variable here, read below for their usage.
-  // Had to move for performance
-  let tileYPositionInMap: i32 = pixelYPositionInMap >> 3;
-  let pixelYInTile: u16 = pixelYPositionInMap % 8;
-
   // Cache the beginning of our scanlineOffset in wasmboy Memory for performance
   // https://github.com/AssemblyScript/assemblyscript/issues/40#issuecomment-372479760
   let scanlineStartOffset: i32 = Memory.frameInProgressVideoOutputLocation + (<i32>scanlineRegister * 160);
@@ -78,21 +73,16 @@ export function renderWindow(scanlineRegister: u8, tileDataMemoryLocation: u16, 
     // And we have x pixel 160. 160 / 8 = 20.
     // * 32, because remember, this is NOT only for the camera, the actual map is 32x32. Therefore, the next tile line of the map, is 32 byte offset.
     // Think like indexing a 2d array, as a 1d array and it make sense :)
-    // let tileMapAddress: u16 = tileMapMemoryLocation + (tileYPositionInMap * 32) + tileXPositionInMap;
-    // moved for performance
+    let tileMapAddress: u16 = tileMapMemoryLocation + (tileYPositionInMap * 32) + tileXPositionInMap;
 
     // Get the tile Id on the Tile Map
-    // let tileIdFromTileMap: u8 = eightBitLoadFromGBMemorySkipTraps(tileMapAddress);
-    // moved for performance
+    let tileIdFromTileMap: u8 = eightBitLoadFromGBMemorySkipTraps(tileMapAddress);
 
     // Now get our tileDataAddress for the corresponding tileID we found in the map
     // Read the comments in _getTileDataAddress() to see what's going on.
     // tl;dr if we had the tile map of "a b c d", and wanted tileId 2.
     // This funcitons returns the start of memory locaiton for the tile 'c'.
-    let tileDataAddress: u16 = getTileDataAddress(
-      tileDataMemoryLocation,
-      eightBitLoadFromGBMemorySkipTraps(tileMapMemoryLocation + <u16>(tileYPositionInMap * 32) + <u16>tileXPositionInMap)
-    );
+    let tileDataAddress: u16 = getTileDataAddress(tileDataMemoryLocation, tileIdFromTileMap);
 
     // Now we can process the the individual bytes that represent the pixel on a tile
 
@@ -105,8 +95,7 @@ export function renderWindow(scanlineRegister: u8, tileDataMemoryLocation: u16, 
     // yPixel = 144. 144 % 8 = 0.
     // 0 Represents last line of pixels in a tile, 1 represents first. 1 2 3 4 5 6 7 0.
     // Because remember, we are counting lines on the display NOT including zero
-    // let pixelYInTile: u16 = pixelYPositionInMap % 8;
-    // Moved for performance
+    let pixelYInTile: u16 = pixelYPositionInMap % 8;
 
     // Remember to represent a single line of 8 pixels on a tile, we need two bytes.
     // Therefore, we need to times our modulo by 2, to get the correct line of pixels on the tile.
