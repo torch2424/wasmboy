@@ -8,11 +8,11 @@ import {
   checkBitOnByte
 } from '../helpers/index';
 
-export function getChannelEnvelopePeriod(channelNumber: i8): u8 {
+export function getChannelEnvelopePeriod(channelNumber: i32): u8 {
   // Get the bottom 3 bits for the period
   return getRegister2OfChannel(channelNumber) & 0x07;
 }
 
-export function getChannelEnvelopeAddMode(channelNumber: i8): boolean {
+export function getChannelEnvelopeAddMode(channelNumber: i32): boolean {
   return checkBitOnByte(3, getRegister2OfChannel(channelNumber))
 }

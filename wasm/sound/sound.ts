@@ -207,37 +207,43 @@ export function updateSound(numberOfCycles: u8): void {
     let rightMixerVolume: i32 = registerNR50;
     rightMixerVolume = rightMixerVolume & 0x07;
 
+    // cache channel numbers for performance
+    let channel1ChannelNumber: i32 = Channel1.channelNumber;
+    let channel2ChannelNumber: i32 = Channel2.channelNumber;
+    let channel3ChannelNumber: i32 = Channel3.channelNumber;
+    let channel4ChannelNumber: i32 = Channel4.channelNumber;
+
     // Get our channel volume for left/right
     let leftChannelSample: i32 = 0;
     let rightChannelSample: i32 = 0;
 
     // Find the channel for the left volume
-    if (isChannelEnabledOnLeftOutput(Channel1.channelNumber)) {
+    if (isChannelEnabledOnLeftOutput(channel1ChannelNumber)) {
       leftChannelSample += channel1Sample;
     }
-    if (isChannelEnabledOnLeftOutput(Channel2.channelNumber)) {
+    if (isChannelEnabledOnLeftOutput(channel2ChannelNumber)) {
       leftChannelSample += channel2Sample;
     }
-    if (isChannelEnabledOnLeftOutput(Channel3.channelNumber)) {
+    if (isChannelEnabledOnLeftOutput(channel3ChannelNumber)) {
       leftChannelSample += channel3Sample;
     }
-    if (isChannelEnabledOnLeftOutput(Channel4.channelNumber)) {
+    if (isChannelEnabledOnLeftOutput(channel4ChannelNumber)) {
       leftChannelSample += channel4Sample;
     }
 
 
     // Find the channel for the right volume
     // TODO: Other Channels
-    if (isChannelEnabledOnRightOutput(Channel1.channelNumber)) {
+    if (isChannelEnabledOnRightOutput(channel1ChannelNumber)) {
       rightChannelSample += channel1Sample;
     }
-    if (isChannelEnabledOnRightOutput(Channel2.channelNumber)) {
+    if (isChannelEnabledOnRightOutput(channel2ChannelNumber)) {
       rightChannelSample += channel2Sample;
     }
-    if (isChannelEnabledOnRightOutput(Channel3.channelNumber)) {
+    if (isChannelEnabledOnRightOutput(channel3ChannelNumber)) {
       rightChannelSample += channel3Sample;
     }
-    if (isChannelEnabledOnRightOutput(Channel4.channelNumber)) {
+    if (isChannelEnabledOnRightOutput(channel4ChannelNumber)) {
       rightChannelSample += channel4Sample;
     }
 
@@ -285,9 +291,7 @@ function getSampleAsUnsignedByte(sample: i32): u8 {
   // Max mixer volume is 8. so 120 * 8 = 960
   // goal is 254 (see blurb at top). 960 / 254 = 3.779527559055118
   // so, 960 * 1000 / 3779 should give approximate answer
-  let adjustedSample: i32 = sample * 1000 / 3779;
-  let convertedSample: u8 = <u8>adjustedSample;
-  return convertedSample;
+  return <u8>(sample * 1000 / 3779);
 }
 
 function getSampleAsUnsignedByteForSingleChannel(sample: i32): u8 {
@@ -295,7 +299,5 @@ function getSampleAsUnsignedByteForSingleChannel(sample: i32): u8 {
   // Max mixer volume is 8. so 30 * 8 = 240
   // goal is 254 (see blurb at top). 240 / 254 = 0.9448818897637795
   // so, 240 * 1000 / 944 should give approximate answer
-  let adjustedSample: i32 = sample * 1000 / 944;
-  let convertedSample: u8 = <u8>adjustedSample;
-  return convertedSample;
+  return <u8>(sample * 1000 / 944);
 }

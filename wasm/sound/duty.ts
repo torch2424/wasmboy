@@ -8,14 +8,14 @@ import {
   checkBitOnByte
 } from '../helpers/index';
 
-export function getChannelDuty(channelNumber: i8): u8 {
+export function getChannelDuty(channelNumber: i32): u8 {
   let duty = getRegister1OfChannel(channelNumber);
   duty = (duty >> 6);
   return (duty & 0x03);
 }
 
 // Since there are no 2d arrays, we will use a byte to represent duty cycles (wave form from percentages)
-export function isDutyCycleClockPositiveOrNegativeForWaveform(channelNumber: i8, waveFormPositionOnDuty: u8): boolean {
+export function isDutyCycleClockPositiveOrNegativeForWaveform(channelNumber: i32, waveFormPositionOnDuty: u8): boolean {
   // Get our current Duty
   let duty: u8 = getChannelDuty(channelNumber);
 

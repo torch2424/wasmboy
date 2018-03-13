@@ -48,7 +48,7 @@ export class Channel4 {
   static readonly memoryLocationNRx4: u16 = 0xFF23;
 
   // Channel Properties
-  static readonly channelNumber: i8 = 4;
+  static readonly channelNumber: i32 = 4;
   static isEnabled: boolean = false;
   static frequencyTimer: i32 = 0x00;
   static envelopeCounter: i32 = 0x00;

@@ -12,7 +12,7 @@ import {
   checkBitOnByte
 } from '../helpers/index';
 
-export function getChannelFrequency(channelNumber: i8): u16 {
+export function getChannelFrequency(channelNumber: i32): u16 {
   // Need to get the 3rd and 4th register.
   // 3rd register is the bottom 8 bits.
   // 4th register contains bits 9-11.
@@ -23,7 +23,7 @@ export function getChannelFrequency(channelNumber: i8): u16 {
   return frequency;
 }
 
-export function setChannelFrequency(channelNumber: i8, frequency: u16): void {
+export function setChannelFrequency(channelNumber: i32, frequency: u16): void {
   // Get the high and low bits
   let passedFrequencyHighBits: u8 = <u8>(frequency >> 8);
   let passedFrequencyLowBits: u8 = <u8>(frequency & 0xFF);

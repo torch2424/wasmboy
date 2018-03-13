@@ -52,7 +52,7 @@ export class Channel3 {
   static readonly memoryLocationWaveTable: u16 = 0xFF30;
 
   // Channel Properties
-  static readonly channelNumber: i8 = 3;
+  static readonly channelNumber: i32 = 3;
   static isEnabled: boolean = false;
   static frequencyTimer: i32 = 0x00;
   static lengthCounter: i32 = 0x00;

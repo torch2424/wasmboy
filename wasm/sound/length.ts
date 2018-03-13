@@ -22,7 +22,7 @@ import {
   hexLog
 } from '../helpers/index';
 
-export function setChannelLengthCounter(channelNumber: i8): void {
+export function setChannelLengthCounter(channelNumber: i32): void {
 
   let lengthLoad = getRegister1OfChannel(channelNumber);
 
@@ -54,6 +54,6 @@ export function setChannelLengthCounter(channelNumber: i8): void {
 
 }
 
-export function isChannelLengthEnabled(channelNumber: i8): boolean {
+export function isChannelLengthEnabled(channelNumber: i32): boolean {
   return checkBitOnByte(6, getRegister4OfChannel(channelNumber))
 }
