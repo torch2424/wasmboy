@@ -142,32 +142,24 @@ export function initializeCartridge(): void {
 }
 
 // Also need to store current frame in memory to be read by JS
-export function setPixelOnFrame(x: u16, y: u16, color: u8): void {
+export function setPixelOnFrame(x: i32, y: i32, color: u8): void {
   // Currently only supports 160x144
   // Storing in X, then y
   // So need an offset
 
-  // Store our x and y to allow them to get really large
-  let largeY: i32 = y;
-  let largeX: i32 = x;
-
-  let offset: i32 = Memory.frameInProgressVideoOutputLocation + (largeY * 160) + largeX;
+  let offset: i32 = Memory.frameInProgressVideoOutputLocation + (y * 160) + x;
 
   // Add one to the color, that way you don't ge the default zero
   store<u8>(offset, color + 1);
 }
 
 // Need to also get our pixel on the frame for sprite priority
-export function getPixelOnFrame(x: u16, y: u16): u8 {
+export function getPixelOnFrame(x: i32, y: i32): u8 {
   // Currently only supports 160x144
   // Storing in X, then y
   // So need an offset
 
-  // Store our x and y to allow them to get really large
-  let largeY: i32 = y;
-  let largeX: i32 = x;
-
-  let offset: i32 = Memory.frameInProgressVideoOutputLocation + (largeY * 160) + largeX;
+  let offset: i32 = Memory.frameInProgressVideoOutputLocation + (y * 160) + x;
 
   // Added one to the color, that way you don't ge the default zero
   return load<u8>(offset);
@@ -175,8 +167,8 @@ export function getPixelOnFrame(x: u16, y: u16): u8 {
 
 // V-Blank occured, move our frame in progress to our render frame
 export function storeFrameToBeRendered(): void {
-  for(let y: u32 = 0; y < 144; y++) {
-    for (let x: u32 = 0; x < 160; x++) {
+  for(let y: i32 = 0; y < 144; y++) {
+    for (let x: i32 = 0; x < 160; x++) {
       store<u8>(Memory.currentFrameVideoOutputLocation + x + (y * 160), getPixelOnFrame(<u16>x, <u16>y))
     }
   }

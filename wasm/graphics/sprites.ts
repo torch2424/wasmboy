@@ -25,10 +25,10 @@ import {
 export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): void {
 
   // Need to loop through all 40 sprites to check their status
-  for(let i: u16 = 0; i < 40; i++) {
+  for(let i: i32 = 0; i < 40; i++) {
 
     // Sprites occupy 4 bytes in the sprite attribute table
-    let spriteTableIndex: u16 = i * 4;
+    let spriteTableIndex: u16 = <u16>(i * 4);
     // Y positon is offset by 16, X position is offset by 8
     // TODO: Why is OAM entry zero???
     let spriteYPosition: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex);

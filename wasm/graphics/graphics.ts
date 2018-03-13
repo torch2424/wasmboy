@@ -32,10 +32,10 @@ import {
 
 export class Graphics {
   // Count the number of cycles to keep synced with cpu cycles
-  static scanlineCycleCounter: i16 = 0x00;
-  static MAX_CYCLES_PER_SCANLINE: i16 = 456;
-  static MIN_CYCLES_SPRITES_LCD_MODE: i16 = 376;
-  static MIN_CYCLES_TRANSFER_DATA_LCD_MODE: i16 = 249;
+  static scanlineCycleCounter: i32 = 0x00;
+  static MAX_CYCLES_PER_SCANLINE: i32 = 456;
+  static MIN_CYCLES_SPRITES_LCD_MODE: i32 = 376;
+  static MIN_CYCLES_TRANSFER_DATA_LCD_MODE: i32 = 249;
 
   // LCD
   // scanlineRegister also known as LY
@@ -83,14 +83,14 @@ export class Graphics {
 
   // Function to save the state of the class
   static saveState(): void {
-    store<i16>(getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot), Graphics.scanlineCycleCounter);
-    store<u8>(getSaveStateMemoryOffset(0x02, Graphics.saveStateSlot), Graphics.currentLcdMode);
+    store<i32>(getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot), Graphics.scanlineCycleCounter);
+    store<u8>(getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot), Graphics.currentLcdMode);
   }
 
   // Function to load the save state from memory
   static loadState(): void {
-    Graphics.scanlineCycleCounter = load<i16>(getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot));
-    Graphics.currentLcdMode = load<u8>(getSaveStateMemoryOffset(0x02, Graphics.saveStateSlot));
+    Graphics.scanlineCycleCounter = load<i32>(getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot));
+    Graphics.currentLcdMode = load<u8>(getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot));
   }
 }
 

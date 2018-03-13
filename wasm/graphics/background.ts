@@ -43,12 +43,12 @@ export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u
   }
 
   // Loop through x to draw the line like a CRT
-  for (let i: u16 = 0; i < 160; i++) {
+  for (let i: i32 = 0; i < 160; i++) {
 
     // Get our Current X position of our pixel on the on the 160x144 camera
     // this is done by getting the current scroll X position,
     // and adding it do what X Value the scanline is drawing on the camera.
-    let pixelXPositionInMap: u16 = i + scrollX;
+    let pixelXPositionInMap: i32 = i + scrollX;
 
     // This is to compensate wrapping, same as above
     if(pixelXPositionInMap >= 0x100) {
@@ -60,8 +60,8 @@ export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u
     // 256 / 8 = 32.
     // Also, bitshifting by 3, do do a division by 8
     // Need to use u16s, as they will be used to compute an address, which will cause weird errors and overflows
-    let tileXPositionInMap: u16 = pixelXPositionInMap >> 3;
-    let tileYPositionInMap: u16 = pixelYPositionInMap >> 3;
+    let tileXPositionInMap: i32 = pixelXPositionInMap >> 3;
+    let tileYPositionInMap: i32 = pixelYPositionInMap >> 3;
 
 
     // Get our tile address on the tileMap
@@ -71,7 +71,7 @@ export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u
     // And we have x pixel 160. 160 / 8 = 20.
     // * 32, because remember, this is NOT only for the camera, the actual map is 32x32. Therefore, the next tile line of the map, is 32 byte offset.
     // Think like indexing a 2d array, as a 1d array and it make sense :)
-    let tileMapAddress: u16 = tileMapMemoryLocation + (tileYPositionInMap * 32) + tileXPositionInMap;
+    let tileMapAddress: u16 = tileMapMemoryLocation + <u16>(tileYPositionInMap * 32) + <u16>tileXPositionInMap;
 
     // Get the tile Id on the Tile Map
     let tileIdFromTileMap: u8 = eightBitLoadFromGBMemorySkipTraps(tileMapAddress);
