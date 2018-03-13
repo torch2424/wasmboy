@@ -14,6 +14,11 @@ import {
 // Returns -1 if no trap found, otherwise returns a value that should be fed for the address
 export function checkReadTraps(offset: u16): i32 {
 
+  // Try to break early for most common scenario
+  if (offset < Memory.videoRamLocation) {
+    return -1;
+  }
+
   // Check the graphics mode to see if we can write to VRAM
   // http://gbdev.gg8.se/wiki/articles/Video_Display#Accessing_VRAM_and_OAM
   if(offset >= Memory.videoRamLocation && offset < Memory.cartridgeRamLocation) {
