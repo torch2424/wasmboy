@@ -269,6 +269,7 @@ export function updateSound(numberOfCycles: u8): void {
     // Mixer volume can be at most 7 + 1
     // Can be at most 7, because we only have 3 bits, 111 = 7
     // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Mixer
+    // Done in the getSampleAsUnsignedByte(), since we are doing some weirdness there :)
     //leftChannelSample = leftChannelSample * (leftMixerVolume + 1);
     //rightChannelSample = rightChannelSample * (rightMixerVolume + 1);
 

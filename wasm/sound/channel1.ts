@@ -7,6 +7,7 @@
 import {
   eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemory,
+  eightBitStoreIntoGBMemorySkipTraps,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
@@ -103,11 +104,11 @@ export class Channel1 {
 
 
   static initialize(): void {
-    eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx0, 0x80);
-    eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx1, 0xBF);
-    eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx2, 0xF3);
-    eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx3, 0xFF);
-    eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx4, 0xBF);
+    eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx0, 0x80);
+    eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx1, 0xBF);
+    eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx2, 0xF3);
+    eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx3, 0xFF);
+    eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx4, 0xBF);
   }
 
   static getSample(numberOfCycles: u8): i32 {
