@@ -22,7 +22,7 @@ import {
   hexLog
 } from '../helpers/index';
 
-export function setChannelLengthCounter(channelNumber: i8): void {
+export function setChannelLengthCounter(channelNumber: i32): void {
 
   let lengthLoad = getRegister1OfChannel(channelNumber);
 
@@ -42,19 +42,22 @@ export function setChannelLengthCounter(channelNumber: i8): void {
   }
 
   // Set the Channel Length Counter
-  if (channelNumber === Channel1.channelNumber) {
-    Channel1.lengthCounter = result;
-  } else if (channelNumber === Channel2.channelNumber) {
-    Channel2.lengthCounter = result;
-  } else if (channelNumber === Channel3.channelNumber) {
-    Channel3.lengthCounter = result;
-  } else if (channelNumber === Channel4.channelNumber) {
-    Channel4.lengthCounter = result;
+  switch(channelNumber) {
+    case Channel1.channelNumber:
+      Channel1.lengthCounter = result;
+      break;
+    case Channel2.channelNumber:
+      Channel2.lengthCounter = result;
+      break;
+    case Channel3.channelNumber:
+      Channel3.lengthCounter = result;
+      break;
+    case Channel4.channelNumber:
+      Channel4.lengthCounter = result;
+      break;
   }
-
 }
 
-export function isChannelLengthEnabled(channelNumber: i8): boolean {
-  let soundRegister: u8 = getRegister4OfChannel(channelNumber);
-  return checkBitOnByte(6, soundRegister)
+export function isChannelLengthEnabled(channelNumber: i32): boolean {
+  return checkBitOnByte(6, getRegister4OfChannel(channelNumber))
 }

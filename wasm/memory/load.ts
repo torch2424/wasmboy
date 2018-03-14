@@ -6,14 +6,17 @@ import {
   getWasmBoyOffsetFromGameBoyOffset
 } from './memoryMap';
 import {
-  concatenateBytes
+  concatenateBytes,
+  performanceTimestamp
 } from '../helpers/index';
 
 export function eightBitLoadFromGBMemory(offset: u16): u8 {
-  if (checkReadTraps(offset) < 0) {
-    return _eightBitLoadFromWasmBoyMemory(offset);
-  } else {
-    return <u8>checkReadTraps(offset);
+  let readTrapResult: i32 = checkReadTraps(offset);
+  switch (readTrapResult) {
+    case -1:
+      return _eightBitLoadFromWasmBoyMemory(offset);
+    default:
+      return <u8>readTrapResult;
   }
 }
 
@@ -25,10 +28,14 @@ export function sixteenBitLoadFromGBMemory(offset: u16): u16 {
 
   // Get our low byte
   let lowByte: u8 = 0;
-  if (checkReadTraps(offset) < 0) {
-    lowByte = _eightBitLoadFromWasmBoyMemory(offset);
-  } else {
-    lowByte = <u8>checkReadTraps(offset);
+  let lowByteReadTrapResult: i32 = checkReadTraps(offset);
+  switch (lowByteReadTrapResult) {
+    case -1:
+      lowByte = _eightBitLoadFromWasmBoyMemory(offset);
+      break;
+    default:
+      lowByte = <u8>lowByteReadTrapResult;
+      break;
   }
 
   // Get the next offset for the second byte
@@ -36,20 +43,22 @@ export function sixteenBitLoadFromGBMemory(offset: u16): u16 {
 
   // Get our high byte
   let highByte: u8 = 0;
-  if (checkReadTraps(nextOffset) < 0) {
-    highByte = _eightBitLoadFromWasmBoyMemory(nextOffset);
-  } else {
-    highByte = <u8>checkReadTraps(nextOffset);
+  let highByteReadTrapResult: i32 = checkReadTraps(nextOffset);
+  switch (highByteReadTrapResult) {
+    case -1:
+      highByte = _eightBitLoadFromWasmBoyMemory(nextOffset);
+      break;
+    default:
+      highByte = <u8>highByteReadTrapResult;
+      break;
   }
 
   // Concatenate the bytes and return
-  let concatenatedValue: u16 = concatenateBytes(highByte, lowByte);
-  return concatenatedValue;
+  return concatenateBytes(highByte, lowByte);
 }
 
 function _eightBitLoadFromWasmBoyMemory(gameboyOffset: u16): u8 {
-  let wasmboyOffset: u32 = getWasmBoyOffsetFromGameBoyOffset(gameboyOffset);
-  return load<u8>(wasmboyOffset);
+  return load<u8>(getWasmBoyOffsetFromGameBoyOffset(gameboyOffset));
 }
 
 export function loadBooleanDirectlyFromWasmMemory(offset: u32): boolean {

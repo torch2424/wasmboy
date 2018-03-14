@@ -17,8 +17,8 @@ import {
 } from '../helpers/index';
 
 export class Interrupts {
-  static memoryLocationInterruptEnabled: u16 = 0xFFFF;
-  static memoryLocationInterruptRequest: u16 = 0xFF0F; // A.K.A interrupt Flag (IF)
+  static readonly memoryLocationInterruptEnabled: u16 = 0xFFFF;
+  static readonly memoryLocationInterruptRequest: u16 = 0xFF0F; // A.K.A interrupt Flag (IF)
 
   static masterInterruptSwitch: boolean = false;
   // According to mooneye, interrupts are not handled until AFTER
@@ -26,14 +26,13 @@ export class Interrupts {
   // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown
   static masterInterruptSwitchDelay: boolean = false;
 
-  static bitPositionVBlankInterrupt: u8 = 0;
-  static bitPositionLcdInterrupt: u8 = 1;
-  static bitPositionTimerInterrupt: u8 = 2;
-  static bitPositionJoypadInterrupt: u8 = 4;
+  static readonly bitPositionVBlankInterrupt: u8 = 0;
+  static readonly bitPositionLcdInterrupt: u8 = 1;
+  static readonly bitPositionTimerInterrupt: u8 = 2;
+  static readonly bitPositionJoypadInterrupt: u8 = 4;
 
   // Save States
-
-  static saveStateSlot: u16 = 2;
+  static readonly saveStateSlot: u16 = 2;
 
   // Function to save the state of the class
   static saveState(): void {
@@ -64,16 +63,19 @@ function _handleInterrupt(bitPosition: u8): void {
 
   // Jump to the correct interrupt location
   // http://www.codeslinger.co.uk/pages/projects/gameboy/interupts.html
-  if (bitPosition === Interrupts.bitPositionVBlankInterrupt) {
-    Cpu.programCounter = 0x40;
-  } else if(bitPosition === Interrupts.bitPositionLcdInterrupt) {
-    //hexLog(2, 1, 6);
-    Cpu.programCounter = 0x48;
-  } else if(bitPosition === Interrupts.bitPositionTimerInterrupt) {
-    Cpu.programCounter = 0x50;
-  } else if(bitPosition === Interrupts.bitPositionJoypadInterrupt) {
-    // JoyPad
-    Cpu.programCounter = 0x60;
+  switch(bitPosition) {
+    case Interrupts.bitPositionVBlankInterrupt:
+      Cpu.programCounter = 0x40;
+      break;
+    case Interrupts.bitPositionLcdInterrupt:
+      Cpu.programCounter = 0x48;
+      break;
+    case Interrupts.bitPositionTimerInterrupt:
+      Cpu.programCounter = 0x50;
+      break;
+    case Interrupts.bitPositionJoypadInterrupt:
+      Cpu.programCounter = 0x60;
+      break;
   }
 
   // If the CPU was halted, now is the time to un-halt

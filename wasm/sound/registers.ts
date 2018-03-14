@@ -49,23 +49,24 @@ export function handledWriteToSoundRegister(offset: u16, value: u16): boolean {
     return true;
   }
 
-  // Set length counter on channels
-  if(offset === Channel1.memoryLocationNRx1) {
-    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
-    setChannelLengthCounter(Channel1.channelNumber);
-    return true;
-  } else if(offset === Channel2.memoryLocationNRx1) {
-    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
-    setChannelLengthCounter(Channel2.channelNumber);
-    return true;
-  } else if(offset === Channel3.memoryLocationNRx1) {
-    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
-    setChannelLengthCounter(Channel3.channelNumber);
-    return true;
-  } else if(offset === Channel4.memoryLocationNRx1) {
-    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
-    setChannelLengthCounter(Channel4.channelNumber);
-    return true;
+  switch(offset) {
+    // Set length counter on channels
+    case Channel1.memoryLocationNRx1:
+      eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+      setChannelLengthCounter(Channel1.channelNumber);
+      return true;
+    case Channel2.memoryLocationNRx1:
+      eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+      setChannelLengthCounter(Channel2.channelNumber);
+      return true;
+    case Channel3.memoryLocationNRx1:
+      eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+      setChannelLengthCounter(Channel3.channelNumber);
+      return true;
+    case Channel4.memoryLocationNRx1:
+      eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+      setChannelLengthCounter(Channel4.channelNumber);
+      return true;
   }
 
   // Check our NRx4 registers to trap our trigger bits
@@ -106,14 +107,14 @@ export function handledWriteToSoundRegister(offset: u16, value: u16): boolean {
   return false;
 }
 
-export function getChannelStartingVolume(channelNumber: i8): u8 {
+export function getChannelStartingVolume(channelNumber: i32): u8 {
   // Simply need to get the top 4 bits of register 2
   let startingVolume: u8 = getRegister2OfChannel(channelNumber);
   startingVolume = (startingVolume >> 4);
   return (startingVolume & 0x0F);
 }
 
-export function isChannelDacEnabled(channelNumber: i8): boolean {
+export function isChannelDacEnabled(channelNumber: i32): boolean {
   // DAC power is controlled by the upper 5 bits of NRx2 (top bit of NR30 for wave channel).
   // If these bits are not all clear, the DAC is on, otherwise it's off and outputs 0 volts.
   if(channelNumber !== 3) {
@@ -131,14 +132,14 @@ export function isChannelDacEnabled(channelNumber: i8): boolean {
   }
 }
 
-export function isChannelEnabledOnLeftOutput(channelNumber: i8): boolean {
+export function isChannelEnabledOnLeftOutput(channelNumber: i32): boolean {
   let registerNR51: u8 = eightBitLoadFromGBMemory(Sound.memoryLocationNR51);
   // Left channel in the higher bits
   let bitNumberOfChannel: u8 = (<u8>channelNumber - 1) + 4;
   return checkBitOnByte(bitNumberOfChannel, registerNR51);
 }
 
-export function isChannelEnabledOnRightOutput(channelNumber: i8): boolean {
+export function isChannelEnabledOnRightOutput(channelNumber: i32): boolean {
   let registerNR51: u8 = eightBitLoadFromGBMemory(Sound.memoryLocationNR51);
   // Left channel in the higher bits
   let bitNumberOfChannel: u8 = (<u8>channelNumber - 1);
@@ -147,80 +148,100 @@ export function isChannelEnabledOnRightOutput(channelNumber: i8): boolean {
 
 // Function to get 1st register of a channel
 // Contains Duty and Length
-export function getRegister1OfChannel(channelNumber: i8): u8 {
-  if (channelNumber === 1) {
-    return eightBitLoadFromGBMemory(Channel1.memoryLocationNRx1);
-  } else if (channelNumber === 2) {
-    return eightBitLoadFromGBMemory(Channel2.memoryLocationNRx1);
-  } else if (channelNumber === 3) {
-    return eightBitLoadFromGBMemory(Channel3.memoryLocationNRx1);
-  } else {
-    return eightBitLoadFromGBMemory(Channel4.memoryLocationNRx1);
+export function getRegister1OfChannel(channelNumber: i32): u8 {
+
+  switch(channelNumber) {
+    case Channel1.channelNumber:
+      return eightBitLoadFromGBMemory(Channel1.memoryLocationNRx1);
+    case Channel2.channelNumber:
+      return eightBitLoadFromGBMemory(Channel2.memoryLocationNRx1);
+    case Channel3.channelNumber:
+      return eightBitLoadFromGBMemory(Channel3.memoryLocationNRx1);
+    default:
+      return eightBitLoadFromGBMemory(Channel4.memoryLocationNRx1);
   }
 }
 
 // Function to get 2nd register of a channel
 // Contains Envelope Information
-export function getRegister2OfChannel(channelNumber: i8): u8 {
-  if (channelNumber === 1) {
-    return eightBitLoadFromGBMemory(Channel1.memoryLocationNRx2);
-  } else if (channelNumber === 2) {
-    return eightBitLoadFromGBMemory(Channel2.memoryLocationNRx2);
-  } else if (channelNumber === 3) {
-    return eightBitLoadFromGBMemory(Channel3.memoryLocationNRx2);
-  } else {
-    return eightBitLoadFromGBMemory(Channel4.memoryLocationNRx2);
+export function getRegister2OfChannel(channelNumber: i32): u8 {
+
+  switch(channelNumber) {
+    case Channel1.channelNumber:
+      return eightBitLoadFromGBMemory(Channel1.memoryLocationNRx2);
+    case Channel2.channelNumber:
+      return eightBitLoadFromGBMemory(Channel2.memoryLocationNRx2);
+    case Channel3.channelNumber:
+      return eightBitLoadFromGBMemory(Channel3.memoryLocationNRx2);
+    default:
+      return eightBitLoadFromGBMemory(Channel4.memoryLocationNRx2);
   }
 }
 
 // Function to get 3rd register of a channel
 // Contains Fequency LSB (lower 8 bits)
-export function getRegister3OfChannel(channelNumber: i8): u8 {
-  if (channelNumber === 1) {
-    return eightBitLoadFromGBMemory(Channel1.memoryLocationNRx3);
-  } else if (channelNumber === 2) {
-    return eightBitLoadFromGBMemory(Channel2.memoryLocationNRx3);
-  } else if (channelNumber === 3) {
-    return eightBitLoadFromGBMemory(Channel3.memoryLocationNRx3);
-  } else {
-    return eightBitLoadFromGBMemory(Channel4.memoryLocationNRx3);
+export function getRegister3OfChannel(channelNumber: i32): u8 {
+
+  switch(channelNumber) {
+    case Channel1.channelNumber:
+      return eightBitLoadFromGBMemory(Channel1.memoryLocationNRx3);
+    case Channel2.channelNumber:
+      return eightBitLoadFromGBMemory(Channel2.memoryLocationNRx3);
+    case Channel3.channelNumber:
+      return eightBitLoadFromGBMemory(Channel3.memoryLocationNRx3);
+    default:
+      return eightBitLoadFromGBMemory(Channel4.memoryLocationNRx3);
   }
 }
 
-export function setRegister3OfChannel(channelNumber: i8, value: u8): void {
-  if (channelNumber === 1) {
-    eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx3, value);
-  } else if (channelNumber === 2) {
-    eightBitStoreIntoGBMemorySkipTraps(Channel2.memoryLocationNRx3, value);
-  } else if (channelNumber === 3) {
-    eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx3, value);
-  } else {
-    eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx3, value);
+export function setRegister3OfChannel(channelNumber: i32, value: u8): void {
+
+  switch(channelNumber) {
+    case Channel1.channelNumber:
+      eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx3, value);
+      break;
+    case Channel2.channelNumber:
+      eightBitStoreIntoGBMemorySkipTraps(Channel2.memoryLocationNRx3, value);
+      break;
+    case Channel3.channelNumber:
+      eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx3, value);
+      break;
+    default:
+      eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx3, value);
+      break;
   }
 }
 
 // Function to get 4th register of a channel
 // Contains Fequency MSB (higher 3 bits), and Length Information
-export function getRegister4OfChannel(channelNumber: i8): u8 {
-  if (channelNumber === 1) {
-    return eightBitLoadFromGBMemory(Channel1.memoryLocationNRx4);
-  } else if (channelNumber === 2) {
-    return eightBitLoadFromGBMemory(Channel2.memoryLocationNRx4);
-  } else if (channelNumber === 3) {
-    return eightBitLoadFromGBMemory(Channel3.memoryLocationNRx4);
-  } else {
-    return eightBitLoadFromGBMemory(Channel4.memoryLocationNRx4);
+export function getRegister4OfChannel(channelNumber: i32): u8 {
+
+  switch(channelNumber) {
+    case Channel1.channelNumber:
+      return eightBitLoadFromGBMemory(Channel1.memoryLocationNRx4);
+    case Channel2.channelNumber:
+      return eightBitLoadFromGBMemory(Channel2.memoryLocationNRx4);
+    case Channel3.channelNumber:
+      return eightBitLoadFromGBMemory(Channel3.memoryLocationNRx4);
+    default:
+      return eightBitLoadFromGBMemory(Channel4.memoryLocationNRx4);
   }
 }
 
-export function setRegister4OfChannel(channelNumber: i8, value: u8): void {
-  if (channelNumber === 1) {
-    eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx4, value);
-  } else if (channelNumber === 2) {
-    eightBitStoreIntoGBMemorySkipTraps(Channel2.memoryLocationNRx4, value);
-  } else if (channelNumber === 3) {
-    eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx4, value);
-  } else {
-    eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx4, value);
+export function setRegister4OfChannel(channelNumber: i32, value: u8): void {
+
+  switch(channelNumber) {
+    case Channel1.channelNumber:
+      eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx4, value);
+      break;
+    case Channel2.channelNumber:
+      eightBitStoreIntoGBMemorySkipTraps(Channel2.memoryLocationNRx4, value);
+      break;
+    case Channel3.channelNumber:
+      eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx4, value);
+      break;
+    default:
+      eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx4, value);
+      break;
   }
 }

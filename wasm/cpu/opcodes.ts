@@ -32,6 +32,7 @@ import {
 import {
   log,
   hexLog,
+  performanceTimestamp,
   rotateByteLeft,
   rotateByteLeftThroughCarry,
   rotateByteRight,
@@ -59,15 +60,23 @@ import {
   updateGraphics
 } from '../graphics/index';
 import {
+  Sound,
   updateSound
 } from '../sound/index'
 
-// Public funciton to run opcodes until a frame should be rendered.
-export function update(): i8 {
+// Public funciton to run opcodes until an event occurs.
+// Return values:
+// -1 = error
+// 1 = render a frame
+// 2 = play audio buffer
+// 3 = replace boot rom
+export function update(): i32 {
 
   let error: boolean = false;
   let numberOfCycles: i8 = -1;
-  while(!error && Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME) {
+  while(!error &&
+      Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME &&
+      Sound.audioQueueIndex < Sound.MAX_NUMBER_OF_SAMPLES) {
     numberOfCycles = emulationStep();
     if (numberOfCycles >= 0) {
       Cpu.currentCycles += numberOfCycles;
@@ -76,17 +85,24 @@ export function update(): i8 {
     }
   }
 
-  // Reset our currentCycles
-  Cpu.currentCycles = 0;
-
-  if (error === true) {
-    Cpu.programCounter -= 1;
-    return -1;
-  } else {
+  // Find our exit reason
+  if (Cpu.currentCycles >= Cpu.MAX_CYCLES_PER_FRAME) {
+    // Render a frame
     // Reset our currentCycles
     Cpu.currentCycles = 0;
+
     return 1;
+  } else if (Sound.audioQueueIndex >= Sound.MAX_NUMBER_OF_SAMPLES) {
+    // Play audio samples
+    // JS will reset queue once it grabs the samples
+
+    return 2;
   }
+
+  // TODO: Boot ROM handling
+  // There was an error, return -1, and push the program counter back to grab the error opcode
+  Cpu.programCounter -= 1;
+  return -1;
 }
 
 // Function to execute an opcode, and update other gameboy hardware.
@@ -98,12 +114,13 @@ export function emulationStep(): i8 {
   let opcode: u8 = 0;
 
   // Cpu Halting best explained: https://www.reddit.com/r/EmuDev/comments/5ie3k7/infinite_loop_trying_to_pass_blarggs_interrupt/db7xnbe/
+  //performanceTimestamp(0);
   if(!Cpu.isHalted && !Cpu.isStopped) {
     opcode = eightBitLoadFromGBMemory(Cpu.programCounter);
     let dataByteOne: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 1);
     let dataByteTwo: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 2);
     numberOfCycles = executeOpcode(opcode, dataByteOne, dataByteTwo);
-    Cpu.previousOpcode = opcode;
+    //Cpu.previousOpcode = opcode;
   } else {
     // if we were halted, and interrupts were disabled but interrupts are pending, stop waiting
     if(Cpu.isHalted && !areInterruptsEnabled() && areInterruptsPending()) {
@@ -127,36 +144,35 @@ export function emulationStep(): i8 {
       Cpu.programCounter -= 1;
     }
   }
+  //performanceTimestamp(0);
 
   // blarggFixes, don't allow register F to have the bottom nibble
   Cpu.registerF = Cpu.registerF & 0xF0;
 
   // Check other Gameboy components
+  //performanceTimestamp(1);
   updateTimers(<u8>numberOfCycles);
+  //performanceTimestamp(1);
   if(!Cpu.isStopped) {
+    //performanceTimestamp(2);
     updateGraphics(<u8>numberOfCycles);
+    //performanceTimestamp(2);
   }
+  // Update Sound
+  //performanceTimestamp(3);
+  updateSound(<u8>numberOfCycles);
+  //performanceTimestamp(3);
   // Interrupt Handling requires 20 cycles
   // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
+  //performanceTimestamp(4);
   numberOfCycles += checkInterrupts();
-  // Update Sound
-  updateSound(<u8>numberOfCycles);
+  //performanceTimestamp(4);
 
   if(numberOfCycles <= 0) {
     log("Opcode at crash: $0", 1, opcode);
   }
 
   return numberOfCycles;
-}
-
-// Private funciton to check if an opcode is a value
-// this is to get out of switch statements, and not have the dangling break; per javascript syntax
-// And allow repeated variable names, for when we are concatenating registers
-function isOpcode(opcode: u8, value: u8): boolean {
-  if(opcode === value) {
-    return true;
-  }
-  return false;
 }
 
 // Take in any opcode, and decode it, and return the number of cycles
@@ -180,180 +196,215 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
   // Find and replace with : concatenatedDataByte
   let concatenatedDataByte: u16 = concatenateBytes(dataByteTwo, dataByteOne);
 
-  if(isOpcode(opcode, 0x00)) {
+  // Split our opcode into a high nibble to speed up performance
+  // Running 255 if statements is slow, even in wasm haha!
+  let opcodeHighNibble = (opcode & 0xF0);
+  opcodeHighNibble = opcodeHighNibble >> 4;
 
-    // NOP
-    // 1  4
-    // No Operation
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x01)) {
+  // Not using a switch statement to avoid cannot redeclare this variable errors
+  // And it would be a ton of work :p
 
-    // LD BC,d16
-    // 3  12
+  switch(opcodeHighNibble) {
+    case 0x00:
+      return handleOpcode0x(opcode, dataByteOne, dataByteTwo, concatenatedDataByte);
+    case 0x01:
+      return handleOpcode1x(opcode, dataByteOne, dataByteTwo, concatenatedDataByte);
+    case 0x02:
+      return handleOpcode2x(opcode, dataByteOne, dataByteTwo, concatenatedDataByte);
+    case 0x03:
+      return handleOpcode3x(opcode, dataByteOne, dataByteTwo, concatenatedDataByte);
+    case 0x04:
+      return handleOpcode4x(opcode, dataByteOne, dataByteTwo, concatenatedDataByte);
+    case 0x05:
+      return handleOpcode5x(opcode, dataByteOne, dataByteTwo, concatenatedDataByte);
+    case 0x06:
+      return handleOpcode6x(opcode, dataByteOne, dataByteTwo, concatenatedDataByte);
+    case 0x07:
+      return handleOpcode7x(opcode, dataByteOne, dataByteTwo, concatenatedDataByte);
+    case 0x08:
+      return handleOpcode8x(opcode, dataByteOne, dataByteTwo, concatenatedDataByte);
+    case 0x09:
+      return handleOpcode9x(opcode, dataByteOne, dataByteTwo, concatenatedDataByte);
+    case 0x0A:
+      return handleOpcodeAx(opcode, dataByteOne, dataByteTwo, concatenatedDataByte);
+    case 0x0B:
+      return handleOpcodeBx(opcode, dataByteOne, dataByteTwo, concatenatedDataByte);
+    case 0x0C:
+      return handleOpcodeCx(opcode, dataByteOne, dataByteTwo, concatenatedDataByte);
+    case 0x0D:
+      return handleOpcodeDx(opcode, dataByteOne, dataByteTwo, concatenatedDataByte);
+    case 0x0E:
+      return handleOpcodeEx(opcode, dataByteOne, dataByteTwo, concatenatedDataByte);
+    default:
+      return handleOpcodeFx(opcode, dataByteOne, dataByteTwo, concatenatedDataByte);
+  }
+}
 
-    Cpu.registerB = splitHighByte(concatenatedDataByte);
-    Cpu.registerC = splitLowByte(concatenatedDataByte);
-    Cpu.programCounter += 2;
-    numberOfCycles = 12;
-  } else if(isOpcode(opcode, 0x02)) {
+function handleOpcode0x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenatedDataByte: u16): i8 {
+  switch(opcode) {
+    case 0x00:
+      // NOP
+      // 1  4
+      // No Operation
+      return 4;
+    case 0x01:
+      // LD BC,d16
+      // 3  12
 
-    // LD (BC),A
-    // 1  8
-    // () means load into address pointed by BC
-    let registerBC: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC)
-    eightBitStoreIntoGBMemory(registerBC, Cpu.registerA);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x03)) {
-
-    // INC BC
-    // 1  8
-    let registerBC: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC);
-    registerBC++;
-    Cpu.registerB = splitHighByte((<u16>registerBC));
-    Cpu.registerC = splitLowByte((<u16>registerBC));
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x04)) {
-
-    // INC B
-    // 1  4
-    // Z 0 H -
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerB, 1);
-    Cpu.registerB += 1;
-    if (Cpu.registerB === 0) {
-      setZeroFlag(1);
-    } else {
+      Cpu.registerB = splitHighByte(concatenatedDataByte);
+      Cpu.registerC = splitLowByte(concatenatedDataByte);
+      Cpu.programCounter += 2;
+      return 12;
+    case 0x02:
+      // LD (BC),A
+      // 1  8
+      // () means load into address pointed by BC
+      let registerBC1: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC)
+      eightBitStoreIntoGBMemory(registerBC1, Cpu.registerA);
+      return 8;
+    case 0x03:
+      // INC BC
+      // 1  8
+      let registerBC2: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC);
+      registerBC2++;
+      Cpu.registerB = splitHighByte((<u16>registerBC2));
+      Cpu.registerC = splitLowByte((<u16>registerBC2));
+      return 8;
+    case 0x04:
+      // INC B
+      // 1  4
+      // Z 0 H -
+      checkAndSetEightBitHalfCarryFlag(Cpu.registerB, 1);
+      Cpu.registerB += 1;
+      if (Cpu.registerB === 0) {
+        setZeroFlag(1);
+      } else {
+        setZeroFlag(0);
+      }
+      setSubtractFlag(0);
+      return 4;
+    case 0x05:
+      // DEC B
+      // 1  4
+      // Z 1 H -
+      checkAndSetEightBitHalfCarryFlag(Cpu.registerB, -1);
+      Cpu.registerB -= 1;
+      if (Cpu.registerB === 0) {
+        setZeroFlag(1);
+      } else {
+        setZeroFlag(0);
+      }
+      setSubtractFlag(1);
+      return 4;
+    case 0x06:
+      // LD B,d8
+      // 2  8
+      Cpu.registerB = dataByteOne;
+      Cpu.programCounter += 1;
+      return 8;
+    case 0x07:
+      // RLCA
+      // 1  4
+      // 0 0 0 C
+      // Check for the carry
+      if((Cpu.registerA & 0x80) === 0x80) {
+        setCarryFlag(1);
+      } else {
+        setCarryFlag(0);
+      }
+      Cpu.registerA = rotateByteLeft(Cpu.registerA);
+      // Set all other flags to zero
       setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x05)) {
-
-    // DEC B
-    // 1  4
-    // Z 1 H -
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerB, -1);
-    Cpu.registerB -= 1;
-    if (Cpu.registerB === 0) {
-      setZeroFlag(1);
-    } else {
+      setSubtractFlag(0);
+      setHalfCarryFlag(0);
+      return 4;
+    case 0x08:
+      // LD (a16),SP
+      // 3  20
+      // Load the stack pointer into the 16 bit address represented by the two data bytes
+      sixteenBitStoreIntoGBMemory(concatenatedDataByte, Cpu.stackPointer);
+      Cpu.programCounter += 2;
+      return 20;
+    case 0x09:
+      // ADD HL,BC
+      // 1 8
+      // - 0 H C
+      let registerHL: u16 = concatenateBytes(Cpu.registerH, Cpu.registerL);
+      let registerBC3: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC);
+      checkAndSetSixteenBitFlagsAddOverflow(<u16>registerHL, <u16>registerBC3, false);
+      let result: u16 = <u16>(registerHL + registerBC3);
+      Cpu.registerH = splitHighByte(<u16>result);
+      Cpu.registerL = splitLowByte(<u16>result);
+      setSubtractFlag(0);
+      return 8;
+    case 0x0A:
+      // LD A,(BC)
+      // 1 8
+      let registerBC4: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC)
+      Cpu.registerA = eightBitLoadFromGBMemory(registerBC4);
+      return 8;
+    case 0x0B:
+      // DEC BC
+      // 1  8
+      let registerBC5: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC);
+      registerBC5 -= 1;
+      Cpu.registerB = splitHighByte(registerBC5);
+      Cpu.registerC = splitLowByte(registerBC5);
+      return 8;
+    case 0x0C:
+      // INC C
+      // 1  4
+      // Z 0 H -
+      checkAndSetEightBitHalfCarryFlag(Cpu.registerC, 1);
+      Cpu.registerC += 1;
+      if (Cpu.registerC === 0) {
+        setZeroFlag(1);
+      } else {
+        setZeroFlag(0);
+      }
+      setSubtractFlag(0);
+      return 4;
+    case 0x0D:
+      // DEC C
+      // 1  4
+      // Z 1 H -
+      checkAndSetEightBitHalfCarryFlag(Cpu.registerC, -1);
+      Cpu.registerC -= 1;
+      if (Cpu.registerC === 0) {
+        setZeroFlag(1);
+      } else {
+        setZeroFlag(0);
+      }
+      setSubtractFlag(1);
+      return 4;
+    case 0x0E:
+      // LD C,d8
+      // 2 8
+      Cpu.registerC = dataByteOne;
+      Cpu.programCounter += 1;
+      return 8;
+    case 0x0F:
+      // RRCA
+      // 1 4
+      // 0 0 0 C
+      // Check for the last bit, to see if it will be carried
+      if ((Cpu.registerA & 0x01) > 0) {
+        setCarryFlag(1);
+      } else {
+        setCarryFlag(0);
+      }
+      Cpu.registerA = rotateByteRight(Cpu.registerA);
+      // Set all other flags to zero
       setZeroFlag(0);
-    }
-    setSubtractFlag(1);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x06)) {
+      setSubtractFlag(0);
+      setHalfCarryFlag(0);
+      return 4;
+  }
+  return -1;
+}
 
-    // LD B,d8
-    // 2  8
-    Cpu.registerB = dataByteOne;
-    Cpu.programCounter += 1;
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x07)) {
-
-    // RLCA
-    // 1  4
-    // 0 0 0 C
-    // Check for the carry
-    if((Cpu.registerA & 0x80) === 0x80) {
-      setCarryFlag(1);
-    } else {
-      setCarryFlag(0);
-    }
-    Cpu.registerA = rotateByteLeft(Cpu.registerA);
-    // Set all other flags to zero
-    setZeroFlag(0);
-    setSubtractFlag(0);
-    setHalfCarryFlag(0);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x08)) {
-
-    // LD (a16),SP
-    // 3  20
-    // Load the stack pointer into the 16 bit address represented by the two data bytes
-    sixteenBitStoreIntoGBMemory(concatenatedDataByte, Cpu.stackPointer);
-    Cpu.programCounter += 2;
-    numberOfCycles = 20;
-  } else if(isOpcode(opcode, 0x09)) {
-
-    // ADD HL,BC
-    // 1 8
-    // - 0 H C
-    let registerHL: u16 = concatenateBytes(Cpu.registerH, Cpu.registerL);
-    let registerBC: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC);
-    checkAndSetSixteenBitFlagsAddOverflow(<u16>registerHL, <u16>registerBC, false);
-    let result: u16 = <u16>(registerHL + registerBC);
-    Cpu.registerH = splitHighByte(<u16>result);
-    Cpu.registerL = splitLowByte(<u16>result);
-    setSubtractFlag(0);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x0A)) {
-
-    // LD A,(BC)
-    // 1 8
-    let registerBC: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC)
-    Cpu.registerA = eightBitLoadFromGBMemory(registerBC);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x0B)) {
-
-    // DEC BC
-    // 1  8
-    let registerBC = concatenateBytes(Cpu.registerB, Cpu.registerC);
-    registerBC -= 1;
-    Cpu.registerB = splitHighByte(registerBC);
-    Cpu.registerC = splitLowByte(registerBC);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x0C)) {
-
-    // INC C
-    // 1  4
-    // Z 0 H -
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerC, 1);
-    Cpu.registerC += 1;
-    if (Cpu.registerC === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x0D)) {
-
-    // DEC C
-    // 1  4
-    // Z 1 H -
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerC, -1);
-    Cpu.registerC -= 1;
-    if (Cpu.registerC === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x0E)) {
-
-    // LD C,d8
-    // 2 8
-    Cpu.registerC = dataByteOne;
-    Cpu.programCounter += 1;
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x0F)) {
-
-    // RRCA
-    // 1 4
-    // 0 0 0 C
-    // Check for the last bit, to see if it will be carried
-    if ((Cpu.registerA & 0x01) > 0) {
-      setCarryFlag(1);
-    } else {
-      setCarryFlag(0);
-    }
-    Cpu.registerA = rotateByteRight(Cpu.registerA);
-    // Set all other flags to zero
-    setZeroFlag(0);
-    setSubtractFlag(0);
-    setHalfCarryFlag(0);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x10)) {
+function handleOpcode1x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenatedDataByte: u16): i8 {
+  if(opcode === 0x10) {
 
     // STOP 0
     // 2 4
@@ -363,23 +414,23 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // TODO: This breaks Blarggs CPU tests, find out what should end a STOP
     //Cpu.isStopped = true;
     Cpu.programCounter += 1;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x11)) {
+    return 4;
+  } else if(opcode === 0x11) {
 
     // LD DE,d16
     // 3  12
     Cpu.registerD = splitHighByte(concatenatedDataByte);
     Cpu.registerE = splitLowByte(concatenatedDataByte);
     Cpu.programCounter += 2;
-    numberOfCycles = 12;
-  } else if(isOpcode(opcode, 0x12)) {
+    return 12;
+  } else if(opcode === 0x12) {
 
     // LD (DE),A
     // 1 8
     let registerDE: u16 = concatenateBytes(Cpu.registerD, Cpu.registerE);
     eightBitStoreIntoGBMemory(registerDE, Cpu.registerA);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x13)) {
+    return 8;
+  } else if(opcode === 0x13) {
 
     // INC DE
     // 1 8
@@ -387,8 +438,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     registerDE += 1;
     Cpu.registerD = splitHighByte(registerDE);
     Cpu.registerE = splitLowByte(registerDE);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x14)) {
+    return 8;
+  } else if(opcode === 0x14) {
 
     // INC D
     // 1  4
@@ -401,8 +452,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x15)) {
+    return 4;
+  } else if(opcode === 0x15) {
 
     // DEC D
     // 1  4
@@ -415,14 +466,14 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x16)) {
+    return 4;
+  } else if(opcode === 0x16) {
     // LD D,d8
     // 2 8
     Cpu.registerD = dataByteOne;
     Cpu.programCounter += 1;
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x17)) {
+    return 8;
+  } else if(opcode === 0x17) {
     // RLA
     // 1 4
     // 0 0 0 C
@@ -443,8 +494,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     setZeroFlag(0);
     setSubtractFlag(0);
     setHalfCarryFlag(0);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x18)) {
+    return 4;
+  } else if(opcode === 0x18) {
 
     // JR r8
     // 2  12
@@ -452,9 +503,9 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // However the relative Jump Function handles this
 
     relativeJump(dataByteOne);
-    numberOfCycles = 12;
+    return 12;
     // Relative Jump Function Handles programcounter
-  } else if(isOpcode(opcode, 0x19)) {
+  } else if(opcode === 0x19) {
 
     // ADD HL,DE
     // 1  8
@@ -466,15 +517,15 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     Cpu.registerH = splitHighByte(<u16>result);
     Cpu.registerL = splitLowByte(<u16>result);
     setSubtractFlag(0);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x1A)) {
+    return 8;
+  } else if(opcode === 0x1A) {
 
     // LD A,(DE)
     // 1 8
     let registerDE: u16 = concatenateBytes(Cpu.registerD, Cpu.registerE);
     Cpu.registerA = eightBitLoadFromGBMemory(registerDE);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x1B)) {
+    return 8;
+  } else if(opcode === 0x1B) {
 
     // DEC DE
     // 1 8
@@ -482,8 +533,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     registerDE -= 1;
     Cpu.registerD = splitHighByte(registerDE);
     Cpu.registerE = splitLowByte(registerDE);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x1C)) {
+    return 8;
+  } else if(opcode === 0x1C) {
 
     // INC E
     // 1  4
@@ -496,8 +547,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x1D)) {
+    return 4;
+  } else if(opcode === 0x1D) {
 
     // DEC E
     // 1  4
@@ -510,15 +561,15 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x1E)) {
+    return 4;
+  } else if(opcode === 0x1E) {
 
     // LD E,d8
     // 2 8
     Cpu.registerE = dataByteOne;
     Cpu.programCounter += 1;
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x1F)) {
+    return 8;
+  } else if(opcode === 0x1F) {
 
     // RRA
     // 1 4
@@ -540,8 +591,13 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     setZeroFlag(0);
     setSubtractFlag(0);
     setHalfCarryFlag(0);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x20)) {
+    return 4;
+  }
+  return -1;
+}
+
+function handleOpcode2x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenatedDataByte: u16): i8 {
+  if(opcode === 0x20) {
 
     // JR NZ,r8
     // 2  12/8
@@ -549,22 +605,22 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Also, / means, if condition. so if met, 12 cycles, otherwise 8 cycles
     if (getZeroFlag() === 0) {
       relativeJump(dataByteOne);
-      numberOfCycles = 12;
+      return 12;
       // Relative Jump Funciton handles program counter
     } else {
-      numberOfCycles = 8;
       Cpu.programCounter += 1;
+      return 8;
     }
-  } else if(isOpcode(opcode, 0x21)) {
+  } else if(opcode === 0x21) {
 
     // LD HL,d16
     // 3  12
     let sixeteenBitDataByte = concatenatedDataByte;
     Cpu.registerH = splitHighByte(sixeteenBitDataByte);
     Cpu.registerL = splitLowByte(sixeteenBitDataByte);
-    numberOfCycles = 12;
     Cpu.programCounter += 2;
-  } else if(isOpcode(opcode, 0x22)) {
+    return 12;
+  } else if(opcode === 0x22) {
 
     // LD (HL+),A
     // 1 8
@@ -573,8 +629,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     registerHL += 1;
     Cpu.registerH = splitHighByte(registerHL);
     Cpu.registerL = splitLowByte(registerHL);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x23)) {
+    return 8;
+  } else if(opcode === 0x23) {
 
     // INC HL
     // 1  8
@@ -582,8 +638,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     registerHL += 1;
     Cpu.registerH = splitHighByte(registerHL);
     Cpu.registerL = splitLowByte(registerHL);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x24)) {
+    return 8;
+  } else if(opcode === 0x24) {
 
     // INC H
     // 1  4
@@ -596,8 +652,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x25)) {
+    return 4;
+  } else if(opcode === 0x25) {
 
     // DEC H
     // 1  4
@@ -610,15 +666,15 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x26)) {
+    return 4;
+  } else if(opcode === 0x26) {
 
     // LD H,d8
     // 2 8
     Cpu.registerH = dataByteOne;
     Cpu.programCounter += 1;
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x27)) {
+    return 8;
+  } else if(opcode === 0x27) {
 
     // DAA
     // 1 4
@@ -659,20 +715,20 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     setHalfCarryFlag(0);
 
     Cpu.registerA = <u8>adjustedRegister;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x28)) {
+    return 4;
+  } else if(opcode === 0x28) {
 
     // JR Z,r8
     // 2  12/8
     if(getZeroFlag() > 0) {
       relativeJump(dataByteOne);
-      numberOfCycles = 12;
+      return 12;
       // Relative Jump funciton handles pogram counter
     } else {
-      numberOfCycles = 8;
       Cpu.programCounter += 1;
+      return 8;
     }
-  } else if(isOpcode(opcode, 0x29)) {
+  } else if(opcode === 0x29) {
 
     // ADD HL,HL
     // 1  8
@@ -683,8 +739,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     Cpu.registerH = splitHighByte(registerHL);
     Cpu.registerL = splitLowByte(registerHL);
     setSubtractFlag(0);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x2A)) {
+    return 8;
+  } else if(opcode === 0x2A) {
 
     // LD A,(HL+)
     // 1  8
@@ -693,8 +749,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     registerHL += 1;
     Cpu.registerH = splitHighByte(registerHL);
     Cpu.registerL = splitLowByte(registerHL);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x2B)) {
+    return 8;
+  } else if(opcode === 0x2B) {
 
     // DEC HL
     // 1 8
@@ -702,8 +758,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     registerHL -= 1;
     Cpu.registerH = splitHighByte(registerHL);
     Cpu.registerL = splitLowByte(registerHL);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x2C)) {
+    return 8;
+  } else if(opcode === 0x2C) {
 
     // INC L
     // 1  4
@@ -716,8 +772,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x2D)) {
+    return 4;
+  } else if(opcode === 0x2D) {
 
     // DEC L
     // 1  4
@@ -730,14 +786,14 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x2E)) {
+    return 4;
+  } else if(opcode === 0x2E) {
     // LD L,d8
     // 2  8
     Cpu.registerL = dataByteOne;
-    numberOfCycles = 8;
     Cpu.programCounter += 1;
-  } else if(isOpcode(opcode, 0x2F)) {
+    return 8;
+  } else if(opcode === 0x2F) {
 
     // CPL
     // 1 4
@@ -745,26 +801,31 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     Cpu.registerA = ~Cpu.registerA;
     setSubtractFlag(1);
     setHalfCarryFlag(1);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x30)) {
+    return 4;
+  }
+  return -1;
+}
+
+function handleOpcode3x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenatedDataByte: u16): i8 {
+  if(opcode === 0x30) {
 
     // JR NC,r8
     // 2 12 / 8
     if (getCarryFlag() === 0) {
       relativeJump(dataByteOne);
-      numberOfCycles = 12;
+      return 12;
       // Relative Jump function handles program counter
     } else {
-      numberOfCycles = 8;
       Cpu.programCounter += 1;
+      return 8;
     }
-  } else if(isOpcode(opcode, 0x31)) {
+  } else if(opcode === 0x31) {
     // LD SP,d16
     // 3 12
     Cpu.stackPointer = concatenatedDataByte;
     Cpu.programCounter += 2;
-    numberOfCycles = 12;
-  } else if(isOpcode(opcode, 0x32)) {
+    return 12;
+  } else if(opcode === 0x32) {
     // LD (HL-),A
     // 1 8
     let registerHL = concatenateBytes(Cpu.registerH, Cpu.registerL);
@@ -772,13 +833,13 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     registerHL -= 1;
     Cpu.registerH = splitHighByte(registerHL);
     Cpu.registerL = splitLowByte(registerHL);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x33)) {
+    return 8;
+  } else if(opcode === 0x33) {
     // INC SP
     // 1 8
     Cpu.stackPointer += 1;
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x34)) {
+    return 8;
+  } else if(opcode === 0x34) {
 
     // INC (HL)
     // 1  12
@@ -799,8 +860,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     }
     setSubtractFlag(0);
     eightBitStoreIntoGBMemory(registerHL, <u8>valueAtHL);
-    numberOfCycles = 12;
-  } else if(isOpcode(opcode, 0x35)) {
+    return 12;
+  } else if(opcode === 0x35) {
 
     // DEC (HL)
     // 1  12
@@ -818,14 +879,14 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     }
     setSubtractFlag(1);
     eightBitStoreIntoGBMemory(registerHL, <u8>valueAtHL);
-    numberOfCycles = 12;
-  } else if(isOpcode(opcode, 0x36)) {
+    return 12;
+  } else if(opcode === 0x36) {
     // LD (HL),d8
     // 2  12
     eightBitStoreIntoGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL), dataByteOne);
     Cpu.programCounter += 1;
-    numberOfCycles = 12;
-  } else if(isOpcode(opcode, 0x37)) {
+    return 12;
+  } else if(opcode === 0x37) {
     // SCF
     // 1  4
     // - 0 0 1
@@ -833,20 +894,20 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     setSubtractFlag(0);
     setHalfCarryFlag(0);
     setCarryFlag(1);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x38)) {
+    return 4;
+  } else if(opcode === 0x38) {
 
     // JR C,r8
     // 2 12/8
     if (getCarryFlag() === 1) {
       relativeJump(dataByteOne);
-      numberOfCycles = 12;
+      return 12;
       // Relative Jump Funciton handles program counter
     } else {
-      numberOfCycles = 8;
-      Cpu.programCounter += 1;
+    Cpu.programCounter += 1;
+      return 8;
     }
-  } else if(isOpcode(opcode, 0x39)) {
+  } else if(opcode === 0x39) {
 
     // ADD HL,SP
     // 1 8
@@ -857,8 +918,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     Cpu.registerH = splitHighByte(<u16>result);
     Cpu.registerL = splitLowByte(<u16>result);
     setSubtractFlag(0);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x3A)) {
+    return 8;
+  } else if(opcode === 0x3A) {
 
     // LD A,(HL-)
     // 1 8
@@ -867,13 +928,13 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     registerHL -= 1;
     Cpu.registerH = splitHighByte(registerHL);
     Cpu.registerL = splitLowByte(registerHL);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x3B)) {
+    return 8;
+  } else if(opcode === 0x3B) {
     // DEC SP
     // 1 8
     Cpu.stackPointer -= 1;
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x3C)) {
+    return 8;
+  } else if(opcode === 0x3C) {
 
     // INC A
     // 1  4
@@ -886,8 +947,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
       setZeroFlag(0);
     }
     setSubtractFlag(0);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x3D)) {
+    return 4;
+  } else if(opcode === 0x3D) {
 
     // DEC A
     // 1  4
@@ -900,15 +961,15 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
       setZeroFlag(0);
     }
     setSubtractFlag(1);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x3E)) {
+    return 4;
+  } else if(opcode === 0x3E) {
 
     // LD A,d8
     // 2 8
     Cpu.registerA = dataByteOne;
     Cpu.programCounter += 1;
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x3F)) {
+    return 8;
+  } else if(opcode === 0x3F) {
 
     // CCF
     // 1 4
@@ -920,331 +981,351 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     } else {
       setCarryFlag(1);
     }
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x40)) {
+    return 4;
+  }
+  return -1;
+}
+
+function handleOpcode4x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenatedDataByte: u16): i8 {
+  if(opcode === 0x40) {
     // LD B,B
     // 1 4
     // Load B into B, Do nothing
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x41)) {
+    return 4;
+  } else if(opcode === 0x41) {
 
     // LD B,C
     // 1 4
     Cpu.registerB = Cpu.registerC;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x42)) {
+    return 4;
+  } else if(opcode === 0x42) {
 
     // LD B,D
     // 1 4
     Cpu.registerB = Cpu.registerD;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x43)) {
+    return 4;
+  } else if(opcode === 0x43) {
 
     // LD B,E
     // 1 4
     Cpu.registerB = Cpu.registerE;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x44)) {
+    return 4;
+  } else if(opcode === 0x44) {
 
     // LD B,H
     // 1 4
     Cpu.registerB = Cpu.registerH;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x45)) {
+    return 4;
+  } else if(opcode === 0x45) {
 
     // LD B,L
     // 1 4
     Cpu.registerB = Cpu.registerL;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x46)) {
+    return 4;
+  } else if(opcode === 0x46) {
 
     // LD B,(HL)
     // 1 8
     Cpu.registerB = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x47)) {
+    return 8;
+  } else if(opcode === 0x47) {
 
     // LD B,A
     // 1 4
     Cpu.registerB = Cpu.registerA;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x48)) {
+    return 4;
+  } else if(opcode === 0x48) {
 
     // LD C,B
     // 1 4
     Cpu.registerC = Cpu.registerB;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x49)) {
+    return 4;
+  } else if(opcode === 0x49) {
 
     // LD C,C
     // 1 4
     // Do nothing
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x4A)) {
+    return 4;
+  } else if(opcode === 0x4A) {
 
     // LD C,D
     // 1 4
     Cpu.registerC = Cpu.registerD;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x4B)) {
+    return 4;
+  } else if(opcode === 0x4B) {
 
     // LD C,E
     // 1 4
     Cpu.registerC = Cpu.registerE;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x4C)) {
+    return 4;
+  } else if(opcode === 0x4C) {
 
     // LD C,H
     // 1 4
     Cpu.registerC = Cpu.registerH;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x4D)) {
+    return 4;
+  } else if(opcode === 0x4D) {
 
     // LD C,L
     // 1 4
     Cpu.registerC = Cpu.registerL;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x4E)) {
+    return 4;
+  } else if(opcode === 0x4E) {
 
     // LD C,(HL)
     // 1 8
     Cpu.registerC = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x4F)) {
+    return 8;
+  } else if(opcode === 0x4F) {
 
     // LD C,A
     // 1 4
     Cpu.registerC = Cpu.registerA;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x50)) {
+    return 4;
+  }
+  return -1;
+}
+
+function handleOpcode5x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenatedDataByte: u16): i8 {
+  if(opcode === 0x50) {
 
     // LD D,B
     // 1 4
     Cpu.registerD = Cpu.registerB;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x51)) {
+    return 4;
+  } else if(opcode === 0x51) {
 
     // LD D,C
     // 1 4
     Cpu.registerD = Cpu.registerC;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x52)) {
+    return 4;
+  } else if(opcode === 0x52) {
 
     // LD D,D
     // 1 4
     // Do Nothing
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x53)) {
+    return 4;
+  } else if(opcode === 0x53) {
 
     // LD D,E
     // 1 4
     Cpu.registerD = Cpu.registerE;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x54)) {
+    return 4;
+  } else if(opcode === 0x54) {
 
     // LD D,H
     // 1 4
     Cpu.registerD = Cpu.registerH;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x55)) {
+    return 4;
+  } else if(opcode === 0x55) {
 
     // LD D,L
     // 1 4
     Cpu.registerD = Cpu.registerL;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x56)) {
+    return 4;
+  } else if(opcode === 0x56) {
 
     // LD D,(HL)
     // 1 8
     Cpu.registerD = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x57)) {
+    return 8;
+  } else if(opcode === 0x57) {
 
     // LD D,A
     // 1 4
     Cpu.registerD = Cpu.registerA;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x58)) {
+    return 4;
+  } else if(opcode === 0x58) {
 
     // LD E,B
     // 1 4
     Cpu.registerE = Cpu.registerB;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x59)) {
+    return 4;
+  } else if(opcode === 0x59) {
 
     // LD E,C
     // 1 4
     Cpu.registerE = Cpu.registerC;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x5A)) {
+    return 4;
+  } else if(opcode === 0x5A) {
 
     // LD E,D
     // 1 4
     Cpu.registerE = Cpu.registerD;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x5B)) {
+    return 4;
+  } else if(opcode === 0x5B) {
 
     // LD E,E
     // 1 4
     // Do Nothing
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x5C)) {
+    return 4;
+  } else if(opcode === 0x5C) {
 
     // LD E,H
     // 1 4
     Cpu.registerE = Cpu.registerH;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x5D)) {
+    return 4;
+  } else if(opcode === 0x5D) {
 
     // LD E,L
     // 1 4
     Cpu.registerE = Cpu.registerL;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x5E)) {
+    return 4;
+  } else if(opcode === 0x5E) {
 
     // LD E,(HL)
     // 1 4
     Cpu.registerE = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x5F)) {
+    return 4;
+  } else if(opcode === 0x5F) {
 
     // LD E,A
     // 1 4
     Cpu.registerE = Cpu.registerA;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x60)) {
+    return 4;
+  }
+  return -1;
+}
+
+function handleOpcode6x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenatedDataByte: u16): i8 {
+  if(opcode === 0x60) {
 
     // LD H,B
     // 1 4
     Cpu.registerH = Cpu.registerB;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x61)) {
+    return 4;
+  } else if(opcode === 0x61) {
 
     // LD H,C
     // 1 4
     Cpu.registerH = Cpu.registerC;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x62)) {
+    return 4;
+  } else if(opcode === 0x62) {
 
     // LD H,D
     // 1 4
     Cpu.registerH = Cpu.registerD;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x63)) {
+    return 4;
+  } else if(opcode === 0x63) {
 
     // LD H,E
     // 1 4
     Cpu.registerH = Cpu.registerE;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x64)) {
+    return 4;
+  } else if(opcode === 0x64) {
 
     // LD H,H
     // 1 4
     Cpu.registerH = Cpu.registerH;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x65)) {
+    return 4;
+  } else if(opcode === 0x65) {
 
     // LD H,L
     // 1 4
     Cpu.registerH = Cpu.registerL;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x66)) {
+    return 4;
+  } else if(opcode === 0x66) {
 
     // LD H,(HL)
     // 1 8
     Cpu.registerH = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x67)) {
+    return 8;
+  } else if(opcode === 0x67) {
 
     // LD H,A
     // 1 4
     Cpu.registerH = Cpu.registerA;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x68)) {
+    return 4;
+  } else if(opcode === 0x68) {
 
     // LD L,B
     // 1 4
     Cpu.registerL = Cpu.registerB;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x69)) {
+    return 4;
+  } else if(opcode === 0x69) {
 
     // LD L,C
     // 1 4
     Cpu.registerL = Cpu.registerC;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x6A)) {
+    return 4;
+  } else if(opcode === 0x6A) {
 
     // LD L,D
     // 1 4
     Cpu.registerL = Cpu.registerD;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x6B)) {
+    return 4;
+  } else if(opcode === 0x6B) {
 
     // LD L,E
     // 1 4
     Cpu.registerL = Cpu.registerE;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x6C)) {
+    return 4;
+  } else if(opcode === 0x6C) {
 
     // LD L,H
     // 1 4
     Cpu.registerL = Cpu.registerH;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x6D)) {
+    return 4;
+  } else if(opcode === 0x6D) {
 
     // LD L,L
     // 1 4
     Cpu.registerL = Cpu.registerL;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x6E)) {
+    return 4;
+  } else if(opcode === 0x6E) {
 
     // LD L,(HL)
     // 1 8
     Cpu.registerL = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x6F)) {
+    return 8;
+  } else if(opcode === 0x6F) {
 
     // LD L,A
     // 1 4
     Cpu.registerL = Cpu.registerA;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x70)) {
+    return 4;
+  }
+  return -1;
+}
+
+function handleOpcode7x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenatedDataByte: u16): i8 {
+  if(opcode === 0x70) {
 
     // LD (HL),B
     // 1 8
     eightBitStoreIntoGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerB);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x71)) {
+    return 8;
+  } else if(opcode === 0x71) {
 
     // LD (HL),C
     // 1 8
     eightBitStoreIntoGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerC);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x72)) {
+    return 8;
+  } else if(opcode === 0x72) {
 
     // LD (HL),D
     // 1 8
     eightBitStoreIntoGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerD);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x73)) {
+    return 8;
+  } else if(opcode === 0x73) {
 
     // LD (HL),E
     // 1 8
     eightBitStoreIntoGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerE);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x74)) {
+    return 8;
+  } else if(opcode === 0x74) {
 
     // LD (HL),H
     // 1 8
     eightBitStoreIntoGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerH);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x75)) {
+    return 8;
+  } else if(opcode === 0x75) {
 
     // LD (HL),L
     // 1 8
     eightBitStoreIntoGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerL);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x76)) {
+    return 8;
+  } else if(opcode === 0x76) {
 
     // HALT
     // 1 4
@@ -1252,514 +1333,539 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Meaning Don't Decode anymore opcodes until an interrupt occurs
     // Still need to do timers and things
     Cpu.isHalted = true;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x77)) {
+    return 4;
+  } else if(opcode === 0x77) {
 
     // LD (HL),A
     // 1 8
     eightBitStoreIntoGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerA);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x78)) {
+    return 8;
+  } else if(opcode === 0x78) {
 
     // LD A,B
     // 1 4
     Cpu.registerA = Cpu.registerB;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x79)) {
+    return 4;
+  } else if(opcode === 0x79) {
 
     // LD A,C
     // 1 4
     Cpu.registerA = Cpu.registerC;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x7A)) {
+    return 4;
+  } else if(opcode === 0x7A) {
 
     // LD A,D
     // 1 4
     Cpu.registerA = Cpu.registerD;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x7B)) {
+    return 4;
+  } else if(opcode === 0x7B) {
 
     // LD A,E
     // 1 4
     Cpu.registerA = Cpu.registerE;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x7C)) {
+    return 4;
+  } else if(opcode === 0x7C) {
 
     // LD A,H
     // 1 4
     Cpu.registerA = Cpu.registerH;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x7D)) {
+    return 4;
+  } else if(opcode === 0x7D) {
 
     // LD A,L
     // 1 4
     Cpu.registerA = Cpu.registerL;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x7E)) {
+    return 4;
+  } else if(opcode === 0x7E) {
 
     // LD A,(HL)
     // 1 4
     Cpu.registerA = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x7F)) {
+    return 4;
+  } else if(opcode === 0x7F) {
 
     // LD A,A
     // 1 4
     // Do Nothing
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x80)) {
+    return 4;
+  }
+  return -1;
+}
+
+function handleOpcode8x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenatedDataByte: u16): i8 {
+  if(opcode === 0x80) {
     // ADD A,B
     // 1 4
     // Z 0 H C
     addARegister(Cpu.registerB);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x81)) {
+    return 4;
+  } else if(opcode === 0x81) {
     // ADD A,C
     // 1 4
     // Z 0 H C
     addARegister(Cpu.registerC);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x82)) {
+    return 4;
+  } else if(opcode === 0x82) {
     // ADD A,D
     // 1 4
     // Z 0 H C
     addARegister(Cpu.registerD);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x83)) {
+    return 4;
+  } else if(opcode === 0x83) {
     // ADD A,E
     // 1 4
     // Z 0 H C
     addARegister(Cpu.registerE);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x84)) {
+    return 4;
+  } else if(opcode === 0x84) {
     // ADD A,H
     // 1 4
     // Z 0 H C
     addARegister(Cpu.registerH);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x85)) {
+    return 4;
+  } else if(opcode === 0x85) {
     // ADD A,L
     // 1 4
     // Z 0 H C
     addARegister(Cpu.registerL);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x86)) {
+    return 4;
+  } else if(opcode === 0x86) {
     // ADD A,(HL)
     // 1 8
     // Z 0 H C
     let valueAtHL: u8 = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
     addARegister(<u8>valueAtHL);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x87)) {
+    return 8;
+  } else if(opcode === 0x87) {
     // ADD A,A
     // 1 4
     // Z 0 H C
     addARegister(Cpu.registerA);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x88)) {
+    return 4;
+  } else if(opcode === 0x88) {
     // ADC A,B
     // 1 4
     // Z 0 H C
     addAThroughCarryRegister(Cpu.registerB);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x89)) {
+    return 4;
+  } else if(opcode === 0x89) {
     // ADC A,C
     // 1 4
     // Z 0 H C
     addAThroughCarryRegister(Cpu.registerC);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x8A)) {
+    return 4;
+  } else if(opcode === 0x8A) {
     // ADC A,D
     // 1 4
     // Z 0 H C
     addAThroughCarryRegister(Cpu.registerD);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x8B)) {
+    return 4;
+  } else if(opcode === 0x8B) {
     // ADC A,E
     // 1 4
     // Z 0 H C
     addAThroughCarryRegister(Cpu.registerE);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x8C)) {
+    return 4;
+  } else if(opcode === 0x8C) {
     // ADC A,H
     // 1 4
     // Z 0 H C
     addAThroughCarryRegister(Cpu.registerH);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x8D)) {
+    return 4;
+  } else if(opcode === 0x8D) {
     // ADC A,L
     // 1 4
     // Z 0 H C
     addAThroughCarryRegister(Cpu.registerL);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x8E)) {
+    return 4;
+  } else if(opcode === 0x8E) {
     // ADC A,(HL)
     // 1 8
     // Z 0 H C
     let valueAtHL: u8 = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
     addAThroughCarryRegister(<u8>valueAtHL);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x8F)) {
+    return 8;
+  } else if(opcode === 0x8F) {
     // ADC A,A
     // 1 4
     // Z 0 H C
     addAThroughCarryRegister(Cpu.registerA);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x90)) {
+    return 4;
+  }
+  return -1;
+}
+
+function handleOpcode9x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenatedDataByte: u16): i8 {
+  if(opcode === 0x90) {
 
     // SUB B
     // 1  4
     // Z 1 H C
     subARegister(Cpu.registerB);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x91)) {
+    return 4;
+  } else if(opcode === 0x91) {
 
     // SUB C
     // 1  4
     // Z 1 H C
     subARegister(Cpu.registerC);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x92)) {
+    return 4;
+  } else if(opcode === 0x92) {
 
     // SUB D
     // 1  4
     // Z 1 H C
     subARegister(Cpu.registerD);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x93)) {
+    return 4;
+  } else if(opcode === 0x93) {
 
     // SUB E
     // 1  4
     // Z 1 H C
     subARegister(Cpu.registerE);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x94)) {
+    return 4;
+  } else if(opcode === 0x94) {
 
     // SUB H
     // 1  4
     // Z 1 H C
     subARegister(Cpu.registerH);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x95)) {
+    return 4;
+  } else if(opcode === 0x95) {
 
     // SUB L
     // 1  4
     // Z 1 H C
     subARegister(Cpu.registerL);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x96)) {
+    return 4;
+  } else if(opcode === 0x96) {
 
     // SUB (HL)
     // 1  8
     // Z 1 H C
     let valueAtHL: u8 = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
     subARegister(<u8>valueAtHL);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x97)) {
+    return 8;
+  } else if(opcode === 0x97) {
 
     // SUB A
     // 1  4
     // Z 1 H C
     subARegister(Cpu.registerA);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x98)) {
+    return 4;
+  } else if(opcode === 0x98) {
 
     // SBC A,B
     // 1  4
     // Z 1 H C
     subAThroughCarryRegister(Cpu.registerB);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x99)) {
+    return 4;
+  } else if(opcode === 0x99) {
 
     // SBC A,C
     // 1  4
     // Z 1 H C
     subAThroughCarryRegister(Cpu.registerC);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x9A)) {
+    return 4;
+  } else if(opcode === 0x9A) {
 
     // SBC A,D
     // 1  4
     // Z 1 H C
     subAThroughCarryRegister(Cpu.registerD);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x9B)) {
+    return 4;
+  } else if(opcode === 0x9B) {
 
     // SBC A,E
     // 1  4
     // Z 1 H C
     subAThroughCarryRegister(Cpu.registerE);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x9C)) {
+    return 4;
+  } else if(opcode === 0x9C) {
 
     // SBC A,H
     // 1  4
     // Z 1 H C
     subAThroughCarryRegister(Cpu.registerH);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x9D)) {
+    return 4;
+  } else if(opcode === 0x9D) {
 
     // SBC A,L
     // 1  4
     // Z 1 H C
     subAThroughCarryRegister(Cpu.registerL);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0x9E)) {
+    return 4;
+  } else if(opcode === 0x9E) {
 
     // SBC A,(HL)
     // 1  8
     // Z 1 H C
     let valueAtHL: u8 = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
     subAThroughCarryRegister(<u8>valueAtHL);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0x9F)) {
+    return 8;
+  } else if(opcode === 0x9F) {
 
     // SBC A,A
     // 1  4
     // Z 1 H C
     subAThroughCarryRegister(Cpu.registerA);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xA0)) {
+    return 4;
+  }
+  return -1;
+}
+
+function handleOpcodeAx(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenatedDataByte: u16): i8 {
+  if(opcode === 0xA0) {
 
     // AND B
     // 1  4
     // Z 0 1 0
     andARegister(Cpu.registerB);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xA1)) {
+    return 4;
+  } else if(opcode === 0xA1) {
 
     // AND C
     // 1  4
     // Z 0 1 0
     andARegister(Cpu.registerC);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xA2)) {
+    return 4;
+  } else if(opcode === 0xA2) {
 
     // AND D
     // 1  4
     // Z 0 1 0
     andARegister(Cpu.registerD);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xA3)) {
+    return 4;
+  } else if(opcode === 0xA3) {
 
     // AND E
     // 1  4
     // Z 0 1 0
     andARegister(Cpu.registerE);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xA4)) {
+    return 4;
+  } else if(opcode === 0xA4) {
 
     // AND H
     // 1  4
     // Z 0 1 0
     andARegister(Cpu.registerH);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xA5)) {
+    return 4;
+  } else if(opcode === 0xA5) {
 
     // AND L
     // 1  4
     // Z 0 1 0
     andARegister(Cpu.registerL);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xA6)) {
+    return 4;
+  } else if(opcode === 0xA6) {
 
     // AND (HL)
     // 1  8
     // Z 0 1 0
     let valueAtHL: u8 = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
     andARegister(<u8>valueAtHL);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0xA7)) {
+    return 8;
+  } else if(opcode === 0xA7) {
 
     // AND A
     // 1  4
     // Z 0 1 0
     // NOTE: & Yourself, does nothing
     andARegister(Cpu.registerA);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xA8)) {
+    return 4;
+  } else if(opcode === 0xA8) {
 
     // XOR B
     // 1  4
     // Z 0 0 0
     xorARegister(Cpu.registerB);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xA9)) {
+    return 4;
+  } else if(opcode === 0xA9) {
 
     // XOR C
     // 1  4
     // Z 0 0 0
     xorARegister(Cpu.registerC);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xAA)) {
+    return 4;
+  } else if(opcode === 0xAA) {
 
     // XOR D
     // 1  4
     // Z 0 0 0
     xorARegister(Cpu.registerD);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xAB)) {
+    return 4;
+  } else if(opcode === 0xAB) {
 
     // XOR E
     // 1  4
     // Z 0 0 0
     xorARegister(Cpu.registerE);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xAC)) {
+    return 4;
+  } else if(opcode === 0xAC) {
 
     // XOR H
     // 1  4
     // Z 0 0 0
     xorARegister(Cpu.registerH);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xAD)) {
+    return 4;
+  } else if(opcode === 0xAD) {
 
     // XOR L
     // 1  4
     // Z 0 0 0
     xorARegister(Cpu.registerL);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xAE)) {
+    return 4;
+  } else if(opcode === 0xAE) {
 
     // XOR (HL)
     // 1  8
     // Z 0 0 0
     let valueAtHL: u8 = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
     xorARegister(<u8>valueAtHL);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0xAF)) {
+    return 8;
+  } else if(opcode === 0xAF) {
 
     // XOR A
     // 1  4
     // Z 0 0 0
     xorARegister(Cpu.registerA);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xB0)) {
+    return 4;
+  }
+  return -1;
+}
+
+function handleOpcodeBx(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenatedDataByte: u16): i8 {
+  if(opcode === 0xB0) {
 
     // OR B
     // 1  4
     // Z 0 0 0
     orARegister(Cpu.registerB);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xB1)) {
+    return 4;
+  } else if(opcode === 0xB1) {
 
     // OR C
     // 1  4
     // Z 0 0 0
     orARegister(Cpu.registerC);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xB2)) {
+    return 4;
+  } else if(opcode === 0xB2) {
 
     // OR D
     // 1  4
     // Z 0 0 0
     orARegister(Cpu.registerD);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xB3)) {
+    return 4;
+  } else if(opcode === 0xB3) {
 
     // OR E
     // 1  4
     // Z 0 0 0
     orARegister(Cpu.registerE);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xB4)) {
+    return 4;
+  } else if(opcode === 0xB4) {
 
     // OR H
     // 1  4
     // Z 0 0 0
     orARegister(Cpu.registerH);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xB5)) {
+    return 4;
+  } else if(opcode === 0xB5) {
 
     // OR L
     // 1  4
     // Z 0 0 0
     orARegister(Cpu.registerL);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xB6)) {
+    return 4;
+  } else if(opcode === 0xB6) {
 
     // OR (HL)
     // 1  8
     // Z 0 0 0
     let valueAtHL: u8 = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
     orARegister(<u8>valueAtHL);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0xB7)) {
+    return 8;
+  } else if(opcode === 0xB7) {
 
     // OR A
     // 1  4
     // Z 0 0 0
     orARegister(Cpu.registerA);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xB8)) {
+    return 4;
+  } else if(opcode === 0xB8) {
 
     // CP B
     // 1  4
     // Z 1 H C
     cpARegister(Cpu.registerB);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xB9)) {
+    return 4;
+  } else if(opcode === 0xB9) {
 
     // CP C
     // 1  4
     // Z 1 H C
     cpARegister(Cpu.registerC);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xBA)) {
+    return 4;
+  } else if(opcode === 0xBA) {
 
     // CP D
     // 1  4
     // Z 1 H C
     cpARegister(Cpu.registerD);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xBB)) {
+    return 4;
+  } else if(opcode === 0xBB) {
 
     // CP E
     // 1  4
     // Z 1 H C
     cpARegister(Cpu.registerE);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xBC)) {
+    return 4;
+  } else if(opcode === 0xBC) {
 
     // CP H
     // 1  4
     // Z 1 H C
     cpARegister(Cpu.registerH);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xBD)) {
+    return 4;
+  } else if(opcode === 0xBD) {
 
     // CP L
     // 1  4
     // Z 1 H C
     cpARegister(Cpu.registerL);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xBE)) {
+    return 4;
+  } else if(opcode === 0xBE) {
 
     // CP (HL)
     // 1  8
     // Z 1 H C
     let valueAtHL: u8 = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
     cpARegister(<u8>valueAtHL);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0xBF)) {
+    return 8;
+  } else if(opcode === 0xBF) {
 
     // CP A
     // 1  4
     // Z 1 H C
     cpARegister(Cpu.registerA);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xC0)) {
+    return 4;
+  }
+  return -1;
+}
+
+function handleOpcodeCx(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenatedDataByte: u16): i8 {
+  if(opcode === 0xC0) {
 
     // RET NZ
     // 1  20/8
     if (getZeroFlag() === 0) {
       Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
       Cpu.stackPointer += 2;
-      numberOfCycles = 20;
+      return 20;
     } else {
-      numberOfCycles = 8;
+      return 8;
     }
-  } else if(isOpcode(opcode, 0xC1)) {
+  } else if(opcode === 0xC1) {
 
     // POP BC
     // 1  12
@@ -1768,25 +1874,25 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     Cpu.stackPointer += 2;
     Cpu.registerB = splitHighByte(registerBC);
     Cpu.registerC = splitLowByte(registerBC);
-    numberOfCycles = 12;
-  } else if(isOpcode(opcode, 0xC2)) {
+    return 12;
+  } else if(opcode === 0xC2) {
 
     // JP NZ,a16
     // 3  16/12
     if (getZeroFlag() === 0) {
       Cpu.programCounter = concatenatedDataByte;
-      numberOfCycles = 16;
+      return 16;
     } else {
       Cpu.programCounter += 2;
-      numberOfCycles = 12;
+      return 12;
     }
-  } else if(isOpcode(opcode, 0xC3)) {
+  } else if(opcode === 0xC3) {
 
     // JP a16
     // 3  16
     Cpu.programCounter = concatenatedDataByte;
-    numberOfCycles = 16;
-  } else if(isOpcode(opcode, 0xC4)) {
+    return 16;
+  } else if(opcode === 0xC4) {
 
     // CALL NZ,a16
     // 3  24/12
@@ -1794,72 +1900,73 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
       Cpu.stackPointer -= 2;
       sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
       Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.programCounter);
-      numberOfCycles = 24;
+      return 24;
     } else {
-      numberOfCycles = 12;
       Cpu.programCounter += 2;
+      return 12;
     }
-  } else if(isOpcode(opcode, 0xC5)) {
+  } else if(opcode === 0xC5) {
 
     // PUSH BC
     // 1  16
     let registerBC = concatenateBytes(Cpu.registerB, Cpu.registerC);
     Cpu.stackPointer -= 2;
     sixteenBitStoreIntoGBMemory(Cpu.stackPointer, registerBC);
-    numberOfCycles = 16;
-  } else if(isOpcode(opcode, 0xC6)) {
+    return 16;
+  } else if(opcode === 0xC6) {
 
     // ADD A,d8
     // 2 8
     // Z 0 H C
     addARegister(dataByteOne);
     Cpu.programCounter += 1;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xC7)) {
+    return 4;
+  } else if(opcode === 0xC7) {
 
     // RST 00H
     // 1 16
     Cpu.stackPointer -= 2;
     sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
     Cpu.programCounter = 0x00;
-    numberOfCycles = 16;
-  } else if(isOpcode(opcode, 0xC8)) {
+    return 16;
+  } else if(opcode === 0xC8) {
 
     // RET Z
     // 1  20/8
     if (getZeroFlag() === 1) {
       Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
       Cpu.stackPointer += 2;
-      numberOfCycles = 20;
+      return 20;
     } else {
-      numberOfCycles = 8;
+      return 8;
     }
-  } else if(isOpcode(opcode, 0xC9)) {
+  } else if(opcode === 0xC9) {
 
     // RET
     // 1 16
     Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
     Cpu.stackPointer += 2;
-    numberOfCycles = 16;
-  } else if(isOpcode(opcode, 0xCA)) {
+    return 16;
+  } else if(opcode === 0xCA) {
 
     // JP Z,a16
     // 3 16/12
     if (getZeroFlag() === 1) {
       Cpu.programCounter = concatenatedDataByte;
-      numberOfCycles = 16;
+      return 16;
     } else {
       Cpu.programCounter += 2;
-      numberOfCycles = 12;
+      return 12;
     }
-  } else if(isOpcode(opcode, 0xCB)) {
+  } else if(opcode === 0xCB) {
     // PREFIX CB
     // 1  4
-    numberOfCycles = handleCbOpcode(dataByteOne);
-    if(numberOfCycles > 0) {
-      numberOfCycles += 4;
+    let cbCycles = handleCbOpcode(dataByteOne)
+    if(cbCycles > 0) {
+      cbCycles += 4;
     }
-  } else if(isOpcode(opcode, 0xCC)) {
+    return cbCycles;
+  } else if(opcode === 0xCC) {
 
     // CALL Z,a16
     // 3  24/12
@@ -1867,47 +1974,52 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
       Cpu.stackPointer -= 2;
       sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
       Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.programCounter);
-      numberOfCycles = 24;
+      return 24;
     } else {
       Cpu.programCounter += 2;
-      numberOfCycles = 12;
+      return 12;
     }
-  } else if(isOpcode(opcode, 0xCD)) {
+  } else if(opcode === 0xCD) {
 
     // CALL a16
     // 3  24
     Cpu.stackPointer -= 2;
     sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
     Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.programCounter);
-    numberOfCycles = 24;
-  } else if(isOpcode(opcode, 0xCE)) {
+    return 24;
+  } else if(opcode === 0xCE) {
 
     // ADC A,d8
     // 2  8
     // Z 0 H C
     addAThroughCarryRegister(dataByteOne);
     Cpu.programCounter += 1;
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xCF)) {
+    return 4;
+  } else if(opcode === 0xCF) {
 
     // RST 08H
     // 1 16
     Cpu.stackPointer -= 2;
     sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
     Cpu.programCounter = 0x08;
-    numberOfCycles = 16;
-  } else if(isOpcode(opcode, 0xD0)) {
+    return 16;
+  }
+  return -1;
+}
+
+function handleOpcodeDx(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenatedDataByte: u16): i8 {
+  if(opcode === 0xD0) {
 
     // RET NC
     // 1  20/8
     if (getCarryFlag() === 0) {
       Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
       Cpu.stackPointer += 2;
-      numberOfCycles = 20;
+      return 20;
     } else {
-      numberOfCycles = 8;
+      return 8;
     }
-  } else if(isOpcode(opcode, 0xD1)) {
+  } else if(opcode === 0xD1) {
 
     // POP DE
     // 1  12
@@ -1916,19 +2028,19 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     Cpu.stackPointer += 2;
     Cpu.registerD = splitHighByte(registerDE);
     Cpu.registerE = splitLowByte(registerDE);
-    numberOfCycles = 12;
-  } else if(isOpcode(opcode, 0xD2)) {
+    return 12;
+  } else if(opcode === 0xD2) {
 
     // JP NC,a16
     // 3  16/12
     if (getCarryFlag() === 0) {
       Cpu.programCounter = concatenatedDataByte;
-      numberOfCycles = 16;
+      return 16;
     } else {
       Cpu.programCounter += 2;
-      numberOfCycles = 12;
+      return 12;
     }
-  } /* No Opcode for: 0xD3 */ else if(isOpcode(opcode, 0xD4)) {
+  } /* No Opcode for: 0xD3 */ else if(opcode === 0xD4) {
 
     // CALL NC,a16
     // 3  24/12
@@ -1936,47 +2048,47 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
       Cpu.stackPointer -= 2;
       sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
       Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.programCounter);
-      numberOfCycles = 24;
+      return 24;
     } else {
       Cpu.programCounter += 2;
-      numberOfCycles = 12;
+      return 12;
     }
-  } else if(isOpcode(opcode, 0xD5)) {
+  } else if(opcode === 0xD5) {
 
     // PUSH DE
     // 1 16
     let registerDE = concatenateBytes(Cpu.registerD, Cpu.registerE);
     Cpu.stackPointer -= 2;
     sixteenBitStoreIntoGBMemory(Cpu.stackPointer, registerDE);
-    numberOfCycles = 16;
-  } else if(isOpcode(opcode, 0xD6)) {
+    return 16;
+  } else if(opcode === 0xD6) {
 
     // SUB d8
     // 2  8
     // Z 1 H C
     subARegister(dataByteOne);
     Cpu.programCounter += 1;
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0xD7)) {
+    return 8;
+  } else if(opcode === 0xD7) {
 
     // RST 10H
     // 1 16
     Cpu.stackPointer -= 2;
     sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
     Cpu.programCounter = 0x10;
-    numberOfCycles = 16;
-  } else if(isOpcode(opcode, 0xD8)) {
+    return 16;
+  } else if(opcode === 0xD8) {
 
     // RET C
     // 1  20/8
     if (getCarryFlag() === 1) {
       Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
       Cpu.stackPointer += 2;
-      numberOfCycles = 20;
+      return 20;
     } else {
-      numberOfCycles = 8;
+      return 8;
     }
-  } else if(isOpcode(opcode, 0xD9)) {
+  } else if(opcode === 0xD9) {
 
     // RETI
     // 1  16
@@ -1984,19 +2096,19 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     // Enable interrupts
     setInterrupts(true);
     Cpu.stackPointer += 2;
-    numberOfCycles = 16;
-  } else if(isOpcode(opcode, 0xDA)) {
+    return 16;
+  } else if(opcode === 0xDA) {
 
     // JP C,a16
     // 3 16/12
     if (getCarryFlag() === 1) {
       Cpu.programCounter = concatenatedDataByte;
-      numberOfCycles = 16;
+      return 16;
     } else {
       Cpu.programCounter += 2;
-      numberOfCycles = 12;
+      return 12;
     }
-  } /* No Opcode for: 0xDB */else if(isOpcode(opcode, 0xDC)) {
+  } /* No Opcode for: 0xDB */else if(opcode === 0xDC) {
 
     // CALL C,a16
     // 3  24/12
@@ -2004,27 +2116,32 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
       Cpu.stackPointer -= 2;
       sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
       Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.programCounter);
-      numberOfCycles = 24;
+      return 24;
     } else {
       Cpu.programCounter += 2;
-      numberOfCycles = 12;
+      return 12;
     }
-  } /* No Opcode for: 0xDD */else if(isOpcode(opcode, 0xDE)) {
+  } /* No Opcode for: 0xDD */else if(opcode === 0xDE) {
 
     // SBC A,d8
     // 2 8
     // Z 1 H C
     subAThroughCarryRegister(dataByteOne);
     Cpu.programCounter += 1;
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0xDF)) {
+    return 8;
+  } else if(opcode === 0xDF) {
     // RST 18H
     // 1 16
     Cpu.stackPointer -= 2;
     sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
     Cpu.programCounter = 0x18;
-    numberOfCycles = 16;
-  } else if(isOpcode(opcode, 0xE0)) {
+    return 16;
+  }
+  return -1;
+}
+
+function handleOpcodeEx(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenatedDataByte: u16): i8 {
+  if(opcode === 0xE0) {
 
     // LDH (a8),A
     // 2  12
@@ -2033,8 +2150,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     let largeDataByteOne: u16 = dataByteOne;
     eightBitStoreIntoGBMemory(0xFF00 + largeDataByteOne, Cpu.registerA);
     Cpu.programCounter += 1;
-    numberOfCycles = 12;
-  } else if(isOpcode(opcode, 0xE1)) {
+    return 12;
+  } else if(opcode === 0xE1) {
 
     // POP HL
     // 1  12
@@ -2043,8 +2160,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     Cpu.stackPointer += 2;
     Cpu.registerH = splitHighByte(registerHL);
     Cpu.registerL = splitLowByte(registerHL);
-    numberOfCycles = 12;
-  } else if(isOpcode(opcode, 0xE2)) {
+    return 12;
+  } else if(opcode === 0xE2) {
 
     // LD (C),A
     // 2  8
@@ -2053,32 +2170,32 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
 
     // Store value in high RAM ($FF00 + register c)
     eightBitStoreIntoGBMemory(0xFF00 + Cpu.registerC, Cpu.registerA);
-    numberOfCycles = 8;
-  } /* No Opcode for: 0xE3, 0xE4 */ else if(isOpcode(opcode, 0xE5)) {
+    return 8;
+  } /* No Opcode for: 0xE3, 0xE4 */ else if(opcode === 0xE5) {
 
     // PUSH HL
     // 1 16
     let registerHL = concatenateBytes(Cpu.registerH, Cpu.registerL);
     Cpu.stackPointer -= 2;
     sixteenBitStoreIntoGBMemory(Cpu.stackPointer, registerHL);
-    numberOfCycles = 16;
-  } else if(isOpcode(opcode, 0xE6)) {
+    return 16;
+  } else if(opcode === 0xE6) {
 
     // AND d8
     // 2  8
     // Z 0 1 0
     andARegister(dataByteOne);
     Cpu.programCounter += 1;
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0xE7)) {
+    return 8;
+  } else if(opcode === 0xE7) {
 
     // RST 20H
     // 1 16
     Cpu.stackPointer -= 2;
     sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
     Cpu.programCounter = 0x20;
-    numberOfCycles = 16;
-  } else if(isOpcode(opcode, 0xE8)) {
+    return 16;
+  } else if(opcode === 0xE8) {
 
     // ADD SP, r8
     // 2 16
@@ -2091,45 +2208,50 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     setZeroFlag(0);
     setSubtractFlag(0);
     Cpu.programCounter += 1;
-    numberOfCycles = 16;
-  } else if(isOpcode(opcode, 0xE9)) {
+    return 16;
+  } else if(opcode === 0xE9) {
 
     // JP (HL)
     // 1 4
     Cpu.programCounter = concatenateBytes(Cpu.registerH, Cpu.registerL);
-    numberOfCycles = 4;
-  } else if(isOpcode(opcode, 0xEA)) {
+    return 4;
+  } else if(opcode === 0xEA) {
 
     // LD (a16),A
     // 3 16
     eightBitStoreIntoGBMemory(concatenatedDataByte, Cpu.registerA);
     Cpu.programCounter += 2;
-    numberOfCycles = 16;
-  } /* No Opcode for: 0xEB, 0xEC, 0xED */ else if(isOpcode(opcode, 0xEE)) {
+    return 16;
+  } /* No Opcode for: 0xEB, 0xEC, 0xED */ else if(opcode === 0xEE) {
 
     // XOR d8
     // 2 8
     // Z 0 0 0
     xorARegister(dataByteOne);
     Cpu.programCounter += 1;
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0xEF)) {
+    return 8;
+  } else if(opcode === 0xEF) {
 
     // RST 28H
     // 1 16
     Cpu.stackPointer -= 2;
     sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
     Cpu.programCounter = 0x28;
-    numberOfCycles = 16;
-  } else if(isOpcode(opcode, 0xF0)) {
+    return 16;
+  }
+  return -1;
+}
+
+function handleOpcodeFx(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenatedDataByte: u16): i8 {
+  if(opcode === 0xF0) {
 
     // LDH A,(a8)
     // 2 12
     let largeDataByteOne: u16 = dataByteOne;
     Cpu.registerA = eightBitLoadFromGBMemory(0xFF00 + largeDataByteOne);
     Cpu.programCounter += 1;
-    numberOfCycles = 12;
-  } else if(isOpcode(opcode, 0xF1)) {
+    return 12;
+  } else if(opcode === 0xF1) {
 
     // POP AF
     // 1 12
@@ -2139,45 +2261,45 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     Cpu.stackPointer += 2;
     Cpu.registerA = splitHighByte(registerAF);
     Cpu.registerF = splitLowByte(registerAF);
-    numberOfCycles = 12;
-  } else if(isOpcode(opcode, 0xF2)) {
+    return 12;
+  } else if(opcode === 0xF2) {
 
     // LD A,(C)
     // 2 8
     Cpu.registerA = eightBitLoadFromGBMemory(0xFF00 + Cpu.registerC);
     Cpu.programCounter += 1;
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0xF3)) {
+    return 8;
+  } else if(opcode === 0xF3) {
 
     // DI
     // 1 4
     setInterrupts(false);
-    numberOfCycles = 4;
-  } /* No Opcode for: 0xF4 */ else if(isOpcode(opcode, 0xF5)) {
+    return 4;
+  } /* No Opcode for: 0xF4 */ else if(opcode === 0xF5) {
 
     // PUSH AF
     // 1 16
     let registerAF = concatenateBytes(Cpu.registerA, Cpu.registerF);
     Cpu.stackPointer -= 2;
     sixteenBitStoreIntoGBMemory(Cpu.stackPointer, registerAF);
-    numberOfCycles = 16;
-  } else if(isOpcode(opcode, 0xF6)) {
+    return 16;
+  } else if(opcode === 0xF6) {
 
     // OR d8
     // 2 8
     // Z 0 0 0
     orARegister(dataByteOne);
     Cpu.programCounter += 1;
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0xF7)) {
+    return 8;
+  } else if(opcode === 0xF7) {
 
     // RST 30H
     // 1 16
     Cpu.stackPointer -= 2;
     sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
     Cpu.programCounter = 0x30;
-    numberOfCycles = 16;
-  } else if(isOpcode(opcode, 0xF8)) {
+    return 16;
+  } else if(opcode === 0xF8) {
 
     // LD HL,SP+r8
     // 2 12
@@ -2193,47 +2315,42 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
     Cpu.registerH = splitHighByte(registerHL);
     Cpu.registerL = splitLowByte(registerHL);
     Cpu.programCounter += 1;
-    numberOfCycles = 12;
-  } else if(isOpcode(opcode, 0xF9)) {
+    return 12;
+  } else if(opcode === 0xF9) {
 
     // LD SP,HL
     // 1 8
     Cpu.stackPointer = concatenateBytes(Cpu.registerH, Cpu.registerL);
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0xFA)) {
+    return 8;
+  } else if(opcode === 0xFA) {
 
     // LD A,(a16)
     // 3 16
     Cpu.registerA = eightBitLoadFromGBMemory(concatenatedDataByte);
     Cpu.programCounter += 2;
-    numberOfCycles = 16;
-  } else if(isOpcode(opcode, 0xFB)) {
+    return 16;
+  } else if(opcode === 0xFB) {
 
     // EI
     // 1 4
     setInterrupts(true);
-    numberOfCycles = 4;
-  } /* No Opcode for: 0xFC, 0xFD */ else if(isOpcode(opcode, 0xFE)) {
+    return 4;
+  } /* No Opcode for: 0xFC, 0xFD */ else if(opcode === 0xFE) {
 
     // CP d8
     // 2 8
     // Z 1 H C
     cpARegister(dataByteOne);
     Cpu.programCounter += 1;
-    numberOfCycles = 8;
-  } else if(isOpcode(opcode, 0xFF)) {
+    return 8;
+  } else if(opcode === 0xFF) {
 
     // RST 38H
     // 1 16
     Cpu.stackPointer -= 2;
     sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
     Cpu.programCounter = 0x38;
-    numberOfCycles = 16;
+    return 16;
   }
-
-  // NOTE: Moved Program Counter to top, because program counter state should be considered Before doing calls
-
-
-  // Return the number of cycles
-  return numberOfCycles;
+  return -1;
 }

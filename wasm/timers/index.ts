@@ -13,35 +13,35 @@ import {
 } from '../interrupts/index';
 
 export class Timers {
-  static memoryLocationTIMA: u16 = 0xFF05; // Timer Modulator
-  static memoryLocationTMA: u16 = 0xFF06; // Timer Counter (Actual Time Value)
-  static memoryLocationTIMC: u16 = 0xFF07; // Timer Controller (A.K.A TAC)
-  static memoryLocationDividerRegister: u16 = 0xFF04; // DividerRegister likes to count
+  static readonly memoryLocationTIMA: u16 = 0xFF05; // Timer Modulator
+  static readonly memoryLocationTMA: u16 = 0xFF06; // Timer Counter (Actual Time Value)
+  static readonly memoryLocationTIMC: u16 = 0xFF07; // Timer Controller (A.K.A TAC)
+  static readonly memoryLocationDividerRegister: u16 = 0xFF04; // DividerRegister likes to count
 
   // Cycle counter. This is used to determine if we should increment the REAL timer
   // I know this is weird, but it's all to make sure the emulation is in sync :p
-  static cycleCounter: i16 = 0x00;
-  static currentMaxCycleCount: i16 = 1024;
+  static cycleCounter: i32 = 0x00;
+  static currentMaxCycleCount: i32 = 1024;
 
   // Another timer, that doesn't fire intterupts, but jsut counts to 255, and back to zero :p
-  static dividerRegisterCycleCounter: i16 = 0x00;
+  static dividerRegisterCycleCounter: i32 = 0x00;
 
   // Save States
 
-  static saveStateSlot: u16 = 5;
+  static readonly saveStateSlot: u16 = 5;
 
   // Function to save the state of the class
   static saveState(): void {
-    store<i16>(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot), Timers.cycleCounter);
-    store<i16>(getSaveStateMemoryOffset(0x02, Timers.saveStateSlot), Timers.currentMaxCycleCount);
-    store<i16>(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot), Timers.dividerRegisterCycleCounter);
+    store<i32>(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot), Timers.cycleCounter);
+    store<i32>(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot), Timers.currentMaxCycleCount);
+    store<i32>(getSaveStateMemoryOffset(0x08, Timers.saveStateSlot), Timers.dividerRegisterCycleCounter);
   }
 
   // Function to load the save state from memory
   static loadState(): void {
-    Timers.cycleCounter = load<i16>(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot));
-    Timers.currentMaxCycleCount = load<i16>(getSaveStateMemoryOffset(0x02, Timers.saveStateSlot));
-    Timers.dividerRegisterCycleCounter = load<i16>(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot));
+    Timers.cycleCounter = load<i32>(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot));
+    Timers.currentMaxCycleCount = load<i32>(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot));
+    Timers.dividerRegisterCycleCounter = load<i32>(getSaveStateMemoryOffset(0x08, Timers.saveStateSlot));
   }
 }
 
@@ -61,7 +61,7 @@ export function updateTimers(numberOfCycles: u8): void {
       Timers.cycleCounter -= _getCurrentCycleCounterFrequency();
 
       // Update the actual timer counter
-      let tima = eightBitLoadFromGBMemory(Timers.memoryLocationTIMA);
+      let tima: u8 = eightBitLoadFromGBMemory(Timers.memoryLocationTIMA);
       if(tima == 255) {
         // Store Timer Modulator inside of TIMA
         eightBitStoreIntoGBMemorySkipTraps(Timers.memoryLocationTIMA, eightBitLoadFromGBMemory(Timers.memoryLocationTMA));
@@ -88,28 +88,20 @@ function _checkDividerRegister(numberOfCycles: u8): void {
     Timers.dividerRegisterCycleCounter -= 255;
 
     let dividerRegister = eightBitLoadFromGBMemory(Timers.memoryLocationDividerRegister);
-    if(dividerRegister === 255) {
-      dividerRegister = 0;
-    } else {
-      dividerRegister += 1;
-    }
+    // TODO: Hoping that the overflow will occur correctly here, see this for any weird errors
+    dividerRegister += 1;
     eightBitStoreIntoGBMemorySkipTraps(Timers.memoryLocationDividerRegister, dividerRegister);
   }
 }
 
 function _isTimerEnabled(): boolean {
   // second bit, e.g 000 0100, will be set if the timer is enabled
-  let timc = eightBitLoadFromGBMemory(Timers.memoryLocationTIMC);
-  if((timc & 0x04) > 0) {
-    return true;
-  } else {
-    return false;
-  }
+  return (eightBitLoadFromGBMemory(Timers.memoryLocationTIMC) & 0x04) > 0;
 }
 
 // NOTE: This can be sped up by intercepting writes to memory
 // And handling this there
-function _getCurrentCycleCounterFrequency(): i16 {
+function _getCurrentCycleCounterFrequency(): i32 {
 
   // Get TIMC
   let timc = eightBitLoadFromGBMemory(Timers.memoryLocationTIMC);
@@ -119,26 +111,28 @@ function _getCurrentCycleCounterFrequency(): i16 {
 
   // Returns value equivalent to
   // Cpu.CLOCK_SPEED / timc frequency
-  let cycleCount = 0;
-  if(timc === 0x00) {
-    // TIMC -> 4096
-    cycleCount = 1024;
-  } else if (timc === 0x01) {
-    // TIMC -> 262144
-    cycleCount = 16;
-  } else if (timc === 0x02) {
-    // TIMC -> 65536
-    cycleCount = 64;
-  } else {
-    // TIMC -> 16382
-    cycleCount = 256
+  // TIMC -> 16382
+  let cycleCount: i32 = 256;
+  switch(timc) {
+    case 0x00:
+      // TIMC -> 4096
+      cycleCount = 1024;
+      break;
+    case 0x01:
+      // TIMC -> 262144
+      cycleCount = 16;
+      break;
+    case 0x02:
+      // TIMC -> 65536
+      cycleCount = 64;
+      break;
   }
 
   // If we notice the current max cycle count changes, reset the cyclecounter
   if(cycleCount != Timers.currentMaxCycleCount) {
     Timers.cycleCounter = 0;
-    Timers.currentMaxCycleCount = <i16>cycleCount;
+    Timers.currentMaxCycleCount = cycleCount;
   }
 
-  return <i16>cycleCount;
+  return cycleCount;
 }

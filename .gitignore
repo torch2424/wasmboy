@@ -12,6 +12,7 @@
 
 # Ignore build output
 dist/
+assets/*.map
 build/
 
 # Ignore node files

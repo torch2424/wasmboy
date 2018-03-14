@@ -27,7 +27,7 @@ const TEST_ROM_TIMEOUT = {
 // Initialize wasmBoy headless, with a frameskip
 // Frameskip will simply run that many gameboy frames,
 // before calling and waiting for another requestAnimationFrame()
-WasmBoy.initializeHeadless(30);
+WasmBoy.initializeHeadless(60);
 
 // Get our folders under testroms
 const isDirectory = source => fs.lstatSync(source).isDirectory()
@@ -85,11 +85,8 @@ getDirectories(testRomsPath).forEach((directory) => {
           console.log(`Running the following test rom: ${directory}/${testRom}`)
 
           setTimeout(() => {
-            WasmBoy.pauseGame();
-
-            // Timeout again to let the game pause
-            setTimeout(() => {
-
+            
+            WasmBoy.pauseGame().then(() => {
               console.log(`Checking results for the following test rom: ${directory}/${testRom}`);
 
               // Going to compare pixel values from the VRAM to confirm tests
@@ -210,7 +207,7 @@ getDirectories(testRomsPath).forEach((directory) => {
                     done();
                 });
               }
-            }, 500);
+            });
           }, timeToWaitForTestRom);
         });
       });

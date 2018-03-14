@@ -13,8 +13,7 @@ export function handleBanking(offset: u16, value: u16): void {
       }
 
       // Enable Ram Banking
-      if(offset >= 0x0000 &&
-      offset <= 0x1FFF) {
+      if(offset <= 0x1FFF) {
 
         if(Memory.isMBC2 && !checkBitOnByte(4, <u8>value)) {
           // Do Nothing
@@ -27,8 +26,7 @@ export function handleBanking(offset: u16, value: u16): void {
             Memory.isRamBankingEnabled = true;
           }
         }
-      } else if(offset >= 0x2000 &&
-      offset <= 0x3FFF) {
+      } else if(offset <= 0x3FFF) {
         if(!Memory.isMBC5 || offset <= 0x2FFF) {
           // Change Low Bits on the Current Rom Bank
           if (Memory.isMBC2) {
@@ -58,7 +56,6 @@ export function handleBanking(offset: u16, value: u16): void {
           // TODO: MBC5 High bits Rom bank
         }
       } else if(!Memory.isMBC2 &&
-      offset >= 0x4000 &&
       offset <= 0x5FFF) {
         // ROM / RAM Banking, MBC2 doesn't do this
         if (Memory.isMBC1 && Memory.isMBC1RomModeEnabled) {
@@ -92,7 +89,6 @@ export function handleBanking(offset: u16, value: u16): void {
         Memory.currentRamBank = ramBankBits;
         return;
       } else if(!Memory.isMBC2 &&
-      offset >= 0x6000 &&
       offset <= 0x7FFF) {
         if(Memory.isMBC1) {
           if(checkBitOnByte(0, <u8>value)) {
@@ -112,16 +108,10 @@ export function getRomBankAddress(gameboyOffset: u32): u32 {
   }
 
   // Adjust our gameboy offset relative to zero for the gameboy memory map
-  let romBankOffset: u32 = gameboyOffset - Memory.switchableCartridgeRomLocation;
-
-  let romBankSize: u32 = 0x4000;
-  let currentRomBankAddress: u32 = (0x4000 * currentRomBank) + romBankOffset;
-  return currentRomBankAddress;
+  return <u32>((0x4000 * currentRomBank) + (gameboyOffset - Memory.switchableCartridgeRomLocation));
 }
 
 export function getRamBankAddress(gameboyOffset: u32): u32 {
   // Adjust our gameboy offset relative to zero for the gameboy memory map
-  let ramBankOffset: u32 = gameboyOffset - Memory.cartridgeRamLocation;
-  let currentRamBankAddress: u32 = (0x2000 * Memory.currentRamBank) + ramBankOffset;
-  return currentRamBankAddress;
+  return <u32>((0x2000 * Memory.currentRamBank) + (gameboyOffset - Memory.cartridgeRamLocation));
 }

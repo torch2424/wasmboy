@@ -13,7 +13,8 @@ import {
   eightBitLoadFromGBMemorySkipTraps
 } from '../memory/load';
 import {
-  setPixelOnFrame
+  Memory,
+  setPixelOnFrameDirectlyToWasmMemory
 } from '../memory/memory';
 import {
   hexLog,
@@ -42,13 +43,17 @@ export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u
     pixelYPositionInMap -= 0x100;
   }
 
+  // Cache the beginning of our scanlineOffset in wasmboy Memory for performance
+  // https://github.com/AssemblyScript/assemblyscript/issues/40#issuecomment-372479760
+  let scanlineStartOffset: i32 = Memory.frameInProgressVideoOutputLocation + (<i32>scanlineRegister * 160);
+
   // Loop through x to draw the line like a CRT
-  for (let i: u16 = 0; i < 160; i++) {
+  for (let i: i32 = 0; i < 160; i++) {
 
     // Get our Current X position of our pixel on the on the 160x144 camera
     // this is done by getting the current scroll X position,
     // and adding it do what X Value the scanline is drawing on the camera.
-    let pixelXPositionInMap: u16 = i + scrollX;
+    let pixelXPositionInMap: i32 = i + scrollX;
 
     // This is to compensate wrapping, same as above
     if(pixelXPositionInMap >= 0x100) {
@@ -60,8 +65,8 @@ export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u
     // 256 / 8 = 32.
     // Also, bitshifting by 3, do do a division by 8
     // Need to use u16s, as they will be used to compute an address, which will cause weird errors and overflows
-    let tileXPositionInMap: u16 = pixelXPositionInMap >> 3;
-    let tileYPositionInMap: u16 = pixelYPositionInMap >> 3;
+    let tileXPositionInMap: i32 = pixelXPositionInMap >> 3;
+    let tileYPositionInMap: i32 = pixelYPositionInMap >> 3;
 
 
     // Get our tile address on the tileMap
@@ -71,7 +76,7 @@ export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u
     // And we have x pixel 160. 160 / 8 = 20.
     // * 32, because remember, this is NOT only for the camera, the actual map is 32x32. Therefore, the next tile line of the map, is 32 byte offset.
     // Think like indexing a 2d array, as a 1d array and it make sense :)
-    let tileMapAddress: u16 = tileMapMemoryLocation + (tileYPositionInMap * 32) + tileXPositionInMap;
+    let tileMapAddress: u16 = tileMapMemoryLocation + <u16>(tileYPositionInMap * 32) + <u16>tileXPositionInMap;
 
     // Get the tile Id on the Tile Map
     let tileIdFromTileMap: u8 = eightBitLoadFromGBMemorySkipTraps(tileMapAddress);
@@ -94,6 +99,7 @@ export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u
     // 0 Represents last line of pixels in a tile, 1 represents first. 1 2 3 4 5 6 7 0.
     // Because remember, we are counting lines on the display NOT including zero
     let pixelYInTile: u16 = pixelYPositionInMap % 8;
+
     // Remember to represent a single line of 8 pixels on a tile, we need two bytes.
     // Therefore, we need to times our modulo by 2, to get the correct line of pixels on the tile.
     // Again, think like you had to map a 2d array as a 1d.
@@ -126,10 +132,11 @@ export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u
     // Now get the colorId from the pallete, to get our final color
     // Developers could change colorIds to represents different colors
     // in their palette, thus we need to grab the color from there
-    let pixelColorInTileFromPalette: u8 = getColorFromPalette(paletteColorId, Graphics.memoryLocationBackgroundPalette);
+    //let pixelColorInTileFromPalette: u8 = getColorFromPalette(paletteColorId, Graphics.memoryLocationBackgroundPalette);
+    // Moved below for perofrmance
 
     // FINALLY, RENDER THAT PIXEL!
     // Only rendering camera for now, so coordinates are for the camera.
-    setPixelOnFrame(i, scanlineRegister, pixelColorInTileFromPalette);
+    setPixelOnFrameDirectlyToWasmMemory(scanlineStartOffset + i, getColorFromPalette(paletteColorId, Graphics.memoryLocationBackgroundPalette));
   }
 }

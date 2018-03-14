@@ -50,9 +50,7 @@ export function sixteenBitStoreIntoGBMemorySkipTraps(offset: u16, value: u16): v
 }
 
 function _eightBitStoreIntoWasmBoyMemory(gameboyOffset: u16, value: u8): void {
-  let wasmboyOffset: u32 = getWasmBoyOffsetFromGameBoyOffset(gameboyOffset);
-
-  store<u8>(wasmboyOffset, value);
+  store<u8>(getWasmBoyOffsetFromGameBoyOffset(gameboyOffset), value);
 }
 
 export function storeBooleanDirectlyToWasmMemory(offset: u32, value: boolean): void {

@@ -48,12 +48,12 @@ export class Joypad {
   static select: boolean = false;
   static start: boolean = false;
 
-  static memoryLocationJoypadRegister: u16 = 0xFF00;
+  static readonly memoryLocationJoypadRegister: u16 = 0xFF00;
 
   // Save States
   // Not doing anything for Joypad for now
 
-  static saveStateSlot: u16 = 3;
+  static readonly saveStateSlot: u16 = 3;
 
   // Function to save the state of the class
   static saveState(): void {
@@ -257,43 +257,53 @@ function _getBitNumberForButtonId(buttonId: u8): u8 {
 }
 
 function _getJoypadButtonStateFromButtonId(buttonId: u8): boolean {
-  if(buttonId === 0) {
-    return Joypad.up;
-  } else if (buttonId === 1) {
-    return Joypad.right;
-  } else if (buttonId === 2) {
-    return Joypad.down;
-  } else if (buttonId === 3) {
-    return Joypad.left;
-  } else if (buttonId === 4) {
-    return Joypad.a;
-  } else if (buttonId === 5) {
-    return Joypad.b;
-  } else if (buttonId === 6) {
-    return Joypad.select;
-  } else if (buttonId === 7) {
-    return Joypad.start;
+  switch(buttonId) {
+    case 0:
+      return Joypad.up;
+    case 1:
+      return Joypad.right;
+    case 2:
+      return Joypad.down;
+    case 3:
+      return Joypad.left;
+    case 4:
+      return Joypad.a;
+    case 5:
+      return Joypad.b;
+    case 6:
+      return Joypad.select;
+    case 7:
+      return Joypad.start;
+    default:
+      return false;
   }
-
-  return false;
 }
 
 function _setJoypadButtonStateFromButtonId(buttonId: u8, isPressed: boolean):  void {
-  if(buttonId === 0) {
-    Joypad.up = isPressed;
-  } else if (buttonId === 1) {
-    Joypad.right = isPressed;
-  } else if (buttonId === 2) {
-    Joypad.down = isPressed;
-  } else if (buttonId === 3) {
-    Joypad.left = isPressed;
-  } else if (buttonId === 4) {
-    Joypad.a = isPressed;
-  } else if (buttonId === 5) {
-    Joypad.b = isPressed;
-  } else if (buttonId === 6) {
-    Joypad.select = isPressed;
-  } else if (buttonId === 7) {
-    Joypad.start = isPressed;
+  switch(buttonId) {
+    case 0:
+      Joypad.up = isPressed;
+      break;
+    case 1:
+      Joypad.right = isPressed;
+      break;
+    case 2:
+      Joypad.down = isPressed;
+      break;
+    case 3:
+      Joypad.left = isPressed;
+      break;
+    case 4:
+      Joypad.a = isPressed;
+      break;
+    case 5:
+      Joypad.b = isPressed;
+      break;
+    case 6:
+      Joypad.select = isPressed;
+      break;
+    case 7:
+      Joypad.start = isPressed;
+      break;
   }
 }

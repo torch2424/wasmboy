@@ -6,6 +6,7 @@
 import {
   eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemory,
+  eightBitStoreIntoGBMemorySkipTraps,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
@@ -38,21 +39,21 @@ export class Channel3 {
 
   // Voluntary Wave channel with 32 4-bit programmable samples, played in sequence.
   // NR30 -> Sound on/off (R/W)
-  static memoryLocationNRx0: u16 = 0xFF1A;
+  static readonly memoryLocationNRx0: u16 = 0xFF1A;
   // NR31 -> Sound length (R/W)
-  static memoryLocationNRx1: u16 = 0xFF1B;
+  static readonly memoryLocationNRx1: u16 = 0xFF1B;
   // NR32 -> Select ouput level (R/W)
-  static memoryLocationNRx2: u16 = 0xFF1C;
+  static readonly memoryLocationNRx2: u16 = 0xFF1C;
   // NR33 -> Frequency lower data (W)
-  static memoryLocationNRx3: u16 = 0xFF1D;
+  static readonly memoryLocationNRx3: u16 = 0xFF1D;
   // NR34 -> Frequency higher data (R/W)
-  static memoryLocationNRx4: u16 = 0xFF1E;
+  static readonly memoryLocationNRx4: u16 = 0xFF1E;
 
   // Our wave table location
-  static memoryLocationWaveTable: u16 = 0xFF30;
+  static readonly memoryLocationWaveTable: u16 = 0xFF30;
 
   // Channel Properties
-  static channelNumber: i8 = 3;
+  static readonly channelNumber: i32 = 3;
   static isEnabled: boolean = false;
   static frequencyTimer: i32 = 0x00;
   static lengthCounter: i32 = 0x00;
@@ -60,7 +61,7 @@ export class Channel3 {
 
   // Save States
 
-  static saveStateSlot: u16 = 9;
+  static readonly saveStateSlot: u16 = 9;
 
   // Function to save the state of the class
   static saveState(): void {
@@ -79,14 +80,14 @@ export class Channel3 {
   }
 
   static initialize(): void {
-    eightBitStoreIntoGBMemory(Channel3.memoryLocationNRx0, 0x7F);
-    eightBitStoreIntoGBMemory(Channel3.memoryLocationNRx1, 0xFF);
-    eightBitStoreIntoGBMemory(Channel3.memoryLocationNRx2, 0x9F);
-    eightBitStoreIntoGBMemory(Channel3.memoryLocationNRx3, 0xBF);
-    eightBitStoreIntoGBMemory(Channel3.memoryLocationNRx4, 0xFF);
+    eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx0, 0x7F);
+    eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx1, 0xFF);
+    eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx2, 0x9F);
+    eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx3, 0xBF);
+    eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx4, 0xFF);
   }
 
-  static getSample(numberOfCycles: u8): u32 {
+  static getSample(numberOfCycles: u8): i32 {
 
     // Decrement our channel timer
     Channel3.frequencyTimer -= <i32>numberOfCycles;
@@ -109,6 +110,25 @@ export class Channel3 {
       }
     }
 
+    // Get our ourput volume
+    let outputVolume: i16 = 0;
+    let volumeCode: u8 = 0;
+
+    // Finally to set our output volume, the channel must be enabled,
+    // Our channel DAC must be enabled, and we must be in an active state
+    // Of our duty cycle
+    if(Channel3.isEnabled &&
+    isChannelDacEnabled(Channel3.channelNumber)) {
+      // Get our volume code
+      volumeCode = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx2);
+      volumeCode = (volumeCode >> 5);
+      volumeCode = (volumeCode & 0x0F);
+    } else {
+      // Return silence
+      // Since range from -15 - 15, or 0 to 30 for our unsigned
+      return 15;
+    }
+
     // Get the current sample
     let sample: i16 = 0;
 
@@ -128,34 +148,20 @@ export class Channel3 {
       sample = (sample & 0x0F);
     }
 
-    // Get our ourput volume, set to zero for silence
-    let outputVolume: i16 = 0;
-
-    // Finally to set our output volume, the channel must be enabled,
-    // Our channel DAC must be enabled, and we must be in an active state
-    // Of our duty cycle
-    if(Channel3.isEnabled &&
-    isChannelDacEnabled(Channel3.channelNumber)) {
-      // Get our volume code
-      let volumeCode = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx2);
-      volumeCode = (volumeCode >> 5);
-      volumeCode = (volumeCode & 0x0F);
-
-      // Shift our sample and set our volume depending on the volume code
-      // Since we can't multiply by float, simply divide by 4, 2, 1
-      // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Wave_Channel
-      if(volumeCode <= 0) {
-        sample = (sample >> 4);
-      } else if (volumeCode === 1) {
-        // Dont Shift sample
-        outputVolume = 1;
-      } else if (volumeCode === 2) {
-        sample = (sample >> 1)
-        outputVolume = 2;
-      } else {
-        sample = (sample >> 2)
-        outputVolume = 4;
-      }
+    // Shift our sample and set our volume depending on the volume code
+    // Since we can't multiply by float, simply divide by 4, 2, 1
+    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Wave_Channel
+    if(volumeCode <= 0) {
+      sample = (sample >> 4);
+    } else if (volumeCode === 1) {
+      // Dont Shift sample
+      outputVolume = 1;
+    } else if (volumeCode === 2) {
+      sample = (sample >> 1)
+      outputVolume = 2;
+    } else {
+      sample = (sample >> 2)
+      outputVolume = 4;
     }
 
     // Spply out output volume
@@ -167,7 +173,7 @@ export class Channel3 {
 
     // Square Waves Can range from -15 - 15. Therefore simply add 15
     sample = sample + 15;
-    return <u32>sample;
+    return <i32>sample;
   }
 
   //http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Trigger_Event

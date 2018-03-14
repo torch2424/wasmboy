@@ -8,14 +8,11 @@ import {
   checkBitOnByte
 } from '../helpers/index';
 
-export function getChannelEnvelopePeriod(channelNumber: i8): u8 {
-  let soundRegister: u8 = getRegister2OfChannel(channelNumber);
+export function getChannelEnvelopePeriod(channelNumber: i32): u8 {
   // Get the bottom 3 bits for the period
-  let channelPeriod: u8 = soundRegister & 0x07;
-  return channelPeriod;
+  return getRegister2OfChannel(channelNumber) & 0x07;
 }
 
-export function getChannelEnvelopeAddMode(channelNumber: i8): boolean {
-  let soundRegister: u8 = getRegister2OfChannel(channelNumber);
-  return checkBitOnByte(3, soundRegister)
+export function getChannelEnvelopeAddMode(channelNumber: i32): boolean {
+  return checkBitOnByte(3, getRegister2OfChannel(channelNumber))
 }

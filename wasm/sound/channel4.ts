@@ -6,6 +6,7 @@
 import {
   eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemory,
+  eightBitStoreIntoGBMemorySkipTraps,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
@@ -39,16 +40,16 @@ export class Channel4 {
   // Channel 4
   // 'white noise' channel with volume envelope functions.
   // NR41 -> Sound length (R/W)
-  static memoryLocationNRx1: u16 = 0xFF20;
+  static readonly memoryLocationNRx1: u16 = 0xFF20;
   // NR42 -> Volume Envelope (R/W)
-  static memoryLocationNRx2: u16 = 0xFF21;
+  static readonly memoryLocationNRx2: u16 = 0xFF21;
   // NR43 -> Polynomial Counter (R/W)
-  static memoryLocationNRx3: u16 = 0xFF22;
+  static readonly memoryLocationNRx3: u16 = 0xFF22;
   // NR43 -> Counter/consecutive; initial (R/W)
-  static memoryLocationNRx4: u16 = 0xFF23;
+  static readonly memoryLocationNRx4: u16 = 0xFF23;
 
   // Channel Properties
-  static channelNumber: i8 = 4;
+  static readonly channelNumber: i32 = 4;
   static isEnabled: boolean = false;
   static frequencyTimer: i32 = 0x00;
   static envelopeCounter: i32 = 0x00;
@@ -61,7 +62,7 @@ export class Channel4 {
 
   // Save States
 
-  static saveStateSlot: u16 = 10;
+  static readonly saveStateSlot: u16 = 10;
 
   // Function to save the state of the class
   static saveState(): void {
@@ -84,17 +85,18 @@ export class Channel4 {
   }
 
   static initialize(): void {
-    eightBitStoreIntoGBMemory(Channel4.memoryLocationNRx1 - 1, 0xFF);
-    eightBitStoreIntoGBMemory(Channel4.memoryLocationNRx1, 0xFF);
-    eightBitStoreIntoGBMemory(Channel4.memoryLocationNRx2, 0x00);
-    eightBitStoreIntoGBMemory(Channel4.memoryLocationNRx3, 0x00);
-    eightBitStoreIntoGBMemory(Channel4.memoryLocationNRx4, 0xBF);
+    eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx1 - 1, 0xFF);
+    eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx1, 0xFF);
+    eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx2, 0x00);
+    eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx3, 0x00);
+    eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx4, 0xBF);
   }
 
-  static getSample(numberOfCycles: u8): u32 {
+  static getSample(numberOfCycles: u8): i32 {
 
     // Decrement our channel timer
     Channel4.frequencyTimer -= <i32>numberOfCycles;
+
     if(Channel4.frequencyTimer <= 0) {
 
       // Get the amount that overflowed so we don't drop cycles
@@ -103,9 +105,6 @@ export class Channel4 {
       // Reset our timer
       Channel4.frequencyTimer = Channel4.getNoiseChannelFrequencyPeriod();
       Channel4.frequencyTimer -= overflowAmount;
-
-      // Declare our sample
-      let sample: i32 = 0;
 
       // Do some cool stuff with lfsr
       // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Noise_Channel
@@ -128,34 +127,38 @@ export class Channel4 {
         Channel4.linearFeedbackShiftRegister = Channel4.linearFeedbackShiftRegister & (~0x40);
         Channel4.linearFeedbackShiftRegister = Channel4.linearFeedbackShiftRegister | (xorLfsrBitZeroOne << 6);
       }
+    }
 
-      // Wave form output is bit zero of lfsr, INVERTED
-      if (!checkBitOnByte(0, <u8>Channel4.linearFeedbackShiftRegister)) {
-        sample = 1;
-      } else {
-        sample = -1;
-      }
+    // Get our ourput volume, set to zero for silence
+    let outputVolume: i32 = 0;
 
-      // Get our ourput volume, set to zero for silence
-      let outputVolume: i32 = 0;
-
-      // Finally to set our output volume, the channel must be enabled,
-      // Our channel DAC must be enabled, and we must be in an active state
-      // Of our duty cycle
-      if(Channel4.isEnabled &&
-      isChannelDacEnabled(Channel4.channelNumber)) {
-        outputVolume = Channel4.volume;
-      }
-
-      sample = sample * outputVolume;
-
-      // Noise Can range from -15 - 15. Therefore simply add 15
-      sample = sample + 15;
-      return <u32>sample;
+    // Finally to set our output volume, the channel must be enabled,
+    // Our channel DAC must be enabled, and we must be in an active state
+    // Of our duty cycle
+    if(Channel4.isEnabled &&
+    isChannelDacEnabled(Channel4.channelNumber)) {
+      outputVolume = Channel4.volume;
     } else {
-      // Return 15 and not zero because 15 is no sound :) see above
+      // Return silence
+      // Since range from -15 - 15, or 0 to 30 for our unsigned
       return 15;
     }
+
+    // Declare our sample
+    let sample: i32 = 0;
+
+    // Wave form output is bit zero of lfsr, INVERTED
+    if (!checkBitOnByte(0, <u8>Channel4.linearFeedbackShiftRegister)) {
+      sample = 1;
+    } else {
+      sample = -1;
+    }
+
+    sample = sample * outputVolume;
+
+    // Noise Can range from -15 - 15. Therefore simply add 15
+    sample = sample + 15;
+    return <i32>sample;
   }
 
   //http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Trigger_Event
@@ -183,7 +186,7 @@ export class Channel4 {
 
   static getNoiseChannelFrequencyPeriod(): u16 {
     // Get our divisor from the divisor code
-    let divisor: u16 = Channel4.getNoiseChannelDivisorFromDivisorCode()
+    let divisor: u16 = Channel4.getNoiseChannelDivisorFromDivisorCode();
     let clockShift: u8 = Channel4.getNoiseChannelClockShift();
     return (divisor << clockShift);
   }
