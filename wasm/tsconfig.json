@@ -1,26 +1,5 @@
 {
-  "compilerOptions": {
-    "alwaysStrict": true,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noEmitOnError": true,
-    "strictNullChecks": true,
-    "experimentalDecorators": true,
-    "target": "esnext",
-    "module": "commonjs",
-    "downlevelIteration": true,
-    "preserveConstEnums": true,
-    "noLib": true,
-    "types": [],
-    "rootDirs": [
-      "."
-    ],
-    "allowJs": true
-  },
-  "files": [
-    "./assembly.d.ts"
-  ],
+  "extends": "./node_modules/assemblyscript/std/assembly.json",
   "include": [
     "./**/*.ts"
   ]
