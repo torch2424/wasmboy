@@ -63,14 +63,19 @@ export function checkBitOnByte(bitPosition: u8, byte: u8): boolean {
 }
 
 namespace env {
-  export declare function log(message: string, numArgs: i32, arg0: i32, arg1: i32, arg2: i32, arg3: i32, arg4: i32, arg5: i32): void;
-  export declare function hexLog(numArgs: i32, arg0: i32, arg1: i32, arg2: i32, arg3: i32, arg4: i32, arg5: i32): void;
+  export declare function log(message: string, arg0: i32, arg1: i32, arg2: i32, arg3: i32, arg4: i32, arg5: i32): void;
+  export declare function hexLog(arg0: i32, arg1: i32, arg2: i32, arg3: i32, arg4: i32, arg5: i32): void;
+  export declare function performanceTimestamp(id: i32, value: i32): void;
 }
 
-export function log(message: string, numArgs: i32 = 0, arg0: i32 = 0, arg1: i32 = 0, arg2: i32 = 0, arg3: i32 = 0, arg4: i32 = 0, arg5: i32 = 0): void {
-  env.log(message, numArgs, arg0, arg1, arg2, arg3, arg4, arg5);
+export function log(message: string, arg0: i32 = 0, arg1: i32 = 0, arg2: i32 = 0, arg3: i32 = 0, arg4: i32 = 0, arg5: i32 = 0): void {
+  env.log(message, arg0, arg1, arg2, arg3, arg4, arg5);
 }
 
-export function hexLog(numArgs: i32 = 0, arg0: i32 = 0, arg1: i32 = 0, arg2: i32 = 0, arg3: i32 = 0, arg4: i32 = 0, arg5: i32 = 0): void {
-  env.hexLog(numArgs, arg0, arg1, arg2, arg3, arg4, arg5);
+export function hexLog(arg0: i32 = 0, arg1: i32 = 0, arg2: i32 = 0, arg3: i32 = 0, arg4: i32 = 0, arg5: i32 = 0): void {
+  env.hexLog(arg0, arg1, arg2, arg3, arg4, arg5);
+}
+
+export function performanceTimestamp(id: i32 = 0, value: i32 = 0): void {
+  env.performanceTimestamp(id, value);
 }

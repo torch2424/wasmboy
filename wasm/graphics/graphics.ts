@@ -27,7 +27,8 @@ import {
 import {
   checkBitOnByte,
   setBitOnByte,
-  resetBitOnByte
+  resetBitOnByte,
+  performanceTimestamp
 } from '../helpers/index';
 
 export class Graphics {

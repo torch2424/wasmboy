@@ -6,7 +6,8 @@ import {
   getWasmBoyOffsetFromGameBoyOffset
 } from './memoryMap';
 import {
-  concatenateBytes
+  concatenateBytes,
+  performanceTimestamp
 } from '../helpers/index';
 
 export function eightBitLoadFromGBMemory(offset: u16): u8 {

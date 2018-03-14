@@ -32,6 +32,7 @@ import {
 import {
   log,
   hexLog,
+  performanceTimestamp,
   rotateByteLeft,
   rotateByteLeftThroughCarry,
   rotateByteRight,
@@ -89,10 +90,12 @@ export function update(): i32 {
     // Render a frame
     // Reset our currentCycles
     Cpu.currentCycles = 0;
+
     return 1;
   } else if (Sound.audioQueueIndex >= Sound.MAX_NUMBER_OF_SAMPLES) {
     // Play audio samples
     // JS will reset queue once it grabs the samples
+
     return 2;
   }
 
@@ -111,6 +114,7 @@ export function emulationStep(): i8 {
   let opcode: u8 = 0;
 
   // Cpu Halting best explained: https://www.reddit.com/r/EmuDev/comments/5ie3k7/infinite_loop_trying_to_pass_blarggs_interrupt/db7xnbe/
+  performanceTimestamp(0);
   if(!Cpu.isHalted && !Cpu.isStopped) {
     opcode = eightBitLoadFromGBMemory(Cpu.programCounter);
     let dataByteOne: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 1);
@@ -140,20 +144,29 @@ export function emulationStep(): i8 {
       Cpu.programCounter -= 1;
     }
   }
+  performanceTimestamp(0);
 
   // blarggFixes, don't allow register F to have the bottom nibble
   Cpu.registerF = Cpu.registerF & 0xF0;
 
   // Check other Gameboy components
+  performanceTimestamp(1);
   updateTimers(<u8>numberOfCycles);
+  performanceTimestamp(1);
   if(!Cpu.isStopped) {
+    performanceTimestamp(2);
     updateGraphics(<u8>numberOfCycles);
+    performanceTimestamp(2);
   }
   // Update Sound
+  performanceTimestamp(3);
   updateSound(<u8>numberOfCycles);
+  performanceTimestamp(3);
   // Interrupt Handling requires 20 cycles
   // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
+  performanceTimestamp(4);
   numberOfCycles += checkInterrupts();
+  performanceTimestamp(4);
 
   if(numberOfCycles <= 0) {
     log("Opcode at crash: $0", 1, opcode);

@@ -37,7 +37,8 @@ import {
   storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
 import {
-  hexLog
+  hexLog,
+  performanceTimestamp
 } from '../helpers/index';
 
 export class Sound {
