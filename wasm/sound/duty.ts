@@ -22,17 +22,18 @@ export function isDutyCycleClockPositiveOrNegativeForWaveform(channelNumber: i32
   // Get our Wave Form According to the Duty
   // Default to a duty of 1
   // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
-  if (duty === 0x01) {
-    // 1000 0001
-    return checkBitOnByte(waveFormPositionOnDuty, 0x81);
-  } else if (duty === 0x02) {
-    // 1000 0111
-    return checkBitOnByte(waveFormPositionOnDuty, 0x87);
-  } else if (duty === 0x03) {
-    // 0111 1110
-    return checkBitOnByte(waveFormPositionOnDuty, 0x7E);
-  } else {
-    // 0000 0001
-    return checkBitOnByte(waveFormPositionOnDuty, 0x01);
+  switch(getChannelDuty(channelNumber)) {
+    case 0x01:
+      // 1000 0001
+      return checkBitOnByte(waveFormPositionOnDuty, 0x81);
+    case 0x02:
+      // 1000 0111
+      return checkBitOnByte(waveFormPositionOnDuty, 0x87);
+    case 0x03:
+      // 0111 1110
+      return checkBitOnByte(waveFormPositionOnDuty, 0x7E);
+    default:
+      // 0000 0001
+      return checkBitOnByte(waveFormPositionOnDuty, 0x01);
   }
 }

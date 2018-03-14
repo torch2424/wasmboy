@@ -149,11 +149,11 @@ export function emulationStep(): i8 {
   if(!Cpu.isStopped) {
     updateGraphics(<u8>numberOfCycles);
   }
+  // Update Sound
+  updateSound(<u8>numberOfCycles);
   // Interrupt Handling requires 20 cycles
   // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
   numberOfCycles += checkInterrupts();
-  // Update Sound
-  updateSound(<u8>numberOfCycles);
 
   if(numberOfCycles <= 0) {
     log("Opcode at crash: $0", 1, opcode);
@@ -166,10 +166,7 @@ export function emulationStep(): i8 {
 // this is to get out of switch statements, and not have the dangling break; per javascript syntax
 // And allow repeated variable names, for when we are concatenating registers
 function isOpcode(opcode: u8, value: u8): boolean {
-  if(opcode === value) {
-    return true;
-  }
-  return false;
+  return opcode === value;
 }
 
 // Take in any opcode, and decode it, and return the number of cycles
@@ -198,6 +195,8 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
   let opcodeHighNibble = (opcode & 0xF0);
   opcodeHighNibble = opcodeHighNibble >> 4;
 
+  // Not using a switch statement to avoid cannot redeclare this variable errors
+  // And it would be a ton of work :p
 
   // Opcodes 0x00 - 0x0F
   if(opcodeHighNibble === 0x00) {

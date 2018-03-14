@@ -42,16 +42,20 @@ export function setChannelLengthCounter(channelNumber: i32): void {
   }
 
   // Set the Channel Length Counter
-  if (channelNumber === Channel1.channelNumber) {
-    Channel1.lengthCounter = result;
-  } else if (channelNumber === Channel2.channelNumber) {
-    Channel2.lengthCounter = result;
-  } else if (channelNumber === Channel3.channelNumber) {
-    Channel3.lengthCounter = result;
-  } else if (channelNumber === Channel4.channelNumber) {
-    Channel4.lengthCounter = result;
+  switch(channelNumber) {
+    case Channel1.channelNumber:
+      Channel1.lengthCounter = result;
+      break;
+    case Channel2.channelNumber:
+      Channel2.lengthCounter = result;
+      break;
+    case Channel3.channelNumber:
+      Channel3.lengthCounter = result;
+      break;
+    case Channel4.channelNumber:
+      Channel4.lengthCounter = result;
+      break;
   }
-
 }
 
 export function isChannelLengthEnabled(channelNumber: i32): boolean {

@@ -111,19 +111,21 @@ function _getCurrentCycleCounterFrequency(): i32 {
 
   // Returns value equivalent to
   // Cpu.CLOCK_SPEED / timc frequency
-  let cycleCount: i32 = 0;
-  if(timc === 0x00) {
-    // TIMC -> 4096
-    cycleCount = 1024;
-  } else if (timc === 0x01) {
-    // TIMC -> 262144
-    cycleCount = 16;
-  } else if (timc === 0x02) {
-    // TIMC -> 65536
-    cycleCount = 64;
-  } else {
-    // TIMC -> 16382
-    cycleCount = 256
+  // TIMC -> 16382
+  let cycleCount: i32 = 256;
+  switch(timc) {
+    case 0x00:
+      // TIMC -> 4096
+      cycleCount = 1024;
+      break;
+    case 0x01:
+      // TIMC -> 262144
+      cycleCount = 16;
+      break;
+    case 0x02:
+      // TIMC -> 65536
+      cycleCount = 64;
+      break;
   }
 
   // If we notice the current max cycle count changes, reset the cyclecounter

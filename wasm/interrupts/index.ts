@@ -63,16 +63,19 @@ function _handleInterrupt(bitPosition: u8): void {
 
   // Jump to the correct interrupt location
   // http://www.codeslinger.co.uk/pages/projects/gameboy/interupts.html
-  if (bitPosition === Interrupts.bitPositionVBlankInterrupt) {
-    Cpu.programCounter = 0x40;
-  } else if(bitPosition === Interrupts.bitPositionLcdInterrupt) {
-    //hexLog(2, 1, 6);
-    Cpu.programCounter = 0x48;
-  } else if(bitPosition === Interrupts.bitPositionTimerInterrupt) {
-    Cpu.programCounter = 0x50;
-  } else if(bitPosition === Interrupts.bitPositionJoypadInterrupt) {
-    // JoyPad
-    Cpu.programCounter = 0x60;
+  switch(bitPosition) {
+    case Interrupts.bitPositionVBlankInterrupt:
+      Cpu.programCounter = 0x40;
+      break;
+    case Interrupts.bitPositionLcdInterrupt:
+      Cpu.programCounter = 0x48;
+      break;
+    case Interrupts.bitPositionTimerInterrupt:
+      Cpu.programCounter = 0x50;
+      break;
+    case Interrupts.bitPositionJoypadInterrupt:
+      Cpu.programCounter = 0x60;
+      break;
   }
 
   // If the CPU was halted, now is the time to un-halt
