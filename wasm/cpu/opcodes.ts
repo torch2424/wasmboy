@@ -228,179 +228,164 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
 }
 
 function handleOpcode0x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenatedDataByte: u16): i8 {
-  if(opcode === 0x00) {
+  switch(opcode) {
+    case 0x00:
+      // NOP
+      // 1  4
+      // No Operation
+      return 4;
+    case 0x01:
+      // LD BC,d16
+      // 3  12
 
-    // NOP
-    // 1  4
-    // No Operation
-    return 4;
-  } else if(opcode === 0x01) {
-
-    // LD BC,d16
-    // 3  12
-
-    Cpu.registerB = splitHighByte(concatenatedDataByte);
-    Cpu.registerC = splitLowByte(concatenatedDataByte);
-    Cpu.programCounter += 2;
-    return 12;
-  } else if(opcode === 0x02) {
-
-    // LD (BC),A
-    // 1  8
-    // () means load into address pointed by BC
-    let registerBC: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC)
-    eightBitStoreIntoGBMemory(registerBC, Cpu.registerA);
-    return 8;
-  } else if(opcode === 0x03) {
-
-    // INC BC
-    // 1  8
-    let registerBC: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC);
-    registerBC++;
-    Cpu.registerB = splitHighByte((<u16>registerBC));
-    Cpu.registerC = splitLowByte((<u16>registerBC));
-    return 8;
-  } else if(opcode === 0x04) {
-
-    // INC B
-    // 1  4
-    // Z 0 H -
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerB, 1);
-    Cpu.registerB += 1;
-    if (Cpu.registerB === 0) {
-      setZeroFlag(1);
-    } else {
+      Cpu.registerB = splitHighByte(concatenatedDataByte);
+      Cpu.registerC = splitLowByte(concatenatedDataByte);
+      Cpu.programCounter += 2;
+      return 12;
+    case 0x02:
+      // LD (BC),A
+      // 1  8
+      // () means load into address pointed by BC
+      let registerBC1: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC)
+      eightBitStoreIntoGBMemory(registerBC1, Cpu.registerA);
+      return 8;
+    case 0x03:
+      // INC BC
+      // 1  8
+      let registerBC2: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC);
+      registerBC2++;
+      Cpu.registerB = splitHighByte((<u16>registerBC2));
+      Cpu.registerC = splitLowByte((<u16>registerBC2));
+      return 8;
+    case 0x04:
+      // INC B
+      // 1  4
+      // Z 0 H -
+      checkAndSetEightBitHalfCarryFlag(Cpu.registerB, 1);
+      Cpu.registerB += 1;
+      if (Cpu.registerB === 0) {
+        setZeroFlag(1);
+      } else {
+        setZeroFlag(0);
+      }
+      setSubtractFlag(0);
+      return 4;
+    case 0x05:
+      // DEC B
+      // 1  4
+      // Z 1 H -
+      checkAndSetEightBitHalfCarryFlag(Cpu.registerB, -1);
+      Cpu.registerB -= 1;
+      if (Cpu.registerB === 0) {
+        setZeroFlag(1);
+      } else {
+        setZeroFlag(0);
+      }
+      setSubtractFlag(1);
+      return 4;
+    case 0x06:
+      // LD B,d8
+      // 2  8
+      Cpu.registerB = dataByteOne;
+      Cpu.programCounter += 1;
+      return 8;
+    case 0x07:
+      // RLCA
+      // 1  4
+      // 0 0 0 C
+      // Check for the carry
+      if((Cpu.registerA & 0x80) === 0x80) {
+        setCarryFlag(1);
+      } else {
+        setCarryFlag(0);
+      }
+      Cpu.registerA = rotateByteLeft(Cpu.registerA);
+      // Set all other flags to zero
       setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    return 4;
-  } else if(opcode === 0x05) {
-
-    // DEC B
-    // 1  4
-    // Z 1 H -
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerB, -1);
-    Cpu.registerB -= 1;
-    if (Cpu.registerB === 0) {
-      setZeroFlag(1);
-    } else {
+      setSubtractFlag(0);
+      setHalfCarryFlag(0);
+      return 4;
+    case 0x08:
+      // LD (a16),SP
+      // 3  20
+      // Load the stack pointer into the 16 bit address represented by the two data bytes
+      sixteenBitStoreIntoGBMemory(concatenatedDataByte, Cpu.stackPointer);
+      Cpu.programCounter += 2;
+      return 20;
+    case 0x09:
+      // ADD HL,BC
+      // 1 8
+      // - 0 H C
+      let registerHL: u16 = concatenateBytes(Cpu.registerH, Cpu.registerL);
+      let registerBC3: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC);
+      checkAndSetSixteenBitFlagsAddOverflow(<u16>registerHL, <u16>registerBC3, false);
+      let result: u16 = <u16>(registerHL + registerBC3);
+      Cpu.registerH = splitHighByte(<u16>result);
+      Cpu.registerL = splitLowByte(<u16>result);
+      setSubtractFlag(0);
+      return 8;
+    case 0x0A:
+      // LD A,(BC)
+      // 1 8
+      let registerBC4: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC)
+      Cpu.registerA = eightBitLoadFromGBMemory(registerBC4);
+      return 8;
+    case 0x0B:
+      // DEC BC
+      // 1  8
+      let registerBC5: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC);
+      registerBC5 -= 1;
+      Cpu.registerB = splitHighByte(registerBC5);
+      Cpu.registerC = splitLowByte(registerBC5);
+      return 8;
+    case 0x0C:
+      // INC C
+      // 1  4
+      // Z 0 H -
+      checkAndSetEightBitHalfCarryFlag(Cpu.registerC, 1);
+      Cpu.registerC += 1;
+      if (Cpu.registerC === 0) {
+        setZeroFlag(1);
+      } else {
+        setZeroFlag(0);
+      }
+      setSubtractFlag(0);
+      return 4;
+    case 0x0D:
+      // DEC C
+      // 1  4
+      // Z 1 H -
+      checkAndSetEightBitHalfCarryFlag(Cpu.registerC, -1);
+      Cpu.registerC -= 1;
+      if (Cpu.registerC === 0) {
+        setZeroFlag(1);
+      } else {
+        setZeroFlag(0);
+      }
+      setSubtractFlag(1);
+      return 4;
+    case 0x0E:
+      // LD C,d8
+      // 2 8
+      Cpu.registerC = dataByteOne;
+      Cpu.programCounter += 1;
+      return 8;
+    case 0x0F:
+      // RRCA
+      // 1 4
+      // 0 0 0 C
+      // Check for the last bit, to see if it will be carried
+      if ((Cpu.registerA & 0x01) > 0) {
+        setCarryFlag(1);
+      } else {
+        setCarryFlag(0);
+      }
+      Cpu.registerA = rotateByteRight(Cpu.registerA);
+      // Set all other flags to zero
       setZeroFlag(0);
-    }
-    setSubtractFlag(1);
-    return 4;
-  } else if(opcode === 0x06) {
-
-    // LD B,d8
-    // 2  8
-    Cpu.registerB = dataByteOne;
-    Cpu.programCounter += 1;
-    return 8;
-  } else if(opcode === 0x07) {
-
-    // RLCA
-    // 1  4
-    // 0 0 0 C
-    // Check for the carry
-    if((Cpu.registerA & 0x80) === 0x80) {
-      setCarryFlag(1);
-    } else {
-      setCarryFlag(0);
-    }
-    Cpu.registerA = rotateByteLeft(Cpu.registerA);
-    // Set all other flags to zero
-    setZeroFlag(0);
-    setSubtractFlag(0);
-    setHalfCarryFlag(0);
-    return 4;
-  } else if(opcode === 0x08) {
-
-    // LD (a16),SP
-    // 3  20
-    // Load the stack pointer into the 16 bit address represented by the two data bytes
-    sixteenBitStoreIntoGBMemory(concatenatedDataByte, Cpu.stackPointer);
-    Cpu.programCounter += 2;
-    return 20;
-  } else if(opcode === 0x09) {
-
-    // ADD HL,BC
-    // 1 8
-    // - 0 H C
-    let registerHL: u16 = concatenateBytes(Cpu.registerH, Cpu.registerL);
-    let registerBC: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC);
-    checkAndSetSixteenBitFlagsAddOverflow(<u16>registerHL, <u16>registerBC, false);
-    let result: u16 = <u16>(registerHL + registerBC);
-    Cpu.registerH = splitHighByte(<u16>result);
-    Cpu.registerL = splitLowByte(<u16>result);
-    setSubtractFlag(0);
-    return 8;
-  } else if(opcode === 0x0A) {
-
-    // LD A,(BC)
-    // 1 8
-    let registerBC: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC)
-    Cpu.registerA = eightBitLoadFromGBMemory(registerBC);
-    return 8;
-  } else if(opcode === 0x0B) {
-
-    // DEC BC
-    // 1  8
-    let registerBC = concatenateBytes(Cpu.registerB, Cpu.registerC);
-    registerBC -= 1;
-    Cpu.registerB = splitHighByte(registerBC);
-    Cpu.registerC = splitLowByte(registerBC);
-    return 8;
-  } else if(opcode === 0x0C) {
-
-    // INC C
-    // 1  4
-    // Z 0 H -
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerC, 1);
-    Cpu.registerC += 1;
-    if (Cpu.registerC === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(0);
-    return 4;
-  } else if(opcode === 0x0D) {
-
-    // DEC C
-    // 1  4
-    // Z 1 H -
-    checkAndSetEightBitHalfCarryFlag(Cpu.registerC, -1);
-    Cpu.registerC -= 1;
-    if (Cpu.registerC === 0) {
-      setZeroFlag(1);
-    } else {
-      setZeroFlag(0);
-    }
-    setSubtractFlag(1);
-    return 4;
-  } else if(opcode === 0x0E) {
-
-    // LD C,d8
-    // 2 8
-    Cpu.registerC = dataByteOne;
-    Cpu.programCounter += 1;
-    return 8;
-  } else if(opcode === 0x0F) {
-
-    // RRCA
-    // 1 4
-    // 0 0 0 C
-    // Check for the last bit, to see if it will be carried
-    if ((Cpu.registerA & 0x01) > 0) {
-      setCarryFlag(1);
-    } else {
-      setCarryFlag(0);
-    }
-    Cpu.registerA = rotateByteRight(Cpu.registerA);
-    // Set all other flags to zero
-    setZeroFlag(0);
-    setSubtractFlag(0);
-    setHalfCarryFlag(0);
-    return 4;
+      setSubtractFlag(0);
+      setHalfCarryFlag(0);
+      return 4;
   }
   return -1;
 }
