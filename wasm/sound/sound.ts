@@ -218,34 +218,51 @@ export function updateSound(numberOfCycles: u8): void {
     let leftChannelSample: i32 = 0;
     let rightChannelSample: i32 = 0;
 
-    // Find the channel for the left volume
+    // Find the sample for the left if enabled
+    // other wise add silence (15) for the channel
     if (isChannelEnabledOnLeftOutput(channel1ChannelNumber)) {
       leftChannelSample += channel1Sample;
+    } else {
+      leftChannelSample += 15;
     }
     if (isChannelEnabledOnLeftOutput(channel2ChannelNumber)) {
       leftChannelSample += channel2Sample;
+    } else {
+      leftChannelSample += 15;
     }
     if (isChannelEnabledOnLeftOutput(channel3ChannelNumber)) {
       leftChannelSample += channel3Sample;
+    } else {
+      leftChannelSample += 15;
     }
     if (isChannelEnabledOnLeftOutput(channel4ChannelNumber)) {
       leftChannelSample += channel4Sample;
+    } else {
+      leftChannelSample += 15;
     }
 
 
-    // Find the channel for the right volume
-    // TODO: Other Channels
+    // Find the sample for the right if enabled
+    // other wise add silence (15) for the channel
     if (isChannelEnabledOnRightOutput(channel1ChannelNumber)) {
       rightChannelSample += channel1Sample;
+    } else {
+      rightChannelSample += 15;
     }
     if (isChannelEnabledOnRightOutput(channel2ChannelNumber)) {
       rightChannelSample += channel2Sample;
+    } else {
+      rightChannelSample += 15;
     }
     if (isChannelEnabledOnRightOutput(channel3ChannelNumber)) {
       rightChannelSample += channel3Sample;
+    } else {
+      rightChannelSample += 15;
     }
     if (isChannelEnabledOnRightOutput(channel4ChannelNumber)) {
       rightChannelSample += channel4Sample;
+    } else {
+      rightChannelSample += 15;
     }
 
     // Finally multiply our volumes by the mixer volume
