@@ -77,5 +77,5 @@ export function hexLog(arg0: i32 = 0, arg1: i32 = 0, arg2: i32 = 0, arg3: i32 = 
 }
 
 export function performanceTimestamp(id: i32 = 0, value: i32 = 0): void {
-  env.performanceTimestamp(id, value);
+  //env.performanceTimestamp(id, value);
 }
