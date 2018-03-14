@@ -149,6 +149,8 @@ export class Channel1 {
       return 15;
     }
 
+    //hexLog(3, Channel1.volume);
+
     // Get the current sampleValue
     let sample: i32 = 1;
     if (!isDutyCycleClockPositiveOrNegativeForWaveform(1, Channel1.waveFormPositionOnDuty)) {

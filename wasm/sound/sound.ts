@@ -269,16 +269,13 @@ export function updateSound(numberOfCycles: u8): void {
     // Mixer volume can be at most 7 + 1
     // Can be at most 7, because we only have 3 bits, 111 = 7
     // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Mixer
-    leftChannelSample = leftChannelSample * (leftMixerVolume + 1);
-    rightChannelSample = rightChannelSample * (rightMixerVolume + 1);
+    //leftChannelSample = leftChannelSample * (leftMixerVolume + 1);
+    //rightChannelSample = rightChannelSample * (rightMixerVolume + 1);
 
     // Convert our samples from unsigned 32 to unsigned byte
     // Reason being, We want to be able to pass in wasm memory as usigned byte. Javascript will handle the conversion back
-    let leftChannelSampleUnsignedByte: u8 = getSampleAsUnsignedByte(leftChannelSample);
-    let rightChannelSampleUnsignedByte: u8 = getSampleAsUnsignedByte(rightChannelSample);
-    // TODO: Remove this channel isolation debug code, original code above
-    //let leftChannelSampleUnsignedByte: u8 = getSampleAsUnsignedByteForSingleChannel(channel4Sample);
-    //let rightChannelSampleUnsignedByte: u8 = getSampleAsUnsignedByteForSingleChannel(channel4Sample);
+    let leftChannelSampleUnsignedByte: u8 = getSampleAsUnsignedByte(leftChannelSample, (leftMixerVolume + 1));
+    let rightChannelSampleUnsignedByte: u8 = getSampleAsUnsignedByte(rightChannelSample, (rightMixerVolume + 1));
 
     // Set our volumes in memory
     // +1 so it can not be zero
@@ -304,18 +301,36 @@ export function resetAudioQueue(): void {
   Sound.audioQueueIndex = 0;
 }
 
-function getSampleAsUnsignedByte(sample: i32): u8 {
-  // With Four Channels (0 to 30) and no global volume. Max is 120
-  // Max mixer volume is 8. so 120 * 8 = 960
-  // goal is 254 (see blurb at top). 960 / 254 = 3.779527559055118
-  // so, 960 * 1000 / 3779 should give approximate answer
-  return <u8>(sample * 1000 / 3779);
-}
+function getSampleAsUnsignedByte(sample: i32, mixerVolume: i32): u8 {
 
-function getSampleAsUnsignedByteForSingleChannel(sample: i32): u8 {
-  // With One Channels (0 to 30) and no global volume. Max is 30
-  // Max mixer volume is 8. so 30 * 8 = 240
-  // goal is 254 (see blurb at top). 240 / 254 = 0.9448818897637795
-  // so, 240 * 1000 / 944 should give approximate answer
-  return <u8>(sample * 1000 / 944);
+  // If the sample is silence, return silence as unsigned byte
+  // Silence is common, and should be checked for performance
+  if(sample === 60) {
+    return 127;
+  }
+
+  // convert to a signed, precise scale of -6000 to 6000 (cheap way of -1.0 to 1.0)
+  // Multiply by the mixer volume fraction (to find the actual volume)
+  let precision: i32 = 100000;
+  let convertedSample: i32 = sample - 60;
+  convertedSample = convertedSample * precision;
+
+  // Multiply by the mixer volume fraction (to find the actual volume)
+  convertedSample = convertedSample * mixerVolume / 8;
+
+  // Convert back to scale of 0 to 120
+  convertedSample = convertedSample / precision;
+  convertedSample = convertedSample + 60;
+
+  // Finally, convert to an unsigned byte scale
+  // With Four Channels (0 to 30) and no global volume. Max is 120
+  // max unsigned byte goal is 254 (see blurb at top).
+  // 120 / 254 should give the correct conversion
+  // For example, 120 / 254 = 0.47244094488188976
+  // Multiply by 1000 to increase the float into an int
+  // so, 120 * 1000 / (0.47244094488188976 * 1000) should give approximate answer for max mixer volume
+  let maxDivider: i32 = (120 * precision) / 254;
+  convertedSample = (convertedSample * precision) / maxDivider;
+
+  return <u8>(convertedSample);
 }
