@@ -78,7 +78,6 @@ export function update(): i32 {
       Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME &&
       Sound.audioQueueIndex < Sound.MAX_NUMBER_OF_SAMPLES) {
     numberOfCycles = emulationStep();
-    Cpu.currentCycles += numberOfCycles;
     if (numberOfCycles >= 0) {
       Cpu.currentCycles += numberOfCycles;
     } else {
