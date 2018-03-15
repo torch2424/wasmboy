@@ -72,9 +72,10 @@ export class Sound {
   static frameSequencer: u8 = 0x00;
 
   // Our current sample number we are passing back to the wasmboy memory map
-  // Going to pass back 4096 samples and then reset
+  // Found that a static number of samples doesn't work well on mobile
+  // Will just update the queue index, grab as much as we can whenever we need more audio, then reset
   // NOTE: Giving a really large sample rate gives more latency, but less pops!
-  static readonly MAX_NUMBER_OF_SAMPLES: i32 = 4096;
+  //static readonly MAX_NUMBER_OF_SAMPLES: i32 = 4096;
   static audioQueueIndex: i32 = 0x0000;
 
   // Save States

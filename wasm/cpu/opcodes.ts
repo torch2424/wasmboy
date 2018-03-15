@@ -68,15 +68,13 @@ import {
 // Return values:
 // -1 = error
 // 1 = render a frame
-// 2 = play audio buffer
-// 3 = replace boot rom
+// 2 = replace boot rom
 export function update(): i32 {
 
   let error: boolean = false;
   let numberOfCycles: i8 = -1;
   while(!error &&
-      Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME &&
-      Sound.audioQueueIndex < Sound.MAX_NUMBER_OF_SAMPLES) {
+      Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME) {
     numberOfCycles = emulationStep();
     if (numberOfCycles >= 0) {
       Cpu.currentCycles += numberOfCycles;
@@ -92,14 +90,9 @@ export function update(): i32 {
     Cpu.currentCycles = 0;
 
     return 1;
-  } else if (Sound.audioQueueIndex >= Sound.MAX_NUMBER_OF_SAMPLES) {
-    // Play audio samples
-    // JS will reset queue once it grabs the samples
-
-    return 2;
   }
-
   // TODO: Boot ROM handling
+  
   // There was an error, return -1, and push the program counter back to grab the error opcode
   Cpu.programCounter -= 1;
   return -1;
