@@ -115,6 +115,7 @@ export function initializeSound(): void {
 
 // Function for updating sound
 export function updateSound(numberOfCycles: u8): void {
+
   // APU runs at 4194304 / 512
   // Or Cpu.clockSpeed / 512
   // Which means, we need to update once every 8192 cycles :)
@@ -125,41 +126,49 @@ export function updateSound(numberOfCycles: u8): void {
     Sound.frameSequenceCycleCounter -= Sound.maxFrameSequenceCycles;
 
     // Check our frame sequencer
-    // TODO: uncomment
     // https://gist.github.com/drhelius/3652407
-    if (Sound.frameSequencer === 0) {
-      // Update Length on Channels
-      Channel1.updateLength();
-      Channel2.updateLength();
-      Channel3.updateLength();
-      Channel4.updateLength();
-    } /* Do Nothing on one */ else if(Sound.frameSequencer === 2) {
-      // Update Sweep and Length on Channels
-      Channel1.updateLength();
-      Channel2.updateLength();
-      Channel3.updateLength();
-      Channel4.updateLength();
+    switch (Sound.frameSequencer) {
+      case 0:
+        // Update Length on Channels
+        Channel1.updateLength();
+        Channel2.updateLength();
+        Channel3.updateLength();
+        Channel4.updateLength();
+        break;
+      /* Do Nothing on one */
+      case 2:
+        // Update Sweep and Length on Channels
+        Channel1.updateLength();
+        Channel2.updateLength();
+        Channel3.updateLength();
+        Channel4.updateLength();
 
-      Channel1.updateSweep();
-    } /* Do Nothing on three */ else if(Sound.frameSequencer === 4) {
-      // Update Length on Channels
-      Channel1.updateLength();
-      Channel2.updateLength();
-      Channel3.updateLength();
-      Channel4.updateLength();
-    } /* Do Nothing on three */ else if(Sound.frameSequencer === 6) {
-      // Update Sweep and Length on Channels
-      Channel1.updateLength();
-      Channel2.updateLength();
-      Channel3.updateLength();
-      Channel4.updateLength();
+        Channel1.updateSweep();
+        break;
+      /* Do Nothing on three */
+      case 4:
+        // Update Length on Channels
+        Channel1.updateLength();
+        Channel2.updateLength();
+        Channel3.updateLength();
+        Channel4.updateLength();
+        break;
+      /* Do Nothing on five */
+      case 6:
+        // Update Sweep and Length on Channels
+        Channel1.updateLength();
+        Channel2.updateLength();
+        Channel3.updateLength();
+        Channel4.updateLength();
 
-      Channel1.updateSweep();
-    } else if(Sound.frameSequencer === 7) {
-      // Update Envelope on channels
-      Channel1.updateEnvelope();
-      Channel2.updateEnvelope();
-      Channel4.updateEnvelope();
+        Channel1.updateSweep();
+        break;
+      case 7:
+        // Update Envelope on channels
+        Channel1.updateEnvelope();
+        Channel2.updateEnvelope();
+        Channel4.updateEnvelope();
+        break;
     }
 
     // Update our frame sequencer

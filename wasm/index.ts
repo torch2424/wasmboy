@@ -27,6 +27,9 @@ import {
 import {
   eightBitLoadFromGBMemory
 } from './memory/index';
+import {
+  performanceTimestamp
+} from './helpers/index'
 
 // Public Exports
 export {

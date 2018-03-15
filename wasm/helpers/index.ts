@@ -7,8 +7,7 @@ import {
 // AF, BC, DE, HL
 export function concatenateBytes(highByte: u8, lowByte: u8): u16 {
   //https://stackoverflow.com/questions/38298412/convert-two-bytes-into-signed-16-bit-integer-in-javascript
-  let highByteExpanded: u16 = <u16>highByte;
-  return (((highByteExpanded & 0xFF) << 8) | (lowByte & 0xFF))
+  return (((<u16>highByte & 0xFF) << 8) | (lowByte & 0xFF))
 }
 
 export function splitHighByte(groupedByte: u16): u8 {
@@ -30,8 +29,7 @@ export function rotateByteLeft(value: u8): u8 {
 export function rotateByteLeftThroughCarry(value: u8): u8 {
   // Example: https://github.com/nakardo/node-gameboy/blob/master/lib/cpu/opcodes.js
   // Through carry meaning, instead of raotating the bit that gets dropped off, but the carry there instead
-  value = (value << 1) | getCarryFlag();
-  return value;
+  return (value << 1) | getCarryFlag();
 }
 
 export function rotateByteRight(value: u8): u8 {
@@ -44,8 +42,7 @@ export function rotateByteRight(value: u8): u8 {
 export function rotateByteRightThroughCarry(value: u8): u8 {
   // Example: https://github.com/nakardo/node-gameboy/blob/master/lib/cpu/opcodes.js
   // Through carry meaning, instead of raotating the bit that gets dropped off, put the carry there instead
-  value = (value >> 1) | (getCarryFlag() << 7);
-  return value;
+  return (value >> 1) | (getCarryFlag() << 7);
 }
 
 export function setBitOnByte(bitPosition: u8, byte: u8): u8 {

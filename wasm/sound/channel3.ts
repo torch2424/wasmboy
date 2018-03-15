@@ -151,17 +151,22 @@ export class Channel3 {
     // Shift our sample and set our volume depending on the volume code
     // Since we can't multiply by float, simply divide by 4, 2, 1
     // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Wave_Channel
-    if(volumeCode <= 0) {
-      sample = (sample >> 4);
-    } else if (volumeCode === 1) {
-      // Dont Shift sample
-      outputVolume = 1;
-    } else if (volumeCode === 2) {
-      sample = (sample >> 1)
-      outputVolume = 2;
-    } else {
-      sample = (sample >> 2)
-      outputVolume = 4;
+    switch(volumeCode) {
+      case 0:
+        sample = (sample >> 4);
+        break;
+      case 1:
+        // Dont Shift sample
+        outputVolume = 1;
+        break;
+      case 2:
+        sample = (sample >> 1)
+        outputVolume = 2;
+        break;
+      default:
+        sample = (sample >> 2)
+        outputVolume = 4;
+        break;
     }
 
     // Spply out output volume

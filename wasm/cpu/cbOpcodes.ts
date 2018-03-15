@@ -15,7 +15,8 @@ import {
   setBitOnRegister
 } from './instructions';
 import {
-  concatenateBytes
+  concatenateBytes,
+  performanceTimestamp
 } from '../helpers/index';
 import {
   eightBitStoreIntoGBMemory,

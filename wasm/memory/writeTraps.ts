@@ -20,7 +20,8 @@ import {
   sixteenBitLoadFromGBMemory
 } from './load';
 import {
-  checkBitOnByte
+  checkBitOnByte,
+  hexLog
 } from '../helpers/index';
 
 // Internal function to trap any modify data trying to be written to Gameboy memory
