@@ -14,9 +14,8 @@ export class WasmBoySystemControls extends Component {
         fps: props.wasmboy.getFps()
       });
       setTimeout(() => {
-        console.log(this.state.fps);
         fpsCounter();
-      }, 1000);
+      }, 500);
     }
     fpsCounter();
 	}
