@@ -76,7 +76,8 @@ export class Sound {
   // Will just update the queue index, grab as much as we can whenever we need more audio, then reset
   // NOTE: Giving a really large sample rate gives more latency, but less pops!
   //static readonly MAX_NUMBER_OF_SAMPLES: i32 = 4096;
-  static audioQueueIndex: i32 = 0x0000;
+  static audioQueueIndex: i32 = 0x0000
+  static wasmBoyMemoryMaxBufferSize: i32 = 0x20000;
 
   // Save States
   static readonly saveStateSlot: u16 = 6;
@@ -296,8 +297,8 @@ export function updateSound(numberOfCycles: u8): void {
     // Don't allow our audioQueueIndex to overflow into other parts of the wasmBoy memory map
     // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit#gid=0
     // Not 0xFFFF because we need half of 64kb since we store left and right channel
-    if(Sound.audioQueueIndex >= (0xFFFF / 2) - 1) {
-      resetAudioQueue();
+    if(Sound.audioQueueIndex >= (Sound.wasmBoyMemoryMaxBufferSize / 2) - 1) {
+      Sound.audioQueueIndex -= 1;
     }
   }
 }
