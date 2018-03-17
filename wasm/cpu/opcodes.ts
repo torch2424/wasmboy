@@ -78,6 +78,7 @@ export function update(): i32 {
     numberOfCycles = emulationStep();
     if (numberOfCycles >= 0) {
       Cpu.currentCycles += numberOfCycles;
+      Sound.currentCycles += numberOfCycles;
     } else {
       error = true;
     }
@@ -92,7 +93,7 @@ export function update(): i32 {
     return 1;
   }
   // TODO: Boot ROM handling
-  
+
   // There was an error, return -1, and push the program counter back to grab the error opcode
   Cpu.programCounter -= 1;
   return -1;
@@ -147,8 +148,10 @@ export function emulationStep(): i8 {
   if(!Cpu.isStopped) {
     updateGraphics(<u8>numberOfCycles);
   }
+
   // Update Sound
-  updateSound(<u8>numberOfCycles);
+  // Now Batch Processing Audio
+  // updateSound(<u8>numberOfCycles);
 
   // Interrupt Handling requires 20 cycles
   // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt

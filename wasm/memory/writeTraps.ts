@@ -5,8 +5,9 @@ import {
   Graphics
 } from '../graphics/graphics';
 import {
+  batchProcessAudio,
   handledWriteToSoundRegister
-} from '../sound/registers';
+} from '../sound/index';
 import {
   handleBanking
 } from './banking';
@@ -81,6 +82,17 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
 
   // Sound
   if(offset >= 0xFF10 && offset <= 0xFF26) {
+    batchProcessAudio();
+    if(handledWriteToSoundRegister(offset, value)) {
+      return false;
+    }
+  }
+
+  // FF27 - FF2F not used
+
+  // Final Wave Table for Channel 3
+  if(offset >= 0xFF10 && offset <= 0xFF26) {
+    batchProcessAudio();
     if(handledWriteToSoundRegister(offset, value)) {
       return false;
     }

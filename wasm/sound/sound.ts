@@ -43,6 +43,10 @@ import {
 
 export class Sound {
 
+  // Current cycles
+  // This will be used for batch audio processing
+  static currentCycles: i32 = 0;
+
   // Channel control / On-OFF / Volume (RW)
   static readonly memoryLocationNR50: u16 = 0xFF24;
 
@@ -113,6 +117,15 @@ export function initializeSound(): void {
   eightBitStoreIntoGBMemory(Sound.memoryLocationNR50, 0x77);
   eightBitStoreIntoGBMemory(Sound.memoryLocationNR51, 0xF3);
   eightBitStoreIntoGBMemory(Sound.memoryLocationNR52, 0xF1);
+}
+
+// Function to batch process our audio after we skipped so many cycles
+export function batchProcessAudio(): void {
+  // Simply keep passing 4 cycles at a time until we run out of cycles
+  while (Sound.currentCycles > 0) {
+    updateSound(4);
+    Sound.currentCycles = Sound.currentCycles - 4;
+  }
 }
 
 // Function for updating sound

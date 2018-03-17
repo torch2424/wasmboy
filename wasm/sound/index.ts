@@ -1,10 +1,15 @@
 export {
   initializeSound,
+  batchProcessAudio,
   updateSound,
   getAudioQueueIndex,
   resetAudioQueue,
   Sound
 } from './sound';
+
+export {
+  handledWriteToSoundRegister
+} from './registers';
 
 export {
   Channel1
