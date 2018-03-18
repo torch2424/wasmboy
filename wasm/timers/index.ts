@@ -54,6 +54,7 @@ export class Timers {
 }
 
 // Batch Process Timers
+// Only checked on writes
 // Function to batch process our Timers after we skipped so many cycles
 export function batchProcessTimers(): void {
 

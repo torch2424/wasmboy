@@ -154,6 +154,7 @@ export function emulationStep(): i8 {
   Cpu.registerF = Cpu.registerF & 0xF0;
 
   // Check other Gameboy components
+  
   // Now Batch Processing Graphics based on memory read/writes
   //updateTimers(numberOfCycles);
 
