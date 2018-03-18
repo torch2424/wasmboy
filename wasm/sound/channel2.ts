@@ -94,10 +94,10 @@ export class Channel2 {
     eightBitStoreIntoGBMemorySkipTraps(Channel2.memoryLocationNRx4, 0xBF);
   }
 
-  static getSample(numberOfCycles: u8): i32 {
+  static getSample(numberOfCycles: i32): i32 {
 
     // Decrement our channel timer
-    Channel2.frequencyTimer -= <i32>numberOfCycles;
+    Channel2.frequencyTimer -= numberOfCycles;
     if(Channel2.frequencyTimer <= 0) {
 
       // Get the amount that overflowed so we don't drop cycles

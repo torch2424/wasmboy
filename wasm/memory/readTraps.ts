@@ -2,7 +2,8 @@ import {
   Memory
 } from './memory';
 import {
-  Graphics
+  Graphics,
+  batchProcessGraphics
 } from '../graphics/graphics';
 import {
   batchProcessAudio
@@ -26,16 +27,22 @@ export function checkReadTraps(offset: u16): i32 {
     return -1;
   }
 
-  // Check the graphics mode to see if we can write to VRAM
+  // Batch Process Graphics
+  // http://gameboy.mongenel.com/dmg/asmmemmap.html and http://gbdev.gg8.se/wiki/articles/Video_Display
+  // and Check the graphics mode to see if we can read VRAM
   // http://gbdev.gg8.se/wiki/articles/Video_Display#Accessing_VRAM_and_OAM
   if(offset >= videoRamLocation && offset < Memory.cartridgeRamLocation) {
     // Can only read/write from VRAM During Modes 0 - 2
     // See graphics/lcd.ts
     if (Graphics.currentLcdMode > 2) {
       return 0xFF;
+    } else {
+      batchProcessGraphics();
     }
   }
 
+  // Batch Process Graphics
+  // http://gameboy.mongenel.com/dmg/asmmemmap.html and http://gbdev.gg8.se/wiki/articles/Video_Display
   // Also check for individal writes
   // Can only read/write from OAM During Modes 0 - 1
   // See graphics/lcd.ts
@@ -44,11 +51,18 @@ export function checkReadTraps(offset: u16): i32 {
     // See graphics/lcd.ts
     if (Graphics.currentLcdMode !== 2) {
       return 0xFF;
+    } else {
+      batchProcessGraphics();
     }
+  }
+
+  if(offset === Joypad.memoryLocationJoypadRegister) {
+    return getJoypadState();
   }
 
   // Sound
   // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
+  // TODO: Put these bounds on the Sound Class
   if(offset >= 0xFF10 && offset <= 0xFF26) {
     batchProcessAudio();
   }
@@ -58,8 +72,11 @@ export function checkReadTraps(offset: u16): i32 {
     batchProcessAudio();
   }
 
-  if(offset === Joypad.memoryLocationJoypadRegister) {
-    return getJoypadState();
+  // Batch Process Graphics
+  // http://gameboy.mongenel.com/dmg/asmmemmap.html and http://gbdev.gg8.se/wiki/articles/Video_Display
+  if (offset >= Graphics.memoryLocationLcdControl && offset <= Graphics.memoryLocationWindowX) {
+    // Do our batch processing
+    batchProcessGraphics();
   }
 
   return -1;

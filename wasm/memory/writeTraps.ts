@@ -2,7 +2,8 @@ import {
   Memory
 } from './memory';
 import {
-  Graphics
+  Graphics,
+  batchProcessGraphics
 } from '../graphics/graphics';
 import {
   batchProcessAudio,
@@ -39,14 +40,21 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
     return false;
   }
 
-  // Check the graphics mode to see if we can write to VRAM
+  // Batch Process Graphics
+  // http://gameboy.mongenel.com/dmg/asmmemmap.html and http://gbdev.gg8.se/wiki/articles/Video_Display
+  // And Check the graphics mode to see if we can write to VRAM
   // http://gbdev.gg8.se/wiki/articles/Video_Display#Accessing_VRAM_and_OAM
   if(offset >= videoRamLocation && offset < Memory.cartridgeRamLocation) {
     // Can only read/write from VRAM During Modes 0 - 2
     // See graphics/lcd.ts
     if (Graphics.currentLcdMode > 2) {
       return false;
+    } else {
+      batchProcessGraphics();
     }
+
+    // Allow the original write, and return since we dont need to look anymore
+    return true;
   }
 
   // Be sure to copy everything in EchoRam to Work Ram
@@ -57,6 +65,9 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
     } else {
       sixteenBitStoreIntoGBMemorySkipTraps(offset, value);
     }
+
+    // Allow the original write, and return since we dont need to look anymore
+    return true;
   }
 
   // Also check for individal writes
@@ -67,7 +78,12 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
     // See graphics/lcd.ts
     if (Graphics.currentLcdMode !== 2) {
       return false;
+    } else {
+      batchProcessGraphics();
     }
+
+    // Allow the original write, and return since we dont need to look anymore
+    return true;
   }
 
   if(offset >= Memory.unusableMemoryLocation && offset <= Memory.unusableMemoryEndLocation) {
@@ -94,18 +110,30 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
     batchProcessAudio();
   }
 
-  // reset the current scanline if the game tries to write to it
-  if (offset === 0xFF44) {
-    eightBitStoreIntoGBMemorySkipTraps(offset, 0);
-    return false;
-  }
+  // Batch Process Graphics
+  // http://gameboy.mongenel.com/dmg/asmmemmap.html and http://gbdev.gg8.se/wiki/articles/Video_Display
+  // And other Memory effects fomr read/write to GraphicsGraphics
+  if (offset >= Graphics.memoryLocationLcdControl && offset <= Graphics.memoryLocationWindowX) {
 
-  // Do the direct memory access transfer for spriteInformationTable
-  // Check the graphics mode to see if we can write to VRAM
-  // http://gbdev.gg8.se/wiki/articles/Video_Display#Accessing_VRAM_and_OAM
-  if (offset === 0xFF46) {
-    // otherwise, performa the DMA transfer
-    _dmaTransfer(<u8>value);
+    // Do our batch processing
+    batchProcessGraphics();
+
+    // reset the current scanline if the game tries to write to it
+    if (offset === Graphics.memoryLocationScanlineRegister) {
+      eightBitStoreIntoGBMemorySkipTraps(offset, 0);
+      return false;
+    }
+
+    // Do the direct memory access transfer for spriteInformationTable
+    // Check the graphics mode to see if we can write to VRAM
+    // http://gbdev.gg8.se/wiki/articles/Video_Display#Accessing_VRAM_and_OAM
+    if (offset === Graphics.memoryLocationDmaTransfer) {
+      // otherwise, performa the DMA transfer
+      _dmaTransfer(<u8>value);
+    }
+
+    // Allow the original write, and return since we dont need to look anymore
+    return true;
   }
 
   return true;

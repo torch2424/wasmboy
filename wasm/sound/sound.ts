@@ -53,7 +53,7 @@ export class Sound {
   // This number should be in sync so that sound doesn't run too many cyles at once
   // and does not exceed the minimum number of cyles for either down sampling, or
   // How often we change the frame, or a channel's update process
-  static batchProcessCycles: u8 = 87;
+  static batchProcessCycles: i32 = 87;
 
   // Channel control / On-OFF / Volume (RW)
   static readonly memoryLocationNR50: u16 = 0xFF24;
@@ -75,8 +75,8 @@ export class Sound {
   // Also need to downsample our audio to average audio qualty
   // https://www.reddit.com/r/EmuDev/comments/5gkwi5/gb_apu_sound_emulation/
   // Want to do 48000hz, so CpuRate / Sound Rate, 4194304 / 48000 ~ 87 cycles
-  static downSampleCycleCounter: u8 = 0x00;
-  static readonly maxDownSampleCycles: u8 = 87;
+  static downSampleCycleCounter: i32 = 0x00;
+  static readonly maxDownSampleCycles: i32 = 87;
 
   // Frame sequencer controls what should be updated and and ticked
   // Everyt time the sound is updated :) It is updated everytime the
@@ -141,12 +141,12 @@ export function batchProcessAudio(): void {
 }
 
 // Function for updating sound
-export function updateSound(numberOfCycles: u8): void {
+export function updateSound(numberOfCycles: i32): void {
 
   // APU runs at 4194304 / 512
   // Or Cpu.clockSpeed / 512
   // Which means, we need to update once every 8192 cycles :)
-  Sound.frameSequenceCycleCounter += <i32>numberOfCycles;
+  Sound.frameSequenceCycleCounter += numberOfCycles;
   if(Sound.frameSequenceCycleCounter >= Sound.maxFrameSequenceCycles) {
     // Reset the frameSequenceCycleCounter
     // Not setting to zero as we do not want to drop cycles

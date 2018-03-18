@@ -92,10 +92,10 @@ export class Channel4 {
     eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx4, 0xBF);
   }
 
-  static getSample(numberOfCycles: u8): i32 {
+  static getSample(numberOfCycles: i32): i32 {
 
     // Decrement our channel timer
-    Channel4.frequencyTimer -= <i32>numberOfCycles;
+    Channel4.frequencyTimer -= numberOfCycles;
 
     if(Channel4.frequencyTimer <= 0) {
 

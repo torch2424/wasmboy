@@ -57,7 +57,9 @@ import {
   areInterruptsPending
 } from '../interrupts/index';
 import {
-  updateGraphics
+  Graphics,
+  updateGraphics,
+  batchProcessGraphics
 } from '../graphics/index';
 import {
   Sound,
@@ -79,6 +81,10 @@ export function update(): i32 {
     if (numberOfCycles >= 0) {
       Cpu.currentCycles += numberOfCycles;
       Sound.currentCycles += numberOfCycles;
+      Graphics.currentCycles += numberOfCycles;
+      // Need to do this, since a lot of things depend on the scanline
+      // Batch processing will simply return if the number of cycles is too low
+      batchProcessGraphics();
     } else {
       error = true;
     }
@@ -146,12 +152,13 @@ export function emulationStep(): i8 {
   updateTimers(<u8>numberOfCycles);
 
   if(!Cpu.isStopped) {
-    updateGraphics(<u8>numberOfCycles);
-  }
+    // Now Batch Processing Graphics based on memory read/writes
+    // updateGraphics(<u8>numberOfCycles);
 
-  // Update Sound
-  // Now Batch Processing Audio
-  // updateSound(<u8>numberOfCycles);
+    // Update Sound
+    // Now Batch Processing Audio based on memory read/writes
+    // updateSound(<u8>numberOfCycles);
+  }
 
   // Interrupt Handling requires 20 cycles
   // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
