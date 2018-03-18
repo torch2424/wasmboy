@@ -4,7 +4,7 @@
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
 
 import {
-  eightBitLoadFromGBMemory,
+  eightBitLoadFromGBMemorySkipTraps,
   eightBitStoreIntoGBMemorySkipTraps,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,

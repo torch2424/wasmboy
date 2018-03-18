@@ -5,6 +5,9 @@ import {
   Graphics
 } from '../graphics/graphics';
 import {
+  batchProcessAudio
+} from '../sound/index';
+import {
   eightBitStoreIntoGBMemorySkipTraps
 } from './store';
 import {
@@ -42,6 +45,17 @@ export function checkReadTraps(offset: u16): i32 {
     if (Graphics.currentLcdMode !== 2) {
       return 0xFF;
     }
+  }
+
+  // Sound
+  // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
+  if(offset >= 0xFF10 && offset <= 0xFF26) {
+    batchProcessAudio();
+  }
+  // FF27 - FF2F not used
+  // Final Wave Table for Channel 3
+  if(offset >= 0xFF30 && offset <= 0xFF3F) {
+    batchProcessAudio();
   }
 
   if(offset === Joypad.memoryLocationJoypadRegister) {

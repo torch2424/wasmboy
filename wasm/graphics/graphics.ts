@@ -32,6 +32,17 @@ import {
 } from '../helpers/index';
 
 export class Graphics {
+
+  // Current cycles
+  // This will be used for batch processing
+  static currentCycles: i32 = 0;
+
+  // Number of cycles to run in each batch process
+  // This number should be in sync so that graphics doesn't run too many cyles at once
+  // and does not exceed the minimum number of cyles for either scanlines, or
+  // How often we change the frame, or a channel's update process
+  static batchProcessCycles: u8 = 87;
+
   // Count the number of cycles to keep synced with cpu cycles
   static scanlineCycleCounter: i32 = 0x00;
   static readonly MAX_CYCLES_PER_SCANLINE: i32 = 456;
@@ -92,6 +103,19 @@ export class Graphics {
   static loadState(): void {
     Graphics.scanlineCycleCounter = load<i32>(getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot));
     Graphics.currentLcdMode = load<u8>(getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot));
+  }
+}
+
+// Function to batch process our audio after we skipped so many cycles
+export function batchProcessGraphics(): void {
+
+  if (Graphics.currentCycles < Graphics.batchProcessCycles) {
+    return;
+  }
+
+  while (Graphics.currentCycles >= Graphics.batchProcessCycles) {
+    updateGraphics(Graphics.batchProcessCycles);
+    Graphics.currentCycles = Graphics.currentCycles - Graphics.batchProcessCycles;
   }
 }
 

@@ -81,21 +81,17 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
   }
 
   // Sound
+  // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
   if(offset >= 0xFF10 && offset <= 0xFF26) {
     batchProcessAudio();
     if(handledWriteToSoundRegister(offset, value)) {
       return false;
     }
   }
-
   // FF27 - FF2F not used
-
   // Final Wave Table for Channel 3
-  if(offset >= 0xFF10 && offset <= 0xFF26) {
+  if(offset >= 0xFF30 && offset <= 0xFF3F) {
     batchProcessAudio();
-    if(handledWriteToSoundRegister(offset, value)) {
-      return false;
-    }
   }
 
   // reset the current scanline if the game tries to write to it
@@ -109,7 +105,7 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
   // http://gbdev.gg8.se/wiki/articles/Video_Display#Accessing_VRAM_and_OAM
   if (offset === 0xFF46) {
     // otherwise, performa the DMA transfer
-    _dmaTransfer(<u8>value) ;
+    _dmaTransfer(<u8>value);
   }
 
   return true;

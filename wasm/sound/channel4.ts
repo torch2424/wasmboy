@@ -4,7 +4,7 @@
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Noise_Channel
 
 import {
-  eightBitLoadFromGBMemory,
+  eightBitLoadFromGBMemorySkipTraps,
   eightBitStoreIntoGBMemory,
   eightBitStoreIntoGBMemorySkipTraps,
   getSaveStateMemoryOffset,
@@ -192,21 +192,21 @@ export class Channel4 {
   }
 
   static getNoiseChannelClockShift(): u8 {
-    let registerNRx3: u8 = eightBitLoadFromGBMemory(Channel4.memoryLocationNRx3);
+    let registerNRx3: u8 = eightBitLoadFromGBMemorySkipTraps(Channel4.memoryLocationNRx3);
     // It is within the top 4 bits
     let clockShift = (registerNRx3 >> 4);
     return clockShift;
   }
 
   static isNoiseChannelWidthModeSet(): boolean {
-    let registerNRx3: u8 = eightBitLoadFromGBMemory(Channel4.memoryLocationNRx3);
+    let registerNRx3: u8 = eightBitLoadFromGBMemorySkipTraps(Channel4.memoryLocationNRx3);
     return checkBitOnByte(3, registerNRx3);
   }
 
   static getNoiseChannelDivisorFromDivisorCode(): u8 {
     // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Noise_Channel
     // Get our divisor code
-    let registerNRx3: u8 = eightBitLoadFromGBMemory(Channel4.memoryLocationNRx3);
+    let registerNRx3: u8 = eightBitLoadFromGBMemorySkipTraps(Channel4.memoryLocationNRx3);
     // Get the bottom 3 bits
     let divisorCode: u8 = registerNRx3 & 0x07;
     let divisor: u8 = 0;

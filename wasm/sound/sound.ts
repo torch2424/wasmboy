@@ -29,8 +29,8 @@ import {
   Cpu
 } from '../cpu/index';
 import {
-  eightBitLoadFromGBMemory,
-  eightBitStoreIntoGBMemory,
+  eightBitLoadFromGBMemorySkipTraps,
+  eightBitStoreIntoGBMemorySkipTraps,
   setLeftAndRightOutputForAudioQueue,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
@@ -44,8 +44,16 @@ import {
 export class Sound {
 
   // Current cycles
-  // This will be used for batch audio processing
+  // This will be used for batch processing
+  // https://github.com/binji/binjgb/commit/e028f45e805bc0b0aa4697224a209f9ae514c954
+  // TODO: May Also need to do this for Reads
   static currentCycles: i32 = 0;
+
+  // Number of cycles to run in each batch process
+  // This number should be in sync so that sound doesn't run too many cyles at once
+  // and does not exceed the minimum number of cyles for either down sampling, or
+  // How often we change the frame, or a channel's update process
+  static batchProcessCycles: u8 = 87;
 
   // Channel control / On-OFF / Volume (RW)
   static readonly memoryLocationNR50: u16 = 0xFF24;
@@ -114,17 +122,21 @@ export function initializeSound(): void {
   Channel4.initialize();
 
   // Other Sound Registers
-  eightBitStoreIntoGBMemory(Sound.memoryLocationNR50, 0x77);
-  eightBitStoreIntoGBMemory(Sound.memoryLocationNR51, 0xF3);
-  eightBitStoreIntoGBMemory(Sound.memoryLocationNR52, 0xF1);
+  eightBitStoreIntoGBMemorySkipTraps(Sound.memoryLocationNR50, 0x77);
+  eightBitStoreIntoGBMemorySkipTraps(Sound.memoryLocationNR51, 0xF3);
+  eightBitStoreIntoGBMemorySkipTraps(Sound.memoryLocationNR52, 0xF1);
 }
 
 // Function to batch process our audio after we skipped so many cycles
 export function batchProcessAudio(): void {
-  // Simply keep passing 4 cycles at a time until we run out of cycles
-  while (Sound.currentCycles > 0) {
-    updateSound(4);
-    Sound.currentCycles = Sound.currentCycles - 4;
+
+  if (Sound.currentCycles < Sound.batchProcessCycles) {
+    return;
+  }
+
+  while (Sound.currentCycles >= Sound.batchProcessCycles) {
+    updateSound(Sound.batchProcessCycles);
+    Sound.currentCycles = Sound.currentCycles - Sound.batchProcessCycles;
   }
 }
 
@@ -224,7 +236,7 @@ export function updateSound(numberOfCycles: u8): void {
     // TODO: Vin Mixing
 
     // Simply get the left/right volume, add up the values, and put into memory!
-    let registerNR50 = eightBitLoadFromGBMemory(Sound.memoryLocationNR50);
+    let registerNR50 = eightBitLoadFromGBMemorySkipTraps(Sound.memoryLocationNR50);
     // Want bits 6-4
     let leftMixerVolume: i32 = (registerNR50 >> 4);
     leftMixerVolume = leftMixerVolume & 0x07;

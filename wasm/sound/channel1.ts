@@ -5,8 +5,7 @@
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Frequency_Sweep
 
 import {
-  eightBitLoadFromGBMemory,
-  eightBitStoreIntoGBMemory,
+  eightBitLoadFromGBMemorySkipTraps,
   eightBitStoreIntoGBMemorySkipTraps,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
@@ -263,7 +262,7 @@ export class Channel1 {
 // Sweep Specific functions
 
 function getSweepPeriod(): u8 {
-  let sweepRegister: u8 = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx0);
+  let sweepRegister: u8 = eightBitLoadFromGBMemorySkipTraps(Channel1.memoryLocationNRx0);
   // Get bits 4-6
   let sweepPeriod: u8 = sweepRegister & 0x70;
   sweepPeriod = (sweepPeriod >> 4);
@@ -271,7 +270,7 @@ function getSweepPeriod(): u8 {
 }
 
 function getSweepShift(): u8 {
-  let sweepRegister: u8 = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx0);
+  let sweepRegister: u8 = eightBitLoadFromGBMemorySkipTraps(Channel1.memoryLocationNRx0);
   // Get bits 0-2
   let sweepShift: u8 = sweepRegister & 0x07;
 
@@ -309,7 +308,7 @@ function getNewFrequencyFromSweep(): u16 {
   newFrequency = (newFrequency >> getSweepShift());
 
   // Check for sweep negation
-  let sweepRegister: u8 = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx0);
+  let sweepRegister: u8 = eightBitLoadFromGBMemorySkipTraps(Channel1.memoryLocationNRx0);
   if (checkBitOnByte(3, sweepRegister)) {
     newFrequency = Channel1.sweepShadowFrequency - newFrequency;
   } else {
