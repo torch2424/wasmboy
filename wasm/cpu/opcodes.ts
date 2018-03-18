@@ -82,6 +82,7 @@ export function update(): i32 {
       Cpu.currentCycles += numberOfCycles;
       Sound.currentCycles += numberOfCycles;
       Graphics.currentCycles += numberOfCycles;
+      
       // Need to do this, since a lot of things depend on the scanline
       // Batch processing will simply return if the number of cycles is too low
       batchProcessGraphics();

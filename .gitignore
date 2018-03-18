@@ -10,6 +10,12 @@
 *.rtc
 *.sym
 
+# Ignore test files
+test/testroms/**/*.output
+test/testroms/**/*.png
+!test/testroms/**/*.golden.output
+!test/testroms/**/*.golden.png
+
 # Ignore build output
 dist/
 assets/*.map
