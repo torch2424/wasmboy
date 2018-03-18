@@ -108,8 +108,12 @@ export class Graphics {
   }
 }
 
-// Function to batch process our audio after we skipped so many cycles
+// Batch Process Graphics
+// http://gameboy.mongenel.com/dmg/asmmemmap.html and http://gbdev.gg8.se/wiki/articles/Video_Display
+// Function to batch process our graphics after we skipped so many cycles
+// This is not currently checked in memory read/write
 export function batchProcessGraphics(): void {
+
   if (Graphics.currentCycles < Graphics.batchProcessCycles) {
     return;
   }

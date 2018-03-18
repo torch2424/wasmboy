@@ -40,18 +40,17 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
     return false;
   }
 
-  // Batch Process Graphics
-  // http://gameboy.mongenel.com/dmg/asmmemmap.html and http://gbdev.gg8.se/wiki/articles/Video_Display
-  // And Check the graphics mode to see if we can write to VRAM
+  // Check the graphics mode to see if we can write to VRAM
   // http://gbdev.gg8.se/wiki/articles/Video_Display#Accessing_VRAM_and_OAM
   if(offset >= videoRamLocation && offset < Memory.cartridgeRamLocation) {
     // Can only read/write from VRAM During Modes 0 - 2
     // See graphics/lcd.ts
     if (Graphics.currentLcdMode > 2) {
       return false;
-    } else {
-      batchProcessGraphics();
     }
+
+    // Not batch processing here for performance
+    // batchProcessGraphics();
 
     // Allow the original write, and return since we dont need to look anymore
     return true;
@@ -78,9 +77,9 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
     // See graphics/lcd.ts
     if (Graphics.currentLcdMode !== 2) {
       return false;
-    } else {
-      batchProcessGraphics();
     }
+    // Not batch processing here for performance
+    // batchProcessGraphics();
 
     // Allow the original write, and return since we dont need to look anymore
     return true;
@@ -110,13 +109,11 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
     batchProcessAudio();
   }
 
-  // Batch Process Graphics
-  // http://gameboy.mongenel.com/dmg/asmmemmap.html and http://gbdev.gg8.se/wiki/articles/Video_Display
-  // And other Memory effects fomr read/write to GraphicsGraphics
+  // Other Memory effects fomr read/write to GraphicsGraphics
   if (offset >= Graphics.memoryLocationLcdControl && offset <= Graphics.memoryLocationWindowX) {
 
-    // Do our batch processing
-    batchProcessGraphics();
+    // Not batch processing here for performance
+    // batchProcessGraphics();
 
     // reset the current scanline if the game tries to write to it
     if (offset === Graphics.memoryLocationScanlineRegister) {

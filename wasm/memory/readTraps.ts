@@ -27,23 +27,20 @@ export function checkReadTraps(offset: u16): i32 {
     return -1;
   }
 
-  // Batch Process Graphics
-  // http://gameboy.mongenel.com/dmg/asmmemmap.html and http://gbdev.gg8.se/wiki/articles/Video_Display
-  // and Check the graphics mode to see if we can read VRAM
+  // Check the graphics mode to see if we can read VRAM
   // http://gbdev.gg8.se/wiki/articles/Video_Display#Accessing_VRAM_and_OAM
   if(offset >= videoRamLocation && offset < Memory.cartridgeRamLocation) {
     // Can only read/write from VRAM During Modes 0 - 2
     // See graphics/lcd.ts
     if (Graphics.currentLcdMode > 2) {
       return 0xFF;
-    } else {
-      batchProcessGraphics();
     }
+
+    // Not batch processing here for performance
+    // batchProcessGraphics();
   }
 
-  // Batch Process Graphics
-  // http://gameboy.mongenel.com/dmg/asmmemmap.html and http://gbdev.gg8.se/wiki/articles/Video_Display
-  // Also check for individal writes
+  // Check for individal writes
   // Can only read/write from OAM During Modes 0 - 1
   // See graphics/lcd.ts
   if(offset >= Memory.spriteInformationTableLocation && offset <= Memory.spriteInformationTableLocationEnd) {
@@ -51,9 +48,10 @@ export function checkReadTraps(offset: u16): i32 {
     // See graphics/lcd.ts
     if (Graphics.currentLcdMode !== 2) {
       return 0xFF;
-    } else {
-      batchProcessGraphics();
     }
+
+    // Not batch processing here for performance
+    // batchProcessGraphics();
   }
 
   if(offset === Joypad.memoryLocationJoypadRegister) {
@@ -74,10 +72,10 @@ export function checkReadTraps(offset: u16): i32 {
 
   // Batch Process Graphics
   // http://gameboy.mongenel.com/dmg/asmmemmap.html and http://gbdev.gg8.se/wiki/articles/Video_Display
-  if (offset >= Graphics.memoryLocationLcdControl && offset <= Graphics.memoryLocationWindowX) {
-    // Do our batch processing
-    batchProcessGraphics();
-  }
+  // if (offset >= Graphics.memoryLocationLcdControl && offset <= Graphics.memoryLocationWindowX) {
+  //   // Not batch processing here for performance
+  //   // batchProcessGraphics();
+  // }
 
   return -1;
 }
