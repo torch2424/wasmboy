@@ -10,6 +10,10 @@ import {
   handledWriteToSoundRegister
 } from '../sound/index';
 import {
+  Timers,
+  batchProcessTimers
+} from '../timers/index'
+import {
   handleBanking
 } from './banking';
 import {
@@ -89,10 +93,20 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
     return false;
   }
 
-  // Trap our divider register from our timers
-  if(offset === 0xFF04) {
-    eightBitStoreIntoGBMemorySkipTraps(offset, 0);
-    return false;
+  // Timers
+  if (offset >= Timers.memoryLocationDividerRegister && offset <= Timers.memoryLocationTIMC) {
+
+    // Batch Process
+    batchProcessTimers();
+
+    // Trap our divider register from our timers
+    if(offset === Timers.memoryLocationDividerRegister) {
+      eightBitStoreIntoGBMemorySkipTraps(offset, 0);
+      return false;
+    }
+
+    // Allow the original Write
+    return true;
   }
 
   // Sound

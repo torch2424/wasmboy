@@ -48,6 +48,8 @@ import {
   sixteenBitLoadFromGBMemory
 } from '../memory/index';
 import {
+  Timers,
+  batchProcessTimers,
   updateTimers
 } from '../timers/index';
 import {
@@ -82,10 +84,12 @@ export function update(): i32 {
       Cpu.currentCycles += numberOfCycles;
       Sound.currentCycles += numberOfCycles;
       Graphics.currentCycles += numberOfCycles;
-      
+      Timers.currentCycles += numberOfCycles;
+
       // Need to do this, since a lot of things depend on the scanline
       // Batch processing will simply return if the number of cycles is too low
       batchProcessGraphics();
+      batchProcessTimers();
     } else {
       error = true;
     }
@@ -150,16 +154,18 @@ export function emulationStep(): i8 {
   Cpu.registerF = Cpu.registerF & 0xF0;
 
   // Check other Gameboy components
-  updateTimers(<u8>numberOfCycles);
+  // Now Batch Processing Graphics based on memory read/writes
+  //updateTimers(numberOfCycles);
 
-  if(!Cpu.isStopped) {
-    // Now Batch Processing Graphics based on memory read/writes
-    // updateGraphics(<u8>numberOfCycles);
-
-    // Update Sound
-    // Now Batch Processing Audio based on memory read/writes
-    // updateSound(<u8>numberOfCycles);
-  }
+  // TODO: Allow turning off batch processing
+  // if(!Cpu.isStopped) {
+  //   // Now Batch Processing Graphics based on memory read/writes
+  //   // updateGraphics(<u8>numberOfCycles);
+  //
+  //   // Update Sound
+  //   // Now Batch Processing Audio based on memory read/writes
+  //   // updateSound(<u8>numberOfCycles);
+  // }
 
   // Interrupt Handling requires 20 cycles
   // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt

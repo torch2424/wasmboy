@@ -2,7 +2,7 @@ import {
   Cpu
 } from '../cpu/index';
 import {
-  eightBitLoadFromGBMemory,
+  eightBitLoadFromGBMemorySkipTraps,
   eightBitStoreIntoGBMemorySkipTraps,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
@@ -13,6 +13,14 @@ import {
 } from '../interrupts/index';
 
 export class Timers {
+
+  // Current cycles
+  // This will be used for batch processing
+  static currentCycles: i32 = 0;
+
+  // Number of cycles to run in each batch process
+  static batchProcessCycles: i32 = 255;
+
   static readonly memoryLocationTIMA: u16 = 0xFF05; // Timer Modulator
   static readonly memoryLocationTMA: u16 = 0xFF06; // Timer Counter (Actual Time Value)
   static readonly memoryLocationTIMC: u16 = 0xFF07; // Timer Controller (A.K.A TAC)
@@ -45,7 +53,29 @@ export class Timers {
   }
 }
 
-export function updateTimers(numberOfCycles: u8): void {
+// Batch Process Timers
+// Function to batch process our Timers after we skipped so many cycles
+export function batchProcessTimers(): void {
+
+  // Get our current batch process cycles
+  // This will depend on the least amount of cycles we need to update
+  // Something
+  let batchProcessCycles: i32 = Timers.batchProcessCycles;
+  if (_isTimerEnabled() && Timers.currentMaxCycleCount < batchProcessCycles) {
+    batchProcessCycles = Timers.currentMaxCycleCount;
+  }
+
+  if (Timers.currentCycles < batchProcessCycles) {
+    return;
+  }
+
+  while (Timers.currentCycles >= batchProcessCycles) {
+    updateTimers(batchProcessCycles);
+    Timers.currentCycles = Timers.currentCycles - batchProcessCycles;
+  }
+}
+
+export function updateTimers(numberOfCycles: i32): void {
 
   _checkDividerRegister(numberOfCycles);
 
@@ -61,10 +91,11 @@ export function updateTimers(numberOfCycles: u8): void {
       Timers.cycleCounter -= _getCurrentCycleCounterFrequency();
 
       // Update the actual timer counter
-      let tima: u8 = eightBitLoadFromGBMemory(Timers.memoryLocationTIMA);
+      let tima: u8 = eightBitLoadFromGBMemorySkipTraps(Timers.memoryLocationTIMA);
       if(tima == 255) {
         // Store Timer Modulator inside of TIMA
-        eightBitStoreIntoGBMemorySkipTraps(Timers.memoryLocationTIMA, eightBitLoadFromGBMemory(Timers.memoryLocationTMA));
+        eightBitStoreIntoGBMemorySkipTraps(Timers.memoryLocationTIMA, eightBitLoadFromGBMemorySkipTraps(Timers.memoryLocationTMA));
+
         // Fire off timer interrupt
         requestTimerInterrupt();
       } else {
@@ -75,7 +106,7 @@ export function updateTimers(numberOfCycles: u8): void {
 }
 
 // Function to update our divider register
-function _checkDividerRegister(numberOfCycles: u8): void {
+function _checkDividerRegister(numberOfCycles: i32): void {
   // CLOCK_SPEED / 16382
 
   // Every 256 clock cycles need to increment
@@ -87,7 +118,7 @@ function _checkDividerRegister(numberOfCycles: u8): void {
     // - 255 to catch any overflow with the cycles
     Timers.dividerRegisterCycleCounter -= 255;
 
-    let dividerRegister = eightBitLoadFromGBMemory(Timers.memoryLocationDividerRegister);
+    let dividerRegister = eightBitLoadFromGBMemorySkipTraps(Timers.memoryLocationDividerRegister);
     // TODO: Hoping that the overflow will occur correctly here, see this for any weird errors
     dividerRegister += 1;
     eightBitStoreIntoGBMemorySkipTraps(Timers.memoryLocationDividerRegister, dividerRegister);
@@ -96,7 +127,7 @@ function _checkDividerRegister(numberOfCycles: u8): void {
 
 function _isTimerEnabled(): boolean {
   // second bit, e.g 000 0100, will be set if the timer is enabled
-  return (eightBitLoadFromGBMemory(Timers.memoryLocationTIMC) & 0x04) > 0;
+  return (eightBitLoadFromGBMemorySkipTraps(Timers.memoryLocationTIMC) & 0x04) > 0;
 }
 
 // NOTE: This can be sped up by intercepting writes to memory
@@ -104,7 +135,7 @@ function _isTimerEnabled(): boolean {
 function _getCurrentCycleCounterFrequency(): i32 {
 
   // Get TIMC
-  let timc = eightBitLoadFromGBMemory(Timers.memoryLocationTIMC);
+  let timc = eightBitLoadFromGBMemorySkipTraps(Timers.memoryLocationTIMC);
 
   // Clear the top byte
   timc = timc & 0x03;
