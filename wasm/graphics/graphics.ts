@@ -12,7 +12,9 @@ import {
 import {
   renderSprites
 } from './sprites';
-// TODO: Dcode fixed the Assemblyscript bug where the index imports didn't work, can undo all of these now :)
+import {
+  Config
+} from '../config';
 import {
   eightBitLoadFromGBMemorySkipTraps,
   eightBitStoreIntoGBMemorySkipTraps,
@@ -148,14 +150,20 @@ export function updateGraphics(numberOfCycles: i32): void {
       // Check if we've reached the last scanline
       if(scanlineRegister === 144) {
         // Draw the scanline
-        _drawScanline(scanlineRegister);
+        if (!Config.graphicsDisableScanlineRendering) {
+          _drawScanline(scanlineRegister);
+        } else {
+          _renderEntireFrame();
+        }
         // Store the frame to be rendered
         storeFrameToBeRendered();
         // Request a VBlank interrupt
         requestVBlankInterrupt();
       } else if (scanlineRegister < 144) {
         // Draw the scanline
-        _drawScanline(scanlineRegister);
+        if (!Config.graphicsDisableScanlineRendering) {
+          _drawScanline(scanlineRegister);
+        }
       }
 
       // Store our scanline
@@ -223,5 +231,15 @@ function _drawScanline(scanlineRegister: u8): void {
   if (checkBitOnByte(1, lcdControl)) {
     // Sprites are enabled, render them!
     renderSprites(scanlineRegister, checkBitOnByte(2, lcdControl));
+  }
+}
+
+// Function to render everything for a frame at once
+// This is to improve performance
+// See above for comments on how things are donw
+function _renderEntireFrame(): void {
+  // Scanline needs to be in sync while we draw, thus, we can't shortcut anymore than here
+  for(let i: u8 = 0; i <= 144; i++) {
+    _drawScanline(i);
   }
 }

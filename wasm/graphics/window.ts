@@ -19,7 +19,8 @@ import {
 import {
   checkBitOnByte,
   setBitOnByte,
-  resetBitOnByte
+  resetBitOnByte,
+  hexLog
 } from '../helpers/index';
 
 export function renderWindow(scanlineRegister: u8, tileDataMemoryLocation: u16, tileMapMemoryLocation: u16): void {
