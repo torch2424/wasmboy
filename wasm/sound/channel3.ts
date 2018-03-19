@@ -36,6 +36,9 @@ import {
 
 export class Channel3 {
 
+  // Cycle Counter for our sound accumulator
+  static cycleCounter: i32 = 0;
+
   // Voluntary Wave channel with 32 4-bit programmable samples, played in sequence.
   // NR30 -> Sound on/off (R/W)
   static readonly memoryLocationNRx0: u16 = 0xFF1A;
@@ -57,6 +60,8 @@ export class Channel3 {
   static frequencyTimer: i32 = 0x00;
   static lengthCounter: i32 = 0x00;
   static waveTablePosition: u16 = 0x00;
+  static volumeCode: u8 = 0x00;
+  static volumeCodeChanged: boolean = false;
 
   // Save States
 
@@ -84,6 +89,16 @@ export class Channel3 {
     eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx2, 0x9F);
     eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx3, 0xBF);
     eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx4, 0xFF);
+
+    // The volume code changed
+    Channel3.volumeCodeChanged = true;
+  }
+
+  // Function to get a sample using the cycle counter on the channel
+  static getSampleFromCycleCounter(): i32 {
+    let accumulatedCycles: i32 = Channel3.cycleCounter;
+    Channel3.cycleCounter = 0;
+    return Channel3.getSample(accumulatedCycles);
   }
 
   static getSample(numberOfCycles: i32): i32 {
@@ -111,7 +126,7 @@ export class Channel3 {
 
     // Get our ourput volume
     let outputVolume: i16 = 0;
-    let volumeCode: u8 = 0;
+    let volumeCode: u8 = Channel3.volumeCode;
 
     // Finally to set our output volume, the channel must be enabled,
     // Our channel DAC must be enabled, and we must be in an active state
@@ -119,9 +134,13 @@ export class Channel3 {
     if(Channel3.isEnabled &&
     isChannelDacEnabled(Channel3.channelNumber)) {
       // Get our volume code
-      volumeCode = eightBitLoadFromGBMemorySkipTraps(Channel3.memoryLocationNRx2);
-      volumeCode = (volumeCode >> 5);
-      volumeCode = (volumeCode & 0x0F);
+      if(Channel3.volumeCodeChanged) {
+        let volumeCode: u8 = eightBitLoadFromGBMemorySkipTraps(Channel3.memoryLocationNRx2);
+        volumeCode = (volumeCode >> 5);
+        volumeCode = (volumeCode & 0x0F);
+        Channel3.volumeCode = volumeCode;
+        Channel3.volumeCodeChanged = false;
+      }
     } else {
       // Return silence
       // Since range from -15 - 15, or 0 to 30 for our unsigned
@@ -198,6 +217,22 @@ export class Channel3 {
     if(!isChannelDacEnabled(Channel3.channelNumber)) {
       Channel3.isEnabled = false;
     }
+  }
+
+  // Function to determine if the current channel would update when getting the sample
+  // This is used to accumulate samples
+  static willChannelUpdate(numberOfCycles: i32): boolean {
+
+    //Increment our cycle counter
+    Channel3.cycleCounter += numberOfCycles;
+
+    if (Channel3.frequencyTimer - Channel3.cycleCounter > 0 &&
+      isChannelDacEnabled(Channel3.channelNumber) &&
+      !Channel3.volumeCodeChanged) {
+      return false;
+    }
+
+    return true;
   }
 
   static updateLength(): void {

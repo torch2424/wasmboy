@@ -36,6 +36,9 @@ import {
 
 export class Channel1 {
 
+  // Cycle Counter for our sound accumulator
+  static cycleCounter: i32 = 0;
+
   // Squarewave channel with volume envelope and frequency sweep functions.
   // NR10 -> Sweep Register R/W
   static readonly memoryLocationNRx0: u16 = 0xFF10;
@@ -108,6 +111,13 @@ export class Channel1 {
     eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx2, 0xF3);
     eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx3, 0xFF);
     eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx4, 0xBF);
+  }
+
+  // Function to get a sample using the cycle counter on the channel
+  static getSampleFromCycleCounter(): i32 {
+    let accumulatedCycles: i32 = Channel1.cycleCounter;
+    Channel1.cycleCounter = 0;
+    return Channel1.getSample(accumulatedCycles);
   }
 
   static getSample(numberOfCycles: i32): i32 {
@@ -201,6 +211,21 @@ export class Channel1 {
     if(!isChannelDacEnabled(Channel1.channelNumber)) {
       Channel1.isEnabled = false;
     }
+  }
+
+  // Function to determine if the current channel would update when getting the sample
+  // This is used to accumulate samples
+  static willChannelUpdate(numberOfCycles: i32): boolean {
+
+    //Increment our cycle counter
+    Channel1.cycleCounter += numberOfCycles;
+
+    if (Channel1.frequencyTimer - Channel1.cycleCounter > 0 &&
+      isChannelDacEnabled(Channel1.channelNumber)) {
+      return false;
+    }
+
+    return true;
   }
 
   static updateSweep(): void {

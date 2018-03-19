@@ -3,7 +3,8 @@
 // Passing channel number to make things simpler than passing around memory addresses, to avoid bugs in choosing the wrong address
 
 import {
-  Sound
+  Sound,
+  SoundAccumulator
 } from './sound';
 import {
     Channel1
@@ -68,6 +69,12 @@ export function handledWriteToSoundRegister(offset: u16, value: u16): boolean {
       return true;
   }
 
+  // Check if channel 3's volume code was written too
+  // This is handcy to know for accumulation of samples
+  if (offset === Channel3.memoryLocationNRx2) {
+    Channel3.volumeCodeChanged = true;
+  }
+
   // Check our NRx4 registers to trap our trigger bits
   if(offset === Channel1.memoryLocationNRx4 && checkBitOnByte(7, <u8>value)) {
     // Write the value skipping traps, and then trigger
@@ -86,6 +93,16 @@ export function handledWriteToSoundRegister(offset: u16, value: u16): boolean {
     eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
     Channel4.trigger();
     return true;
+  }
+
+  // Tell the sound accumulator if volumes changes
+  if(offset === Sound.memoryLocationNR50) {
+    SoundAccumulator.mixerVolumeChanged = true;
+  }
+
+  // Tell the sound accumulator if the Mixer Enabled changes
+  if(offset === Sound.memoryLocationNR50) {
+    SoundAccumulator.mixerEnabledChanged = true;
   }
 
   // Write 0 to the 7th bit of NR52, resets all sound registers, and stops them from receiving writes

@@ -36,6 +36,9 @@ import {
 
 export class Channel2 {
 
+  // Cycle Counter for our sound accumulator
+  static cycleCounter: i32 = 0;
+
   // Squarewave channel with volume envelope functions only.
   // NR21 -> Sound length/Wave pattern duty (R/W)
   static readonly memoryLocationNRx1: u16 = 0xFF16;
@@ -92,6 +95,13 @@ export class Channel2 {
     eightBitStoreIntoGBMemorySkipTraps(Channel2.memoryLocationNRx2, 0x00);
     eightBitStoreIntoGBMemorySkipTraps(Channel2.memoryLocationNRx3, 0xF3);
     eightBitStoreIntoGBMemorySkipTraps(Channel2.memoryLocationNRx4, 0xBF);
+  }
+
+  // Function to get a sample using the cycle counter on the channel
+  static getSampleFromCycleCounter(): i32 {
+    let accumulatedCycles: i32 = Channel2.cycleCounter;
+    Channel2.cycleCounter =  0;
+    return Channel2.getSample(accumulatedCycles);
   }
 
   static getSample(numberOfCycles: i32): i32 {
@@ -166,6 +176,21 @@ export class Channel2 {
     if(!isChannelDacEnabled(Channel2.channelNumber)) {
       Channel2.isEnabled = false;
     }
+  }
+
+  // Function to determine if the current channel would update when getting the sample
+  // This is used to accumulate samples
+  static willChannelUpdate(numberOfCycles: i32): boolean {
+
+    //Increment our cycle counter
+    Channel2.cycleCounter += numberOfCycles;
+
+    if (Channel2.frequencyTimer - Channel2.cycleCounter > 0 &&
+      isChannelDacEnabled(Channel2.channelNumber)) {
+      return false;
+    }
+
+    return true;
   }
 
   static updateLength(): void {
