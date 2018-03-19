@@ -27,11 +27,17 @@ import {
 import {
   eightBitLoadFromGBMemory
 } from './memory/index';
+import {
+  performanceTimestamp
+} from './helpers/index'
 
 // Public Exports
 export {
-initialize
+  initialize
 } from './cpu/index';
+export {
+  config
+} from './config';
 export {
   update,
   emulationStep

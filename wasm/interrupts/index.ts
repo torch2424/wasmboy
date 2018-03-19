@@ -2,7 +2,7 @@ import {
   Cpu
 } from '../cpu/index';
 import {
-  eightBitLoadFromGBMemory,
+  eightBitLoadFromGBMemorySkipTraps,
   eightBitStoreIntoGBMemorySkipTraps,
   sixteenBitStoreIntoGBMemorySkipTraps,
   getSaveStateMemoryOffset,
@@ -47,13 +47,60 @@ export class Interrupts {
   }
 }
 
+export function checkInterrupts(): i8 {
+
+  if(Interrupts.masterInterruptSwitch) {
+
+    // Boolean to track if interrupts were handled
+    // Interrupt handling requires 20 cycles
+    // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
+    let wasInterruptHandled: boolean = false;
+
+    let interruptRequest = eightBitLoadFromGBMemorySkipTraps(Interrupts.memoryLocationInterruptRequest);
+    let interruptEnabled = eightBitLoadFromGBMemorySkipTraps(Interrupts.memoryLocationInterruptEnabled);
+
+    if(interruptRequest > 0) {
+
+      // Check our interrupts
+      if (checkBitOnByte(Interrupts.bitPositionVBlankInterrupt, interruptRequest) &&
+        checkBitOnByte(Interrupts.bitPositionVBlankInterrupt, interruptEnabled)) {
+
+        _handleInterrupt(Interrupts.bitPositionVBlankInterrupt);
+        wasInterruptHandled = true;
+      } else if (checkBitOnByte(Interrupts.bitPositionLcdInterrupt, interruptRequest) &&
+        checkBitOnByte(Interrupts.bitPositionLcdInterrupt, interruptEnabled)) {
+
+          _handleInterrupt(Interrupts.bitPositionLcdInterrupt);
+          wasInterruptHandled = true;
+      } else if (checkBitOnByte(Interrupts.bitPositionTimerInterrupt, interruptRequest) &&
+        checkBitOnByte(Interrupts.bitPositionTimerInterrupt, interruptEnabled)) {
+
+          _handleInterrupt(Interrupts.bitPositionTimerInterrupt);
+          wasInterruptHandled = true;
+      } else if (checkBitOnByte(Interrupts.bitPositionJoypadInterrupt, interruptRequest) &&
+        checkBitOnByte(Interrupts.bitPositionJoypadInterrupt, interruptEnabled)) {
+
+          _handleInterrupt(Interrupts.bitPositionJoypadInterrupt);
+          wasInterruptHandled = true;
+      }
+    }
+
+    // Interrupt handling requires 20 cycles
+    if(wasInterruptHandled) {
+      return 20;
+    }
+  }
+
+  return 0;
+}
+
 function _handleInterrupt(bitPosition: u8): void {
 
   // Disable the master switch
   setInterrupts(false);
 
   // Disable the bit on the interruptRequest
-  let interruptRequest = eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptRequest);
+  let interruptRequest = eightBitLoadFromGBMemorySkipTraps(Interrupts.memoryLocationInterruptRequest);
   interruptRequest = resetBitOnByte(bitPosition, interruptRequest);
   eightBitStoreIntoGBMemorySkipTraps(Interrupts.memoryLocationInterruptRequest, interruptRequest);
 
@@ -86,7 +133,7 @@ function _handleInterrupt(bitPosition: u8): void {
 
 function _requestInterrupt(bitPosition: u8): void {
 
-  let interruptRequest = eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptRequest);
+  let interruptRequest = eightBitLoadFromGBMemorySkipTraps(Interrupts.memoryLocationInterruptRequest);
 
   // Pass to set the correct interrupt bit on interruptRequest
   interruptRequest = setBitOnByte(bitPosition, interruptRequest);
@@ -105,62 +152,13 @@ export function areInterruptsEnabled(): boolean {
 
 // Useful fo determining the HALT bug
 export function areInterruptsPending(): boolean {
-  let interruptRequest = eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptRequest);
-  let interruptEnabled = eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptEnabled);
+  let interruptRequest = eightBitLoadFromGBMemorySkipTraps(Interrupts.memoryLocationInterruptRequest);
+  let interruptEnabled = eightBitLoadFromGBMemorySkipTraps(Interrupts.memoryLocationInterruptEnabled);
 
   if((interruptRequest & interruptEnabled) !== 0) {
     return true;
   } else {
     return false;
-  }
-}
-
-// Helper function to get if interrupts are pending but the switch is not set
-
-export function checkInterrupts(): i8 {
-
-  // Boolean to track if interrupts were handled
-  // Interrupt handling requires 20 cycles
-  // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
-  let wasInterruptHandled: boolean = false;
-
-  if(Interrupts.masterInterruptSwitch) {
-
-    let interruptRequest = eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptRequest);
-    let interruptEnabled = eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptEnabled);
-
-    if(interruptRequest > 0) {
-
-      // Check our interrupts
-      if (checkBitOnByte(Interrupts.bitPositionVBlankInterrupt, interruptRequest) &&
-        checkBitOnByte(Interrupts.bitPositionVBlankInterrupt, interruptEnabled)) {
-
-        _handleInterrupt(Interrupts.bitPositionVBlankInterrupt);
-        wasInterruptHandled = true;
-      } else if (checkBitOnByte(Interrupts.bitPositionLcdInterrupt, interruptRequest) &&
-        checkBitOnByte(Interrupts.bitPositionLcdInterrupt, interruptEnabled)) {
-
-          _handleInterrupt(Interrupts.bitPositionLcdInterrupt);
-          wasInterruptHandled = true;
-      } else if (checkBitOnByte(Interrupts.bitPositionTimerInterrupt, interruptRequest) &&
-        checkBitOnByte(Interrupts.bitPositionTimerInterrupt, interruptEnabled)) {
-
-          _handleInterrupt(Interrupts.bitPositionTimerInterrupt);
-          wasInterruptHandled = true;
-      } else if (checkBitOnByte(Interrupts.bitPositionJoypadInterrupt, interruptRequest) &&
-        checkBitOnByte(Interrupts.bitPositionJoypadInterrupt, interruptEnabled)) {
-
-          _handleInterrupt(Interrupts.bitPositionJoypadInterrupt);
-          wasInterruptHandled = true;
-      }
-    }
-  }
-
-  // Interrupt handling requires 20 cycles
-  if(wasInterruptHandled) {
-    return 20;
-  } else {
-    return 0;
   }
 }
 

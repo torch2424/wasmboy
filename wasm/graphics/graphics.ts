@@ -14,7 +14,7 @@ import {
 } from './sprites';
 // TODO: Dcode fixed the Assemblyscript bug where the index imports didn't work, can undo all of these now :)
 import {
-  eightBitLoadFromGBMemory,
+  eightBitLoadFromGBMemorySkipTraps,
   eightBitStoreIntoGBMemorySkipTraps,
   storeFrameToBeRendered,
   getSaveStateMemoryOffset,
@@ -28,10 +28,22 @@ import {
   checkBitOnByte,
   setBitOnByte,
   resetBitOnByte,
-  performanceTimestamp
+  performanceTimestamp,
+  hexLog
 } from '../helpers/index';
 
 export class Graphics {
+
+  // Current cycles
+  // This will be used for batch processing
+  static currentCycles: i32 = 0;
+
+  // Number of cycles to run in each batch process
+  // This number should be in sync so that graphics doesn't run too many cyles at once
+  // and does not exceed the minimum number of cyles for either scanlines, or
+  // How often we change the frame, or a channel's update process
+  static batchProcessCycles: i32 = 456;
+
   // Count the number of cycles to keep synced with cpu cycles
   static scanlineCycleCounter: i32 = 0x00;
   static readonly MAX_CYCLES_PER_SCANLINE: i32 = 456;
@@ -43,6 +55,7 @@ export class Graphics {
   // See: http://bgb.bircd.org/pandocs.txt , and search " LY "
   static readonly memoryLocationScanlineRegister: u16 = 0xFF44;
   static readonly memoryLocationCoincidenceCompare: u16 = 0xFF45;
+  static readonly memoryLocationDmaTransfer: u16 = 0xFF46;
   // Also known at STAT
   static readonly memoryLocationLcdStatus: u16 = 0xFF41;
   // Also known as LCDC
@@ -95,7 +108,23 @@ export class Graphics {
   }
 }
 
-export function updateGraphics(numberOfCycles: u8): void {
+// Batch Process Graphics
+// http://gameboy.mongenel.com/dmg/asmmemmap.html and http://gbdev.gg8.se/wiki/articles/Video_Display
+// Function to batch process our graphics after we skipped so many cycles
+// This is not currently checked in memory read/write
+export function batchProcessGraphics(): void {
+
+  if (Graphics.currentCycles < Graphics.batchProcessCycles) {
+    return;
+  }
+
+  while (Graphics.currentCycles >= Graphics.batchProcessCycles) {
+    updateGraphics(Graphics.batchProcessCycles);
+    Graphics.currentCycles = Graphics.currentCycles - Graphics.batchProcessCycles;
+  }
+}
+
+export function updateGraphics(numberOfCycles: i32): void {
 
   // Get if the LCD is currently enabled
   // Doing this for performance
@@ -114,7 +143,7 @@ export function updateGraphics(numberOfCycles: u8): void {
       Graphics.scanlineCycleCounter -= Graphics.MAX_CYCLES_PER_SCANLINE;
 
       // Move to next scanline
-      let scanlineRegister: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationScanlineRegister);
+      let scanlineRegister: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationScanlineRegister);
 
       // Check if we've reached the last scanline
       if(scanlineRegister === 144) {
@@ -155,7 +184,7 @@ function _drawScanline(scanlineRegister: u8): void {
   // Bit 0 - BG Display (for CGB see below) (0=Off, 1=On)
 
   // Get our lcd control, see above for usage
-  let lcdControl: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationLcdControl);
+  let lcdControl: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationLcdControl);
 
   // Get our seleted tile data memory location
   let tileDataMemoryLocation = Graphics.memoryLocationTileDataSelectZeroStart;

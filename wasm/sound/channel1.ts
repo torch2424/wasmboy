@@ -5,8 +5,7 @@
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Frequency_Sweep
 
 import {
-  eightBitLoadFromGBMemory,
-  eightBitStoreIntoGBMemory,
+  eightBitLoadFromGBMemorySkipTraps,
   eightBitStoreIntoGBMemorySkipTraps,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
@@ -111,10 +110,10 @@ export class Channel1 {
     eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx4, 0xBF);
   }
 
-  static getSample(numberOfCycles: u8): i32 {
+  static getSample(numberOfCycles: i32): i32 {
 
     // Decrement our channel timer
-    Channel1.frequencyTimer -= <i32>numberOfCycles;
+    Channel1.frequencyTimer -= numberOfCycles;
     if(Channel1.frequencyTimer <= 0) {
 
       // Get the amount that overflowed so we don't drop cycles
@@ -149,8 +148,6 @@ export class Channel1 {
       // Since range from -15 - 15, or 0 to 30 for our unsigned
       return 15;
     }
-
-    //hexLog(3, Channel1.volume);
 
     // Get the current sampleValue
     let sample: i32 = 1;
@@ -265,7 +262,7 @@ export class Channel1 {
 // Sweep Specific functions
 
 function getSweepPeriod(): u8 {
-  let sweepRegister: u8 = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx0);
+  let sweepRegister: u8 = eightBitLoadFromGBMemorySkipTraps(Channel1.memoryLocationNRx0);
   // Get bits 4-6
   let sweepPeriod: u8 = sweepRegister & 0x70;
   sweepPeriod = (sweepPeriod >> 4);
@@ -273,7 +270,7 @@ function getSweepPeriod(): u8 {
 }
 
 function getSweepShift(): u8 {
-  let sweepRegister: u8 = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx0);
+  let sweepRegister: u8 = eightBitLoadFromGBMemorySkipTraps(Channel1.memoryLocationNRx0);
   // Get bits 0-2
   let sweepShift: u8 = sweepRegister & 0x07;
 
@@ -311,7 +308,7 @@ function getNewFrequencyFromSweep(): u16 {
   newFrequency = (newFrequency >> getSweepShift());
 
   // Check for sweep negation
-  let sweepRegister: u8 = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx0);
+  let sweepRegister: u8 = eightBitLoadFromGBMemorySkipTraps(Channel1.memoryLocationNRx0);
   if (checkBitOnByte(3, sweepRegister)) {
     newFrequency = Channel1.sweepShadowFrequency - newFrequency;
   } else {

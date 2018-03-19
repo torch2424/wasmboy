@@ -2,11 +2,17 @@ import {
   Memory
 } from './memory';
 import {
-  Graphics
+  Graphics,
+  batchProcessGraphics
 } from '../graphics/graphics';
 import {
+  batchProcessAudio,
   handledWriteToSoundRegister
-} from '../sound/registers';
+} from '../sound/index';
+import {
+  Timers,
+  batchProcessTimers
+} from '../timers/index'
 import {
   handleBanking
 } from './banking';
@@ -20,7 +26,8 @@ import {
   sixteenBitLoadFromGBMemory
 } from './load';
 import {
-  checkBitOnByte
+  checkBitOnByte,
+  hexLog
 } from '../helpers/index';
 
 // Internal function to trap any modify data trying to be written to Gameboy memory
@@ -45,6 +52,12 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
     if (Graphics.currentLcdMode > 2) {
       return false;
     }
+
+    // Not batch processing here for performance
+    // batchProcessGraphics();
+
+    // Allow the original write, and return since we dont need to look anymore
+    return true;
   }
 
   // Be sure to copy everything in EchoRam to Work Ram
@@ -55,6 +68,9 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
     } else {
       sixteenBitStoreIntoGBMemorySkipTraps(offset, value);
     }
+
+    // Allow the original write, and return since we dont need to look anymore
+    return true;
   }
 
   // Also check for individal writes
@@ -66,37 +82,69 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
     if (Graphics.currentLcdMode !== 2) {
       return false;
     }
+    // Not batch processing here for performance
+    // batchProcessGraphics();
+
+    // Allow the original write, and return since we dont need to look anymore
+    return true;
   }
 
   if(offset >= Memory.unusableMemoryLocation && offset <= Memory.unusableMemoryEndLocation) {
     return false;
   }
 
-  // Trap our divider register from our timers
-  if(offset === 0xFF04) {
-    eightBitStoreIntoGBMemorySkipTraps(offset, 0);
-    return false;
+  // Timers
+  if (offset >= Timers.memoryLocationDividerRegister && offset <= Timers.memoryLocationTIMC) {
+
+    // Batch Process
+    batchProcessTimers();
+
+    // Trap our divider register from our timers
+    if(offset === Timers.memoryLocationDividerRegister) {
+      eightBitStoreIntoGBMemorySkipTraps(offset, 0);
+      return false;
+    }
+
+    // Allow the original Write
+    return true;
   }
 
   // Sound
+  // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
   if(offset >= 0xFF10 && offset <= 0xFF26) {
+    batchProcessAudio();
     if(handledWriteToSoundRegister(offset, value)) {
       return false;
     }
   }
-
-  // reset the current scanline if the game tries to write to it
-  if (offset === 0xFF44) {
-    eightBitStoreIntoGBMemorySkipTraps(offset, 0);
-    return false;
+  // FF27 - FF2F not used
+  // Final Wave Table for Channel 3
+  if(offset >= 0xFF30 && offset <= 0xFF3F) {
+    batchProcessAudio();
   }
 
-  // Do the direct memory access transfer for spriteInformationTable
-  // Check the graphics mode to see if we can write to VRAM
-  // http://gbdev.gg8.se/wiki/articles/Video_Display#Accessing_VRAM_and_OAM
-  if (offset === 0xFF46) {
-    // otherwise, performa the DMA transfer
-    _dmaTransfer(<u8>value) ;
+  // Other Memory effects fomr read/write to GraphicsGraphics
+  if (offset >= Graphics.memoryLocationLcdControl && offset <= Graphics.memoryLocationWindowX) {
+
+    // Not batch processing here for performance
+    // batchProcessGraphics();
+
+    // reset the current scanline if the game tries to write to it
+    if (offset === Graphics.memoryLocationScanlineRegister) {
+      eightBitStoreIntoGBMemorySkipTraps(offset, 0);
+      return false;
+    }
+
+    // Do the direct memory access transfer for spriteInformationTable
+    // Check the graphics mode to see if we can write to VRAM
+    // http://gbdev.gg8.se/wiki/articles/Video_Display#Accessing_VRAM_and_OAM
+    if (offset === Graphics.memoryLocationDmaTransfer) {
+      // otherwise, performa the DMA transfer
+      _dmaTransfer(<u8>value);
+    }
+
+    // Allow the original write, and return since we dont need to look anymore
+    return true;
   }
 
   return true;

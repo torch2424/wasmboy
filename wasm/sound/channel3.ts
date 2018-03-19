@@ -4,8 +4,7 @@
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Wave_Channel
 
 import {
-  eightBitLoadFromGBMemory,
-  eightBitStoreIntoGBMemory,
+  eightBitLoadFromGBMemorySkipTraps,
   eightBitStoreIntoGBMemorySkipTraps,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
@@ -87,10 +86,10 @@ export class Channel3 {
     eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx4, 0xFF);
   }
 
-  static getSample(numberOfCycles: u8): i32 {
+  static getSample(numberOfCycles: i32): i32 {
 
     // Decrement our channel timer
-    Channel3.frequencyTimer -= <i32>numberOfCycles;
+    Channel3.frequencyTimer -= numberOfCycles;
     if(Channel3.frequencyTimer <= 0) {
 
       // Get the amount that overflowed so we don't drop cycles
@@ -120,7 +119,7 @@ export class Channel3 {
     if(Channel3.isEnabled &&
     isChannelDacEnabled(Channel3.channelNumber)) {
       // Get our volume code
-      volumeCode = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx2);
+      volumeCode = eightBitLoadFromGBMemorySkipTraps(Channel3.memoryLocationNRx2);
       volumeCode = (volumeCode >> 5);
       volumeCode = (volumeCode & 0x0F);
     } else {
@@ -136,7 +135,7 @@ export class Channel3 {
     let positionIndexToAdd: u16 = Channel3.waveTablePosition / 2;
     let memoryLocationWaveSample: u16 = Channel3.memoryLocationWaveTable + positionIndexToAdd;
 
-    sample = <i16>eightBitLoadFromGBMemory(memoryLocationWaveSample);
+    sample = <i16>eightBitLoadFromGBMemorySkipTraps(memoryLocationWaveSample);
 
     // Need to grab the top or lower half for the correct sample
     if (Channel3.waveTablePosition % 2 === 0) {
@@ -151,17 +150,22 @@ export class Channel3 {
     // Shift our sample and set our volume depending on the volume code
     // Since we can't multiply by float, simply divide by 4, 2, 1
     // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Wave_Channel
-    if(volumeCode <= 0) {
-      sample = (sample >> 4);
-    } else if (volumeCode === 1) {
-      // Dont Shift sample
-      outputVolume = 1;
-    } else if (volumeCode === 2) {
-      sample = (sample >> 1)
-      outputVolume = 2;
-    } else {
-      sample = (sample >> 2)
-      outputVolume = 4;
+    switch(volumeCode) {
+      case 0:
+        sample = (sample >> 4);
+        break;
+      case 1:
+        // Dont Shift sample
+        outputVolume = 1;
+        break;
+      case 2:
+        sample = (sample >> 1)
+        outputVolume = 2;
+        break;
+      default:
+        sample = (sample >> 2)
+        outputVolume = 4;
+        break;
     }
 
     // Spply out output volume

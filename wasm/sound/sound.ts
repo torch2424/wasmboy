@@ -29,8 +29,8 @@ import {
   Cpu
 } from '../cpu/index';
 import {
-  eightBitLoadFromGBMemory,
-  eightBitStoreIntoGBMemory,
+  eightBitLoadFromGBMemorySkipTraps,
+  eightBitStoreIntoGBMemorySkipTraps,
   setLeftAndRightOutputForAudioQueue,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
@@ -42,6 +42,18 @@ import {
 } from '../helpers/index';
 
 export class Sound {
+
+  // Current cycles
+  // This will be used for batch processing
+  // https://github.com/binji/binjgb/commit/e028f45e805bc0b0aa4697224a209f9ae514c954
+  // TODO: May Also need to do this for Reads
+  static currentCycles: i32 = 0;
+
+  // Number of cycles to run in each batch process
+  // This number should be in sync so that sound doesn't run too many cyles at once
+  // and does not exceed the minimum number of cyles for either down sampling, or
+  // How often we change the frame, or a channel's update process
+  static batchProcessCycles: i32 = 87;
 
   // Channel control / On-OFF / Volume (RW)
   static readonly memoryLocationNR50: u16 = 0xFF24;
@@ -63,8 +75,8 @@ export class Sound {
   // Also need to downsample our audio to average audio qualty
   // https://www.reddit.com/r/EmuDev/comments/5gkwi5/gb_apu_sound_emulation/
   // Want to do 48000hz, so CpuRate / Sound Rate, 4194304 / 48000 ~ 87 cycles
-  static downSampleCycleCounter: u8 = 0x00;
-  static readonly maxDownSampleCycles: u8 = 87;
+  static downSampleCycleCounter: i32 = 0x00;
+  static readonly maxDownSampleCycles: i32 = 87;
 
   // Frame sequencer controls what should be updated and and ticked
   // Everyt time the sound is updated :) It is updated everytime the
@@ -72,10 +84,12 @@ export class Sound {
   static frameSequencer: u8 = 0x00;
 
   // Our current sample number we are passing back to the wasmboy memory map
-  // Going to pass back 4096 samples and then reset
+  // Found that a static number of samples doesn't work well on mobile
+  // Will just update the queue index, grab as much as we can whenever we need more audio, then reset
   // NOTE: Giving a really large sample rate gives more latency, but less pops!
-  static readonly MAX_NUMBER_OF_SAMPLES: i32 = 4096;
-  static audioQueueIndex: i32 = 0x0000;
+  //static readonly MAX_NUMBER_OF_SAMPLES: i32 = 4096;
+  static audioQueueIndex: i32 = 0x0000
+  static wasmBoyMemoryMaxBufferSize: i32 = 0x20000;
 
   // Save States
   static readonly saveStateSlot: u16 = 6;
@@ -108,58 +122,80 @@ export function initializeSound(): void {
   Channel4.initialize();
 
   // Other Sound Registers
-  eightBitStoreIntoGBMemory(Sound.memoryLocationNR50, 0x77);
-  eightBitStoreIntoGBMemory(Sound.memoryLocationNR51, 0xF3);
-  eightBitStoreIntoGBMemory(Sound.memoryLocationNR52, 0xF1);
+  eightBitStoreIntoGBMemorySkipTraps(Sound.memoryLocationNR50, 0x77);
+  eightBitStoreIntoGBMemorySkipTraps(Sound.memoryLocationNR51, 0xF3);
+  eightBitStoreIntoGBMemorySkipTraps(Sound.memoryLocationNR52, 0xF1);
+}
+
+// Function to batch process our audio after we skipped so many cycles
+export function batchProcessAudio(): void {
+
+  if (Sound.currentCycles < Sound.batchProcessCycles) {
+    return;
+  }
+
+  while (Sound.currentCycles >= Sound.batchProcessCycles) {
+    updateSound(Sound.batchProcessCycles);
+    Sound.currentCycles = Sound.currentCycles - Sound.batchProcessCycles;
+  }
 }
 
 // Function for updating sound
-export function updateSound(numberOfCycles: u8): void {
+export function updateSound(numberOfCycles: i32): void {
+
   // APU runs at 4194304 / 512
   // Or Cpu.clockSpeed / 512
   // Which means, we need to update once every 8192 cycles :)
-  Sound.frameSequenceCycleCounter += <i32>numberOfCycles;
+  Sound.frameSequenceCycleCounter += numberOfCycles;
   if(Sound.frameSequenceCycleCounter >= Sound.maxFrameSequenceCycles) {
     // Reset the frameSequenceCycleCounter
     // Not setting to zero as we do not want to drop cycles
     Sound.frameSequenceCycleCounter -= Sound.maxFrameSequenceCycles;
 
     // Check our frame sequencer
-    // TODO: uncomment
     // https://gist.github.com/drhelius/3652407
-    if (Sound.frameSequencer === 0) {
-      // Update Length on Channels
-      Channel1.updateLength();
-      Channel2.updateLength();
-      Channel3.updateLength();
-      Channel4.updateLength();
-    } /* Do Nothing on one */ else if(Sound.frameSequencer === 2) {
-      // Update Sweep and Length on Channels
-      Channel1.updateLength();
-      Channel2.updateLength();
-      Channel3.updateLength();
-      Channel4.updateLength();
+    switch (Sound.frameSequencer) {
+      case 0:
+        // Update Length on Channels
+        Channel1.updateLength();
+        Channel2.updateLength();
+        Channel3.updateLength();
+        Channel4.updateLength();
+        break;
+      /* Do Nothing on one */
+      case 2:
+        // Update Sweep and Length on Channels
+        Channel1.updateLength();
+        Channel2.updateLength();
+        Channel3.updateLength();
+        Channel4.updateLength();
 
-      Channel1.updateSweep();
-    } /* Do Nothing on three */ else if(Sound.frameSequencer === 4) {
-      // Update Length on Channels
-      Channel1.updateLength();
-      Channel2.updateLength();
-      Channel3.updateLength();
-      Channel4.updateLength();
-    } /* Do Nothing on three */ else if(Sound.frameSequencer === 6) {
-      // Update Sweep and Length on Channels
-      Channel1.updateLength();
-      Channel2.updateLength();
-      Channel3.updateLength();
-      Channel4.updateLength();
+        Channel1.updateSweep();
+        break;
+      /* Do Nothing on three */
+      case 4:
+        // Update Length on Channels
+        Channel1.updateLength();
+        Channel2.updateLength();
+        Channel3.updateLength();
+        Channel4.updateLength();
+        break;
+      /* Do Nothing on five */
+      case 6:
+        // Update Sweep and Length on Channels
+        Channel1.updateLength();
+        Channel2.updateLength();
+        Channel3.updateLength();
+        Channel4.updateLength();
 
-      Channel1.updateSweep();
-    } else if(Sound.frameSequencer === 7) {
-      // Update Envelope on channels
-      Channel1.updateEnvelope();
-      Channel2.updateEnvelope();
-      Channel4.updateEnvelope();
+        Channel1.updateSweep();
+        break;
+      case 7:
+        // Update Envelope on channels
+        Channel1.updateEnvelope();
+        Channel2.updateEnvelope();
+        Channel4.updateEnvelope();
+        break;
     }
 
     // Update our frame sequencer
@@ -200,7 +236,7 @@ export function updateSound(numberOfCycles: u8): void {
     // TODO: Vin Mixing
 
     // Simply get the left/right volume, add up the values, and put into memory!
-    let registerNR50 = eightBitLoadFromGBMemory(Sound.memoryLocationNR50);
+    let registerNR50 = eightBitLoadFromGBMemorySkipTraps(Sound.memoryLocationNR50);
     // Want bits 6-4
     let leftMixerVolume: i32 = (registerNR50 >> 4);
     leftMixerVolume = leftMixerVolume & 0x07;
@@ -286,8 +322,8 @@ export function updateSound(numberOfCycles: u8): void {
     // Don't allow our audioQueueIndex to overflow into other parts of the wasmBoy memory map
     // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit#gid=0
     // Not 0xFFFF because we need half of 64kb since we store left and right channel
-    if(Sound.audioQueueIndex >= (0xFFFF / 2) - 1) {
-      resetAudioQueue();
+    if(Sound.audioQueueIndex >= (Sound.wasmBoyMemoryMaxBufferSize / 2) - 1) {
+      Sound.audioQueueIndex -= 1;
     }
   }
 }
