@@ -1,0 +1,7 @@
+# .gitattributes
+* text=auto
+*.js text
+*.css text
+
+# help to Github linguist determine this code as AssemblyScript mostly
+*.ts linguist-language=AssemblyScript
