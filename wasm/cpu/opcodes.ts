@@ -30,6 +30,9 @@ import {
   cpARegister
 } from './instructions';
 import {
+  Config
+} from '../config'
+import {
   log,
   hexLog,
   performanceTimestamp,
@@ -75,21 +78,38 @@ import {
 // 2 = replace boot rom
 export function update(): i32 {
 
+  // Get our config settings
+  let audioBatchProcessing: boolean = Config.audioBatchProcessing;
+  let graphicsBatchProcessing: boolean = Config.graphicsBatchProcessing;
+  let timersBatchProcessing: boolean = Config.timersBatchProcessing;
+
+
   let error: boolean = false;
   let numberOfCycles: i8 = -1;
+
   while(!error &&
       Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME) {
-    numberOfCycles = emulationStep();
+    numberOfCycles = emulationStep(audioBatchProcessing, graphicsBatchProcessing, timersBatchProcessing);
     if (numberOfCycles >= 0) {
       Cpu.currentCycles += numberOfCycles;
-      Sound.currentCycles += numberOfCycles;
-      Graphics.currentCycles += numberOfCycles;
-      Timers.currentCycles += numberOfCycles;
 
-      // Need to do this, since a lot of things depend on the scanline
-      // Batch processing will simply return if the number of cycles is too low
-      batchProcessGraphics();
-      batchProcessTimers();
+      if(audioBatchProcessing) {
+        Sound.currentCycles += numberOfCycles;
+      }
+
+      if (graphicsBatchProcessing) {
+        // Need to do this, since a lot of things depend on the scanline
+        // Batch processing will simply return if the number of cycles is too low
+        Graphics.currentCycles += numberOfCycles;
+        batchProcessGraphics();
+      }
+
+      if (timersBatchProcessing) {
+        // Batch processing will simply return if the number of cycles is too low
+        Timers.currentCycles += numberOfCycles;
+        batchProcessTimers();
+      }
+      Timers.currentCycles += numberOfCycles;
     } else {
       error = true;
     }
@@ -112,7 +132,9 @@ export function update(): i32 {
 
 // Function to execute an opcode, and update other gameboy hardware.
 // http://www.codeslinger.co.uk/pages/projects/gameboy/beginning.html
-export function emulationStep(): i8 {
+export function emulationStep(audioBatchProcessing: boolean = false,
+  graphicsBatchProcessing: boolean = false,
+  timersBatchProcessing: boolean = false): i8 {
   // Get the opcode, and additional bytes to be handled
   // Number of cycles defaults to 4, because while we're halted, we run 4 cycles (according to matt :))
   let numberOfCycles: i8 = 4;
@@ -154,19 +176,19 @@ export function emulationStep(): i8 {
   Cpu.registerF = Cpu.registerF & 0xF0;
 
   // Check other Gameboy components
-  
-  // Now Batch Processing Graphics based on memory read/writes
-  //updateTimers(numberOfCycles);
+  if (!timersBatchProcessing) {
+    updateTimers(numberOfCycles);
+  }
 
-  // TODO: Allow turning off batch processing
-  // if(!Cpu.isStopped) {
-  //   // Now Batch Processing Graphics based on memory read/writes
-  //   // updateGraphics(<u8>numberOfCycles);
-  //
-  //   // Update Sound
-  //   // Now Batch Processing Audio based on memory read/writes
-  //   // updateSound(<u8>numberOfCycles);
-  // }
+  if(!Cpu.isStopped) {
+    if(!graphicsBatchProcessing) {
+      updateGraphics(numberOfCycles);
+    }
+
+    if(!audioBatchProcessing) {
+      updateSound(numberOfCycles);
+    }
+  }
 
   // Interrupt Handling requires 20 cycles
   // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt

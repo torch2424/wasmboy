@@ -33,8 +33,11 @@ import {
 
 // Public Exports
 export {
-initialize
+  initialize
 } from './cpu/index';
+export {
+  config
+} from './config';
 export {
   update,
   emulationStep
