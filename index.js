@@ -11,7 +11,9 @@ export default class App extends Component {
 		const canvasElement = document.querySelector(".wasmboy__canvas-container__canvas");
 
 		// Load our game
-		WasmBoy.initialize(canvasElement);
+		WasmBoy.initialize(canvasElement, {
+			frameSkip: 2
+		});
 
 		// Add our touch inputs
 		// Add our touch inputs
