@@ -12,7 +12,11 @@ export default class App extends Component {
 
 		// Load our game
 		WasmBoy.initialize(canvasElement, {
-			frameSkip: 2
+			frameSkip: 1,
+			audioBatchProcessing: true,
+			timersBatchProcessing: true,
+			audioAccumulateSamples: true,
+			graphicsDisableScanlineRendering: true
 		});
 
 		// Add our touch inputs
