@@ -12,6 +12,7 @@ export default class App extends Component {
 
 		// Load our game
 		WasmBoy.initialize(canvasElement, {
+			isAudioEnabled: true,
 			frameSkip: 1,
 			audioBatchProcessing: true,
 			timersBatchProcessing: true,

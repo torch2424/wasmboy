@@ -112,14 +112,13 @@ export function update(): i32 {
         Timers.currentCycles += numberOfCycles;
         batchProcessTimers();
       }
-      Timers.currentCycles += numberOfCycles;
     } else {
       error = true;
     }
   }
 
   // Find our exit reason
-  if (Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME()) {
+  if (Cpu.currentCycles >= Cpu.MAX_CYCLES_PER_FRAME()) {
     // Render a frame
 
     // Reset our currentCycles
