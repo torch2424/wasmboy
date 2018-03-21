@@ -101,7 +101,7 @@ export class Cpu {
   }
 }
 
-export function initialize(useGBCMode: i32, includeBootRom: i32): void {
+export function initialize(useGBCMode: i32 = 0, includeBootRom: i32 = 0): void {
 
   // First, try to switch to Gameboy Color Mode
 
