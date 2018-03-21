@@ -3326,6 +3326,18 @@ function index__inherits(subClass, superClass) { if (typeof superClass !== "func
 
 
 
+var wasmBoyOptions = {
+	isAudioEnabled: true,
+	frameSkip: 1,
+	audioBatchProcessing: true,
+	timersBatchProcessing: true,
+	audioAccumulateSamples: true,
+	graphicsBatchProcessing: true,
+	graphicsDisableScanlineRendering: true
+};
+
+var wasmBoyOptionsString = JSON.stringify(wasmBoyOptions, null, 4);
+
 var index__ref = Object(preact_min["h"])(
 	'h1',
 	null,
@@ -3335,39 +3347,51 @@ var index__ref = Object(preact_min["h"])(
 var index__ref2 = Object(preact_min["h"])(
 	'p',
 	null,
-	Object(preact_min["h"])(
-		'i',
-		null,
-		'Currently built for mobile performance testing. Accuracy is lower because of this'
-	)
+	'Build Options:'
 );
 
 var index__ref3 = Object(preact_min["h"])(
+	'p',
+	null,
+	Object(preact_min["h"])(
+		'i',
+		null,
+		'(Currently built for Mobile Performance testing. Accuracy is lowered.)'
+	)
+);
+
+var index__ref4 = Object(preact_min["h"])(
+	'p',
+	null,
+	wasmBoyOptionsString
+);
+
+var index__ref5 = Object(preact_min["h"])(
 	'div',
 	{ 'class': 'wasmboy__systemControls' },
 	Object(preact_min["h"])(wasmboySystemControls_WasmBoySystemControls, { wasmboy: WasmBoy })
 );
 
-var index__ref4 = Object(preact_min["h"])(
+var index__ref6 = Object(preact_min["h"])(
 	'div',
 	{ className: 'wasmboy__canvas-container' },
 	Object(preact_min["h"])('canvas', { className: 'wasmboy__canvas-container__canvas' })
 );
 
-var index__ref5 = Object(preact_min["h"])(
+var _ref7 = Object(preact_min["h"])(
 	'div',
 	{ 'class': 'wasmboy__debugger' },
 	Object(preact_min["h"])(wasmboyDebugger_WasmBoyDebugger, { wasmboy: WasmBoy, wasmboyGraphics: WasmBoyGraphics, wasmboyAudio: WasmBoyAudio })
 );
 
-var index__ref6 = Object(preact_min["h"])(
+var _ref8 = Object(preact_min["h"])(
 	'svg',
 	{ id: 'gamepadDpad', height: '24', viewBox: '0 0 24 24', width: '24', xmlns: 'http://www.w3.org/2000/svg' },
 	Object(preact_min["h"])('path', { d: 'M0 0h24v24H0z', fill: 'none' }),
 	Object(preact_min["h"])('path', { d: 'M15 7.5V2H9v5.5l3 3 3-3zM7.5 9H2v6h5.5l3-3-3-3zM9 16.5V22h6v-5.5l-3-3-3 3zM16.5 9l-3 3 3 3H22V9h-5.5z' })
 );
 
-var _ref7 = Object(preact_min["h"])(
+var _ref9 = Object(preact_min["h"])(
 	'svg',
 	{ id: 'gamepadStart', height: '24', viewBox: '6 6 12 12', width: '24', xmlns: 'http://www.w3.org/2000/svg' },
 	Object(preact_min["h"])('path', { d: 'M19 13H5v-2h14v2z' }),
@@ -3379,7 +3403,7 @@ var _ref7 = Object(preact_min["h"])(
 	)
 );
 
-var _ref8 = Object(preact_min["h"])(
+var _ref10 = Object(preact_min["h"])(
 	'svg',
 	{ id: 'gamepadSelect', height: '24', viewBox: '6 6 12 12', width: '24', xmlns: 'http://www.w3.org/2000/svg' },
 	Object(preact_min["h"])('path', { d: 'M19 13H5v-2h14v2z' }),
@@ -3391,7 +3415,7 @@ var _ref8 = Object(preact_min["h"])(
 	)
 );
 
-var _ref9 = Object(preact_min["h"])(
+var _ref11 = Object(preact_min["h"])(
 	'svg',
 	{ id: 'gamepadA', height: '24', viewBox: '0 0 24 24', width: '24', xmlns: 'http://www.w3.org/2000/svg' },
 	Object(preact_min["h"])('path', { d: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z' }),
@@ -3403,7 +3427,7 @@ var _ref9 = Object(preact_min["h"])(
 	)
 );
 
-var _ref10 = Object(preact_min["h"])(
+var _ref12 = Object(preact_min["h"])(
 	'svg',
 	{ id: 'gamepadB', height: '24', viewBox: '0 0 24 24', width: '24', xmlns: 'http://www.w3.org/2000/svg' },
 	Object(preact_min["h"])('path', { d: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z' }),
@@ -3430,15 +3454,7 @@ var index_App = function (_Component) {
 		var canvasElement = document.querySelector(".wasmboy__canvas-container__canvas");
 
 		// Load our game
-		WasmBoy.initialize(canvasElement, {
-			isAudioEnabled: true,
-			frameSkip: 1,
-			audioBatchProcessing: true,
-			timersBatchProcessing: true,
-			audioAccumulateSamples: true,
-			graphicsBatchProcessing: true,
-			graphicsDisableScanlineRendering: true
-		});
+		WasmBoy.initialize(canvasElement, wasmBoyOptions);
 
 		// Add our touch inputs
 		// Add our touch inputs
@@ -3473,14 +3489,16 @@ var index_App = function (_Component) {
 			index__ref3,
 			index__ref4,
 			index__ref5,
+			index__ref6,
+			_ref7,
 			Object(preact_min["h"])(
 				'div',
 				{ 'class': 'wasmboy__gamepad' },
-				index__ref6,
-				_ref7,
 				_ref8,
 				_ref9,
-				_ref10
+				_ref10,
+				_ref11,
+				_ref12
 			)
 		);
 	};
