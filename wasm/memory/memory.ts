@@ -54,14 +54,14 @@ export class Memory {
   // Wasmboy Memory Map
   // ----------------------------------
   static readonly gameBoyInternalMemoryLocation: u32 = 0x000400;
-  static readonly videoOutputLocation: u32 = 0x028400;
+  static readonly videoOutputLocation: u32 = 0x030400;
   static readonly currentFrameVideoOutputLocation: u32 = Memory.videoOutputLocation;
   static readonly frameInProgressVideoOutputLocation: u32 = Memory.currentFrameVideoOutputLocation + (160 * 144);
-  static readonly soundOutputLocation: u32 = 0x053800;
+  static readonly soundOutputLocation: u32 = 0x05B800;
 
   // Passed in Game backup or ROM from the user
-  static readonly gameBytesLocation: u32 = 0x073800;
-  static readonly gameRamBanksLocation: u32 = 0x008400;
+  static readonly gameBytesLocation: u32 = 0x07B800;
+  static readonly gameRamBanksLocation: u32 = 0x010400;
 
   // ----------------------------------
   // Rom/Ram Banking
