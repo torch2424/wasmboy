@@ -4,14 +4,6 @@
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Noise_Channel
 
 import {
-  eightBitLoadFromGBMemorySkipTraps,
-  eightBitStoreIntoGBMemory,
-  eightBitStoreIntoGBMemorySkipTraps,
-  getSaveStateMemoryOffset,
-  loadBooleanDirectlyFromWasmMemory,
-  storeBooleanDirectlyToWasmMemory
-} from '../memory/index';
-import {
   getChannelStartingVolume,
   isChannelDacEnabled,
   getRegister2OfChannel
@@ -30,6 +22,17 @@ import {
 import {
   isDutyCycleClockPositiveOrNegativeForWaveform
 } from './duty';
+import {
+  Cpu
+} from '../cpu/cpu';
+import {
+  eightBitLoadFromGBMemorySkipTraps,
+  eightBitStoreIntoGBMemory,
+  eightBitStoreIntoGBMemorySkipTraps,
+  getSaveStateMemoryOffset,
+  loadBooleanDirectlyFromWasmMemory,
+  storeBooleanDirectlyToWasmMemory
+} from '../memory/index';
 import {
   checkBitOnByte,
   hexLog
@@ -213,7 +216,11 @@ export class Channel4 {
     // Get our divisor from the divisor code
     let divisor: u16 = Channel4.getNoiseChannelDivisorFromDivisorCode();
     let clockShift: u8 = Channel4.getNoiseChannelClockShift();
-    return (divisor << clockShift);
+    let response: u16 = (divisor << clockShift);
+    if (Cpu.GBCDoubleSpeed) {
+      response = response * 2;
+    }
+    return response;
   }
 
   static getNoiseChannelClockShift(): u8 {

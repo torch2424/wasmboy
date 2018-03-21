@@ -4,13 +4,6 @@
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
 
 import {
-  eightBitLoadFromGBMemorySkipTraps,
-  eightBitStoreIntoGBMemorySkipTraps,
-  getSaveStateMemoryOffset,
-  loadBooleanDirectlyFromWasmMemory,
-  storeBooleanDirectlyToWasmMemory
-} from '../memory/index';
-import {
   getChannelStartingVolume,
   isChannelDacEnabled,
   getRegister2OfChannel
@@ -29,6 +22,16 @@ import {
 import {
   isDutyCycleClockPositiveOrNegativeForWaveform
 } from './duty';
+import {
+  Cpu
+} from '../cpu/cpu';
+import {
+  eightBitLoadFromGBMemorySkipTraps,
+  eightBitStoreIntoGBMemorySkipTraps,
+  getSaveStateMemoryOffset,
+  loadBooleanDirectlyFromWasmMemory,
+  storeBooleanDirectlyToWasmMemory
+} from '../memory/index';
 import {
   checkBitOnByte,
   hexLog
@@ -104,6 +107,16 @@ export class Channel2 {
     return Channel2.getSample(accumulatedCycles);
   }
 
+  // Function to reset our timer, useful for GBC double speed mode
+  static resetTimer(): void {
+    Channel2.frequencyTimer = (2048 - getChannelFrequency(Channel2.channelNumber)) * 4;
+
+    // TODO: Ensure this is correct for GBC Double Speed Mode
+    if (Cpu.GBCDoubleSpeed) {
+      Channel2.frequencyTimer = Channel2.frequencyTimer * 2;
+    }
+  }
+
   static getSample(numberOfCycles: i32): i32 {
 
     // Decrement our channel timer
@@ -116,7 +129,7 @@ export class Channel2 {
       // Reset our timer
       // A square channel's frequency timer period is set to (2048-frequency)*4.
       // Four duty cycles are available, each waveform taking 8 frequency timer clocks to cycle through:
-      Channel2.frequencyTimer = (2048 - getChannelFrequency(Channel2.channelNumber)) * 4;
+      Channel2.resetTimer();
       Channel2.frequencyTimer -= overflowAmount;
 
       // Also increment our duty cycle
@@ -166,7 +179,7 @@ export class Channel2 {
     // Reset our timer
     // A square channel's frequency timer period is set to (2048-frequency)*4.
     // Four duty cycles are available, each waveform taking 8 frequency timer clocks to cycle through:
-    Channel2.frequencyTimer = (2048 - getChannelFrequency(Channel2.channelNumber)) * 4;
+    Channel2.resetTimer();
 
     Channel2.envelopeCounter = getChannelEnvelopePeriod(Channel2.channelNumber);
 

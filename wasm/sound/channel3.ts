@@ -4,13 +4,6 @@
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Wave_Channel
 
 import {
-  eightBitLoadFromGBMemorySkipTraps,
-  eightBitStoreIntoGBMemorySkipTraps,
-  getSaveStateMemoryOffset,
-  loadBooleanDirectlyFromWasmMemory,
-  storeBooleanDirectlyToWasmMemory
-} from '../memory/index';
-import {
   getChannelStartingVolume,
   isChannelDacEnabled,
   getRegister2OfChannel
@@ -29,6 +22,16 @@ import {
 import {
   isDutyCycleClockPositiveOrNegativeForWaveform
 } from './duty';
+import {
+  Cpu
+} from '../cpu/cpu';
+import {
+  eightBitLoadFromGBMemorySkipTraps,
+  eightBitStoreIntoGBMemorySkipTraps,
+  getSaveStateMemoryOffset,
+  loadBooleanDirectlyFromWasmMemory,
+  storeBooleanDirectlyToWasmMemory
+} from '../memory/index';
 import {
   checkBitOnByte,
   hexLog
@@ -101,6 +104,16 @@ export class Channel3 {
     return Channel3.getSample(accumulatedCycles);
   }
 
+  // Function to reset our timer, useful for GBC double speed mode
+  static resetTimer(): void {
+    Channel3.frequencyTimer = (2048 - getChannelFrequency(Channel3.channelNumber)) * 2;
+
+    // TODO: Ensure this is correct for GBC Double Speed Mode
+    if (Cpu.GBCDoubleSpeed) {
+      Channel3.frequencyTimer = Channel3.frequencyTimer * 2;
+    }
+  }
+
   static getSample(numberOfCycles: i32): i32 {
 
     // Decrement our channel timer
@@ -113,7 +126,7 @@ export class Channel3 {
       // Reset our timer
       // A wave channel's frequency timer period is set to (2048-frequency) * 2.
       // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Wave_Channel
-      Channel3.frequencyTimer = (2048 - getChannelFrequency(Channel3.channelNumber)) * 2;
+      Channel3.resetTimer();
       Channel3.frequencyTimer -= overflowAmount;
 
 
@@ -208,7 +221,7 @@ export class Channel3 {
 
     // Reset our timer
     // A wave channel's frequency timer period is set to (2048-frequency)*2.
-    Channel3.frequencyTimer = (2048 - getChannelFrequency(Channel3.channelNumber)) * 2;
+    Channel3.resetTimer();
 
     // Reset our wave table position
     Channel3.waveTablePosition = 0;

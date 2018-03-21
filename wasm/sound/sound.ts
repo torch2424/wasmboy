@@ -30,7 +30,7 @@ import {
 } from '../cpu/index';
 import {
   Config
-} from '../config'
+} from '../config';
 import {
   eightBitLoadFromGBMemorySkipTraps,
   eightBitStoreIntoGBMemorySkipTraps,
@@ -59,7 +59,13 @@ export class Sound {
   // This number should be in sync so that sound doesn't run too many cyles at once
   // and does not exceed the minimum number of cyles for either down sampling, or
   // How often we change the frame, or a channel's update process
-  static batchProcessCycles: i32 = 87;
+  static batchProcessCycles(): i32 {
+    if (Cpu.GBCDoubleSpeed) {
+      return 174;
+    }
+
+    return 87;
+  }
 
   // Channel control / On-OFF / Volume (RW)
   static readonly memoryLocationNR50: u16 = 0xFF24;
@@ -76,14 +82,22 @@ export class Sound {
   // Need to count how often we need to increment our frame sequencer
   // Which you can read about below
   static frameSequenceCycleCounter: i32 = 0x0000;
-  static readonly maxFrameSequenceCycles: i32 = 8192;
+  static maxFrameSequenceCycles(): i32 {
+    if (Cpu.GBCDoubleSpeed) {
+      return 16384;
+    }
+
+    return 8192;
+  }
 
   // Also need to downsample our audio to average audio qualty
   // https://www.reddit.com/r/EmuDev/comments/5gkwi5/gb_apu_sound_emulation/
   // Want to do 48000hz, so CpuRate / Sound Rate, 4194304 / 48000 ~ 87 cycles
   static downSampleCycleCounter: i32 = 0x00;
   static downSampleCycleMultiplier: i32 = 48000;
-  static readonly maxDownSampleCycles: i32 = 4194304;
+  static maxDownSampleCycles(): i32 {
+    return Cpu.CLOCK_SPEED();
+  }
 
   // Frame sequencer controls what should be updated and and ticked
   // Everyt time the sound is updated :) It is updated everytime the
@@ -153,13 +167,13 @@ export function initializeSound(): void {
 // Function to batch process our audio after we skipped so many cycles
 export function batchProcessAudio(): void {
 
-  if (Sound.currentCycles < Sound.batchProcessCycles) {
+  if (Sound.currentCycles < Sound.batchProcessCycles()) {
     return;
   }
 
-  while (Sound.currentCycles >= Sound.batchProcessCycles) {
-    updateSound(Sound.batchProcessCycles);
-    Sound.currentCycles = Sound.currentCycles - Sound.batchProcessCycles;
+  while (Sound.currentCycles >= Sound.batchProcessCycles()) {
+    updateSound(Sound.batchProcessCycles());
+    Sound.currentCycles = Sound.currentCycles - Sound.batchProcessCycles();
   }
 }
 
@@ -205,11 +219,11 @@ function calculateSound(numberOfCycles: i32): void {
 
   // Do Some downsampling magic
   Sound.downSampleCycleCounter += (numberOfCycles * Sound.downSampleCycleMultiplier);
-  if(Sound.downSampleCycleCounter >= Sound.maxDownSampleCycles) {
+  if(Sound.downSampleCycleCounter >= Sound.maxDownSampleCycles()) {
 
     // Reset the downsample counter
     // Don't set to zero to catch overflowed cycles
-    Sound.downSampleCycleCounter -= Sound.maxDownSampleCycles;
+    Sound.downSampleCycleCounter -= Sound.maxDownSampleCycles();
 
     // Mixe our samples
     let mixedSample: u16 = mixChannelSamples(channel1Sample, channel2Sample, channel3Sample, channel4Sample);
@@ -261,11 +275,11 @@ function accumulateSound(numberOfCycles: i32): void {
 
   // Do Some downsampling magic
   Sound.downSampleCycleCounter += (numberOfCycles * Sound.downSampleCycleMultiplier);
-  if(Sound.downSampleCycleCounter >= Sound.maxDownSampleCycles) {
+  if(Sound.downSampleCycleCounter >= Sound.maxDownSampleCycles()) {
 
     // Reset the downsample counter
     // Don't set to zero to catch overflowed cycles
-    Sound.downSampleCycleCounter -= Sound.maxDownSampleCycles;
+    Sound.downSampleCycleCounter -= Sound.maxDownSampleCycles();
 
     if (SoundAccumulator.mixerVolumeChanged ||
       SoundAccumulator.mixerEnabledChanged) {
@@ -292,10 +306,10 @@ function updateFrameSequencer(numberOfCycles: i32): boolean {
   // Or Cpu.clockSpeed / 512
   // Which means, we need to update once every 8192 cycles :)
   Sound.frameSequenceCycleCounter += numberOfCycles;
-  if(Sound.frameSequenceCycleCounter >= Sound.maxFrameSequenceCycles) {
+  if(Sound.frameSequenceCycleCounter >= Sound.maxFrameSequenceCycles()) {
     // Reset the frameSequenceCycleCounter
     // Not setting to zero as we do not want to drop cycles
-    Sound.frameSequenceCycleCounter -= Sound.maxFrameSequenceCycles;
+    Sound.frameSequenceCycleCounter -= Sound.maxFrameSequenceCycles();
 
     // Check our frame sequencer
     // https://gist.github.com/drhelius/3652407
