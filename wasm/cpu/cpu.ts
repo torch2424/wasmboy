@@ -19,6 +19,9 @@ import {
 // https://github.com/AssemblyScript/assemblyscript/blob/master/tests/compiler/showcase.ts
 export class Cpu {
 
+  // Status to track if we are in Gameboy Color Mode
+  static GBCEnabled: boolean = false;
+
   // Clock Speed to determine all kinds of other values
   static clockSpeed: i32 = 4194304;
 
@@ -98,11 +101,14 @@ export class Cpu {
   }
 }
 
-export function initialize(includeBootRom: u8): void {
-  log("initializing (includeBootRom=$0)", 1, includeBootRom);
+export function initialize(useGBCMode: i32, includeBootRom: i32): void {
+
+  // First, try to switch to Gameboy Color Mode
+
   // TODO: depending on the boot rom, initialization may be different
   // From: http://www.codeslinger.co.uk/pages/projects/gameboy/hardware.html
   // All values default to zero in memory, so not setting them yet
+  log("initializing (includeBootRom=$0)", 1, includeBootRom);
   if(includeBootRom <= 0) {
     Cpu.programCounter = 0x100;
     Cpu.registerA = 0x01;
@@ -134,13 +140,13 @@ export function initialize(includeBootRom: u8): void {
     eightBitStoreIntoGBMemory(0xFF47, 0xFC);
     eightBitStoreIntoGBMemory(0xFF48, 0xFF);
     eightBitStoreIntoGBMemory(0xFF49, 0xFF);
+
+    // Call our memory to initialize our cartridge type
+    initializeCartridge();
+
+    // Initialize our sound registers
+    initializeSound();
   }
-
-  // Call our memory to initialize our cartridge type
-  initializeCartridge();
-
-  // Initialize our sound registers
-  initializeSound();
 }
 
 // Private function for our relative jumps
