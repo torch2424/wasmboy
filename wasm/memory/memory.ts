@@ -84,6 +84,10 @@ export class Memory {
   // Cycles accumulated for DMA
   static DMACycles: i32 = 0;
 
+  // GBC Registers
+  static memoryLocationGBCWRAMBAnk: u16 = 0xFF70;
+  static memoryLocationGBCVRAMBAnk: u16 = 0xFF4F;
+
   // Save States
 
   static readonly saveStateSlot: u16 = 4;

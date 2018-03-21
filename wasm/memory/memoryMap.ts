@@ -1,11 +1,19 @@
 // WasmBoy memory map:
 // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
 
-import { Memory } from './memory';
+import {
+  Memory
+} from './memory';
+import {
+  eightBitLoadFromGBMemorySkipTraps
+} from './load';
 import {
   getRomBankAddress,
   getRamBankAddress
 } from './banking';
+import {
+  Cpu
+} from '../cpu/cpu'
 import {
   hexLog
 } from '../helpers/index';
@@ -18,7 +26,8 @@ import {
 export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
 
   // Get the top byte and switch
-  switch(gameboyOffset >> 12) {
+  let gameboyOffsetHighByte: i32 = (gameboyOffset >> 12);
+  switch(gameboyOffsetHighByte) {
     case 0x00:
     case 0x01:
     case 0x02:
@@ -37,40 +46,54 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
     case 0x09:
       // Video RAM
       // 0x8000 -> 0x000400
-      return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation;
+      if (Cpu.GBCEnabled) {
+        // Find our current VRAM Bank
+        let vramBankId: i32 = (eightBitLoadFromGBMemorySkipTraps(Memory.memoryLocationGBCVRAMBAnk) & 0x01);
+        return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation + (0x2000 * vramBankId);
+      } else {
+        return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation;
+      }
     case 0x0A:
     case 0x0B:
       // Cartridge RAM - A.K.A External RAM
       // 0xA000 -> 0x008400
       return getRamBankAddress(gameboyOffset) + Memory.gameRamBanksLocation;
-    default:
-      // NOTE / TODO: Switchable Internal Ram Banks?
+    case 0x0C:
+      // Gameboy Ram Bank 0
       // 0xC000 -> 0x000400
-      return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation;
+      if (Cpu.GBCEnabled) {
+        // 0x2000 For VRAM Bank 1 offset
+        return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation + 0x2000;
+      } else {
+        return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation;
+      }
+    case 0x0D:
+      // Gameboy Ram Banks, Switchable in GBC Mode
+      // 0xC000 -> 0x000400
+      // In CGB Mode 32 KBytes internal RAM are available.
+      // This memory is divided into 8 banks of 4 KBytes each.
+      // Bank 0 is always available in memory at C000-CFFF,
+      // Bank 1-7 can be selected into the address space at D000-DFFF.
+      // http://gbdev.gg8.se/wiki/articles/CGB_Registers#FF70_-_SVBK_-_CGB_Mode_Only_-_WRAM_Bank
+      if (Cpu.GBCEnabled) {
+        // Get the last 3 bits to find our wram ID
+        let wramBankId: i32 = (eightBitLoadFromGBMemorySkipTraps(Memory.memoryLocationGBCWRAMBAnk) & 0x07);
+        if (wramBankId < 1) {
+          wramBankId = 1;
+        }
+        // (0x1000 * (wramBankId - 1)) -> To find the correct wram bank. 0x2000 For the Bank 1 VRAM offset
+        return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation + (0x1000 * (wramBankId - 1)) + 0x2000;
+      } else {
+        return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation;
+      }
+    default:
+      // Everything Else after Gameboy Ram Bankss
+      // 0xE000 -> 0x000400
+      if (Cpu.GBCEnabled) {
+        // 0x2000 For VRAM Bank 1 offset
+        return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation + 0x2000;
+      } else {
+        return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation;
+      }
   }
-
-  // // Find the wasmboy offset
-  // if (gameboyOffset < Memory.switchableCartridgeRomLocation) {
-  //   // Cartridge ROM - Bank 0 (fixed)
-  //   // 0x0000 -> 0x073800
-  //   return gameboyOffset + Memory.gameBytesLocation;
-  // }
-  // if (gameboyOffset < Memory.videoRamLocation) {
-  //   // Cartridge ROM - Switchable Banks 1-xx
-  //   // 0x4000 -> (0x073800 + 0x4000)
-  //   return getRomBankAddress(gameboyOffset) + Memory.gameBytesLocation;
-  // }
-  // if (gameboyOffset < Memory.cartridgeRamLocation) {
-  //   // Video RAM
-  //   // 0x8000 -> 0x000400
-  //   return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation;
-  // }
-  // if (gameboyOffset < Memory.internalRamBankZeroLocation) {
-  //   // Cartridge RAM - A.K.A External RAM
-  //   // 0xA000 -> 0x008400
-  //   return getRamBankAddress(gameboyOffset) + Memory.gameRamBanksLocation;
-  // }
-  // // NOTE / TODO: Switchable Internal Ram Banks?
-  // // 0xC000 -> 0x000400
-  // return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation;
 }

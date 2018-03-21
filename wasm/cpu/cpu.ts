@@ -12,7 +12,8 @@ import {
 } from '../sound/index'
 
 import {
-  log
+  log,
+  hexLog
 } from '../helpers/index';
 
 // Everything Static as class instances just aren't quite there yet
@@ -126,7 +127,7 @@ export function initialize(useGBCMode: i32 = 0, includeBootRom: i32 = 0): void {
 
   if (gbcType === 0xC0 ||
     (useGBCMode > 0 && gbcType === 0x80)) {
-    //Cpu.GBCEnabled = true;
+    Cpu.GBCEnabled = true;
   }
 
   // TODO: depending on the boot rom, initialization may be different
