@@ -165,7 +165,7 @@ function _getCurrentCycleCounterFrequency(): i32 {
       // TIMC -> 4096
       cycleCount = 1024;
       if (Cpu.GBCDoubleSpeed) {
-        cycleCount = 2948;
+        cycleCount = 2048;
       }
       break;
     case 0x01:
