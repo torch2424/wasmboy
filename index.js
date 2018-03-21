@@ -3,6 +3,18 @@ import { Component } from 'preact';
 import { WasmBoy, WasmBoyGraphics, WasmBoyAudio, WasmBoyController, WasmBoyMemory } from './lib/wasmboy.js';
 import { WasmBoyDebugger, WasmBoySystemControls } from './debugger/index';
 
+const wasmBoyOptions = {
+	isAudioEnabled: true,
+	frameSkip: 1,
+	audioBatchProcessing: true,
+	timersBatchProcessing: true,
+	audioAccumulateSamples: true,
+	graphicsBatchProcessing: true,
+	graphicsDisableScanlineRendering: true
+};
+
+const wasmBoyOptionsString = JSON.stringify(wasmBoyOptions, null, 4);
+
 export default class App extends Component {
 
 	// Using componentDidMount to wait for the canvas element to be inserted in DOM
@@ -10,16 +22,10 @@ export default class App extends Component {
 		// Get our canvas element
 		const canvasElement = document.querySelector(".wasmboy__canvas-container__canvas");
 
+
+
 		// Load our game
-		WasmBoy.initialize(canvasElement, {
-			isAudioEnabled: true,
-			frameSkip: 1,
-			audioBatchProcessing: true,
-			timersBatchProcessing: true,
-			audioAccumulateSamples: true,
-			graphicsBatchProcessing: true,
-			graphicsDisableScanlineRendering: true
-		});
+		WasmBoy.initialize(canvasElement, wasmBoyOptions);
 
 		// Add our touch inputs
 		// Add our touch inputs
@@ -50,7 +56,9 @@ export default class App extends Component {
 		return (
 			<div>
 				<h1>WasmBoy</h1>
-				<p><i>Currently built for mobile performance testing. Accuracy is lower because of this</i></p>
+				<p>Build Options:</p>
+				<p><i>(Currently built for Mobile Performance testing. Accuracy is lowered.)</i></p>
+				<p>{wasmBoyOptionsString}</p>
 				<div class="wasmboy__systemControls">
 					<WasmBoySystemControls wasmboy={WasmBoy}></WasmBoySystemControls>
 				</div>
