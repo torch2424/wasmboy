@@ -47,6 +47,7 @@ import {
   resetBitOnByte
 } from '../helpers/index';
 import {
+  Memory,
   eightBitStoreIntoGBMemory,
   sixteenBitStoreIntoGBMemory,
   eightBitLoadFromGBMemory,
@@ -87,7 +88,7 @@ export function update(): i32 {
 
 
   let error: boolean = false;
-  let numberOfCycles: i8 = -1;
+  let numberOfCycles: i32 = -1;
 
   while(!error &&
     Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME()) {
@@ -137,10 +138,10 @@ export function update(): i32 {
 // http://www.codeslinger.co.uk/pages/projects/gameboy/beginning.html
 export function emulationStep(audioBatchProcessing: boolean = false,
   graphicsBatchProcessing: boolean = false,
-  timersBatchProcessing: boolean = false): i8 {
+  timersBatchProcessing: boolean = false): i32 {
   // Get the opcode, and additional bytes to be handled
   // Number of cycles defaults to 4, because while we're halted, we run 4 cycles (according to matt :))
-  let numberOfCycles: i8 = 4;
+  let numberOfCycles: i32 = 4;
   let opcode: u8 = 0;
 
   // Cpu Halting best explained: https://www.reddit.com/r/EmuDev/comments/5ie3k7/infinite_loop_trying_to_pass_blarggs_interrupt/db7xnbe/
@@ -172,6 +173,12 @@ export function emulationStep(audioBatchProcessing: boolean = false,
       numberOfCycles = executeOpcode(opcode, dataByteOne, dataByteTwo);
       Cpu.programCounter -= 1;
     }
+  }
+
+  // Check if we did a DMA TRansfer, if we did add the cycles
+  if (Memory.DMACycles > 0) {
+    numberOfCycles += Memory.DMACycles;
+    Memory.DMACycles = 0;
   }
 
 
@@ -209,11 +216,11 @@ export function emulationStep(audioBatchProcessing: boolean = false,
 // Setting return value to i32 instead of u16, as we want to return a negative number on error
 // https://rednex.github.io/rgbds/gbz80.7.html
 // http://pastraiser.com/cpu/gameboy/gameboyopcodes.html
-function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
+function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i32 {
 
   // Initialize our number of cycles
   // Return -1 if no opcode was found, representing an error
-  let numberOfCycles: i8 = -1;
+  let numberOfCycles: i32 = -1;
 
   // Always implement the program counter by one
   // Any other value can just subtract or add however much offset before reaching this line
@@ -455,6 +462,9 @@ function handleOpcode1x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
           } else {
             Cpu.GBCDoubleSpeed = false;
           }
+
+          // Cycle accurate gameboy docs says this takes 76 clocks
+          return 76;
       }
 
       // TODO: This breaks Blarggs CPU tests, find out what should end a STOP

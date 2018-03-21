@@ -85,9 +85,13 @@ export function checkInterrupts(): i8 {
       }
     }
 
-    // Interrupt handling requires 20 cycles
+    // Interrupt handling requires 20 cycles, TCAGBD
     if(wasInterruptHandled) {
-      return 20;
+      let intteruptHandlerCycles: i8 = 20;
+      if(Cpu.isHalted) {
+        intteruptHandlerCycles += 4;
+      }
+      return intteruptHandlerCycles;
     }
   }
 

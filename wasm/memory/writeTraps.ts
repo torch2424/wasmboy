@@ -160,4 +160,8 @@ function _dmaTransfer(sourceAddressOffset: u8): void {
     let spriteInformationAddress: u16 = Memory.spriteInformationTableLocation + i;
     eightBitStoreIntoGBMemorySkipTraps(spriteInformationAddress, spriteInformationByte);
   }
+
+  // TCAGBD:  This copy (DMA) needs 160 × 4 + 4 clocks to complete in both double speed and single speeds modes
+  // Increment all of our Cycle coiunters in ../cpu/opcodes
+  Memory.DMACycles += 644;
 }

@@ -81,6 +81,9 @@ export class Memory {
   static isMBC3: boolean = false;
   static isMBC5: boolean = false;
 
+  // Cycles accumulated for DMA
+  static DMACycles: i32 = 0;
+
   // Save States
 
   static readonly saveStateSlot: u16 = 4;

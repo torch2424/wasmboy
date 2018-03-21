@@ -19,7 +19,13 @@ export class Timers {
   static currentCycles: i32 = 0;
 
   // Number of cycles to run in each batch process
-  static batchProcessCycles: i32 = 255;
+  static batchProcessCycles(): i32 {
+  if (Cpu.GBCDoubleSpeed) {
+    return 140448;
+  }
+
+    return 255;
+  }
 
   static readonly memoryLocationTIMA: u16 = 0xFF05; // Timer Modulator
   static readonly memoryLocationTMA: u16 = 0xFF06; // Timer Counter (Actual Time Value)
@@ -33,6 +39,13 @@ export class Timers {
 
   // Another timer, that doesn't fire intterupts, but jsut counts to 255, and back to zero :p
   static dividerRegisterCycleCounter: i32 = 0x00;
+  static dividerRegisterMaxCycleCount(): i32 {
+    if (Cpu.GBCDoubleSpeed) {
+      return 140448;
+    }
+
+    return 255;
+  }
 
   // Save States
 
@@ -61,7 +74,7 @@ export function batchProcessTimers(): void {
   // Get our current batch process cycles
   // This will depend on the least amount of cycles we need to update
   // Something
-  let batchProcessCycles: i32 = Timers.batchProcessCycles;
+  let batchProcessCycles: i32 = Timers.batchProcessCycles();
   if (_isTimerEnabled() && Timers.currentMaxCycleCount < batchProcessCycles) {
     batchProcessCycles = Timers.currentMaxCycleCount;
   }
@@ -108,16 +121,15 @@ export function updateTimers(numberOfCycles: i32): void {
 
 // Function to update our divider register
 function _checkDividerRegister(numberOfCycles: i32): void {
-  // CLOCK_SPEED / 16382
 
   // Every 256 clock cycles need to increment
   Timers.dividerRegisterCycleCounter += numberOfCycles;
 
-  if(Timers.dividerRegisterCycleCounter >= 255) {
+  if(Timers.dividerRegisterCycleCounter >= Timers.dividerRegisterMaxCycleCount()) {
 
     // Reset the cycle counter
     // - 255 to catch any overflow with the cycles
-    Timers.dividerRegisterCycleCounter -= 255;
+    Timers.dividerRegisterCycleCounter -= Timers.dividerRegisterMaxCycleCount();
 
     let dividerRegister = eightBitLoadFromGBMemorySkipTraps(Timers.memoryLocationDividerRegister);
     // TODO: Hoping that the overflow will occur correctly here, see this for any weird errors
@@ -145,18 +157,30 @@ function _getCurrentCycleCounterFrequency(): i32 {
   // Cpu.CLOCK_SPEED / timc frequency
   // TIMC -> 16382
   let cycleCount: i32 = 256;
+  if (Cpu.GBCDoubleSpeed) {
+    cycleCount = 512;
+  }
   switch(timc) {
     case 0x00:
       // TIMC -> 4096
       cycleCount = 1024;
+      if (Cpu.GBCDoubleSpeed) {
+        cycleCount = 2948;
+      }
       break;
     case 0x01:
       // TIMC -> 262144
       cycleCount = 16;
+      if (Cpu.GBCDoubleSpeed) {
+        cycleCount = 32;
+      }
       break;
     case 0x02:
       // TIMC -> 65536
       cycleCount = 64;
+      if (Cpu.GBCDoubleSpeed) {
+        cycleCount = 126;
+      }
       break;
   }
 
