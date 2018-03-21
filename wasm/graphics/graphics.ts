@@ -58,10 +58,10 @@ export class Graphics {
 
   static MAX_CYCLES_PER_SCANLINE(): i32 {
     if (Cpu.GBCDoubleSpeed) {
-      return 456;
+      return 912;
     }
 
-    return 912;
+    return 456;
   }
 
   static MIN_CYCLES_SPRITES_LCD_MODE(): i32 {

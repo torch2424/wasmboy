@@ -17,6 +17,7 @@ export default class App extends Component {
 			audioBatchProcessing: true,
 			timersBatchProcessing: true,
 			audioAccumulateSamples: true,
+			graphicsBatchProcessing: true,
 			graphicsDisableScanlineRendering: true
 		});
 
@@ -49,6 +50,7 @@ export default class App extends Component {
 		return (
 			<div>
 				<h1>WasmBoy</h1>
+				<p><i>Currently built for mobile performance testing. Accuracy is lower because of this</i></p>
 				<div class="wasmboy__systemControls">
 					<WasmBoySystemControls wasmboy={WasmBoy}></WasmBoySystemControls>
 				</div>
