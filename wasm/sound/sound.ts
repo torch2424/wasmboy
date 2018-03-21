@@ -82,7 +82,8 @@ export class Sound {
   // https://www.reddit.com/r/EmuDev/comments/5gkwi5/gb_apu_sound_emulation/
   // Want to do 48000hz, so CpuRate / Sound Rate, 4194304 / 48000 ~ 87 cycles
   static downSampleCycleCounter: i32 = 0x00;
-  static readonly maxDownSampleCycles: i32 = 87;
+  static downSampleCycleMultiplier: i32 = 48000;
+  static readonly maxDownSampleCycles: i32 = 4194304;
 
   // Frame sequencer controls what should be updated and and ticked
   // Everyt time the sound is updated :) It is updated everytime the
@@ -203,7 +204,7 @@ function calculateSound(numberOfCycles: i32): void {
   SoundAccumulator.channel4Sample = channel4Sample;
 
   // Do Some downsampling magic
-  Sound.downSampleCycleCounter += numberOfCycles;
+  Sound.downSampleCycleCounter += (numberOfCycles * Sound.downSampleCycleMultiplier);
   if(Sound.downSampleCycleCounter >= Sound.maxDownSampleCycles) {
 
     // Reset the downsample counter
@@ -259,7 +260,7 @@ function accumulateSound(numberOfCycles: i32): void {
   }
 
   // Do Some downsampling magic
-  Sound.downSampleCycleCounter += numberOfCycles;
+  Sound.downSampleCycleCounter += (numberOfCycles * Sound.downSampleCycleMultiplier);
   if(Sound.downSampleCycleCounter >= Sound.maxDownSampleCycles) {
 
     // Reset the downsample counter
