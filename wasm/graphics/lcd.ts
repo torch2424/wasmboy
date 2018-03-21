@@ -66,13 +66,13 @@ export function setLcdStatus(lcdEnabledStatus: boolean): void {
     lcdStatus = setBitOnByte(0, lcdStatus);
     shouldRequestInterrupt = checkBitOnByte(4, lcdStatus);
   } else {
-    if (Graphics.scanlineCycleCounter >= Graphics.MIN_CYCLES_SPRITES_LCD_MODE) {
+    if (Graphics.scanlineCycleCounter >= Graphics.MIN_CYCLES_SPRITES_LCD_MODE()) {
       // Searching Sprites Atts
       newLcdMode = 2;
       lcdStatus = resetBitOnByte(0, lcdStatus);
       lcdStatus = setBitOnByte(1, lcdStatus);
       shouldRequestInterrupt = checkBitOnByte(5, lcdStatus);
-    } else if (Graphics.scanlineCycleCounter >= Graphics.MIN_CYCLES_TRANSFER_DATA_LCD_MODE) {
+    } else if (Graphics.scanlineCycleCounter >= Graphics.MIN_CYCLES_TRANSFER_DATA_LCD_MODE()) {
       // Transferring data to lcd
       newLcdMode = 3;
       lcdStatus = setBitOnByte(0, lcdStatus);

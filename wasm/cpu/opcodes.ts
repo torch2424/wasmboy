@@ -42,7 +42,9 @@ import {
   rotateByteRightThroughCarry,
   concatenateBytes,
   splitHighByte,
-  splitLowByte
+  splitLowByte,
+  checkBitOnByte,
+  resetBitOnByte
 } from '../helpers/index';
 import {
   eightBitStoreIntoGBMemory,
@@ -69,7 +71,7 @@ import {
 import {
   Sound,
   updateSound
-} from '../sound/index'
+} from '../sound/index';
 
 // Public funciton to run opcodes until an event occurs.
 // Return values:
@@ -88,7 +90,7 @@ export function update(): i32 {
   let numberOfCycles: i8 = -1;
 
   while(!error &&
-      Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME) {
+    Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME()) {
     numberOfCycles = emulationStep(audioBatchProcessing, graphicsBatchProcessing, timersBatchProcessing);
     if (numberOfCycles >= 0) {
       Cpu.currentCycles += numberOfCycles;
@@ -116,10 +118,11 @@ export function update(): i32 {
   }
 
   // Find our exit reason
-  if (Cpu.currentCycles >= Cpu.MAX_CYCLES_PER_FRAME) {
+  if (Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME()) {
     // Render a frame
+
     // Reset our currentCycles
-    Cpu.currentCycles = 0;
+    Cpu.currentCycles -= Cpu.MAX_CYCLES_PER_FRAME()
 
     return 1;
   }
@@ -438,6 +441,22 @@ function handleOpcode1x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
       // Enter CPU very low power mode. Also used to switch between double and normal speed CPU modes in GBC.
       // Meaning Don't Decode anymore opcodes , or updated the LCD until joypad interrupt (or when button is pressed if I am wrong)
       // See HALT
+
+      // If we are in gameboy color mode, set the new sppeed
+      let speedSwitch: u8 = eightBitLoadFromGBMemory(Cpu.memoryLocationSpeedSwitch);
+      if (Cpu.GBCEnabled && checkBitOnByte(0, speedSwitch)) {
+          // Reset the bit
+          resetBitOnByte(0, speedSwitch);
+          eightBitStoreIntoGBMemory(Cpu.memoryLocationSpeedSwitch, speedSwitch);
+
+          // Switch to the new mode
+          if (checkBitOnByte(7, speedSwitch)) {
+            Cpu.GBCDoubleSpeed = true;
+          } else {
+            Cpu.GBCDoubleSpeed = false;
+          }
+      }
+
       // TODO: This breaks Blarggs CPU tests, find out what should end a STOP
       //Cpu.isStopped = true;
       Cpu.programCounter += 1;

@@ -19,11 +19,9 @@ import {
 // https://github.com/AssemblyScript/assemblyscript/blob/master/tests/compiler/showcase.ts
 export class Cpu {
 
-  // Status to track if we are in Gameboy Color Mode
+  // Status to track if we are in Gameboy Color Mode, and GBC State
   static GBCEnabled: boolean = false;
-
-  // Clock Speed to determine all kinds of other values
-  static clockSpeed: i32 = 4194304;
+  static GBCDoubleSpeed: boolean = false;
 
   // 8-bit Cpu.registers
   static registerA: u8 = 0;
@@ -42,14 +40,32 @@ export class Cpu {
 
   // Current number of cycles, shouldn't execeed max number of cycles
   static currentCycles: i32 = 0;
-  static readonly CLOCK_SPEED: i32 = 4194304;
-  static readonly MAX_CYCLES_PER_FRAME : i32 = 69905;
+  static CLOCK_SPEED(): i32 {
+    if (Cpu.GBCDoubleSpeed) {
+      // 2^23, thanks binji!
+      return 8388608;
+    }
+
+    return 4194304;
+  }
+
+  // cycles = 154 scanlines, 456 cycles per line
+  static MAX_CYCLES_PER_FRAME(): i32 {
+    if (Cpu.GBCDoubleSpeed) {
+      return 140448;
+    }
+
+    return 70224;
+  }
 
   // HALT and STOP instructions need to stop running opcodes, but simply check timers
   // https://github.com/nakardo/node-gameboy/blob/master/lib/cpu/opcodes.js
   // Matt said is should work to, so it must work!
   static isHalted: boolean = false;
   static isStopped: boolean = false;
+
+  // Memory Location for the GBC Speed switch
+  static memoryLocationSpeedSwitch: u16 = 0xFF4D;
 
   // Debugging properties
   static previousOpcode: u8 = 0x00;
@@ -104,6 +120,14 @@ export class Cpu {
 export function initialize(useGBCMode: i32 = 0, includeBootRom: i32 = 0): void {
 
   // First, try to switch to Gameboy Color Mode
+  // Get our GBC support from the cartridge header
+  // http://gbdev.gg8.se/wiki/articles/The_Cartridge_Header
+  let gbcType: u8 = eightBitLoadFromGBMemory(0x0143);
+
+  if (gbcType === 0xC0 ||
+    (useGBCMode > 0 && gbcType === 0x80)) {
+    Cpu.GBCEnabled = true;
+  }
 
   // TODO: depending on the boot rom, initialization may be different
   // From: http://www.codeslinger.co.uk/pages/projects/gameboy/hardware.html
