@@ -77,7 +77,7 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
       // http://gbdev.gg8.se/wiki/articles/CGB_Registers#FF70_-_SVBK_-_CGB_Mode_Only_-_WRAM_Bank
       if (Cpu.GBCEnabled) {
         // Get the last 3 bits to find our wram ID
-        let wramBankId: i32 = (eightBitLoadFromGBMemorySkipTraps(Memory.memoryLocationGBCWRAMBAnk) & 0x07);
+        let wramBankId: i32 = (eightBitLoadFromGBMemorySkipTraps(Memory.memoryLocationGBCWRAMBank) & 0x07);
         if (wramBankId < 1) {
           wramBankId = 1;
         }

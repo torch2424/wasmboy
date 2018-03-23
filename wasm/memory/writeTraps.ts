@@ -44,6 +44,7 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
 
   // Handle banking
   if(offset < videoRamLocation) {
+
     handleBanking(offset, value);
     return false;
   }
@@ -149,23 +150,36 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
       return true;
     }
 
-    // Check if the HDMA registers are attempting to be changed while and HDMA is active
-    if(Memory.isHblankHdmaActive &&
-      offset >= Memory.memoryLocationHdmaSourceHigh &&
-      offset <= Memory.memoryLocationHdmaDestinationLow) {
-        return false;
-    }
-
-    // Do an HDMA
-    if(offset === Memory.memoryLocationHdmaTrigger) {
-      startHdmaTransfer(<u8>value);
-      return false;
-    }
-
 
     // Allow the original write, and return since we dont need to look anymore
     return true;
   }
 
+
+  // Check if the HDMA registers are attempting to be changed while and HDMA is active
+  if(Memory.isHblankHdmaActive &&
+    offset >= Memory.memoryLocationHdmaSourceHigh &&
+    offset <= Memory.memoryLocationHdmaDestinationLow) {
+      return false;
+  }
+
+  // Do an HDMA
+  if(offset === Memory.memoryLocationHdmaTrigger) {
+    startHdmaTransfer(<u8>value);
+    return false;
+  }
+
+  // Don't allow banking if we are doing an Hblank HDM transfer
+  // https://gist.github.com/drhelius/3394856
+  if(offset === Memory.memoryLocationGBCWRAMBank || offset === Memory.memoryLocationGBCVRAMBAnk) {
+    if (Memory.isHblankHdmaActive) {
+      if((Memory.hblankHdmaSource >= 0x4000 && Memory.hblankHdmaSource <= 0x7FFF) ||
+        (Memory.hblankHdmaSource >= 0xD000 && Memory.hblankHdmaSource <= 0xDFFF)) {
+          return false;
+        }
+    }
+  }
+
+  // Allow the original write
   return true;
 }

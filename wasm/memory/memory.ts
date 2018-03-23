@@ -98,7 +98,7 @@ export class Memory {
   static hblankHdmaDestination: u16 = 0x00;
 
   // GBC Registers
-  static memoryLocationGBCWRAMBAnk: u16 = 0xFF70;
+  static memoryLocationGBCWRAMBank: u16 = 0xFF70;
   static memoryLocationGBCVRAMBAnk: u16 = 0xFF4F;
 
   // Save States

@@ -22,8 +22,6 @@ export default class App extends Component {
 		// Get our canvas element
 		const canvasElement = document.querySelector(".wasmboy__canvas-container__canvas");
 
-
-
 		// Load our game
 		WasmBoy.initialize(canvasElement, wasmBoyOptions);
 
