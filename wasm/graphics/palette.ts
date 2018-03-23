@@ -117,13 +117,10 @@ export function getMonochromeColorFromPalette(colorId: u8, paletteMemoryLocation
 export function getColorFromRgbPalette(colorId: u8, colorPalette: u16): u8 {
 
   // Get our bitmask for the color ID
-  let bitMask: u16 = (0x1F << colorId);
-  let colorValue: u16 = ((colorPalette & bitMask) >> colorId);
+  // bit mask tested good :)
+  // TODO: Color palette bad
+  let bitMask: u16 = (0x1F << (colorId * 5));
+  let colorValue: u16 = ((colorPalette & bitMask) >> (colorId * 5));
 
-  // let isDoubleSpeed: u8 = 0;
-  // if(Cpu.GBCDoubleSpeed) {
-  //   isDoubleSpeed = 1;
-  // }
-  // hexLog(colorValue + 1, isDoubleSpeed + 1);
   return <u8>(colorValue * 8);
 }
