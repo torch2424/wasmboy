@@ -21,7 +21,7 @@ import {
 import {
   Memory,
   loadFromVramBank,
-  setPixelOnFrameDirectlyToWasmMemory
+  setPixelOnFrame
 } from '../memory/memory';
 import {
   hexLog,
@@ -50,13 +50,9 @@ export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u
     pixelYPositionInMap -= 0x100;
   }
 
-  // Cache the beginning of our scanlineOffset in wasmboy Memory for performance
-  // https://github.com/AssemblyScript/assemblyscript/issues/40#issuecomment-372479760
-  let scanlineStartOffset: i32 = Memory.frameInProgressVideoOutputLocation + (<i32>scanlineRegister * 160);
-
 
   // Draw the Background scanline
-  drawBackgroundWindowScanline(scanlineRegister, tileDataMemoryLocation, tileMapMemoryLocation, pixelYPositionInMap, 0, scrollX, scanlineStartOffset);
+  drawBackgroundWindowScanline(scanlineRegister, tileDataMemoryLocation, tileMapMemoryLocation, pixelYPositionInMap, 0, scrollX);
 }
 
 export function renderWindow(scanlineRegister: u8, tileDataMemoryLocation: u16, tileMapMemoryLocation: u16): void {
@@ -79,19 +75,15 @@ export function renderWindow(scanlineRegister: u8, tileDataMemoryLocation: u16, 
   // Get our current pixel y positon on the 160x144 camera (Row that the scanline draws across)
   let pixelYPositionInMap: u16 = <u16>scanlineRegister - windowY;
 
-  // Cache the beginning of our scanlineOffset in wasmboy Memory for performance
-  // https://github.com/AssemblyScript/assemblyscript/issues/40#issuecomment-372479760
-  let scanlineStartOffset: i32 = Memory.frameInProgressVideoOutputLocation + (<i32>scanlineRegister * 160);
-
   // xOffset is simply a neagat5ive window x
   let xOffset: i32 = -1 * (<i32>windowX);
 
   // Draw the Background scanline
-  drawBackgroundWindowScanline(scanlineRegister, tileDataMemoryLocation, tileMapMemoryLocation, pixelYPositionInMap, windowX, xOffset, scanlineStartOffset);
+  drawBackgroundWindowScanline(scanlineRegister, tileDataMemoryLocation, tileMapMemoryLocation, pixelYPositionInMap, windowX, xOffset);
 }
 
 // Function frankenstein'd together to allow background and window to share the same draw scanline function
-function drawBackgroundWindowScanline(scanlineRegister: u8, tileDataMemoryLocation: u16, tileMapMemoryLocation: u16, pixelYPositionInMap: u16, iStart: i32, xOffset: i32, memoryStartOffset: i32): void {
+function drawBackgroundWindowScanline(scanlineRegister: u8, tileDataMemoryLocation: u16, tileMapMemoryLocation: u16, pixelYPositionInMap: u16, iStart: i32, xOffset: i32): void {
 
   // Loop through x to draw the line like a CRT
   for (let i: i32 = iStart; i < 160; i++) {
@@ -134,17 +126,17 @@ function drawBackgroundWindowScanline(scanlineRegister: u8, tileDataMemoryLocati
     let tileDataAddress: u16 = getTileDataAddress(tileDataMemoryLocation, tileIdFromTileMap);
 
     if (Cpu.GBCEnabled) {
-      drawMonochromePixelFromTile(pixelYPositionInMap, pixelXPositionInMap, tileDataAddress, memoryStartOffset + i);
-      //drawColorPixelFromTile(pixelYPositionInMap, pixelXPositionInMap, tileMapAddress, tileDataAddress, memoryStartOffset + i);
+      drawMonochromePixelFromTile(i, scanlineRegister, pixelXPositionInMap, pixelYPositionInMap, tileDataAddress);
+      //drawColorPixelFromTile(pixelYPositionInMap, pixelXPositionInMap, tileMapAddress, tileDataAddress);
     } else {
-      drawMonochromePixelFromTile(pixelYPositionInMap, pixelXPositionInMap, tileDataAddress, memoryStartOffset + i);
+      drawMonochromePixelFromTile(i, scanlineRegister, pixelXPositionInMap, pixelYPositionInMap, tileDataAddress);
     }
   }
 }
 
 // Function to draw a pixel for the standard GB
 // TODO: Make this match our new RGB scheme for placing pixels in memory
-function drawMonochromePixelFromTile(pixelYPositionInMap: u16, pixelXPositionInMap: i32, tileDataAddress: u16, memoryOffset: i32): void {
+function drawMonochromePixelFromTile(xPixel: i32, yPixel: u8, pixelXPositionInMap: i32, pixelYPositionInMap: u16, tileDataAddress: u16): void {
   // Now we can process the the individual bytes that represent the pixel on a tile
 
   // Get the y pixel of the 8 by 8 tile.
@@ -196,12 +188,12 @@ function drawMonochromePixelFromTile(pixelYPositionInMap: u16, pixelXPositionInM
 
   // FINALLY, RENDER THAT PIXEL!
   // Only rendering camera for now, so coordinates are for the camera.
-  setPixelOnFrameDirectlyToWasmMemory(memoryOffset, getMonochromeColorFromPalette(paletteColorId, Graphics.memoryLocationBackgroundPalette));
+  setPixelOnFrame(xPixel, yPixel, getMonochromeColorFromPalette(paletteColorId, Graphics.memoryLocationBackgroundPalette));
 }
 
 // Function to draw a pixel from a tile in C O L O R
 // See above for more context on some variables
-function drawColorPixelFromTile(pixelYPositionInMap: u16, pixelXPositionInMap: i32, tileMapAddress: u16, tileDataAddress: u16, memoryOffset: i32): void {
+function drawColorPixelFromTile(xPixel: i32, yPixel: u8, pixelXPositionInMap: i32, pixelYPositionInMap: u16, tileMapAddress: u16, tileDataAddress: u16): void {
 
   // Get the GB Map Attributes
   // Bit 0-2  Background Palette number  (BGP0-7)
@@ -269,9 +261,9 @@ function drawColorPixelFromTile(pixelYPositionInMap: u16, pixelXPositionInMap: i
 
   // Finally Place our colors on the things
   // TODO: Make a new function to actually do this!
-  setPixelOnFrameDirectlyToWasmMemory(memoryOffset, red);
-  setPixelOnFrameDirectlyToWasmMemory(memoryOffset, green);
-  setPixelOnFrameDirectlyToWasmMemory(memoryOffset, blue);
+  // setPixelOnFrameDirectlyToWasmMemory(memoryOffset, red);
+  // setPixelOnFrameDirectlyToWasmMemory(memoryOffset, green);
+  // setPixelOnFrameDirectlyToWasmMemory(memoryOffset, blue);
 
   // TODO: PRIORITY
 }
