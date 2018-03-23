@@ -1,6 +1,8 @@
 html, body {
 	font: 14px/1.21 'Helvetica Neue', arial, sans-serif;
 	font-weight: 400;
+	/* For mobile phones to be able to scroll the view into place */
+	min-height: 600px;
 }
 
 h1 {
