@@ -9,7 +9,8 @@ import {
   getTileDataAddress
 } from './renderUtils';
 import {
-  getMonochromeColorFromPalette
+  getMonochromeColorFromPalette,
+  getRgbColorFromPalette
 } from './palette';
 // Assembly script really not feeling the reexport
 // using Skip Traps, because LCD has unrestricted access
@@ -142,6 +143,7 @@ function drawBackgroundWindowScanline(scanlineRegister: u8, tileDataMemoryLocati
 }
 
 // Function to draw a pixel for the standard GB
+// TODO: Make this match our new RGB scheme for placing pixels in memory
 function drawMonochromePixelFromTile(pixelYPositionInMap: u16, pixelXPositionInMap: i32, tileDataAddress: u16, memoryOffset: i32): void {
   // Now we can process the the individual bytes that represent the pixel on a tile
 
@@ -236,12 +238,40 @@ function drawColorPixelFromTile(pixelYPositionInMap: u16, pixelXPositionInMap: i
     pixelXInTile = 7 - pixelXInTile;
   }
 
+  // Now we can get the color for that pixel
+  // Colors are represented by getting X position of ByteTwo, and X positon of Byte One
+  // To Get the color Id.
+  // For example, the result of the color id is 0000 00[xPixelByteTwo][xPixelByteOne]
+  // See: How to draw a tile/sprite from memory: http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html
+  let paletteColorId: u8 = 0;
+  if (checkBitOnByte(<u8>pixelXInTile, byteTwoForLineOfTilePixels)) {
+    // Byte one represents the second bit in our color id, so bit shift
+    paletteColorId += 1;
+    paletteColorId = (paletteColorId << 1);
+  }
+  if (checkBitOnByte(<u8>pixelXInTile, byteOneForLineOfTilePixels)) {
+    paletteColorId += 1;
+  }
+
   // Finally lets add some, C O L O R
   // Want the botom 3 bits
   let bgPalette: u8 = (bgMapAttributes & 0x07);
 
-  // Since we can't pass around arrays yet, will just do color mixing here
+  // Call the helper function to grab the correct color from the palette
+  let rgbColor: u16 = getRgbColorFromPalette(bgPalette, paletteColorId, false);
 
+  // Split off into red green and blue
+  // Goal is to reach 254 for each color, so 255 / 31 (0x1F) ~8 TODO: Make exact
+  // Want 5 bits for each
+  let red: u8 = ((rgbColor & 0x1F) * 8);
+  let green: u8 = ((rgbColor & (0x1F << 5)) * 8);
+  let blue: u8 = ((rgbColor & (0x1F << 10)) * 8);
+
+  // Finally Place our colors on the things
+  // TODO: Make a new function to actually do this!
+  setPixelOnFrameDirectlyToWasmMemory(memoryOffset, red);
+  setPixelOnFrameDirectlyToWasmMemory(memoryOffset, green);
+  setPixelOnFrameDirectlyToWasmMemory(memoryOffset, blue);
 
   // TODO: PRIORITY
 }
