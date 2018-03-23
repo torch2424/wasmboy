@@ -181,6 +181,10 @@ export function initialize(useGBCMode: i32 = 0, includeBootRom: i32 = 0): void {
       eightBitStoreIntoGBMemory(0xFF69, 0xFF);
       eightBitStoreIntoGBMemory(0xFF6A, 0xC1);
       eightBitStoreIntoGBMemory(0xFF6B, 0x71);
+
+      // Undocumented Registers
+      eightBitStoreIntoGBMemory(0xFF6C, 0xFE);
+      // FF74 is zero
     }
 
     // Call our memory to initialize our cartridge type

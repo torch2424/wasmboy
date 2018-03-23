@@ -452,23 +452,20 @@ function handleOpcode1x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
       if (Cpu.GBCEnabled) {
 
         let speedSwitch: u8 = eightBitLoadFromGBMemory(Cpu.memoryLocationSpeedSwitch);
-        hexLog(speedSwitch);
-
         if(checkBitOnByte(0, speedSwitch)) {
+
+          hexLog(0x24);
 
           // Reset the bit
           speedSwitch = resetBitOnByte(0, speedSwitch);
           eightBitStoreIntoGBMemory(Cpu.memoryLocationSpeedSwitch, speedSwitch);
 
           // Switch to the new mode
-          // TODO: Testing the ! need to fix
-          // if (checkBitOnByte(7, speedSwitch)) {
-          //   Cpu.GBCDoubleSpeed = true;
-          // } else {
-          //   Cpu.GBCDoubleSpeed = false;
-          // }
-
-          Cpu.GBCDoubleSpeed = true;
+          if (checkBitOnByte(7, speedSwitch)) {
+            Cpu.GBCDoubleSpeed = true;
+          } else {
+            Cpu.GBCDoubleSpeed = false;
+          }
 
           // Cycle accurate gameboy docs says this takes 76 clocks
           return 76;
