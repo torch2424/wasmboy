@@ -44,7 +44,8 @@ import {
   splitHighByte,
   splitLowByte,
   checkBitOnByte,
-  resetBitOnByte
+  resetBitOnByte,
+  setBitOnByte
 } from '../helpers/index';
 import {
   Memory,
@@ -454,18 +455,20 @@ function handleOpcode1x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
         let speedSwitch: u8 = eightBitLoadFromGBMemory(Cpu.memoryLocationSpeedSwitch);
         if(checkBitOnByte(0, speedSwitch)) {
 
-          hexLog(0x24);
-
-          // Reset the bit
+          // Reset the prepare bit
           speedSwitch = resetBitOnByte(0, speedSwitch);
-          eightBitStoreIntoGBMemory(Cpu.memoryLocationSpeedSwitch, speedSwitch);
 
-          // Switch to the new mode
-          if (checkBitOnByte(7, speedSwitch)) {
+          // Switch to the new mode, and set the speed switch to the OTHER speed, to represent our new speed
+          if (!checkBitOnByte(7, speedSwitch)) {
             Cpu.GBCDoubleSpeed = true;
+            speedSwitch = setBitOnByte(7, speedSwitch);
           } else {
             Cpu.GBCDoubleSpeed = false;
+            speedSwitch = resetBitOnByte(7, speedSwitch);
           }
+
+          // Store the final speed switch
+          eightBitStoreIntoGBMemory(Cpu.memoryLocationSpeedSwitch, speedSwitch);
 
           // Cycle accurate gameboy docs says this takes 76 clocks
           return 76;

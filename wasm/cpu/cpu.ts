@@ -142,7 +142,6 @@ export function initialize(useGBCMode: i32 = 0, includeBootRom: i32 = 0): void {
     } else {
       Cpu.registerA = 0x01;
     }
-    Cpu.registerA = 0x01;
     Cpu.registerF = 0xB0;
     Cpu.registerB = 0x00;
     Cpu.registerC = 0x13;
