@@ -43,7 +43,7 @@ export function getTileDataAddress(tileDataMemoryLocation: u16, tileIdFromTileMa
 }
 
 
-export function getColorFromPalette(colorId: u8, paletteMemoryLocation: u16): u8 {
+export function getMonochromeColorFromPalette(colorId: u8, paletteMemoryLocation: u16): u8 {
   // Shift our paletteByte, 2 times for each color ID
   // And off any extra bytes
   // Return our Color (00, 01, 10, or 11)

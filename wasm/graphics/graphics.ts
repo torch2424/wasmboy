@@ -4,11 +4,9 @@ import {
   isLcdEnabled
 } from './lcd';
 import {
-  renderBackground
-} from './background';
-import {
+  renderBackground,
   renderWindow
-} from './window';
+} from './backgroundWindow';
 import {
   renderSprites
 } from './sprites';

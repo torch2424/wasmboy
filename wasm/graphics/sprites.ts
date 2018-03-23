@@ -4,7 +4,7 @@ import {
 } from './graphics';
 import {
   getTileDataAddress,
-  getColorFromPalette
+  getMonochromeColorFromPalette
 } from './renderUtils'
 // Assembly script really not feeling the reexport
 // using Skip Traps, because LCD has unrestricted access
@@ -107,7 +107,7 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
         if (spriteColorId !== 0) {
 
           // Get our color ID from the current sprite pallete
-          let spritePixelColorFromPalette: u8 = getColorFromPalette(spriteColorId, spritePaletteLocation);
+          let spritePixelColorFromPalette: u8 = getMonochromeColorFromPalette(spriteColorId, spritePaletteLocation);
 
           // Find our actual X pixel location on the gameboy "camera" view
           let spriteXPixelLocationInCameraView: u8 = spriteXPosition + (7 - <u8>tilePixel);

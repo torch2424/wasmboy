@@ -6,7 +6,7 @@ import {
   hexLog
 } from '../helpers/index';
 import {
-  eightBitLoadFromGBMemory,
+  eightBitLoadFromGBMemorySkipTraps,
   loadBooleanDirectlyFromWasmMemory
 } from './load';
 import {
@@ -57,10 +57,10 @@ export class Memory {
   static readonly videoOutputLocation: u32 = 0x030400;
   static readonly currentFrameVideoOutputLocation: u32 = Memory.videoOutputLocation;
   static readonly frameInProgressVideoOutputLocation: u32 = Memory.currentFrameVideoOutputLocation + (160 * 144);
-  static readonly soundOutputLocation: u32 = 0x05B800;
+  static readonly soundOutputLocation: u32 = 0x0B2000;
 
   // Passed in Game backup or ROM from the user
-  static readonly gameBytesLocation: u32 = 0x07B800;
+  static readonly gameBytesLocation: u32 = 0x0D2000;
   static readonly gameRamBanksLocation: u32 = 0x010400;
 
   // ----------------------------------
@@ -139,7 +139,7 @@ export class Memory {
 export function initializeCartridge(): void {
   // Get our game MBC type from the cartridge header
   // http://gbdev.gg8.se/wiki/articles/The_Cartridge_Header
-  let cartridgeType: u8 = eightBitLoadFromGBMemory(0x0147);
+  let cartridgeType: u8 = eightBitLoadFromGBMemorySkipTraps(0x0147);
 
   // Reset our Cartridge types
   Memory.isRomOnly = false;
@@ -223,6 +223,13 @@ export function setLeftAndRightOutputForAudioQueue(leftVolume: u8, rightVolume: 
   store<u8>(audioQueueOffset, leftVolume + 1);
   store<u8>(audioQueueOffset + 1, rightVolume + 1);
 }
+
+// Function to shortcut the memory map, and load directly from the VRAM Bank
+export function loadFromVramBank(gameboyOffset: u16, vramBankId: i32): u8 {
+  let wasmBoyAddress: u16 = (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation + (0x2000 * (vramBankId & 0x01));
+  return eightBitLoadFromGBMemorySkipTraps(wasmBoyAddress);
+}
+
 
 // Function to return an address to store into save state memory
 // this is to regulate our 20 slots
