@@ -26,6 +26,10 @@ import {
   sixteenBitLoadFromGBMemory
 } from './load';
 import {
+  startDmaTransfer,
+  startHdmaTransfer
+} from './dma';
+import {
   checkBitOnByte,
   hexLog
 } from '../helpers/index';
@@ -139,29 +143,29 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
     // Check the graphics mode to see if we can write to VRAM
     // http://gbdev.gg8.se/wiki/articles/Video_Display#Accessing_VRAM_and_OAM
     if (offset === Graphics.memoryLocationDmaTransfer) {
-      // otherwise, performa the DMA transfer
-      _dmaTransfer(<u8>value);
+      // otherwise, perform a DMA transfer
+      // And allow the original write
+      startDmaTransfer(<u8>value);
+      return true;
     }
+
+    // Check if the HDMA registers are attempting to be changed while and HDMA is active
+    if(Memory.isHblankHdmaActive &&
+      offset >= Memory.memoryLocationHdmaSourceHigh &&
+      offset <= Memory.memoryLocationHdmaDestinationLow) {
+        return false;
+    }
+
+    // Do an HDMA
+    if(offset === Memory.memoryLocationHdmaTrigger) {
+      startHdmaTransfer(<u8>value);
+      return false;
+    }
+
 
     // Allow the original write, and return since we dont need to look anymore
     return true;
   }
 
   return true;
-}
-
-function _dmaTransfer(sourceAddressOffset: u8): void {
-
-  let sourceAddress: u16 = <u16>sourceAddressOffset;
-  sourceAddress = (sourceAddress << 8);
-
-  for(let i: u16 = 0; i < 0xA0; i++) {
-    let spriteInformationByte: u8 = eightBitLoadFromGBMemorySkipTraps(sourceAddress + i);
-    let spriteInformationAddress: u16 = Memory.spriteInformationTableLocation + i;
-    eightBitStoreIntoGBMemorySkipTraps(spriteInformationAddress, spriteInformationByte);
-  }
-
-  // TCAGBD:  This copy (DMA) needs 160 × 4 + 4 clocks to complete in both double speed and single speeds modes
-  // Increment all of our Cycle coiunters in ../cpu/opcodes
-  Memory.DMACycles += 644;
 }

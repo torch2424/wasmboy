@@ -26,3 +26,7 @@ export {
   sixteenBitStoreIntoGBMemorySkipTraps,
   storeBooleanDirectlyToWasmMemory
 } from './store';
+
+export {
+  updateHblankHdma
+} from './dma';

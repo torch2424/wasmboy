@@ -81,8 +81,21 @@ export class Memory {
   static isMBC3: boolean = false;
   static isMBC5: boolean = false;
 
+  // DMA
+  static memoryLocationHdmaSourceHigh: u16 = 0xFF51;
+  static memoryLocationHdmaSourceLow: u16 = 0xFF52;
+  static memoryLocationHdmaDestinationHigh: u16 = 0xFF53;
+  static memoryLocationHdmaDestinationLow: u16 = 0xFF54;
+  static memoryLocationHdmaTrigger: u16 = 0xFF55;
   // Cycles accumulated for DMA
   static DMACycles: i32 = 0;
+  // Boolean we will mirror to indicate if Hdma is active
+  static isHblankHdmaActive: boolean = false;
+  static hblankHdmaIndex: u8 = 0x00;
+  static hblankHdmaTotalBytes: u8 = 0x00;
+  // Store the source and destination for performance, and update as needed
+  static hblankHdmaSource: u16 = 0x00;
+  static hblankHdmaDestination: u16 = 0x00;
 
   // GBC Registers
   static memoryLocationGBCWRAMBAnk: u16 = 0xFF70;

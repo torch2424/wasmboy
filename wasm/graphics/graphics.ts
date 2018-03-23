@@ -21,6 +21,7 @@ import {
 import {
   eightBitLoadFromGBMemorySkipTraps,
   eightBitStoreIntoGBMemorySkipTraps,
+  updateHblankHdma,
   storeFrameToBeRendered,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
@@ -87,6 +88,7 @@ export class Graphics {
   static readonly memoryLocationScanlineRegister: u16 = 0xFF44;
   static readonly memoryLocationCoincidenceCompare: u16 = 0xFF45;
   static readonly memoryLocationDmaTransfer: u16 = 0xFF46;
+
   // Also known at STAT
   static readonly memoryLocationLcdStatus: u16 = 0xFF41;
   // Also known as LCDC
@@ -186,6 +188,8 @@ export function updateGraphics(numberOfCycles: i32): void {
         }
         // Store the frame to be rendered
         storeFrameToBeRendered();
+        // Update the Hblank DMA, will return if not active
+        updateHblankHdma();
         // Request a VBlank interrupt
         requestVBlankInterrupt();
       } else if (scanlineRegister < 144) {
@@ -193,6 +197,8 @@ export function updateGraphics(numberOfCycles: i32): void {
         if (!Config.graphicsDisableScanlineRendering) {
           _drawScanline(scanlineRegister);
         }
+        // Update the Hblank DMA, will return if not active
+        updateHblankHdma();
       }
 
       // Store our scanline
