@@ -1382,7 +1382,12 @@ function handleOpcode7x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
       // Enter CPU very low power mode
       // Meaning Don't Decode anymore opcodes until an interrupt occurs
       // Still need to do timers and things
-      Cpu.isHalted = true;
+
+      // Can't Halt during an HDMA
+      // https://gist.github.com/drhelius/3394856
+      if(!Memory.isHblankHdmaActive) {
+        Cpu.isHalted = true;
+      }
       return 4;
     case 0x77:
 
