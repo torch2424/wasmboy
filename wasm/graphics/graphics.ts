@@ -114,12 +114,6 @@ export class Graphics {
   static readonly memoryLocationSpritePaletteOne: u16 = 0xFF48;
   static readonly memoryLocationSpritePaletteTwo: u16 = 0xFF49;
 
-  // Colors
-  static colorWhite: u8 = 1;
-  static colorLightGrey: u8 = 2;
-  static colorDarkGrey: u8 = 3;
-  static colorBlack: u8 = 4;
-
   // Screen data needs to be stored in wasm memory
 
   // Save States

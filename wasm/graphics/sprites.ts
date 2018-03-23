@@ -3,9 +3,11 @@ import {
   Graphics
 } from './graphics';
 import {
-  getTileDataAddress,
+  getTileDataAddress
+} from './renderUtils';
+import {
   getMonochromeColorFromPalette
-} from './renderUtils'
+} from './palette';
 // Assembly script really not feeling the reexport
 // using Skip Traps, because LCD has unrestricted access
 // http://gbdev.gg8.se/wiki/articles/Video_Display#LCD_OAM_DMA_Transfers

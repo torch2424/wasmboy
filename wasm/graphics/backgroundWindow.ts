@@ -6,9 +6,11 @@ import {
   Graphics
 } from './graphics';
 import {
-  getTileDataAddress,
+  getTileDataAddress
+} from './renderUtils';
+import {
   getMonochromeColorFromPalette
-} from './renderUtils'
+} from './palette';
 // Assembly script really not feeling the reexport
 // using Skip Traps, because LCD has unrestricted access
 // http://gbdev.gg8.se/wiki/articles/Video_Display#LCD_OAM_DMA_Transfers
@@ -165,8 +167,9 @@ function drawMonochromePixelFromTile(pixelYPositionInMap: u16, pixelXPositionInM
   // As pixel 0 is on byte 7, and pixel 1 is on byte 6, etc...
   // Therefore, is pixelX was 2, then really is need to be 5
   // So 2 - 7 = -5, * 1 = 5
-  let reversedPixelXInTile: i16 = <i16>pixelXPositionInMap % 8;
-  let pixelXInTile: u8 = <u8>((reversedPixelXInTile - 7) * -1);
+  // Or to simplify, 7 - 2 = 5 haha!
+  let pixelXInTile: u8 = <u8>(pixelXPositionInMap) % 8;
+  pixelXInTile = 7 - pixelXInTile;
 
   // Now we can get the color for that pixel
   // Colors are represented by getting X position of ByteTwo, and X positon of Byte One
@@ -195,6 +198,7 @@ function drawMonochromePixelFromTile(pixelYPositionInMap: u16, pixelXPositionInM
 }
 
 // Function to draw a pixel from a tile in C O L O R
+// See above for more context on some variables
 function drawColorPixelFromTile(pixelYPositionInMap: u16, pixelXPositionInMap: i32, tileMapAddress: u16, tileDataAddress: u16, memoryOffset: i32): void {
 
   // Get the GB Map Attributes
@@ -206,5 +210,38 @@ function drawColorPixelFromTile(pixelYPositionInMap: u16, pixelXPositionInMap: i
   // Bit 7    BG-to-OAM Priority         (0=Use OAM priority bit, 1=BG Priority)
   let bgMapAttributes: u8 = loadFromVramBank(tileMapAddress, 1);
 
+  // See above for explanation
+  let pixelYInTile: u16 = pixelYPositionInMap % 8;
+  if (checkBitOnByte(6, bgMapAttributes)) {
+    // We are mirroring the tile, therefore, we need to opposite byte
+    // So if our pizel was 0 our of 8, it wild become 7 :)
+    // TODO: This may be wrong :p
+    pixelYInTile = 7 - (pixelYInTile);
+  }
 
+  // Remember to represent a single line of 8 pixels on a tile, we need two bytes.
+  // Therefore, we need to times our modulo by 2, to get the correct line of pixels on the tile.
+  // But we need to load the time from a specific Vram bank
+  let vramBankId: i32 = 0;
+  if (checkBitOnByte(3, bgMapAttributes)) {
+    vramBankId = 1;
+  }
+  let byteOneForLineOfTilePixels: u8 = loadFromVramBank(tileDataAddress + (pixelYInTile * 2), vramBankId)
+  let byteTwoForLineOfTilePixels: u8 = loadFromVramBank(tileDataAddress + (pixelYInTile * 2) + 1, vramBankId);
+
+  // Get our X pixel. Need to NOT reverse it if it was flipped.
+  // See above, you have to reverse this normally
+  let pixelXInTile: u8 = <u8>(pixelXPositionInMap) % 8;
+  if(!checkBitOnByte(5, bgMapAttributes)) {
+    pixelXInTile = 7 - pixelXInTile;
+  }
+
+  // Finally lets add some, C O L O R
+  // Want the botom 3 bits
+  let bgPalette: u8 = (bgMapAttributes & 0x07);
+
+  // Since we can't pass around arrays yet, will just do color mixing here
+
+
+  // TODO: PRIORITY
 }

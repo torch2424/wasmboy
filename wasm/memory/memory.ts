@@ -10,6 +10,7 @@ import {
   loadBooleanDirectlyFromWasmMemory
 } from './load';
 import {
+  eightBitStoreIntoGBMemorySkipTraps,
   storeBooleanDirectlyToWasmMemory
 } from './store';
 import {
@@ -57,10 +58,12 @@ export class Memory {
   static readonly videoOutputLocation: u32 = 0x030400;
   static readonly currentFrameVideoOutputLocation: u32 = Memory.videoOutputLocation;
   static readonly frameInProgressVideoOutputLocation: u32 = Memory.currentFrameVideoOutputLocation + (160 * 144);
-  static readonly soundOutputLocation: u32 = 0x0B2000;
+  // Last KB of video memory
+  static readonly gameboyColorPaletteLocation: u32 = 0x0B2000;
+  static readonly soundOutputLocation: u32 = 0x0B2400;
 
   // Passed in Game backup or ROM from the user
-  static readonly gameBytesLocation: u32 = 0x0D2000;
+  static readonly gameBytesLocation: u32 = 0x0D2400;
   static readonly gameRamBanksLocation: u32 = 0x010400;
 
   // ----------------------------------
@@ -227,7 +230,18 @@ export function setLeftAndRightOutputForAudioQueue(leftVolume: u8, rightVolume: 
 // Function to shortcut the memory map, and load directly from the VRAM Bank
 export function loadFromVramBank(gameboyOffset: u16, vramBankId: i32): u8 {
   let wasmBoyAddress: u16 = (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation + (0x2000 * (vramBankId & 0x01));
-  return eightBitLoadFromGBMemorySkipTraps(wasmBoyAddress);
+  return load<u8>(wasmBoyAddress);
+}
+
+// Function to store a byte to our Gbc Palette memory
+export function storePaletteByteInWasmMemory(paletteIndex: u32, value: u8): void {
+  store<u8>(Memory.gameboyColorPaletteLocation + paletteIndex, value);
+}
+
+// Function to load a byte from our Gbc Palette memory
+// Function to store a byte to our Gbc Palette memory
+export function loadPaletteByteFromWasmMemory(paletteIndex: u32): u8 {
+  return load<u8>(Memory.gameboyColorPaletteLocation + paletteIndex);
 }
 
 

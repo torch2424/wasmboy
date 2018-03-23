@@ -6,6 +6,11 @@ import {
   batchProcessGraphics
 } from '../graphics/graphics';
 import {
+  Palette,
+  incrementPaletteIfSet,
+  writePaletteToMemory
+} from '../graphics/index';
+import {
   batchProcessAudio,
   handledWriteToSoundRegister
 } from '../sound/index';
@@ -178,6 +183,13 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
           return false;
         }
     }
+  }
+
+  // Handle GBC Pallete Write
+  if (offset >= Palette.memoryLocationBackgroundPaletteIndex && offset <= Palette.memoryLocationSpritePaletteData) {
+    writePaletteToMemory(offset, value);
+    incrementPaletteIfSet(offset);
+    return false;
   }
 
   // Allow the original write

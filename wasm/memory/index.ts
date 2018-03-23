@@ -9,6 +9,8 @@ export {
   getPixelOnFrame,
   storeFrameToBeRendered,
   setLeftAndRightOutputForAudioQueue,
+  storePaletteByteInWasmMemory,
+  loadPaletteByteFromWasmMemory,
   getSaveStateMemoryOffset
 } from './memory';
 
