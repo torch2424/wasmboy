@@ -125,6 +125,7 @@ export function initialize(useGBCMode: i32 = 0, includeBootRom: i32 = 0): void {
   // http://gbdev.gg8.se/wiki/articles/The_Cartridge_Header
   let gbcType: u8 = eightBitLoadFromGBMemory(0x0143);
 
+  // Detecting GBC http://bgb.bircd.org/pandocs.htm#cgbregisters
   if (gbcType === 0xC0 ||
     (useGBCMode > 0 && gbcType === 0x80)) {
     Cpu.GBCEnabled = true;
@@ -136,6 +137,11 @@ export function initialize(useGBCMode: i32 = 0, includeBootRom: i32 = 0): void {
   log("initializing (includeBootRom=$0)", 1, includeBootRom);
   if(includeBootRom <= 0) {
     Cpu.programCounter = 0x100;
+    if(Cpu.GBCEnabled) {
+      Cpu.registerA = 0x11;
+    } else {
+      Cpu.registerA = 0x01;
+    }
     Cpu.registerA = 0x01;
     Cpu.registerF = 0xB0;
     Cpu.registerB = 0x00;
@@ -145,6 +151,8 @@ export function initialize(useGBCMode: i32 = 0, includeBootRom: i32 = 0): void {
     Cpu.registerH = 0x01;
     Cpu.registerL = 0x4D;
     Cpu.stackPointer = 0xFFFE;
+
+    // TODO: Get all initialization variables from something like BGB
     eightBitStoreIntoGBMemory(0xFF10, 0x80);
     eightBitStoreIntoGBMemory(0xFF11, 0xBF);
     eightBitStoreIntoGBMemory(0xFF12, 0xF3);
@@ -165,6 +173,15 @@ export function initialize(useGBCMode: i32 = 0, includeBootRom: i32 = 0): void {
     eightBitStoreIntoGBMemory(0xFF47, 0xFC);
     eightBitStoreIntoGBMemory(0xFF48, 0xFF);
     eightBitStoreIntoGBMemory(0xFF49, 0xFF);
+    eightBitStoreIntoGBMemory(0xFF4D, 0x7E);
+
+    if(Cpu.GBCEnabled) {
+      // GBC Palettes
+      eightBitStoreIntoGBMemory(0xFF68, 0xC0);
+      eightBitStoreIntoGBMemory(0xFF69, 0xFF);
+      eightBitStoreIntoGBMemory(0xFF6A, 0xC1);
+      eightBitStoreIntoGBMemory(0xFF6B, 0x71);
+    }
 
     // Call our memory to initialize our cartridge type
     initializeCartridge();

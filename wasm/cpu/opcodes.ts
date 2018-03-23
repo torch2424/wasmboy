@@ -449,21 +449,30 @@ function handleOpcode1x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
       // See HALT
 
       // If we are in gameboy color mode, set the new sppeed
-      let speedSwitch: u8 = eightBitLoadFromGBMemory(Cpu.memoryLocationSpeedSwitch);
-      if (Cpu.GBCEnabled && checkBitOnByte(0, speedSwitch)) {
+      if (Cpu.GBCEnabled) {
+
+        let speedSwitch: u8 = eightBitLoadFromGBMemory(Cpu.memoryLocationSpeedSwitch);
+        hexLog(speedSwitch);
+
+        if(checkBitOnByte(0, speedSwitch)) {
+
           // Reset the bit
-          resetBitOnByte(0, speedSwitch);
+          speedSwitch = resetBitOnByte(0, speedSwitch);
           eightBitStoreIntoGBMemory(Cpu.memoryLocationSpeedSwitch, speedSwitch);
 
           // Switch to the new mode
-          if (checkBitOnByte(7, speedSwitch)) {
-            Cpu.GBCDoubleSpeed = true;
-          } else {
-            Cpu.GBCDoubleSpeed = false;
-          }
+          // TODO: Testing the ! need to fix
+          // if (checkBitOnByte(7, speedSwitch)) {
+          //   Cpu.GBCDoubleSpeed = true;
+          // } else {
+          //   Cpu.GBCDoubleSpeed = false;
+          // }
+
+          Cpu.GBCDoubleSpeed = true;
 
           // Cycle accurate gameboy docs says this takes 76 clocks
           return 76;
+        }
       }
 
       // TODO: This breaks Blarggs CPU tests, find out what should end a STOP

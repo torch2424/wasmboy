@@ -232,7 +232,7 @@ export function setLeftAndRightOutputForAudioQueue(leftVolume: u8, rightVolume: 
 
 // Function to shortcut the memory map, and load directly from the VRAM Bank
 export function loadFromVramBank(gameboyOffset: u16, vramBankId: i32): u8 {
-  let wasmBoyAddress: u16 = (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation + (0x2000 * (vramBankId & 0x01));
+  let wasmBoyAddress: u32 = <u32>(gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation + (0x2000 * <u32>(vramBankId & 0x01));
   return load<u8>(wasmBoyAddress);
 }
 

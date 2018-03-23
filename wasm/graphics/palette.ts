@@ -1,4 +1,7 @@
 import {
+  Cpu
+} from '../cpu/cpu';
+import {
   eightBitLoadFromGBMemorySkipTraps,
   eightBitStoreIntoGBMemorySkipTraps,
   storePaletteByteInWasmMemory,
@@ -16,8 +19,8 @@ import {
 export class Palette {
   static memoryLocationBackgroundPaletteIndex: u16 = 0xFF68;
   static memoryLocationBackgroundPaletteData: u16 = 0xFF69;
-  static memoryLocationSpritePaletteIndex: u16 = 0xFF68;
-  static memoryLocationSpritePaletteData: u16 = 0xFF69;
+  static memoryLocationSpritePaletteIndex: u16 = 0xFF6A;
+  static memoryLocationSpritePaletteData: u16 = 0xFF6B;
 }
 
 // Functions to Handle Read/Write to pallete registers
@@ -55,6 +58,30 @@ export function writePaletteToMemory(offset: u16, value: u16): void {
   }
 }
 
+// FF68
+// Bit 0-5   Index (00-3F)
+// Bit 7     Auto Increment  (0=Disabled, 1=Increment after Writing)
+// Index is 00-0x3F because the means 0 - 63 (64),
+// and apparently there are 8 bytes per pallete to describe Color 0-3 (4 colors),
+// and 0-7 (8 palltetes). Therefroe, 64!
+export function getRgbColorPalette(paletteId: u8, colorId: u8, isSprite: boolean): u16 {
+
+  // Offset Sprite palette Loads by the maximum index of Backgrounds
+  if (isSprite) {
+    paletteId += 0x3F;
+  }
+
+  // Each color takes 2 bytes, therefore, multiple by 2 for the correct color bytes in the palette
+  let paletteIndex: u8 = paletteId + (colorId * 2);
+
+  // Load the color that is seperated into two bytes
+  let colorHighByte: u8 = loadPaletteByteFromWasmMemory(paletteIndex);
+  let colorLowByte: u8 = loadPaletteByteFromWasmMemory(paletteIndex);
+
+  // Return the concatenated color byte
+  return concatenateBytes(colorHighByte, colorLowByte);
+}
+
 
 // Simple get pallete color or monochroime GB
 export function getMonochromeColorFromPalette(colorId: u8, paletteMemoryLocation: u16): u8 {
@@ -85,26 +112,18 @@ export function getMonochromeColorFromPalette(colorId: u8, paletteMemoryLocation
   return rgbColor;
 }
 
-// FF68
-// Bit 0-5   Index (00-3F)
-// Bit 7     Auto Increment  (0=Disabled, 1=Increment after Writing)
-// Index is 00-0x3F because the means 0 - 63 (64),
-// and apparently there are 8 bytes per pallete to describe Color 0-3 (4 colors),
-// and 0-7 (8 palltetes). Therefroe, 64!
-export function getRgbColorFromPalette(paletteId: u8, colorId: u8, isSprite: boolean): u16 {
 
-  // Offset Sprite palette Loads by the maximum index of Backgrounds
-  if (isSprite) {
-    paletteId += 0x3F;
-  }
+// Function to return the color from a passed 16 bit color pallette
+export function getColorFromRgbPalette(colorId: u8, colorPalette: u16): u8 {
 
-  // Each color takes 2 bytes, therefore, multiple by 2 for the correct color bytes in the palette
-  let paletteIndex: u8 = paletteId + (colorId * 2);
+  // Get our bitmask for the color ID
+  let bitMask: u16 = (0x1F << colorId);
+  let colorValue: u16 = ((colorPalette & bitMask) >> colorId);
 
-  // Load the color that is seperated into two bytes
-  let colorHighByte: u8 = loadPaletteByteFromWasmMemory(paletteIndex);
-  let colorLowByte: u8 = loadPaletteByteFromWasmMemory(paletteIndex);
-
-  // Return the concatenated color byte
-  return concatenateBytes(colorHighByte, colorLowByte);
+  // let isDoubleSpeed: u8 = 0;
+  // if(Cpu.GBCDoubleSpeed) {
+  //   isDoubleSpeed = 1;
+  // }
+  // hexLog(colorValue + 1, isDoubleSpeed + 1);
+  return <u8>(colorValue * 8);
 }

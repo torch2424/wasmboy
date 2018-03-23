@@ -10,7 +10,8 @@ import {
 } from './renderUtils';
 import {
   getMonochromeColorFromPalette,
-  getRgbColorFromPalette
+  getRgbColorPalette,
+  getColorFromRgbPalette
 } from './palette';
 // Assembly script really not feeling the reexport
 // using Skip Traps, because LCD has unrestricted access
@@ -126,8 +127,8 @@ function drawBackgroundWindowScanline(scanlineRegister: u8, tileDataMemoryLocati
     let tileDataAddress: u16 = getTileDataAddress(tileDataMemoryLocation, tileIdFromTileMap);
 
     if (Cpu.GBCEnabled) {
-      drawMonochromePixelFromTile(i, scanlineRegister, pixelXPositionInMap, pixelYPositionInMap, tileDataAddress);
-      //drawColorPixelFromTile(pixelYPositionInMap, pixelXPositionInMap, tileMapAddress, tileDataAddress);
+      //drawMonochromePixelFromTile(i, scanlineRegister, pixelXPositionInMap, pixelYPositionInMap, tileDataAddress);
+      drawColorPixelFromTile(i, scanlineRegister, pixelXPositionInMap, pixelYPositionInMap, tileMapAddress, tileDataAddress);
     } else {
       drawMonochromePixelFromTile(i, scanlineRegister, pixelXPositionInMap, pixelYPositionInMap, tileDataAddress);
     }
@@ -199,6 +200,8 @@ function drawMonochromePixelFromTile(xPixel: i32, yPixel: u8, pixelXPositionInMa
 // See above for more context on some variables
 function drawColorPixelFromTile(xPixel: i32, yPixel: u8, pixelXPositionInMap: i32, pixelYPositionInMap: u16, tileMapAddress: u16, tileDataAddress: u16): void {
 
+  // TODO: PRIORITY
+
   // Get the GB Map Attributes
   // Bit 0-2  Background Palette number  (BGP0-7)
   // Bit 3    Tile VRAM Bank number      (0=Bank 0, 1=Bank 1)
@@ -254,20 +257,19 @@ function drawColorPixelFromTile(xPixel: i32, yPixel: u8, pixelXPositionInMap: i3
   let bgPalette: u8 = (bgMapAttributes & 0x07);
 
   // Call the helper function to grab the correct color from the palette
-  let rgbColor: u16 = getRgbColorFromPalette(bgPalette, paletteColorId, false);
+  let rgbColorPalette: u16 = getRgbColorPalette(bgPalette, paletteColorId, false);
+
+  //hexLog(rgbColorPalette);
 
   // Split off into red green and blue
   // Goal is to reach 254 for each color, so 255 / 31 (0x1F) ~8 TODO: Make exact
   // Want 5 bits for each
-  let red: u8 = ((rgbColor & 0x1F) * 8);
-  let green: u8 = ((rgbColor & (0x1F << 5)) * 8);
-  let blue: u8 = ((rgbColor & (0x1F << 10)) * 8);
+  let red: u8 = getColorFromRgbPalette(0, rgbColorPalette);
+  let green: u8 = getColorFromRgbPalette(1, rgbColorPalette);
+  let blue: u8 = getColorFromRgbPalette(2, rgbColorPalette);
 
   // Finally Place our colors on the things
-  // TODO: Make a new function to actually do this!
-  // setPixelOnFrameDirectlyToWasmMemory(memoryOffset, red);
-  // setPixelOnFrameDirectlyToWasmMemory(memoryOffset, green);
-  // setPixelOnFrameDirectlyToWasmMemory(memoryOffset, blue);
-
-  // TODO: PRIORITY
+  setPixelOnFrame(xPixel, yPixel, 0, red);
+  setPixelOnFrame(xPixel, yPixel, 1, green);
+  setPixelOnFrame(xPixel, yPixel, 2, blue);
 }

@@ -19,6 +19,9 @@ import {
   Joypad,
   getJoypadState
 } from '../joypad/index'
+import {
+  hexLog
+} from '../helpers/index';
 
 // Returns -1 if no trap found, otherwise returns a value that should be fed for the address
 export function checkReadTraps(offset: u16): i32 {
