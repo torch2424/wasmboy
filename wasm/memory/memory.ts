@@ -57,7 +57,7 @@ export class Memory {
   static readonly gameBoyInternalMemoryLocation: u32 = 0x000400;
   static readonly videoOutputLocation: u32 = 0x030400;
   static readonly currentFrameVideoOutputLocation: u32 = Memory.videoOutputLocation;
-  static readonly frameInProgressVideoOutputLocation: u32 = Memory.currentFrameVideoOutputLocation + (160 * 144);
+  static readonly frameInProgressVideoOutputLocation: u32 = Memory.currentFrameVideoOutputLocation + ((160 * 144) * 3);
   // Last KB of video memory
   static readonly gameboyColorPaletteLocation: u32 = 0x0B2000;
   static readonly soundOutputLocation: u32 = 0x0B2400;
@@ -165,12 +165,12 @@ export function initializeCartridge(): void {
 }
 
 // Also need to store current frame in memory to be read by JS
-export function setPixelOnFrame(x: i32, y: i32, color: u8): void {
+export function setPixelOnFrame(x: i32, y: i32, colorId: i32, color: u8): void {
   // Currently only supports 160x144
   // Storing in X, then y
   // So need an offset
 
-  let offset: i32 = Memory.frameInProgressVideoOutputLocation + (y * 160) + x;
+  let offset: i32 = Memory.frameInProgressVideoOutputLocation + getRgbPixelStart(x, y) + colorId;
 
   // Add one to the color, that way you don't ge the default zero
   store<u8>(offset, color + 1);
@@ -182,10 +182,18 @@ export function getPixelOnFrame(x: i32, y: i32): u8 {
   // Storing in X, then y
   // So need an offset
 
-  let offset: i32 = Memory.frameInProgressVideoOutputLocation + (y * 160) + x;
+  let offset: i32 = Memory.frameInProgressVideoOutputLocation + getRgbPixelStart(x, y);
 
   // Added one to the color, that way you don't ge the default zero
   return load<u8>(offset);
+}
+
+// Function to get the start of a RGB pixel (R, G, B)
+function getRgbPixelStart(x: i32, y: i32): i32 {
+  // Get the pixel number
+  let pixelNumber: i32 = (y * 160) + x;
+  // Each pixel takes 3 slots, therefore, multiply by 3!
+  return pixelNumber * 3;
 }
 
 // V-Blank occured, move our frame in progress to our render frame
@@ -199,11 +207,14 @@ export function storeFrameToBeRendered(): void {
 
   for(let y: i32 = 0; y < 144; y++) {
     for (let x: i32 = 0; x < 160; x++) {
-      // Need to store RGB values
-      store<u8>(
-        currentFrameVideoOutputLocation + x + (y * 160),
-        load<u8>(frameInProgressVideoOutputLocation + (y * 160) + x)
-      )
+      // Store three times for each pixel
+      let pixelStart: i32 = getRgbPixelStart(x, y);
+      for (let colorId: i32 = 0; colorId < 3; colorId++) {
+        store<u8>(
+          currentFrameVideoOutputLocation + pixelStart + colorId,
+          load<u8>(frameInProgressVideoOutputLocation + pixelStart + colorId)
+        )
+      }
     }
   }
 }

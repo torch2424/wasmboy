@@ -7,7 +7,8 @@ import {
 import {
   checkBitOnByte,
   resetBitOnByte,
-  concatenateBytes
+  concatenateBytes,
+  hexLog
 } from '../helpers/index';
 
 // Class for GBC Color palletes
@@ -59,8 +60,29 @@ export function writePaletteToMemory(offset: u16, value: u16): void {
 export function getMonochromeColorFromPalette(colorId: u8, paletteMemoryLocation: u16): u8 {
   // Shift our paletteByte, 2 times for each color ID
   // And off any extra bytes
-  // Return our Color (00, 01, 10, or 11)
-  return (eightBitLoadFromGBMemorySkipTraps(paletteMemoryLocation) >> (colorId * 2)) & 0x03;
+  // Return our Color (00 - white, 01 - light grey, 10 Dark grey, or 11 - Black)
+  let color: u8 = (eightBitLoadFromGBMemorySkipTraps(paletteMemoryLocation) >> (colorId * 2)) & 0x03;
+
+
+  // Since our max is 254, and max is 3.
+  // monochrome color palette is modified from bgb
+  let rgbColor: u8 = 242;
+
+  switch (color) {
+    case 0:
+      break;
+    case 1:
+      rgbColor = 160;
+      break;
+    case 2:
+      rgbColor = 88;
+      break;
+    case 3:
+      rgbColor = 8;
+      break;
+  }
+
+  return rgbColor;
 }
 
 // FF68

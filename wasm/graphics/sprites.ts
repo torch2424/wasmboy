@@ -108,7 +108,7 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
         // http://gbdev.gg8.se/wiki/articles/Video_Display
         if (spriteColorId !== 0) {
 
-          // Get our color ID from the current sprite pallete
+          // Get our color RGB from the current sprite pallete
           let spritePixelColorFromPalette: u8 = getMonochromeColorFromPalette(spriteColorId, spritePaletteLocation);
 
           // Find our actual X pixel location on the gameboy "camera" view
@@ -116,10 +116,14 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
 
           // Now that we have our coordinates, check sprite priority
           // Remember, set pixel on frame increases the value by one!
+          // TODO: Make Color RGB for MOnochrome into a constant
           if (!isSpritePriorityBehindWindowAndBackground ||
-            getPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister) <= 1) {
+            getPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister) >= 200) {
+
             // Finally set the pixel!
-            setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, spritePixelColorFromPalette);
+            setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, 0, spritePixelColorFromPalette);
+            setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, 1, spritePixelColorFromPalette);
+            setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, 2, spritePixelColorFromPalette);
           }
         }
 

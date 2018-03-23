@@ -188,7 +188,11 @@ function drawMonochromePixelFromTile(xPixel: i32, yPixel: u8, pixelXPositionInMa
 
   // FINALLY, RENDER THAT PIXEL!
   // Only rendering camera for now, so coordinates are for the camera.
-  setPixelOnFrame(xPixel, yPixel, getMonochromeColorFromPalette(paletteColorId, Graphics.memoryLocationBackgroundPalette));
+  // Get the rgb value for the color Id, will be repeated into R, G, B
+  let monochromeColor: u8 = getMonochromeColorFromPalette(paletteColorId, Graphics.memoryLocationBackgroundPalette);
+  setPixelOnFrame(xPixel, yPixel, 0, monochromeColor);
+  setPixelOnFrame(xPixel, yPixel, 1, monochromeColor);
+  setPixelOnFrame(xPixel, yPixel, 2, monochromeColor);
 }
 
 // Function to draw a pixel from a tile in C O L O R
