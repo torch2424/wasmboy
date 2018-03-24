@@ -6,6 +6,5 @@ export {
 
 export {
   Palette,
-  incrementPaletteIfSet,
   writePaletteToMemory
 } from './palette';

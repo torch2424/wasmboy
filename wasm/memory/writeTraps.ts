@@ -7,7 +7,6 @@ import {
 } from '../graphics/graphics';
 import {
   Palette,
-  incrementPaletteIfSet,
   writePaletteToMemory
 } from '../graphics/index';
 import {
@@ -187,9 +186,9 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
 
   // Handle GBC Pallete Write
   if (offset >= Palette.memoryLocationBackgroundPaletteIndex && offset <= Palette.memoryLocationSpritePaletteData) {
+    // Incremeenting the palette handled by the write
     writePaletteToMemory(offset, value);
-    incrementPaletteIfSet(offset);
-    return false;
+    return true;
   }
 
   // Allow the original write

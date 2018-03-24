@@ -6,8 +6,7 @@ import {
   batchProcessGraphics
 } from '../graphics/graphics';
 import {
-  Palette,
-  incrementPaletteIfSet
+  Palette
 } from '../graphics/index';
 import {
   batchProcessAudio
@@ -83,12 +82,6 @@ export function checkReadTraps(offset: u16): i32 {
   //   // Not batch processing here for performance
   //   // batchProcessGraphics();
   // }
-
-  // Handle GBC Pallete read
-  if (offset >= Palette.memoryLocationBackgroundPaletteIndex && offset <= Palette.memoryLocationSpritePaletteData) {
-    incrementPaletteIfSet(offset);
-    return -1;
-  }
 
   return -1;
 }
