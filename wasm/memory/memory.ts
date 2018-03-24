@@ -2,10 +2,6 @@
 // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
 
 import {
-  checkBitOnByte,
-  hexLog
-} from '../helpers/index';
-import {
   eightBitLoadFromGBMemorySkipTraps,
   loadBooleanDirectlyFromWasmMemory
 } from './load';
@@ -16,6 +12,11 @@ import {
 import {
   handleBanking
 } from './banking';
+import {
+  checkBitOnByte,
+  resetBitOnByte,
+  hexLog
+} from '../helpers/index';
 
 export class Memory {
 
@@ -237,13 +238,31 @@ export function loadFromVramBank(gameboyOffset: u16, vramBankId: i32): u8 {
 }
 
 // Function to store a byte to our Gbc Palette memory
-export function storePaletteByteInWasmMemory(paletteIndex: u32, value: u8): void {
+export function storePaletteByteInWasmMemory(paletteIndexByte: u8, value: u8, isSprite: boolean): void {
+
+  // Clear the top auto increment bytes
+  let paletteIndex: u32 = resetBitOnByte(7, paletteIndexByte);
+
+  // Move over the palette index to not overlap the background
+  if(isSprite) {
+    paletteIndex += 0x3F;
+  }
+
   store<u8>(Memory.gameboyColorPaletteLocation + paletteIndex, value);
 }
 
 // Function to load a byte from our Gbc Palette memory
 // Function to store a byte to our Gbc Palette memory
-export function loadPaletteByteFromWasmMemory(paletteIndex: u32): u8 {
+export function loadPaletteByteFromWasmMemory(paletteIndexByte: u8, isSprite: boolean): u8 {
+
+  // Clear the top auto increment bytes
+  let paletteIndex: u32 = resetBitOnByte(7, paletteIndexByte);
+
+  // Move over the palette index to not overlap the background
+  if(isSprite) {
+    paletteIndex += 0x3F;
+  }
+
   return load<u8>(Memory.gameboyColorPaletteLocation + paletteIndex);
 }
 

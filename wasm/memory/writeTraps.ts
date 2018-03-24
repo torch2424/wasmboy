@@ -7,7 +7,7 @@ import {
 } from '../graphics/graphics';
 import {
   Palette,
-  writePaletteToMemory
+  writeColorPaletteToMemory
 } from '../graphics/index';
 import {
   batchProcessAudio,
@@ -187,7 +187,7 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
   // Handle GBC Pallete Write
   if (offset >= Palette.memoryLocationBackgroundPaletteIndex && offset <= Palette.memoryLocationSpritePaletteData) {
     // Incremeenting the palette handled by the write
-    writePaletteToMemory(offset, value);
+    writeColorPaletteToMemory(offset, value);
     return true;
   }
 

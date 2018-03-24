@@ -10,8 +10,8 @@ import {
 } from './renderUtils';
 import {
   getMonochromeColorFromPalette,
-  getRgbColorPalette,
-  getColorFromRgbPalette
+  getRgbColorFromPalette,
+  getColorComponentFromRgb
 } from './palette';
 // Assembly script really not feeling the reexport
 // using Skip Traps, because LCD has unrestricted access
@@ -257,16 +257,16 @@ function drawColorPixelFromTile(xPixel: i32, yPixel: u8, pixelXPositionInMap: i3
   let bgPalette: u8 = (bgMapAttributes & 0x07);
 
   // Call the helper function to grab the correct color from the palette
-  let rgbColorPalette: u16 = getRgbColorPalette(bgPalette, paletteColorId, false);
+  let rgbColorPalette: u16 = getRgbColorFromPalette(bgPalette, paletteColorId, false);
 
   //hexLog(rgbColorPalette);
 
   // Split off into red green and blue
   // Goal is to reach 254 for each color, so 255 / 31 (0x1F) ~8 TODO: Make exact
   // Want 5 bits for each
-  let red: u8 = getColorFromRgbPalette(0, rgbColorPalette);
-  let green: u8 = getColorFromRgbPalette(1, rgbColorPalette);
-  let blue: u8 = getColorFromRgbPalette(2, rgbColorPalette);
+  let red: u8 = getColorComponentFromRgb(0, rgbColorPalette);
+  let green: u8 = getColorComponentFromRgb(1, rgbColorPalette);
+  let blue: u8 = getColorComponentFromRgb(2, rgbColorPalette);
 
   // Finally Place our colors on the things
   setPixelOnFrame(xPixel, yPixel, 0, red);

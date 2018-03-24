@@ -6,5 +6,5 @@ export {
 
 export {
   Palette,
-  writePaletteToMemory
+  writeColorPaletteToMemory
 } from './palette';
