@@ -240,12 +240,12 @@ export function loadFromVramBank(gameboyOffset: u16, vramBankId: i32): u8 {
 // Function to store a byte to our Gbc Palette memory
 export function storePaletteByteInWasmMemory(paletteIndexByte: u8, value: u8, isSprite: boolean): void {
 
-  // Clear the top bits to just get the bottom palette Index
-  let paletteIndex: u32 = (paletteIndexByte & 0x3F);
+  // Clear the top bit to just get the bottom palette Index
+  let paletteIndex: u32 = resetBitOnByte(7, paletteIndexByte);
 
-  // Move over the palette index to not overlap the background
+  // Move over the palette index to not overlap the background (has 0x3F, so Zero for Sprites is 0x40)
   if(isSprite) {
-    paletteIndex += 0x3F;
+    paletteIndex += 0x40;
   }
 
   store<u8>(Memory.gameboyColorPaletteLocation + paletteIndex, value);
@@ -255,12 +255,12 @@ export function storePaletteByteInWasmMemory(paletteIndexByte: u8, value: u8, is
 // Function to store a byte to our Gbc Palette memory
 export function loadPaletteByteFromWasmMemory(paletteIndexByte: u8, isSprite: boolean): u8 {
 
-  // Clear the top bits to just get the bottom palette Index
-  let paletteIndex: u32 = (paletteIndexByte & 0x3F);
+  // Clear the top bit to just get the bottom palette Index
+  let paletteIndex: u32 = resetBitOnByte(7, paletteIndexByte);
 
-  // Move over the palette index to not overlap the background
+  // Move over the palette index to not overlap the background has 0x3F, so Zero for Sprites is 0x40)
   if(isSprite) {
-    paletteIndex += 0x3F;
+    paletteIndex += 0x40;
   }
 
   return load<u8>(Memory.gameboyColorPaletteLocation + paletteIndex);

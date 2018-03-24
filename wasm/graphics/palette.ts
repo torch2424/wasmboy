@@ -10,6 +10,7 @@ import {
 import {
   checkBitOnByte,
   resetBitOnByte,
+  setBitOnByte,
   concatenateBytes,
   hexLog
 } from '../helpers/index';
@@ -79,9 +80,9 @@ function incrementPaletteIndexIfSet(paletteIndex: u8, offset: u16): void {
   // Check ther auto increment box
   if (checkBitOnByte(7, paletteIndex)) {
     // Increment the index, and return the value before the increment
-    // Incrementing by adding one, and clearing the overflow bit (6)
+    // Ensure we don't ouverflow our auto increment bit
     paletteIndex += 1;
-    paletteIndex = resetBitOnByte(6, paletteIndex);
+    paletteIndex = setBitOnByte(7, paletteIndex);
 
     eightBitStoreIntoGBMemorySkipTraps(offset, paletteIndex);
   }
@@ -102,8 +103,6 @@ export function getRgbColorFromPalette(paletteId: u8, colorId: u8, isSprite: boo
   // Load the Color that is seperated into two bytes
   let paletteHighByte: u8 = loadPaletteByteFromWasmMemory(paletteIndex + 1, isSprite);
   let paletteLowByte: u8 = loadPaletteByteFromWasmMemory(paletteIndex, isSprite);
-
-  hexLog(paletteId, paletteIndex, colorId, concatenateBytes(paletteHighByte, paletteLowByte));
 
   // Return the concatenated color byte
   return concatenateBytes(paletteHighByte, paletteLowByte);
