@@ -65,14 +65,14 @@ namespace env {
   export declare function performanceTimestamp(id: i32, value: i32): void;
 }
 
-export function log(message: string, arg0: i32 = 0, arg1: i32 = 0, arg2: i32 = 0, arg3: i32 = 0, arg4: i32 = 0, arg5: i32 = 0): void {
+export function log(message: string, arg0: i32 = -9999, arg1: i32 = -9999, arg2: i32 = -9999, arg3: i32 = -9999, arg4: i32 = -9999, arg5: i32 = -9999): void {
   env.log(message, arg0, arg1, arg2, arg3, arg4, arg5);
 }
 
-export function hexLog(arg0: i32 = 0, arg1: i32 = 0, arg2: i32 = 0, arg3: i32 = 0, arg4: i32 = 0, arg5: i32 = 0): void {
+export function hexLog(arg0: i32 = -9999, arg1: i32 = -9999, arg2: i32 = -9999, arg3: i32 = -9999, arg4: i32 = -9999, arg5: i32 = -9999): void {
   env.hexLog(arg0, arg1, arg2, arg3, arg4, arg5);
 }
 
-export function performanceTimestamp(id: i32 = 0, value: i32 = 0): void {
+export function performanceTimestamp(id: i32 = -9999, value: i32 = -9999): void {
   env.performanceTimestamp(id, value);
 }

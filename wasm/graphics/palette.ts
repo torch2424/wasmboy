@@ -67,27 +67,23 @@ export function writeColorPaletteToMemory(offset: u16, value: u16): void {
 
     storePaletteByteInWasmMemory(paletteIndex, <u8>value, isSprite);
 
-    incrementPaletteIfSet(offset);
+    incrementPaletteIndexIfSet(paletteIndex, offset - 1);
   }
 }
 
 // Functions to Handle Write to pallete data registers
 // http://gbdev.gg8.se/wiki/articles/Video_Display#FF68_-_BCPS.2FBGPI_-_CGB_Mode_Only_-_Background_Palette_Index
 // Function to handle incrementing the pallete index if required
-function incrementPaletteIfSet(offset: u16): void {
-  if (offset === Palette.memoryLocationBackgroundPaletteData || offset === Palette.memoryLocationSpritePaletteData) {
-    // Get the palette index
-    let paletteIndex: u8 = eightBitLoadFromGBMemorySkipTraps(offset - 1);
+function incrementPaletteIndexIfSet(paletteIndex: u8, offset: u16): void {
 
-    // Check ther auto increment box
-    if (checkBitOnByte(7, paletteIndex)) {
-      // Increment the index, and return the value before the increment
-      // Incrementing by adding one, and clearing the overflow bit (6)
-      paletteIndex += 1;
-      paletteIndex = resetBitOnByte(6, paletteIndex);
+  // Check ther auto increment box
+  if (checkBitOnByte(7, paletteIndex)) {
+    // Increment the index, and return the value before the increment
+    // Incrementing by adding one, and clearing the overflow bit (6)
+    paletteIndex += 1;
+    paletteIndex = resetBitOnByte(6, paletteIndex);
 
-      eightBitStoreIntoGBMemorySkipTraps(offset - 1, paletteIndex);
-    }
+    eightBitStoreIntoGBMemorySkipTraps(offset, paletteIndex);
   }
 }
 
@@ -99,12 +95,15 @@ function incrementPaletteIfSet(offset: u16): void {
 // and 0-7 (8 palltetes). Therefore, 64!
 export function getRgbColorFromPalette(paletteId: u8, colorId: u8, isSprite: boolean): u16 {
 
-  // Each color takes 2 bytes, therefore, multiple by 2 for the correct color bytes in the palette
-  let paletteIndex: u8 = paletteId + (colorId * 2);
+  // Each Pallete takes 8 bytes, so multiply by 8 to get the pallete
+  // And Each color takes 2 bytes, therefore, multiple by 2 for the correct color bytes in the palette
+  let paletteIndex: u8 = (paletteId * 8) + (colorId * 2);
 
-  // Load the palette that is seperated into two bytes
-  let paletteHighByte: u8 = loadPaletteByteFromWasmMemory(paletteIndex, isSprite);
-  let paletteLowByte: u8 = loadPaletteByteFromWasmMemory(paletteIndex + 1, isSprite);
+  // Load the Color that is seperated into two bytes
+  let paletteHighByte: u8 = loadPaletteByteFromWasmMemory(paletteIndex + 1, isSprite);
+  let paletteLowByte: u8 = loadPaletteByteFromWasmMemory(paletteIndex, isSprite);
+
+  hexLog(paletteId, paletteIndex, colorId, concatenateBytes(paletteHighByte, paletteLowByte));
 
   // Return the concatenated color byte
   return concatenateBytes(paletteHighByte, paletteLowByte);

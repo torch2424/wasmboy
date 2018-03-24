@@ -70,6 +70,9 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
       if(flipSpriteY) {
         currentSpriteLine -= <i16>spriteHeight;
         currentSpriteLine = currentSpriteLine * -1;
+
+        // Bug fix for the flipped flies in link's awakening
+        currentSpriteLine -= 1;
       }
       // Each line of a tile takes two bytes of memory
       currentSpriteLine = currentSpriteLine * 2;
