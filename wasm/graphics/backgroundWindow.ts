@@ -259,11 +259,7 @@ function drawColorPixelFromTile(xPixel: i32, yPixel: u8, pixelXPositionInMap: i3
   // Call the helper function to grab the correct color from the palette
   let rgbColorPalette: u16 = getRgbColorFromPalette(bgPalette, paletteColorId, false);
 
-  //hexLog(rgbColorPalette);
-
   // Split off into red green and blue
-  // Goal is to reach 254 for each color, so 255 / 31 (0x1F) ~8 TODO: Make exact
-  // Want 5 bits for each
   let red: u8 = getColorComponentFromRgb(0, rgbColorPalette);
   let green: u8 = getColorComponentFromRgb(1, rgbColorPalette);
   let blue: u8 = getColorComponentFromRgb(2, rgbColorPalette);

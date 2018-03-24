@@ -106,8 +106,6 @@ export function getRgbColorFromPalette(paletteId: u8, colorId: u8, isSprite: boo
   let paletteHighByte: u8 = loadPaletteByteFromWasmMemory(paletteIndex, isSprite);
   let paletteLowByte: u8 = loadPaletteByteFromWasmMemory(paletteIndex + 1, isSprite);
 
-  hexLog(paletteId, colorId, concatenateBytes(paletteHighByte, paletteLowByte));
-
   // Return the concatenated color byte
   return concatenateBytes(paletteHighByte, paletteLowByte);
 }
@@ -121,5 +119,7 @@ export function getColorComponentFromRgb(colorId: u8, colorRgb: u16): u8 {
   let bitMask: u16 = (0x1F << (colorId * 5));
   let colorValue: u16 = ((colorRgb & bitMask) >> (colorId * 5));
 
+  // Goal is to reach 254 for each color, so 255 / 31 (0x1F) ~8 TODO: Make exact
+  // Want 5 bits for each
   return <u8>(colorValue * 8);
 }
