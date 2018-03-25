@@ -7,10 +7,10 @@ const wasmBoyOptions = {
 	isAudioEnabled: true,
 	frameSkip: 1,
 	audioBatchProcessing: true,
-	timersBatchProcessing: false,
+	timersBatchProcessing: true,
 	audioAccumulateSamples: true,
-	graphicsBatchProcessing: false,
-	graphicsDisableScanlineRendering: false
+	graphicsBatchProcessing: true,
+	graphicsDisableScanlineRendering: true
 };
 
 const wasmBoyOptionsString = JSON.stringify(wasmBoyOptions, null, 4);
