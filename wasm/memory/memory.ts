@@ -95,15 +95,15 @@ export class Memory {
   static DMACycles: i32 = 0;
   // Boolean we will mirror to indicate if Hdma is active
   static isHblankHdmaActive: boolean = false;
-  static hblankHdmaIndex: u8 = 0x00;
-  static hblankHdmaTotalBytes: u8 = 0x00;
+  static hblankHdmaIndex: i32 = 0x00;
+  static hblankHdmaTotalBytes: i32 = 0x00;
   // Store the source and destination for performance, and update as needed
   static hblankHdmaSource: u16 = 0x00;
   static hblankHdmaDestination: u16 = 0x00;
 
   // GBC Registers
-  static memoryLocationGBCWRAMBank: u16 = 0xFF70;
   static memoryLocationGBCVRAMBAnk: u16 = 0xFF4F;
+  static memoryLocationGBCWRAMBank: u16 = 0xFF70;
 
   // Save States
 

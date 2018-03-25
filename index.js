@@ -5,13 +5,13 @@ import { WasmBoyDebugger, WasmBoySystemControls } from './debugger/index';
 
 const wasmBoyOptions = {
 	isGbcEnabled: true,
-	isAudioEnabled: true,
+	isAudioEnabled: false,
 	frameSkip: 1,
-	audioBatchProcessing: true,
-	timersBatchProcessing: true,
-	audioAccumulateSamples: true,
-	graphicsBatchProcessing: true,
-	graphicsDisableScanlineRendering: true
+	audioBatchProcessing: false,
+	timersBatchProcessing: false,
+	audioAccumulateSamples: false,
+	graphicsBatchProcessing: false,
+	graphicsDisableScanlineRendering: false
 };
 
 const wasmBoyOptionsString = JSON.stringify(wasmBoyOptions, null, 4);
@@ -43,7 +43,7 @@ export default class App extends Component {
 		WasmBoyController.addTouchInput('START', startElement, 'BUTTON');
 		WasmBoyController.addTouchInput('SELECT', selectElement, 'BUTTON');
 
-		WasmBoy.loadGame('./games/linksawakening.gb')
+		WasmBoy.loadGame('./games/warioland3.gbc')
 		.then(() => {
 			console.log('Wasmboy Ready!');
 		}).catch((error) => {

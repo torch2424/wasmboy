@@ -69,7 +69,7 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
       }
     case 0x0D:
       // Gameboy Ram Banks, Switchable in GBC Mode
-      // 0xC000 -> 0x000400
+      // 0xD000 -> 0x000400
       // In CGB Mode 32 KBytes internal RAM are available.
       // This memory is divided into 8 banks of 4 KBytes each.
       // Bank 0 is always available in memory at C000-CFFF,
@@ -82,16 +82,20 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
           wramBankId = 1;
         }
         // (0x1000 * (wramBankId - 1)) -> To find the correct wram bank. 0x2000 For the Bank 1 VRAM offset
+        // wramBankId - 1, because we alreayd have the space for wramBank 1, and are currently in it
+        // So need to address space for 6 OTHER banks
+        // + 0x2000 for second wram bank
         return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation + (0x1000 * (wramBankId - 1)) + 0x2000;
       } else {
         return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation;
       }
     default:
-      // Everything Else after Gameboy Ram Bankss
+      // Everything Else after Gameboy Ram Banks
       // 0xE000 -> 0x000400
       if (Cpu.GBCEnabled) {
         // 0x2000 For VRAM Bank 1 offset
-        return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation + 0x2000;
+        // 0x6000 For the Extra WRAM Banks
+        return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation + 0x2000 + 0x6000;
       } else {
         return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation;
       }
