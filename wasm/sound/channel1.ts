@@ -112,7 +112,7 @@ export class Channel1 {
     eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx0, 0x80);
     eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx1, 0xBF);
     eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx2, 0xF3);
-    eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx3, 0xFF);
+    eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx3, 0xC1);
     eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx4, 0xBF);
   }
 

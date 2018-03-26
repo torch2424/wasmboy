@@ -43,7 +43,7 @@ export default class App extends Component {
 		WasmBoyController.addTouchInput('START', startElement, 'BUTTON');
 		WasmBoyController.addTouchInput('SELECT', selectElement, 'BUTTON');
 
-		WasmBoy.loadGame('./games/warioland3.gbc')
+		WasmBoy.loadGame('./games/mbc3/pokemoncrystal.gbc')
 		.then(() => {
 			console.log('Wasmboy Ready!');
 		}).catch((error) => {

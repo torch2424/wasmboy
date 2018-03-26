@@ -96,8 +96,8 @@ export class Channel2 {
     eightBitStoreIntoGBMemorySkipTraps(Channel2.memoryLocationNRx1 - 1, 0xFF);
     eightBitStoreIntoGBMemorySkipTraps(Channel2.memoryLocationNRx1, 0x3F);
     eightBitStoreIntoGBMemorySkipTraps(Channel2.memoryLocationNRx2, 0x00);
-    eightBitStoreIntoGBMemorySkipTraps(Channel2.memoryLocationNRx3, 0xF3);
-    eightBitStoreIntoGBMemorySkipTraps(Channel2.memoryLocationNRx4, 0xBF);
+    eightBitStoreIntoGBMemorySkipTraps(Channel2.memoryLocationNRx3, 0x00);
+    eightBitStoreIntoGBMemorySkipTraps(Channel2.memoryLocationNRx4, 0xB8);
   }
 
   // Function to get a sample using the cycle counter on the channel

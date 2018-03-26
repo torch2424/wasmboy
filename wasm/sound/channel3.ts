@@ -90,8 +90,8 @@ export class Channel3 {
     eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx0, 0x7F);
     eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx1, 0xFF);
     eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx2, 0x9F);
-    eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx3, 0xBF);
-    eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx4, 0xFF);
+    eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx3, 0x00);
+    eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx4, 0xB8);
 
     // The volume code changed
     Channel3.volumeCodeChanged = true;
