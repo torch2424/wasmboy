@@ -50,6 +50,8 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
         // Find our current VRAM Bank
         let vramBankId: i32 = (eightBitLoadFromGBMemorySkipTraps(Memory.memoryLocationGBCVRAMBAnk) & 0x01);
         return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation + (0x2000 * vramBankId);
+        // Even though We added another 0x2000, the Cartridge ram is pulled out of our Internal Memory Space
+        // Therefore, we do not need to adjust for this extra 0x2000
       } else {
         return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation;
       }
@@ -62,8 +64,7 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
       // Gameboy Ram Bank 0
       // 0xC000 -> 0x000400
       if (Cpu.GBCEnabled) {
-        // 0x2000 For VRAM Bank 1 offset
-        return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation + 0x2000;
+        return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation;
       } else {
         return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation;
       }
@@ -81,11 +82,10 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
         if (wramBankId < 1) {
           wramBankId = 1;
         }
-        // (0x1000 * (wramBankId - 1)) -> To find the correct wram bank. 0x2000 For the Bank 1 VRAM offset
+        // (0x1000 * (wramBankId - 1)) -> To find the correct wram bank.
         // wramBankId - 1, because we alreayd have the space for wramBank 1, and are currently in it
         // So need to address space for 6 OTHER banks
-        // + 0x2000 for second wram bank
-        return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation + (0x1000 * (wramBankId - 1)) + 0x2000;
+        return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation + (0x1000 * (wramBankId - 1));
       } else {
         return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation;
       }
@@ -93,9 +93,8 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
       // Everything Else after Gameboy Ram Banks
       // 0xE000 -> 0x000400
       if (Cpu.GBCEnabled) {
-        // 0x2000 For VRAM Bank 1 offset
         // 0x6000 For the Extra WRAM Banks
-        return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation + 0x2000 + 0x6000;
+        return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation + 0x6000;
       } else {
         return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation;
       }
