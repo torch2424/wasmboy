@@ -5,7 +5,7 @@ import { WasmBoyDebugger, WasmBoySystemControls } from './debugger/index';
 
 const wasmBoyOptions = {
 	isGbcEnabled: true,
-	isAudioEnabled: false,
+	isAudioEnabled: true,
 	frameSkip: 1,
 	audioBatchProcessing: false,
 	timersBatchProcessing: false,
