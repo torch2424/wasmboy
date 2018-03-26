@@ -123,10 +123,6 @@ export function getStackPointer(): u16 {
   return Cpu.stackPointer;
 }
 
-export function getPreviousOpcode(): u8 {
-  return Cpu.previousOpcode;
-}
-
 export function getOpcodeAtProgramCounter(): u8 {
   return eightBitLoadFromGBMemory(Cpu.programCounter);
 }

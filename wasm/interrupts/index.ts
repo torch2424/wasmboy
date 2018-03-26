@@ -47,7 +47,7 @@ export class Interrupts {
   }
 }
 
-export function checkInterrupts(): i8 {
+export function checkInterrupts(): i32 {
 
   if(Interrupts.masterInterruptSwitch) {
 
@@ -87,7 +87,7 @@ export function checkInterrupts(): i8 {
 
     // Interrupt handling requires 20 cycles, TCAGBD
     if(wasInterruptHandled) {
-      let intteruptHandlerCycles: i8 = 20;
+      let intteruptHandlerCycles: i32 = 20;
       if(Cpu.isHalted) {
         intteruptHandlerCycles += 4;
       }

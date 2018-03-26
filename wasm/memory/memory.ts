@@ -163,6 +163,9 @@ export function initializeCartridge(): void {
   } else if (cartridgeType >= 0x19 && cartridgeType <= 0x1E) {
     Memory.isMBC5 = true;
   }
+
+  Memory.currentRomBank = 0x01;
+  Memory.currentRamBank = 0x00;
 }
 
 // Also need to store current frame in memory to be read by JS

@@ -95,7 +95,6 @@ export class WasmBoyDebugger extends Component {
     // Update CPU State
     state.cpu['Program Counter (PC)'] = wasmboy.wasmInstance.exports.getProgramCounter();
     state.cpu['Opcode at PC'] = wasmboy.wasmInstance.exports.getOpcodeAtProgramCounter();
-    state.cpu['Previous Opcode'] = wasmboy.wasmInstance.exports.getPreviousOpcode();
     state.cpu['Stack Pointer'] = wasmboy.wasmInstance.exports.getStackPointer();
     state.cpu['Register A'] = wasmboy.wasmInstance.exports.getRegisterA();
     state.cpu['Register F'] = wasmboy.wasmInstance.exports.getRegisterF();

@@ -70,9 +70,6 @@ export class Cpu {
   // Memory Location for the GBC Speed switch
   static memoryLocationSpeedSwitch: u16 = 0xFF4D;
 
-  // Debugging properties
-  static previousOpcode: u8 = 0x00;
-
   // Save States
 
   static readonly saveStateSlot: u16 = 0;
@@ -142,9 +139,12 @@ export function initialize(useGBCMode: i32 = 1, includeBootRom: i32 = 0): void {
     // Initialization variables from BGB
 
     if(Cpu.GBCEnabled) {
+
       // CPU Registers
       Cpu.registerA = 0x11;
       Cpu.registerF = 0x80;
+      Cpu.registerB = 0x00;
+      Cpu.registerC = 0x00;
       Cpu.registerD = 0xFF;
       Cpu.registerE = 0x56;
       Cpu.registerH = 0x00;

@@ -150,7 +150,6 @@ export function emulationStep(audioBatchProcessing: boolean = false,
     let dataByteOne: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 1);
     let dataByteTwo: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 2);
     numberOfCycles = executeOpcode(opcode, dataByteOne, dataByteTwo);
-    //Cpu.previousOpcode = opcode;
   } else {
     // if we were halted, and interrupts were disabled but interrupts are pending, stop waiting
     if(Cpu.isHalted && !areInterruptsEnabled() && areInterruptsPending()) {
@@ -173,6 +172,11 @@ export function emulationStep(audioBatchProcessing: boolean = false,
       numberOfCycles = executeOpcode(opcode, dataByteOne, dataByteTwo);
       Cpu.programCounter -= 1;
     }
+  }
+
+  if(numberOfCycles <= 0) {
+    hexLog(Cpu.programCounter, opcode);
+    return numberOfCycles;
   }
 
   // Check if we did a DMA TRansfer, if we did add the cycles
@@ -203,10 +207,6 @@ export function emulationStep(audioBatchProcessing: boolean = false,
   // Interrupt Handling requires 20 cycles
   // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
   numberOfCycles += checkInterrupts();
-
-  if(numberOfCycles <= 0) {
-    log("Opcode at crash: $0", 1, opcode);
-  }
 
   return numberOfCycles;
 }
