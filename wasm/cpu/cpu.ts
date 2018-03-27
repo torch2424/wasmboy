@@ -150,6 +150,10 @@ export function initialize(useGBCMode: i32 = 1, includeBootRom: i32 = 0): void {
       Cpu.registerH = 0x00;
       Cpu.registerL = 0x0D;
 
+      // Cpu Control Flow
+      Cpu.programCounter = 0x100;
+      Cpu.stackPointer = 0xFFFE;
+
       // LCD / Graphics
       eightBitStoreIntoGBMemorySkipTraps(0xFF40, 0x91);
       eightBitStoreIntoGBMemorySkipTraps(0xFF41, 0x81);
