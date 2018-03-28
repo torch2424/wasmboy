@@ -94,13 +94,12 @@ export class Graphics {
   static currentLcdMode: u8 = 0;
 
   // Scroll and Window
-  // TODO -7 on windowX, and export to be used
   static readonly memoryLocationScrollX: u16 = 0xFF43;
   static readonly memoryLocationScrollY: u16 = 0xFF42;
   static readonly memoryLocationWindowX: u16 = 0xFF4B;
   static readonly memoryLocationWindowY: u16 = 0xFF4A;
 
-  // Tile Maps And Data (TODO: Dont seperate Background and window :p)
+  // Tile Maps And Data
   static readonly memoryLocationTileMapSelectZeroStart: u16 = 0x9800;
   static readonly memoryLocationTileMapSelectOneStart: u16 = 0x9C00;
   static readonly memoryLocationTileDataSelectZeroStart: u16 = 0x8800;

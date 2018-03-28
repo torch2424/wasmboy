@@ -118,7 +118,7 @@ function drawBackgroundWindowScanline(scanlineRegister: u8, tileDataMemoryLocati
     let tileMapAddress: u16 = tileMapMemoryLocation + <u16>(tileYPositionInMap * 32) + <u16>tileXPositionInMap;
 
     // Get the tile Id on the Tile Map
-    let tileIdFromTileMap: u8 = eightBitLoadFromGBMemorySkipTraps(tileMapAddress);
+    let tileIdFromTileMap: u8 = loadFromVramBank(tileMapAddress, 0);
 
     // Now get our tileDataAddress for the corresponding tileID we found in the map
     // Read the comments in _getTileDataAddress() to see what's going on.
@@ -154,8 +154,8 @@ function drawMonochromePixelFromTile(xPixel: i32, yPixel: u8, pixelXPositionInMa
   // Remember to represent a single line of 8 pixels on a tile, we need two bytes.
   // Therefore, we need to times our modulo by 2, to get the correct line of pixels on the tile.
   // Again, think like you had to map a 2d array as a 1d.
-  let byteOneForLineOfTilePixels: u8 = eightBitLoadFromGBMemorySkipTraps(tileDataAddress + (pixelYInTile * 2))
-  let byteTwoForLineOfTilePixels: u8 = eightBitLoadFromGBMemorySkipTraps(tileDataAddress + (pixelYInTile * 2) + 1);
+  let byteOneForLineOfTilePixels: u8 = loadFromVramBank(tileDataAddress + (pixelYInTile * 2), 0)
+  let byteTwoForLineOfTilePixels: u8 = loadFromVramBank(tileDataAddress + (pixelYInTile * 2) + 1, 0);
 
   // Same logic as pixelYInTile.
   // However, We need to reverse our byte,

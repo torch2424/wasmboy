@@ -88,7 +88,7 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
   if(offset >= spriteInformationTableLocation && offset <= Memory.spriteInformationTableLocationEnd) {
     // Can only read/write from OAM During Mode 2
     // See graphics/lcd.ts
-    if (Graphics.currentLcdMode !== 2) {
+    if (Graphics.currentLcdMode < 2) {
       return false;
     }
     // Not batch processing here for performance

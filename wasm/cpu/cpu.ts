@@ -193,6 +193,10 @@ export function initialize(useGBCMode: i32 = 1, includeBootRom: i32 = 0): void {
       eightBitStoreIntoGBMemorySkipTraps(0xFF54, 0xFF);
       eightBitStoreIntoGBMemorySkipTraps(0xFF55, 0xFF);
 
+      // Undocumented from Pandocs
+      eightBitStoreIntoGBMemorySkipTraps(0xFF6C, 0xFE);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF75, 0x8F);
+
     } else {
       // Cpu Registers
       Cpu.registerA = 0x01;

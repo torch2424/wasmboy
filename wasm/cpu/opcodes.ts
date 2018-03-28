@@ -176,7 +176,9 @@ export function emulationStep(audioBatchProcessing: boolean = false,
 
   if(numberOfCycles <= 0) {
     hexLog(Cpu.programCounter, opcode);
-    return numberOfCycles;
+    // Set number of cycles to 4
+    numberOfCycles = 4;
+    //return numberOfCycles;
   }
 
   // Check if we did a DMA TRansfer, if we did add the cycles
@@ -443,13 +445,14 @@ function handleOpcode1x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
 
   switch (opcode) {
     case 0x10:
+
       // STOP 0
       // 2 4
       // Enter CPU very low power mode. Also used to switch between double and normal speed CPU modes in GBC.
       // Meaning Don't Decode anymore opcodes , or updated the LCD until joypad interrupt (or when button is pressed if I am wrong)
       // See HALT
 
-      // If we are in gameboy color mode, set the new sppeed
+      // If we are in gameboy color mode, set the new speed
       if (Cpu.GBCEnabled) {
 
         let speedSwitch: u8 = eightBitLoadFromGBMemory(Cpu.memoryLocationSpeedSwitch);
