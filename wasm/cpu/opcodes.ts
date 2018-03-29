@@ -670,9 +670,9 @@ function handleOpcode2x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
 
       // LD HL,d16
       // 3  12
-      let sixeteenBitDataByte = concatenatedDataByte;
-      Cpu.registerH = splitHighByte(sixeteenBitDataByte);
-      Cpu.registerL = splitLowByte(sixeteenBitDataByte);
+      let sixteenBitDataByte = concatenatedDataByte;
+      Cpu.registerH = splitHighByte(sixteenBitDataByte);
+      Cpu.registerL = splitLowByte(sixteenBitDataByte);
       Cpu.programCounter += 2;
       return 12;
     case 0x22:
@@ -2287,7 +2287,7 @@ function handleOpcodeEx(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
       return 16;
     case 0xE9:
 
-      // JP (HL)
+      // JP HL
       // 1 4
       Cpu.programCounter = concatenateBytes(Cpu.registerH, Cpu.registerL);
       return 4;
