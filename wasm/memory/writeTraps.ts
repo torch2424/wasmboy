@@ -15,7 +15,8 @@ import {
 } from '../sound/index';
 import {
   Timers,
-  batchProcessTimers
+  batchProcessTimers,
+  handleTIMCWrite
 } from '../timers/index'
 import {
   handleBanking
@@ -112,6 +113,12 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
     if(offset === Timers.memoryLocationDividerRegister) {
       eightBitStoreIntoGBMemorySkipTraps(offset, 0);
       return false;
+    }
+
+    // Trap our TIMC writes
+    if(offset === Timers.memoryLocationTIMC) {
+      handleTIMCWrite(<u8>value);
+      return true;
     }
 
     // Allow the original Write

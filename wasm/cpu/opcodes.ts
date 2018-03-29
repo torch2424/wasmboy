@@ -176,9 +176,7 @@ export function emulationStep(audioBatchProcessing: boolean = false,
 
   if(numberOfCycles <= 0) {
     hexLog(Cpu.programCounter, opcode);
-    // Set number of cycles to 4
-    numberOfCycles = 4;
-    //return numberOfCycles;
+    return numberOfCycles;
   }
 
   // Check if we did a DMA TRansfer, if we did add the cycles

@@ -11,6 +11,10 @@ import {
 import {
   requestTimerInterrupt
 } from '../interrupts/index';
+import {
+  checkBitOnByte,
+  hexLog
+} from '../helpers/index';
 
 export class Timers {
 
@@ -32,6 +36,9 @@ export class Timers {
   static readonly memoryLocationTIMC: u16 = 0xFF07; // Timer Controller (A.K.A TAC)
   static readonly memoryLocationDividerRegister: u16 = 0xFF04; // DividerRegister likes to count
 
+  // Check if the timer is currently enabled
+  static isEnabled: boolean = true;
+
   // Cycle counter. This is used to determine if we should increment the REAL timer
   // I know this is weird, but it's all to make sure the emulation is in sync :p
   static cycleCounter: i32 = 0x00;
@@ -52,6 +59,7 @@ export class Timers {
   static readonly saveStateSlot: u16 = 5;
 
   // Function to save the state of the class
+  // TODO: Save state for new properties on Timers
   static saveState(): void {
     store<i32>(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot), Timers.cycleCounter);
     store<i32>(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot), Timers.currentMaxCycleCount);
@@ -75,7 +83,7 @@ export function batchProcessTimers(): void {
   // This will depend on the least amount of cycles we need to update
   // Something
   let batchProcessCycles: i32 = Timers.batchProcessCycles();
-  if (_isTimerEnabled() && Timers.currentMaxCycleCount < batchProcessCycles) {
+  if (Timers.isEnabled && Timers.currentMaxCycleCount < batchProcessCycles) {
     batchProcessCycles = Timers.currentMaxCycleCount;
   }
 
@@ -93,20 +101,22 @@ export function updateTimers(numberOfCycles: i32): void {
 
   _checkDividerRegister(numberOfCycles);
 
-  if(_isTimerEnabled()) {
+  if(Timers.isEnabled) {
 
     // Add our cycles our cycle counter
     Timers.cycleCounter += numberOfCycles;
 
-    if(Timers.cycleCounter > _getCurrentCycleCounterFrequency()) {
+    //hexLog(eightBitLoadFromGBMemorySkipTraps(Timers.memoryLocationTIMA), Timers.cycleCounter, Timers.currentMaxCycleCount);
+
+    if(Timers.cycleCounter >= Timers.currentMaxCycleCount) {
 
       // Reset our cycle counters
       // Not setting to zero as we do not want to drop cycles
-      Timers.cycleCounter -= _getCurrentCycleCounterFrequency();
+      Timers.cycleCounter -= Timers.currentMaxCycleCount;
 
       // Update the actual timer counter
       let tima: u8 = eightBitLoadFromGBMemorySkipTraps(Timers.memoryLocationTIMA);
-      if(tima == 255) {
+      if(tima >= 255) {
         // Store Timer Modulator inside of TIMA
         eightBitStoreIntoGBMemorySkipTraps(Timers.memoryLocationTIMA, eightBitLoadFromGBMemorySkipTraps(Timers.memoryLocationTMA));
 
@@ -119,36 +129,11 @@ export function updateTimers(numberOfCycles: i32): void {
   }
 }
 
-// Function to update our divider register
-function _checkDividerRegister(numberOfCycles: i32): void {
+// Function called on write to TIMC
+export function handleTIMCWrite(timc: u8): void {
 
-  // Every 256 clock cycles need to increment
-  Timers.dividerRegisterCycleCounter += numberOfCycles;
-
-  if(Timers.dividerRegisterCycleCounter >= Timers.dividerRegisterMaxCycleCount()) {
-
-    // Reset the cycle counter
-    // - 255 to catch any overflow with the cycles
-    Timers.dividerRegisterCycleCounter -= Timers.dividerRegisterMaxCycleCount();
-
-    let dividerRegister = eightBitLoadFromGBMemorySkipTraps(Timers.memoryLocationDividerRegister);
-    // TODO: Hoping that the overflow will occur correctly here, see this for any weird errors
-    dividerRegister += 1;
-    eightBitStoreIntoGBMemorySkipTraps(Timers.memoryLocationDividerRegister, dividerRegister);
-  }
-}
-
-function _isTimerEnabled(): boolean {
-  // second bit, e.g 000 0100, will be set if the timer is enabled
-  return (eightBitLoadFromGBMemorySkipTraps(Timers.memoryLocationTIMC) & 0x04) > 0;
-}
-
-// NOTE: This can be sped up by intercepting writes to memory
-// And handling this there
-function _getCurrentCycleCounterFrequency(): i32 {
-
-  // Get TIMC
-  let timc = eightBitLoadFromGBMemorySkipTraps(Timers.memoryLocationTIMC);
+  // Set if the timer is enabled
+  Timers.isEnabled = checkBitOnByte(2, timc);
 
   // Clear the top byte
   timc = timc & 0x03;
@@ -184,11 +169,25 @@ function _getCurrentCycleCounterFrequency(): i32 {
       break;
   }
 
-  // If we notice the current max cycle count changes, reset the cyclecounter
-  if(cycleCount != Timers.currentMaxCycleCount) {
-    Timers.cycleCounter = 0;
-    Timers.currentMaxCycleCount = cycleCount;
-  }
+  // Set our new current max, and reset the cycle counter
+  Timers.cycleCounter = 0;
+  Timers.currentMaxCycleCount = cycleCount;
+}
 
-  return cycleCount;
+// Function to update our divider register
+function _checkDividerRegister(numberOfCycles: i32): void {
+
+  // Every 256 clock cycles need to increment
+  Timers.dividerRegisterCycleCounter += numberOfCycles;
+
+  if(Timers.dividerRegisterCycleCounter >= Timers.dividerRegisterMaxCycleCount()) {
+
+    // Reset the cycle counter
+    // - 255 to catch any overflow with the cycles
+    Timers.dividerRegisterCycleCounter -= Timers.dividerRegisterMaxCycleCount();
+
+    let dividerRegister: u8 = eightBitLoadFromGBMemorySkipTraps(Timers.memoryLocationDividerRegister);
+    dividerRegister += 1;
+    eightBitStoreIntoGBMemorySkipTraps(Timers.memoryLocationDividerRegister, dividerRegister);
+  }
 }
