@@ -1969,7 +1969,7 @@ function handleOpcodeCx(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
       if (getZeroFlag() === 0) {
         Cpu.stackPointer -= 2;
         sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
-        Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.programCounter);
+        Cpu.programCounter = concatenatedDataByte;
         return 24;
       } else {
         Cpu.programCounter += 2;
@@ -2043,7 +2043,7 @@ function handleOpcodeCx(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
       if (getZeroFlag() === 1) {
         Cpu.stackPointer -= 2;
         sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
-        Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.programCounter);
+        Cpu.programCounter = concatenatedDataByte;
         return 24;
       } else {
         Cpu.programCounter += 2;
@@ -2055,7 +2055,7 @@ function handleOpcodeCx(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
       // 3  24
       Cpu.stackPointer -= 2;
       sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
-      Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.programCounter);
+      Cpu.programCounter = concatenatedDataByte;
       return 24;
     case 0xCE:
 
@@ -2119,7 +2119,7 @@ function handleOpcodeDx(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
       if (getCarryFlag() === 0) {
         Cpu.stackPointer -= 2;
         sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
-        Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.programCounter);
+        Cpu.programCounter = concatenatedDataByte;
         return 24;
       } else {
         Cpu.programCounter += 2;
@@ -2188,7 +2188,7 @@ function handleOpcodeDx(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
       if (getCarryFlag() === 1) {
         Cpu.stackPointer -= 2;
         sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
-        Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.programCounter);
+        Cpu.programCounter = concatenatedDataByte;
         return 24;
       } else {
         Cpu.programCounter += 2;
