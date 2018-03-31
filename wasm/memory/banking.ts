@@ -3,7 +3,10 @@ import {
 Memory
 } from './memory';
 import {
-  checkBitOnByte
+  concatenateBytes,
+  checkBitOnByte,
+  splitLowByte,
+  hexLog
 } from '../helpers/index';
 
 export function handleBanking(offset: u16, value: u16): void {
@@ -53,7 +56,13 @@ export function handleBanking(offset: u16, value: u16): void {
           Memory.currentRomBank = Memory.currentRomBank | romBankLowerBits;
           return;
         } else {
-          // TODO: MBC5 High bits Rom bank
+          // TODO: MBC5 High bits Rom bank, check if this works, not sure about the value
+          let highByte: u8 = 0;
+          let lowByte: u8 = splitLowByte(Memory.currentRomBank);
+          if(value > 0) {
+            highByte = 1;
+          }
+          Memory.currentRomBank = concatenateBytes(highByte, lowByte);
         }
       } else if(!Memory.isMBC2 &&
       offset <= 0x5FFF) {

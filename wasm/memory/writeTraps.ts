@@ -171,6 +171,7 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
   if(Memory.isHblankHdmaActive &&
     offset >= Memory.memoryLocationHdmaSourceHigh &&
     offset <= Memory.memoryLocationHdmaDestinationLow) {
+      hexLog(3);
       return false;
   }
 

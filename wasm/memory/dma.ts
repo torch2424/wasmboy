@@ -39,6 +39,11 @@ export function startDmaTransfer(sourceAddressOffset: u8): void {
 // http://bgb.bircd.org/pandocs.htm
 export function startHdmaTransfer(hdmaTriggerByteToBeWritten: u8): void {
 
+  // Check if we are Gbc
+  if(!Cpu.GBCEnabled) {
+    return;
+  }
+
   // Check if we are trying to terminate an already active HBLANK HDMA
   if (Memory.isHblankHdmaActive && !checkBitOnByte(7, hdmaTriggerByteToBeWritten)) {
     Memory.isHblankHdmaActive = false;
@@ -66,14 +71,19 @@ export function startHdmaTransfer(hdmaTriggerByteToBeWritten: u8): void {
   // And off the bottom 4 bits
   hdmaSource = (hdmaSource & 0xFFF0);
   // Can only be in VRAM, 0x8000 -> 0x9FF0
-  // Pan docs says to knock off upper 3 bits, but then it's impossible to reach 0x9FF0
-  hdmaDestination = (hdmaDestination & 0xFFF0);
+  // Pan docs says to knock off upper 3 bits, and lower 4 bits
+  // Which gives us: 0001111111110000 or 0x1FF0
+  // Meaning we must add 0x8000
+  hdmaDestination = (hdmaDestination & 0x1FF0);
+  hdmaDestination += Memory.videoRamLocation;
 
   // Get the length from the trigger
   // Lower 7 bits, Add 1, times 16
   // https://gist.github.com/drhelius/3394856
   let transferLength: i32 = resetBitOnByte(7, hdmaTriggerByteToBeWritten);
   transferLength = (transferLength + 1) * 16;
+
+  hexLog(hdmaSourceHigh, hdmaSourceLow, hdmaSource, hdmaDestinationHigh, hdmaDestinationLow, hdmaDestination);
 
   // Get bit 7 of the trigger for the HDMA type
   if (checkBitOnByte(7, hdmaTriggerByteToBeWritten)) {

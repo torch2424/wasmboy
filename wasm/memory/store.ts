@@ -7,7 +7,8 @@ import {
 } from './memoryMap';
 import {
   splitHighByte,
-  splitLowByte
+  splitLowByte,
+  hexLog
 } from '../helpers/index';
 
 export function eightBitStoreIntoGBMemory(offset: u16, value: u8): void {

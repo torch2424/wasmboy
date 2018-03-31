@@ -33,14 +33,14 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
     case 0x02:
     case 0x03:
       // Cartridge ROM - Bank 0 (fixed)
-      // 0x0000 -> 0x073800
+      // 0x0000 -> 0x0D2400
       return gameboyOffset + Memory.gameBytesLocation;
     case 0x04:
     case 0x05:
     case 0x06:
     case 0x07:
       // Cartridge ROM - Switchable Banks 1-xx
-      // 0x4000 -> (0x073800 + 0x4000)
+      // 0x4000 -> (0x0D2400 + 0x4000)
       return getRomBankAddress(gameboyOffset) + Memory.gameBytesLocation;
     case 0x08:
     case 0x09:

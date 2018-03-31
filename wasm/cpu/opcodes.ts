@@ -75,6 +75,10 @@ import {
   updateSound
 } from '../sound/index';
 
+class Debug {
+  static memoryIndex: i32 = 0;
+}
+
 // Public funciton to run opcodes until an event occurs.
 // Return values:
 // -1 = error
@@ -157,7 +161,8 @@ export function emulationStep(audioBatchProcessing: boolean = false,
       Cpu.isStopped = false;
 
       // Need to run the next opcode twice, it's a bug menitoned in
-      // The reddit comment mentioned above, HOWEVER, TODO: This does not happen in GBC mode, see cpu manual
+      // The reddit comment mentioned above
+
       // CTRL+F "low-power" on gameboy cpu manual
       // http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf
       // E.g
@@ -174,8 +179,23 @@ export function emulationStep(audioBatchProcessing: boolean = false,
     }
   }
 
+  // Output the opcode run to memory
+  store<u8>(0x8D2400 + Debug.memoryIndex, opcode);
+  Debug.memoryIndex++;
+  store<u8>(0x8D2400 + Debug.memoryIndex, splitHighByte(Cpu.programCounter));
+  Debug.memoryIndex++;
+  store<u8>(0x8D2400 + Debug.memoryIndex, splitLowByte(Cpu.programCounter));
+  Debug.memoryIndex++;
+  if(Debug.memoryIndex > 1000) {
+    Debug.memoryIndex = 0;
+  }
+
+  // blarggFixes, don't allow register F to have the bottom nibble
+  Cpu.registerF = Cpu.registerF & 0xF0;
+
+  // Check if there was an error decoding the opcode
   if(numberOfCycles <= 0) {
-    hexLog(Cpu.programCounter, opcode);
+    hexLog(Cpu.programCounter, opcode, Debug.memoryIndex - 3, Memory.currentRomBank, Memory.currentRamBank);
     return numberOfCycles;
   }
 
@@ -185,14 +205,9 @@ export function emulationStep(audioBatchProcessing: boolean = false,
     Memory.DMACycles = 0;
   }
 
-
-  // blarggFixes, don't allow register F to have the bottom nibble
-  Cpu.registerF = Cpu.registerF & 0xF0;
-
-  // Check other Gameboy components
-  if (!timersBatchProcessing) {
-    updateTimers(numberOfCycles);
-  }
+  // Interrupt Handling requires 20 cycles
+  // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
+  numberOfCycles += checkInterrupts();
 
   if(!Cpu.isStopped) {
     if(!graphicsBatchProcessing) {
@@ -204,9 +219,10 @@ export function emulationStep(audioBatchProcessing: boolean = false,
     }
   }
 
-  // Interrupt Handling requires 20 cycles
-  // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
-  numberOfCycles += checkInterrupts();
+  // Check other Gameboy components
+  if (!timersBatchProcessing) {
+    updateTimers(numberOfCycles);
+  }
 
   return numberOfCycles;
 }
@@ -960,7 +976,7 @@ function handleOpcode3x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
         return 12;
         // Relative Jump Funciton handles program counter
       } else {
-      Cpu.programCounter += 1;
+        Cpu.programCounter += 1;
         return 8;
       }
     case 0x39:
@@ -2239,9 +2255,10 @@ function handleOpcodeEx(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
     case 0xE2:
 
       // LD (C),A
-      // 2  8
+      // 1  8
       // NOTE: Table says 2 Program counter,
       // But stepping through the boot rom, should be one
+      // Also should change 0xF2
 
       // Store value in high RAM ($FF00 + register c)
       eightBitStoreIntoGBMemory(0xFF00 + Cpu.registerC, Cpu.registerA);
@@ -2343,9 +2360,8 @@ function handleOpcodeFx(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
     case 0xF2:
 
       // LD A,(C)
-      // 2 8
+      // 1 8
       Cpu.registerA = eightBitLoadFromGBMemory(0xFF00 + Cpu.registerC);
-      Cpu.programCounter += 1;
       return 8;
     case 0xF3:
 

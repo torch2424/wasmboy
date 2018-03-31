@@ -37,12 +37,12 @@ export class Timers {
   static readonly memoryLocationDividerRegister: u16 = 0xFF04; // DividerRegister likes to count
 
   // Check if the timer is currently enabled
-  static isEnabled: boolean = true;
+  static isEnabled: boolean = false;
 
   // Cycle counter. This is used to determine if we should increment the REAL timer
   // I know this is weird, but it's all to make sure the emulation is in sync :p
   static cycleCounter: i32 = 0x00;
-  static currentMaxCycleCount: i32 = 1024;
+  static currentMaxCycleCount: i32 = 256;
 
   // Another timer, that doesn't fire intterupts, but jsut counts to 255, and back to zero :p
   static dividerRegisterCycleCounter: i32 = 0x00;
@@ -101,30 +101,30 @@ export function updateTimers(numberOfCycles: i32): void {
 
   _checkDividerRegister(numberOfCycles);
 
-  if(Timers.isEnabled) {
+  if(!Timers.isEnabled) {
+    return;
+  }
 
-    // Add our cycles our cycle counter
-    Timers.cycleCounter += numberOfCycles;
+  // Add our cycles our cycle counter
+  Timers.cycleCounter += numberOfCycles;
 
-    //hexLog(eightBitLoadFromGBMemorySkipTraps(Timers.memoryLocationTIMA), Timers.cycleCounter, Timers.currentMaxCycleCount);
+  while (Timers.cycleCounter >= Timers.currentMaxCycleCount) {
 
-    if(Timers.cycleCounter >= Timers.currentMaxCycleCount) {
+    // Update the actual timer counter
+    let tima: u8 = eightBitLoadFromGBMemorySkipTraps(Timers.memoryLocationTIMA);
 
-      // Reset our cycle counters
-      // Not setting to zero as we do not want to drop cycles
-      Timers.cycleCounter -= Timers.currentMaxCycleCount;
+    // Reset our cycle counters
+    // Not setting to zero as we do not want to drop cycles
+    Timers.cycleCounter -= Timers.currentMaxCycleCount;
 
-      // Update the actual timer counter
-      let tima: u8 = eightBitLoadFromGBMemorySkipTraps(Timers.memoryLocationTIMA);
-      if(tima >= 255) {
-        // Store Timer Modulator inside of TIMA
-        eightBitStoreIntoGBMemorySkipTraps(Timers.memoryLocationTIMA, eightBitLoadFromGBMemorySkipTraps(Timers.memoryLocationTMA));
+    if(tima >= 255) {
+      // Store Timer Modulator inside of TIMA
+      eightBitStoreIntoGBMemorySkipTraps(Timers.memoryLocationTIMA, eightBitLoadFromGBMemorySkipTraps(Timers.memoryLocationTMA));
 
-        // Fire off timer interrupt
-        requestTimerInterrupt();
-      } else {
-        eightBitStoreIntoGBMemorySkipTraps(Timers.memoryLocationTIMA, tima + 1);
-      }
+      // Fire off timer interrupt
+      requestTimerInterrupt();
+    } else {
+      eightBitStoreIntoGBMemorySkipTraps(Timers.memoryLocationTIMA, tima + 1);
     }
   }
 }
@@ -134,6 +134,10 @@ export function handleTIMCWrite(timc: u8): void {
 
   // Set if the timer is enabled
   Timers.isEnabled = checkBitOnByte(2, timc);
+
+  if(!Timers.isEnabled) {
+    return;
+  }
 
   // Clear the top byte
   timc = timc & 0x03;
