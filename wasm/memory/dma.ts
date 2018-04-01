@@ -47,8 +47,8 @@ export function startHdmaTransfer(hdmaTriggerByteToBeWritten: u8): void {
   }
 
   // Check if we are trying to terminate an already active HBLANK HDMA
+  // TODO: Pokemon crystal is cancelling it's HDMAs, investigate
   if (Memory.isHblankHdmaActive && !checkBitOnByte(7, hdmaTriggerByteToBeWritten)) {
-    hexLog(2);
     Memory.isHblankHdmaActive = false;
     Memory.hblankHdmaIndex = 0x00;
     Memory.hblankHdmaTotalBytes = 0x00;
