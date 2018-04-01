@@ -1,4 +1,7 @@
 import {
+  Constants
+} from '../constants/constants';
+import {
   eightBitStoreIntoGBMemory,
   eightBitStoreIntoGBMemorySkipTraps,
   eightBitLoadFromGBMemory,
@@ -68,11 +71,10 @@ export class Cpu {
   static isStopped: boolean = false;
 
   // Memory Location for the GBC Speed switch
-  static memoryLocationSpeedSwitch: u16 = 0xFF4D;
+  static readonly memoryLocationSpeedSwitch: u16 = Constants.memoryLocationSpeedSwitch;
 
   // Save States
-
-  static readonly saveStateSlot: u16 = 0;
+  static readonly saveStateSlot: u16 = Constants.cpuSaveStateSlot;
 
   // Function to save the state of the class
   static saveState(): void {
