@@ -261,17 +261,3 @@ export function initialize(useGBCMode: i32 = 1, includeBootRom: i32 = 0): void {
     initializeSound();
   }
 }
-
-// Private function for our relative jumps
-export function relativeJump(value: u8): void {
-  // Need to convert the value to i8, since in this case, u8 can be negative
-  let relativeJumpOffset: i8 = <i8> value;
-
-  Cpu.programCounter += relativeJumpOffset;
-  // Realtive jump, using bgb debugger
-  // and my debugger shows,
-  // on JR you need to jump to the relative jump offset,
-  // However, if the jump fails (such as conditional), only jump +2 in total
-
-  Cpu.programCounter += 1;
-}

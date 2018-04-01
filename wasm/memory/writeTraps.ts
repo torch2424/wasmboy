@@ -166,15 +166,6 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
     return true;
   }
 
-
-  // Check if the HDMA registers are attempting to be changed while and HDMA is active
-  if(Memory.isHblankHdmaActive &&
-    offset >= Memory.memoryLocationHdmaSourceHigh &&
-    offset <= Memory.memoryLocationHdmaDestinationLow) {
-      hexLog(3);
-      return false;
-  }
-
   // Do an HDMA
   if(offset === Memory.memoryLocationHdmaTrigger) {
     startHdmaTransfer(<u8>value);

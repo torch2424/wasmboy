@@ -18,6 +18,5 @@ export {
 
 export {
   Cpu,
-  initialize,
-  relativeJump
+  initialize
 } from './cpu';

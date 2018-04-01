@@ -179,8 +179,6 @@ export function updateGraphics(numberOfCycles: i32): void {
         }
         // Store the frame to be rendered
         storeFrameToBeRendered();
-        // Update the Hblank DMA, will return if not active
-        updateHblankHdma();
         // Request a VBlank interrupt
         requestVBlankInterrupt();
       } else if (scanlineRegister < 144) {
@@ -188,6 +186,7 @@ export function updateGraphics(numberOfCycles: i32): void {
         if (!Config.graphicsDisableScanlineRendering) {
           _drawScanline(scanlineRegister);
         }
+        
         // Update the Hblank DMA, will return if not active
         updateHblankHdma();
       }

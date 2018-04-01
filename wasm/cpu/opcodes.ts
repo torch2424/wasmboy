@@ -1,7 +1,6 @@
 // Imports
 import {
-  Cpu,
-  relativeJump
+  Cpu
 } from './index';
 import {
   handleCbOpcode
@@ -27,7 +26,8 @@ import {
   andARegister,
   xorARegister,
   orARegister,
-  cpARegister
+  cpARegister,
+  relativeJump
 } from './instructions';
 import {
   Config
@@ -75,8 +75,9 @@ import {
   updateSound
 } from '../sound/index';
 
-class Debug {
+export class Debug {
   static memoryIndex: i32 = 0;
+  static currentOpcode: u8 = 0;
 }
 
 // Public funciton to run opcodes until an event occurs.
@@ -181,12 +182,13 @@ export function emulationStep(audioBatchProcessing: boolean = false,
 
   // Output the opcode run to memory
   store<u8>(0x8D2400 + Debug.memoryIndex, opcode);
+  Debug.currentOpcode = opcode;
   Debug.memoryIndex++;
   store<u8>(0x8D2400 + Debug.memoryIndex, splitHighByte(Cpu.programCounter));
   Debug.memoryIndex++;
   store<u8>(0x8D2400 + Debug.memoryIndex, splitLowByte(Cpu.programCounter));
   Debug.memoryIndex++;
-  if(Debug.memoryIndex > 1000) {
+  if(Debug.memoryIndex > 5000) {
     Debug.memoryIndex = 0;
   }
 
