@@ -2,12 +2,6 @@
 import {
   Graphics
 } from './graphics';
-// Assembly script really not feeling the reexport
-// using Skip Traps, because LCD has unrestricted access
-// http://gbdev.gg8.se/wiki/articles/Video_Display#LCD_OAM_DMA_Transfers
-import {
-  eightBitLoadFromGBMemorySkipTraps
-} from '../memory/load';
 import {
   checkBitOnByte,
   setBitOnByte,
@@ -40,12 +34,4 @@ export function getTileDataAddress(tileDataMemoryLocation: u16, tileIdFromTileMa
     // if the background layout gave us the tileId 0, then the tile data would be between 0x8000-0x800F.
     return tileDataMemoryLocation + <u16>tileIdFromTileMap * 16;
   }
-}
-
-
-export function getColorFromPalette(colorId: u8, paletteMemoryLocation: u16): u8 {
-  // Shift our paletteByte, 2 times for each color ID
-  // And off any extra bytes
-  // Return our Color (00, 01, 10, or 11)
-  return (eightBitLoadFromGBMemorySkipTraps(paletteMemoryLocation) >> (colorId * 2)) & 0x03;
 }

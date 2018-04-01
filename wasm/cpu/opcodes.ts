@@ -1,7 +1,6 @@
 // Imports
 import {
-  Cpu,
-  relativeJump
+  Cpu
 } from './index';
 import {
   handleCbOpcode
@@ -27,7 +26,8 @@ import {
   andARegister,
   xorARegister,
   orARegister,
-  cpARegister
+  cpARegister,
+  relativeJump
 } from './instructions';
 import {
   Config
@@ -42,9 +42,13 @@ import {
   rotateByteRightThroughCarry,
   concatenateBytes,
   splitHighByte,
-  splitLowByte
+  splitLowByte,
+  checkBitOnByte,
+  resetBitOnByte,
+  setBitOnByte
 } from '../helpers/index';
 import {
+  Memory,
   eightBitStoreIntoGBMemory,
   sixteenBitStoreIntoGBMemory,
   eightBitLoadFromGBMemory,
@@ -69,7 +73,7 @@ import {
 import {
   Sound,
   updateSound
-} from '../sound/index'
+} from '../sound/index';
 
 // Public funciton to run opcodes until an event occurs.
 // Return values:
@@ -85,10 +89,10 @@ export function update(): i32 {
 
 
   let error: boolean = false;
-  let numberOfCycles: i8 = -1;
+  let numberOfCycles: i32 = -1;
 
   while(!error &&
-      Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME) {
+    Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME()) {
     numberOfCycles = emulationStep(audioBatchProcessing, graphicsBatchProcessing, timersBatchProcessing);
     if (numberOfCycles >= 0) {
       Cpu.currentCycles += numberOfCycles;
@@ -109,17 +113,17 @@ export function update(): i32 {
         Timers.currentCycles += numberOfCycles;
         batchProcessTimers();
       }
-      Timers.currentCycles += numberOfCycles;
     } else {
       error = true;
     }
   }
 
   // Find our exit reason
-  if (Cpu.currentCycles >= Cpu.MAX_CYCLES_PER_FRAME) {
+  if (Cpu.currentCycles >= Cpu.MAX_CYCLES_PER_FRAME()) {
     // Render a frame
+
     // Reset our currentCycles
-    Cpu.currentCycles = 0;
+    Cpu.currentCycles -= Cpu.MAX_CYCLES_PER_FRAME()
 
     return 1;
   }
@@ -134,10 +138,10 @@ export function update(): i32 {
 // http://www.codeslinger.co.uk/pages/projects/gameboy/beginning.html
 export function emulationStep(audioBatchProcessing: boolean = false,
   graphicsBatchProcessing: boolean = false,
-  timersBatchProcessing: boolean = false): i8 {
+  timersBatchProcessing: boolean = false): i32 {
   // Get the opcode, and additional bytes to be handled
   // Number of cycles defaults to 4, because while we're halted, we run 4 cycles (according to matt :))
-  let numberOfCycles: i8 = 4;
+  let numberOfCycles: i32 = 4;
   let opcode: u8 = 0;
 
   // Cpu Halting best explained: https://www.reddit.com/r/EmuDev/comments/5ie3k7/infinite_loop_trying_to_pass_blarggs_interrupt/db7xnbe/
@@ -146,7 +150,6 @@ export function emulationStep(audioBatchProcessing: boolean = false,
     let dataByteOne: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 1);
     let dataByteTwo: u8 = eightBitLoadFromGBMemory(Cpu.programCounter + 2);
     numberOfCycles = executeOpcode(opcode, dataByteOne, dataByteTwo);
-    //Cpu.previousOpcode = opcode;
   } else {
     // if we were halted, and interrupts were disabled but interrupts are pending, stop waiting
     if(Cpu.isHalted && !areInterruptsEnabled() && areInterruptsPending()) {
@@ -154,7 +157,8 @@ export function emulationStep(audioBatchProcessing: boolean = false,
       Cpu.isStopped = false;
 
       // Need to run the next opcode twice, it's a bug menitoned in
-      // The reddit comment mentioned above, HOWEVER, TODO: This does not happen in GBC mode, see cpu manual
+      // The reddit comment mentioned above
+
       // CTRL+F "low-power" on gameboy cpu manual
       // http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf
       // E.g
@@ -171,14 +175,23 @@ export function emulationStep(audioBatchProcessing: boolean = false,
     }
   }
 
-
   // blarggFixes, don't allow register F to have the bottom nibble
   Cpu.registerF = Cpu.registerF & 0xF0;
 
-  // Check other Gameboy components
-  if (!timersBatchProcessing) {
-    updateTimers(numberOfCycles);
+  // Check if there was an error decoding the opcode
+  if(numberOfCycles <= 0) {
+    return numberOfCycles;
   }
+
+  // Check if we did a DMA TRansfer, if we did add the cycles
+  if (Memory.DMACycles > 0) {
+    numberOfCycles += Memory.DMACycles;
+    Memory.DMACycles = 0;
+  }
+
+  // Interrupt Handling requires 20 cycles
+  // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
+  numberOfCycles += checkInterrupts();
 
   if(!Cpu.isStopped) {
     if(!graphicsBatchProcessing) {
@@ -190,12 +203,9 @@ export function emulationStep(audioBatchProcessing: boolean = false,
     }
   }
 
-  // Interrupt Handling requires 20 cycles
-  // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
-  numberOfCycles += checkInterrupts();
-
-  if(numberOfCycles <= 0) {
-    log("Opcode at crash: $0", 1, opcode);
+  // Check other Gameboy components
+  if (!timersBatchProcessing) {
+    updateTimers(numberOfCycles);
   }
 
   return numberOfCycles;
@@ -206,19 +216,17 @@ export function emulationStep(audioBatchProcessing: boolean = false,
 // Setting return value to i32 instead of u16, as we want to return a negative number on error
 // https://rednex.github.io/rgbds/gbz80.7.html
 // http://pastraiser.com/cpu/gameboy/gameboyopcodes.html
-function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
+function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i32 {
 
   // Initialize our number of cycles
   // Return -1 if no opcode was found, representing an error
-  let numberOfCycles: i8 = -1;
+  let numberOfCycles: i32 = -1;
 
   // Always implement the program counter by one
   // Any other value can just subtract or add however much offset before reaching this line
   Cpu.programCounter += 1;
 
   // Get our concatenated databyte one and dataByteTwo
-  // Doing this here, because for some odd reason, these are swapped ONLY
-  // When concatenated :p
   // Find and replace with : concatenatedDataByte
   let concatenatedDataByte: u16 = concatenateBytes(dataByteTwo, dataByteOne);
 
@@ -226,6 +234,10 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i8 {
   // Running 255 if statements is slow, even in wasm haha!
   let opcodeHighNibble = (opcode & 0xF0);
   opcodeHighNibble = opcodeHighNibble >> 4;
+
+  // NOTE: @binji rule of thumb: it takes 4 cpu cycles to read one byte
+  // Therefore isntructions that use more than just the opcode (databyte one and two) will take at least
+  // 8 cyckles to use databyteOne, and two cycles to use the concatented
 
   // Not using a switch statement to avoid cannot redeclare this variable errors
   // And it would be a ton of work :p
@@ -433,11 +445,39 @@ function handleOpcode1x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
 
   switch (opcode) {
     case 0x10:
+
       // STOP 0
       // 2 4
       // Enter CPU very low power mode. Also used to switch between double and normal speed CPU modes in GBC.
       // Meaning Don't Decode anymore opcodes , or updated the LCD until joypad interrupt (or when button is pressed if I am wrong)
       // See HALT
+
+      // If we are in gameboy color mode, set the new speed
+      if (Cpu.GBCEnabled) {
+
+        let speedSwitch: u8 = eightBitLoadFromGBMemory(Cpu.memoryLocationSpeedSwitch);
+        if(checkBitOnByte(0, speedSwitch)) {
+
+          // Reset the prepare bit
+          speedSwitch = resetBitOnByte(0, speedSwitch);
+
+          // Switch to the new mode, and set the speed switch to the OTHER speed, to represent our new speed
+          if (!checkBitOnByte(7, speedSwitch)) {
+            Cpu.GBCDoubleSpeed = true;
+            speedSwitch = setBitOnByte(7, speedSwitch);
+          } else {
+            Cpu.GBCDoubleSpeed = false;
+            speedSwitch = resetBitOnByte(7, speedSwitch);
+          }
+
+          // Store the final speed switch
+          eightBitStoreIntoGBMemory(Cpu.memoryLocationSpeedSwitch, speedSwitch);
+
+          // Cycle accurate gameboy docs says this takes 76 clocks
+          return 76;
+        }
+      }
+
       // TODO: This breaks Blarggs CPU tests, find out what should end a STOP
       //Cpu.isStopped = true;
       Cpu.programCounter += 1;
@@ -632,9 +672,9 @@ function handleOpcode2x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
 
       // LD HL,d16
       // 3  12
-      let sixeteenBitDataByte = concatenatedDataByte;
-      Cpu.registerH = splitHighByte(sixeteenBitDataByte);
-      Cpu.registerL = splitLowByte(sixeteenBitDataByte);
+      let sixteenBitDataByte = concatenatedDataByte;
+      Cpu.registerH = splitHighByte(sixteenBitDataByte);
+      Cpu.registerL = splitLowByte(sixteenBitDataByte);
       Cpu.programCounter += 2;
       return 12;
     case 0x22:
@@ -922,7 +962,7 @@ function handleOpcode3x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
         return 12;
         // Relative Jump Funciton handles program counter
       } else {
-      Cpu.programCounter += 1;
+        Cpu.programCounter += 1;
         return 8;
       }
     case 0x39:
@@ -1212,9 +1252,10 @@ function handleOpcode6x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
     case 0x60:
 
       // LD H,B
-      // 1 4
+      // 1 8
+      // NOTE: Thanks to @binji for catching that this should be 8 cycles, not 4
       Cpu.registerH = Cpu.registerB;
-      return 4;
+      return 8;
     case 0x61:
 
       // LD H,C
@@ -1354,7 +1395,12 @@ function handleOpcode7x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
       // Enter CPU very low power mode
       // Meaning Don't Decode anymore opcodes until an interrupt occurs
       // Still need to do timers and things
-      Cpu.isHalted = true;
+
+      // Can't Halt during an HDMA
+      // https://gist.github.com/drhelius/3394856
+      if(!Memory.isHblankHdmaActive) {
+        Cpu.isHalted = true;
+      }
       return 4;
     case 0x77:
 
@@ -1401,9 +1447,10 @@ function handleOpcode7x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
     case 0x7E:
 
       // LD A,(HL)
-      // 1 4
+      // 1 8
+      // NOTE: Thanks to @binji for catching that this should be 8 cycles, not 4
       Cpu.registerA = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
-      return 4;
+      return 8;
     case 0x7F:
 
       // LD A,A
@@ -1926,7 +1973,7 @@ function handleOpcodeCx(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
       if (getZeroFlag() === 0) {
         Cpu.stackPointer -= 2;
         sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
-        Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.programCounter);
+        Cpu.programCounter = concatenatedDataByte;
         return 24;
       } else {
         Cpu.programCounter += 2;
@@ -1947,7 +1994,7 @@ function handleOpcodeCx(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
       // Z 0 H C
       addARegister(dataByteOne);
       Cpu.programCounter += 1;
-      return 4;
+      return 8;
     case 0xC7:
 
       // RST 00H
@@ -2000,7 +2047,7 @@ function handleOpcodeCx(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
       if (getZeroFlag() === 1) {
         Cpu.stackPointer -= 2;
         sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
-        Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.programCounter);
+        Cpu.programCounter = concatenatedDataByte;
         return 24;
       } else {
         Cpu.programCounter += 2;
@@ -2012,7 +2059,7 @@ function handleOpcodeCx(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
       // 3  24
       Cpu.stackPointer -= 2;
       sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
-      Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.programCounter);
+      Cpu.programCounter = concatenatedDataByte;
       return 24;
     case 0xCE:
 
@@ -2021,7 +2068,7 @@ function handleOpcodeCx(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
       // Z 0 H C
       addAThroughCarryRegister(dataByteOne);
       Cpu.programCounter += 1;
-      return 4;
+      return 8;
     case 0xCF:
 
       // RST 08H
@@ -2076,7 +2123,7 @@ function handleOpcodeDx(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
       if (getCarryFlag() === 0) {
         Cpu.stackPointer -= 2;
         sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
-        Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.programCounter);
+        Cpu.programCounter = concatenatedDataByte;
         return 24;
       } else {
         Cpu.programCounter += 2;
@@ -2145,7 +2192,7 @@ function handleOpcodeDx(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
       if (getCarryFlag() === 1) {
         Cpu.stackPointer -= 2;
         sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
-        Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.programCounter);
+        Cpu.programCounter = concatenatedDataByte;
         return 24;
       } else {
         Cpu.programCounter += 2;
@@ -2196,9 +2243,10 @@ function handleOpcodeEx(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
     case 0xE2:
 
       // LD (C),A
-      // 2  8
+      // 1  8
       // NOTE: Table says 2 Program counter,
       // But stepping through the boot rom, should be one
+      // Also should change 0xF2
 
       // Store value in high RAM ($FF00 + register c)
       eightBitStoreIntoGBMemory(0xFF00 + Cpu.registerC, Cpu.registerA);
@@ -2244,7 +2292,7 @@ function handleOpcodeEx(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
       return 16;
     case 0xE9:
 
-      // JP (HL)
+      // JP HL
       // 1 4
       Cpu.programCounter = concatenateBytes(Cpu.registerH, Cpu.registerL);
       return 4;
@@ -2300,9 +2348,8 @@ function handleOpcodeFx(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
     case 0xF2:
 
       // LD A,(C)
-      // 2 8
+      // 1 8
       Cpu.registerA = eightBitLoadFromGBMemory(0xFF00 + Cpu.registerC);
-      Cpu.programCounter += 1;
       return 8;
     case 0xF3:
 

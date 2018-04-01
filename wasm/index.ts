@@ -52,6 +52,17 @@ export {
   getAudioQueueIndex,
   resetAudioQueue
 } from './sound/index';
+export {
+  getRegisterA,
+  getRegisterB,
+  getRegisterC,
+  getRegisterD,
+  getRegisterE,
+  getRegisterH,
+  getRegisterL,
+  getRegisterF,
+  getOpcodeAtProgramCounter
+} from './debug/debug';
 
 // Function to save state to memory for all of our classes
 export function saveState(): void {
@@ -81,52 +92,4 @@ export function loadState(): void {
   Channel2.loadState();
   Channel3.loadState();
   Channel4.loadState();
-}
-
-export function getRegisterA(): u8 {
-  return Cpu.registerA;
-}
-
-export function getRegisterB(): u8 {
-  return Cpu.registerB;
-}
-
-export function getRegisterC(): u8 {
-  return Cpu.registerC;
-}
-
-export function getRegisterD(): u8 {
-  return Cpu.registerD;
-}
-
-export function getRegisterE(): u8 {
-  return Cpu.registerE;
-}
-
-export function getRegisterH(): u8 {
-  return Cpu.registerH;
-}
-
-export function getRegisterL(): u8 {
-  return Cpu.registerL;
-}
-
-export function getRegisterF(): u8 {
-  return Cpu.registerF;
-}
-
-export function getProgramCounter(): u16 {
-  return Cpu.programCounter;
-}
-
-export function getStackPointer(): u16 {
-  return Cpu.stackPointer;
-}
-
-export function getPreviousOpcode(): u8 {
-  return Cpu.previousOpcode;
-}
-
-export function getOpcodeAtProgramCounter(): u8 {
-  return eightBitLoadFromGBMemory(Cpu.programCounter);
 }

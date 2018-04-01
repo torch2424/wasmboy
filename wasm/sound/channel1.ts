@@ -5,13 +5,6 @@
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Frequency_Sweep
 
 import {
-  eightBitLoadFromGBMemorySkipTraps,
-  eightBitStoreIntoGBMemorySkipTraps,
-  getSaveStateMemoryOffset,
-  loadBooleanDirectlyFromWasmMemory,
-  storeBooleanDirectlyToWasmMemory
-} from '../memory/index';
-import {
   getChannelStartingVolume,
   isChannelDacEnabled
 } from './registers';
@@ -30,11 +23,24 @@ import {
   isDutyCycleClockPositiveOrNegativeForWaveform
 } from './duty';
 import {
+  Cpu
+} from '../cpu/cpu';
+import {
+  eightBitLoadFromGBMemorySkipTraps,
+  eightBitStoreIntoGBMemorySkipTraps,
+  getSaveStateMemoryOffset,
+  loadBooleanDirectlyFromWasmMemory,
+  storeBooleanDirectlyToWasmMemory
+} from '../memory/index';
+import {
   checkBitOnByte,
   hexLog
 } from '../helpers/index';
 
 export class Channel1 {
+
+  // Cycle Counter for our sound accumulator
+  static cycleCounter: i32 = 0;
 
   // Squarewave channel with volume envelope and frequency sweep functions.
   // NR10 -> Sweep Register R/W
@@ -106,8 +112,25 @@ export class Channel1 {
     eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx0, 0x80);
     eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx1, 0xBF);
     eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx2, 0xF3);
-    eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx3, 0xFF);
+    eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx3, 0xC1);
     eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx4, 0xBF);
+  }
+
+  // Function to get a sample using the cycle counter on the channel
+  static getSampleFromCycleCounter(): i32 {
+    let accumulatedCycles: i32 = Channel1.cycleCounter;
+    Channel1.cycleCounter = 0;
+    return Channel1.getSample(accumulatedCycles);
+  }
+
+  // Function to reset our timer, useful for GBC double speed mode
+  static resetTimer(): void {
+    Channel1.frequencyTimer = (2048 - getChannelFrequency(Channel1.channelNumber)) * 4;
+
+    // TODO: Ensure this is correct for GBC Double Speed Mode
+    if (Cpu.GBCDoubleSpeed) {
+      Channel1.frequencyTimer = Channel1.frequencyTimer * 2;
+    }
   }
 
   static getSample(numberOfCycles: i32): i32 {
@@ -122,7 +145,7 @@ export class Channel1 {
       // Reset our timer
       // A square channel's frequency timer period is set to (2048-frequency)*4.
       // Four duty cycles are available, each waveform taking 8 frequency timer clocks to cycle through:
-      Channel1.frequencyTimer = (2048 - getChannelFrequency(Channel1.channelNumber)) * 4;
+      Channel1.resetTimer();
       Channel1.frequencyTimer -= overflowAmount;
 
       // Also increment our duty cycle
@@ -172,7 +195,7 @@ export class Channel1 {
     // Reset our timer
     // A square channel's frequency timer period is set to (2048-frequency)*4.
     // Four duty cycles are available, each waveform taking 8 frequency timer clocks to cycle through:
-    Channel1.frequencyTimer = (2048 - getChannelFrequency(Channel1.channelNumber)) * 4;
+    Channel1.resetTimer();
 
     Channel1.envelopeCounter = getChannelEnvelopePeriod(Channel1.channelNumber);
 
@@ -201,6 +224,21 @@ export class Channel1 {
     if(!isChannelDacEnabled(Channel1.channelNumber)) {
       Channel1.isEnabled = false;
     }
+  }
+
+  // Function to determine if the current channel would update when getting the sample
+  // This is used to accumulate samples
+  static willChannelUpdate(numberOfCycles: i32): boolean {
+
+    //Increment our cycle counter
+    Channel1.cycleCounter += numberOfCycles;
+
+    if (Channel1.frequencyTimer - Channel1.cycleCounter > 0 &&
+      isChannelDacEnabled(Channel1.channelNumber)) {
+      return false;
+    }
+
+    return true;
   }
 
   static updateSweep(): void {

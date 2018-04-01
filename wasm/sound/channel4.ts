@@ -4,14 +4,6 @@
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Noise_Channel
 
 import {
-  eightBitLoadFromGBMemorySkipTraps,
-  eightBitStoreIntoGBMemory,
-  eightBitStoreIntoGBMemorySkipTraps,
-  getSaveStateMemoryOffset,
-  loadBooleanDirectlyFromWasmMemory,
-  storeBooleanDirectlyToWasmMemory
-} from '../memory/index';
-import {
   getChannelStartingVolume,
   isChannelDacEnabled,
   getRegister2OfChannel
@@ -31,11 +23,25 @@ import {
   isDutyCycleClockPositiveOrNegativeForWaveform
 } from './duty';
 import {
+  Cpu
+} from '../cpu/cpu';
+import {
+  eightBitLoadFromGBMemorySkipTraps,
+  eightBitStoreIntoGBMemory,
+  eightBitStoreIntoGBMemorySkipTraps,
+  getSaveStateMemoryOffset,
+  loadBooleanDirectlyFromWasmMemory,
+  storeBooleanDirectlyToWasmMemory
+} from '../memory/index';
+import {
   checkBitOnByte,
   hexLog
 } from '../helpers/index';
 
 export class Channel4 {
+
+  // Cycle Counter for our sound accumulator
+  static cycleCounter: i32 = 0;
 
   // Channel 4
   // 'white noise' channel with volume envelope functions.
@@ -90,6 +96,13 @@ export class Channel4 {
     eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx2, 0x00);
     eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx3, 0x00);
     eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx4, 0xBF);
+  }
+
+  // Function to get a sample using the cycle counter on the channel
+  static getSampleFromCycleCounter(): i32 {
+    let accumulatedCycles: i32 = Channel4.cycleCounter;
+    Channel4.cycleCounter = 0;
+    return Channel4.getSample(accumulatedCycles);
   }
 
   static getSample(numberOfCycles: i32): i32 {
@@ -184,11 +197,30 @@ export class Channel4 {
     }
   }
 
+  // Function to determine if the current channel would update when getting the sample
+  // This is used to accumulate samples
+  static willChannelUpdate(numberOfCycles: i32): boolean {
+
+    //Increment our cycle counter
+    Channel4.cycleCounter += numberOfCycles;
+
+    if (Channel4.frequencyTimer - Channel4.cycleCounter > 0 &&
+      isChannelDacEnabled(Channel4.channelNumber)) {
+      return false;
+    }
+
+    return true;
+  }
+
   static getNoiseChannelFrequencyPeriod(): u16 {
     // Get our divisor from the divisor code
     let divisor: u16 = Channel4.getNoiseChannelDivisorFromDivisorCode();
     let clockShift: u8 = Channel4.getNoiseChannelClockShift();
-    return (divisor << clockShift);
+    let response: u16 = (divisor << clockShift);
+    if (Cpu.GBCDoubleSpeed) {
+      response = response * 2;
+    }
+    return response;
   }
 
   static getNoiseChannelClockShift(): u8 {

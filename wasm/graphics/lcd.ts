@@ -66,13 +66,13 @@ export function setLcdStatus(lcdEnabledStatus: boolean): void {
     lcdStatus = setBitOnByte(0, lcdStatus);
     shouldRequestInterrupt = checkBitOnByte(4, lcdStatus);
   } else {
-    if (Graphics.scanlineCycleCounter >= Graphics.MIN_CYCLES_SPRITES_LCD_MODE) {
+    if (Graphics.scanlineCycleCounter >= Graphics.MIN_CYCLES_SPRITES_LCD_MODE()) {
       // Searching Sprites Atts
       newLcdMode = 2;
       lcdStatus = resetBitOnByte(0, lcdStatus);
       lcdStatus = setBitOnByte(1, lcdStatus);
       shouldRequestInterrupt = checkBitOnByte(5, lcdStatus);
-    } else if (Graphics.scanlineCycleCounter >= Graphics.MIN_CYCLES_TRANSFER_DATA_LCD_MODE) {
+    } else if (Graphics.scanlineCycleCounter >= Graphics.MIN_CYCLES_TRANSFER_DATA_LCD_MODE()) {
       // Transferring data to lcd
       newLcdMode = 3;
       lcdStatus = setBitOnByte(0, lcdStatus);
@@ -93,7 +93,10 @@ export function setLcdStatus(lcdEnabledStatus: boolean): void {
     }
 
     // Check for the coincidence flag
-    if(newLcdMode === 0 && scanlineRegister === eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationCoincidenceCompare)) {
+    // Need to check on every mode, and not just HBLANK, as checking on hblank breaks shantae, which checks on vblank
+    let coincidenceCompare: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationCoincidenceCompare);
+    if((newLcdMode === 0 || newLcdMode === 1) &&
+      scanlineRegister === coincidenceCompare) {
       lcdStatus = setBitOnByte(2, lcdStatus);
       if(checkBitOnByte(6, lcdStatus)) {
         requestLcdInterrupt();

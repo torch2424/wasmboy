@@ -4,13 +4,6 @@
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Wave_Channel
 
 import {
-  eightBitLoadFromGBMemorySkipTraps,
-  eightBitStoreIntoGBMemorySkipTraps,
-  getSaveStateMemoryOffset,
-  loadBooleanDirectlyFromWasmMemory,
-  storeBooleanDirectlyToWasmMemory
-} from '../memory/index';
-import {
   getChannelStartingVolume,
   isChannelDacEnabled,
   getRegister2OfChannel
@@ -30,11 +23,24 @@ import {
   isDutyCycleClockPositiveOrNegativeForWaveform
 } from './duty';
 import {
+  Cpu
+} from '../cpu/cpu';
+import {
+  eightBitLoadFromGBMemorySkipTraps,
+  eightBitStoreIntoGBMemorySkipTraps,
+  getSaveStateMemoryOffset,
+  loadBooleanDirectlyFromWasmMemory,
+  storeBooleanDirectlyToWasmMemory
+} from '../memory/index';
+import {
   checkBitOnByte,
   hexLog
 } from '../helpers/index';
 
 export class Channel3 {
+
+  // Cycle Counter for our sound accumulator
+  static cycleCounter: i32 = 0;
 
   // Voluntary Wave channel with 32 4-bit programmable samples, played in sequence.
   // NR30 -> Sound on/off (R/W)
@@ -57,6 +63,8 @@ export class Channel3 {
   static frequencyTimer: i32 = 0x00;
   static lengthCounter: i32 = 0x00;
   static waveTablePosition: u16 = 0x00;
+  static volumeCode: u8 = 0x00;
+  static volumeCodeChanged: boolean = false;
 
   // Save States
 
@@ -82,8 +90,28 @@ export class Channel3 {
     eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx0, 0x7F);
     eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx1, 0xFF);
     eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx2, 0x9F);
-    eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx3, 0xBF);
-    eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx4, 0xFF);
+    eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx3, 0x00);
+    eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx4, 0xB8);
+
+    // The volume code changed
+    Channel3.volumeCodeChanged = true;
+  }
+
+  // Function to get a sample using the cycle counter on the channel
+  static getSampleFromCycleCounter(): i32 {
+    let accumulatedCycles: i32 = Channel3.cycleCounter;
+    Channel3.cycleCounter = 0;
+    return Channel3.getSample(accumulatedCycles);
+  }
+
+  // Function to reset our timer, useful for GBC double speed mode
+  static resetTimer(): void {
+    Channel3.frequencyTimer = (2048 - getChannelFrequency(Channel3.channelNumber)) * 2;
+
+    // TODO: Ensure this is correct for GBC Double Speed Mode
+    if (Cpu.GBCDoubleSpeed) {
+      Channel3.frequencyTimer = Channel3.frequencyTimer * 2;
+    }
   }
 
   static getSample(numberOfCycles: i32): i32 {
@@ -98,7 +126,7 @@ export class Channel3 {
       // Reset our timer
       // A wave channel's frequency timer period is set to (2048-frequency) * 2.
       // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Wave_Channel
-      Channel3.frequencyTimer = (2048 - getChannelFrequency(Channel3.channelNumber)) * 2;
+      Channel3.resetTimer();
       Channel3.frequencyTimer -= overflowAmount;
 
 
@@ -111,7 +139,7 @@ export class Channel3 {
 
     // Get our ourput volume
     let outputVolume: i16 = 0;
-    let volumeCode: u8 = 0;
+    let volumeCode: u8 = Channel3.volumeCode;
 
     // Finally to set our output volume, the channel must be enabled,
     // Our channel DAC must be enabled, and we must be in an active state
@@ -119,9 +147,13 @@ export class Channel3 {
     if(Channel3.isEnabled &&
     isChannelDacEnabled(Channel3.channelNumber)) {
       // Get our volume code
-      volumeCode = eightBitLoadFromGBMemorySkipTraps(Channel3.memoryLocationNRx2);
-      volumeCode = (volumeCode >> 5);
-      volumeCode = (volumeCode & 0x0F);
+      if(Channel3.volumeCodeChanged) {
+        let volumeCode: u8 = eightBitLoadFromGBMemorySkipTraps(Channel3.memoryLocationNRx2);
+        volumeCode = (volumeCode >> 5);
+        volumeCode = (volumeCode & 0x0F);
+        Channel3.volumeCode = volumeCode;
+        Channel3.volumeCodeChanged = false;
+      }
     } else {
       // Return silence
       // Since range from -15 - 15, or 0 to 30 for our unsigned
@@ -189,7 +221,7 @@ export class Channel3 {
 
     // Reset our timer
     // A wave channel's frequency timer period is set to (2048-frequency)*2.
-    Channel3.frequencyTimer = (2048 - getChannelFrequency(Channel3.channelNumber)) * 2;
+    Channel3.resetTimer();
 
     // Reset our wave table position
     Channel3.waveTablePosition = 0;
@@ -198,6 +230,22 @@ export class Channel3 {
     if(!isChannelDacEnabled(Channel3.channelNumber)) {
       Channel3.isEnabled = false;
     }
+  }
+
+  // Function to determine if the current channel would update when getting the sample
+  // This is used to accumulate samples
+  static willChannelUpdate(numberOfCycles: i32): boolean {
+
+    //Increment our cycle counter
+    Channel3.cycleCounter += numberOfCycles;
+
+    if (Channel3.frequencyTimer - Channel3.cycleCounter > 0 &&
+      isChannelDacEnabled(Channel3.channelNumber) &&
+      !Channel3.volumeCodeChanged) {
+      return false;
+    }
+
+    return true;
   }
 
   static updateLength(): void {

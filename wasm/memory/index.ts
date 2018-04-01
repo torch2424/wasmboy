@@ -9,6 +9,8 @@ export {
   getPixelOnFrame,
   storeFrameToBeRendered,
   setLeftAndRightOutputForAudioQueue,
+  storePaletteByteInWasmMemory,
+  loadPaletteByteFromWasmMemory,
   getSaveStateMemoryOffset
 } from './memory';
 
@@ -26,3 +28,7 @@ export {
   sixteenBitStoreIntoGBMemorySkipTraps,
   storeBooleanDirectlyToWasmMemory
 } from './store';
+
+export {
+  updateHblankHdma
+} from './dma';

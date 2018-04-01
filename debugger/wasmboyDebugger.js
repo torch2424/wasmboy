@@ -38,7 +38,7 @@ export class WasmBoyDebugger extends Component {
     this.updateDebugInfo(wasmboy);
   }
 
-  runNumberOfOpcodes(wasmboy, wasmboyGraphics, numberOfOpcodes, stopAtOpcode, stopOpcodeShouldHaveValue) {
+  runNumberOfOpcodes(wasmboy, wasmboyGraphics, numberOfOpcodes, stopAtOpcode, stopOpcodeShouldHaveValue, skipDebugOutput) {
     // Keep stepping until highest opcode increases
     let opcodesToRun = 2000;
     if(numberOfOpcodes) {
@@ -53,13 +53,17 @@ export class WasmBoyDebugger extends Component {
           }
       }
     }
+
+    if(skipDebugOutput) {
+      return;
+    }
     wasmboyGraphics.renderFrame();
     this.updateDebugInfo(wasmboy);
   }
 
   breakPoint(wasmboy, wasmboyGraphics, skipInitialStep) {
     // Set our opcode breakpoint
-    const breakPoint = 0x401d;
+    const breakPoint = 0x7C33;
 
     if(!skipInitialStep) {
       this.runNumberOfOpcodes(wasmboy, wasmboyGraphics, 1, breakPoint);
@@ -67,7 +71,7 @@ export class WasmBoyDebugger extends Component {
 
     if(wasmboy.wasmInstance.exports.getProgramCounter() !== breakPoint) {
       requestAnimationFrame(() => {
-        this.runNumberOfOpcodes(wasmboy, wasmboyGraphics, 2000, breakPoint, 0x34);
+        this.runNumberOfOpcodes(wasmboy, wasmboyGraphics, 200, breakPoint, false, true);
         this.breakPoint(wasmboy, wasmboyGraphics, true);
       });
     } else {
@@ -95,7 +99,6 @@ export class WasmBoyDebugger extends Component {
     // Update CPU State
     state.cpu['Program Counter (PC)'] = wasmboy.wasmInstance.exports.getProgramCounter();
     state.cpu['Opcode at PC'] = wasmboy.wasmInstance.exports.getOpcodeAtProgramCounter();
-    state.cpu['Previous Opcode'] = wasmboy.wasmInstance.exports.getPreviousOpcode();
     state.cpu['Stack Pointer'] = wasmboy.wasmInstance.exports.getStackPointer();
     state.cpu['Register A'] = wasmboy.wasmInstance.exports.getRegisterA();
     state.cpu['Register F'] = wasmboy.wasmInstance.exports.getRegisterF();

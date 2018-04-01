@@ -4,18 +4,22 @@ import {
   isLcdEnabled
 } from './lcd';
 import {
-  renderBackground
-} from './background';
-import {
+  renderBackground,
   renderWindow
-} from './window';
+} from './backgroundWindow';
 import {
   renderSprites
 } from './sprites';
-// TODO: Dcode fixed the Assemblyscript bug where the index imports didn't work, can undo all of these now :)
+import {
+  Cpu
+} from '../cpu/cpu'
+import {
+  Config
+} from '../config';
 import {
   eightBitLoadFromGBMemorySkipTraps,
   eightBitStoreIntoGBMemorySkipTraps,
+  updateHblankHdma,
   storeFrameToBeRendered,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
@@ -42,13 +46,39 @@ export class Graphics {
   // This number should be in sync so that graphics doesn't run too many cyles at once
   // and does not exceed the minimum number of cyles for either scanlines, or
   // How often we change the frame, or a channel's update process
-  static batchProcessCycles: i32 = 456;
+  static batchProcessCycles(): i32 {
+      return Graphics.MAX_CYCLES_PER_SCANLINE();
+  }
 
   // Count the number of cycles to keep synced with cpu cycles
+  // Found GBC cycles by finding clock speed from Gb Cycles
+  // See TCAGBD For cycles
   static scanlineCycleCounter: i32 = 0x00;
-  static readonly MAX_CYCLES_PER_SCANLINE: i32 = 456;
-  static readonly MIN_CYCLES_SPRITES_LCD_MODE: i32 = 376;
-  static readonly MIN_CYCLES_TRANSFER_DATA_LCD_MODE: i32 = 249;
+
+  static MAX_CYCLES_PER_SCANLINE(): i32 {
+    if (Cpu.GBCDoubleSpeed) {
+      return 912;
+    }
+
+    return 456;
+  }
+
+  static MIN_CYCLES_SPRITES_LCD_MODE(): i32 {
+    if (Cpu.GBCDoubleSpeed) {
+      // TODO: Confirm these clock cyles, double similar to scanline, which TCAGBD did
+      return 752;
+    }
+
+    return 376;
+  }
+  static MIN_CYCLES_TRANSFER_DATA_LCD_MODE(): i32 {
+    if (Cpu.GBCDoubleSpeed) {
+      // TODO: Confirm these clock cyles, double similar to scanline, which TCAGBD did
+      return 498;
+    }
+
+    return 249;
+  }
 
   // LCD
   // scanlineRegister also known as LY
@@ -56,6 +86,7 @@ export class Graphics {
   static readonly memoryLocationScanlineRegister: u16 = 0xFF44;
   static readonly memoryLocationCoincidenceCompare: u16 = 0xFF45;
   static readonly memoryLocationDmaTransfer: u16 = 0xFF46;
+
   // Also known at STAT
   static readonly memoryLocationLcdStatus: u16 = 0xFF41;
   // Also known as LCDC
@@ -63,13 +94,12 @@ export class Graphics {
   static currentLcdMode: u8 = 0;
 
   // Scroll and Window
-  // TODO -7 on windowX, and export to be used
   static readonly memoryLocationScrollX: u16 = 0xFF43;
   static readonly memoryLocationScrollY: u16 = 0xFF42;
   static readonly memoryLocationWindowX: u16 = 0xFF4B;
   static readonly memoryLocationWindowY: u16 = 0xFF4A;
 
-  // Tile Maps And Data (TODO: Dont seperate Background and window :p)
+  // Tile Maps And Data
   static readonly memoryLocationTileMapSelectZeroStart: u16 = 0x9800;
   static readonly memoryLocationTileMapSelectOneStart: u16 = 0x9C00;
   static readonly memoryLocationTileDataSelectZeroStart: u16 = 0x8800;
@@ -82,12 +112,6 @@ export class Graphics {
   static readonly memoryLocationBackgroundPalette: u16 = 0xFF47;
   static readonly memoryLocationSpritePaletteOne: u16 = 0xFF48;
   static readonly memoryLocationSpritePaletteTwo: u16 = 0xFF49;
-
-  // Colors
-  static colorWhite: u8 = 1;
-  static colorLightGrey: u8 = 2;
-  static colorDarkGrey: u8 = 3;
-  static colorBlack: u8 = 4;
 
   // Screen data needs to be stored in wasm memory
 
@@ -114,13 +138,13 @@ export class Graphics {
 // This is not currently checked in memory read/write
 export function batchProcessGraphics(): void {
 
-  if (Graphics.currentCycles < Graphics.batchProcessCycles) {
+  if (Graphics.currentCycles < Graphics.batchProcessCycles()) {
     return;
   }
 
-  while (Graphics.currentCycles >= Graphics.batchProcessCycles) {
-    updateGraphics(Graphics.batchProcessCycles);
-    Graphics.currentCycles = Graphics.currentCycles - Graphics.batchProcessCycles;
+  while (Graphics.currentCycles >= Graphics.batchProcessCycles()) {
+    updateGraphics(Graphics.batchProcessCycles());
+    Graphics.currentCycles = Graphics.currentCycles - Graphics.batchProcessCycles();
   }
 }
 
@@ -136,11 +160,11 @@ export function updateGraphics(numberOfCycles: i32): void {
 
     Graphics.scanlineCycleCounter += numberOfCycles;
 
-    if (Graphics.scanlineCycleCounter >= Graphics.MAX_CYCLES_PER_SCANLINE) {
+    if (Graphics.scanlineCycleCounter >= Graphics.MAX_CYCLES_PER_SCANLINE()) {
 
       // Reset the scanlineCycleCounter
       // Don't set to zero to catch extra cycles
-      Graphics.scanlineCycleCounter -= Graphics.MAX_CYCLES_PER_SCANLINE;
+      Graphics.scanlineCycleCounter -= Graphics.MAX_CYCLES_PER_SCANLINE();
 
       // Move to next scanline
       let scanlineRegister: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationScanlineRegister);
@@ -148,14 +172,23 @@ export function updateGraphics(numberOfCycles: i32): void {
       // Check if we've reached the last scanline
       if(scanlineRegister === 144) {
         // Draw the scanline
-        _drawScanline(scanlineRegister);
+        if (!Config.graphicsDisableScanlineRendering) {
+          _drawScanline(scanlineRegister);
+        } else {
+          _renderEntireFrame();
+        }
         // Store the frame to be rendered
         storeFrameToBeRendered();
         // Request a VBlank interrupt
         requestVBlankInterrupt();
       } else if (scanlineRegister < 144) {
         // Draw the scanline
-        _drawScanline(scanlineRegister);
+        if (!Config.graphicsDisableScanlineRendering) {
+          _drawScanline(scanlineRegister);
+        }
+        
+        // Update the Hblank DMA, will return if not active
+        updateHblankHdma();
       }
 
       // Store our scanline
@@ -223,5 +256,15 @@ function _drawScanline(scanlineRegister: u8): void {
   if (checkBitOnByte(1, lcdControl)) {
     // Sprites are enabled, render them!
     renderSprites(scanlineRegister, checkBitOnByte(2, lcdControl));
+  }
+}
+
+// Function to render everything for a frame at once
+// This is to improve performance
+// See above for comments on how things are donw
+function _renderEntireFrame(): void {
+  // Scanline needs to be in sync while we draw, thus, we can't shortcut anymore than here
+  for(let i: u8 = 0; i <= 144; i++) {
+    _drawScanline(i);
   }
 }

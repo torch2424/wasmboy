@@ -1,6 +1,11 @@
 import {
+  Constants
+} from '../constants/constants';
+import {
   eightBitStoreIntoGBMemory,
+  eightBitStoreIntoGBMemorySkipTraps,
   eightBitLoadFromGBMemory,
+  eightBitLoadFromGBMemorySkipTraps,
   initializeCartridge,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
@@ -12,15 +17,17 @@ import {
 } from '../sound/index'
 
 import {
-  log
+  log,
+  hexLog
 } from '../helpers/index';
 
 // Everything Static as class instances just aren't quite there yet
 // https://github.com/AssemblyScript/assemblyscript/blob/master/tests/compiler/showcase.ts
 export class Cpu {
 
-  // Clock Speed to determine all kinds of other values
-  static clockSpeed: i32 = 4194304;
+  // Status to track if we are in Gameboy Color Mode, and GBC State
+  static GBCEnabled: boolean = false;
+  static GBCDoubleSpeed: boolean = false;
 
   // 8-bit Cpu.registers
   static registerA: u8 = 0;
@@ -39,8 +46,23 @@ export class Cpu {
 
   // Current number of cycles, shouldn't execeed max number of cycles
   static currentCycles: i32 = 0;
-  static readonly CLOCK_SPEED: i32 = 4194304;
-  static readonly MAX_CYCLES_PER_FRAME : i32 = 69905;
+  static CLOCK_SPEED(): i32 {
+    if (Cpu.GBCDoubleSpeed) {
+      // 2^23, thanks binji!
+      return 8388608;
+    }
+
+    return 4194304;
+  }
+
+  // cycles = 154 scanlines, 456 cycles per line
+  static MAX_CYCLES_PER_FRAME(): i32 {
+    if (Cpu.GBCDoubleSpeed) {
+      return 140448;
+    }
+
+    return 70224;
+  }
 
   // HALT and STOP instructions need to stop running opcodes, but simply check timers
   // https://github.com/nakardo/node-gameboy/blob/master/lib/cpu/opcodes.js
@@ -48,12 +70,11 @@ export class Cpu {
   static isHalted: boolean = false;
   static isStopped: boolean = false;
 
-  // Debugging properties
-  static previousOpcode: u8 = 0x00;
+  // Memory Location for the GBC Speed switch
+  static readonly memoryLocationSpeedSwitch: u16 = Constants.memoryLocationSpeedSwitch;
 
   // Save States
-
-  static readonly saveStateSlot: u16 = 0;
+  static readonly saveStateSlot: u16 = Constants.cpuSaveStateSlot;
 
   // Function to save the state of the class
   static saveState(): void {
@@ -98,61 +119,147 @@ export class Cpu {
   }
 }
 
-export function initialize(includeBootRom: u8): void {
-  log("initializing (includeBootRom=$0)", 1, includeBootRom);
+export function initialize(useGBCMode: i32 = 1, includeBootRom: i32 = 0): void {
+
+  // First, try to switch to Gameboy Color Mode
+  // Get our GBC support from the cartridge header
+  // http://gbdev.gg8.se/wiki/articles/The_Cartridge_Header
+  let gbcType: u8 = eightBitLoadFromGBMemorySkipTraps(0x0143);
+
+  // Detecting GBC http://bgb.bircd.org/pandocs.htm#cgbregisters
+  if (gbcType === 0xC0 ||
+    (useGBCMode > 0 && gbcType === 0x80)) {
+    Cpu.GBCEnabled = true;
+  }
+
   // TODO: depending on the boot rom, initialization may be different
   // From: http://www.codeslinger.co.uk/pages/projects/gameboy/hardware.html
   // All values default to zero in memory, so not setting them yet
+  log("initializing (includeBootRom=$0)", 1, includeBootRom);
   if(includeBootRom <= 0) {
-    Cpu.programCounter = 0x100;
-    Cpu.registerA = 0x01;
-    Cpu.registerF = 0xB0;
-    Cpu.registerB = 0x00;
-    Cpu.registerC = 0x13;
-    Cpu.registerD = 0x00;
-    Cpu.registerE = 0xD8;
-    Cpu.registerH = 0x01;
-    Cpu.registerL = 0x4D;
-    Cpu.stackPointer = 0xFFFE;
-    eightBitStoreIntoGBMemory(0xFF10, 0x80);
-    eightBitStoreIntoGBMemory(0xFF11, 0xBF);
-    eightBitStoreIntoGBMemory(0xFF12, 0xF3);
-    eightBitStoreIntoGBMemory(0xFF14, 0xBF);
-    eightBitStoreIntoGBMemory(0xFF16, 0x3F);
-    eightBitStoreIntoGBMemory(0xFF17, 0x00);
-    eightBitStoreIntoGBMemory(0xFF19, 0xBF);
-    eightBitStoreIntoGBMemory(0xFF1A, 0x7F);
-    eightBitStoreIntoGBMemory(0xFF1B, 0xFF);
-    eightBitStoreIntoGBMemory(0xFF1C, 0x9F);
-    eightBitStoreIntoGBMemory(0xFF1E, 0xBF);
-    eightBitStoreIntoGBMemory(0xFF20, 0xFF);
-    eightBitStoreIntoGBMemory(0xFF23, 0xBF);
-    eightBitStoreIntoGBMemory(0xFF24, 0x77);
-    eightBitStoreIntoGBMemory(0xFF25, 0xF3);
-    eightBitStoreIntoGBMemory(0xFF26, 0xF1);
-    eightBitStoreIntoGBMemory(0xFF40, 0x91);
-    eightBitStoreIntoGBMemory(0xFF47, 0xFC);
-    eightBitStoreIntoGBMemory(0xFF48, 0xFF);
-    eightBitStoreIntoGBMemory(0xFF49, 0xFF);
+
+    // Initialization variables from BGB
+
+    if(Cpu.GBCEnabled) {
+
+      // CPU Registers
+      Cpu.registerA = 0x11;
+      Cpu.registerF = 0x80;
+      Cpu.registerB = 0x00;
+      Cpu.registerC = 0x00;
+      Cpu.registerD = 0xFF;
+      Cpu.registerE = 0x56;
+      Cpu.registerH = 0x00;
+      Cpu.registerL = 0x0D;
+
+      // Cpu Control Flow
+      Cpu.programCounter = 0x100;
+      Cpu.stackPointer = 0xFFFE;
+
+      // LCD / Graphics
+      eightBitStoreIntoGBMemorySkipTraps(0xFF40, 0x91);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF41, 0x81);
+      // 0xFF42 -> 0xFF43 = 0x00
+      eightBitStoreIntoGBMemorySkipTraps(0xFF44, 0x90);
+      // 0xFF45 -> 0xFF46 = 0x00
+      eightBitStoreIntoGBMemorySkipTraps(0xFF47, 0xFC);
+      // 0xFF48 -> 0xFF4B = 0x00
+
+      // Various other registers
+      eightBitStoreIntoGBMemorySkipTraps(0xFF70, 0xF8);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF4F, 0xFE);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF4D, 0x7E);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF00, 0xCF);
+      // FF01 = 0x00
+      eightBitStoreIntoGBMemorySkipTraps(0xFF02, 0x7C);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF04, 0x2F);
+      // 0xFF05 -> 0xFF06 = 0x00
+      eightBitStoreIntoGBMemorySkipTraps(0xFF07, 0xF8);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF0F, 0xE1);
+      // 0xFFFF = 0x00
+
+      // GBC Palettes
+      eightBitStoreIntoGBMemorySkipTraps(0xFF68, 0xC0);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF69, 0xFF);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF6A, 0xC1);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF6B, 0x0D);
+
+      // GBC Banks
+      eightBitStoreIntoGBMemorySkipTraps(0xFF4F, 0x00);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF70, 0x01);
+
+      // GBC DMA
+      eightBitStoreIntoGBMemorySkipTraps(0xFF51, 0xFF);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF52, 0xFF);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF53, 0xFF);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF54, 0xFF);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF55, 0xFF);
+
+      // Undocumented from Pandocs
+      eightBitStoreIntoGBMemorySkipTraps(0xFF6C, 0xFE);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF75, 0x8F);
+
+    } else {
+      // Cpu Registers
+      Cpu.registerA = 0x01;
+      Cpu.registerF = 0xB0;
+      Cpu.registerB = 0x00;
+      Cpu.registerC = 0x13;
+      Cpu.registerD = 0x00;
+      Cpu.registerE = 0xD8;
+      Cpu.registerH = 0x01;
+      Cpu.registerL = 0x4D;
+
+      // Cpu Control Flow
+      Cpu.programCounter = 0x100;
+      Cpu.stackPointer = 0xFFFE;
+
+      // LCD / Graphics
+      eightBitStoreIntoGBMemorySkipTraps(0xFF40, 0x91);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF41, 0x85);
+      // 0xFF42 -> 0xFF45 = 0x00
+      eightBitStoreIntoGBMemorySkipTraps(0xFF46, 0xFF);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF47, 0xFC);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF48, 0xFF);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF49, 0xFF);
+      // 0xFF4A -> 0xFF4B = 0x00
+
+      // Various other registers
+      eightBitStoreIntoGBMemorySkipTraps(0xFF70, 0xFF);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF4F, 0xFF);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF4D, 0xFF);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF00, 0xCF);
+      // FF01 = 0x00
+      eightBitStoreIntoGBMemorySkipTraps(0xFF02, 0x7E);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF04, 0xAB);
+      // 0xFF05 -> 0xFF06 = 0x00
+      eightBitStoreIntoGBMemorySkipTraps(0xFF07, 0xF8);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF0F, 0xE1);
+      // 0xFFFF = 0x00
+
+
+      // GBC Palettes
+      eightBitStoreIntoGBMemorySkipTraps(0xFF68, 0xFF);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF69, 0xFF);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF6A, 0xFF);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF6B, 0xFF);
+
+      // GBC Banks
+      eightBitStoreIntoGBMemorySkipTraps(0xFF4F, 0x00);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF70, 0x01);
+
+      // GBC DMA
+      eightBitStoreIntoGBMemorySkipTraps(0xFF51, 0xFF);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF52, 0xFF);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF53, 0xFF);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF54, 0xFF);
+      eightBitStoreIntoGBMemorySkipTraps(0xFF55, 0xFF);
+    }
+
+    // Call our memory to initialize our cartridge type
+    initializeCartridge();
+
+    // Initialize our sound registers
+    initializeSound();
   }
-
-  // Call our memory to initialize our cartridge type
-  initializeCartridge();
-
-  // Initialize our sound registers
-  initializeSound();
-}
-
-// Private function for our relative jumps
-export function relativeJump(value: u8): void {
-  // Need to convert the value to i8, since in this case, u8 can be negative
-  let relativeJumpOffset: i8 = <i8> value;
-
-  Cpu.programCounter += relativeJumpOffset;
-  // Realtive jump, using bgb debugger
-  // and my debugger shows,
-  // on JR you need to jump to the relative jump offset,
-  // However, if the jump fails (such as conditional), only jump +2 in total
-
-  Cpu.programCounter += 1;
 }

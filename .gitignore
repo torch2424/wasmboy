@@ -9,6 +9,7 @@
 *.sav
 *.rtc
 *.sym
+*.sn1
 
 # Ignore test files
 test/testroms/**/*.output

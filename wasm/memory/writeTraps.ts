@@ -6,12 +6,17 @@ import {
   batchProcessGraphics
 } from '../graphics/graphics';
 import {
+  Palette,
+  writeColorPaletteToMemory
+} from '../graphics/index';
+import {
   batchProcessAudio,
   handledWriteToSoundRegister
 } from '../sound/index';
 import {
   Timers,
-  batchProcessTimers
+  batchProcessTimers,
+  handleTIMCWrite
 } from '../timers/index'
 import {
   handleBanking
@@ -25,6 +30,10 @@ import {
   eightBitLoadFromGBMemorySkipTraps,
   sixteenBitLoadFromGBMemory
 } from './load';
+import {
+  startDmaTransfer,
+  startHdmaTransfer
+} from './dma';
 import {
   checkBitOnByte,
   hexLog
@@ -40,6 +49,7 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
 
   // Handle banking
   if(offset < videoRamLocation) {
+
     handleBanking(offset, value);
     return false;
   }
@@ -49,9 +59,11 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
   if(offset >= videoRamLocation && offset < Memory.cartridgeRamLocation) {
     // Can only read/write from VRAM During Modes 0 - 2
     // See graphics/lcd.ts
-    if (Graphics.currentLcdMode > 2) {
-      return false;
-    }
+    // TODO: This can do more harm than good in a beta emulator,
+    // requires precise timing disabling for now
+    // if (Graphics.currentLcdMode > 2) {
+    //   return false;
+    // }
 
     // Not batch processing here for performance
     // batchProcessGraphics();
@@ -61,12 +73,14 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
   }
 
   // Be sure to copy everything in EchoRam to Work Ram
+  // Codeslinger: The ECHO memory region (0xE000-0xFDFF) is quite different because any data written here is also written in the equivelent ram memory region 0xC000-0xDDFF.
+  // Hence why it is called echo
   if(offset >= Memory.echoRamLocation && offset < spriteInformationTableLocation) {
-    // TODO: Also write to Work Ram
+    let wramOffset: u16 = offset - 0x2000;
     if(isEightBitStore) {
-      eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+      eightBitStoreIntoGBMemorySkipTraps(wramOffset, <u8>value);
     } else {
-      sixteenBitStoreIntoGBMemorySkipTraps(offset, value);
+      sixteenBitStoreIntoGBMemorySkipTraps(wramOffset, value);
     }
 
     // Allow the original write, and return since we dont need to look anymore
@@ -79,7 +93,7 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
   if(offset >= spriteInformationTableLocation && offset <= Memory.spriteInformationTableLocationEnd) {
     // Can only read/write from OAM During Mode 2
     // See graphics/lcd.ts
-    if (Graphics.currentLcdMode !== 2) {
+    if (Graphics.currentLcdMode < 2) {
       return false;
     }
     // Not batch processing here for performance
@@ -103,6 +117,12 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
     if(offset === Timers.memoryLocationDividerRegister) {
       eightBitStoreIntoGBMemorySkipTraps(offset, 0);
       return false;
+    }
+
+    // Trap our TIMC writes
+    if(offset === Timers.memoryLocationTIMC) {
+      handleTIMCWrite(<u8>value);
+      return true;
     }
 
     // Allow the original Write
@@ -139,25 +159,41 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
     // Check the graphics mode to see if we can write to VRAM
     // http://gbdev.gg8.se/wiki/articles/Video_Display#Accessing_VRAM_and_OAM
     if (offset === Graphics.memoryLocationDmaTransfer) {
-      // otherwise, performa the DMA transfer
-      _dmaTransfer(<u8>value);
+      // otherwise, perform a DMA transfer
+      // And allow the original write
+      startDmaTransfer(<u8>value);
+      return true;
     }
+
 
     // Allow the original write, and return since we dont need to look anymore
     return true;
   }
 
-  return true;
-}
-
-function _dmaTransfer(sourceAddressOffset: u8): void {
-
-  let sourceAddress: u16 = <u16>sourceAddressOffset;
-  sourceAddress = (sourceAddress << 8);
-
-  for(let i: u16 = 0; i < 0xA0; i++) {
-    let spriteInformationByte: u8 = eightBitLoadFromGBMemorySkipTraps(sourceAddress + i);
-    let spriteInformationAddress: u16 = Memory.spriteInformationTableLocation + i;
-    eightBitStoreIntoGBMemorySkipTraps(spriteInformationAddress, spriteInformationByte);
+  // Do an HDMA
+  if(offset === Memory.memoryLocationHdmaTrigger) {
+    startHdmaTransfer(<u8>value);
+    return false;
   }
+
+  // Don't allow banking if we are doing an Hblank HDM transfer
+  // https://gist.github.com/drhelius/3394856
+  if(offset === Memory.memoryLocationGBCWRAMBank || offset === Memory.memoryLocationGBCVRAMBAnk) {
+    if (Memory.isHblankHdmaActive) {
+      if((Memory.hblankHdmaSource >= 0x4000 && Memory.hblankHdmaSource <= 0x7FFF) ||
+        (Memory.hblankHdmaSource >= 0xD000 && Memory.hblankHdmaSource <= 0xDFFF)) {
+          return false;
+        }
+    }
+  }
+
+  // Handle GBC Pallete Write
+  if (offset >= Palette.memoryLocationBackgroundPaletteIndex && offset <= Palette.memoryLocationSpritePaletteData) {
+    // Incremeenting the palette handled by the write
+    writeColorPaletteToMemory(offset, value);
+    return true;
+  }
+
+  // Allow the original write
+  return true;
 }

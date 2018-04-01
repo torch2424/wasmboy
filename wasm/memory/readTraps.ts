@@ -6,15 +6,25 @@ import {
   batchProcessGraphics
 } from '../graphics/graphics';
 import {
-  batchProcessAudio
+  Palette
+} from '../graphics/index';
+import {
+  batchProcessAudio,
+  handleReadToSoundRegister
 } from '../sound/index';
 import {
   eightBitStoreIntoGBMemorySkipTraps
 } from './store';
 import {
+  eightBitLoadFromGBMemorySkipTraps
+} from './load';
+import {
   Joypad,
   getJoypadState
 } from '../joypad/index'
+import {
+  hexLog
+} from '../helpers/index';
 
 // Returns -1 if no trap found, otherwise returns a value that should be fed for the address
 export function checkReadTraps(offset: u16): i32 {
@@ -32,12 +42,21 @@ export function checkReadTraps(offset: u16): i32 {
   if(offset >= videoRamLocation && offset < Memory.cartridgeRamLocation) {
     // Can only read/write from VRAM During Modes 0 - 2
     // See graphics/lcd.ts
-    if (Graphics.currentLcdMode > 2) {
-      return 0xFF;
-    }
+    // TODO: This can do more harm than good in a beta emulator,
+    // requres precise timing, disabling for now
+    // if (Graphics.currentLcdMode > 2) {
+    //   return 0xFF;
+    // }
 
     // Not batch processing here for performance
     // batchProcessGraphics();
+  }
+
+  // ECHO Ram, E000	FDFF	Mirror of C000~DDFF (ECHO RAM)
+  // http://gbdev.gg8.se/wiki/articles/Memory_Map
+  if(offset >= Memory.echoRamLocation && offset < Memory.spriteInformationTableLocation) {
+    // Simply return the mirror'd value
+    return eightBitLoadFromGBMemorySkipTraps(offset - 0x2000);
   }
 
   // Check for individal writes
@@ -46,7 +65,7 @@ export function checkReadTraps(offset: u16): i32 {
   if(offset >= Memory.spriteInformationTableLocation && offset <= Memory.spriteInformationTableLocationEnd) {
     // Can only read/write from OAM During Mode 2
     // See graphics/lcd.ts
-    if (Graphics.currentLcdMode !== 2) {
+    if (Graphics.currentLcdMode < 2) {
       return 0xFF;
     }
 
@@ -63,6 +82,11 @@ export function checkReadTraps(offset: u16): i32 {
   // TODO: Put these bounds on the Sound Class
   if(offset >= 0xFF10 && offset <= 0xFF26) {
     batchProcessAudio();
+    let soundReadResponse: i32 = handleReadToSoundRegister(offset);
+    if(soundReadResponse < 0) {
+      return -1;
+    }
+    return <u8>soundReadResponse;
   }
   // FF27 - FF2F not used
   // Final Wave Table for Channel 3

@@ -47,7 +47,7 @@ export class Interrupts {
   }
 }
 
-export function checkInterrupts(): i8 {
+export function checkInterrupts(): i32 {
 
   if(Interrupts.masterInterruptSwitch) {
 
@@ -69,7 +69,6 @@ export function checkInterrupts(): i8 {
         wasInterruptHandled = true;
       } else if (checkBitOnByte(Interrupts.bitPositionLcdInterrupt, interruptRequest) &&
         checkBitOnByte(Interrupts.bitPositionLcdInterrupt, interruptEnabled)) {
-
           _handleInterrupt(Interrupts.bitPositionLcdInterrupt);
           wasInterruptHandled = true;
       } else if (checkBitOnByte(Interrupts.bitPositionTimerInterrupt, interruptRequest) &&
@@ -85,9 +84,17 @@ export function checkInterrupts(): i8 {
       }
     }
 
-    // Interrupt handling requires 20 cycles
+    // Interrupt handling requires 20 cycles, TCAGBD
     if(wasInterruptHandled) {
-      return 20;
+      let intteruptHandlerCycles: i32 = 20;
+      if(Cpu.isHalted) {
+        // If the CPU was halted, now is the time to un-halt
+        // Should be done here when the jump occurs according to:
+        // https://www.reddit.com/r/EmuDev/comments/6fmjch/gb_glitches_in_links_awakening_and_pok%C3%A9mon_gold/
+        Cpu.isHalted = false;
+        intteruptHandlerCycles += 4;
+      }
+      return intteruptHandlerCycles;
     }
   }
 
@@ -124,11 +131,6 @@ function _handleInterrupt(bitPosition: u8): void {
       Cpu.programCounter = 0x60;
       break;
   }
-
-  // If the CPU was halted, now is the time to un-halt
-  // Should be done here when the jump occurs according to:
-  // https://www.reddit.com/r/EmuDev/comments/6fmjch/gb_glitches_in_links_awakening_and_pok%C3%A9mon_gold/
-  Cpu.isHalted = false;
 }
 
 function _requestInterrupt(bitPosition: u8): void {

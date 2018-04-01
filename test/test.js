@@ -14,14 +14,14 @@ const PNGImage = require('pngjs-image');
 // Define some constants
 const GAMEBOY_CAMERA_WIDTH = 160;
 const GAMEBOY_CAMERA_HEIGHT = 144;
-const WASMBOY_MEMORY_CURRENT_RENDERED_FRAME = 0x028400;
+const WASMBOY_MEMORY_CURRENT_RENDERED_FRAME = 0x030400;
 
 // Some Timeouts for specified test roms
 // Default is 20 seconds, as it runs cpu_instrs in that time
 // on my mid-tier 2015 MBP. and cpu_instrs takes a while :)
-const TEST_ROM_DEFAULT_TIMEOUT = 60000;
+const TEST_ROM_DEFAULT_TIMEOUT = 80000;
 const TEST_ROM_TIMEOUT = {
-  cpu_instrs: 60000
+  cpu_instrs: 80000
 };
 
 // Initialize wasmBoy headless, with a frame rate option
@@ -130,45 +130,30 @@ getDirectories(testRomsPath).forEach((directory) => {
 
               // Going to compare pixel values from the VRAM to confirm tests
               const imageDataArray = [];
+              const rgbColor = [];
 
-              // Taken from: `../lib/wasmboyGraphics.js`
-              // Draw the pixels
-              // 160x144
               for(let y = 0; y < GAMEBOY_CAMERA_HEIGHT; y++) {
                 for (let x = 0; x < GAMEBOY_CAMERA_WIDTH; x++) {
 
-                  // Wasm Memory Mapping
-                  // See: https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
-                  const pixelIndex = WASMBOY_MEMORY_CURRENT_RENDERED_FRAME + x + (y * GAMEBOY_CAMERA_WIDTH);
-                  const color = WasmBoy.wasmByteMemory[pixelIndex];
+                  // Each color has an R G B component
+                  let pixelStart = ((y * 160) + x) * 3;
+
+                  for (let color = 0; color < 3; color++) {
+                    rgbColor[color] = WasmBoy.wasmByteMemory[
+                      WASMBOY_MEMORY_CURRENT_RENDERED_FRAME + pixelStart + color
+                    ];
+                  }
 
                   // Doing graphics using second answer on:
                   // https://stackoverflow.com/questions/4899799/whats-the-best-way-to-set-a-single-pixel-in-an-html5-canvas
                   // Image Data mapping
                   const imageDataIndex = (x + (y * GAMEBOY_CAMERA_WIDTH)) * 4;
-                  let rgba = [];
-                  const alpha = 255;
 
-                  if (color) {
-                    if(color === 1) {
-                      rgba = [255, 255, 255, alpha];
-                    } else if (color === 2) {
-                      rgba = [211, 211, 211, alpha];
-                    } else if (color === 3) {
-                      rgba = [169, 169, 169, alpha];
-                    } else {
-                      rgba = [0, 0, 0, alpha];
-                    }
-                  } else {
-                    // TODO: Remove this testing code:
-                    rgba = [255, 0, 0, 1];
-                  }
-
-
-                  // Fill our imageDataArray
-                  for(let i = 0; i < rgba.length; i++) {
-                    imageDataArray[imageDataIndex + i] = rgba[i];
-                  }
+                  imageDataArray[imageDataIndex] = rgbColor[0];
+                  imageDataArray[imageDataIndex + 1] = rgbColor[1];
+                  imageDataArray[imageDataIndex + 2] = rgbColor[2];
+                  // Alpha, no transparency
+                  imageDataArray[imageDataIndex + 3] = 255;
                 }
               }
 

@@ -8,7 +8,8 @@ export {
 } from './sound';
 
 export {
-  handledWriteToSoundRegister
+  handledWriteToSoundRegister,
+  handleReadToSoundRegister
 } from './registers';
 
 export {

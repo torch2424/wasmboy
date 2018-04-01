@@ -2,19 +2,21 @@
 // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
 
 import {
-  checkBitOnByte,
-  hexLog
-} from '../helpers/index';
-import {
-  eightBitLoadFromGBMemory,
+  eightBitLoadFromGBMemorySkipTraps,
   loadBooleanDirectlyFromWasmMemory
 } from './load';
 import {
+  eightBitStoreIntoGBMemorySkipTraps,
   storeBooleanDirectlyToWasmMemory
 } from './store';
 import {
   handleBanking
 } from './banking';
+import {
+  checkBitOnByte,
+  resetBitOnByte,
+  hexLog
+} from '../helpers/index';
 
 export class Memory {
 
@@ -54,14 +56,16 @@ export class Memory {
   // Wasmboy Memory Map
   // ----------------------------------
   static readonly gameBoyInternalMemoryLocation: u32 = 0x000400;
-  static readonly videoOutputLocation: u32 = 0x028400;
+  static readonly videoOutputLocation: u32 = 0x030400;
   static readonly currentFrameVideoOutputLocation: u32 = Memory.videoOutputLocation;
-  static readonly frameInProgressVideoOutputLocation: u32 = Memory.currentFrameVideoOutputLocation + (160 * 144);
-  static readonly soundOutputLocation: u32 = 0x053800;
+  static readonly frameInProgressVideoOutputLocation: u32 = Memory.currentFrameVideoOutputLocation + ((160 * 144) * 3);
+  // Last KB of video memory
+  static readonly gameboyColorPaletteLocation: u32 = 0x0B2000;
+  static readonly soundOutputLocation: u32 = 0x0B2400;
 
   // Passed in Game backup or ROM from the user
-  static readonly gameBytesLocation: u32 = 0x073800;
-  static readonly gameRamBanksLocation: u32 = 0x008400;
+  static readonly gameBytesLocation: u32 = 0x0D2400;
+  static readonly gameRamBanksLocation: u32 = 0x010400;
 
   // ----------------------------------
   // Rom/Ram Banking
@@ -80,6 +84,26 @@ export class Memory {
   static isMBC2: boolean = false;
   static isMBC3: boolean = false;
   static isMBC5: boolean = false;
+
+  // DMA
+  static memoryLocationHdmaSourceHigh: u16 = 0xFF51;
+  static memoryLocationHdmaSourceLow: u16 = 0xFF52;
+  static memoryLocationHdmaDestinationHigh: u16 = 0xFF53;
+  static memoryLocationHdmaDestinationLow: u16 = 0xFF54;
+  static memoryLocationHdmaTrigger: u16 = 0xFF55;
+  // Cycles accumulated for DMA
+  static DMACycles: i32 = 0;
+  // Boolean we will mirror to indicate if Hdma is active
+  static isHblankHdmaActive: boolean = false;
+  static hblankHdmaIndex: i32 = 0x00;
+  static hblankHdmaTotalBytes: i32 = 0x00;
+  // Store the source and destination for performance, and update as needed
+  static hblankHdmaSource: u16 = 0x00;
+  static hblankHdmaDestination: u16 = 0x00;
+
+  // GBC Registers
+  static memoryLocationGBCVRAMBAnk: u16 = 0xFF4F;
+  static memoryLocationGBCWRAMBank: u16 = 0xFF70;
 
   // Save States
 
@@ -119,7 +143,7 @@ export class Memory {
 export function initializeCartridge(): void {
   // Get our game MBC type from the cartridge header
   // http://gbdev.gg8.se/wiki/articles/The_Cartridge_Header
-  let cartridgeType: u8 = eightBitLoadFromGBMemory(0x0147);
+  let cartridgeType: u8 = eightBitLoadFromGBMemorySkipTraps(0x0147);
 
   // Reset our Cartridge types
   Memory.isRomOnly = false;
@@ -139,26 +163,20 @@ export function initializeCartridge(): void {
   } else if (cartridgeType >= 0x19 && cartridgeType <= 0x1E) {
     Memory.isMBC5 = true;
   }
+
+  Memory.currentRomBank = 0x01;
+  Memory.currentRamBank = 0x00;
 }
 
 // Also need to store current frame in memory to be read by JS
-export function setPixelOnFrame(x: i32, y: i32, color: u8): void {
+export function setPixelOnFrame(x: i32, y: i32, colorId: i32, color: u8): void {
   // Currently only supports 160x144
   // Storing in X, then y
   // So need an offset
 
-  let offset: i32 = Memory.frameInProgressVideoOutputLocation + (y * 160) + x;
+  let offset: i32 = Memory.frameInProgressVideoOutputLocation + getRgbPixelStart(x, y) + colorId;
 
   // Add one to the color, that way you don't ge the default zero
-  store<u8>(offset, color + 1);
-}
-
-// Also need to store current frame in memory to be read by JS
-// Faster version of setPixel on frame, expects caching to speed up set times
-// https://github.com/AssemblyScript/assemblyscript/issues/40#issuecomment-372479760
-export function setPixelOnFrameDirectlyToWasmMemory(offset: i32, color: u8): void {
-  // Currently only supports 160x144
-  // Add one to the color, that way you don't get the default zero
   store<u8>(offset, color + 1);
 }
 
@@ -168,10 +186,18 @@ export function getPixelOnFrame(x: i32, y: i32): u8 {
   // Storing in X, then y
   // So need an offset
 
-  let offset: i32 = Memory.frameInProgressVideoOutputLocation + (y * 160) + x;
+  let offset: i32 = Memory.frameInProgressVideoOutputLocation + getRgbPixelStart(x, y);
 
   // Added one to the color, that way you don't ge the default zero
   return load<u8>(offset);
+}
+
+// Function to get the start of a RGB pixel (R, G, B)
+function getRgbPixelStart(x: i32, y: i32): i32 {
+  // Get the pixel number
+  let pixelNumber: i32 = (y * 160) + x;
+  // Each pixel takes 3 slots, therefore, multiply by 3!
+  return pixelNumber * 3;
 }
 
 // V-Blank occured, move our frame in progress to our render frame
@@ -185,10 +211,14 @@ export function storeFrameToBeRendered(): void {
 
   for(let y: i32 = 0; y < 144; y++) {
     for (let x: i32 = 0; x < 160; x++) {
-      store<u8>(
-        currentFrameVideoOutputLocation + x + (y * 160),
-        load<u8>(frameInProgressVideoOutputLocation + (y * 160) + x)
-      )
+      // Store three times for each pixel
+      let pixelStart: i32 = getRgbPixelStart(x, y);
+      for (let colorId: i32 = 0; colorId < 3; colorId++) {
+        store<u8>(
+          currentFrameVideoOutputLocation + pixelStart + colorId,
+          load<u8>(frameInProgressVideoOutputLocation + pixelStart + colorId)
+        )
+      }
     }
   }
 }
@@ -203,6 +233,42 @@ export function setLeftAndRightOutputForAudioQueue(leftVolume: u8, rightVolume: 
   store<u8>(audioQueueOffset, leftVolume + 1);
   store<u8>(audioQueueOffset + 1, rightVolume + 1);
 }
+
+// Function to shortcut the memory map, and load directly from the VRAM Bank
+export function loadFromVramBank(gameboyOffset: i32, vramBankId: i32): u8 {
+  let wasmBoyAddress: u32 = (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation + (0x2000 * (vramBankId & 0x01));
+  return load<u8>(wasmBoyAddress);
+}
+
+// Function to store a byte to our Gbc Palette memory
+export function storePaletteByteInWasmMemory(paletteIndexByte: u8, value: u8, isSprite: boolean): void {
+
+  // Clear the top two bits to just get the bottom palette Index
+  let paletteIndex: u32 = (paletteIndexByte & 0x3F);
+
+  // Move over the palette index to not overlap the background (has 0x3F, so Zero for Sprites is 0x40)
+  if(isSprite) {
+    paletteIndex += 0x40;
+  }
+
+  store<u8>(Memory.gameboyColorPaletteLocation + paletteIndex, value);
+}
+
+// Function to load a byte from our Gbc Palette memory
+// Function to store a byte to our Gbc Palette memory
+export function loadPaletteByteFromWasmMemory(paletteIndexByte: u8, isSprite: boolean): u8 {
+
+  // Clear the top two bits to just get the bottom palette Index
+  let paletteIndex: u32 = (paletteIndexByte & 0x3F);
+
+  // Move over the palette index to not overlap the background has 0x3F, so Zero for Sprites is 0x40)
+  if(isSprite) {
+    paletteIndex += 0x40;
+  }
+
+  return load<u8>(Memory.gameboyColorPaletteLocation + paletteIndex);
+}
+
 
 // Function to return an address to store into save state memory
 // this is to regulate our 20 slots

@@ -3,9 +3,16 @@ import {
   Graphics
 } from './graphics';
 import {
-  getTileDataAddress,
-  getColorFromPalette
-} from './renderUtils'
+  Cpu
+} from '../cpu/cpu';
+import {
+  getTileDataAddress
+} from './renderUtils';
+import {
+  getMonochromeColorFromPalette,
+  getRgbColorFromPalette,
+  getColorComponentFromRgb
+} from './palette';
 // Assembly script really not feeling the reexport
 // using Skip Traps, because LCD has unrestricted access
 // http://gbdev.gg8.se/wiki/articles/Video_Display#LCD_OAM_DMA_Transfers
@@ -13,13 +20,15 @@ import {
   eightBitLoadFromGBMemorySkipTraps
 } from '../memory/load';
 import {
+  loadFromVramBank,
   setPixelOnFrame,
   getPixelOnFrame
 } from '../memory/memory';
 import {
   checkBitOnByte,
   setBitOnByte,
-  resetBitOnByte
+  resetBitOnByte,
+  hexLog
 } from '../helpers/index';
 
 export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): void {
@@ -45,12 +54,6 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
     let flipSpriteY: boolean = checkBitOnByte(6, spriteAttributes);
     let flipSpriteX: boolean = checkBitOnByte(5, spriteAttributes);
 
-    // Get our sprite pallete
-    let spritePaletteLocation: u16 = Graphics.memoryLocationSpritePaletteOne;
-    if (checkBitOnByte(4, spriteAttributes)) {
-      spritePaletteLocation = Graphics.memoryLocationSpritePaletteTwo;
-    }
-
     // Find our sprite height
     let spriteHeight: u8 = 8;
     if(useLargerSprites) {
@@ -68,6 +71,9 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
       if(flipSpriteY) {
         currentSpriteLine -= <i16>spriteHeight;
         currentSpriteLine = currentSpriteLine * -1;
+
+        // Bug fix for the flipped flies in link's awakening
+        currentSpriteLine -= 1;
       }
       // Each line of a tile takes two bytes of memory
       currentSpriteLine = currentSpriteLine * 2;
@@ -76,10 +82,16 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
       let spriteTileAddressStart: i32 = <i32>getTileDataAddress(Graphics.memoryLocationTileDataSelectOneStart, spriteTileId);
       spriteTileAddressStart = spriteTileAddressStart + currentSpriteLine;
       let spriteTileAddress: u16 = <u16>spriteTileAddressStart;
-      let spriteDataByteOneForLineOfTilePixels: u8 = eightBitLoadFromGBMemorySkipTraps(spriteTileAddress);
-      let spriteDataByteTwoForLineOfTilePixels: u8 = eightBitLoadFromGBMemorySkipTraps(spriteTileAddress + 1);
 
-      // Iterate over the width of our sprite to found our individual pixels
+      // Find which VRAM Bank to load from
+      let vramBankId: i32 = 0;
+      if (Cpu.GBCEnabled && checkBitOnByte(3, spriteAttributes)) {
+        vramBankId = 1;
+      }
+      let spriteDataByteOneForLineOfTilePixels: u8 = loadFromVramBank(spriteTileAddress, vramBankId);
+      let spriteDataByteTwoForLineOfTilePixels: u8 = loadFromVramBank(spriteTileAddress + 1, vramBankId);
+
+      // Iterate over the width of our sprite to find our individual pixels
       for(let tilePixel: i8 = 7; tilePixel >= 0; tilePixel--) {
 
         // Get our spritePixel, and check for flipping
@@ -106,18 +118,48 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
         // http://gbdev.gg8.se/wiki/articles/Video_Display
         if (spriteColorId !== 0) {
 
-          // Get our color ID from the current sprite pallete
-          let spritePixelColorFromPalette: u8 = getColorFromPalette(spriteColorId, spritePaletteLocation);
-
           // Find our actual X pixel location on the gameboy "camera" view
           let spriteXPixelLocationInCameraView: u8 = spriteXPosition + (7 - <u8>tilePixel);
 
           // Now that we have our coordinates, check sprite priority
           // Remember, set pixel on frame increases the value by one!
           if (!isSpritePriorityBehindWindowAndBackground ||
-            getPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister) <= 1) {
-            // Finally set the pixel!
-            setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, spritePixelColorFromPalette);
+            getPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister) >= 200) {
+
+            if(!Cpu.GBCEnabled) {
+              // Get our monochrome color RGB from the current sprite pallete
+              // Get our sprite pallete
+              let spritePaletteLocation: u16 = Graphics.memoryLocationSpritePaletteOne;
+              if (checkBitOnByte(4, spriteAttributes)) {
+                spritePaletteLocation = Graphics.memoryLocationSpritePaletteTwo;
+              }
+              let spritePixelColorFromPalette: u8 = getMonochromeColorFromPalette(spriteColorId, spritePaletteLocation);
+
+              // Finally set the pixel!
+              setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, 0, spritePixelColorFromPalette);
+              setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, 1, spritePixelColorFromPalette);
+              setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, 2, spritePixelColorFromPalette);
+            } else {
+
+              // Get our RGB Color
+
+              // Finally lets add some, C O L O R
+              // Want the botom 3 bits
+              let bgPalette: u8 = (spriteAttributes & 0x07);
+
+              // Call the helper function to grab the correct color from the palette
+              let rgbColorPalette: u16 = getRgbColorFromPalette(bgPalette, spriteColorId, true);
+
+              // Split off into red green and blue
+              let red: u8 = getColorComponentFromRgb(0, rgbColorPalette);
+              let green: u8 = getColorComponentFromRgb(1, rgbColorPalette);
+              let blue: u8 = getColorComponentFromRgb(2, rgbColorPalette);
+
+              // Finally Place our colors on the things
+              setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, 0, red);
+              setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, 1, green);
+              setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, 2, blue);
+            }
           }
         }
 

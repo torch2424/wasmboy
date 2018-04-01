@@ -43,7 +43,7 @@ For now I would watch the video posted at the top of the readme :)
 
 **cpu_instrs**
 
-![Cpu Instructions all tests passing](./test/testroms/blargg/cpu_instrs.png)
+![Cpu Instructions all tests passing](./test/testroms/blargg/cpu_instrs.golden.png)
 
 # Roadmap
 
@@ -150,3 +150,5 @@ Using the [gh-pages](https://www.npmjs.com/package/gh-pages) for debugger/demo d
 * [Gameboy Sound Operation](https://gist.github.com/drhelius/3652407)
 
 * [Google Material Icons](https://material.io/icons/)
+
+* [The Cycle Accurate Game Boy Docs](https://github.com/AntonioND/giibiiadvance/blob/master/docs/TCAGBD.pdf)

@@ -3,6 +3,19 @@ import { Component } from 'preact';
 import { WasmBoy, WasmBoyGraphics, WasmBoyAudio, WasmBoyController, WasmBoyMemory } from './lib/wasmboy.js';
 import { WasmBoyDebugger, WasmBoySystemControls } from './debugger/index';
 
+const wasmBoyOptions = {
+	isGbcEnabled: true,
+	isAudioEnabled: true,
+	frameSkip: 1,
+	audioBatchProcessing: false,
+	timersBatchProcessing: false,
+	audioAccumulateSamples: false,
+	graphicsBatchProcessing: false,
+	graphicsDisableScanlineRendering: false
+};
+
+const wasmBoyOptionsString = JSON.stringify(wasmBoyOptions, null, 4);
+
 export default class App extends Component {
 
 	// Using componentDidMount to wait for the canvas element to be inserted in DOM
@@ -11,7 +24,7 @@ export default class App extends Component {
 		const canvasElement = document.querySelector(".wasmboy__canvas-container__canvas");
 
 		// Load our game
-		WasmBoy.initialize(canvasElement);
+		WasmBoy.initialize(canvasElement, wasmBoyOptions);
 
 		// Add our touch inputs
 		// Add our touch inputs
@@ -30,7 +43,8 @@ export default class App extends Component {
 		WasmBoyController.addTouchInput('START', startElement, 'BUTTON');
 		WasmBoyController.addTouchInput('SELECT', selectElement, 'BUTTON');
 
-		WasmBoy.loadGame('./games/linksawakening.gb')
+		//WasmBoy.loadGame('./test/testroms/blargg/cpu_instrs.gb')
+		WasmBoy.loadGame('./games/silver.gbc')
 		.then(() => {
 			console.log('Wasmboy Ready!');
 		}).catch((error) => {
@@ -42,6 +56,9 @@ export default class App extends Component {
 		return (
 			<div>
 				<h1>WasmBoy</h1>
+				<p>Build Options:</p>
+				<p><i>(Currently built for Mobile Performance testing. Accuracy is lowered.)</i></p>
+				<p>{wasmBoyOptionsString}</p>
 				<div class="wasmboy__systemControls">
 					<WasmBoySystemControls wasmboy={WasmBoy}></WasmBoySystemControls>
 				</div>
