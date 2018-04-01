@@ -7,9 +7,9 @@ const wasmBoyOptions = {
 	isGbcEnabled: true,
 	isAudioEnabled: true,
 	frameSkip: 1,
-	audioBatchProcessing: false,
-	timersBatchProcessing: false,
-	audioAccumulateSamples: false,
+	audioBatchProcessing: true,
+	timersBatchProcessing: true,
+	audioAccumulateSamples: true,
 	graphicsBatchProcessing: false,
 	graphicsDisableScanlineRendering: false
 };
