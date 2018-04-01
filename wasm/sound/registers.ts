@@ -27,12 +27,10 @@ import {
 } from '../memory/index';
 import {
   checkBitOnByte,
+  setBitOnByte,
+  resetBitOnByte,
   hexLog
 } from '../helpers/index';
-
-// TODO: handledReadToSoundRegister
-// http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
-// binji: I have a bool per channel called status that basically keeps track of whether a channel is playing currently. I return that bool in NR52
 
 // Function to check and handle writes to sound registers
 export function handledWriteToSoundRegister(offset: u16, value: u16): boolean {
@@ -106,11 +104,13 @@ export function handledWriteToSoundRegister(offset: u16, value: u16): boolean {
   }
 
   // Write 0 to the 7th bit of NR52, resets all sound registers, and stops them from receiving writes
-  if(offset === Sound.memoryLocationNR52 && !checkBitOnByte(7, <u8>value)) {
+  if(offset === Sound.memoryLocationNR52) {
 
     // Reset all registers except NR52
-    for (let i: u16 = 0xFF10; i < 0xFF26; i++) {
-      eightBitStoreIntoGBMemorySkipTraps(i, 0x00);
+    if(!checkBitOnByte(7, <u8>value)) {
+      for (let i: u16 = 0xFF10; i < 0xFF26; i++) {
+        eightBitStoreIntoGBMemorySkipTraps(i, 0x00);
+      }
     }
 
     // Write our final value to NR52
@@ -121,6 +121,53 @@ export function handledWriteToSoundRegister(offset: u16, value: u16): boolean {
 
   // We did not handle the write, return false
   return false;
+}
+
+// http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
+export function handleReadToSoundRegister(offset: u16): i32  {
+
+  // TODO: OR All Registers
+
+  // This will fix bugs in orcale of ages :)
+  if (offset === Sound.memoryLocationNR52) {
+    // Get our registerNR52
+    let registerNR52: u8 = eightBitLoadFromGBMemorySkipTraps(Sound.memoryLocationNR52);
+
+    // Knock off lower 7 bits
+    registerNR52 = (registerNR52 & 0x80);
+
+    // Set our lower 4 bits to our channel isEnabled statuses
+    if(Channel1.isEnabled) {
+      setBitOnByte(0, registerNR52);
+    } else {
+      resetBitOnByte(0, registerNR52);
+    }
+
+    if(Channel2.isEnabled) {
+      setBitOnByte(1, registerNR52);
+    } else {
+      resetBitOnByte(1, registerNR52);
+    }
+
+    if(Channel3.isEnabled) {
+      setBitOnByte(2, registerNR52);
+    } else {
+      resetBitOnByte(2, registerNR52);
+    }
+
+    if(Channel4.isEnabled) {
+      setBitOnByte(3, registerNR52);
+    } else {
+      resetBitOnByte(3, registerNR52);
+    }
+
+    // Or from the table
+    registerNR52 = (registerNR52 | 0x70);
+
+    return registerNR52;
+  }
+
+  return -1;
 }
 
 export function getChannelStartingVolume(channelNumber: i32): u8 {

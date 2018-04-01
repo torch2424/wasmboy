@@ -27,7 +27,8 @@ import {
 import {
   checkBitOnByte,
   setBitOnByte,
-  resetBitOnByte
+  resetBitOnByte,
+  hexLog
 } from '../helpers/index';
 
 export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): void {
@@ -122,7 +123,6 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
 
           // Now that we have our coordinates, check sprite priority
           // Remember, set pixel on frame increases the value by one!
-          // TODO: Make Color RGB for MOnochrome into a constant
           if (!isSpritePriorityBehindWindowAndBackground ||
             getPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister) >= 200) {
 

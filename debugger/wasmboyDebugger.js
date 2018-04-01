@@ -63,7 +63,7 @@ export class WasmBoyDebugger extends Component {
 
   breakPoint(wasmboy, wasmboyGraphics, skipInitialStep) {
     // Set our opcode breakpoint
-    const breakPoint = 0x49cd;
+    const breakPoint = 0x0467;
 
     if(!skipInitialStep) {
       this.runNumberOfOpcodes(wasmboy, wasmboyGraphics, 1, breakPoint);

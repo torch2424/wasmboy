@@ -34,6 +34,7 @@ export function getMonochromeColorFromPalette(colorId: u8, paletteMemoryLocation
 
   // Since our max is 254, and max is 3.
   // monochrome color palette is modified from bgb
+  // TODO: Make these colors into a constant
   let rgbColor: u8 = 242;
 
   switch (color) {
@@ -59,6 +60,9 @@ export function writeColorPaletteToMemory(offset: u16, value: u16): void {
   if (offset === Palette.memoryLocationBackgroundPaletteData || offset === Palette.memoryLocationSpritePaletteData) {
     // Get the palette index
     let paletteIndex: u8 = eightBitLoadFromGBMemorySkipTraps(offset - 1);
+
+    // Clear the 6th bit, as it does nothing
+    paletteIndex = resetBitOnByte(6, paletteIndex);
 
     // Check if we are changing the sprite pallete data
     let isSprite: boolean = false;

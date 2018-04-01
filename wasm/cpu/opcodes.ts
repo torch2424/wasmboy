@@ -75,11 +75,6 @@ import {
   updateSound
 } from '../sound/index';
 
-export class Debug {
-  static memoryIndex: i32 = 0;
-  static currentOpcode: u8 = 0;
-}
-
 // Public funciton to run opcodes until an event occurs.
 // Return values:
 // -1 = error
@@ -180,24 +175,11 @@ export function emulationStep(audioBatchProcessing: boolean = false,
     }
   }
 
-  // Output the opcode run to memory
-  store<u8>(0x8D2400 + Debug.memoryIndex, opcode);
-  Debug.currentOpcode = opcode;
-  Debug.memoryIndex++;
-  store<u8>(0x8D2400 + Debug.memoryIndex, splitHighByte(Cpu.programCounter));
-  Debug.memoryIndex++;
-  store<u8>(0x8D2400 + Debug.memoryIndex, splitLowByte(Cpu.programCounter));
-  Debug.memoryIndex++;
-  if(Debug.memoryIndex > 5000) {
-    Debug.memoryIndex = 0;
-  }
-
   // blarggFixes, don't allow register F to have the bottom nibble
   Cpu.registerF = Cpu.registerF & 0xF0;
 
   // Check if there was an error decoding the opcode
   if(numberOfCycles <= 0) {
-    hexLog(Cpu.programCounter, opcode, Debug.memoryIndex - 3, Memory.currentRomBank, Memory.currentRamBank);
     return numberOfCycles;
   }
 
