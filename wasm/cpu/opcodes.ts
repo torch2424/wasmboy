@@ -227,8 +227,6 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i32 {
   Cpu.programCounter += 1;
 
   // Get our concatenated databyte one and dataByteTwo
-  // Doing this here, because for some odd reason, these are swapped ONLY
-  // When concatenated :p
   // Find and replace with : concatenatedDataByte
   let concatenatedDataByte: u16 = concatenateBytes(dataByteTwo, dataByteOne);
 
@@ -236,6 +234,10 @@ function executeOpcode(opcode: u8, dataByteOne: u8, dataByteTwo: u8): i32 {
   // Running 255 if statements is slow, even in wasm haha!
   let opcodeHighNibble = (opcode & 0xF0);
   opcodeHighNibble = opcodeHighNibble >> 4;
+
+  // NOTE: @binji rule of thumb: it takes 4 cpu cycles to read one byte
+  // Therefore isntructions that use more than just the opcode (databyte one and two) will take at least
+  // 8 cyckles to use databyteOne, and two cycles to use the concatented
 
   // Not using a switch statement to avoid cannot redeclare this variable errors
   // And it would be a ton of work :p
