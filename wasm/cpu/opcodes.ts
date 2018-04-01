@@ -1250,9 +1250,10 @@ function handleOpcode6x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
     case 0x60:
 
       // LD H,B
-      // 1 4
+      // 1 8
+      // NOTE: Thanks to @binji for catching that this should be 8 cycles, not 4
       Cpu.registerH = Cpu.registerB;
-      return 4;
+      return 8;
     case 0x61:
 
       // LD H,C
@@ -1444,9 +1445,10 @@ function handleOpcode7x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
     case 0x7E:
 
       // LD A,(HL)
-      // 1 4
+      // 1 8
+      // NOTE: Thanks to @binji for catching that this should be 8 cycles, not 4
       Cpu.registerA = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
-      return 4;
+      return 8;
     case 0x7F:
 
       // LD A,A
@@ -1990,7 +1992,7 @@ function handleOpcodeCx(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
       // Z 0 H C
       addARegister(dataByteOne);
       Cpu.programCounter += 1;
-      return 4;
+      return 8;
     case 0xC7:
 
       // RST 00H
@@ -2064,7 +2066,7 @@ function handleOpcodeCx(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
       // Z 0 H C
       addAThroughCarryRegister(dataByteOne);
       Cpu.programCounter += 1;
-      return 4;
+      return 8;
     case 0xCF:
 
       // RST 08H
