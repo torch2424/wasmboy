@@ -59,9 +59,11 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
   if(offset >= videoRamLocation && offset < Memory.cartridgeRamLocation) {
     // Can only read/write from VRAM During Modes 0 - 2
     // See graphics/lcd.ts
-    if (Graphics.currentLcdMode > 2) {
-      return false;
-    }
+    // TODO: This can do more harm than good in a beta emulator,
+    // requires precise timing disabling for now
+    // if (Graphics.currentLcdMode > 2) {
+    //   return false;
+    // }
 
     // Not batch processing here for performance
     // batchProcessGraphics();
@@ -71,12 +73,14 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
   }
 
   // Be sure to copy everything in EchoRam to Work Ram
+  // Codeslinger: The ECHO memory region (0xE000-0xFDFF) is quite different because any data written here is also written in the equivelent ram memory region 0xC000-0xDDFF.
+  // Hence why it is called echo
   if(offset >= Memory.echoRamLocation && offset < spriteInformationTableLocation) {
-    // TODO: Also write to Work Ram
+    let wramOffset: u16 = offset - 0x2000;
     if(isEightBitStore) {
-      eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+      eightBitStoreIntoGBMemorySkipTraps(wramOffset, <u8>value);
     } else {
-      sixteenBitStoreIntoGBMemorySkipTraps(offset, value);
+      sixteenBitStoreIntoGBMemorySkipTraps(wramOffset, value);
     }
 
     // Allow the original write, and return since we dont need to look anymore

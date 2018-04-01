@@ -16,6 +16,9 @@ import {
   eightBitStoreIntoGBMemorySkipTraps
 } from './store';
 import {
+  eightBitLoadFromGBMemorySkipTraps
+} from './load';
+import {
   Joypad,
   getJoypadState
 } from '../joypad/index'
@@ -39,12 +42,21 @@ export function checkReadTraps(offset: u16): i32 {
   if(offset >= videoRamLocation && offset < Memory.cartridgeRamLocation) {
     // Can only read/write from VRAM During Modes 0 - 2
     // See graphics/lcd.ts
-    if (Graphics.currentLcdMode > 2) {
-      return 0xFF;
-    }
+    // TODO: This can do more harm than good in a beta emulator,
+    // requres precise timing, disabling for now
+    // if (Graphics.currentLcdMode > 2) {
+    //   return 0xFF;
+    // }
 
     // Not batch processing here for performance
     // batchProcessGraphics();
+  }
+
+  // ECHO Ram, E000	FDFF	Mirror of C000~DDFF (ECHO RAM)
+  // http://gbdev.gg8.se/wiki/articles/Memory_Map
+  if(offset >= Memory.echoRamLocation && offset < Memory.spriteInformationTableLocation) {
+    // Simply return the mirror'd value
+    return eightBitLoadFromGBMemorySkipTraps(offset - 0x2000);
   }
 
   // Check for individal writes
