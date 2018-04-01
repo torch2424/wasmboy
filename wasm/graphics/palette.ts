@@ -2,6 +2,7 @@ import {
   Cpu
 } from '../cpu/cpu';
 import {
+  Memory,
   eightBitLoadFromGBMemorySkipTraps,
   eightBitStoreIntoGBMemorySkipTraps,
   storePaletteByteInWasmMemory,

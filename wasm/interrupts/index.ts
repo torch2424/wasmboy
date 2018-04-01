@@ -69,7 +69,6 @@ export function checkInterrupts(): i32 {
         wasInterruptHandled = true;
       } else if (checkBitOnByte(Interrupts.bitPositionLcdInterrupt, interruptRequest) &&
         checkBitOnByte(Interrupts.bitPositionLcdInterrupt, interruptEnabled)) {
-
           _handleInterrupt(Interrupts.bitPositionLcdInterrupt);
           wasInterruptHandled = true;
       } else if (checkBitOnByte(Interrupts.bitPositionTimerInterrupt, interruptRequest) &&

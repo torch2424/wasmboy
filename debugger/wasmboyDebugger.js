@@ -40,7 +40,7 @@ export class WasmBoyDebugger extends Component {
 
   runNumberOfOpcodes(wasmboy, wasmboyGraphics, numberOfOpcodes, stopAtOpcode, stopOpcodeShouldHaveValue, skipDebugOutput) {
     // Keep stepping until highest opcode increases
-    let opcodesToRun = 100;
+    let opcodesToRun = 2000;
     if(numberOfOpcodes) {
       opcodesToRun = numberOfOpcodes
     }
@@ -63,7 +63,7 @@ export class WasmBoyDebugger extends Component {
 
   breakPoint(wasmboy, wasmboyGraphics, skipInitialStep) {
     // Set our opcode breakpoint
-    const breakPoint = 0x0467;
+    const breakPoint = 0x7C33;
 
     if(!skipInitialStep) {
       this.runNumberOfOpcodes(wasmboy, wasmboyGraphics, 1, breakPoint);
@@ -71,7 +71,7 @@ export class WasmBoyDebugger extends Component {
 
     if(wasmboy.wasmInstance.exports.getProgramCounter() !== breakPoint) {
       requestAnimationFrame(() => {
-        this.runNumberOfOpcodes(wasmboy, wasmboyGraphics, 2000, breakPoint, 0x34, true);
+        this.runNumberOfOpcodes(wasmboy, wasmboyGraphics, 200, breakPoint, false, true);
         this.breakPoint(wasmboy, wasmboyGraphics, true);
       });
     } else {
