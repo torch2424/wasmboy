@@ -9,6 +9,7 @@ export class Constants {
   // Wasmboy Memory Map
   // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
   // ----------------------------------
+  static readonly wasmMemorySize: u32 = 0x8D3FFF;
   static readonly gameBoyInternalMemoryLocation: u32 = 0x000400;
   static readonly videoOutputLocation: u32 = 0x030400;
   static readonly currentFrameVideoOutputLocation: u32 = Constants.videoOutputLocation;
@@ -21,6 +22,10 @@ export class Constants {
 }
 
 // Exported functions to get specific constants
+export function wasmMemorySize(): u32 {
+  return Constants.wasmMemorySize;
+}
+
 export function gameBoyInternalMemoryLocation(): u32 {
   return Constants.gameBoyInternalMemoryLocation;
 }
