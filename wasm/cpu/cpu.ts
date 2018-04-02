@@ -1,7 +1,4 @@
 import {
-  Constants
-} from '../constants/constants';
-import {
   eightBitStoreIntoGBMemory,
   eightBitStoreIntoGBMemorySkipTraps,
   eightBitLoadFromGBMemory,
