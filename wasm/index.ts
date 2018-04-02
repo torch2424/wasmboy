@@ -54,7 +54,10 @@ export {
 } from './sound/index';
 export {
   wasmMemorySize,
+  wasmBoyInternalStateLocation,
+  wasmBoyInternalStateSize,
   gameBoyInternalMemoryLocation,
+  gameBoyInternalMemorySize,
   videoOutputLocation,
   currentFrameVideoOutputLocation,
   frameInProgressVideoOutputLocation,

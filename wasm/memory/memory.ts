@@ -1,7 +1,15 @@
 // WasmBoy memory map:
 // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
 import {
-  Constants
+  wasmMemorySize,
+  gameBoyInternalMemoryLocation,
+  videoOutputLocation,
+  currentFrameVideoOutputLocation,
+  frameInProgressVideoOutputLocation,
+  gameboyColorPaletteLocation,
+  soundOutputLocation,
+  gameBytesLocation,
+  gameRamBanksLocation
 } from '../constants/constants';
 import {
   eightBitLoadFromGBMemorySkipTraps,
@@ -57,16 +65,16 @@ export class Memory {
   // ----------------------------------
   // Wasmboy Memory Map
   // ----------------------------------
-  static readonly gameBoyInternalMemoryLocation: u32 = Constants.gameBoyInternalMemoryLocation;
-  static readonly videoOutputLocation: u32 = Constants.videoOutputLocation;
-  static readonly currentFrameVideoOutputLocation: u32 = Constants.currentFrameVideoOutputLocation;
-  static readonly frameInProgressVideoOutputLocation: u32 = Constants.frameInProgressVideoOutputLocation;
-  static readonly gameboyColorPaletteLocation: u32 = Constants.gameboyColorPaletteLocation;
-  static readonly soundOutputLocation: u32 = Constants.soundOutputLocation;
+  static readonly gameBoyInternalMemoryLocation: u32 = gameBoyInternalMemoryLocation;
+  static readonly videoOutputLocation: u32 = videoOutputLocation;
+  static readonly currentFrameVideoOutputLocation: u32 = currentFrameVideoOutputLocation;
+  static readonly frameInProgressVideoOutputLocation: u32 = frameInProgressVideoOutputLocation;
+  static readonly gameboyColorPaletteLocation: u32 = gameboyColorPaletteLocation;
+  static readonly soundOutputLocation: u32 = soundOutputLocation;
   // Passed in Game backup or ROM from the user
-  static readonly gameBytesLocation: u32 = Constants.gameBytesLocation;
-  static readonly gameRamBanksLocation: u32 = Constants.gameRamBanksLocation;
-  
+  static readonly gameBytesLocation: u32 = gameBytesLocation;
+  static readonly gameRamBanksLocation: u32 = gameRamBanksLocation;
+
 
   // ----------------------------------
   // Rom/Ram Banking
