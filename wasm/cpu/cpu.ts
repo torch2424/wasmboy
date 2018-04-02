@@ -71,10 +71,10 @@ export class Cpu {
   static isStopped: boolean = false;
 
   // Memory Location for the GBC Speed switch
-  static readonly memoryLocationSpeedSwitch: u16 = Constants.memoryLocationSpeedSwitch;
+  static readonly memoryLocationSpeedSwitch: u16 = 0xFF4D;
 
   // Save States
-  static readonly saveStateSlot: u16 = Constants.cpuSaveStateSlot;
+  static readonly saveStateSlot: u16 = 0;
 
   // Function to save the state of the class
   static saveState(): void {

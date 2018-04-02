@@ -53,6 +53,17 @@ export {
   resetAudioQueue
 } from './sound/index';
 export {
+  wasmMemorySize,
+  gameBoyInternalMemoryLocation,
+  videoOutputLocation,
+  currentFrameVideoOutputLocation,
+  frameInProgressVideoOutputLocation,
+  gameboyColorPaletteLocation,
+  soundOutputLocation,
+  gameBytesLocation,
+  gameRamBanksLocation
+} from './constants/constants';
+export {
   getRegisterA,
   getRegisterB,
   getRegisterC,
@@ -61,6 +72,8 @@ export {
   getRegisterH,
   getRegisterL,
   getRegisterF,
+  getProgramCounter,
+  getStackPointer,
   getOpcodeAtProgramCounter
 } from './debug/debug';
 

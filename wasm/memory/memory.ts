@@ -1,6 +1,8 @@
 // WasmBoy memory map:
 // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
-
+import {
+  Constants
+} from '../constants/constants';
 import {
   eightBitLoadFromGBMemorySkipTraps,
   loadBooleanDirectlyFromWasmMemory
@@ -55,17 +57,16 @@ export class Memory {
   // ----------------------------------
   // Wasmboy Memory Map
   // ----------------------------------
-  static readonly gameBoyInternalMemoryLocation: u32 = 0x000400;
-  static readonly videoOutputLocation: u32 = 0x030400;
-  static readonly currentFrameVideoOutputLocation: u32 = Memory.videoOutputLocation;
-  static readonly frameInProgressVideoOutputLocation: u32 = Memory.currentFrameVideoOutputLocation + ((160 * 144) * 3);
-  // Last KB of video memory
-  static readonly gameboyColorPaletteLocation: u32 = 0x0B2000;
-  static readonly soundOutputLocation: u32 = 0x0B2400;
-
+  static readonly gameBoyInternalMemoryLocation: u32 = Constants.gameBoyInternalMemoryLocation;
+  static readonly videoOutputLocation: u32 = Constants.videoOutputLocation;
+  static readonly currentFrameVideoOutputLocation: u32 = Constants.currentFrameVideoOutputLocation;
+  static readonly frameInProgressVideoOutputLocation: u32 = Constants.frameInProgressVideoOutputLocation;
+  static readonly gameboyColorPaletteLocation: u32 = Constants.gameboyColorPaletteLocation;
+  static readonly soundOutputLocation: u32 = Constants.soundOutputLocation;
   // Passed in Game backup or ROM from the user
-  static readonly gameBytesLocation: u32 = 0x0D2400;
-  static readonly gameRamBanksLocation: u32 = 0x010400;
+  static readonly gameBytesLocation: u32 = Constants.gameBytesLocation;
+  static readonly gameRamBanksLocation: u32 = Constants.gameRamBanksLocation;
+  
 
   // ----------------------------------
   // Rom/Ram Banking
