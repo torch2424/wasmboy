@@ -19,7 +19,7 @@ export class WasmBoyDebugger extends Component {
 		this.state = {
       showValueTable: false,
       autoUpdateValueTable: false,
-      breakPoint: "48",
+      breakPoint: "40",
       opcodesToRun: 2000,
       valueTable: {
         cpu: {},
@@ -64,8 +64,7 @@ export class WasmBoyDebugger extends Component {
 
   // Function to runa  single opcode
   stepOpcode(wasmboy, wasmboyGraphics, skipDebugOutput) {
-
-    wasmboy.pauseGame().then(() => {
+    return new Promise((resolve) => {
       const numberOfCycles = wasmboy.wasmInstance.exports.emulationStep();
 
       if(numberOfCycles <= 0) {
@@ -75,59 +74,81 @@ export class WasmBoyDebugger extends Component {
       }
 
       if(skipDebugOutput) {
+        resolve();
         return;
       }
       wasmboyGraphics.renderFrame();
       this.updateValueTable(wasmboy);
+
+      resolve();
     });
   }
 
   // Function to run a specifed number of opcodes for faster stepping
-  runNumberOfOpcodes(wasmboy, wasmboyGraphics, numberOfOpcodes, stopAtOpcode, stopOpcodeShouldHaveValue, skipDebugOutput) {
+  runNumberOfOpcodes(wasmboy, wasmboyGraphics, numberOfOpcodes, breakPoint, skipDebugOutput) {
     // Keep stepping until highest opcode increases
     let opcodesToRun = this.state.opcodesToRun;
     if(numberOfOpcodes) {
       opcodesToRun = numberOfOpcodes
     }
-    for(let i = 0; i < opcodesToRun; i++) {
-      this.stepOpcode(wasmboy, wasmboyGraphics, true);
-      if(stopAtOpcode && stopAtOpcode === wasmboy.wasmInstance.exports.getProgramCounter()) {
-        if(!stopOpcodeShouldHaveValue ||
-          stopOpcodeShouldHaveValue === wasmboy.wasmByteMemory[wasmboy.wasmInstance.exports.getProgramCounter()]) {
-            i = opcodesToRun;
+
+    return new Promise((resolve) => {
+
+      let opcodesRan = 0;
+
+      const runOpcode = () => {
+        this.stepOpcode(wasmboy, wasmboyGraphics, true).then(() => {
+          if(breakPoint && breakPoint === wasmboy.wasmInstance.exports.getProgramCounter()) {
+            resolve();
+            return;
           }
+
+          if (opcodesRan < opcodesToRun) {
+            opcodesRan++;
+            runOpcode();
+            return;
+          }
+
+          if(skipDebugOutput) {
+            resolve();
+            return;
+          }
+
+          wasmboyGraphics.renderFrame();
+          this.updateValueTable(wasmboy);
+
+          resolve();
+        });
       }
-    }
-
-    if(skipDebugOutput) {
-      return;
-    }
-
-    wasmboyGraphics.renderFrame();
-    this.updateValueTable(wasmboy);
+      runOpcode();
+    });
   }
 
-  // Function to keep running opcodes untila breakpoint is reached
+  // Function to keep running opcodes until a breakpoint is reached
   breakPoint(wasmboy, wasmboyGraphics, skipInitialStep) {
     // Set our opcode breakpoint
-    const breakPoint = 0x7C33;
+    const breakPoint = parseInt(this.state.breakPoint, 16);
 
+    let initialStepPromise = Promise.resolve();
     if(!skipInitialStep) {
-      this.runNumberOfOpcodes(wasmboy, wasmboyGraphics, 1, breakPoint);
+      initialStepPromise = this.runNumberOfOpcodes(wasmboy, wasmboyGraphics, 1, breakPoint);
     }
 
-    if(wasmboy.wasmInstance.exports.getProgramCounter() !== breakPoint) {
-      requestAnimationFrame(() => {
-        this.runNumberOfOpcodes(wasmboy, wasmboyGraphics, 200, breakPoint, false, true);
-        this.breakPoint(wasmboy, wasmboyGraphics, true);
-      });
-    } else {
-        wasmboyGraphics.renderFrame();
-        this.updateValueTable(wasmboy);
+    initialStepPromise.then(() => {
+      if(wasmboy.wasmInstance.exports.getProgramCounter() !== breakPoint) {
         requestAnimationFrame(() => {
-          console.log('Reached Breakpoint, that satisfies test inside runNumberOfOpcodes');
+          this.runNumberOfOpcodes(wasmboy, wasmboyGraphics, 2000 + Math.floor(Math.random() * 10), breakPoint, true).then(() => {
+            wasmboyGraphics.renderFrame();
+            this.updateValueTable(wasmboy);
+            this.breakPoint(wasmboy, wasmboyGraphics, true);
+          });
         });
-    }
+      } else {
+          console.log('Reached Breakpoint, that satisfies test inside runNumberOfOpcodes');
+          wasmboyGraphics.renderFrame();
+          this.updateValueTable(wasmboy);
+      }
+    });
   }
 
   logWasmBoyMemory(wasmBoy) {
@@ -211,21 +232,21 @@ export class WasmBoyDebugger extends Component {
           <h2>Control Flow Actions:</h2>
 
           <div class="debuggerAction">
-            <button onclick={() => {this.stepOpcode(props.wasmboy, props.wasmboyGraphics);}}>Step Opcode</button>
+            <button onclick={() => {this.stepOpcode(props.wasmboy, props.wasmboyGraphics).then(() => {})}}>Step Opcode</button>
           </div>
 
           <div class="debuggerAction">
             <input type="number"
              value={this.state.opcodesToRun }
              onChange={(evt) => { this.state.opcodesToRun = evt.target.value; }} />
-            <button onclick={() => {this.runNumberOfOpcodes(props.wasmboy, props.wasmboyGraphics);}}>Run number of opcodes</button>
+            <button onclick={() => {this.runNumberOfOpcodes(props.wasmboy, props.wasmboyGraphics).then(() => {})}}>Run number of opcodes</button>
           </div>
 
           <div class="debuggerAction">
-            0x<input type="string"
+            Breakpoint Line Number: 0x<input type="string"
              value={this.state.breakPoint }
              onChange={(evt) => { this.state.breakPoint = evt.target.value; }} />
-            <button onclick={() => {this.breakPoint(props.wasmboy, props.wasmboyGraphics);}}>Breakpoint (HEX)</button>
+            <button onclick={() => {this.breakPoint(props.wasmboy, props.wasmboyGraphics)}}>Run To Breakpoint</button>
           </div>
 
           <h2>Wasmboy State Actions:</h2>
