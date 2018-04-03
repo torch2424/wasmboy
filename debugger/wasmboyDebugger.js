@@ -20,6 +20,7 @@ export class WasmBoyDebugger extends Component {
       showValueTable: false,
       autoUpdateValueTable: false,
       breakPoint: "48",
+      opcodesToRun: 2000,
       valueTable: {
         cpu: {},
         ppu: {},
@@ -84,7 +85,7 @@ export class WasmBoyDebugger extends Component {
   // Function to run a specifed number of opcodes for faster stepping
   runNumberOfOpcodes(wasmboy, wasmboyGraphics, numberOfOpcodes, stopAtOpcode, stopOpcodeShouldHaveValue, skipDebugOutput) {
     // Keep stepping until highest opcode increases
-    let opcodesToRun = 2000;
+    let opcodesToRun = this.state.opcodesToRun;
     if(numberOfOpcodes) {
       opcodesToRun = numberOfOpcodes
     }
@@ -214,12 +215,14 @@ export class WasmBoyDebugger extends Component {
           </div>
 
           <div class="debuggerAction">
-            <button onclick={() => {this.runNumberOfOpcodes(props.wasmboy, props.wasmboyGraphics);}}>Run Hardcoded number of opcodes</button>
+            <input type="number"
+             value={this.state.opcodesToRun }
+             onChange={(evt) => { this.state.opcodesToRun = evt.target.value; }} />
+            <button onclick={() => {this.runNumberOfOpcodes(props.wasmboy, props.wasmboyGraphics);}}>Run number of opcodes</button>
           </div>
 
           <div class="debuggerAction">
-            0x<input id="number"
-             type="string"
+            0x<input type="string"
              value={this.state.breakPoint }
              onChange={(evt) => { this.state.breakPoint = evt.target.value; }} />
             <button onclick={() => {this.breakPoint(props.wasmboy, props.wasmboyGraphics);}}>Breakpoint (HEX)</button>
