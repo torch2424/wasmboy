@@ -67,6 +67,9 @@ export {
   gameRamBanksLocation
 } from './constants/constants';
 export {
+  getWasmBoyOffsetFromGameBoyOffset
+} from './memory/memoryMap';
+export {
   getRegisterA,
   getRegisterB,
   getRegisterC,

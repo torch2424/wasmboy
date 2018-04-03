@@ -54,7 +54,7 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
         // Therefore, we do not need to adjust for this extra 0x2000
       }
 
-      return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation + (0x2000 * vramBankId);
+      return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyVramLocation + (0x2000 * vramBankId);
     case 0x0A:
     case 0x0B:
       // Cartridge RAM - A.K.A External RAM
@@ -64,7 +64,7 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
       // Gameboy Ram Bank 0
       // 0xC000 -> 0x000400
       // Don't need to add head, since we move out 0x200 from the cartridge ram
-      return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation;
+      return (gameboyOffset - Memory.internalRamBankZeroLocation) + Memory.gameBoyWramLocation;
     case 0x0D:
       // Gameboy Ram Banks, Switchable in GBC Mode
       // 0xD000 -> 0x000400
@@ -84,11 +84,11 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
       // (0x1000 * (wramBankId - 1)) -> To find the correct wram bank.
       // wramBankId - 1, because we alreayd have the space for wramBank 1, and are currently in it
       // So need to address space for 6 OTHER banks
-      return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation + (0x1000 * (wramBankId - 1));
+      return (gameboyOffset - Memory.internalRamBankZeroLocation) + Memory.gameBoyWramLocation + (0x1000 * (wramBankId - 1));
     default:
       // Everything Else after Gameboy Ram Banks
       // 0xE000 -> 0x000400
       // 0x6000 For the Extra WRAM Banks
-      return (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation + 0x6000;
+      return (gameboyOffset - Memory.echoRamLocation) + Memory.gameBoyMemoryRegistersLocation;
   }
 }

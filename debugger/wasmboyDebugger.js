@@ -3,10 +3,7 @@ import { NumberBaseTable } from './numberBaseTable';
 
 // Function to get a value in gameboy memory, to wasmboy memory
 const getWasmBoyOffsetFromGameBoyOffset = (gameboyOffset, wasmboy) => {
-  // 0x6000 For the Extra WRAM Banks
-  // TODO Make this use the wasm memory map version
-  let wasmAddress = (gameboyOffset - 0x8000) + wasmboy.wasmInstance.exports.gameBoyInternalMemoryLocation + 0x6000;
-  return wasmAddress;
+  return wasmboy.wasmInstance.exports.getWasmBoyOffsetFromGameBoyOffset(gameboyOffset);
 }
 
 let autoUpdateValueTableId = false;
