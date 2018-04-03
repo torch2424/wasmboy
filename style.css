@@ -21,6 +21,15 @@ button {
 	margin-right: 5px;
 }
 
+.hide {
+	display: none;
+}
+
+.debuggerAction {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
 .wasmboy__canvas-container {
 	text-align: center;
 }
@@ -107,25 +116,20 @@ button {
 }
 
 /* Only display on phones */
-@media screen and (max-width: 1024px) {
+@media screen and (max-width: 800px) {
 	.wasmboy__gamepad {
 		display: block;
 	}
-
-	.wasmboy__debugger {
-		display: none;
-	}
 }
-
 
 .number-base-table-container {
 	width: 100%;
 	min-width: 1024px;
+	margin-top: 10px;
 	overflow-x: auto;
 }
 
 .number-base-table {
-	table-layout: fixed;
 	border-collapse: collapse;
 	width: 100%;
 }
@@ -148,4 +152,5 @@ button {
 	text-align: left;
 	border: 1px solid black;
 	padding: 5px;
+	min-width: 150px;
 }

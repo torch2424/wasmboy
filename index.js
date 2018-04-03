@@ -18,6 +18,14 @@ const wasmBoyOptionsString = JSON.stringify(wasmBoyOptions, null, 4);
 
 export default class App extends Component {
 
+	constructor() {
+		super();
+
+		this.state = {
+			showDebugger: false
+		}
+	}
+
 	// Using componentDidMount to wait for the canvas element to be inserted in DOM
 	componentDidMount() {
 		// Get our canvas element
@@ -59,6 +67,19 @@ export default class App extends Component {
 				<p>Build Options:</p>
 				<p><i>(Currently built for Mobile Performance testing. Accuracy is lowered.)</i></p>
 				<p>{wasmBoyOptionsString}</p>
+				<div style="text-align: center">
+          <label for="showDebugger">Show Debugger</label>
+          <input
+            id="showDebugger"
+            type="checkbox"
+            checked={ this.state.showDebugger }
+            onChange={ () => {
+								const newState = Object.assign({}, this.state);
+								newState.showDebugger = !newState.showDebugger;
+								this.setState(newState);
+							}
+						} />
+        </div>
 				<div class="wasmboy__systemControls">
 					<WasmBoySystemControls wasmboy={WasmBoy}></WasmBoySystemControls>
 				</div>
@@ -66,7 +87,7 @@ export default class App extends Component {
     			<canvas className="wasmboy__canvas-container__canvas">
           </canvas>
         </div>
-				<div class="wasmboy__debugger">
+				<div className={ "wasmboy__debugger " + (this.state.showDebugger ? '' : 'hide') }>
 					<WasmBoyDebugger wasmboy={WasmBoy} wasmboyGraphics={WasmBoyGraphics} wasmboyAudio={WasmBoyAudio}></WasmBoyDebugger>
 				</div>
 

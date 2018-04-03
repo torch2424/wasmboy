@@ -19,6 +19,7 @@ export class NumberBaseTable extends Component {
 
   // Modifed from: https://ourcodeworld.com/articles/read/380/how-to-convert-a-binary-string-into-a-readable-string-and-vice-versa-with-javascript
   numberToBinaryString(number) {
+
      // Simply Convert each place in hex to binary
      const hexString = number.toString(16);
 
@@ -36,6 +37,11 @@ export class NumberBaseTable extends Component {
        if(i !== hexString.length - 1) {
          binaryString += ' ';
        }
+     }
+
+     // Padd out to 8 bit increments
+     if ((binaryString.length % 4) % 2 !== 1) {
+       binaryString = '0000 ' + binaryString;
      }
 
      return binaryString;
