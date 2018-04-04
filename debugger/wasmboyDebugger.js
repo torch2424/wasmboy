@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import { NumberBaseTable } from './numberBaseTable';
+import { WasmBoyBackgroundMap } from './wasmboyBackgroundMap';
 
 // Function to get a value in gameboy memory, to wasmboy memory
 const getWasmBoyOffsetFromGameBoyOffset = (gameboyOffset, wasmboy) => {
@@ -16,6 +17,7 @@ export class WasmBoyDebugger extends Component {
 		this.state = {
       showValueTable: false,
       autoUpdateValueTable: false,
+      showBackgroundMap: true,
       breakPoint: "40",
       opcodesToRun: 2000,
       valueTable: {
@@ -280,6 +282,15 @@ export class WasmBoyDebugger extends Component {
               onChange={ () => { this.state.showValueTable = true; this.flipShowStatus('autoUpdateValueTable', props.wasmboy); } } />
           </div>
 
+          <div>
+            <label for="showBackgroundMap">Show Background Map</label>
+            <input
+              id="showBackgroundMap"
+              type="checkbox"
+              checked={ this.state.showBackgroundMap }
+              onChange={ () => { this.flipShowStatus('showBackgroundMap'); } } />
+          </div>
+
           <div className={ this.getStateClass('showValueTable') }>
             <h2>Value Table</h2>
 
@@ -302,6 +313,13 @@ export class WasmBoyDebugger extends Component {
             <h3>Interrupt Info:</h3>
             <a href="http://gbdev.gg8.se/wiki/articles/Interrupts" target="blank"><i>Reference Doc</i></a>
             <NumberBaseTable object={this.state.valueTable.interrupts}></NumberBaseTable>
+          </div>
+
+          <div className={ this.getStateClass('showBackgroundMap') } >
+            <WasmBoyBackgroundMap
+              wasmboy={props.wasmboy}
+              shouldUpdate={this.state.showBackgroundMap}
+              getWasmBoyOffsetFromGameBoyOffset={getWasmBoyOffsetFromGameBoyOffset}></WasmBoyBackgroundMap>
           </div>
       </div>
 		);

@@ -11,7 +11,8 @@ export {
   setLeftAndRightOutputForAudioQueue,
   storePaletteByteInWasmMemory,
   loadPaletteByteFromWasmMemory,
-  getSaveStateMemoryOffset
+  getSaveStateMemoryOffset,
+  loadFromVramBank
 } from './memory';
 
 export {

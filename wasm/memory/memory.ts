@@ -191,9 +191,7 @@ export function setPixelOnFrame(x: i32, y: i32, colorId: i32, color: u8): void {
   // So need an offset
 
   let offset: i32 = Memory.frameInProgressVideoOutputLocation + getRgbPixelStart(x, y) + colorId;
-
-  // Add one to the color, that way you don't ge the default zero
-  store<u8>(offset, color + 1);
+  store<u8>(offset, color);
 }
 
 // Need to also get our pixel on the frame for sprite priority
