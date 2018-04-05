@@ -191,3 +191,15 @@ export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
     }
   }
 }
+
+export function drawTileDataToWasmMemory(showColor: i32 = 0): void {
+  drawVramBankTileDataToWasmMemory(0, showColor);
+}
+
+function drawVramBankTileDataToWasmMemory(vramBankId: i32 = 0, showColor: i32 = 0): void {
+  for(let tileNumberY: i32 = 0x00; tileNumberY < 0x07; tileNumberY++) {
+    for(let tileNumberX: i32 = 0x00; tileNumberX < 0x0F; tileNumberX++) {
+      // TODO:
+    }
+  }
+}

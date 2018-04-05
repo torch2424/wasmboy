@@ -7,9 +7,9 @@ const wasmBoyOptions = {
 	isGbcEnabled: true,
 	isAudioEnabled: true,
 	frameSkip: 1,
-	audioBatchProcessing: false,
+	audioBatchProcessing: true,
 	timersBatchProcessing: false,
-	audioAccumulateSamples: false,
+	audioAccumulateSamples: true,
 	graphicsBatchProcessing: false,
 	graphicsDisableScanlineRendering: false
 };
@@ -100,7 +100,7 @@ export default class App extends Component {
     			<canvas className="wasmboy__canvas-container__canvas">
           </canvas>
         </div>
-				
+
 				{debuggerComponent}
 
 				<div class="wasmboy__gamepad">
