@@ -6,6 +6,9 @@ import {
   Graphics
 } from '../graphics/graphics';
 import {
+  Cpu
+} from '../cpu/cpu';
+import {
   getTileDataAddress
 } from '../graphics/renderUtils';
 import {
@@ -22,7 +25,7 @@ import {
   checkBitOnByte
 } from '../helpers/index';
 
-export function drawBackgroundMapToWasmMemory(): void {
+export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
   // http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html
   // Bit 7 - LCD Display Enable (0=Off, 1=On)
   // Bit 6 - Window Tile Map Display Select (0=9800-9BFF, 1=9C00-9FFF)
@@ -97,12 +100,6 @@ export function drawBackgroundMapToWasmMemory(): void {
       // Because remember, we are counting lines on the display NOT including zero
       let pixelYInTile: u16 = pixelYPositionInMap % 8;
 
-      // Remember to represent a single line of 8 pixels on a tile, we need two bytes.
-      // Therefore, we need to times our modulo by 2, to get the correct line of pixels on the tile.
-      // Again, think like you had to map a 2d array as a 1d.
-      let byteOneForLineOfTilePixels: u8 = loadFromVramBank(tileDataAddress + (pixelYInTile * 2), 0)
-      let byteTwoForLineOfTilePixels: u8 = loadFromVramBank(tileDataAddress + (pixelYInTile * 2) + 1, 0);
-
       // Same logic as pixelYInTile.
       // However, We need to reverse our byte,
       // As pixel 0 is on byte 7, and pixel 1 is on byte 6, etc...
@@ -111,6 +108,39 @@ export function drawBackgroundMapToWasmMemory(): void {
       // Or to simplify, 7 - 2 = 5 haha!
       let pixelXInTile: u8 = <u8>(pixelXPositionInMap) % 8;
       pixelXInTile = 7 - pixelXInTile;
+
+      // Get the GB Map Attributes
+      // Bit 0-2  Background Palette number  (BGP0-7)
+      // Bit 3    Tile VRAM Bank number      (0=Bank 0, 1=Bank 1)
+      // Bit 4    Not used
+      // Bit 5    Horizontal Flip            (0=Normal, 1=Mirror horizontally)
+      // Bit 6    Vertical Flip              (0=Normal, 1=Mirror vertically)
+      // Bit 7    BG-to-OAM Priority         (0=Use OAM priority bit, 1=BG Priority)
+      let bgMapAttributes: u8 = 0;
+      if(Cpu.GBCEnabled && showColor > 0) {
+        bgMapAttributes = loadFromVramBank(tileMapAddress, 1);
+      }
+
+      if (checkBitOnByte(6, bgMapAttributes)) {
+        // We are mirroring the tile, therefore, we need to opposite byte
+        // So if our pizel was 0 our of 8, it wild become 7 :)
+        // TODO: This may be wrong :p
+        pixelYInTile = 7 - (pixelYInTile);
+      }
+
+      // Remember to represent a single line of 8 pixels on a tile, we need two bytes.
+      // Therefore, we need to times our modulo by 2, to get the correct line of pixels on the tile.
+      // But we need to load the time from a specific Vram bank
+      let vramBankId: i32 = 0;
+      if (checkBitOnByte(3, bgMapAttributes)) {
+        vramBankId = 1;
+      }
+
+      // Remember to represent a single line of 8 pixels on a tile, we need two bytes.
+      // Therefore, we need to times our modulo by 2, to get the correct line of pixels on the tile.
+      // Again, think like you had to map a 2d array as a 1d.
+      let byteOneForLineOfTilePixels: u8 = loadFromVramBank(tileDataAddress + (pixelYInTile * 2), vramBankId)
+      let byteTwoForLineOfTilePixels: u8 = loadFromVramBank(tileDataAddress + (pixelYInTile * 2) + 1, vramBankId);
 
       // Now we can get the color for that pixel
       // Colors are represented by getting X position of ByteTwo, and X positon of Byte One
@@ -127,22 +157,36 @@ export function drawBackgroundMapToWasmMemory(): void {
         paletteColorId += 1;
       }
 
-      // Now get the colorId from the pallete, to get our final color
-      // Developers could change colorIds to represents different colors
-      // in their palette, thus we need to grab the color from there
-      //let pixelColorInTileFromPalette: u8 = getColorFromPalette(paletteColorId, Graphics.memoryLocationBackgroundPalette);
-      // Moved below for perofrmance
-
       // FINALLY, RENDER THAT PIXEL!
-      // Only rendering camera for now, so coordinates are for the camera.
-      // Get the rgb value for the color Id, will be repeated into R, G, B
-      let monochromeColor: u8 = getMonochromeColorFromPalette(paletteColorId, Graphics.memoryLocationBackgroundPalette);
-
       let pixelStart: i32 = ((y * 256) + x) * 3;
 
-      for(let i: i32 = 0; i < 3; i++) {
-        let offset: i32 = backgroundMapLocation + pixelStart + i;
-        store<u8>(offset, monochromeColor);
+      if(Cpu.GBCEnabled && showColor > 0) {
+        // Finally lets add some, C O L O R
+        // Want the botom 3 bits
+        let bgPalette: u8 = (bgMapAttributes & 0x07);
+
+        // Call the helper function to grab the correct color from the palette
+        let rgbColorPalette: u16 = getRgbColorFromPalette(bgPalette, paletteColorId, false);
+
+        // Split off into red green and blue
+        let red: u8 = getColorComponentFromRgb(0, rgbColorPalette);
+        let green: u8 = getColorComponentFromRgb(1, rgbColorPalette);
+        let blue: u8 = getColorComponentFromRgb(2, rgbColorPalette);
+
+        let offset: i32 = backgroundMapLocation + pixelStart;
+        store<u8>(offset, red);
+        store<u8>(offset + 1, green);
+        store<u8>(offset + 2, blue);
+      } else {
+
+        // Only rendering camera for now, so coordinates are for the camera.
+        // Get the rgb value for the color Id, will be repeated into R, G, B
+        let monochromeColor: u8 = getMonochromeColorFromPalette(paletteColorId, Graphics.memoryLocationBackgroundPalette);
+
+        for(let i: i32 = 0; i < 3; i++) {
+          let offset: i32 = backgroundMapLocation + pixelStart + i;
+          store<u8>(offset, monochromeColor);
+        }
       }
     }
   }
