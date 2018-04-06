@@ -77,9 +77,9 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
       let wramBankId: u32 = 0;
       if(Cpu.GBCEnabled) {
         wramBankId  = (eightBitLoadFromGBMemorySkipTraps(Memory.memoryLocationGBCWRAMBank) & 0x07);
-        if (wramBankId < 1) {
-          wramBankId = 1;
-        }
+      }
+      if (wramBankId < 1) {
+        wramBankId = 1;
       }
       // (0x1000 * (wramBankId - 1)) -> To find the correct wram bank.
       // wramBankId - 1, because we alreayd have the space for wramBank 1, and are currently in it
