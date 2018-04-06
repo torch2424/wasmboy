@@ -40,7 +40,7 @@ export class NumberBaseTable extends Component {
      }
 
      // Padd out to 8 bit increments
-     if ((binaryString.length % 4) % 2 !== 1) {
+     if (!(binaryString.length & 1)) {
        binaryString = '0000 ' + binaryString;
      }
 
