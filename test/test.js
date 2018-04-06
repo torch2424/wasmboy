@@ -19,15 +19,15 @@ const GAMEBOY_CAMERA_HEIGHT = 144;
 // Some Timeouts for specified test roms
 // Default is 20 seconds, as it runs cpu_instrs in that time
 // on my mid-tier 2015 MBP. and cpu_instrs takes a while :)
-const TEST_ROM_DEFAULT_TIMEOUT = 20000;
+const TEST_ROM_DEFAULT_TIMEOUT = 40000;
 const TEST_ROM_TIMEOUT = {
-  cpu_instrs: 20000
+  cpu_instrs: 40000
 };
 
 // Initialize wasmBoy headless, with a speed option
 WasmBoy.initialize(false, {
     headless: true,
-    gameboySpeed: 2.0,
+    gameboySpeed: 2.5,
     isGbcEnabled: true
 });
 
