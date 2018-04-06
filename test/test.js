@@ -11,26 +11,24 @@ const path = require('path');
 // Image Creation
 const PNGImage = require('pngjs-image');
 
+
 // Define some constants
 const GAMEBOY_CAMERA_WIDTH = 160;
 const GAMEBOY_CAMERA_HEIGHT = 144;
-const WASMBOY_MEMORY_CURRENT_RENDERED_FRAME = 0x030400;
 
 // Some Timeouts for specified test roms
 // Default is 20 seconds, as it runs cpu_instrs in that time
 // on my mid-tier 2015 MBP. and cpu_instrs takes a while :)
-const TEST_ROM_DEFAULT_TIMEOUT = 80000;
+const TEST_ROM_DEFAULT_TIMEOUT = 40000;
 const TEST_ROM_TIMEOUT = {
-  cpu_instrs: 80000
+  cpu_instrs: 40000
 };
 
-// Initialize wasmBoy headless, with a frame rate option
+// Initialize wasmBoy headless, with a speed option
 WasmBoy.initialize(false, {
     headless: true,
-    gameboySpeed: 5.0,
-    audioBatchProcessing: true,
-    graphicsBatchProcessing: true,
-    timersBatchProcessing: true
+    gameboySpeed: 2.5,
+    isGbcEnabled: true
 });
 
 // Function to create an image from output
@@ -140,7 +138,7 @@ getDirectories(testRomsPath).forEach((directory) => {
 
                   for (let color = 0; color < 3; color++) {
                     rgbColor[color] = WasmBoy.wasmByteMemory[
-                      WASMBOY_MEMORY_CURRENT_RENDERED_FRAME + pixelStart + color
+                      WasmBoy.wasmInstance.exports.frameInProgressVideoOutputLocation + pixelStart + color
                     ];
                   }
 
@@ -209,6 +207,10 @@ getDirectories(testRomsPath).forEach((directory) => {
                     done();
                   });
                 }
+              }).catch(() => {
+                console.log('Error creating images...');
+                assert.equal(true, false);
+                done();
               });
             });
           }, timeToWaitForTestRom);

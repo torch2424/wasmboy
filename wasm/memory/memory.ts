@@ -9,7 +9,10 @@ import {
   gameboyColorPaletteLocation,
   soundOutputLocation,
   gameBytesLocation,
-  gameRamBanksLocation
+  gameRamBanksLocation,
+  gameBoyVramLocation,
+  gameBoyWramLocation,
+  gameBoyMemoryRegistersLocation
 } from '../constants/constants';
 import {
   eightBitLoadFromGBMemorySkipTraps,
@@ -66,14 +69,18 @@ export class Memory {
   // Wasmboy Memory Map
   // ----------------------------------
   static readonly gameBoyInternalMemoryLocation: u32 = gameBoyInternalMemoryLocation;
+  static readonly gameBoyVramLocation: u32 = gameBoyVramLocation;
+  static readonly gameBoyWramLocation: u32 = gameBoyWramLocation;
+  static readonly gameBoyMemoryRegistersLocation: u32 = gameBoyMemoryRegistersLocation;
   static readonly videoOutputLocation: u32 = videoOutputLocation;
   static readonly currentFrameVideoOutputLocation: u32 = currentFrameVideoOutputLocation;
   static readonly frameInProgressVideoOutputLocation: u32 = frameInProgressVideoOutputLocation;
   static readonly gameboyColorPaletteLocation: u32 = gameboyColorPaletteLocation;
   static readonly soundOutputLocation: u32 = soundOutputLocation;
+
   // Passed in Game backup or ROM from the user
-  static readonly gameBytesLocation: u32 = gameBytesLocation;
   static readonly gameRamBanksLocation: u32 = gameRamBanksLocation;
+  static readonly gameBytesLocation: u32 = gameBytesLocation;
 
 
   // ----------------------------------
@@ -184,9 +191,7 @@ export function setPixelOnFrame(x: i32, y: i32, colorId: i32, color: u8): void {
   // So need an offset
 
   let offset: i32 = Memory.frameInProgressVideoOutputLocation + getRgbPixelStart(x, y) + colorId;
-
-  // Add one to the color, that way you don't ge the default zero
-  store<u8>(offset, color + 1);
+  store<u8>(offset, color);
 }
 
 // Need to also get our pixel on the frame for sprite priority

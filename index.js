@@ -7,16 +7,25 @@ const wasmBoyOptions = {
 	isGbcEnabled: true,
 	isAudioEnabled: true,
 	frameSkip: 1,
-	audioBatchProcessing: false,
+	audioBatchProcessing: true,
 	timersBatchProcessing: false,
-	audioAccumulateSamples: false,
+	audioAccumulateSamples: true,
 	graphicsBatchProcessing: false,
-	graphicsDisableScanlineRendering: false
+	graphicsDisableScanlineRendering: false,
+	gameboySpeed: 1.0
 };
 
 const wasmBoyOptionsString = JSON.stringify(wasmBoyOptions, null, 4);
 
 export default class App extends Component {
+
+	constructor() {
+		super();
+
+		this.state = {
+			showDebugger: false
+		}
+	}
 
 	// Using componentDidMount to wait for the canvas element to be inserted in DOM
 	componentDidMount() {
@@ -44,7 +53,7 @@ export default class App extends Component {
 		WasmBoyController.addTouchInput('SELECT', selectElement, 'BUTTON');
 
 		//WasmBoy.loadGame('./test/testroms/blargg/cpu_instrs.gb')
-		WasmBoy.loadGame('./games/silver.gbc')
+		WasmBoy.loadGame('./games/megaman2.gb')
 		.then(() => {
 			console.log('Wasmboy Ready!');
 		}).catch((error) => {
@@ -53,12 +62,38 @@ export default class App extends Component {
 	}
 
 	render() {
+
+		// optionally render the debugger
+		let debuggerComponent = (
+			<div></div>
+		)
+		if (this.state.showDebugger) {
+			debuggerComponent = (
+				<div className={ "wasmboy__debugger" }>
+					<WasmBoyDebugger wasmboy={WasmBoy} wasmboyGraphics={WasmBoyGraphics} wasmboyAudio={WasmBoyAudio}></WasmBoyDebugger>
+				</div>
+			)
+		}
+
 		return (
 			<div>
 				<h1>WasmBoy</h1>
 				<p>Build Options:</p>
 				<p><i>(Currently built for Mobile Performance testing. Accuracy is lowered.)</i></p>
 				<p>{wasmBoyOptionsString}</p>
+				<div style="text-align: center">
+          <label for="showDebugger">Show Debugger</label>
+          <input
+            id="showDebugger"
+            type="checkbox"
+            checked={ this.state.showDebugger }
+            onChange={ () => {
+								const newState = Object.assign({}, this.state);
+								newState.showDebugger = !newState.showDebugger;
+								this.setState(newState);
+							}
+						} />
+        </div>
 				<div class="wasmboy__systemControls">
 					<WasmBoySystemControls wasmboy={WasmBoy}></WasmBoySystemControls>
 				</div>
@@ -66,9 +101,8 @@ export default class App extends Component {
     			<canvas className="wasmboy__canvas-container__canvas">
           </canvas>
         </div>
-				<div class="wasmboy__debugger">
-					<WasmBoyDebugger wasmboy={WasmBoy} wasmboyGraphics={WasmBoyGraphics} wasmboyAudio={WasmBoyAudio}></WasmBoyDebugger>
-				</div>
+
+				{debuggerComponent}
 
 				<div class="wasmboy__gamepad">
 

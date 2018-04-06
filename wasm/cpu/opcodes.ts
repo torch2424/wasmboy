@@ -123,7 +123,7 @@ export function update(): i32 {
     // Render a frame
 
     // Reset our currentCycles
-    Cpu.currentCycles -= Cpu.MAX_CYCLES_PER_FRAME()
+    Cpu.currentCycles -= Cpu.MAX_CYCLES_PER_FRAME();
 
     return 1;
   }
