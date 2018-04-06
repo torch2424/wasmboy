@@ -19,7 +19,7 @@ export class WasmBoyDebugger extends Component {
       showValueTable: false,
       autoUpdateValueTable: false,
       showBackgroundMap: false,
-      showTileData: true,
+      showTileData: false,
       breakPoint: "40",
       opcodesToRun: 2000,
       valueTable: {
