@@ -33,7 +33,7 @@ import {
 } from '../helpers/index';
 
 
-export function drawLineOfTile(tileId: u8, tileLineY: i32, tileDataMemoryLocation: u16, vramBankId: i32, tileGridX: u32, tileGridY: u32, maxXTilesInGrid: u32, wasmMemoryStart: u32, paletteLocation: u16 = 0, paletteByte: u8 = 0) {
+export function drawLineOfTile(tileId: u8, tileLineY: i32, tileDataMemoryLocation: u16, vramBankId: i32, tileGridX: u32, tileGridY: u32, maxXTilesInGrid: u32, wasmMemoryStart: u32, paletteLocation: u16 = 0, paletteByte: u8 = 0): void {
   // Get our tile data address
   let tileDataAddress: u16 = getTileDataAddress(tileDataMemoryLocation, tileId);
 
