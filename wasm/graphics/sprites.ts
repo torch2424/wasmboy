@@ -71,6 +71,10 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
       spriteHeight = 16;
       // @binji says in 8x16 mode, even tileId always drawn first
       // This will fix shantae sprites which always uses odd numbered indexes
+
+      // TODO: Do the actual Pandocs thing:
+      // "In 8x16 mode, the lower bit of the tile number is ignored. Ie. the upper 8x8 tile is "NN AND FEh", and the lower 8x8 tile is "NN OR 01h"."
+      // So just knock off the last bit? :)
       if(spriteTileId % 2 === 1) {
         spriteTileId -= 1;
       }
