@@ -26,11 +26,16 @@ export class Palette {
 }
 
 // Simple get pallete color or monochroime GB
-export function getMonochromeColorFromPalette(colorId: u8, paletteMemoryLocation: u16): u8 {
+// shouldRepresentColorByColorId is good for debugging tile data for GBC games that don't have
+// monochromePalettes
+export function getMonochromeColorFromPalette(colorId: u8, paletteMemoryLocation: u16, shouldRepresentColorByColorId: boolean = false): u8 {
   // Shift our paletteByte, 2 times for each color ID
   // And off any extra bytes
   // Return our Color (00 - white, 01 - light grey, 10 Dark grey, or 11 - Black)
-  let color: u8 = (eightBitLoadFromGBMemorySkipTraps(paletteMemoryLocation) >> (colorId * 2)) & 0x03;
+  let color: u8 = colorId;
+  if(!shouldRepresentColorByColorId) {
+    color = (eightBitLoadFromGBMemorySkipTraps(paletteMemoryLocation) >> (colorId * 2)) & 0x03;
+  }
 
 
   // Since our max is 254, and max is 3.
