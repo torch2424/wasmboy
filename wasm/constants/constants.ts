@@ -28,12 +28,12 @@ export const frameInProgressVideoOutputLocation: u32 = 0x011000;
 export const currentFrameVideoOutputLocation: u32 = 0x022000;
 export const backgroundMapLocation: u32 = 0x033000;
 export const tileDataMap: u32 = 0x063000;
-export const oamTiles: u32 = 0x068000;
+export const oamTiles: u32 = 0x087000;
 
 // Sound output
-export const soundOutputLocation: u32 = 0x06B000;
+export const soundOutputLocation: u32 = 0x08A000;
 
 // Game Cartridge
-export const gameRamBanksLocation: u32 = 0x08B000;
+export const gameRamBanksLocation: u32 = 0x0AA000;
 // Passed in Game backup or ROM from the user
-export const gameBytesLocation: u32 = 0x0AB000;
+export const gameBytesLocation: u32 = 0x0CA000;

@@ -1,6 +1,7 @@
 // Functions to debug graphical output
 import {
-  backgroundMapLocation
+  backgroundMapLocation,
+  tileDataMap
 } from '../constants/constants';
 import {
   Graphics
@@ -16,6 +17,9 @@ import {
   getRgbColorFromPalette,
   getColorComponentFromRgb
 } from '../graphics/palette';
+import {
+  drawLineOfTile
+} from '../graphics/tiles';
 import {
   eightBitLoadFromGBMemorySkipTraps,
   Memory,
@@ -192,14 +196,38 @@ export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
   }
 }
 
-export function drawTileDataToWasmMemory(showColor: i32 = 0): void {
-  drawVramBankTileDataToWasmMemory(0, showColor);
-}
+export function drawTileDataToWasmMemory(): void {
+  for(let tileDataMapGridY: i32 = 0; tileDataMapGridY < 0x16; tileDataMapGridY++) {
+    for(let tileDataMapGridX: i32 = 0; tileDataMapGridX < 0x16; tileDataMapGridX++) {
 
-function drawVramBankTileDataToWasmMemory(vramBankId: i32 = 0, showColor: i32 = 0): void {
-  for(let tileNumberY: i32 = 0x00; tileNumberY < 0x07; tileNumberY++) {
-    for(let tileNumberX: i32 = 0x00; tileNumberX < 0x0F; tileNumberX++) {
-      // TODO:
+      // Get Our VramBankID
+      let vramBankId: i32 = 0;
+      if(tileDataMapGridX > 0x0F) {
+        vramBankId = 1;
+      }
+
+      // Get our tile ID
+      let tileId: u8 = tileDataMapGridY;
+      if(tileDataMapGridY > 0x0F) {
+        tileId -= 0x0F;
+      }
+      tileId = tileId << 8;
+      if(tileDataMapGridX > 0x0F) {
+        tileId = tileId + (tileDataMapGridX - 0x0F);
+      } else {
+        tileId = tileId + tileDataMapGridX;
+      }
+
+      // Finally get our tile Data location
+      let tileDataMemoryLocation: u32 = Graphics.memoryLocationTileDataSelectOneStart;
+      if(tileDataMapGridY > 0x0F) {
+        tileDataMemoryLocation = Graphics.memoryLocationTileDataSelectZeroStart;
+      }
+
+      // Draw each Y line of the tile
+      for(let tileLineY: u8; tileLineY < 8; tileLineY++) {
+        drawLineOfTile(tileId, tileLineY, tileDataMemoryLocation, vramBankId, tileDataMapGridX, tileDataMapGridY, 0x0F, tileDataMemoryLocation);
+      }
     }
   }
 }

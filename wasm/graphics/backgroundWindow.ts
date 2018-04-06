@@ -215,7 +215,7 @@ function drawColorPixelFromTile(xPixel: i32, yPixel: u8, pixelXPositionInMap: i3
   let pixelYInTile: u16 = pixelYPositionInMap % 8;
   if (checkBitOnByte(6, bgMapAttributes)) {
     // We are mirroring the tile, therefore, we need to opposite byte
-    // So if our pizel was 0 our of 8, it wild become 7 :)
+    // So if our pixel was 0 our of 8, it wild become 7 :)
     // TODO: This may be wrong :p
     pixelYInTile = 7 - (pixelYInTile);
   }
