@@ -33,7 +33,7 @@ import {
 } from '../helpers/index';
 
 
-export function drawLineOfTile(tileId: u8, tileLineY: i32, tileDataMemoryLocation: u16, vramBankId: i32, tileGridX: u32, tileGridY: u32, maxXTilesInGrid: u32, wasmMemoryStart: u32, paletteLocation: u16 = 0, paletteByte: u8 = 0): void {
+export function drawLineOfTile(tileId: u8, tileLineY: u16, tileDataMemoryLocation: u16, vramBankId: i32, tileGridX: u32, tileGridY: u32, maxXTilesInGrid: u32, wasmMemoryStart: u32, paletteLocation: u16 = 0, paletteByte: u8 = 0): void {
   // Get our tile data address
   let tileDataAddress: u16 = getTileDataAddress(tileDataMemoryLocation, tileId);
 
@@ -41,16 +41,25 @@ export function drawLineOfTile(tileId: u8, tileLineY: i32, tileDataMemoryLocatio
   let byteOneForLineOfTilePixels: u8 = loadFromVramBank(tileDataAddress + (tileLineY * 2), vramBankId)
   let byteTwoForLineOfTilePixels: u8 = loadFromVramBank(tileDataAddress + (tileLineY * 2) + 1, vramBankId);
 
-  //Loop through for every x value
+  // Loop through for every x value
   for(let x: i32 = 0; x < 8; x++) {
+
+    // However, We need to reverse our byte,
+    // As pixel 0 is on byte 7, and pixel 1 is on byte 6, etc...
+    // Therefore, is pixelX was 2, then really is need to be 5
+    // So 2 - 7 = -5, * 1 = 5
+    // Or to simplify, 7 - 2 = 5 haha!
+    let pixelXInTile: u8 = <u8>(x) % 8;
+    pixelXInTile = 7 - pixelXInTile;
+
     // Get our pallete colors for the tile
     let paletteColorId: u8 = 0;
-    if (checkBitOnByte(<u8>x, byteTwoForLineOfTilePixels)) {
+    if (checkBitOnByte(<u8>pixelXInTile, byteTwoForLineOfTilePixels)) {
       // Byte one represents the second bit in our color id, so bit shift
       paletteColorId += 1;
       paletteColorId = (paletteColorId << 1);
     }
-    if (checkBitOnByte(<u8>x, byteOneForLineOfTilePixels)) {
+    if (checkBitOnByte(<u8>pixelXInTile, byteOneForLineOfTilePixels)) {
       paletteColorId += 1;
     }
 

@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 import { NumberBaseTable } from './numberBaseTable';
 import { WasmBoyBackgroundMap } from './wasmboyBackgroundMap';
+import { WasmBoyTileData } from './wasmboyTileData';
 
 // Function to get a value in gameboy memory, to wasmboy memory
 const getWasmBoyOffsetFromGameBoyOffset = (gameboyOffset, wasmboy) => {
@@ -17,7 +18,8 @@ export class WasmBoyDebugger extends Component {
 		this.state = {
       showValueTable: false,
       autoUpdateValueTable: false,
-      showBackgroundMap: true,
+      showBackgroundMap: false,
+      showTileData: true,
       breakPoint: "40",
       opcodesToRun: 2000,
       valueTable: {
@@ -291,6 +293,15 @@ export class WasmBoyDebugger extends Component {
               onChange={ () => { this.flipShowStatus('showBackgroundMap'); } } />
           </div>
 
+          <div>
+            <label for="showTileData">Show Tile Data</label>
+            <input
+              id="showTileData"
+              type="checkbox"
+              checked={ this.state.showTileData }
+              onChange={ () => { this.flipShowStatus('showTileData'); } } />
+          </div>
+
           <div className={ this.getStateClass('showValueTable') }>
             <h2>Value Table</h2>
 
@@ -320,6 +331,13 @@ export class WasmBoyDebugger extends Component {
               wasmboy={props.wasmboy}
               shouldUpdate={this.state.showBackgroundMap}
               getWasmBoyOffsetFromGameBoyOffset={getWasmBoyOffsetFromGameBoyOffset}></WasmBoyBackgroundMap>
+          </div>
+
+          <div className={ this.getStateClass('showTileData') } >
+            <WasmBoyTileData
+              wasmboy={props.wasmboy}
+              shouldUpdate={this.state.showTileData}
+              getWasmBoyOffsetFromGameBoyOffset={getWasmBoyOffsetFromGameBoyOffset}></WasmBoyTileData>
           </div>
       </div>
 		);

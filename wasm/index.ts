@@ -63,6 +63,7 @@ export {
   frameInProgressVideoOutputLocation,
   gameboyColorPaletteLocation,
   backgroundMapLocation,
+  tileDataMap,
   soundOutputLocation,
   gameBytesLocation,
   gameRamBanksLocation
@@ -82,7 +83,8 @@ export {
   getProgramCounter,
   getStackPointer,
   getOpcodeAtProgramCounter,
-  drawBackgroundMapToWasmMemory
+  drawBackgroundMapToWasmMemory,
+  drawTileDataToWasmMemory
 } from './debug/debug';
 
 // Function to save state to memory for all of our classes

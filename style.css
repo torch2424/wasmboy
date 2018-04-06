@@ -154,3 +154,10 @@ button {
 	padding: 5px;
 	min-width: 150px;
 }
+
+.wasmboy__debugger canvas {
+	max-width: 600px;
+	width: 100%;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}

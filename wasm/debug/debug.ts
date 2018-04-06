@@ -13,5 +13,6 @@ export {
   getOpcodeAtProgramCounter
 } from './debug-cpu';
 export {
-  drawBackgroundMapToWasmMemory
+  drawBackgroundMapToWasmMemory,
+  drawTileDataToWasmMemory
 } from './debug-graphics';

@@ -52,7 +52,7 @@ export class WasmBoyBackgroundMap extends Component {
         return;
       }
 
-      this.props.wasmboy.wasmInstance.exports.drawBackgroundMapToWasmMemory();
+      this.props.wasmboy.wasmInstance.exports.drawBackgroundMapToWasmMemory(1);
 
       const imageDataArray = new Uint8ClampedArray(256 * 256 * 4);
       const rgbColor = new Uint8ClampedArray(3);

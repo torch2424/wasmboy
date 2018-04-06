@@ -26,7 +26,8 @@ import {
   loadFromVramBank
 } from '../memory/index';
 import {
-  checkBitOnByte
+  checkBitOnByte,
+  hexLog
 } from '../helpers/index';
 
 export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
@@ -197,8 +198,8 @@ export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
 }
 
 export function drawTileDataToWasmMemory(): void {
-  for(let tileDataMapGridY: i32 = 0; tileDataMapGridY < 0x16; tileDataMapGridY++) {
-    for(let tileDataMapGridX: i32 = 0; tileDataMapGridX < 0x16; tileDataMapGridX++) {
+  for(let tileDataMapGridY: u8 = 0; tileDataMapGridY < 0x17; tileDataMapGridY++) {
+    for(let tileDataMapGridX: u8 = 0; tileDataMapGridX < 0x1F; tileDataMapGridX++) {
 
       // Get Our VramBankID
       let vramBankId: i32 = 0;
@@ -211,7 +212,7 @@ export function drawTileDataToWasmMemory(): void {
       if(tileDataMapGridY > 0x0F) {
         tileId -= 0x0F;
       }
-      tileId = tileId << 8;
+      tileId = tileId << 4;
       if(tileDataMapGridX > 0x0F) {
         tileId = tileId + (tileDataMapGridX - 0x0F);
       } else {
@@ -219,14 +220,14 @@ export function drawTileDataToWasmMemory(): void {
       }
 
       // Finally get our tile Data location
-      let tileDataMemoryLocation: u32 = Graphics.memoryLocationTileDataSelectOneStart;
+      let tileDataMemoryLocation: u16 = Graphics.memoryLocationTileDataSelectOneStart;
       if(tileDataMapGridY > 0x0F) {
         tileDataMemoryLocation = Graphics.memoryLocationTileDataSelectZeroStart;
       }
 
       // Draw each Y line of the tile
-      for(let tileLineY: u8; tileLineY < 8; tileLineY++) {
-        drawLineOfTile(tileId, tileLineY, tileDataMemoryLocation, vramBankId, tileDataMapGridX, tileDataMapGridY, 0x0F, tileDataMemoryLocation);
+      for(let tileLineY: u16 = 0; tileLineY < 8; tileLineY++) {
+        drawLineOfTile(tileId, tileLineY, tileDataMemoryLocation, vramBankId, tileDataMapGridX, tileDataMapGridY, 0x1F, tileDataMap);
       }
     }
   }
