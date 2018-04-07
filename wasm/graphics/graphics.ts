@@ -19,7 +19,6 @@ import {
 import {
   eightBitLoadFromGBMemorySkipTraps,
   eightBitStoreIntoGBMemorySkipTraps,
-  updateHblankHdma,
   storeFrameToBeRendered,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
@@ -169,6 +168,17 @@ export function updateGraphics(numberOfCycles: i32): void {
       // Move to next scanline
       let scanlineRegister: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationScanlineRegister);
 
+      // Need to increment scanline before drawing and things
+      // Games like Pokemon crystal want the vblank right as it turns to the value, and not have it increment after
+      // It will break and lead to an infinite loop in crystal
+      if (scanlineRegister > 153) {
+        // Check if we overflowed scanlines
+        // if so, reset our scanline number
+        scanlineRegister = 0;
+      } else {
+        scanlineRegister += 1;
+      }
+
       // Check if we've reached the last scanline
       if(scanlineRegister === 144) {
         // Draw the scanline
@@ -186,19 +196,9 @@ export function updateGraphics(numberOfCycles: i32): void {
         if (!Config.graphicsDisableScanlineRendering) {
           _drawScanline(scanlineRegister);
         }
-        
-        // Update the Hblank DMA, will return if not active
-        updateHblankHdma();
       }
 
-      // Store our scanline
-      if (scanlineRegister > 153) {
-        // Check if we overflowed scanlines
-        // if so, reset our scanline number
-        scanlineRegister = 0;
-      } else {
-        scanlineRegister += 1;
-      }
+      // Store our new scanline value
       eightBitStoreIntoGBMemorySkipTraps(Graphics.memoryLocationScanlineRegister, scanlineRegister);
     }
   }
