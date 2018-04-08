@@ -34,7 +34,9 @@ import {
 export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): void {
 
   // Need to loop through all 40 sprites to check their status
-  for(let i: i32 = 0; i < 40; i++) {
+  // Going backwards since lower sprites draw over higher ones
+  // Will fix dragon warrior 3 intro
+  for(let i: i32 = 39; i >= 0; i--) {
 
     // Sprites occupy 4 bytes in the sprite attribute table
     let spriteTableIndex: u16 = <u16>(i * 4);

@@ -227,7 +227,13 @@ function _drawScanline(scanlineRegister: u8): void {
 
 
   // Check if the background is enabled
-  if (checkBitOnByte(0, lcdControl)) {
+  // NOTE: On Gameboy color, Pandocs says this does something completely different
+  // LCDC.0 - 2) CGB in CGB Mode: BG and Window Master Priority
+  // When Bit 0 is cleared, the background and window lose their priority -
+  // the sprites will be always displayed on top of background and window,
+  // independently of the priority flags in OAM and BG Map attributes.
+  // TODO: Enable this different feature for GBC
+  if (Cpu.GBCEnabled || checkBitOnByte(0, lcdControl)) {
 
     // Get our map memory location
     let tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectZeroStart;
