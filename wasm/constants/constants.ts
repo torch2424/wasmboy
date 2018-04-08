@@ -24,16 +24,17 @@ export const gameBoyMemoryRegistersLocation: u32 = 0x00C800;
 // Video output
 export const videoOutputLocation: u32 = 0x010800;
 export const gameboyColorPaletteLocation: u32 = 0x010800;
-export const frameInProgressVideoOutputLocation: u32 = 0x011000;
-export const currentFrameVideoOutputLocation: u32 = 0x022000;
-export const backgroundMapLocation: u32 = 0x033000;
-export const tileDataMap: u32 = 0x063000;
-export const oamTiles: u32 = 0x087000;
+export const bgPriorityMapLocation: u32 = 0x011000;
+export const frameInProgressVideoOutputLocation: u32 = 0x016C00;
+export const currentFrameVideoOutputLocation: u32 = 0x027C00;
+export const backgroundMapLocation: u32 = 0x038C00;
+export const tileDataMap: u32 = 0x068C00;
+export const oamTiles: u32 = 0x08CC00;
 
 // Sound output
-export const soundOutputLocation: u32 = 0x08A000;
+export const soundOutputLocation: u32 = 0x08FC00;
 
 // Game Cartridge
-export const gameRamBanksLocation: u32 = 0x0AA000;
+export const gameRamBanksLocation: u32 = 0x0AFC00;
 // Passed in Game backup or ROM from the user
-export const gameBytesLocation: u32 = 0x0CA000;
+export const gameBytesLocation: u32 = 0x0CFC00;
