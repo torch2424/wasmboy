@@ -25,9 +25,6 @@ import {
   storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
 import {
-  requestVBlankInterrupt
-} from '../interrupts/index';
-import {
   checkBitOnByte,
   setBitOnByte,
   resetBitOnByte,
@@ -153,8 +150,6 @@ export function updateGraphics(numberOfCycles: i32): void {
   // Doing this for performance
   let lcdEnabledStatus: boolean = isLcdEnabled();
 
-  setLcdStatus(lcdEnabledStatus);
-
   if(lcdEnabledStatus) {
 
     Graphics.scanlineCycleCounter += numberOfCycles;
@@ -168,17 +163,6 @@ export function updateGraphics(numberOfCycles: i32): void {
       // Move to next scanline
       let scanlineRegister: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationScanlineRegister);
 
-      // Need to increment scanline before drawing and things
-      // Games like Pokemon crystal want the vblank right as it turns to the value, and not have it increment after
-      // It will break and lead to an infinite loop in crystal
-      if (scanlineRegister > 153) {
-        // Check if we overflowed scanlines
-        // if so, reset our scanline number
-        scanlineRegister = 0;
-      } else {
-        scanlineRegister += 1;
-      }
-
       // Check if we've reached the last scanline
       if(scanlineRegister === 144) {
         // Draw the scanline
@@ -189,8 +173,6 @@ export function updateGraphics(numberOfCycles: i32): void {
         }
         // Store the frame to be rendered
         storeFrameToBeRendered();
-        // Request a VBlank interrupt
-        requestVBlankInterrupt();
       } else if (scanlineRegister < 144) {
         // Draw the scanline
         if (!Config.graphicsDisableScanlineRendering) {
@@ -198,10 +180,24 @@ export function updateGraphics(numberOfCycles: i32): void {
         }
       }
 
+      // Post increment the scanline register after drawing
+      if (scanlineRegister > 153) {
+        // Check if we overflowed scanlines
+        // if so, reset our scanline number
+        scanlineRegister = 0;
+      } else {
+        scanlineRegister += 1;
+      }
+
       // Store our new scanline value
       eightBitStoreIntoGBMemorySkipTraps(Graphics.memoryLocationScanlineRegister, scanlineRegister);
     }
   }
+
+  // Games like Pokemon crystal want the vblank right as it turns to the value, and not have it increment after
+  // It will break and lead to an infinite loop in crystal
+  // Therefore, we want to be checking/Setting our LCD status after the scanline updates
+  setLcdStatus(lcdEnabledStatus);
 }
 
 // TODO: Make this a _drawPixelOnScanline, as values can be updated while drawing a scanline

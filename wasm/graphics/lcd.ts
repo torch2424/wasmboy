@@ -13,7 +13,8 @@ import {
   updateHblankHdma
 } from '../memory/index';
 import {
-  requestLcdInterrupt
+  requestLcdInterrupt,
+  requestVBlankInterrupt
 } from '../interrupts/index';
 import {
   checkBitOnByte,
@@ -95,10 +96,15 @@ export function setLcdStatus(lcdEnabledStatus: boolean): void {
       requestLcdInterrupt();
     }
 
-    // Check fo updating the Hblank HDMA
+    // Check for updating the Hblank HDMA
     if(newLcdMode === 0) {
       // Update the Hblank DMA, will simply return if not active
       updateHblankHdma();
+    }
+
+    // Check for requesting a VBLANK interrupt
+    if(newLcdMode === 1) {
+      requestVBlankInterrupt();
     }
 
     // Check for the coincidence flag
