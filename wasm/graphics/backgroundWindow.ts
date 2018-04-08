@@ -13,6 +13,9 @@ import {
   getRgbColorFromPalette,
   getColorComponentFromRgb
 } from './palette';
+import {
+  addPriorityforPixel
+} from './priority';
 // Assembly script really not feeling the reexport
 // using Skip Traps, because LCD has unrestricted access
 // http://gbdev.gg8.se/wiki/articles/Video_Display#LCD_OAM_DMA_Transfers
@@ -194,13 +197,17 @@ function drawMonochromePixelFromTile(xPixel: i32, yPixel: u8, pixelXPositionInMa
   setPixelOnFrame(xPixel, yPixel, 0, monochromeColor);
   setPixelOnFrame(xPixel, yPixel, 1, monochromeColor);
   setPixelOnFrame(xPixel, yPixel, 2, monochromeColor);
+
+  // Lastly, add the pixel to our background priority map
+  // https://github.com/torch2424/wasmBoy/issues/51
+  // Bits 0 & 1 will represent the color Id drawn by the BG/Window
+  // Bit 2 will represent if the Bg/Window has GBC priority.
+  addPriorityforPixel(xPixel, yPixel, paletteColorId);
 }
 
 // Function to draw a pixel from a tile in C O L O R
 // See above for more context on some variables
 function drawColorPixelFromTile(xPixel: i32, yPixel: u8, pixelXPositionInMap: i32, pixelYPositionInMap: u16, tileMapAddress: u16, tileDataAddress: u16): void {
-
-  // TODO: PRIORITY
 
   // Get the GB Map Attributes
   // Bit 0-2  Background Palette number  (BGP0-7)
@@ -268,4 +275,10 @@ function drawColorPixelFromTile(xPixel: i32, yPixel: u8, pixelXPositionInMap: i3
   setPixelOnFrame(xPixel, yPixel, 0, red);
   setPixelOnFrame(xPixel, yPixel, 1, green);
   setPixelOnFrame(xPixel, yPixel, 2, blue);
+
+  // Lastly, add the pixel to our background priority map
+  // https://github.com/torch2424/wasmBoy/issues/51
+  // Bits 0 & 1 will represent the color Id drawn by the BG/Window
+  // Bit 2 will represent if the Bg/Window has GBC priority.
+  addPriorityforPixel(xPixel, yPixel, paletteColorId, checkBitOnByte(7, bgMapAttributes));
 }

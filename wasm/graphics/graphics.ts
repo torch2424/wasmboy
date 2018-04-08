@@ -11,6 +11,9 @@ import {
   renderSprites
 } from './sprites';
 import {
+  clearPriorityMap
+} from './priority';
+import {
   Cpu
 } from '../cpu/cpu'
 import {
@@ -171,8 +174,12 @@ export function updateGraphics(numberOfCycles: i32): void {
         } else {
           _renderEntireFrame();
         }
+
         // Store the frame to be rendered
         storeFrameToBeRendered();
+
+        // Clear the priority map
+        clearPriorityMap();
       } else if (scanlineRegister < 144) {
         // Draw the scanline
         if (!Config.graphicsDisableScanlineRendering) {

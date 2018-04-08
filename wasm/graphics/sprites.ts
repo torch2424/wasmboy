@@ -13,6 +13,9 @@ import {
   getRgbColorFromPalette,
   getColorComponentFromRgb
 } from './palette';
+import {
+  getPriorityforPixel
+} from './priority';
 // Assembly script really not feeling the reexport
 // using Skip Traps, because LCD has unrestricted access
 // http://gbdev.gg8.se/wiki/articles/Video_Display#LCD_OAM_DMA_Transfers
@@ -144,10 +147,33 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
           // Find our actual X pixel location on the gameboy "camera" view
           let spriteXPixelLocationInCameraView: u8 = spriteXPosition + (7 - <u8>tilePixel);
 
-          // Now that we have our coordinates, check sprite priority
-          // Remember, set pixel on frame increases the value by one!
-          if (!isSpritePriorityBehindWindowAndBackground ||
-            getPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister) >= 200) {
+          // Now that we have our coordinates, check for sprite priority
+          // Lets get the priority byte we put in memory
+          let bgPriorityByte: u8 = getPriorityforPixel(spriteXPixelLocationInCameraView, scanlineRegister);
+
+          // There are two cases where wouldnt draw the pixel on top of the Bg/window
+          // 1. if isSpritePriorityBehindWindowAndBackground, sprite can only draw over color 0
+          // 2. if bit 2 of our priority is set, then BG-to-OAM Priority from pandoc
+          //  is active, meaning BG tile will have priority above all OBJs
+          //  (regardless of the priority bits in OAM memory)
+          // But if GBC and Bit 0 of LCDC is set, we always draw the object
+
+          let shouldHideFromOamPriority: boolean = false;
+          if(isSpritePriorityBehindWindowAndBackground && (bgPriorityByte & 0x03) > 0) {
+            shouldHideFromOamPriority = true;
+          }
+
+          let shouldHideFromBgPriority: boolean = false;
+          if(Cpu.GBCEnabled && checkBitOnByte(2, bgPriorityByte)) {
+            shouldHideFromBgPriority = true;
+          }
+
+          let shouldShowFromLcdcPriority: boolean = false;
+          if(Cpu.GBCEnabled && !checkBitOnByte(0, eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationLcdControl))) {
+            shouldShowFromLcdcPriority = true;
+          }
+
+          if (shouldShowFromLcdcPriority || (!shouldHideFromOamPriority && !shouldHideFromBgPriority)) {
 
             if(!Cpu.GBCEnabled) {
               // Get our monochrome color RGB from the current sprite pallete
@@ -185,8 +211,6 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
             }
           }
         }
-
-        // Done!
       }
     }
   }
