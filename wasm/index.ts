@@ -29,7 +29,10 @@ import {
 } from './memory/index';
 import {
   performanceTimestamp
-} from './helpers/index'
+} from './helpers/index';
+import {
+  wasmPages
+} from './constants/constants';
 
 // Public Exports
 export {
@@ -86,6 +89,11 @@ export {
   drawBackgroundMapToWasmMemory,
   drawTileDataToWasmMemory
 } from './debug/debug';
+
+// Grow our memory to the specified size
+if(current_memory() < wasmPages) {
+  grow_memory(wasmPages - current_memory());
+}
 
 // Function to save state to memory for all of our classes
 export function saveState(): void {

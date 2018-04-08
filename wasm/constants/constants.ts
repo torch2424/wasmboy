@@ -10,6 +10,7 @@
 
 // WasmBoy
 export const wasmMemorySize: u32 = 0x8B0000;
+export const wasmPages: u32 = wasmMemorySize / 1024 / 64;
 export const assemblyScriptMemoryBaseLocation: u32 = 0x000000;
 export const wasmBoyInternalStateLocation: u32 = 0x000400;
 export const wasmBoyInternalStateSize: u32 = 0x000400;
