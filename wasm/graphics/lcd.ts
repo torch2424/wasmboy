@@ -10,7 +10,11 @@ import {
   eightBitStoreIntoGBMemorySkipTraps
 } from '../memory/store';
 import {
-  requestLcdInterrupt
+  updateHblankHdma
+} from '../memory/index';
+import {
+  requestLcdInterrupt,
+  requestVBlankInterrupt
 } from '../interrupts/index';
 import {
   checkBitOnByte,
@@ -90,6 +94,17 @@ export function setLcdStatus(lcdEnabledStatus: boolean): void {
     // Check if we want to request an interrupt, and we JUST changed modes
     if(shouldRequestInterrupt) {
       requestLcdInterrupt();
+    }
+
+    // Check for updating the Hblank HDMA
+    if(newLcdMode === 0) {
+      // Update the Hblank DMA, will simply return if not active
+      updateHblankHdma();
+    }
+
+    // Check for requesting a VBLANK interrupt
+    if(newLcdMode === 1) {
+      requestVBlankInterrupt();
     }
 
     // Check for the coincidence flag

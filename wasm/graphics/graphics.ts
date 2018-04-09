@@ -11,6 +11,9 @@ import {
   renderSprites
 } from './sprites';
 import {
+  clearPriorityMap
+} from './priority';
+import {
   Cpu
 } from '../cpu/cpu'
 import {
@@ -19,15 +22,11 @@ import {
 import {
   eightBitLoadFromGBMemorySkipTraps,
   eightBitStoreIntoGBMemorySkipTraps,
-  updateHblankHdma,
   storeFrameToBeRendered,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
-import {
-  requestVBlankInterrupt
-} from '../interrupts/index';
 import {
   checkBitOnByte,
   setBitOnByte,
@@ -154,8 +153,6 @@ export function updateGraphics(numberOfCycles: i32): void {
   // Doing this for performance
   let lcdEnabledStatus: boolean = isLcdEnabled();
 
-  setLcdStatus(lcdEnabledStatus);
-
   if(lcdEnabledStatus) {
 
     Graphics.scanlineCycleCounter += numberOfCycles;
@@ -177,21 +174,20 @@ export function updateGraphics(numberOfCycles: i32): void {
         } else {
           _renderEntireFrame();
         }
+
         // Store the frame to be rendered
         storeFrameToBeRendered();
-        // Request a VBlank interrupt
-        requestVBlankInterrupt();
+
+        // Clear the priority map
+        clearPriorityMap();
       } else if (scanlineRegister < 144) {
         // Draw the scanline
         if (!Config.graphicsDisableScanlineRendering) {
           _drawScanline(scanlineRegister);
         }
-        
-        // Update the Hblank DMA, will return if not active
-        updateHblankHdma();
       }
 
-      // Store our scanline
+      // Post increment the scanline register after drawing
       if (scanlineRegister > 153) {
         // Check if we overflowed scanlines
         // if so, reset our scanline number
@@ -199,9 +195,16 @@ export function updateGraphics(numberOfCycles: i32): void {
       } else {
         scanlineRegister += 1;
       }
+
+      // Store our new scanline value
       eightBitStoreIntoGBMemorySkipTraps(Graphics.memoryLocationScanlineRegister, scanlineRegister);
     }
   }
+
+  // Games like Pokemon crystal want the vblank right as it turns to the value, and not have it increment after
+  // It will break and lead to an infinite loop in crystal
+  // Therefore, we want to be checking/Setting our LCD status after the scanline updates
+  setLcdStatus(lcdEnabledStatus);
 }
 
 // TODO: Make this a _drawPixelOnScanline, as values can be updated while drawing a scanline
@@ -227,7 +230,13 @@ function _drawScanline(scanlineRegister: u8): void {
 
 
   // Check if the background is enabled
-  if (checkBitOnByte(0, lcdControl)) {
+  // NOTE: On Gameboy color, Pandocs says this does something completely different
+  // LCDC.0 - 2) CGB in CGB Mode: BG and Window Master Priority
+  // When Bit 0 is cleared, the background and window lose their priority -
+  // the sprites will be always displayed on top of background and window,
+  // independently of the priority flags in OAM and BG Map attributes.
+  // TODO: Enable this different feature for GBC
+  if (Cpu.GBCEnabled || checkBitOnByte(0, lcdControl)) {
 
     // Get our map memory location
     let tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectZeroStart;

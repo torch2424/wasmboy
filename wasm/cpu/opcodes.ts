@@ -478,7 +478,7 @@ function handleOpcode1x(opcode: u8, dataByteOne: u8, dataByteTwo: u8, concatenat
         }
       }
 
-      // TODO: This breaks Blarggs CPU tests, find out what should end a STOP
+      // NOTE: This breaks Blarggs CPU tests, therefore, need to implement STOP at somepoint to get around this
       //Cpu.isStopped = true;
       Cpu.programCounter += 1;
       return 4;

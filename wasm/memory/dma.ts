@@ -25,11 +25,13 @@ export function startDmaTransfer(sourceAddressOffset: u8): void {
   let sourceAddress: u16 = <u16>sourceAddressOffset;
   sourceAddress = (sourceAddress << 8);
 
-  for(let i: u16 = 0; i < 0xA0; i++) {
+  for(let i: u16 = 0; i <= 0x9F; i++) {
     let spriteInformationByte: u8 = eightBitLoadFromGBMemorySkipTraps(sourceAddress + i);
     let spriteInformationAddress: u16 = Memory.spriteInformationTableLocation + i;
     eightBitStoreIntoGBMemorySkipTraps(spriteInformationAddress, spriteInformationByte);
   }
+
+  //hexLog(sourceAddress, Cpu.programCounter);
 
   // TCAGBD:  This copy (DMA) needs 160 × 4 + 4 clocks to complete in both double speed and single speeds modes
   // Increment all of our Cycle coiunters in ../cpu/opcodes
@@ -47,7 +49,6 @@ export function startHdmaTransfer(hdmaTriggerByteToBeWritten: u8): void {
   }
 
   // Check if we are trying to terminate an already active HBLANK HDMA
-  // TODO: Pokemon crystal is cancelling it's HDMAs, investigate
   if (Memory.isHblankHdmaActive && !checkBitOnByte(7, hdmaTriggerByteToBeWritten)) {
     Memory.isHblankHdmaActive = false;
     Memory.hblankHdmaIndex = 0x00;
@@ -89,17 +90,6 @@ export function startHdmaTransfer(hdmaTriggerByteToBeWritten: u8): void {
 
     // Stop the DMA
     eightBitStoreIntoGBMemorySkipTraps(Memory.memoryLocationHdmaTrigger, 0xFF);
-
-    // Set our Cycles used for the HDMA
-    // Since DMA in GBC Double Speed Mode takes 80 micro seconds,
-    // And HDMA takes 8 micro seconds in GBC Double Speed mode (and GBC Normal Mode)
-    // Will assume (644 / 10) cycles for GBC Double Speed Mode,
-    // and (644 / 10 / 2) for GBC Normal Mode
-    if(Cpu.GBCDoubleSpeed) {
-      Memory.DMACycles += 64;
-    } else {
-      Memory.DMACycles += 32;
-    }
   }
 }
 
@@ -152,6 +142,18 @@ function hdmaTransfer(hdmaSource: u16, hdmaDestination: u16, transferLength: i32
     let sourceByte: u8 = eightBitLoadFromGBMemory(hdmaSource + i);
     eightBitStoreIntoGBMemory(hdmaDestination + i, sourceByte);
   }
+
+  // Set our Cycles used for the HDMA
+  // Since DMA in GBC Double Speed Mode takes 80 micro seconds,
+  // And HDMA takes 8 micro seconds per 0x10 bytes in GBC Double Speed mode (and GBC Normal Mode)
+  // Will assume (644 / 10) cycles for GBC Double Speed Mode,
+  // and (644 / 10 / 2) for GBC Normal Mode
+  let hdmaCycles: i32 = 32;
+  if(Cpu.GBCDoubleSpeed) {
+    hdmaCycles = 64;
+  }
+  hdmaCycles = hdmaCycles * (transferLength / 0x10);
+  Memory.DMACycles += hdmaCycles;
 }
 
 // Function to get our HDMA Source

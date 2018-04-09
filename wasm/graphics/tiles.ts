@@ -71,7 +71,7 @@ export function drawLineOfTile(tileId: u8, tileLineY: u16, tileDataMemoryLocatio
       if (paletteLocation <= 0) {
         paletteLocation = Graphics.memoryLocationBackgroundPalette;
       }
-      let monochromeColor: u8 = getMonochromeColorFromPalette(paletteColorId, paletteLocation);
+      let monochromeColor: u8 = getMonochromeColorFromPalette(paletteColorId, paletteLocation, true);
       red = monochromeColor;
       green = monochromeColor;
       blue = monochromeColor;
