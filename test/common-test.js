@@ -91,7 +91,8 @@ const getAllRomsInDirectory = (directory) => {
   // Get all test roms for the directory
   const files = fs.readdirSync(directory);
   const testRoms = files.filter(function(file) {
-      return path.extname(file).toLowerCase() === '.gb';
+      const fileExt = path.extname(file).toLowerCase();
+      return fileExt === '.gb' || fileExt === '.gbc';
   });
 
   return testRoms;
