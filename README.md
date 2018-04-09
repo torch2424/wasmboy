@@ -43,7 +43,7 @@ For now I would watch the video posted at the top of the readme :)
 
 **cpu_instrs**
 
-![Cpu Instructions all tests passing](./test/testroms/blargg/cpu_instrs.golden.png)
+![Cpu Instructions all tests passing](./test/performance/testroms/blargg/cpu_instrs.golden.png)
 
 # Roadmap
 
