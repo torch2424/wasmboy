@@ -10,7 +10,7 @@
     "dev": "npm run start",
     "watch": "npm run start",
     "build": "npm run wasm:build && npm run lib:build",
-    "test": "npm run build && npx mocha --exit",
+    "test": "npm run build && npx mocha test/accuracy/accuracy-test.js --exit",
     "lint": "eslint src",
     "debugger:watch": "preact watch",
     "debugger:serve": "preact build && preact serve",
