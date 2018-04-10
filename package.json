@@ -12,6 +12,7 @@
     "build": "npm run wasm:build && npm run lib:build",
     "test": "npm run build && npx mocha test/accuracy/accuracy-test.js --exit",
     "test:accuracy": "npm run build && npx mocha test/accuracy/accuracy-test.js --exit",
+    "test:perf": "npm run test:performance",
     "test:performance": "npm run build && npx mocha test/performance/performance-test.js --exit",
     "lint": "eslint src",
     "debugger:watch": "preact watch",

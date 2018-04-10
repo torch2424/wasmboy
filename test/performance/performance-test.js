@@ -17,7 +17,8 @@ const markdownTable = require('markdown-table');
 const assert = require('assert');
 
 // Number of frames to run per test
-const NUMBER_OF_FRAMES = 2000;
+const NUMBER_OF_FRAMES = 2500;
+const PERFORMANCE_OPTION_TIMEOUT = 35000;
 
 // Initialize wasmBoy headless, with a speed option
 const WASMBOY_INITIALIZE_OPTIONS = {
@@ -40,19 +41,43 @@ const WASMBOY_PERFORMANCE_TESTS = [
   "graphicsDisableScanlineRendering"
 ];
 
+const PERFORMANCE_TABLE_HEADER = `
+# WasmBoy Performance Options Table
+
+This is a Auto-generated file to give users some understanding of expected performance gains of each performance option.
+
+**NOTE:** this is not a representation of emulator speed, but rather an easy way to determine for users and developers how much speed a performance option offers.
+
+'noPerformanceOptions' represents what the emulator runs as when no options are toggled on while running the emulator.
+
+`;
+
 const performanceTablePath = './test/performance/results.md';
 
 const testRomsPath = './test/performance/testroms';
 
+// Start Main tests
+let performanceTableString = PERFORMANCE_TABLE_HEADER;
+
+const writePerformanceTable = () => {
+  // Finally write to our markdown table file
+  fs.writeFileSync(performanceTablePath, performanceTableString);
+  console.log(`Created a Markdown table with these results at: ${performanceTablePath}`);
+}
+
 // Create our callback insanity
-commonTest.getDirectories(testRomsPath).forEach((directory) => {
+const directories = commonTest.getDirectories(testRomsPath);
+directories.forEach((directory, directoryIndex) => {
   // Get all test roms for the directory
   const testRoms = commonTest.getAllRomsInDirectory(directory);
 
-  let performanceTableString = '';
-
   // Create a describe for the directory
   describe(directory, () => {
+
+    // Check if we should write the performance table
+    if(directoryIndex >= directories.length - 1 && (!testRoms || testRoms.length <= 0)) {
+      writePerformanceTable();
+    }
 
     // Describe for each test rom
     testRoms.forEach((testRom, testRomIndex) => {
@@ -93,7 +118,7 @@ commonTest.getDirectories(testRomsPath).forEach((directory) => {
              it(`should be able to run ${NUMBER_OF_FRAMES} frames in a timely manner`, function(done) {
 
                // Add some timeout in case the option takes much longer
-               this.timeout(30000);
+               this.timeout(PERFORMANCE_OPTION_TIMEOUT);
 
                const start = now();
 
@@ -131,13 +156,11 @@ commonTest.getDirectories(testRomsPath).forEach((directory) => {
                      markdownTableArray.push([tableKey, testRomTableObject[tableKey]])
                    });
 
-                   performanceTableString += `\n # ${testRom} \n\n ${markdownTable(markdownTableArray)} \n`;
+                   performanceTableString += `\n ## ${testRom} \n\n ${markdownTable(markdownTableArray)} \n`;
 
                    // Check if this is the last everything
-                   if(testRomIndex >= testRoms.length - 1) {
-                     // Finally write to our markdown table file
-                     fs.writeFileSync(performanceTablePath, performanceTableString);
-                     console.log(`Created a Markdwon table with these results at: ${performanceTablePath}`);
+                   if(testRomIndex >= testRoms.length - 1 && directoryIndex >= directories.length - 1) {
+                     writePerformanceTable();
                    }
                  }
 
