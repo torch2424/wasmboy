@@ -111,7 +111,7 @@ directories.forEach((directory, directoryIndex) => {
                const clonedInitializeOptions = Object.assign({}, WASMBOY_INITIALIZE_OPTIONS);
                clonedInitializeOptions[performanceOptionKey] = true;
 
-               WasmBoy.initialize(false, clonedInitializeOptions);
+               WasmBoy.reset(clonedInitializeOptions);
              });
 
              // Descibe what the tesrt should do for the option

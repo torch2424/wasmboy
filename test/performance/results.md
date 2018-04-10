@@ -12,20 +12,20 @@ This is a Auto-generated file to give users some understanding of expected perfo
 
  | Performance Option               | Time (milliseconds) |
 | -------------------------------- | ------------------- |
-| noPerformanceOptions             | 21081.125           |
-| audioBatchProcessing             | 21036.567           |
-| timersBatchProcessing            | 11760.452           |
-| audioAccumulateSamples           | 23409.551           |
-| graphicsBatchProcessing          | 27679.804           |
-| graphicsDisableScanlineRendering | 18930.715           | 
+| noPerformanceOptions             | 22921.561           |
+| audioBatchProcessing             | 11845.901           |
+| timersBatchProcessing            | 12310.214           |
+| audioAccumulateSamples           | 28582.536           |
+| graphicsBatchProcessing          | 24513.372           |
+| graphicsDisableScanlineRendering | 19009.645           | 
 
  ## tobutobugirl.gb 
 
  | Performance Option               | Time (milliseconds) |
 | -------------------------------- | ------------------- |
-| noPerformanceOptions             | 12088.056           |
-| audioBatchProcessing             | 11505.342           |
-| timersBatchProcessing            | 7799.743            |
-| audioAccumulateSamples           | 11311.984           |
-| graphicsBatchProcessing          | 12920.941           |
-| graphicsDisableScanlineRendering | 9879.087            | 
+| noPerformanceOptions             | 14841.971           |
+| audioBatchProcessing             | 8699.473            |
+| timersBatchProcessing            | 8246.996            |
+| audioAccumulateSamples           | 13141.537           |
+| graphicsBatchProcessing          | 11673.400           |
+| graphicsDisableScanlineRendering | 10135.179           | 
