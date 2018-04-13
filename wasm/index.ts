@@ -39,7 +39,8 @@ export {
   initialize
 } from './cpu/index';
 export {
-  config
+  config,
+  getConfigAudioBatchProcessing
 } from './config';
 export {
   update,

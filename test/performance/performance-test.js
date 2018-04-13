@@ -17,13 +17,16 @@ const markdownTable = require('markdown-table');
 const assert = require('assert');
 
 // Number of frames to run per test
-const NUMBER_OF_FRAMES = 2500;
+const NUMBER_OF_FRAMES = 1250;
 const PERFORMANCE_OPTION_TIMEOUT = 35000;
+
+// Iterations of Performance time options
+const PERFORMANCE_OPTION_ITERATIONS = 2;
 
 // Initialize wasmBoy headless, with a speed option
 const WASMBOY_INITIALIZE_OPTIONS = {
     headless: true,
-    gameboySpeed: 2.0,
+    gameboySpeed: 1.0,
     isGbcEnabled: true
 };
 
@@ -50,6 +53,8 @@ This is a Auto-generated file to give users some understanding of expected perfo
 
 'noPerformanceOptions' represents what the emulator runs as when no options are toggled on while running the emulator.
 
+This currently runs ${NUMBER_OF_FRAMES}, and averages the results of ${PERFORMANCE_OPTION_ITERATIONS} iterations.
+
 `;
 
 const performanceTablePath = './test/performance/results.md';
@@ -62,7 +67,9 @@ let performanceTableString = PERFORMANCE_TABLE_HEADER;
 const writePerformanceTable = () => {
   // Finally write to our markdown table file
   fs.writeFileSync(performanceTablePath, performanceTableString);
+  console.log(' ')
   console.log(`Created a Markdown table with these results at: ${performanceTablePath}`);
+  console.log(' ')
 }
 
 // Create our callback insanity
@@ -118,21 +125,38 @@ directories.forEach((directory, directoryIndex) => {
              it(`should be able to run ${NUMBER_OF_FRAMES} frames in a timely manner`, function(done) {
 
                // Add some timeout in case the option takes much longer
-               this.timeout(PERFORMANCE_OPTION_TIMEOUT);
+               this.timeout(PERFORMANCE_OPTION_TIMEOUT * PERFORMANCE_OPTION_ITERATIONS);
 
-               const start = now();
+               const iterationTimes = [];
 
-               for(let i = 0; i < NUMBER_OF_FRAMES; i++) {
-                 WasmBoy.wasmInstance.exports.update();
+               for(let iterations = 0; iterations < PERFORMANCE_OPTION_ITERATIONS; iterations++) {
+                 const start = now();
+
+                 for(let i = 0; i < NUMBER_OF_FRAMES; i++) {
+                   WasmBoy.wasmInstance.exports.update();
+                 }
+
+                 const end = now();
+
+                 const iterationTimeElapsed = (end - start).toFixed(3);
+                 iterationTimes.push(iterationTimeElapsed);
+
+                 console.log(`Finished Iteration #${iterations}`)
                }
 
-               const end = now();
-
-               const timeElapsed = (end - start).toFixed(3);
+               let totalTime = 0;
+               iterationTimes.forEach((time) => {
+                 totalTime += parseFloat(time);
+               });
+               let timeElapsed = 0;
+               if(iterationTimes.length > 0) {
+                 timeElapsed = totalTime / iterationTimes.length;
+               }
 
                // Some Spacing
                console.log(' ');
                console.log(`WasmBoy with the option: ${performanceOptionKey} enabled, took ${timeElapsed} milliseconds to run`);
+               console.log(' ');
 
                // Store into our tableObject
                testRomTableObject[performanceOptionKey] = timeElapsed;

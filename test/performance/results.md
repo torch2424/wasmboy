@@ -7,25 +7,27 @@ This is a Auto-generated file to give users some understanding of expected perfo
 
 'noPerformanceOptions' represents what the emulator runs as when no options are toggled on while running the emulator.
 
+This currently runs 1250, and averages the results of 2 iterations.
+
 
  ## back-to-color.gbc 
 
  | Performance Option               | Time (milliseconds) |
 | -------------------------------- | ------------------- |
-| noPerformanceOptions             | 22921.561           |
-| audioBatchProcessing             | 11845.901           |
-| timersBatchProcessing            | 12310.214           |
-| audioAccumulateSamples           | 28582.536           |
-| graphicsBatchProcessing          | 24513.372           |
-| graphicsDisableScanlineRendering | 19009.645           | 
+| noPerformanceOptions             | 10449.621500000001  |
+| audioBatchProcessing             | 5276.716            |
+| timersBatchProcessing            | 10457.828           |
+| audioAccumulateSamples           | 9967.7125           |
+| graphicsBatchProcessing          | 8914.633            |
+| graphicsDisableScanlineRendering | 10393.1515          | 
 
  ## tobutobugirl.gb 
 
  | Performance Option               | Time (milliseconds) |
 | -------------------------------- | ------------------- |
-| noPerformanceOptions             | 14841.971           |
-| audioBatchProcessing             | 8699.473            |
-| timersBatchProcessing            | 8246.996            |
-| audioAccumulateSamples           | 13141.537           |
-| graphicsBatchProcessing          | 11673.400           |
-| graphicsDisableScanlineRendering | 10135.179           | 
+| noPerformanceOptions             | 7801.648499999999   |
+| audioBatchProcessing             | 5841.7875           |
+| timersBatchProcessing            | 7092.201            |
+| audioAccumulateSamples           | 6750.137000000001   |
+| graphicsBatchProcessing          | 5551.57             |
+| graphicsDisableScanlineRendering | 5547.9195           | 
