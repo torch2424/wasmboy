@@ -33,7 +33,7 @@ import {
 } from '../helpers/index';
 
 
-export function drawLineOfTile(tileId: u8, tileLineY: u16, tileDataMemoryLocation: u16, vramBankId: i32, tileGridX: u32, tileGridY: u32, maxXTilesInGrid: u32, wasmMemoryStart: u32, paletteLocation: u16 = 0, paletteByte: u8 = 0): void {
+export function drawLineOfTile(tileId: u8, tileLineY: u16, tileDataMemoryLocation: u16, vramBankId: i32, tileGridX: u32, tileGridY: u32, maxXTilesInGrid: u32, wasmMemoryStart: u32, paletteLocation: u16 = 0, paletteIndexByte: i32 = -1): void {
   // Get our tile data address
   let tileDataAddress: u16 = getTileDataAddress(tileDataMemoryLocation, tileId);
 
@@ -67,7 +67,9 @@ export function drawLineOfTile(tileId: u8, tileLineY: u16, tileDataMemoryLocatio
     let red: u8 = 0;
     let green: u8 = 0;
     let blue: u8 = 0;
-    if(paletteByte <= 0) {
+
+    // PaletteIndexByte is an i32 to allow an index of 0
+    if(paletteIndexByte < 0) {
       if (paletteLocation <= 0) {
         paletteLocation = Graphics.memoryLocationBackgroundPalette;
       }
@@ -77,7 +79,7 @@ export function drawLineOfTile(tileId: u8, tileLineY: u16, tileDataMemoryLocatio
       blue = monochromeColor;
     } else {
       // Call the helper function to grab the correct color from the palette
-      let rgbColorPalette: u16 = getRgbColorFromPalette(paletteByte, paletteColorId, false);
+      let rgbColorPalette: u16 = getRgbColorFromPalette(<u8>paletteIndexByte, paletteColorId, false);
 
       // Split off into red green and blue
       red = getColorComponentFromRgb(0, rgbColorPalette);

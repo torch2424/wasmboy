@@ -10,6 +10,9 @@ export class Config {
 
   // Acumulate Sound Samples
   static audioAccumulateSamples: boolean = false;
+
+  // Tile Rednering
+  static tileRendering: boolean = false; 
 }
 
 export function config(audioBatchProcessing: i32 = 0,

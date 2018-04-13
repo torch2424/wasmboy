@@ -3,6 +3,9 @@ import {
   Cpu
 } from '../cpu/cpu';
 import {
+  Config
+} from '../config';
+import {
   Graphics
 } from './graphics';
 import {
@@ -16,6 +19,9 @@ import {
 import {
   addPriorityforPixel
 } from './priority';
+import {
+  drawLineOfTile
+} from './tiles';
 // Assembly script really not feeling the reexport
 // using Skip Traps, because LCD has unrestricted access
 // http://gbdev.gg8.se/wiki/articles/Video_Display#LCD_OAM_DMA_Transfers
@@ -56,7 +62,7 @@ export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u
 
 
   // Draw the Background scanline
-  drawBackgroundWindowScanline(scanlineRegister, tileDataMemoryLocation, tileMapMemoryLocation, pixelYPositionInMap, 0, scrollX);
+  drawBackgroundWindowScanline(scanlineRegister, tileDataMemoryLocation, tileMapMemoryLocation, pixelYPositionInMap, 0, scrollX, scrollY);
 }
 
 export function renderWindow(scanlineRegister: u8, tileDataMemoryLocation: u16, tileMapMemoryLocation: u16): void {
@@ -83,11 +89,11 @@ export function renderWindow(scanlineRegister: u8, tileDataMemoryLocation: u16, 
   let xOffset: i32 = -1 * (<i32>windowX);
 
   // Draw the Background scanline
-  drawBackgroundWindowScanline(scanlineRegister, tileDataMemoryLocation, tileMapMemoryLocation, pixelYPositionInMap, windowX, xOffset);
+  drawBackgroundWindowScanline(scanlineRegister, tileDataMemoryLocation, tileMapMemoryLocation, pixelYPositionInMap, windowX, xOffset, windowY);
 }
 
 // Function frankenstein'd together to allow background and window to share the same draw scanline function
-function drawBackgroundWindowScanline(scanlineRegister: u8, tileDataMemoryLocation: u16, tileMapMemoryLocation: u16, pixelYPositionInMap: u16, iStart: i32, xOffset: i32): void {
+function drawBackgroundWindowScanline(scanlineRegister: u8, tileDataMemoryLocation: u16, tileMapMemoryLocation: u16, pixelYPositionInMap: u16, iStart: i32, xOffset: i32, yOffset: u16): void {
 
   // Loop through x to draw the line like a CRT
   for (let i: i32 = iStart; i < 160; i++) {
@@ -132,6 +138,33 @@ function drawBackgroundWindowScanline(scanlineRegister: u8, tileDataMemoryLocati
     if (Cpu.GBCEnabled) {
       //drawMonochromePixelFromTile(i, scanlineRegister, pixelXPositionInMap, pixelYPositionInMap, tileDataAddress);
       drawColorPixelFromTile(i, scanlineRegister, pixelXPositionInMap, pixelYPositionInMap, tileMapAddress, tileDataAddress);
+
+      if(Config.tileRendering) {
+        // Get the which line of the tile we are rendering
+        let tileLineY: u16 = scanlineRegister % 8;
+
+        // Get which VRAM bank we want to use
+        let bgMapAttributes: u8 = loadFromVramBank(tileMapAddress, 1);
+        let vramBankId: i32 = 0;
+        if (checkBitOnByte(3, bgMapAttributes)) {
+          vramBankId = 1;
+        }
+
+        // Get the palette index byte
+        let bgPalette: u8 = (bgMapAttributes & 0x07);
+
+        // Now try to draw the entire tile at a time
+        // Background camera is 20 x 18 tile grid
+        // TODO: Pass tileXOffset to draw entire tiles and not jagged movement
+        let tileXPositionInCameraMap: u32 = (i - iStart) / 8;
+        // TODO: FInish this to fix scrollY
+        let tileYPositionInCameraMap: u32 = (pixelYPositionInMap - yOffset) / 8;
+        hexLog(tileYPositionInCameraMap);
+        drawLineOfTile(tileIdFromTileMap, tileLineY, tileDataMemoryLocation, vramBankId, tileXPositionInCameraMap, tileYPositionInCameraMap, 20, Memory.frameInProgressVideoOutputLocation, 0, bgPalette);
+        // A line of a tile is 8 pixels wide, therefore increase i by 7, and then the for loop will increment by 1
+        // For a net increment for 8
+        i += 7;
+      }
     } else {
       drawMonochromePixelFromTile(i, scanlineRegister, pixelXPositionInMap, pixelYPositionInMap, tileDataAddress);
     }
