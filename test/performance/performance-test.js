@@ -21,6 +21,11 @@ const NUMBER_OF_FRAMES = 1250;
 const PERFORMANCE_OPTION_TIMEOUT = 35000;
 
 // Iterations of Performance time options
+// Please note, we do not re-initialize between iterations.
+// So for example, with NUMBER_OF_FRAMES = 1250 and PERFORMANCE_OPTION_ITERATIONS = 2,
+// Would be the same as: NUMBER_OF_FRAMES = 2500 and PERFORMANCE_OPTION_ITERATIONS = 1,
+// Except this makes an average of all iterations, but the frames aren't the same,
+// Which may be better or worse?
 const PERFORMANCE_OPTION_ITERATIONS = 2;
 
 // Initialize wasmBoy headless, with a speed option
