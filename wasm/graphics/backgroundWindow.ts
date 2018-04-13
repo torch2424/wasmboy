@@ -139,6 +139,7 @@ function drawBackgroundWindowScanline(scanlineRegister: u8, tileDataMemoryLocati
       //drawMonochromePixelFromTile(i, scanlineRegister, pixelXPositionInMap, pixelYPositionInMap, tileDataAddress);
       drawColorPixelFromTile(i, scanlineRegister, pixelXPositionInMap, pixelYPositionInMap, tileMapAddress, tileDataAddress);
 
+      // Pass in === false to test
       if(Config.tileRendering) {
         // Get the which line of the tile we are rendering
         let tileLineY: u16 = scanlineRegister % 8;
@@ -155,11 +156,11 @@ function drawBackgroundWindowScanline(scanlineRegister: u8, tileDataMemoryLocati
 
         // Now try to draw the entire tile at a time
         // Background camera is 20 x 18 tile grid
-        // TODO: Pass tileXOffset to draw entire tiles and not jagged movement
+        // TODO: Pass tileXOffset, tileYOffset to draw entire tiles and not jagged movement
         let tileXPositionInCameraMap: u32 = (i - iStart) / 8;
-        // TODO: FInish this to fix scrollY
-        let tileYPositionInCameraMap: u32 = (pixelYPositionInMap - yOffset) / 8;
-        hexLog(tileYPositionInCameraMap);
+        let tileYPositionInCameraMap: u32 = (scanlineRegister / 8);
+
+
         drawLineOfTile(tileIdFromTileMap, tileLineY, tileDataMemoryLocation, vramBankId, tileXPositionInCameraMap, tileYPositionInCameraMap, 20, Memory.frameInProgressVideoOutputLocation, 0, bgPalette);
         // A line of a tile is 8 pixels wide, therefore increase i by 7, and then the for loop will increment by 1
         // For a net increment for 8
