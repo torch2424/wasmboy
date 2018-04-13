@@ -58,7 +58,7 @@ This is a Auto-generated file to give users some understanding of expected perfo
 
 'noPerformanceOptions' represents what the emulator runs as when no options are toggled on while running the emulator.
 
-This currently runs ${NUMBER_OF_FRAMES}, and averages the results of ${PERFORMANCE_OPTION_ITERATIONS} iterations.
+This currently runs ${NUMBER_OF_FRAMES} frames of each rom, and averages the results of ${PERFORMANCE_OPTION_ITERATIONS} iterations of running the number of frames.
 
 `;
 
