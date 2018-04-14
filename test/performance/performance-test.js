@@ -42,6 +42,7 @@ WasmBoy.initialize(false, WASMBOY_INITIALIZE_OPTIONS);
 // "Dummy" option will do nothing
 const WASMBOY_PERFORMANCE_TESTS = [
   "noPerformanceOptions",
+  "tileRendering",
   "audioBatchProcessing",
   "timersBatchProcessing",
   "audioAccumulateSamples",

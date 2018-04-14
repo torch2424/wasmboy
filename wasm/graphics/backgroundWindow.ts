@@ -129,7 +129,7 @@ function drawBackgroundWindowScanline(scanlineRegister: u8, tileDataMemoryLocati
     // Get the tile Id on the Tile Map
     let tileIdFromTileMap: u8 = loadFromVramBank(tileMapAddress, 0);
 
-    if(Config.tileRendering === false) {
+    if(Config.tileRendering) {
       let pixelsDrawn: i32 = drawLineOfTileFromTileId(i, scanlineRegister, pixelXPositionInMap, pixelYPositionInMap, tileMapAddress, tileDataMemoryLocation, tileIdFromTileMap);
       // A line of a tile is 8 pixels wide, therefore increase i by (pixelsDrawn - 1), and then the for loop will increment by 1
       // For a net increment for 8
