@@ -20,7 +20,7 @@ import {
   addPriorityforPixel
 } from './priority';
 import {
-  drawLineOfTile
+  drawPixelsFromLineOfTile
 } from './tiles';
 // Assembly script really not feeling the reexport
 // using Skip Traps, because LCD has unrestricted access
@@ -62,7 +62,7 @@ export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u
 
 
   // Draw the Background scanline
-  drawBackgroundWindowScanline(scanlineRegister, tileDataMemoryLocation, tileMapMemoryLocation, pixelYPositionInMap, 0, scrollX, scrollY);
+  drawBackgroundWindowScanline(scanlineRegister, tileDataMemoryLocation, tileMapMemoryLocation, pixelYPositionInMap, 0, scrollX);
 }
 
 export function renderWindow(scanlineRegister: u8, tileDataMemoryLocation: u16, tileMapMemoryLocation: u16): void {
@@ -89,11 +89,11 @@ export function renderWindow(scanlineRegister: u8, tileDataMemoryLocation: u16, 
   let xOffset: i32 = -1 * (<i32>windowX);
 
   // Draw the Background scanline
-  drawBackgroundWindowScanline(scanlineRegister, tileDataMemoryLocation, tileMapMemoryLocation, pixelYPositionInMap, windowX, xOffset, windowY);
+  drawBackgroundWindowScanline(scanlineRegister, tileDataMemoryLocation, tileMapMemoryLocation, pixelYPositionInMap, windowX, xOffset);
 }
 
 // Function frankenstein'd together to allow background and window to share the same draw scanline function
-function drawBackgroundWindowScanline(scanlineRegister: u8, tileDataMemoryLocation: u16, tileMapMemoryLocation: u16, pixelYPositionInMap: u16, iStart: i32, xOffset: i32, yOffset: u16): void {
+function drawBackgroundWindowScanline(scanlineRegister: u8, tileDataMemoryLocation: u16, tileMapMemoryLocation: u16, pixelYPositionInMap: u16, iStart: i32, xOffset: i32): void {
 
   // Loop through x to draw the line like a CRT
   for (let i: i32 = iStart; i < 160; i++) {
@@ -129,53 +129,37 @@ function drawBackgroundWindowScanline(scanlineRegister: u8, tileDataMemoryLocati
     // Get the tile Id on the Tile Map
     let tileIdFromTileMap: u8 = loadFromVramBank(tileMapAddress, 0);
 
-    // Now get our tileDataAddress for the corresponding tileID we found in the map
-    // Read the comments in _getTileDataAddress() to see what's going on.
-    // tl;dr if we had the tile map of "a b c d", and wanted tileId 2.
-    // This funcitons returns the start of memory locaiton for the tile 'c'.
-    let tileDataAddress: u16 = getTileDataAddress(tileDataMemoryLocation, tileIdFromTileMap);
-
-    if (Cpu.GBCEnabled) {
-      //drawMonochromePixelFromTile(i, scanlineRegister, pixelXPositionInMap, pixelYPositionInMap, tileDataAddress);
-      drawColorPixelFromTile(i, scanlineRegister, pixelXPositionInMap, pixelYPositionInMap, tileMapAddress, tileDataAddress);
-
-      // Pass in === false to test
-      if(Config.tileRendering) {
-        // Get the which line of the tile we are rendering
-        let tileLineY: u16 = scanlineRegister % 8;
-
-        // Get which VRAM bank we want to use
-        let bgMapAttributes: u8 = loadFromVramBank(tileMapAddress, 1);
-        let vramBankId: i32 = 0;
-        if (checkBitOnByte(3, bgMapAttributes)) {
-          vramBankId = 1;
-        }
-
-        // Get the palette index byte
-        let bgPalette: u8 = (bgMapAttributes & 0x07);
-
-        // Now try to draw the entire tile at a time
-        // Background camera is 20 x 18 tile grid
-        // TODO: Pass tileXOffset, tileYOffset to draw entire tiles and not jagged movement
-        let tileXPositionInCameraMap: u32 = (i - iStart) / 8;
-        let tileYPositionInCameraMap: u32 = (scanlineRegister / 8);
-
-
-        drawLineOfTile(tileIdFromTileMap, tileLineY, tileDataMemoryLocation, vramBankId, tileXPositionInCameraMap, tileYPositionInCameraMap, 20, Memory.frameInProgressVideoOutputLocation, 0, bgPalette);
-        // A line of a tile is 8 pixels wide, therefore increase i by 7, and then the for loop will increment by 1
-        // For a net increment for 8
-        i += 7;
+    if(Config.tileRendering === false) {
+      let pixelsDrawn: i32 = drawLineOfTileFromTileId(i, scanlineRegister, pixelXPositionInMap, pixelYPositionInMap, tileMapAddress, tileDataMemoryLocation, tileIdFromTileMap);
+      // A line of a tile is 8 pixels wide, therefore increase i by (pixelsDrawn - 1), and then the for loop will increment by 1
+      // For a net increment for 8
+      if(pixelsDrawn > 0) {
+        i += (pixelsDrawn - 1);
       }
     } else {
-      drawMonochromePixelFromTile(i, scanlineRegister, pixelXPositionInMap, pixelYPositionInMap, tileDataAddress);
+      if (Cpu.GBCEnabled) {
+        // Draw the individual pixel
+        drawColorPixelFromTileId(i, scanlineRegister, pixelXPositionInMap, pixelYPositionInMap, tileMapAddress, tileDataMemoryLocation, tileIdFromTileMap);
+
+      } else {
+
+        // Draw the individual pixel
+        drawMonochromePixelFromTileId(i, scanlineRegister, pixelXPositionInMap, pixelYPositionInMap, tileDataMemoryLocation, tileIdFromTileMap);
+      }
     }
   }
 }
 
 // Function to draw a pixel for the standard GB
 // TODO: Make this match our new RGB scheme for placing pixels in memory
-function drawMonochromePixelFromTile(xPixel: i32, yPixel: u8, pixelXPositionInMap: i32, pixelYPositionInMap: u16, tileDataAddress: u16): void {
+function drawMonochromePixelFromTileId(xPixel: i32, yPixel: u8, pixelXPositionInMap: i32, pixelYPositionInMap: u16, tileDataMemoryLocation: u16, tileIdFromTileMap: u8): void {
   // Now we can process the the individual bytes that represent the pixel on a tile
+
+  // Now get our tileDataAddress for the corresponding tileID we found in the map
+  // Read the comments in _getTileDataAddress() to see what's going on.
+  // tl;dr if we had the tile map of "a b c d", and wanted tileId 2.
+  // This funcitons returns the start of memory locaiton for the tile 'c'.
+  let tileDataAddress: u16 = getTileDataAddress(tileDataMemoryLocation, tileIdFromTileMap);
 
   // Get the y pixel of the 8 by 8 tile.
   // Simply modulo the scanline.
@@ -241,7 +225,13 @@ function drawMonochromePixelFromTile(xPixel: i32, yPixel: u8, pixelXPositionInMa
 
 // Function to draw a pixel from a tile in C O L O R
 // See above for more context on some variables
-function drawColorPixelFromTile(xPixel: i32, yPixel: u8, pixelXPositionInMap: i32, pixelYPositionInMap: u16, tileMapAddress: u16, tileDataAddress: u16): void {
+function drawColorPixelFromTileId(xPixel: i32, yPixel: u8, pixelXPositionInMap: i32, pixelYPositionInMap: u16, tileMapAddress: u16, tileDataMemoryLocation: u16, tileIdFromTileMap: u8): void {
+
+  // Now get our tileDataAddress for the corresponding tileID we found in the map
+  // Read the comments in _getTileDataAddress() to see what's going on.
+  // tl;dr if we had the tile map of "a b c d", and wanted tileId 2.
+  // This funcitons returns the start of memory locaiton for the tile 'c'.
+  let tileDataAddress: u16 = getTileDataAddress(tileDataMemoryLocation, tileIdFromTileMap);
 
   // Get the GB Map Attributes
   // Bit 0-2  Background Palette number  (BGP0-7)
@@ -315,4 +305,41 @@ function drawColorPixelFromTile(xPixel: i32, yPixel: u8, pixelXPositionInMap: i3
   // Bits 0 & 1 will represent the color Id drawn by the BG/Window
   // Bit 2 will represent if the Bg/Window has GBC priority.
   addPriorityforPixel(xPixel, yPixel, paletteColorId, checkBitOnByte(7, bgMapAttributes));
+}
+
+// Function to draw a line of a tile in Color
+// This is for tile rendering shortcuts
+function drawLineOfTileFromTileId(xPixel: i32, yPixel: u8, pixelXPositionInMap: i32, pixelYPositionInMap: u16, tileMapAddress: u16, tileDataMemoryLocation: u16, tileIdFromTileMap: u8): i32 {
+
+  // Get the which line of the tile we are rendering
+  let tileLineY: u16 = pixelYPositionInMap % 8;
+
+  // Now lets find our tileX start and end
+  let xOffsetTileWidthRemainder = pixelXPositionInMap % 8;
+  let tileXStart: i32 = 0;
+  if(xPixel < xOffsetTileWidthRemainder) {
+    tileXStart = xOffsetTileWidthRemainder;
+  }
+  let tileXEnd: i32 = 7;
+  if(xPixel + xOffsetTileWidthRemainder > 160) {
+    tileXEnd = 160 - xPixel;
+  }
+
+  // initialize some variables for GBC
+  let bgMapAttributes: i32 = -1;
+  let vramBankId: i32 = 0;
+  let bgPalette: i32 = -1;
+  if(Cpu.GBCEnabled) {
+    // Get Our GBC properties
+    bgMapAttributes = loadFromVramBank(tileMapAddress, 1);
+    if (checkBitOnByte(3, <u8>bgMapAttributes)) {
+      vramBankId = 1;
+    }
+
+    // Get the palette index byte
+    bgPalette = (bgMapAttributes & 0x07);
+  }
+
+  // Return the number of pixels drawn
+  return drawPixelsFromLineOfTile(tileIdFromTileMap, tileDataMemoryLocation, vramBankId, tileXStart, tileXEnd, tileLineY, xPixel, yPixel, 160, Memory.frameInProgressVideoOutputLocation, 0, bgPalette, bgMapAttributes);
 }
