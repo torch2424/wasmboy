@@ -7,35 +7,56 @@
 <!--- Short Description-->
 🎮👾🕹️ Gameboy Emulator Library written in Web Assembly using [AssemblyScript](https://github.com/AssemblyScript/assemblyscript), Debugger/Shell in Preact 🎮👾🕹️
 
-
 [Debugger / Demo with support for mobile controls](https://torch2424.github.io/wasmBoy/)
 
+<!-- Header gif -->
+![Pokemon Crystal Wasmboy Demo](./docs/images/wasmBoyPokemonCrystal.gif)
 
-*🎵 Click the image below for a quick video of a sound test the Alpha version 🎵*
+<!-- Generated with: https://github.com/ekalinin/github-markdown-toc -->
+# Table of Contents
 
-
-[![WasmBoy Alpha Sound Test Video](https://img.youtube.com/vi/LqH495sZ6ns/0.jpg)](https://www.youtube.com/watch?v=LqH495sZ6ns)
+* [Features](#features)
+* [Example Gifs &amp; Screenshots](#example-gifs--screenshots)
+* [Tests](#tests)
+     * [Blarrg](#blarrg)
+* [Roadmap](#roadmap)
+* [Contributing](#contributing)
+     * [Installation](#installation)
+     * [CLI Commands / Npm Scripts](#cli-commands--npm-scripts)
+* [Special Thanks](#special-thanks)
+* [Random Tips for new Gameboy EmuDevs](#random-tips-for-new-gameboy-emudevs)
+* [Resources](#resources)
 
 # Features
 
-* Emulates the gameboy and outputs graphics to an HTML5 canvas 🖼️, and audio through the Web Audio API 🔊
+* Emulates the Gameboy / Gameboy Color 🎮👾🕹️
+* Outputs graphics to a scalable / responsive HTML5 canvas 🖼️, and audio through the Web Audio API 🔊
+* Support for In-game saves, and save states 💾
+* Configurable options to increase performance for low end devices 🔥
 * Importable into other projects as a dependency ♻️
 * Built with Web Assembly 🕸️
-* Keyboard and gamepad input support ⌨️ 🎮
-* Debugger with information of all relevant registers 🐛
+* Keyboard and gamepad input support using [responsive gamepad](https://www.npmjs.com/package/responsive-gamepad) ⌨️ 🎮
+* Debugger with a value table (I/O map), Tile Data visualizer, and Background Map with Scroll Indicators 🐛
 
 [Please see the Roadmap for upcoming features](#roadmap)
 
-# Gifs & Screenshots
+# Example Gifs & Screenshots
+
+**Gameboy Support**
+
+![Is that a demo in your pocket](./docs/images/wasmBoyIsThatADemoInYourPocket.png) ![Megaman 2](./docs/images/wasmBoyMegaman2.png) ![Pokemon Blue](./docs/images/wasmBoyPokemonBlue.png) ![tetris](./docs/images/wasmBoyTetris.png) ![tobu tobu girl](./test/performance/testroms/tobutobugirl/tobutobugirl.gb.noPerformanceOptions.png)
+
+**Gameboy Color Support**
+
+![Links Awakening](./docs/images/wasmBoyLinksAwakening.png) ![L s d j](./docs/images/wasmBoyLsdj.png) ![Megaman extreme 2](./docs/images/wasmBoyMegamanXtreme2.png) ![Pokemon Silver](./docs/images/wasmBoyPokemonSilver.png) ![Pokemon Yellow](./docs/images/wasmBoyPokemonYellow.png) ![back to color demo](./test/performance/testroms/back-to-color/back-to-color.gbc.noPerformanceOptions.png)
 
 **Save States**
 
-
 ![wasm boy save state](https://user-images.githubusercontent.com/1448289/37084052-45e35e62-21a6-11e8-96d0-539c5649c197.gif)
 
-**More Coming soon!**
+**Debugger**
 
-For now I would watch the video posted at the top of the readme :)
+![was boy pokemon silver debugger demo](./docs/images/wasmBoyPokemonSilverDebugger.gif)
 
 # Tests
 
@@ -43,7 +64,7 @@ For now I would watch the video posted at the top of the readme :)
 
 **cpu_instrs**
 
-![Cpu Instructions all tests passing](./test/performance/testroms/blargg/cpu_instrs.golden.png)
+![Cpu Instructions all tests passing](./test/accuracy/testroms/blargg/cpu_instrs.golden.png)
 
 # Roadmap
 
@@ -51,13 +72,21 @@ The project doe quality and performance also depends on the [AssemblyScript Road
 
 The Wasmboy library is being recorded at [Issue #3](https://github.com/torch2424/wasmBoy/issues/3)
 
-# CLI Commands / Npm Scripts
+# Contributing
+
+Feel free to fork and submit PRs! Any help is much appreciated, and would be a ton of fun!
+
+### Installation
+
+Just your standard node app. Install Node with [nvm](https://github.com/creationix/nvm), `git clone` the project, and `npm install`, and you should be good to go!
+
+### CLI Commands / Npm Scripts
 
 The project contains three different elements.
 
 * The `debugger` is the container for the wasmBoy library, which is simply a [preact](https://github.com/developit/preact) application, generated with [preact-cli](https://github.com/developit/preact-cli).
-* The `wasm` which is the web assembly module for wasmBoy written in [AssemblyScript](https://github.com/AssemblyScript/assemblyscript).
-* The `lib` which is the importable library of wasmBoy that can be used in other projects.
+* The `wasm` or `core` which is the web assembly module for wasmBoy written in [AssemblyScript](https://github.com/AssemblyScript/assemblyscript).
+* The `lib` which is the importable library of wasmBoy that can be used in other projects, that adds a top level API to the `core`.
 
 Each of these uses a different build process. The debugger uses [webpack](https://webpack.js.org/), the wasm uses the [AssemblyScript](https://github.com/AssemblyScript/assemblyscript) compiler CLI tool, and the lib uses [Rollup.js](https://rollupjs.org/guide/en).
 
@@ -80,8 +109,11 @@ npm run watch
 # Build the wasm module and the lib to be ready to be pushed to npm or released
 npm run build
 
-# Run tests in `test/test.js`
+# Run tests in `test/accuracy/test.js`
 npm run test
+
+# Run tests in `test/performance/test.js`
+npm run test:performance
 
 # Watch the debugger (preact) project for changes and livereload
 npm run debugger:watch
@@ -115,9 +147,9 @@ Using the [gh-pages](https://www.npmjs.com/package/gh-pages) for debugger/demo d
 
 * [dcodeIO for building and fixing bugs with AssemblyScript](https://github.com/AssemblyScript/assemblyscript). And for being awesome!
 
-* [r/emudev](https://www.reddit.com/r/EmuDev/), especially to [binjimint](https://www.reddit.com/r/EmuDev/comments/7y2bux/gameboy_gb_graphical_bugs_game_writes_zeroes_into/dudlj3w/) for helping me find that bug not even Blargg's cpu tests could find.
+* [r/emudev](https://www.reddit.com/r/EmuDev/), especially to [binjimint](https://www.reddit.com/r/EmuDev/comments/7y2bux/gameboy_gb_graphical_bugs_game_writes_zeroes_into/dudlj3w/) for helping me sooooo much!
 
-# Random Tips for new Gameboy EmuDevs:
+# Random Tips for new Gameboy EmuDevs
 
 * It's better to code an emulator by abstracting assembly commands into functions, rather than by Opcode operation
 

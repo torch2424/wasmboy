@@ -17,6 +17,7 @@ test/accuracy/testroms/**/*.png
 !test/accuracy/testroms/**/*.golden.output
 !test/accuracy/testroms/**/*.golden.png
 test/performance/testroms/**/*.png
+!test/performance/testroms/**/*.*.noPerformanceOptions.png
 
 # Ignore build output
 dist/
