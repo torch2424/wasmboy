@@ -52,6 +52,7 @@ import {
   eightBitStoreIntoGBMemory,
   sixteenBitStoreIntoGBMemory,
   eightBitLoadFromGBMemory,
+  eightBitLoadFromGBMemorySkipTraps,
   sixteenBitLoadFromGBMemory
 } from '../memory/index';
 import {
@@ -272,11 +273,11 @@ function executeOpcode(opcode: u8): i32 {
 
 // Functions to access the next operands of a opcode, reffering to them as "dataBytes"
 function getDataByteOne(): u8 {
-    return eightBitLoadFromGBMemory(Cpu.programCounter);
+    return eightBitLoadFromGBMemorySkipTraps(Cpu.programCounter);
 }
 
 function getDataByteTwo(): u8 {
-  return eightBitLoadFromGBMemory(Cpu.programCounter + 1);
+  return eightBitLoadFromGBMemorySkipTraps(Cpu.programCounter + 1);
 }
 // Get our concatenated databyte one and getDataByteTwo()
 // Find and replace with : getConcatenatedDataByte()

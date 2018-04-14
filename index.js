@@ -9,7 +9,7 @@ const wasmBoyOptions = {
 	frameSkip: 1,
 	audioBatchProcessing: false,
 	timersBatchProcessing: false,
-	audioAccumulateSamples: false,
+	audioAccumulateSamples: true,
 	graphicsBatchProcessing: false,
 	graphicsDisableScanlineRendering: false,
 	tileRendering: false,
