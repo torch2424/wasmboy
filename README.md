@@ -21,6 +21,7 @@
      * [Blarrg](#blarrg)
 * [Roadmap](#roadmap)
 * [Contributing](#contributing)
+     * [Installation](#installation)
      * [CLI Commands / Npm Scripts](#cli-commands--npm-scripts)
 * [Special Thanks](#special-thanks)
 * [Random Tips for new Gameboy EmuDevs](#random-tips-for-new-gameboy-emudevs)
@@ -73,6 +74,10 @@ The Wasmboy library is being recorded at [Issue #3](https://github.com/torch2424
 # Contributing
 
 Feel free to fork and submit PRs! Any help is much appreciated, and would be a ton of fun!
+
+### Installation
+
+Just your standard node app. Install Node with [nvm](https://github.com/creationix/nvm), `git clone` the project, and `npm install`, and you should be good to go!
 
 ### CLI Commands / Npm Scripts
 
