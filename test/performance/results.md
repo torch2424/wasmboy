@@ -14,22 +14,24 @@ This currently runs 1250 frames of each rom, and averages the results of 2 itera
 
  | Performance Option               | Time (milliseconds) |
 | -------------------------------- | ------------------- |
-| noPerformanceOptions             | 11286.6535          |
-| tileRendering                    | 10969.646           |
-| audioBatchProcessing             | 5564.326            |
-| timersBatchProcessing            | 11197.097000000002  |
-| audioAccumulateSamples           | 10378.996500000001  |
-| graphicsBatchProcessing          | 9247.812            |
-| graphicsDisableScanlineRendering | 10816.5305          | 
+| noPerformanceOptions             | 11020.1105          |
+| tileRendering                    | 10267.3595          |
+| tileCaching                      | 10202.6815          |
+| audioBatchProcessing             | 4912.7955           |
+| timersBatchProcessing            | 10275.867999999999  |
+| audioAccumulateSamples           | 9798.849999999999   |
+| graphicsBatchProcessing          | 8532.903            |
+| graphicsDisableScanlineRendering | 10191.3955          | 
 
  ## tobutobugirl.gb 
 
  | Performance Option               | Time (milliseconds) |
 | -------------------------------- | ------------------- |
-| noPerformanceOptions             | 5771.198            |
-| tileRendering                    | 5796.2255000000005  |
-| audioBatchProcessing             | 3919.6425           |
-| timersBatchProcessing            | 5970.2545           |
-| audioAccumulateSamples           | 6030.3735           |
-| graphicsBatchProcessing          | 5116.941000000001   |
-| graphicsDisableScanlineRendering | 5739.223            | 
+| noPerformanceOptions             | 4853.4715           |
+| tileRendering                    | 5929.1435           |
+| tileCaching                      | 4742.4405           |
+| audioBatchProcessing             | 2876.304            |
+| timersBatchProcessing            | 4702.7195           |
+| audioAccumulateSamples           | 5094.6345           |
+| graphicsBatchProcessing          | 4246.211499999999   |
+| graphicsDisableScanlineRendering | 4866.633            | 

@@ -17,10 +17,12 @@ import {
   getColorComponentFromRgb
 } from './palette';
 import {
-  addPriorityforPixel
+  addPriorityforPixel,
+  getPriorityforPixel
 } from './priority';
 import {
-  drawPixelsFromLineOfTile
+  drawPixelsFromLineOfTile,
+  TileCache
 } from './tiles';
 // Assembly script really not feeling the reexport
 // using Skip Traps, because LCD has unrestricted access
@@ -31,7 +33,8 @@ import {
 import {
   Memory,
   loadFromVramBank,
-  setPixelOnFrame
+  setPixelOnFrame,
+  getRgbPixelStart
 } from '../memory/memory';
 import {
   hexLog,
@@ -129,14 +132,63 @@ function drawBackgroundWindowScanline(scanlineRegister: u8, tileDataMemoryLocati
     // Get the tile Id on the Tile Map
     let tileIdFromTileMap: u8 = loadFromVramBank(tileMapAddress, 0);
 
-    if(Config.tileRendering) {
+    // Now that we have our Tile Id, let's check our Tile Cache
+    let usedTileCache: boolean = false;
+    if(Config.tileCaching) {
+      // Check if the current tile matches our tileId
+      if(i > 8 && <i32>tileIdFromTileMap === TileCache.tileId && i === TileCache.nextXIndexToPerformCacheCheck) {
+        hexLog(15);
+        // Simply copy the last 8 pixels from memory to copy the line from the tile
+        let pixelsDrawn: i32 = 0;
+        for(let tileCacheIndex = 0; tileCacheIndex < 8; tileCacheIndex++) {
+          // First check for overflow
+          if(i + tileCacheIndex <= 160) {
+            // Get the pixel location in memory of the tile
+            let previousXPixel = i - (8 - tileCacheIndex);
+            let previousTilePixelLocation = Memory.frameInProgressVideoOutputLocation + getRgbPixelStart(i + tileCacheIndex, scanlineRegister);
+
+            // Cycle through the RGB
+            for (let tileCacheRgb = 0; tileCacheRgb < 3; tileCacheRgb++) {
+              setPixelOnFrame(i + tileCacheIndex, scanlineRegister, tileCacheRgb, load<u8>(previousTilePixelLocation + tileCacheRgb));
+            }
+
+            // Copy the priority for the pixel if needed
+            if(Cpu.GBCEnabled) {
+              let pixelPriority: u8 = getPriorityforPixel(previousXPixel, scanlineRegister);
+              addPriorityforPixel(i + tileCacheIndex, scanlineRegister, resetBitOnByte(2, pixelPriority), checkBitOnByte(2, pixelPriority));
+            }
+
+            pixelsDrawn++;
+          }
+        }
+        // Increment i by 7, not 8 because i will be incremented at end of for loop
+        if(pixelsDrawn > 0) {
+          i += (pixelsDrawn - 1);
+          usedTileCache = true;
+        }
+      } else {
+        // Save our current tile Id, and the next x value we should check the x index
+        TileCache.tileId = tileIdFromTileMap;
+      }
+
+      // Calculate when we should do the tileCache calculation again
+      if(i >= TileCache.nextXIndexToPerformCacheCheck) {
+        TileCache.nextXIndexToPerformCacheCheck = i + 8;
+        let xOffsetTileWidthRemainder: i32 = pixelXPositionInMap % 8;
+        if (i < xOffsetTileWidthRemainder) {
+          TileCache.nextXIndexToPerformCacheCheck += xOffsetTileWidthRemainder;
+        }
+      }
+    }
+
+    if(Config.tileRendering && !usedTileCache) {
       let pixelsDrawn: i32 = drawLineOfTileFromTileId(i, scanlineRegister, pixelXPositionInMap, pixelYPositionInMap, tileMapAddress, tileDataMemoryLocation, tileIdFromTileMap);
       // A line of a tile is 8 pixels wide, therefore increase i by (pixelsDrawn - 1), and then the for loop will increment by 1
       // For a net increment for 8
       if(pixelsDrawn > 0) {
         i += (pixelsDrawn - 1);
       }
-    } else {
+    } else if(!usedTileCache) {
       if (Cpu.GBCEnabled) {
         // Draw the individual pixel
         drawColorPixelFromTileId(i, scanlineRegister, pixelXPositionInMap, pixelYPositionInMap, tileMapAddress, tileDataMemoryLocation, tileIdFromTileMap);
@@ -315,7 +367,7 @@ function drawLineOfTileFromTileId(xPixel: i32, yPixel: u8, pixelXPositionInMap: 
   let tileLineY: u16 = pixelYPositionInMap % 8;
 
   // Now lets find our tileX start and end
-  let xOffsetTileWidthRemainder = pixelXPositionInMap % 8;
+  let xOffsetTileWidthRemainder: i32 = pixelXPositionInMap % 8;
   let tileXStart: i32 = 0;
   if(xPixel < xOffsetTileWidthRemainder) {
     tileXStart = xOffsetTileWidthRemainder;

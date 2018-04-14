@@ -13,6 +13,7 @@ const wasmBoyOptions = {
 	graphicsBatchProcessing: false,
 	graphicsDisableScanlineRendering: false,
 	tileRendering: true,
+	tileCaching: true,
 	gameboySpeed: 1.0
 };
 

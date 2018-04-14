@@ -43,6 +43,7 @@ WasmBoy.initialize(false, WASMBOY_INITIALIZE_OPTIONS);
 const WASMBOY_PERFORMANCE_TESTS = [
   "noPerformanceOptions",
   "tileRendering",
+  "tileCaching",
   "audioBatchProcessing",
   "timersBatchProcessing",
   "audioAccumulateSamples",

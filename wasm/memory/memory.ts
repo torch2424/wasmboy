@@ -194,20 +194,8 @@ export function setPixelOnFrame(x: i32, y: i32, colorId: i32, color: u8): void {
   store<u8>(offset, color);
 }
 
-// Need to also get our pixel on the frame for sprite priority
-export function getPixelOnFrame(x: i32, y: i32): u8 {
-  // Currently only supports 160x144
-  // Storing in X, then y
-  // So need an offset
-
-  let offset: i32 = Memory.frameInProgressVideoOutputLocation + getRgbPixelStart(x, y);
-
-  // Added one to the color, that way you don't ge the default zero
-  return load<u8>(offset);
-}
-
 // Function to get the start of a RGB pixel (R, G, B)
-function getRgbPixelStart(x: i32, y: i32): i32 {
+export function getRgbPixelStart(x: i32, y: i32): i32 {
   // Get the pixel number
   let pixelNumber: i32 = (y * 160) + x;
   // Each pixel takes 3 slots, therefore, multiply by 3!

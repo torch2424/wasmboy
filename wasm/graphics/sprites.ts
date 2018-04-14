@@ -24,8 +24,7 @@ import {
 } from '../memory/load';
 import {
   loadFromVramBank,
-  setPixelOnFrame,
-  getPixelOnFrame
+  setPixelOnFrame
 } from '../memory/memory';
 import {
   checkBitOnByte,

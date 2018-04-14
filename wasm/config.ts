@@ -13,6 +13,7 @@ export class Config {
 
   // Tile Rednering
   static tileRendering: boolean = false;
+  static tileCaching: boolean = false;
 }
 
 export function config(audioBatchProcessing: i32 = 0,
@@ -20,7 +21,8 @@ export function config(audioBatchProcessing: i32 = 0,
   timersBatchProcessing: i32 = 0,
   graphicsDisableScanlineRendering: i32 = 0,
   audioAccumulateSamples: i32 = 0,
-  tileRendering: i32 = 0): void {
+  tileRendering: i32 = 0,
+  tileCaching: i32 = 0): void {
 
   if(audioBatchProcessing > 0) {
     Config.audioBatchProcessing = true;
@@ -56,5 +58,11 @@ export function config(audioBatchProcessing: i32 = 0,
     Config.tileRendering = true;
   } else {
     Config.tileRendering = false;
+  }
+
+  if(tileCaching > 0) {
+    Config.tileCaching = true;
+  } else {
+    Config.tileCaching = false;
   }
 }
