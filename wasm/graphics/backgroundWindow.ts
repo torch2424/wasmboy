@@ -135,48 +135,11 @@ function drawBackgroundWindowScanline(scanlineRegister: u8, tileDataMemoryLocati
     // Now that we have our Tile Id, let's check our Tile Cache
     let usedTileCache: boolean = false;
     if(Config.tileCaching) {
-      // Check if the current tile matches our tileId
-      if(i > 8 && <i32>tileIdFromTileMap === TileCache.tileId && i === TileCache.nextXIndexToPerformCacheCheck) {
-        // Simply copy the last 8 pixels from memory to copy the line from the tile
-        let pixelsDrawn: i32 = 0;
-        for(let tileCacheIndex = 0; tileCacheIndex < 8; tileCacheIndex++) {
-          // First check for overflow
-          if(i + tileCacheIndex <= 160) {
-            // Get the pixel location in memory of the tile
-            let previousXPixel = i - (8 - tileCacheIndex);
-            let previousTilePixelLocation = Memory.frameInProgressVideoOutputLocation + getRgbPixelStart(i + tileCacheIndex, scanlineRegister);
-
-            // Cycle through the RGB
-            for (let tileCacheRgb = 0; tileCacheRgb < 3; tileCacheRgb++) {
-              setPixelOnFrame(i + tileCacheIndex, scanlineRegister, tileCacheRgb, load<u8>(previousTilePixelLocation + tileCacheRgb));
-            }
-
-            // Copy the priority for the pixel if needed
-            if(Cpu.GBCEnabled) {
-              let pixelPriority: u8 = getPriorityforPixel(previousXPixel, scanlineRegister);
-              addPriorityforPixel(i + tileCacheIndex, scanlineRegister, resetBitOnByte(2, pixelPriority), checkBitOnByte(2, pixelPriority));
-            }
-
-            pixelsDrawn++;
-          }
-        }
-        // Increment i by 7, not 8 because i will be incremented at end of for loop
-        if(pixelsDrawn > 0) {
-          i += (pixelsDrawn - 1);
-          usedTileCache = true;
-        }
-      } else {
-        // Save our current tile Id, and the next x value we should check the x index
-        TileCache.tileId = tileIdFromTileMap;
-      }
-
-      // Calculate when we should do the tileCache calculation again
-      if(i >= TileCache.nextXIndexToPerformCacheCheck) {
-        TileCache.nextXIndexToPerformCacheCheck = i + 8;
-        let xOffsetTileWidthRemainder: i32 = pixelXPositionInMap % 8;
-        if (i < xOffsetTileWidthRemainder) {
-          TileCache.nextXIndexToPerformCacheCheck += xOffsetTileWidthRemainder;
-        }
+      let pixelsDrawn: i32 = drawLineOfTileFromTileCache(i, scanlineRegister, pixelXPositionInMap, pixelYPositionInMap, tileMapAddress, tileDataMemoryLocation, tileIdFromTileMap);
+      // Increment i by 7, not 8 because i will be incremented at end of for loop
+      if(pixelsDrawn > 0) {
+        i += (pixelsDrawn - 1);
+        usedTileCache = true;
       }
     }
 
@@ -356,6 +319,54 @@ function drawColorPixelFromTileId(xPixel: i32, yPixel: u8, pixelXPositionInMap: 
   // Bits 0 & 1 will represent the color Id drawn by the BG/Window
   // Bit 2 will represent if the Bg/Window has GBC priority.
   addPriorityforPixel(xPixel, yPixel, paletteColorId, checkBitOnByte(7, bgMapAttributes));
+}
+
+// Function to attempt to draw the tile from the tile cache
+function drawLineOfTileFromTileCache(xPixel: i32, yPixel: u8, pixelXPositionInMap: i32, pixelYPositionInMap: u16, tileMapAddress: u16, tileDataMemoryLocation: u16, tileIdFromTileMap: u8): i32 {
+
+  // First, initialize how many pixels we have drawn
+  let pixelsDrawn: i32 = 0;
+
+  // Check if the current tile matches our tileId
+  // TODO: Allow the first line to use the tile cache, for some odd reason it doesn't work when scanline is 0
+  if(yPixel > 0 && xPixel > 8 && <i32>tileIdFromTileMap === TileCache.tileId && xPixel === TileCache.nextXIndexToPerformCacheCheck) {
+    // Simply copy the last 8 pixels from memory to copy the line from the tile
+    for(let tileCacheIndex = 0; tileCacheIndex < 8; tileCacheIndex++) {
+      // First check for overflow
+      if(xPixel + tileCacheIndex <= 160) {
+        // Get the pixel location in memory of the tile
+        let previousXPixel = xPixel - (8 - tileCacheIndex);
+        let previousTilePixelLocation = Memory.frameInProgressVideoOutputLocation + getRgbPixelStart(xPixel + tileCacheIndex, yPixel);
+
+        // Cycle through the RGB
+        for (let tileCacheRgb = 0; tileCacheRgb < 3; tileCacheRgb++) {
+          setPixelOnFrame(xPixel + tileCacheIndex, yPixel, tileCacheRgb, load<u8>(previousTilePixelLocation + tileCacheRgb));
+        }
+
+        // Copy the priority for the pixel if needed
+        if(Cpu.GBCEnabled) {
+          let pixelPriority: u8 = getPriorityforPixel(previousXPixel, yPixel);
+          addPriorityforPixel(xPixel + tileCacheIndex, yPixel, resetBitOnByte(2, pixelPriority), checkBitOnByte(2, pixelPriority));
+        }
+
+        pixelsDrawn++;
+      }
+    }
+  } else {
+    // Save our current tile Id, and the next x value we should check the x index
+    TileCache.tileId = tileIdFromTileMap;
+  }
+
+  // Calculate when we should do the tileCache calculation again
+  if(xPixel >= TileCache.nextXIndexToPerformCacheCheck) {
+    TileCache.nextXIndexToPerformCacheCheck = xPixel + 8;
+    let xOffsetTileWidthRemainder: i32 = pixelXPositionInMap % 8;
+    if (xPixel < xOffsetTileWidthRemainder) {
+      TileCache.nextXIndexToPerformCacheCheck += xOffsetTileWidthRemainder;
+    }
+  }
+
+  return pixelsDrawn;
 }
 
 // Function to draw a line of a tile in Color

@@ -14,24 +14,24 @@ This currently runs 1250 frames of each rom, and averages the results of 2 itera
 
  | Performance Option               | Time (milliseconds) |
 | -------------------------------- | ------------------- |
-| noPerformanceOptions             | 11020.1105          |
-| tileRendering                    | 10267.3595          |
-| tileCaching                      | 10202.6815          |
-| audioBatchProcessing             | 4912.7955           |
-| timersBatchProcessing            | 10275.867999999999  |
-| audioAccumulateSamples           | 9798.849999999999   |
-| graphicsBatchProcessing          | 8532.903            |
-| graphicsDisableScanlineRendering | 10191.3955          | 
+| noPerformanceOptions             | 10921.064           |
+| tileRendering                    | 10137.5725          |
+| tileCaching                      | 10203.5535          |
+| audioBatchProcessing             | 5113.0025000000005  |
+| timersBatchProcessing            | 10163.1235          |
+| audioAccumulateSamples           | 9624.607            |
+| graphicsBatchProcessing          | 8414.306            |
+| graphicsDisableScanlineRendering | 10157.933           | 
 
  ## tobutobugirl.gb 
 
  | Performance Option               | Time (milliseconds) |
 | -------------------------------- | ------------------- |
-| noPerformanceOptions             | 4853.4715           |
-| tileRendering                    | 5929.1435           |
-| tileCaching                      | 4742.4405           |
-| audioBatchProcessing             | 2876.304            |
-| timersBatchProcessing            | 4702.7195           |
-| audioAccumulateSamples           | 5094.6345           |
-| graphicsBatchProcessing          | 4246.211499999999   |
-| graphicsDisableScanlineRendering | 4866.633            | 
+| noPerformanceOptions             | 4996.906            |
+| tileRendering                    | 4875.8435           |
+| tileCaching                      | 4967.965            |
+| audioBatchProcessing             | 2993.6535           |
+| timersBatchProcessing            | 4840.7945           |
+| audioAccumulateSamples           | 5151.6645           |
+| graphicsBatchProcessing          | 4225.9325           |
+| graphicsDisableScanlineRendering | 4820.901            | 
