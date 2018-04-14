@@ -64,7 +64,7 @@
 
 **cpu_instrs**
 
-![Cpu Instructions all tests passing](./test/performance/testroms/blargg/cpu_instrs.golden.png)
+![Cpu Instructions all tests passing](./test/accuracy/testroms/blargg/cpu_instrs.golden.png)
 
 # Roadmap
 
