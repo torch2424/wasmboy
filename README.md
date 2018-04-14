@@ -14,18 +14,17 @@
 
 <!-- Generated with: https://github.com/ekalinin/github-markdown-toc -->
 # Table of Contents
-=================
 
-   * [Features](#features)
-   * [Example Gifs &amp; Screenshots](#example-gifs--screenshots)
-   * [Tests](#tests)
-         * [Blarrg](#blarrg)
-   * [Roadmap](#roadmap)
-   * [Contributing](#contributing)
-         * [CLI Commands / Npm Scripts](#cli-commands--npm-scripts)
-   * [Special Thanks](#special-thanks)
-   * [Random Tips for new Gameboy EmuDevs:](#random-tips-for-new-gameboy-emudevs)
-   * [Resources](#resources)
+* [Features](#features)
+* [Example Gifs &amp; Screenshots](#example-gifs--screenshots)
+* [Tests](#tests)
+     * [Blarrg](#blarrg)
+* [Roadmap](#roadmap)
+* [Contributing](#contributing)
+     * [CLI Commands / Npm Scripts](#cli-commands--npm-scripts)
+* [Special Thanks](#special-thanks)
+* [Random Tips for new Gameboy EmuDevs:](#random-tips-for-new-gameboy-emudevs)
+* [Resources](#resources)
 
 # Features
 
