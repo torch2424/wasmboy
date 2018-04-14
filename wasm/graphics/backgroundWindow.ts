@@ -137,7 +137,6 @@ function drawBackgroundWindowScanline(scanlineRegister: u8, tileDataMemoryLocati
     if(Config.tileCaching) {
       // Check if the current tile matches our tileId
       if(i > 8 && <i32>tileIdFromTileMap === TileCache.tileId && i === TileCache.nextXIndexToPerformCacheCheck) {
-        hexLog(15);
         // Simply copy the last 8 pixels from memory to copy the line from the tile
         let pixelsDrawn: i32 = 0;
         for(let tileCacheIndex = 0; tileCacheIndex < 8; tileCacheIndex++) {
