@@ -43,7 +43,7 @@ For now I would watch the video posted at the top of the readme :)
 
 **cpu_instrs**
 
-![Cpu Instructions all tests passing](./test/testroms/blargg/cpu_instrs.golden.png)
+![Cpu Instructions all tests passing](./test/performance/testroms/blargg/cpu_instrs.golden.png)
 
 # Roadmap
 
@@ -152,3 +152,5 @@ Using the [gh-pages](https://www.npmjs.com/package/gh-pages) for debugger/demo d
 * [Google Material Icons](https://material.io/icons/)
 
 * [The Cycle Accurate Game Boy Docs](https://github.com/AntonioND/giibiiadvance/blob/master/docs/TCAGBD.pdf)
+
+* [Demos for perf testing GB/GBC](http://privat.bahnhof.se/wb800787/gb/demos/)

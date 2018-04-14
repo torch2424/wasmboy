@@ -14,6 +14,9 @@ import {
   clearPriorityMap
 } from './priority';
 import {
+  resetTileCache
+} from './tiles';
+import {
   Cpu
 } from '../cpu/cpu'
 import {
@@ -180,6 +183,9 @@ export function updateGraphics(numberOfCycles: i32): void {
 
         // Clear the priority map
         clearPriorityMap();
+
+        // Reset the tile cache
+        resetTileCache();
       } else if (scanlineRegister < 144) {
         // Draw the scanline
         if (!Config.graphicsDisableScanlineRendering) {

@@ -3,19 +3,20 @@
 
 # Ignore game files
 *.gb
-!test/testroms/**/*.gb
+!test/**/*.gb
 *.gbc
-!test/testroms/**/*.gbc
+!test/**/*.gbc
 *.sav
 *.rtc
 *.sym
 *.sn1
 
 # Ignore test files
-test/testroms/**/*.output
-test/testroms/**/*.png
-!test/testroms/**/*.golden.output
-!test/testroms/**/*.golden.png
+test/accuracy/testroms/**/*.output
+test/accuracy/testroms/**/*.png
+!test/accuracy/testroms/**/*.golden.output
+!test/accuracy/testroms/**/*.golden.png
+test/performance/testroms/**/*.png
 
 # Ignore build output
 dist/

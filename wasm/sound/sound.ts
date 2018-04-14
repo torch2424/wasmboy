@@ -23,7 +23,8 @@ import {
 } from './channel4';
 import {
   isChannelEnabledOnLeftOutput,
-  isChannelEnabledOnRightOutput
+  isChannelEnabledOnRightOutput,
+  isChannelDacEnabled
 } from './registers';
 import {
   Cpu
@@ -139,10 +140,17 @@ export class SoundAccumulator {
   static channel2Sample: i32 = 15;
   static channel3Sample: i32 = 15;
   static channel4Sample: i32 = 15;
+  static channel1DacEnabled: boolean = false;
+  static channel2DacEnabled: boolean = false;
+  static channel3DacEnabled: boolean = false;
+  static channel4DacEnabled: boolean = false;
   static leftChannelSampleUnsignedByte: u8 = 127;
   static rightChannelSampleUnsignedByte: u8 = 127;
   static mixerVolumeChanged: boolean = false;
   static mixerEnabledChanged: boolean = false;
+
+  //If a channel was updated, need to also track if we need to need to mix them again
+  static needToRemixSamples: boolean = false;
 }
 
 // Initialize sound registers
@@ -247,10 +255,10 @@ function calculateSound(numberOfCycles: i32): void {
 function accumulateSound(numberOfCycles: i32): void {
 
   // Check if any of the individual channels will update
-  let channel1WillUpdate: boolean = Channel1.willChannelUpdate(numberOfCycles);
-  let channel2WillUpdate: boolean = Channel2.willChannelUpdate(numberOfCycles);
-  let channel3WillUpdate: boolean = Channel3.willChannelUpdate(numberOfCycles);
-  let channel4WillUpdate: boolean = Channel4.willChannelUpdate(numberOfCycles);
+  let channel1WillUpdate: boolean = Channel1.willChannelUpdate(numberOfCycles) || didChannelDacChange(Channel1.channelNumber);
+  let channel2WillUpdate: boolean = Channel2.willChannelUpdate(numberOfCycles) || didChannelDacChange(Channel2.channelNumber);
+  let channel3WillUpdate: boolean = Channel3.willChannelUpdate(numberOfCycles) || didChannelDacChange(Channel3.channelNumber);
+  let channel4WillUpdate: boolean = Channel4.willChannelUpdate(numberOfCycles) || didChannelDacChange(Channel4.channelNumber);
 
   if (channel1WillUpdate) {
     SoundAccumulator.channel1Sample = Channel1.getSampleFromCycleCounter();
@@ -270,7 +278,7 @@ function accumulateSound(numberOfCycles: i32): void {
     channel2WillUpdate ||
     channel3WillUpdate ||
     channel4WillUpdate) {
-    mixChannelSamples(SoundAccumulator.channel1Sample, SoundAccumulator.channel2Sample, SoundAccumulator.channel3Sample, SoundAccumulator.channel4Sample);
+    SoundAccumulator.needToRemixSamples = true;
   }
 
   // Do Some downsampling magic
@@ -281,7 +289,8 @@ function accumulateSound(numberOfCycles: i32): void {
     // Don't set to zero to catch overflowed cycles
     Sound.downSampleCycleCounter -= Sound.maxDownSampleCycles();
 
-    if (SoundAccumulator.mixerVolumeChanged ||
+    if (SoundAccumulator.needToRemixSamples ||
+      SoundAccumulator.mixerVolumeChanged ||
       SoundAccumulator.mixerEnabledChanged) {
       mixChannelSamples(SoundAccumulator.channel1Sample, SoundAccumulator.channel2Sample, SoundAccumulator.channel3Sample, SoundAccumulator.channel4Sample);
     }
@@ -299,6 +308,37 @@ function accumulateSound(numberOfCycles: i32): void {
       Sound.audioQueueIndex -= 1;
     }
   }
+}
+
+// Function used by SoundAccumulator to find out if a channel Dac Changed
+function didChannelDacChange(channelNumber: i32): boolean {
+  switch(channelNumber) {
+    case Channel1.channelNumber:
+      if(SoundAccumulator.channel1DacEnabled !== isChannelDacEnabled(Channel1.channelNumber)) {
+        SoundAccumulator.channel1DacEnabled = isChannelDacEnabled(Channel1.channelNumber);
+        return true;
+      }
+      return false;
+    case Channel2.channelNumber:
+      if(SoundAccumulator.channel2DacEnabled !== isChannelDacEnabled(Channel2.channelNumber)) {
+        SoundAccumulator.channel2DacEnabled = isChannelDacEnabled(Channel2.channelNumber);
+        return true;
+      }
+      return false;
+    case Channel3.channelNumber:
+      if(SoundAccumulator.channel3DacEnabled !== isChannelDacEnabled(Channel3.channelNumber)) {
+        SoundAccumulator.channel3DacEnabled = isChannelDacEnabled(Channel3.channelNumber);
+        return true;
+      }
+      return false;
+    case Channel4.channelNumber:
+      if(SoundAccumulator.channel4DacEnabled !== isChannelDacEnabled(Channel4.channelNumber)) {
+        SoundAccumulator.channel4DacEnabled = isChannelDacEnabled(Channel4.channelNumber);
+        return true;
+      }
+      return false;
+  }
+  return false;
 }
 
 function updateFrameSequencer(numberOfCycles: i32): boolean {
@@ -453,7 +493,9 @@ function mixChannelSamples(channel1Sample: i32 = 15, channel2Sample: i32 = 15, c
     rightChannelSample += 15;
   }
 
+  // Update our accumulator
   SoundAccumulator.mixerEnabledChanged = false;
+  SoundAccumulator.needToRemixSamples = false;
 
   // Finally multiply our volumes by the mixer volume
   // Mixer volume can be at most 7 + 1

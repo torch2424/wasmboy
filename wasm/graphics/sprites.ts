@@ -24,8 +24,7 @@ import {
 } from '../memory/load';
 import {
   loadFromVramBank,
-  setPixelOnFrame,
-  getPixelOnFrame
+  setPixelOnFrame
 } from '../memory/memory';
 import {
   checkBitOnByte,
@@ -48,7 +47,6 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
     let spriteYPosition: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex);
     let spriteXPosition: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 1);
     let spriteTileId: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 2);
-    let spriteAttributes: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 3);
 
     // Pan docs of sprite attirbute table
     // Bit7   OBJ-to-BG Priority (0=OBJ Above BG, 1=OBJ Behind BG color 1-3)
@@ -62,13 +60,6 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
     // Apply sprite X and Y offset
     spriteYPosition -= 16;
     spriteXPosition -= 8;
-
-    // Check sprite Priority
-    let isSpritePriorityBehindWindowAndBackground: boolean = checkBitOnByte(7, spriteAttributes);
-
-    // Check if we should flip the sprite on the x or y axis
-    let flipSpriteY: boolean = checkBitOnByte(6, spriteAttributes);
-    let flipSpriteX: boolean = checkBitOnByte(5, spriteAttributes);
 
     // Find our sprite height
     let spriteHeight: u8 = 8;
@@ -88,6 +79,17 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
     // Find if our sprite is on the current scanline
     if(scanlineRegister >= spriteYPosition && scanlineRegister < (spriteYPosition + spriteHeight)) {
       // Then we need to draw the current sprite
+
+      // Get our sprite attributes since we know we shall be drawing the tile
+      let spriteAttributes: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 3);
+
+
+      // Check sprite Priority
+      let isSpritePriorityBehindWindowAndBackground: boolean = checkBitOnByte(7, spriteAttributes);
+
+      // Check if we should flip the sprite on the x or y axis
+      let flipSpriteY: boolean = checkBitOnByte(6, spriteAttributes);
+      let flipSpriteX: boolean = checkBitOnByte(5, spriteAttributes);
 
       // Find which line on the sprite we are on
       let currentSpriteLine: i16 = scanlineRegister - spriteYPosition;
@@ -147,30 +149,33 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
           // Find our actual X pixel location on the gameboy "camera" view
           let spriteXPixelLocationInCameraView: u8 = spriteXPosition + (7 - <u8>tilePixel);
 
-          // Now that we have our coordinates, check for sprite priority
-          // Lets get the priority byte we put in memory
-          let bgPriorityByte: u8 = getPriorityforPixel(spriteXPixelLocationInCameraView, scanlineRegister);
-
           // There are two cases where wouldnt draw the pixel on top of the Bg/window
           // 1. if isSpritePriorityBehindWindowAndBackground, sprite can only draw over color 0
           // 2. if bit 2 of our priority is set, then BG-to-OAM Priority from pandoc
           //  is active, meaning BG tile will have priority above all OBJs
           //  (regardless of the priority bits in OAM memory)
           // But if GBC and Bit 0 of LCDC is set, we always draw the object
-
-          let shouldHideFromOamPriority: boolean = false;
-          if(isSpritePriorityBehindWindowAndBackground && (bgPriorityByte & 0x03) > 0) {
-            shouldHideFromOamPriority = true;
-          }
-
-          let shouldHideFromBgPriority: boolean = false;
-          if(Cpu.GBCEnabled && checkBitOnByte(2, bgPriorityByte)) {
-            shouldHideFromBgPriority = true;
-          }
-
           let shouldShowFromLcdcPriority: boolean = false;
+          let shouldHideFromOamPriority: boolean = false;
+          let shouldHideFromBgPriority: boolean = false;
+          // LCDC Priority
           if(Cpu.GBCEnabled && !checkBitOnByte(0, eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationLcdControl))) {
             shouldShowFromLcdcPriority = true;
+          }
+
+          if(!shouldShowFromLcdcPriority) {
+            // Now that we have our coordinates, check for sprite priority
+            // Lets get the priority byte we put in memory
+            let bgPriorityByte: u8 = getPriorityforPixel(spriteXPixelLocationInCameraView, scanlineRegister);
+
+            // Doing an else if, since either will automatically stop drawing the pixel
+            if(isSpritePriorityBehindWindowAndBackground && (bgPriorityByte & 0x03) > 0) {
+              // OAM Priority
+              shouldHideFromOamPriority = true;
+            } else if(Cpu.GBCEnabled && checkBitOnByte(2, bgPriorityByte)) {
+              // Bg priority
+              shouldHideFromBgPriority = true;
+            }
           }
 
           if (shouldShowFromLcdcPriority || (!shouldHideFromOamPriority && !shouldHideFromBgPriority)) {

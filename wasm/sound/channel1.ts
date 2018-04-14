@@ -233,8 +233,8 @@ export class Channel1 {
     //Increment our cycle counter
     Channel1.cycleCounter += numberOfCycles;
 
-    if (Channel1.frequencyTimer - Channel1.cycleCounter > 0 &&
-      isChannelDacEnabled(Channel1.channelNumber)) {
+    // Dac enabled status cached by accumulator
+    if (Channel1.frequencyTimer - Channel1.cycleCounter > 0) {
       return false;
     }
 

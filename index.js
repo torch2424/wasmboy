@@ -7,11 +7,13 @@ const wasmBoyOptions = {
 	isGbcEnabled: true,
 	isAudioEnabled: true,
 	frameSkip: 1,
-	audioBatchProcessing: true,
+	audioBatchProcessing: false,
 	timersBatchProcessing: false,
 	audioAccumulateSamples: true,
 	graphicsBatchProcessing: false,
 	graphicsDisableScanlineRendering: false,
+	tileRendering: false,
+	tileCaching: false,
 	gameboySpeed: 1.0
 };
 
@@ -53,7 +55,7 @@ export default class App extends Component {
 		WasmBoyController.addTouchInput('SELECT', selectElement, 'BUTTON');
 
 		//WasmBoy.loadGame('./test/testroms/blargg/cpu_instrs.gb')
-		WasmBoy.loadGame('./games/pokemoncrystal.gbc')
+		WasmBoy.loadGame('./games/shantae.gbc')
 		.then(() => {
 			console.log('Wasmboy Ready!');
 		}).catch((error) => {
