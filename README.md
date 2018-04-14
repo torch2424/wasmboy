@@ -32,6 +32,7 @@
 * Emulates the Gameboy / Gameboy Color 🎮👾🕹️
 * Outputs graphics to a scalable / responsive HTML5 canvas 🖼️, and audio through the Web Audio API 🔊
 * Support for In-game saves, and save states 💾
+* Configurable options to increase performance for low end devices 🔥
 * Importable into other projects as a dependency ♻️
 * Built with Web Assembly 🕸️
 * Keyboard and gamepad input support using [responsive gamepad](https://www.npmjs.com/package/responsive-gamepad) ⌨️ 🎮
@@ -43,11 +44,11 @@
 
 **Gameboy Support**
 
-![Is that a demo in your pocket](./docs/images/wasmBoyIsThatADemoInYourPocket.png) ![Megaman 2](./docs/images/wasmBoyMegaman2.png) ![Pokemon Blue](./docs/images/wasmBoyPokemonBlue.png) ![tetris](./docs/images/wasmBoyTetris.png)
+![Is that a demo in your pocket](./docs/images/wasmBoyIsThatADemoInYourPocket.png) ![Megaman 2](./docs/images/wasmBoyMegaman2.png) ![Pokemon Blue](./docs/images/wasmBoyPokemonBlue.png) ![tetris](./docs/images/wasmBoyTetris.png) ![tobu tobu girl](./test/performance/testroms/tobutobugirl/tobutobugirl.gb.noPerformanceOptions.png)
 
 **Gameboy Color Support**
 
-![Links Awakening](./docs/images/wasmBoyLinksAwakening.png) ![L s d j](./docs/images/wasmBoyLsdj.png) ![Megaman extreme 2](./docs/images/wasmBoyMegamanXtreme2.png) ![Pokemon Silver](./docs/images/wasmBoyPokemonSilver.png) ![Pokemon Yellow](./docs/images/wasmBoyPokemonYellow.png)
+![Links Awakening](./docs/images/wasmBoyLinksAwakening.png) ![L s d j](./docs/images/wasmBoyLsdj.png) ![Megaman extreme 2](./docs/images/wasmBoyMegamanXtreme2.png) ![Pokemon Silver](./docs/images/wasmBoyPokemonSilver.png) ![Pokemon Yellow](./docs/images/wasmBoyPokemonYellow.png) ![back to color demo](./test/performance/testroms/back-to-color/back-to-color.gbc.noPerformanceOptions.png)
 
 **Save States**
 
