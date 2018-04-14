@@ -115,13 +115,16 @@ export function drawPixelsFromLineOfTile(tileId: u8, tileDataMemoryLocation: u16
       store<u8>(wasmMemoryStart + pixelStart + 1, green);
       store<u8>(wasmMemoryStart + pixelStart + 2, blue);
 
+      let gbcBgPriority: boolean = false;
       if(bgMapAttributesForPriorityMap >= 0) {
-        // Lastly, add the pixel to our background priority map
-        // https://github.com/torch2424/wasmBoy/issues/51
-        // Bits 0 & 1 will represent the color Id drawn by the BG/Window
-        // Bit 2 will represent if the Bg/Window has GBC priority.
-        addPriorityforPixel(iteratedOutputX, outputLineY, paletteColorId, checkBitOnByte(7, <u8>bgMapAttributesForPriorityMap));
+        gbcBgPriority = checkBitOnByte(7, <u8>bgMapAttributesForPriorityMap);
       }
+
+      // Lastly, add the pixel to our background priority map
+      // https://github.com/torch2424/wasmBoy/issues/51
+      // Bits 0 & 1 will represent the color Id drawn by the BG/Window
+      // Bit 2 will represent if the Bg/Window has GBC priority.
+      addPriorityforPixel(iteratedOutputX, outputLineY, paletteColorId, gbcBgPriority);
 
       pixelsDrawn++;
     }

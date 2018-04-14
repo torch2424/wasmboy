@@ -343,11 +343,9 @@ function drawLineOfTileFromTileCache(xPixel: i32, yPixel: u8, pixelXPositionInMa
           setPixelOnFrame(xPixel + tileCacheIndex, yPixel, tileCacheRgb, load<u8>(previousTilePixelLocation + tileCacheRgb));
         }
 
-        // Copy the priority for the pixel if needed
-        if(Cpu.GBCEnabled) {
-          let pixelPriority: u8 = getPriorityforPixel(previousXPixel, yPixel);
-          addPriorityforPixel(xPixel + tileCacheIndex, yPixel, resetBitOnByte(2, pixelPriority), checkBitOnByte(2, pixelPriority));
-        }
+        // Copy the priority for the pixel
+        let pixelPriority: u8 = getPriorityforPixel(previousXPixel, yPixel);
+        addPriorityforPixel(xPixel + tileCacheIndex, yPixel, resetBitOnByte(2, pixelPriority), checkBitOnByte(2, pixelPriority));
 
         pixelsDrawn++;
       }
