@@ -23,7 +23,7 @@
 * [Contributing](#contributing)
      * [CLI Commands / Npm Scripts](#cli-commands--npm-scripts)
 * [Special Thanks](#special-thanks)
-* [Random Tips for new Gameboy EmuDevs:](#random-tips-for-new-gameboy-emudevs)
+* [Random Tips for new Gameboy EmuDevs](#random-tips-for-new-gameboy-emudevs)
 * [Resources](#resources)
 
 # Features
@@ -42,7 +42,7 @@
 
 **Gameboy Support**
 
-![Is that a demo in your pocket](./docs/images/wasmBoyIsThatADemoInYourPocket.png) ![Megaman 2](./docs/images/Megaman2.png) ![Pokemon Blue](./docs/images/wasmBoyPokemonBlue.png) ![tetris](./docs/images/wasmBoyTetris.png)
+![Is that a demo in your pocket](./docs/images/wasmBoyIsThatADemoInYourPocket.png) ![Megaman 2](./docs/images/wasmBoyMegaman2.png) ![Pokemon Blue](./docs/images/wasmBoyPokemonBlue.png) ![tetris](./docs/images/wasmBoyTetris.png)
 
 **Gameboy Color Support**
 
@@ -143,7 +143,7 @@ Using the [gh-pages](https://www.npmjs.com/package/gh-pages) for debugger/demo d
 
 * [r/emudev](https://www.reddit.com/r/EmuDev/), especially to [binjimint](https://www.reddit.com/r/EmuDev/comments/7y2bux/gameboy_gb_graphical_bugs_game_writes_zeroes_into/dudlj3w/) for helping me sooooo much!
 
-# Random Tips for new Gameboy EmuDevs:
+# Random Tips for new Gameboy EmuDevs
 
 * It's better to code an emulator by abstracting assembly commands into functions, rather than by Opcode operation
 
