@@ -3,6 +3,15 @@ import { Component } from 'preact';
 import { WasmBoy, WasmBoyGraphics, WasmBoyAudio, WasmBoyController, WasmBoyMemory } from './lib/wasmboy.js';
 import { WasmBoyDebugger, WasmBoySystemControls } from './debugger/index';
 
+// Old Perf Options
+// WasmBoy.initialize(canvasElement, {
+// 	frameSkip: 1,
+// 	audioBatchProcessing: true,
+// 	timersBatchProcessing: true,
+// 	audioAccumulateSamples: true,
+// 	graphicsDisableScanlineRendering: true
+// });
+
 const wasmBoyOptions = {
 	isGbcEnabled: false,
 	isAudioEnabled: true,
