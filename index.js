@@ -4,16 +4,16 @@ import { WasmBoy, WasmBoyGraphics, WasmBoyAudio, WasmBoyController, WasmBoyMemor
 import { WasmBoyDebugger, WasmBoySystemControls } from './debugger/index';
 
 const wasmBoyOptions = {
-	isGbcEnabled: true,
+	isGbcEnabled: false,
 	isAudioEnabled: true,
 	frameSkip: 1,
-	audioBatchProcessing: false,
-	timersBatchProcessing: false,
+	audioBatchProcessing: true,
+	timersBatchProcessing: true,
 	audioAccumulateSamples: true,
-	graphicsBatchProcessing: false,
-	graphicsDisableScanlineRendering: false,
+	graphicsBatchProcessing: true,
+	graphicsDisableScanlineRendering: true,
 	tileRendering: false,
-	tileCaching: false,
+	tileCaching: true,
 	gameboySpeed: 1.0
 };
 
@@ -55,7 +55,7 @@ export default class App extends Component {
 		WasmBoyController.addTouchInput('SELECT', selectElement, 'BUTTON');
 
 		//WasmBoy.loadGame('./test/testroms/blargg/cpu_instrs.gb')
-		WasmBoy.loadGame('./games/shantae.gbc')
+		WasmBoy.loadGame('./games/linksawakening.gb')
 		.then(() => {
 			console.log('Wasmboy Ready!');
 		}).catch((error) => {
