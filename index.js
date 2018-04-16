@@ -3,17 +3,26 @@ import { Component } from 'preact';
 import { WasmBoy, WasmBoyGraphics, WasmBoyAudio, WasmBoyController, WasmBoyMemory } from './lib/wasmboy.js';
 import { WasmBoyDebugger, WasmBoySystemControls } from './debugger/index';
 
+// Old Perf Options
+// WasmBoy.initialize(canvasElement, {
+// 	frameSkip: 1,
+// 	audioBatchProcessing: true,
+// 	timersBatchProcessing: true,
+// 	audioAccumulateSamples: true,
+// 	graphicsDisableScanlineRendering: true
+// });
+
 const wasmBoyOptions = {
-	isGbcEnabled: true,
+	isGbcEnabled: false,
 	isAudioEnabled: true,
 	frameSkip: 1,
-	audioBatchProcessing: false,
+	audioBatchProcessing: true,
 	timersBatchProcessing: false,
 	audioAccumulateSamples: true,
 	graphicsBatchProcessing: false,
 	graphicsDisableScanlineRendering: false,
-	tileRendering: false,
-	tileCaching: false,
+	tileRendering: true,
+	tileCaching: true,
 	gameboySpeed: 1.0
 };
 
@@ -55,7 +64,7 @@ export default class App extends Component {
 		WasmBoyController.addTouchInput('SELECT', selectElement, 'BUTTON');
 
 		//WasmBoy.loadGame('./test/testroms/blargg/cpu_instrs.gb')
-		WasmBoy.loadGame('./games/shantae.gbc')
+		WasmBoy.loadGame('./games/linksawakening.gb')
 		.then(() => {
 			console.log('Wasmboy Ready!');
 		}).catch((error) => {

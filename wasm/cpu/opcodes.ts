@@ -83,33 +83,27 @@ import {
 // 2 = replace boot rom
 export function update(): i32 {
 
-  // Get our config settings
-  let audioBatchProcessing: boolean = Config.audioBatchProcessing;
-  let graphicsBatchProcessing: boolean = Config.graphicsBatchProcessing;
-  let timersBatchProcessing: boolean = Config.timersBatchProcessing;
-
-
   let error: boolean = false;
   let numberOfCycles: i32 = -1;
 
   while(!error &&
     Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME()) {
-    numberOfCycles = emulationStep(audioBatchProcessing, graphicsBatchProcessing, timersBatchProcessing);
+    numberOfCycles = emulationStep();
     if (numberOfCycles >= 0) {
       Cpu.currentCycles += numberOfCycles;
 
-      if(audioBatchProcessing) {
+      if(Config.audioBatchProcessing) {
         Sound.currentCycles += numberOfCycles;
       }
 
-      if (graphicsBatchProcessing) {
+      if (Config.graphicsBatchProcessing) {
         // Need to do this, since a lot of things depend on the scanline
         // Batch processing will simply return if the number of cycles is too low
         Graphics.currentCycles += numberOfCycles;
         batchProcessGraphics();
       }
 
-      if (timersBatchProcessing) {
+      if (Config.timersBatchProcessing) {
         // Batch processing will simply return if the number of cycles is too low
         Timers.currentCycles += numberOfCycles;
         batchProcessTimers();
@@ -137,9 +131,7 @@ export function update(): i32 {
 
 // Function to execute an opcode, and update other gameboy hardware.
 // http://www.codeslinger.co.uk/pages/projects/gameboy/beginning.html
-export function emulationStep(audioBatchProcessing: boolean = false,
-  graphicsBatchProcessing: boolean = false,
-  timersBatchProcessing: boolean = false): i32 {
+export function emulationStep(): i32 {
   // Get the opcode, and additional bytes to be handled
   // Number of cycles defaults to 4, because while we're halted, we run 4 cycles (according to matt :))
   let numberOfCycles: i32 = 4;
@@ -191,17 +183,17 @@ export function emulationStep(audioBatchProcessing: boolean = false,
   numberOfCycles += checkInterrupts();
 
   if(!Cpu.isStopped) {
-    if(!graphicsBatchProcessing) {
+    if(!Config.graphicsBatchProcessing) {
       updateGraphics(numberOfCycles);
     }
 
-    if(!audioBatchProcessing) {
+    if(!Config.audioBatchProcessing) {
       updateSound(numberOfCycles);
     }
   }
 
   // Check other Gameboy components
-  if (!timersBatchProcessing) {
+  if (!Config.timersBatchProcessing) {
     updateTimers(numberOfCycles);
   }
 

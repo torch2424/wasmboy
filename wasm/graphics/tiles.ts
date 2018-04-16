@@ -45,7 +45,7 @@ export function resetTileCache(): void {
   TileCache.nextXIndexToPerformCacheCheck = - 1;
 }
 
-export function drawPixelsFromLineOfTile(tileId: u8, tileDataMemoryLocation: u16, vramBankId: i32, tileLineXStart: i32, tileLineXEnd: i32, tileLineY: u16, outputLineX: i32, outputLineY: u16, outputWidth: i32, wasmMemoryStart: u32, paletteLocation: u16 = 0, paletteIndexByte: i32 = -1, bgMapAttributesForPriorityMap: i32 = -1): i32 {
+export function drawPixelsFromLineOfTile(tileId: u8, tileDataMemoryLocation: u16, vramBankId: i32, tileLineXStart: i32, tileLineXEnd: i32, tileLineY: u16, outputLineX: i32, outputLineY: u16, outputWidth: i32, wasmMemoryStart: u32, shouldRepresentMonochromeColorByColorId: boolean = false, paletteLocation: u16 = 0, paletteIndexByte: i32 = -1, bgMapAttributesForPriorityMap: i32 = -1): i32 {
 
   // Get our number of pixels drawn
   let pixelsDrawn: i32 = 0;
@@ -93,7 +93,7 @@ export function drawPixelsFromLineOfTile(tileId: u8, tileDataMemoryLocation: u16
         if (paletteLocation <= 0) {
           paletteLocation = Graphics.memoryLocationBackgroundPalette;
         }
-        let monochromeColor: u8 = getMonochromeColorFromPalette(paletteColorId, paletteLocation, true);
+        let monochromeColor: u8 = getMonochromeColorFromPalette(paletteColorId, paletteLocation, shouldRepresentMonochromeColorByColorId);
         red = monochromeColor;
         green = monochromeColor;
         blue = monochromeColor;
