@@ -59,7 +59,7 @@ export function checkInterrupts(): i32 {
     let interruptRequest = eightBitLoadFromGBMemorySkipTraps(Interrupts.memoryLocationInterruptRequest);
     let interruptEnabled = eightBitLoadFromGBMemorySkipTraps(Interrupts.memoryLocationInterruptEnabled);
 
-    if(interruptRequest > 0) {
+    if(interruptRequest > 0 && interruptEnabled > 0) {
 
       // Check our interrupts
       if (checkBitOnByte(Interrupts.bitPositionVBlankInterrupt, interruptRequest) &&
