@@ -19,10 +19,10 @@ const wasmBoyOptions = {
 	audioBatchProcessing: true,
 	timersBatchProcessing: true,
 	audioAccumulateSamples: true,
-	graphicsBatchProcessing: false,
+	graphicsBatchProcessing: true,
 	graphicsDisableScanlineRendering: true,
 	tileRendering: false,
-	tileCaching: false,
+	tileCaching: true,
 	gameboySpeed: 1.0
 };
 
