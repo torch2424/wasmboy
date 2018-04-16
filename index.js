@@ -17,10 +17,10 @@ const wasmBoyOptions = {
 	isAudioEnabled: true,
 	frameSkip: 1,
 	audioBatchProcessing: true,
-	timersBatchProcessing: true,
+	timersBatchProcessing: false,
 	audioAccumulateSamples: true,
-	graphicsBatchProcessing: true,
-	graphicsDisableScanlineRendering: true,
+	graphicsBatchProcessing: false,
+	graphicsDisableScanlineRendering: false,
 	tileRendering: false,
 	tileCaching: true,
 	gameboySpeed: 1.0
