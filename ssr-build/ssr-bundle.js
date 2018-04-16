@@ -4031,10 +4031,10 @@ var index_wasmBoyOptions = {
 	isAudioEnabled: true,
 	frameSkip: 1,
 	audioBatchProcessing: true,
-	timersBatchProcessing: false,
+	timersBatchProcessing: true,
 	audioAccumulateSamples: true,
-	graphicsBatchProcessing: false,
-	graphicsDisableScanlineRendering: false,
+	graphicsBatchProcessing: true,
+	graphicsDisableScanlineRendering: true,
 	tileRendering: false,
 	tileCaching: true,
 	gameboySpeed: 1.0
