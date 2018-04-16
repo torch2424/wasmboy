@@ -13,7 +13,7 @@ import { WasmBoyDebugger, WasmBoySystemControls } from './debugger/index';
 // });
 
 const wasmBoyOptions = {
-	isGbcEnabled: false,
+	isGbcEnabled: true,
 	isAudioEnabled: true,
 	frameSkip: 1,
 	audioBatchProcessing: true,
@@ -21,7 +21,7 @@ const wasmBoyOptions = {
 	audioAccumulateSamples: true,
 	graphicsBatchProcessing: false,
 	graphicsDisableScanlineRendering: false,
-	tileRendering: true,
+	tileRendering: false,
 	tileCaching: true,
 	gameboySpeed: 1.0
 };
