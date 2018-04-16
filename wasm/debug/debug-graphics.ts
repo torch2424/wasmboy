@@ -227,7 +227,7 @@ export function drawTileDataToWasmMemory(): void {
 
       // Draw each Y line of the tile
       for(let tileLineY: u16 = 0; tileLineY < 8; tileLineY++) {
-        drawPixelsFromLineOfTile(tileId, tileDataMemoryLocation, vramBankId, 0, 7, tileLineY, (tileDataMapGridX * 8), (tileDataMapGridY * 8) + <u8>tileLineY, (0x1F * 8), tileDataMap)
+        drawPixelsFromLineOfTile(tileId, tileDataMemoryLocation, vramBankId, 0, 7, tileLineY, (tileDataMapGridX * 8), (tileDataMapGridY * 8) + <u8>tileLineY, (0x1F * 8), tileDataMap, true)
       }
     }
   }

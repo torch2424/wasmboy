@@ -401,5 +401,5 @@ function drawLineOfTileFromTileId(xPixel: i32, yPixel: u8, pixelXPositionInMap: 
   }
 
   // Return the number of pixels drawn
-  return drawPixelsFromLineOfTile(tileIdFromTileMap, tileDataMemoryLocation, vramBankId, tileXStart, tileXEnd, tileLineY, xPixel, yPixel, 160, Memory.frameInProgressVideoOutputLocation, 0, bgPalette, bgMapAttributes);
+  return drawPixelsFromLineOfTile(tileIdFromTileMap, tileDataMemoryLocation, vramBankId, tileXStart, tileXEnd, tileLineY, xPixel, yPixel, 160, Memory.frameInProgressVideoOutputLocation, false, 0, bgPalette, bgMapAttributes);
 }
