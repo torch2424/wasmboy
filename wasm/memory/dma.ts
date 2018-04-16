@@ -140,7 +140,14 @@ export function updateHblankHdma(): void {
 function hdmaTransfer(hdmaSource: u16, hdmaDestination: u16, transferLength: i32): void {
   for(let i: u16 = 0; i < <u16>transferLength; i++) {
     let sourceByte: u8 = eightBitLoadFromGBMemory(hdmaSource + i);
-    eightBitStoreIntoGBMemory(hdmaDestination + i, sourceByte);
+    // get the hdmaDestination with wrapping
+    // See issue #61: https://github.com/torch2424/wasmBoy/issues/61
+    let hdmaDestinationWithWrapping = hdmaDestination + i;
+    if (hdmaDestinationWithWrapping > 0x9FFF) {
+      hdmaDestinationWithWrapping = Memory.videoRamLocation + (hdmaDestinationWithWrapping - 0x9FFF - 1);
+      hexLog(hdmaSource, hdmaDestination, transferLength, hdmaDestination + i, hdmaDestinationWithWrapping)
+    }
+    eightBitStoreIntoGBMemory(hdmaDestinationWithWrapping, sourceByte);
   }
 
   // Set our Cycles used for the HDMA
