@@ -50,18 +50,16 @@ export function startHdmaTransfer(hdmaTriggerByteToBeWritten: u8): void {
 
   // Check if we are trying to terminate an already active HBLANK HDMA
   if (Memory.isHblankHdmaActive && !checkBitOnByte(7, hdmaTriggerByteToBeWritten)) {
+    // Don't reset anything, just set bit 7 to 1 on the trigger byte
     Memory.isHblankHdmaActive = false;
-    Memory.hblankHdmaIndex = 0x00;
-    Memory.hblankHdmaTotalBytes = 0x00;
-    Memory.hblankHdmaSource = 0x00;
-    Memory.hblankHdmaDestination = 0x00;
-    eightBitStoreIntoGBMemorySkipTraps(Memory.memoryLocationHdmaTrigger, 0xFF);
+    let hdmaTriggerByte = eightBitLoadFromGBMemorySkipTraps(Memory.memoryLocationHdmaTrigger);
+    eightBitStoreIntoGBMemorySkipTraps(Memory.memoryLocationHdmaTrigger, setBitOnByte(7, hdmaTriggerByte));
     return;
   }
 
   // Get our source and destination for the HDMA
-  let hdmaSource: u16 = getHdmaSource();
-  let hdmaDestination: u16 = getHdmaDestination();
+  let hdmaSource: u16 = getHdmaSourceFromMemory();
+  let hdmaDestination: u16 = getHdmaDestinationFromMemory();
 
   // Get the length from the trigger
   // Lower 7 bits, Add 1, times 16
@@ -74,15 +72,15 @@ export function startHdmaTransfer(hdmaTriggerByteToBeWritten: u8): void {
 
     // H-Blank DMA
     Memory.isHblankHdmaActive = true;
-    Memory.hblankHdmaIndex = 0x00;
-    Memory.hblankHdmaTotalBytes = transferLength;
+    Memory.hblankHdmaTransferLengthRemaining = transferLength;
     Memory.hblankHdmaSource = hdmaSource;
     Memory.hblankHdmaDestination = hdmaDestination;
 
     // This will be handled in updateHblankHdma()
 
     // Since we return false in write traps, we need to now write the byte
-    eightBitStoreIntoGBMemorySkipTraps(Memory.memoryLocationHdmaTrigger, hdmaTriggerByteToBeWritten);
+    // Be sure to reset bit 7, to show that the hdma is active
+    eightBitStoreIntoGBMemorySkipTraps(Memory.memoryLocationHdmaTrigger, resetBitOnByte(7, hdmaTriggerByteToBeWritten));
   } else {
 
     // General DMA
@@ -99,40 +97,34 @@ export function updateHblankHdma(): void {
     return;
   }
 
-  // Get our source and destination for the HDMA
-  let hdmaSource: u16 = getHdmaSource();
-  let hdmaDestination: u16 = getHdmaDestination();
-
   // Get our amount of bytes to transfer (Only 0x10 bytes at a time)
   let bytesToTransfer: i32 = 0x10;
-  if (Memory.hblankHdmaIndex + bytesToTransfer > Memory.hblankHdmaTotalBytes) {
+  if (Memory.hblankHdmaTransferLengthRemaining < bytesToTransfer) {
     // Set to the difference
-    bytesToTransfer = Memory.hblankHdmaTotalBytes - Memory.hblankHdmaIndex;
+    bytesToTransfer = Memory.hblankHdmaTransferLengthRemaining;
   }
 
   // Do the transfer (Only 0x10 bytes at a time)
-  hdmaTransfer(hdmaSource + <u16>Memory.hblankHdmaIndex, hdmaDestination + <u16>Memory.hblankHdmaIndex, bytesToTransfer);
+  hdmaTransfer(Memory.hblankHdmaSource, Memory.hblankHdmaDestination, bytesToTransfer);
 
-  // Increase our transfer index
-  Memory.hblankHdmaIndex += bytesToTransfer;
+  // Update our source and destination
+  Memory.hblankHdmaSource += <u16>bytesToTransfer;
+  Memory.hblankHdmaDestination += <u16>bytesToTransfer;
+  Memory.hblankHdmaTransferLengthRemaining -= bytesToTransfer;
 
-  if(Memory.hblankHdmaIndex >= Memory.hblankHdmaTotalBytes) {
-
-    //hexLog(hdmaSource, hdmaDestination, Memory.hblankHdmaIndex, Memory.hblankHdmaTotalBytes);
+  if(Memory.hblankHdmaTransferLengthRemaining <= 0) {
 
     // End the transfer
     Memory.isHblankHdmaActive = false;
-    Memory.hblankHdmaIndex = 0x00;
-    Memory.hblankHdmaTotalBytes = 0x00;
-    Memory.hblankHdmaSource = 0x00;
-    Memory.hblankHdmaDestination = 0x00;
 
+    // Need to clear the HDMA with 0xFF, which sets bit 7 to 1 to show the HDMA has ended
     eightBitStoreIntoGBMemorySkipTraps(Memory.memoryLocationHdmaTrigger, 0xFF);
   } else {
-    // Set our new transfer length, make sure it is in the weird format, and make sure bit 7 is still 1
-    let remainingTransferLength: i32 = Memory.hblankHdmaTotalBytes - Memory.hblankHdmaIndex;
+    // Set our new transfer length, make sure it is in the weird format,
+    // and make sure bit 7 is 0, to show that the HDMA is Active
+    let remainingTransferLength: i32 = Memory.hblankHdmaTransferLengthRemaining;
     let transferLengthAsByte: u8 = <u8>((remainingTransferLength / 16) - 1);
-    eightBitStoreIntoGBMemorySkipTraps(Memory.memoryLocationHdmaTrigger, setBitOnByte(7, transferLengthAsByte));
+    eightBitStoreIntoGBMemorySkipTraps(Memory.memoryLocationHdmaTrigger, resetBitOnByte(7, transferLengthAsByte));
   }
 }
 
@@ -140,7 +132,14 @@ export function updateHblankHdma(): void {
 function hdmaTransfer(hdmaSource: u16, hdmaDestination: u16, transferLength: i32): void {
   for(let i: u16 = 0; i < <u16>transferLength; i++) {
     let sourceByte: u8 = eightBitLoadFromGBMemory(hdmaSource + i);
-    eightBitStoreIntoGBMemory(hdmaDestination + i, sourceByte);
+    // get the hdmaDestination with wrapping
+    // See issue #61: https://github.com/torch2424/wasmBoy/issues/61
+    let hdmaDestinationWithWrapping = hdmaDestination + i;
+    while (hdmaDestinationWithWrapping > 0x9FFF) {
+      // Simply clear the top 3 bits
+      hdmaDestinationWithWrapping = (hdmaDestinationWithWrapping - 0x2000);
+    }
+    eightBitStoreIntoGBMemory(hdmaDestinationWithWrapping, sourceByte);
   }
 
   // Set our Cycles used for the HDMA
@@ -158,7 +157,7 @@ function hdmaTransfer(hdmaSource: u16, hdmaDestination: u16, transferLength: i32
 
 // Function to get our HDMA Source
 // Follows the poan docs
-function getHdmaSource(): u16 {
+function getHdmaSourceFromMemory(): u16 {
   // Get our source for the HDMA
   let hdmaSourceHigh: u8 = eightBitLoadFromGBMemorySkipTraps(Memory.memoryLocationHdmaSourceHigh);
   let hdmaSourceLow: u8 = eightBitLoadFromGBMemorySkipTraps(Memory.memoryLocationHdmaSourceLow);
@@ -169,15 +168,12 @@ function getHdmaSource(): u16 {
   // And off the bottom 4 bits
   hdmaSource = (hdmaSource & 0xFFF0);
 
-  // Also cache the result
-  Memory.hblankHdmaSource = hdmaSource;
-
   return hdmaSource;
 }
 
 // Function to get our HDMA Destination
 // Follows the poan docs
-function getHdmaDestination(): u16 {
+function getHdmaDestinationFromMemory(): u16 {
   let hdmaDestinationHigh: u8 = eightBitLoadFromGBMemorySkipTraps(Memory.memoryLocationHdmaDestinationHigh);
   let hdmaDestinationLow: u8 = eightBitLoadFromGBMemorySkipTraps(Memory.memoryLocationHdmaDestinationLow);
 
@@ -189,9 +185,6 @@ function getHdmaDestination(): u16 {
   // Meaning we must add 0x8000
   hdmaDestination = (hdmaDestination & 0x1FF0);
   hdmaDestination += Memory.videoRamLocation;
-
-  // Also cache the result
-  Memory.hblankHdmaDestination = hdmaDestination;
 
   return hdmaDestination;
 }
