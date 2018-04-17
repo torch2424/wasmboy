@@ -24,7 +24,7 @@ const wasmBoyOptions = {
 	graphicsBatchProcessing: false,
 	graphicsDisableScanlineRendering: false,
 	tileRendering: false,
-	tileCaching: false,
+	tileCaching: true,
 	gameboySpeed: 1.0
 };
 
