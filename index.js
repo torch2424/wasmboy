@@ -12,7 +12,7 @@ import { WasmBoyDebugger, WasmBoySystemControls } from './debugger/index';
 // 	graphicsDisableScanlineRendering: true
 // });
 
-const gamePath = './games/donkeykongcountry.gbc';
+const gamePath = './games/aevilia_discord.gbc';
 
 const wasmBoyOptions = {
 	isGbcEnabled: true,
@@ -24,7 +24,7 @@ const wasmBoyOptions = {
 	graphicsBatchProcessing: false,
 	graphicsDisableScanlineRendering: false,
 	tileRendering: false,
-	tileCaching: true,
+	tileCaching: false,
 	gameboySpeed: 1.0
 };
 

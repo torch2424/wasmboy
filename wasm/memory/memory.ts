@@ -111,8 +111,7 @@ export class Memory {
   static DMACycles: i32 = 0;
   // Boolean we will mirror to indicate if Hdma is active
   static isHblankHdmaActive: boolean = false;
-  static hblankHdmaIndex: i32 = 0x00;
-  static hblankHdmaTotalBytes: i32 = 0x00;
+  static hblankHdmaTransferLengthRemaining: i32 = 0x00;
   // Store the source and destination for performance, and update as needed
   static hblankHdmaSource: u16 = 0x00;
   static hblankHdmaDestination: u16 = 0x00;
