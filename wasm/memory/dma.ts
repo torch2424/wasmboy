@@ -82,7 +82,8 @@ export function startHdmaTransfer(hdmaTriggerByteToBeWritten: u8): void {
     // This will be handled in updateHblankHdma()
 
     // Since we return false in write traps, we need to now write the byte
-    eightBitStoreIntoGBMemorySkipTraps(Memory.memoryLocationHdmaTrigger, hdmaTriggerByteToBeWritten);
+    // Be sure to reset bit 7, to show that the hdma is active
+    eightBitStoreIntoGBMemorySkipTraps(Memory.memoryLocationHdmaTrigger, resetBitOnByte(7, hdmaTriggerByteToBeWritten));
   } else {
 
     // General DMA
@@ -127,12 +128,14 @@ export function updateHblankHdma(): void {
     Memory.hblankHdmaSource = 0x00;
     Memory.hblankHdmaDestination = 0x00;
 
+    // Need to clear the HDMA with 0xFF, which sets bit 7 to 1 to show the HDMA has ended
     eightBitStoreIntoGBMemorySkipTraps(Memory.memoryLocationHdmaTrigger, 0xFF);
   } else {
-    // Set our new transfer length, make sure it is in the weird format, and make sure bit 7 is still 1
+    // Set our new transfer length, make sure it is in the weird format,
+    // and make sure bit 7 is 0, to show that the HDMA is Active
     let remainingTransferLength: i32 = Memory.hblankHdmaTotalBytes - Memory.hblankHdmaIndex;
     let transferLengthAsByte: u8 = <u8>((remainingTransferLength / 16) - 1);
-    eightBitStoreIntoGBMemorySkipTraps(Memory.memoryLocationHdmaTrigger, setBitOnByte(7, transferLengthAsByte));
+    eightBitStoreIntoGBMemorySkipTraps(Memory.memoryLocationHdmaTrigger, resetBitOnByte(7, transferLengthAsByte));
   }
 }
 
@@ -145,7 +148,7 @@ function hdmaTransfer(hdmaSource: u16, hdmaDestination: u16, transferLength: i32
     let hdmaDestinationWithWrapping = hdmaDestination + i;
     if (hdmaDestinationWithWrapping > 0x9FFF) {
       hdmaDestinationWithWrapping = Memory.videoRamLocation + (hdmaDestinationWithWrapping - 0x9FFF - 1);
-      hexLog(hdmaSource, hdmaDestination, transferLength, hdmaDestination + i, hdmaDestinationWithWrapping)
+      hexLog(hdmaSource, hdmaDestination, transferLength, hdmaDestination + i, hdmaDestinationWithWrapping);
     }
     eightBitStoreIntoGBMemory(hdmaDestinationWithWrapping, sourceByte);
   }

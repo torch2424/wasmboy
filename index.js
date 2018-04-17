@@ -12,6 +12,8 @@ import { WasmBoyDebugger, WasmBoySystemControls } from './debugger/index';
 // 	graphicsDisableScanlineRendering: true
 // });
 
+const gamePath = './games/donkeykongcountry.gbc';
+
 const wasmBoyOptions = {
 	isGbcEnabled: true,
 	isAudioEnabled: true,
@@ -64,7 +66,7 @@ export default class App extends Component {
 		WasmBoyController.addTouchInput('SELECT', selectElement, 'BUTTON');
 
 		//WasmBoy.loadGame('./test/testroms/blargg/cpu_instrs.gb')
-		WasmBoy.loadGame('./games/aevilia_discord.gbc')
+		WasmBoy.loadGame(gamePath)
 		.then(() => {
 			console.log('Wasmboy Ready!');
 		}).catch((error) => {
