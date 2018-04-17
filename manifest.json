@@ -1,9 +1,9 @@
 {
   "name": "wasmBoy",
   "short_name": "wasmBoy",
-  "start_url": "/wasmBoy/",
-  "display": "fullscreen",
-  "orientation": "landscape",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#fff",
   "theme_color": "#673ab8",
   "icons": [
