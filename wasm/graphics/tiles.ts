@@ -37,6 +37,7 @@ import {
 
 export class TileCache {
   static tileId: i32 = -1;
+  static horizontalFlip: boolean = false;
   static nextXIndexToPerformCacheCheck: i32 = -1;
 }
 
@@ -45,7 +46,7 @@ export function resetTileCache(): void {
   TileCache.nextXIndexToPerformCacheCheck = - 1;
 }
 
-export function drawPixelsFromLineOfTile(tileId: u8, tileDataMemoryLocation: u16, vramBankId: i32, tileLineXStart: i32, tileLineXEnd: i32, tileLineY: u16, outputLineX: i32, outputLineY: u16, outputWidth: i32, wasmMemoryStart: u32, shouldRepresentMonochromeColorByColorId: boolean = false, paletteLocation: u16 = 0, paletteIndexByte: i32 = -1, bgMapAttributesForPriorityMap: i32 = -1): i32 {
+export function drawPixelsFromLineOfTile(tileId: u8, tileDataMemoryLocation: u16, vramBankId: i32, tileLineXStart: i32, tileLineXEnd: i32, tileLineY: u16, outputLineX: i32, outputLineY: u16, outputWidth: i32, wasmMemoryStart: u32, shouldRepresentMonochromeColorByColorId: boolean = false, paletteLocation: u16 = 0, paletteIndexByte: i32 = -1, bgMapAttributes: i32 = -1): i32 {
 
   // Get our number of pixels drawn
   let pixelsDrawn: i32 = 0;
@@ -64,13 +65,17 @@ export function drawPixelsFromLineOfTile(tileId: u8, tileDataMemoryLocation: u16
     // And don't allow any width overflow
     let iteratedOutputX = outputLineX + (x - tileLineXStart);
     if(iteratedOutputX <= outputWidth) {
-      // However, We need to reverse our byte,
+
+      // However, We need to reverse our byte (if not horizontally flipped),
       // As pixel 0 is on byte 7, and pixel 1 is on byte 6, etc...
       // Therefore, is pixelX was 2, then really is need to be 5
       // So 2 - 7 = -5, * 1 = 5
       // Or to simplify, 7 - 2 = 5 haha!
       let pixelXInTile: u8 = <u8>(x) % 8;
-      pixelXInTile = 7 - pixelXInTile;
+      if(bgMapAttributes > 0 || !checkBitOnByte(5, <u8>bgMapAttributes)) {
+        pixelXInTile = 7 - pixelXInTile;
+      }
+      hexLog(bgMapAttributes);
 
       // Get our pallete colors for the tile
       let paletteColorId: u8 = 0;
@@ -116,8 +121,8 @@ export function drawPixelsFromLineOfTile(tileId: u8, tileDataMemoryLocation: u16
       store<u8>(wasmMemoryStart + pixelStart + 2, blue);
 
       let gbcBgPriority: boolean = false;
-      if(bgMapAttributesForPriorityMap >= 0) {
-        gbcBgPriority = checkBitOnByte(7, <u8>bgMapAttributesForPriorityMap);
+      if(bgMapAttributes >= 0) {
+        gbcBgPriority = checkBitOnByte(7, <u8>bgMapAttributes);
       }
 
       // Lastly, add the pixel to our background priority map
