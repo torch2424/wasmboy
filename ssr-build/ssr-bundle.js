@@ -2763,7 +2763,7 @@ var wasmboy_WasmBoyLib = function () {
               if (arg5 !== -9999) logString += ' 0x' + arg5.toString(16) + ' ';
 
               // Uncomment to unthrottle
-              // console.log(logString);
+              //console.log(logString);
 
               // Comment the lines below to disable throttle
               _this7.logRequest = true;
@@ -4199,7 +4199,7 @@ var index_App = function (_Component) {
 		WasmBoyController.addTouchInput('SELECT', selectElement, 'BUTTON');
 
 		//WasmBoy.loadGame('./test/testroms/blargg/cpu_instrs.gb')
-		WasmBoy.loadGame('./games/aevilia_discord.gbc').then(function () {
+		WasmBoy.loadGame('./games/linksawakening.gb').then(function () {
 			console.log('Wasmboy Ready!');
 		}).catch(function (error) {
 			console.log('Load Game Error:', error);
