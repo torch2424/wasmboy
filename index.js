@@ -12,7 +12,7 @@ import { WasmBoyDebugger, WasmBoySystemControls } from './debugger/index';
 // 	graphicsDisableScanlineRendering: true
 // });
 
-const gamePath = './games/shantae.gbc';
+const gamePath = './games/linksawakening.gb';
 
 const wasmBoyOptions = {
 	isGbcEnabled: true,
