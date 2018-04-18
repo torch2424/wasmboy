@@ -388,18 +388,14 @@ function drawLineOfTileFromTileId(xPixel: i32, yPixel: u8, pixelXPositionInMap: 
   // initialize some variables for GBC
   let bgMapAttributes: i32 = -1;
   let vramBankId: i32 = 0;
-  let bgPalette: i32 = -1;
   if(Cpu.GBCEnabled) {
     // Get Our GBC properties
     bgMapAttributes = loadFromVramBank(tileMapAddress, 1);
     if (checkBitOnByte(3, <u8>bgMapAttributes)) {
       vramBankId = 1;
     }
-
-    // Get the palette index byte
-    bgPalette = (bgMapAttributes & 0x07);
   }
 
   // Return the number of pixels drawn
-  return drawPixelsFromLineOfTile(tileIdFromTileMap, tileDataMemoryLocation, vramBankId, tileXStart, tileXEnd, tileLineY, xPixel, yPixel, 160, Memory.frameInProgressVideoOutputLocation, false, 0, bgPalette, bgMapAttributes);
+  return drawPixelsFromLineOfTile(tileIdFromTileMap, tileDataMemoryLocation, vramBankId, tileXStart, tileXEnd, tileLineY, xPixel, yPixel, 160, Memory.frameInProgressVideoOutputLocation, false, 0, bgMapAttributes);
 }
