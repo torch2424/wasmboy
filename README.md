@@ -23,6 +23,7 @@
 * [Contributing](#contributing)
      * [Installation](#installation)
      * [CLI Commands / Npm Scripts](#cli-commands--npm-scripts)
+* [Notable Projects](#notable-projects)
 * [Special Thanks](#special-thanks)
 * [Random Tips for new Gameboy EmuDevs](#random-tips-for-new-gameboy-emudevs)
 * [Resources](#resources)
@@ -140,6 +141,10 @@ npm run lib:build
 The debugger application/container for wasmBoy utilizes the [preact-cli](https://github.com/developit/preact-cli/blob/master/README.md). Additional workflow commands and tips can be found there.
 
 Using the [gh-pages](https://www.npmjs.com/package/gh-pages) for debugger/demo deployment onto gh-pages.
+
+# Notable Projects
+
+* [wasmboy-rs](https://github.com/CryZe/wasmboy-rs) - Wasmboy Compiled to Rust, for native executables and additional cool features!
 
 # Special Thanks
 
