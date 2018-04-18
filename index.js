@@ -24,8 +24,8 @@ const wasmBoyOptions = {
 	graphicsBatchProcessing: false,
 	graphicsDisableScanlineRendering: false,
 	tileRendering: true,
-	tileCaching: false,
-	gameboySpeed: 2.0
+	tileCaching: true,
+	gameboySpeed: 1.0
 };
 
 const wasmBoyOptionsString = JSON.stringify(wasmBoyOptions, null, 4);
