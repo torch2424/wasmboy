@@ -31,8 +31,6 @@ export function startDmaTransfer(sourceAddressOffset: u8): void {
     eightBitStoreIntoGBMemorySkipTraps(spriteInformationAddress, spriteInformationByte);
   }
 
-  //hexLog(sourceAddress, Cpu.programCounter);
-
   // TCAGBD:  This copy (DMA) needs 160 × 4 + 4 clocks to complete in both double speed and single speeds modes
   // Increment all of our Cycle coiunters in ../cpu/opcodes
   Memory.DMACycles = 644;

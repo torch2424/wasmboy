@@ -330,8 +330,25 @@ function drawLineOfTileFromTileCache(xPixel: i32, yPixel: u8, pixelXPositionInMa
   // Check if the current tile matches our tileId
   // TODO: Allow the first line to use the tile cache, for some odd reason it doesn't work when scanline is 0
   if(yPixel > 0 && xPixel > 8 && <i32>tileIdFromTileMap === TileCache.tileId && xPixel === TileCache.nextXIndexToPerformCacheCheck) {
+
+    // Was last tile flipped
+    let wasLastTileHorizontallyFlipped: boolean = false;
+    let isCurrentTileHorizontallyFlipped: boolean = false;
+    if (checkBitOnByte(5, eightBitLoadFromGBMemorySkipTraps(tileMapAddress - 1))) {
+      wasLastTileHorizontallyFlipped = true;
+    }
+    if (checkBitOnByte(5, eightBitLoadFromGBMemorySkipTraps(tileMapAddress))) {
+      isCurrentTileHorizontallyFlipped = true;
+    }
+
     // Simply copy the last 8 pixels from memory to copy the line from the tile
     for(let tileCacheIndex = 0; tileCacheIndex < 8; tileCacheIndex++) {
+
+      // Check if we need to render backwards for flipping
+      if (wasLastTileHorizontallyFlipped !== isCurrentTileHorizontallyFlipped) {
+        tileCacheIndex = 7 - tileCacheIndex;
+      }
+
       // First check for overflow
       if(xPixel + tileCacheIndex <= 160) {
         // Get the pixel location in memory of the tile
@@ -375,31 +392,28 @@ function drawLineOfTileFromTileId(xPixel: i32, yPixel: u8, pixelXPositionInMap: 
   let tileLineY: u16 = pixelYPositionInMap % 8;
 
   // Now lets find our tileX start and end
-  let xOffsetTileWidthRemainder: i32 = pixelXPositionInMap % 8;
+  // This is for the case where i = 0, but scroll X was 3.
+  // Or i is 157, and our camera is only 160 pixels wide
   let tileXStart: i32 = 0;
-  if(xPixel < xOffsetTileWidthRemainder) {
-    tileXStart = xOffsetTileWidthRemainder;
+  if(xPixel == 0) {
+    tileXStart = pixelXPositionInMap - ((pixelXPositionInMap / 8) * 8);
   }
   let tileXEnd: i32 = 7;
-  if(xPixel + xOffsetTileWidthRemainder > 160) {
+  if(xPixel + 8 > 160) {
     tileXEnd = 160 - xPixel;
   }
 
   // initialize some variables for GBC
   let bgMapAttributes: i32 = -1;
   let vramBankId: i32 = 0;
-  let bgPalette: i32 = -1;
   if(Cpu.GBCEnabled) {
     // Get Our GBC properties
     bgMapAttributes = loadFromVramBank(tileMapAddress, 1);
     if (checkBitOnByte(3, <u8>bgMapAttributes)) {
       vramBankId = 1;
     }
-
-    // Get the palette index byte
-    bgPalette = (bgMapAttributes & 0x07);
   }
 
   // Return the number of pixels drawn
-  return drawPixelsFromLineOfTile(tileIdFromTileMap, tileDataMemoryLocation, vramBankId, tileXStart, tileXEnd, tileLineY, xPixel, yPixel, 160, Memory.frameInProgressVideoOutputLocation, false, 0, bgPalette, bgMapAttributes);
+  return drawPixelsFromLineOfTile(tileIdFromTileMap, tileDataMemoryLocation, vramBankId, tileXStart, tileXEnd, tileLineY, xPixel, yPixel, 160, Memory.frameInProgressVideoOutputLocation, false, 0, bgMapAttributes);
 }
