@@ -120,7 +120,7 @@ export function emulationStep(): i32 {
 
   // Cpu Halting best explained: https://www.reddit.com/r/EmuDev/comments/5ie3k7/infinite_loop_trying_to_pass_blarggs_interrupt/db7xnbe/
   if(!Cpu.isHalted && !Cpu.isStopped) {
-    opcode = eightBitLoadFromGBMemoryWithTraps(Cpu.programCounter);
+    opcode = eightBitLoadFromGBMemory(Cpu.programCounter);
     numberOfCycles = executeOpcode(opcode);
   } else {
     // if we were halted, and interrupts were disabled but interrupts are pending, stop waiting
@@ -139,7 +139,7 @@ export function emulationStep(): i32 {
       // Becomes
       // FA FA 34 ld a,(34FA)
       // 12 ld (de),a
-      opcode = eightBitLoadFromGBMemoryWithTraps(Cpu.programCounter);
+      opcode = eightBitLoadFromGBMemory(Cpu.programCounter);
       numberOfCycles = executeOpcode(opcode);
       Cpu.programCounter -= 1;
     }
