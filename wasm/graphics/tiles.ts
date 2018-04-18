@@ -64,14 +64,14 @@ export function drawPixelsFromLineOfTile(tileId: u8, tileDataMemoryLocation: u16
     // First find where we are going to do our final output x
     // And don't allow any width overflow
     let iteratedOutputX = outputLineX + (x - tileLineXStart);
-    if(iteratedOutputX <= outputWidth) {
+    if(iteratedOutputX < outputWidth) {
 
       // However, We need to reverse our byte (if not horizontally flipped),
       // As pixel 0 is on byte 7, and pixel 1 is on byte 6, etc...
       // Therefore, is pixelX was 2, then really is need to be 5
       // So 2 - 7 = -5, * 1 = 5
       // Or to simplify, 7 - 2 = 5 haha!
-      let pixelXInTile: u8 = <u8>(iteratedOutputX) % 8;
+      let pixelXInTile: u8 = <u8>(x);
       if(bgMapAttributes < 0 || !checkBitOnByte(5, <u8>bgMapAttributes)) {
         pixelXInTile = 7 - pixelXInTile;
       }
