@@ -24,7 +24,7 @@ import {
 } from '../config';
 import {
   eightBitLoadFromGBMemory,
-  eightBitStoreIntoGBMemorySkipTraps,
+  eightBitStoreIntoGBMemory,
   storeFrameToBeRendered,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
@@ -203,7 +203,7 @@ export function updateGraphics(numberOfCycles: i32): void {
       }
 
       // Store our new scanline value
-      eightBitStoreIntoGBMemorySkipTraps(Graphics.memoryLocationScanlineRegister, scanlineRegister);
+      eightBitStoreIntoGBMemory(Graphics.memoryLocationScanlineRegister, scanlineRegister);
     }
   }
 

@@ -27,7 +27,7 @@ import {
 } from '../cpu/cpu';
 import {
   eightBitLoadFromGBMemory,
-  eightBitStoreIntoGBMemorySkipTraps,
+  eightBitStoreIntoGBMemory,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
@@ -87,11 +87,11 @@ export class Channel3 {
   }
 
   static initialize(): void {
-    eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx0, 0x7F);
-    eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx1, 0xFF);
-    eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx2, 0x9F);
-    eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx3, 0x00);
-    eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx4, 0xB8);
+    eightBitStoreIntoGBMemory(Channel3.memoryLocationNRx0, 0x7F);
+    eightBitStoreIntoGBMemory(Channel3.memoryLocationNRx1, 0xFF);
+    eightBitStoreIntoGBMemory(Channel3.memoryLocationNRx2, 0x9F);
+    eightBitStoreIntoGBMemory(Channel3.memoryLocationNRx3, 0x00);
+    eightBitStoreIntoGBMemory(Channel3.memoryLocationNRx4, 0xB8);
 
     // The volume code changed
     Channel3.volumeCodeChanged = true;

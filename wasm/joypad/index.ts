@@ -2,7 +2,7 @@ import {
   Cpu
 } from '../cpu/index';
 import {
-  eightBitStoreIntoGBMemorySkipTraps
+  eightBitStoreIntoGBMemory
 } from '../memory/store';
 import {
   eightBitLoadFromGBMemory

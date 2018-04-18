@@ -34,7 +34,7 @@ import {
 } from '../config';
 import {
   eightBitLoadFromGBMemory,
-  eightBitStoreIntoGBMemorySkipTraps,
+  eightBitStoreIntoGBMemory,
   setLeftAndRightOutputForAudioQueue,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
@@ -164,9 +164,9 @@ export function initializeSound(): void {
   Channel4.initialize();
 
   // Other Sound Registers
-  eightBitStoreIntoGBMemorySkipTraps(Sound.memoryLocationNR50, 0x77);
-  eightBitStoreIntoGBMemorySkipTraps(Sound.memoryLocationNR51, 0xF3);
-  eightBitStoreIntoGBMemorySkipTraps(Sound.memoryLocationNR52, 0xF1);
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR50, 0x77);
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR51, 0xF3);
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR52, 0xF1);
 
   SoundAccumulator.mixerVolumeChanged = true;
   SoundAccumulator.mixerEnabledChanged = true;

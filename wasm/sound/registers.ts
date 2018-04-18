@@ -23,7 +23,7 @@ import {
 } from '../sound/length';
 import {
   eightBitLoadFromGBMemory,
-  eightBitStoreIntoGBMemorySkipTraps
+  eightBitStoreIntoGBMemory
 } from '../memory/index';
 import {
   checkBitOnByte,
@@ -50,19 +50,19 @@ export function handledWriteToSoundRegister(offset: u16, value: u16): boolean {
   switch(offset) {
     // Set length counter on channels
     case Channel1.memoryLocationNRx1:
-      eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+      eightBitStoreIntoGBMemory(offset, <u8>value);
       setChannelLengthCounter(Channel1.channelNumber);
       return true;
     case Channel2.memoryLocationNRx1:
-      eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+      eightBitStoreIntoGBMemory(offset, <u8>value);
       setChannelLengthCounter(Channel2.channelNumber);
       return true;
     case Channel3.memoryLocationNRx1:
-      eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+      eightBitStoreIntoGBMemory(offset, <u8>value);
       setChannelLengthCounter(Channel3.channelNumber);
       return true;
     case Channel4.memoryLocationNRx1:
-      eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+      eightBitStoreIntoGBMemory(offset, <u8>value);
       setChannelLengthCounter(Channel4.channelNumber);
       return true;
   }
@@ -76,19 +76,19 @@ export function handledWriteToSoundRegister(offset: u16, value: u16): boolean {
   // Check our NRx4 registers to trap our trigger bits
   if(offset === Channel1.memoryLocationNRx4 && checkBitOnByte(7, <u8>value)) {
     // Write the value skipping traps, and then trigger
-    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+    eightBitStoreIntoGBMemory(offset, <u8>value);
     Channel1.trigger();
     return true;
   } else if(offset === Channel2.memoryLocationNRx4 && checkBitOnByte(7, <u8>value)) {
-    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+    eightBitStoreIntoGBMemory(offset, <u8>value);
     Channel2.trigger();
     return true;
   } else if(offset === Channel3.memoryLocationNRx4 && checkBitOnByte(7, <u8>value)) {
-    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+    eightBitStoreIntoGBMemory(offset, <u8>value);
     Channel3.trigger();
     return true;
   } else if(offset === Channel4.memoryLocationNRx4 && checkBitOnByte(7, <u8>value)) {
-    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+    eightBitStoreIntoGBMemory(offset, <u8>value);
     Channel4.trigger();
     return true;
   }
@@ -109,12 +109,12 @@ export function handledWriteToSoundRegister(offset: u16, value: u16): boolean {
     // Reset all registers except NR52
     if(!checkBitOnByte(7, <u8>value)) {
       for (let i: u16 = 0xFF10; i < 0xFF26; i++) {
-        eightBitStoreIntoGBMemorySkipTraps(i, 0x00);
+        eightBitStoreIntoGBMemory(i, 0x00);
       }
     }
 
     // Write our final value to NR52
-    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
+    eightBitStoreIntoGBMemory(offset, <u8>value);
 
     return true;
   }
@@ -261,16 +261,16 @@ export function setRegister3OfChannel(channelNumber: i32, value: u8): void {
 
   switch(channelNumber) {
     case Channel1.channelNumber:
-      eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx3, value);
+      eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx3, value);
       break;
     case Channel2.channelNumber:
-      eightBitStoreIntoGBMemorySkipTraps(Channel2.memoryLocationNRx3, value);
+      eightBitStoreIntoGBMemory(Channel2.memoryLocationNRx3, value);
       break;
     case Channel3.channelNumber:
-      eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx3, value);
+      eightBitStoreIntoGBMemory(Channel3.memoryLocationNRx3, value);
       break;
     default:
-      eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx3, value);
+      eightBitStoreIntoGBMemory(Channel4.memoryLocationNRx3, value);
       break;
   }
 }
@@ -295,16 +295,16 @@ export function setRegister4OfChannel(channelNumber: i32, value: u8): void {
 
   switch(channelNumber) {
     case Channel1.channelNumber:
-      eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx4, value);
+      eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx4, value);
       break;
     case Channel2.channelNumber:
-      eightBitStoreIntoGBMemorySkipTraps(Channel2.memoryLocationNRx4, value);
+      eightBitStoreIntoGBMemory(Channel2.memoryLocationNRx4, value);
       break;
     case Channel3.channelNumber:
-      eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx4, value);
+      eightBitStoreIntoGBMemory(Channel3.memoryLocationNRx4, value);
       break;
     default:
-      eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx4, value);
+      eightBitStoreIntoGBMemory(Channel4.memoryLocationNRx4, value);
       break;
   }
 }

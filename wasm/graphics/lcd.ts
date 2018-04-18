@@ -7,7 +7,7 @@ import {
   eightBitLoadFromGBMemory
 } from '../memory/load';
 import {
-  eightBitStoreIntoGBMemorySkipTraps
+  eightBitStoreIntoGBMemory
 } from '../memory/store';
 import {
   updateHblankHdma
@@ -42,7 +42,7 @@ export function setLcdStatus(lcdEnabledStatus: boolean): void {
   if(!lcdEnabledStatus) {
     // Reset scanline cycle counter
     Graphics.scanlineCycleCounter = 0;
-    eightBitStoreIntoGBMemorySkipTraps(Graphics.memoryLocationScanlineRegister, 0);
+    eightBitStoreIntoGBMemory(Graphics.memoryLocationScanlineRegister, 0);
 
     // Set to mode 0
     // https://www.reddit.com/r/EmuDev/comments/4w6479/gb_dr_mario_level_generation_issues/
@@ -51,7 +51,7 @@ export function setLcdStatus(lcdEnabledStatus: boolean): void {
     Graphics.currentLcdMode = 0;
 
     // Store the status in memory
-    eightBitStoreIntoGBMemorySkipTraps(Graphics.memoryLocationLcdStatus, lcdStatus);
+    eightBitStoreIntoGBMemory(Graphics.memoryLocationLcdStatus, lcdStatus);
     return;
   }
 
@@ -125,5 +125,5 @@ export function setLcdStatus(lcdEnabledStatus: boolean): void {
   Graphics.currentLcdMode = newLcdMode;
 
   // Finally, save our status
-  eightBitStoreIntoGBMemorySkipTraps(Graphics.memoryLocationLcdStatus, lcdStatus);
+  eightBitStoreIntoGBMemory(Graphics.memoryLocationLcdStatus, lcdStatus);
 }

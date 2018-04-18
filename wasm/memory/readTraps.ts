@@ -13,7 +13,7 @@ import {
   handleReadToSoundRegister
 } from '../sound/index';
 import {
-  eightBitStoreIntoGBMemorySkipTraps
+  eightBitStoreIntoGBMemory
 } from './store';
 import {
   eightBitLoadFromGBMemory

@@ -19,7 +19,7 @@ import {
   loadBooleanDirectlyFromWasmMemory
 } from './load';
 import {
-  eightBitStoreIntoGBMemorySkipTraps,
+  eightBitStoreIntoGBMemory,
   storeBooleanDirectlyToWasmMemory
 } from './store';
 import {

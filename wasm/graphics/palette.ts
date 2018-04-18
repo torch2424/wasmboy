@@ -4,7 +4,7 @@ import {
 import {
   Memory,
   eightBitLoadFromGBMemory,
-  eightBitStoreIntoGBMemorySkipTraps,
+  eightBitStoreIntoGBMemory,
   storePaletteByteInWasmMemory,
   loadPaletteByteFromWasmMemory
 } from '../memory/index';
@@ -94,7 +94,7 @@ function incrementPaletteIndexIfSet(paletteIndex: u8, offset: u16): void {
     paletteIndex += 1;
     paletteIndex = setBitOnByte(7, paletteIndex);
 
-    eightBitStoreIntoGBMemorySkipTraps(offset, paletteIndex);
+    eightBitStoreIntoGBMemory(offset, paletteIndex);
   }
 }
 

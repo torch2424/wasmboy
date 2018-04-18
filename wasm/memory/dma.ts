@@ -9,8 +9,8 @@ import {
   eightBitLoadFromGBMemory
 } from './load';
 import {
-  eightBitStoreIntoGBMemory,
-  eightBitStoreIntoGBMemorySkipTraps
+  eightBitStoreIntoGBMemoryWithTraps,
+  eightBitStoreIntoGBMemory
 } from './store';
 import {
   concatenateBytes,
@@ -28,7 +28,7 @@ export function startDmaTransfer(sourceAddressOffset: u8): void {
   for(let i: u16 = 0; i <= 0x9F; i++) {
     let spriteInformationByte: u8 = eightBitLoadFromGBMemory(sourceAddress + i);
     let spriteInformationAddress: u16 = Memory.spriteInformationTableLocation + i;
-    eightBitStoreIntoGBMemorySkipTraps(spriteInformationAddress, spriteInformationByte);
+    eightBitStoreIntoGBMemory(spriteInformationAddress, spriteInformationByte);
   }
 
   // TCAGBD:  This copy (DMA) needs 160 × 4 + 4 clocks to complete in both double speed and single speeds modes
@@ -51,7 +51,7 @@ export function startHdmaTransfer(hdmaTriggerByteToBeWritten: u8): void {
     // Don't reset anything, just set bit 7 to 1 on the trigger byte
     Memory.isHblankHdmaActive = false;
     let hdmaTriggerByte = eightBitLoadFromGBMemory(Memory.memoryLocationHdmaTrigger);
-    eightBitStoreIntoGBMemorySkipTraps(Memory.memoryLocationHdmaTrigger, setBitOnByte(7, hdmaTriggerByte));
+    eightBitStoreIntoGBMemory(Memory.memoryLocationHdmaTrigger, setBitOnByte(7, hdmaTriggerByte));
     return;
   }
 
@@ -78,14 +78,14 @@ export function startHdmaTransfer(hdmaTriggerByteToBeWritten: u8): void {
 
     // Since we return false in write traps, we need to now write the byte
     // Be sure to reset bit 7, to show that the hdma is active
-    eightBitStoreIntoGBMemorySkipTraps(Memory.memoryLocationHdmaTrigger, resetBitOnByte(7, hdmaTriggerByteToBeWritten));
+    eightBitStoreIntoGBMemory(Memory.memoryLocationHdmaTrigger, resetBitOnByte(7, hdmaTriggerByteToBeWritten));
   } else {
 
     // General DMA
     hdmaTransfer(hdmaSource, hdmaDestination, transferLength);
 
     // Stop the DMA
-    eightBitStoreIntoGBMemorySkipTraps(Memory.memoryLocationHdmaTrigger, 0xFF);
+    eightBitStoreIntoGBMemory(Memory.memoryLocationHdmaTrigger, 0xFF);
   }
 }
 
@@ -116,13 +116,13 @@ export function updateHblankHdma(): void {
     Memory.isHblankHdmaActive = false;
 
     // Need to clear the HDMA with 0xFF, which sets bit 7 to 1 to show the HDMA has ended
-    eightBitStoreIntoGBMemorySkipTraps(Memory.memoryLocationHdmaTrigger, 0xFF);
+    eightBitStoreIntoGBMemory(Memory.memoryLocationHdmaTrigger, 0xFF);
   } else {
     // Set our new transfer length, make sure it is in the weird format,
     // and make sure bit 7 is 0, to show that the HDMA is Active
     let remainingTransferLength: i32 = Memory.hblankHdmaTransferLengthRemaining;
     let transferLengthAsByte: u8 = <u8>((remainingTransferLength / 16) - 1);
-    eightBitStoreIntoGBMemorySkipTraps(Memory.memoryLocationHdmaTrigger, resetBitOnByte(7, transferLengthAsByte));
+    eightBitStoreIntoGBMemory(Memory.memoryLocationHdmaTrigger, resetBitOnByte(7, transferLengthAsByte));
   }
 }
 
@@ -137,7 +137,7 @@ function hdmaTransfer(hdmaSource: u16, hdmaDestination: u16, transferLength: i32
       // Simply clear the top 3 bits
       hdmaDestinationWithWrapping = (hdmaDestinationWithWrapping - 0x2000);
     }
-    eightBitStoreIntoGBMemory(hdmaDestinationWithWrapping, sourceByte);
+    eightBitStoreIntoGBMemoryWithTraps(hdmaDestinationWithWrapping, sourceByte);
   }
 
   // Set our Cycles used for the HDMA

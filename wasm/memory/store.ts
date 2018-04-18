@@ -11,9 +11,13 @@ import {
   hexLog
 } from '../helpers/index';
 
-export function eightBitStoreIntoGBMemory(offset: u16, value: u8): void {
+export function eightBitStoreIntoGBMemory(gameboyOffset: u16, value: u8): void {
+  store<u8>(getWasmBoyOffsetFromGameBoyOffset(gameboyOffset), value);
+}
+
+export function eightBitStoreIntoGBMemoryWithTraps(offset: u16, value: u8): void {
   if(checkWriteTraps(offset, <u16>value, true)) {
-    _eightBitStoreIntoWasmBoyMemory(offset, value);
+    eightBitStoreIntoGBMemory(offset, value);
   }
 }
 
@@ -26,16 +30,12 @@ export function sixteenBitStoreIntoGBMemory(offset: u16, value: u16): void {
   let nextOffset: u16 = offset + 1;
 
   if(checkWriteTraps(offset, lowByte, false)) {
-    _eightBitStoreIntoWasmBoyMemory(offset, lowByte);
+    eightBitStoreIntoGBMemory(offset, lowByte);
   }
 
   if(checkWriteTraps(nextOffset, highByte, false)) {
-    _eightBitStoreIntoWasmBoyMemory(nextOffset, highByte);
+    eightBitStoreIntoGBMemory(nextOffset, highByte);
   }
-}
-
-export function eightBitStoreIntoGBMemorySkipTraps(offset: u16, value: u8): void {
-  _eightBitStoreIntoWasmBoyMemory(offset, value);
 }
 
 export function sixteenBitStoreIntoGBMemorySkipTraps(offset: u16, value: u16): void {
@@ -46,12 +46,8 @@ export function sixteenBitStoreIntoGBMemorySkipTraps(offset: u16, value: u16): v
   let lowByte: u8 = splitLowByte(value);
   let nextOffset: u16 = offset + 1;
 
-  _eightBitStoreIntoWasmBoyMemory(offset, lowByte);
-  _eightBitStoreIntoWasmBoyMemory(nextOffset, highByte);
-}
-
-function _eightBitStoreIntoWasmBoyMemory(gameboyOffset: u16, value: u8): void {
-  store<u8>(getWasmBoyOffsetFromGameBoyOffset(gameboyOffset), value);
+  eightBitStoreIntoGBMemory(offset, lowByte);
+  eightBitStoreIntoGBMemory(nextOffset, highByte);
 }
 
 export function storeBooleanDirectlyToWasmMemory(offset: u32, value: boolean): void {

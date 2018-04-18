@@ -19,7 +19,7 @@ import {
   performanceTimestamp
 } from '../helpers/index';
 import {
-  eightBitStoreIntoGBMemory,
+  eightBitStoreIntoGBMemoryWithTraps,
   sixteenBitStoreIntoGBMemory,
   eightBitLoadFromGBMemoryWithTraps,
   sixteenBitLoadFromGBMemory
@@ -312,7 +312,7 @@ export function handleCbOpcode(cbOpcode: u8): i8 {
       break;
     case 6:
       // Value at register HL
-      eightBitStoreIntoGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL), instructionRegisterResult);
+      eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL), instructionRegisterResult);
       break;
     case 7:
       Cpu.registerA = instructionRegisterResult;

@@ -22,7 +22,7 @@ import {
   handleBanking
 } from './banking';
 import {
-  eightBitStoreIntoGBMemorySkipTraps,
+  eightBitStoreIntoGBMemory,
   sixteenBitStoreIntoGBMemorySkipTraps
 } from './store';
 import {
@@ -78,7 +78,7 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
   if(offset >= Memory.echoRamLocation && offset < spriteInformationTableLocation) {
     let wramOffset: u16 = offset - 0x2000;
     if(isEightBitStore) {
-      eightBitStoreIntoGBMemorySkipTraps(wramOffset, <u8>value);
+      eightBitStoreIntoGBMemory(wramOffset, <u8>value);
     } else {
       sixteenBitStoreIntoGBMemorySkipTraps(wramOffset, value);
     }
@@ -115,7 +115,7 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
 
     // Trap our divider register from our timers
     if(offset === Timers.memoryLocationDividerRegister) {
-      eightBitStoreIntoGBMemorySkipTraps(offset, 0);
+      eightBitStoreIntoGBMemory(offset, 0);
       return false;
     }
 
@@ -151,7 +151,7 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
 
     // reset the current scanline if the game tries to write to it
     if (offset === Graphics.memoryLocationScanlineRegister) {
-      eightBitStoreIntoGBMemorySkipTraps(offset, 0);
+      eightBitStoreIntoGBMemory(offset, 0);
       return false;
     }
 

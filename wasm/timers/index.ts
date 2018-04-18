@@ -3,7 +3,7 @@ import {
 } from '../cpu/index';
 import {
   eightBitLoadFromGBMemory,
-  eightBitStoreIntoGBMemorySkipTraps,
+  eightBitStoreIntoGBMemory,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
@@ -119,12 +119,12 @@ export function updateTimers(numberOfCycles: i32): void {
 
     if(tima >= 255) {
       // Store Timer Modulator inside of TIMA
-      eightBitStoreIntoGBMemorySkipTraps(Timers.memoryLocationTIMA, eightBitLoadFromGBMemory(Timers.memoryLocationTMA));
+      eightBitStoreIntoGBMemory(Timers.memoryLocationTIMA, eightBitLoadFromGBMemory(Timers.memoryLocationTMA));
 
       // Fire off timer interrupt
       requestTimerInterrupt();
     } else {
-      eightBitStoreIntoGBMemorySkipTraps(Timers.memoryLocationTIMA, tima + 1);
+      eightBitStoreIntoGBMemory(Timers.memoryLocationTIMA, tima + 1);
     }
   }
 }
@@ -192,6 +192,6 @@ function _checkDividerRegister(numberOfCycles: i32): void {
 
     let dividerRegister: u8 = eightBitLoadFromGBMemory(Timers.memoryLocationDividerRegister);
     dividerRegister += 1;
-    eightBitStoreIntoGBMemorySkipTraps(Timers.memoryLocationDividerRegister, dividerRegister);
+    eightBitStoreIntoGBMemory(Timers.memoryLocationDividerRegister, dividerRegister);
   }
 }

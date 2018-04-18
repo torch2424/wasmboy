@@ -27,8 +27,8 @@ import {
 } from '../cpu/cpu';
 import {
   eightBitLoadFromGBMemory,
+  eightBitStoreIntoGBMemoryWithTraps,
   eightBitStoreIntoGBMemory,
-  eightBitStoreIntoGBMemorySkipTraps,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
@@ -91,11 +91,11 @@ export class Channel4 {
   }
 
   static initialize(): void {
-    eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx1 - 1, 0xFF);
-    eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx1, 0xFF);
-    eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx2, 0x00);
-    eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx3, 0x00);
-    eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx4, 0xBF);
+    eightBitStoreIntoGBMemory(Channel4.memoryLocationNRx1 - 1, 0xFF);
+    eightBitStoreIntoGBMemory(Channel4.memoryLocationNRx1, 0xFF);
+    eightBitStoreIntoGBMemory(Channel4.memoryLocationNRx2, 0x00);
+    eightBitStoreIntoGBMemory(Channel4.memoryLocationNRx3, 0x00);
+    eightBitStoreIntoGBMemory(Channel4.memoryLocationNRx4, 0xBF);
   }
 
   // Function to get a sample using the cycle counter on the channel

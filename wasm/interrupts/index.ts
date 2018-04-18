@@ -3,7 +3,7 @@ import {
 } from '../cpu/index';
 import {
   eightBitLoadFromGBMemory,
-  eightBitStoreIntoGBMemorySkipTraps,
+  eightBitStoreIntoGBMemory,
   sixteenBitStoreIntoGBMemorySkipTraps,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
@@ -109,7 +109,7 @@ function _handleInterrupt(bitPosition: u8): void {
   // Disable the bit on the interruptRequest
   let interruptRequest = eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptRequest);
   interruptRequest = resetBitOnByte(bitPosition, interruptRequest);
-  eightBitStoreIntoGBMemorySkipTraps(Interrupts.memoryLocationInterruptRequest, interruptRequest);
+  eightBitStoreIntoGBMemory(Interrupts.memoryLocationInterruptRequest, interruptRequest);
 
   // Push the programCounter onto the stacks
   Cpu.stackPointer = Cpu.stackPointer - 2;
@@ -140,7 +140,7 @@ function _requestInterrupt(bitPosition: u8): void {
   // Pass to set the correct interrupt bit on interruptRequest
   interruptRequest = setBitOnByte(bitPosition, interruptRequest);
 
-  eightBitStoreIntoGBMemorySkipTraps(Interrupts.memoryLocationInterruptRequest, interruptRequest);
+  eightBitStoreIntoGBMemory(Interrupts.memoryLocationInterruptRequest, interruptRequest);
 }
 
 export function setInterrupts(value: boolean): void {

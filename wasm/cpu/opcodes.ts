@@ -49,7 +49,7 @@ import {
 } from '../helpers/index';
 import {
   Memory,
-  eightBitStoreIntoGBMemory,
+  eightBitStoreIntoGBMemoryWithTraps,
   sixteenBitStoreIntoGBMemory,
   eightBitLoadFromGBMemoryWithTraps,
   eightBitLoadFromGBMemory,
@@ -298,7 +298,7 @@ function handleOpcode0x(opcode: u8): i8 {
       // 1  8
       // () means load into address pointed by BC
       let registerBC2: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC)
-      eightBitStoreIntoGBMemory(registerBC2, Cpu.registerA);
+      eightBitStoreIntoGBMemoryWithTraps(registerBC2, Cpu.registerA);
       return 8;
     case 0x03:
       // INC BC
@@ -471,7 +471,7 @@ function handleOpcode1x(opcode: u8): i8 {
           }
 
           // Store the final speed switch
-          eightBitStoreIntoGBMemory(Cpu.memoryLocationSpeedSwitch, speedSwitch);
+          eightBitStoreIntoGBMemoryWithTraps(Cpu.memoryLocationSpeedSwitch, speedSwitch);
 
           // Cycle accurate gameboy docs says this takes 76 clocks
           return 76;
@@ -493,7 +493,7 @@ function handleOpcode1x(opcode: u8): i8 {
       // LD (DE),A
       // 1 8
       let registerDE2: u16 = concatenateBytes(Cpu.registerD, Cpu.registerE);
-      eightBitStoreIntoGBMemory(registerDE2, Cpu.registerA);
+      eightBitStoreIntoGBMemoryWithTraps(registerDE2, Cpu.registerA);
       return 8;
     case 0x13:
       // INC DE
@@ -682,7 +682,7 @@ function handleOpcode2x(opcode: u8): i8 {
       // LD (HL+),A
       // 1 8
       let registerHL2: u16 = concatenateBytes(Cpu.registerH, Cpu.registerL);
-      eightBitStoreIntoGBMemory(registerHL2, Cpu.registerA);
+      eightBitStoreIntoGBMemoryWithTraps(registerHL2, Cpu.registerA);
       registerHL2 += 1;
       Cpu.registerH = splitHighByte(registerHL2);
       Cpu.registerL = splitLowByte(registerHL2);
@@ -887,7 +887,7 @@ function handleOpcode3x(opcode: u8): i8 {
       // LD (HL-),A
       // 1 8
       let registerHL2: u16 = concatenateBytes(Cpu.registerH, Cpu.registerL);
-      eightBitStoreIntoGBMemory(registerHL2, Cpu.registerA);
+      eightBitStoreIntoGBMemoryWithTraps(registerHL2, Cpu.registerA);
       registerHL2 -= 1;
       Cpu.registerH = splitHighByte(registerHL2);
       Cpu.registerL = splitLowByte(registerHL2);
@@ -917,7 +917,7 @@ function handleOpcode3x(opcode: u8): i8 {
         setZeroFlag(0);
       }
       setSubtractFlag(0);
-      eightBitStoreIntoGBMemory(registerHL4, <u8>valueAtHL4);
+      eightBitStoreIntoGBMemoryWithTraps(registerHL4, <u8>valueAtHL4);
       return 12;
     case 0x35:
 
@@ -936,12 +936,12 @@ function handleOpcode3x(opcode: u8): i8 {
         setZeroFlag(0);
       }
       setSubtractFlag(1);
-      eightBitStoreIntoGBMemory(registerHL5, <u8>valueAtHL5);
+      eightBitStoreIntoGBMemoryWithTraps(registerHL5, <u8>valueAtHL5);
       return 12;
     case 0x36:
       // LD (HL),d8
       // 2  12
-      eightBitStoreIntoGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL), getDataByteOne());
+      eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL), getDataByteOne());
       Cpu.programCounter += 1;
       return 12;
     case 0x37:
@@ -1356,37 +1356,37 @@ function handleOpcode7x(opcode: u8): i8 {
 
       // LD (HL),B
       // 1 8
-      eightBitStoreIntoGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerB);
+      eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerB);
       return 8;
     case 0x71:
 
       // LD (HL),C
       // 1 8
-      eightBitStoreIntoGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerC);
+      eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerC);
       return 8;
     case 0x72:
 
       // LD (HL),D
       // 1 8
-      eightBitStoreIntoGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerD);
+      eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerD);
       return 8;
     case 0x73:
 
       // LD (HL),E
       // 1 8
-      eightBitStoreIntoGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerE);
+      eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerE);
       return 8;
     case 0x74:
 
       // LD (HL),H
       // 1 8
-      eightBitStoreIntoGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerH);
+      eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerH);
       return 8;
     case 0x75:
 
       // LD (HL),L
       // 1 8
-      eightBitStoreIntoGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerL);
+      eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerL);
       return 8;
     case 0x76:
 
@@ -1406,7 +1406,7 @@ function handleOpcode7x(opcode: u8): i8 {
 
       // LD (HL),A
       // 1 8
-      eightBitStoreIntoGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerA);
+      eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerA);
       return 8;
     case 0x78:
 
@@ -2227,7 +2227,7 @@ function handleOpcodeEx(opcode: u8): i8 {
 
       // Store value in high RAM ($FF00 + a8)
       let largeDataByteOne: u16 = getDataByteOne();
-      eightBitStoreIntoGBMemory(0xFF00 + largeDataByteOne, Cpu.registerA);
+      eightBitStoreIntoGBMemoryWithTraps(0xFF00 + largeDataByteOne, Cpu.registerA);
       Cpu.programCounter += 1;
       return 12;
     case 0xE1:
@@ -2249,7 +2249,7 @@ function handleOpcodeEx(opcode: u8): i8 {
       // Also should change 0xF2
 
       // Store value in high RAM ($FF00 + register c)
-      eightBitStoreIntoGBMemory(0xFF00 + Cpu.registerC, Cpu.registerA);
+      eightBitStoreIntoGBMemoryWithTraps(0xFF00 + Cpu.registerC, Cpu.registerA);
       return 8;
     /* No Opcode for: 0xE3, 0xE4 */
     case 0xE5:
@@ -2300,7 +2300,7 @@ function handleOpcodeEx(opcode: u8): i8 {
 
       // LD (a16),A
       // 3 16
-      eightBitStoreIntoGBMemory(getConcatenatedDataByte(), Cpu.registerA);
+      eightBitStoreIntoGBMemoryWithTraps(getConcatenatedDataByte(), Cpu.registerA);
       Cpu.programCounter += 2;
       return 16;
     /* No Opcode for: 0xEB, 0xEC, 0xED */
