@@ -5,7 +5,7 @@ import {
   Memory
 } from './memory';
 import {
-  eightBitLoadFromGBMemorySkipTraps
+  eightBitLoadFromGBMemory
 } from './load';
 import {
   getRomBankAddress,
@@ -49,7 +49,7 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
       let vramBankId: u32 = 0;
       if (Cpu.GBCEnabled) {
         // Find our current VRAM Bank
-        vramBankId = (eightBitLoadFromGBMemorySkipTraps(Memory.memoryLocationGBCVRAMBAnk) & 0x01);
+        vramBankId = (eightBitLoadFromGBMemory(Memory.memoryLocationGBCVRAMBAnk) & 0x01);
         // Even though We added another 0x2000, the Cartridge ram is pulled out of our Internal Memory Space
         // Therefore, we do not need to adjust for this extra 0x2000
       }
@@ -76,7 +76,7 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
       // Get the last 3 bits to find our wram ID
       let wramBankId: u32 = 0;
       if(Cpu.GBCEnabled) {
-        wramBankId  = (eightBitLoadFromGBMemorySkipTraps(Memory.memoryLocationGBCWRAMBank) & 0x07);
+        wramBankId  = (eightBitLoadFromGBMemory(Memory.memoryLocationGBCWRAMBank) & 0x07);
       }
       if (wramBankId < 1) {
         wramBankId = 1;

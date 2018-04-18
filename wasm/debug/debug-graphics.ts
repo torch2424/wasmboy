@@ -21,7 +21,7 @@ import {
   drawPixelsFromLineOfTile
 } from '../graphics/tiles';
 import {
-  eightBitLoadFromGBMemorySkipTraps,
+  eightBitLoadFromGBMemory,
   Memory,
   loadFromVramBank
 } from '../memory/index';
@@ -42,7 +42,7 @@ export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
   // Bit 0 - BG Display (for CGB see below) (0=Off, 1=On)
 
   // Get our lcd control, see above for usage
-  let lcdControl: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationLcdControl);
+  let lcdControl: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationLcdControl);
 
   // Get our seleted tile data memory location
   let tileDataMemoryLocation = Graphics.memoryLocationTileDataSelectZeroStart;

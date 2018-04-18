@@ -2,7 +2,7 @@ import {
   Cpu
 } from '../cpu/index';
 import {
-  eightBitLoadFromGBMemorySkipTraps,
+  eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemorySkipTraps,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
@@ -111,7 +111,7 @@ export function updateTimers(numberOfCycles: i32): void {
   while (Timers.cycleCounter >= Timers.currentMaxCycleCount) {
 
     // Update the actual timer counter
-    let tima: u8 = eightBitLoadFromGBMemorySkipTraps(Timers.memoryLocationTIMA);
+    let tima: u8 = eightBitLoadFromGBMemory(Timers.memoryLocationTIMA);
 
     // Reset our cycle counters
     // Not setting to zero as we do not want to drop cycles
@@ -119,7 +119,7 @@ export function updateTimers(numberOfCycles: i32): void {
 
     if(tima >= 255) {
       // Store Timer Modulator inside of TIMA
-      eightBitStoreIntoGBMemorySkipTraps(Timers.memoryLocationTIMA, eightBitLoadFromGBMemorySkipTraps(Timers.memoryLocationTMA));
+      eightBitStoreIntoGBMemorySkipTraps(Timers.memoryLocationTIMA, eightBitLoadFromGBMemory(Timers.memoryLocationTMA));
 
       // Fire off timer interrupt
       requestTimerInterrupt();
@@ -190,7 +190,7 @@ function _checkDividerRegister(numberOfCycles: i32): void {
     // - 255 to catch any overflow with the cycles
     Timers.dividerRegisterCycleCounter -= Timers.dividerRegisterMaxCycleCount();
 
-    let dividerRegister: u8 = eightBitLoadFromGBMemorySkipTraps(Timers.memoryLocationDividerRegister);
+    let dividerRegister: u8 = eightBitLoadFromGBMemory(Timers.memoryLocationDividerRegister);
     dividerRegister += 1;
     eightBitStoreIntoGBMemorySkipTraps(Timers.memoryLocationDividerRegister, dividerRegister);
   }

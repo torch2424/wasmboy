@@ -16,7 +16,7 @@ import {
   eightBitStoreIntoGBMemorySkipTraps
 } from './store';
 import {
-  eightBitLoadFromGBMemorySkipTraps
+  eightBitLoadFromGBMemory
 } from './load';
 import {
   Joypad,
@@ -56,7 +56,7 @@ export function checkReadTraps(offset: u16): i32 {
   // http://gbdev.gg8.se/wiki/articles/Memory_Map
   if(offset >= Memory.echoRamLocation && offset < Memory.spriteInformationTableLocation) {
     // Simply return the mirror'd value
-    return eightBitLoadFromGBMemorySkipTraps(offset - 0x2000);
+    return eightBitLoadFromGBMemory(offset - 0x2000);
   }
 
   // Check for individal writes

@@ -20,7 +20,7 @@ import {
 // using Skip Traps, because LCD has unrestricted access
 // http://gbdev.gg8.se/wiki/articles/Video_Display#LCD_OAM_DMA_Transfers
 import {
-  eightBitLoadFromGBMemorySkipTraps
+  eightBitLoadFromGBMemory
 } from '../memory/load';
 import {
   loadFromVramBank,
@@ -44,9 +44,9 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
     let spriteTableIndex: u16 = <u16>(i * 4);
     // Y positon is offset by 16, X position is offset by 8
 
-    let spriteYPosition: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex);
-    let spriteXPosition: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 1);
-    let spriteTileId: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 2);
+    let spriteYPosition: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex);
+    let spriteXPosition: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 1);
+    let spriteTileId: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 2);
 
     // Pan docs of sprite attirbute table
     // Bit7   OBJ-to-BG Priority (0=OBJ Above BG, 1=OBJ Behind BG color 1-3)
@@ -81,7 +81,7 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
       // Then we need to draw the current sprite
 
       // Get our sprite attributes since we know we shall be drawing the tile
-      let spriteAttributes: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 3);
+      let spriteAttributes: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 3);
 
 
       // Check sprite Priority
@@ -159,7 +159,7 @@ export function renderSprites(scanlineRegister: u8, useLargerSprites: boolean): 
           let shouldHideFromOamPriority: boolean = false;
           let shouldHideFromBgPriority: boolean = false;
           // LCDC Priority
-          if(Cpu.GBCEnabled && !checkBitOnByte(0, eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationLcdControl))) {
+          if(Cpu.GBCEnabled && !checkBitOnByte(0, eightBitLoadFromGBMemory(Graphics.memoryLocationLcdControl))) {
             shouldShowFromLcdcPriority = true;
           }
 

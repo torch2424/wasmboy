@@ -5,8 +5,8 @@ import {
   Memory
 } from './memory';
 import {
-  eightBitLoadFromGBMemory,
-  eightBitLoadFromGBMemorySkipTraps
+  eightBitLoadFromGBMemoryWithTraps,
+  eightBitLoadFromGBMemory
 } from './load';
 import {
   eightBitStoreIntoGBMemory,
@@ -26,7 +26,7 @@ export function startDmaTransfer(sourceAddressOffset: u8): void {
   sourceAddress = (sourceAddress << 8);
 
   for(let i: u16 = 0; i <= 0x9F; i++) {
-    let spriteInformationByte: u8 = eightBitLoadFromGBMemorySkipTraps(sourceAddress + i);
+    let spriteInformationByte: u8 = eightBitLoadFromGBMemory(sourceAddress + i);
     let spriteInformationAddress: u16 = Memory.spriteInformationTableLocation + i;
     eightBitStoreIntoGBMemorySkipTraps(spriteInformationAddress, spriteInformationByte);
   }
@@ -50,7 +50,7 @@ export function startHdmaTransfer(hdmaTriggerByteToBeWritten: u8): void {
   if (Memory.isHblankHdmaActive && !checkBitOnByte(7, hdmaTriggerByteToBeWritten)) {
     // Don't reset anything, just set bit 7 to 1 on the trigger byte
     Memory.isHblankHdmaActive = false;
-    let hdmaTriggerByte = eightBitLoadFromGBMemorySkipTraps(Memory.memoryLocationHdmaTrigger);
+    let hdmaTriggerByte = eightBitLoadFromGBMemory(Memory.memoryLocationHdmaTrigger);
     eightBitStoreIntoGBMemorySkipTraps(Memory.memoryLocationHdmaTrigger, setBitOnByte(7, hdmaTriggerByte));
     return;
   }
@@ -129,7 +129,7 @@ export function updateHblankHdma(): void {
 // Simple Function to transfer the bytes from a destination to a source for a general pourpose or Hblank HDMA
 function hdmaTransfer(hdmaSource: u16, hdmaDestination: u16, transferLength: i32): void {
   for(let i: u16 = 0; i < <u16>transferLength; i++) {
-    let sourceByte: u8 = eightBitLoadFromGBMemory(hdmaSource + i);
+    let sourceByte: u8 = eightBitLoadFromGBMemoryWithTraps(hdmaSource + i);
     // get the hdmaDestination with wrapping
     // See issue #61: https://github.com/torch2424/wasmBoy/issues/61
     let hdmaDestinationWithWrapping = hdmaDestination + i;
@@ -157,8 +157,8 @@ function hdmaTransfer(hdmaSource: u16, hdmaDestination: u16, transferLength: i32
 // Follows the poan docs
 function getHdmaSourceFromMemory(): u16 {
   // Get our source for the HDMA
-  let hdmaSourceHigh: u8 = eightBitLoadFromGBMemorySkipTraps(Memory.memoryLocationHdmaSourceHigh);
-  let hdmaSourceLow: u8 = eightBitLoadFromGBMemorySkipTraps(Memory.memoryLocationHdmaSourceLow);
+  let hdmaSourceHigh: u8 = eightBitLoadFromGBMemory(Memory.memoryLocationHdmaSourceHigh);
+  let hdmaSourceLow: u8 = eightBitLoadFromGBMemory(Memory.memoryLocationHdmaSourceLow);
 
   let hdmaSource: u16 = concatenateBytes(hdmaSourceHigh, hdmaSourceLow);
 
@@ -172,8 +172,8 @@ function getHdmaSourceFromMemory(): u16 {
 // Function to get our HDMA Destination
 // Follows the poan docs
 function getHdmaDestinationFromMemory(): u16 {
-  let hdmaDestinationHigh: u8 = eightBitLoadFromGBMemorySkipTraps(Memory.memoryLocationHdmaDestinationHigh);
-  let hdmaDestinationLow: u8 = eightBitLoadFromGBMemorySkipTraps(Memory.memoryLocationHdmaDestinationLow);
+  let hdmaDestinationHigh: u8 = eightBitLoadFromGBMemory(Memory.memoryLocationHdmaDestinationHigh);
+  let hdmaDestinationLow: u8 = eightBitLoadFromGBMemory(Memory.memoryLocationHdmaDestinationLow);
 
   let hdmaDestination: u16 = concatenateBytes(hdmaDestinationHigh, hdmaDestinationLow);
 

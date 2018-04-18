@@ -2,7 +2,7 @@ import {
   Cpu
 } from '../cpu/index';
 import {
-  eightBitLoadFromGBMemorySkipTraps,
+  eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemorySkipTraps,
   sixteenBitStoreIntoGBMemorySkipTraps,
   getSaveStateMemoryOffset,
@@ -56,8 +56,8 @@ export function checkInterrupts(): i32 {
     // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
     let wasInterruptHandled: boolean = false;
 
-    let interruptRequest = eightBitLoadFromGBMemorySkipTraps(Interrupts.memoryLocationInterruptRequest);
-    let interruptEnabled = eightBitLoadFromGBMemorySkipTraps(Interrupts.memoryLocationInterruptEnabled);
+    let interruptRequest = eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptRequest);
+    let interruptEnabled = eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptEnabled);
 
     if(interruptRequest > 0 && interruptEnabled > 0) {
 
@@ -107,7 +107,7 @@ function _handleInterrupt(bitPosition: u8): void {
   setInterrupts(false);
 
   // Disable the bit on the interruptRequest
-  let interruptRequest = eightBitLoadFromGBMemorySkipTraps(Interrupts.memoryLocationInterruptRequest);
+  let interruptRequest = eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptRequest);
   interruptRequest = resetBitOnByte(bitPosition, interruptRequest);
   eightBitStoreIntoGBMemorySkipTraps(Interrupts.memoryLocationInterruptRequest, interruptRequest);
 
@@ -135,7 +135,7 @@ function _handleInterrupt(bitPosition: u8): void {
 
 function _requestInterrupt(bitPosition: u8): void {
 
-  let interruptRequest = eightBitLoadFromGBMemorySkipTraps(Interrupts.memoryLocationInterruptRequest);
+  let interruptRequest = eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptRequest);
 
   // Pass to set the correct interrupt bit on interruptRequest
   interruptRequest = setBitOnByte(bitPosition, interruptRequest);
@@ -154,8 +154,8 @@ export function areInterruptsEnabled(): boolean {
 
 // Useful fo determining the HALT bug
 export function areInterruptsPending(): boolean {
-  let interruptRequest = eightBitLoadFromGBMemorySkipTraps(Interrupts.memoryLocationInterruptRequest);
-  let interruptEnabled = eightBitLoadFromGBMemorySkipTraps(Interrupts.memoryLocationInterruptEnabled);
+  let interruptRequest = eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptRequest);
+  let interruptEnabled = eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptEnabled);
 
   if((interruptRequest & interruptEnabled) !== 0) {
     return true;

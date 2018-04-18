@@ -25,12 +25,6 @@ import {
   Channel4
 } from './sound/index';
 import {
-  eightBitLoadFromGBMemory
-} from './memory/index';
-import {
-  performanceTimestamp
-} from './helpers/index';
-import {
   wasmPages
 } from './constants/constants';
 

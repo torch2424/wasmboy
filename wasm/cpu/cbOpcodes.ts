@@ -21,7 +21,7 @@ import {
 import {
   eightBitStoreIntoGBMemory,
   sixteenBitStoreIntoGBMemory,
-  eightBitLoadFromGBMemory,
+  eightBitLoadFromGBMemoryWithTraps,
   sixteenBitLoadFromGBMemory
 } from '../memory/index';
 
@@ -66,7 +66,7 @@ export function handleCbOpcode(cbOpcode: u8): i8 {
       break;
     case 6:
       // Value at register HL
-      instructionRegisterValue = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
+      instructionRegisterValue = eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
       break;
     case 7:
       instructionRegisterValue = Cpu.registerA;

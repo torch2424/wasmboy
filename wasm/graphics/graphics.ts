@@ -23,7 +23,7 @@ import {
   Config
 } from '../config';
 import {
-  eightBitLoadFromGBMemorySkipTraps,
+  eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemorySkipTraps,
   storeFrameToBeRendered,
   getSaveStateMemoryOffset,
@@ -167,7 +167,7 @@ export function updateGraphics(numberOfCycles: i32): void {
       Graphics.scanlineCycleCounter -= Graphics.MAX_CYCLES_PER_SCANLINE();
 
       // Move to next scanline
-      let scanlineRegister: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationScanlineRegister);
+      let scanlineRegister: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationScanlineRegister);
 
       // Check if we've reached the last scanline
       if(scanlineRegister === 144) {
@@ -226,7 +226,7 @@ function _drawScanline(scanlineRegister: u8): void {
   // Bit 0 - BG Display (for CGB see below) (0=Off, 1=On)
 
   // Get our lcd control, see above for usage
-  let lcdControl: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationLcdControl);
+  let lcdControl: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationLcdControl);
 
   // Get our seleted tile data memory location
   let tileDataMemoryLocation = Graphics.memoryLocationTileDataSelectZeroStart;

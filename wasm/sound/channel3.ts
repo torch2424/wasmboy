@@ -26,7 +26,7 @@ import {
   Cpu
 } from '../cpu/cpu';
 import {
-  eightBitLoadFromGBMemorySkipTraps,
+  eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemorySkipTraps,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
@@ -148,7 +148,7 @@ export class Channel3 {
     isChannelDacEnabled(Channel3.channelNumber)) {
       // Get our volume code
       if(Channel3.volumeCodeChanged) {
-        let volumeCode: u8 = eightBitLoadFromGBMemorySkipTraps(Channel3.memoryLocationNRx2);
+        let volumeCode: u8 = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx2);
         volumeCode = (volumeCode >> 5);
         volumeCode = (volumeCode & 0x0F);
         Channel3.volumeCode = volumeCode;
@@ -167,7 +167,7 @@ export class Channel3 {
     let positionIndexToAdd: u16 = Channel3.waveTablePosition / 2;
     let memoryLocationWaveSample: u16 = Channel3.memoryLocationWaveTable + positionIndexToAdd;
 
-    sample = <i16>eightBitLoadFromGBMemorySkipTraps(memoryLocationWaveSample);
+    sample = <i16>eightBitLoadFromGBMemory(memoryLocationWaveSample);
 
     // Need to grab the top or lower half for the correct sample
     if (Channel3.waveTablePosition % 2 === 0) {

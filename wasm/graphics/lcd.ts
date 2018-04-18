@@ -4,7 +4,7 @@ import {
 } from './graphics';
 // Assembly script really not feeling the reexport
 import {
-  eightBitLoadFromGBMemorySkipTraps
+  eightBitLoadFromGBMemory
 } from '../memory/load';
 import {
   eightBitStoreIntoGBMemorySkipTraps
@@ -24,7 +24,7 @@ import {
 } from '../helpers/index';
 
 export function isLcdEnabled(): boolean {
-  return checkBitOnByte(7, eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationLcdControl));
+  return checkBitOnByte(7, eightBitLoadFromGBMemory(Graphics.memoryLocationLcdControl));
 }
 
 // Pass in the lcd status for performance
@@ -38,7 +38,7 @@ export function setLcdStatus(lcdEnabledStatus: boolean): void {
   // 2 or 10: Searching Sprites Atts
   // 3 or 11: Transfering Data to LCD Driver
 
-  let lcdStatus: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationLcdStatus);
+  let lcdStatus: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationLcdStatus);
   if(!lcdEnabledStatus) {
     // Reset scanline cycle counter
     Graphics.scanlineCycleCounter = 0;
@@ -56,7 +56,7 @@ export function setLcdStatus(lcdEnabledStatus: boolean): void {
   }
 
   // Get our current scanline, and lcd mode
-  let scanlineRegister: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationScanlineRegister);
+  let scanlineRegister: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationScanlineRegister);
   let lcdMode: u8 = lcdStatus & 0x03;
 
   let newLcdMode: u8 = 0;
@@ -109,7 +109,7 @@ export function setLcdStatus(lcdEnabledStatus: boolean): void {
 
     // Check for the coincidence flag
     // Need to check on every mode, and not just HBLANK, as checking on hblank breaks shantae, which checks on vblank
-    let coincidenceCompare: u8 = eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationCoincidenceCompare);
+    let coincidenceCompare: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationCoincidenceCompare);
     if((newLcdMode === 0 || newLcdMode === 1) &&
       scanlineRegister === coincidenceCompare) {
       lcdStatus = setBitOnByte(2, lcdStatus);

@@ -10,18 +10,18 @@ import {
   performanceTimestamp
 } from '../helpers/index';
 
-export function eightBitLoadFromGBMemory(offset: u16): u8 {
+export function eightBitLoadFromGBMemory(gameboyOffset: u16): u8 {
+  return load<u8>(getWasmBoyOffsetFromGameBoyOffset(gameboyOffset));
+}
+
+export function eightBitLoadFromGBMemoryWithTraps(offset: u16): u8 {
   let readTrapResult: i32 = checkReadTraps(offset);
   switch (readTrapResult) {
     case -1:
-      return _eightBitLoadFromWasmBoyMemory(offset);
+      return eightBitLoadFromGBMemory(offset);
     default:
       return <u8>readTrapResult;
   }
-}
-
-export function eightBitLoadFromGBMemorySkipTraps(offset: u16): u8 {
-  return _eightBitLoadFromWasmBoyMemory(offset);
 }
 
 export function sixteenBitLoadFromGBMemory(offset: u16): u16 {
@@ -31,7 +31,7 @@ export function sixteenBitLoadFromGBMemory(offset: u16): u16 {
   let lowByteReadTrapResult: i32 = checkReadTraps(offset);
   switch (lowByteReadTrapResult) {
     case -1:
-      lowByte = _eightBitLoadFromWasmBoyMemory(offset);
+      lowByte = eightBitLoadFromGBMemory(offset);
       break;
     default:
       lowByte = <u8>lowByteReadTrapResult;
@@ -46,7 +46,7 @@ export function sixteenBitLoadFromGBMemory(offset: u16): u16 {
   let highByteReadTrapResult: i32 = checkReadTraps(nextOffset);
   switch (highByteReadTrapResult) {
     case -1:
-      highByte = _eightBitLoadFromWasmBoyMemory(nextOffset);
+      highByte = eightBitLoadFromGBMemory(nextOffset);
       break;
     default:
       highByte = <u8>highByteReadTrapResult;
@@ -55,10 +55,6 @@ export function sixteenBitLoadFromGBMemory(offset: u16): u16 {
 
   // Concatenate the bytes and return
   return concatenateBytes(highByte, lowByte);
-}
-
-function _eightBitLoadFromWasmBoyMemory(gameboyOffset: u16): u8 {
-  return load<u8>(getWasmBoyOffsetFromGameBoyOffset(gameboyOffset));
 }
 
 export function loadBooleanDirectlyFromWasmMemory(offset: u32): boolean {

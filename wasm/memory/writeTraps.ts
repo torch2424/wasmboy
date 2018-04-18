@@ -26,8 +26,8 @@ import {
   sixteenBitStoreIntoGBMemorySkipTraps
 } from './store';
 import {
+  eightBitLoadFromGBMemoryWithTraps,
   eightBitLoadFromGBMemory,
-  eightBitLoadFromGBMemorySkipTraps,
   sixteenBitLoadFromGBMemory
 } from './load';
 import {

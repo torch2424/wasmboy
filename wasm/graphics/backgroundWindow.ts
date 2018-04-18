@@ -28,7 +28,7 @@ import {
 // using Skip Traps, because LCD has unrestricted access
 // http://gbdev.gg8.se/wiki/articles/Video_Display#LCD_OAM_DMA_Transfers
 import {
-  eightBitLoadFromGBMemorySkipTraps
+  eightBitLoadFromGBMemory
 } from '../memory/load';
 import {
   Memory,
@@ -48,8 +48,8 @@ export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u
   // NOTE: Camera is reffering to what you can see inside the 160x144 viewport of the entire rendered 256x256 map.
 
   // Get our scrollX and scrollY (u16 to play nice with assemblyscript)
-  let scrollX: u16 = <u16>eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationScrollX);
-  let scrollY: u16 = <u16>eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationScrollY);
+  let scrollX: u16 = <u16>eightBitLoadFromGBMemory(Graphics.memoryLocationScrollX);
+  let scrollY: u16 = <u16>eightBitLoadFromGBMemory(Graphics.memoryLocationScrollY);
 
   // Get our current pixel y positon on the 160x144 camera (Row that the scanline draws across)
   // this is done by getting the current scroll Y position,
@@ -71,8 +71,8 @@ export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u
 export function renderWindow(scanlineRegister: u8, tileDataMemoryLocation: u16, tileMapMemoryLocation: u16): void {
 
   // Get our windowX and windowY
-  let windowX: u16 = <u16>eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationWindowX);
-  let windowY: u16 = <u16>eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationWindowY);
+  let windowX: u16 = <u16>eightBitLoadFromGBMemory(Graphics.memoryLocationWindowX);
+  let windowY: u16 = <u16>eightBitLoadFromGBMemory(Graphics.memoryLocationWindowY);
 
   // NOTE: Camera is reffering to what you can see inside the 160x144 viewport of the entire rendered 256x256 map.
 
@@ -334,10 +334,10 @@ function drawLineOfTileFromTileCache(xPixel: i32, yPixel: u8, pixelXPositionInMa
     // Was last tile flipped
     let wasLastTileHorizontallyFlipped: boolean = false;
     let isCurrentTileHorizontallyFlipped: boolean = false;
-    if (checkBitOnByte(5, eightBitLoadFromGBMemorySkipTraps(tileMapAddress - 1))) {
+    if (checkBitOnByte(5, eightBitLoadFromGBMemory(tileMapAddress - 1))) {
       wasLastTileHorizontallyFlipped = true;
     }
-    if (checkBitOnByte(5, eightBitLoadFromGBMemorySkipTraps(tileMapAddress))) {
+    if (checkBitOnByte(5, eightBitLoadFromGBMemory(tileMapAddress))) {
       isCurrentTileHorizontallyFlipped = true;
     }
 

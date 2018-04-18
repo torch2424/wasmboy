@@ -33,7 +33,7 @@ import {
   Config
 } from '../config';
 import {
-  eightBitLoadFromGBMemorySkipTraps,
+  eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemorySkipTraps,
   setLeftAndRightOutputForAudioQueue,
   getSaveStateMemoryOffset,
@@ -426,7 +426,7 @@ function mixChannelSamples(channel1Sample: i32 = 15, channel2Sample: i32 = 15, c
   // TODO: Vin Mixing
 
   // Simply get the left/right volume, add up the values, and put into memory!
-  let registerNR50 = eightBitLoadFromGBMemorySkipTraps(Sound.memoryLocationNR50);
+  let registerNR50 = eightBitLoadFromGBMemory(Sound.memoryLocationNR50);
   // Want bits 6-4
   let leftMixerVolume: i32 = (registerNR50 >> 4);
   leftMixerVolume = leftMixerVolume & 0x07;

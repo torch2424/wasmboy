@@ -5,7 +5,7 @@ import {
   eightBitStoreIntoGBMemorySkipTraps
 } from '../memory/store';
 import {
-  eightBitLoadFromGBMemorySkipTraps
+  eightBitLoadFromGBMemory
 } from '../memory/load';
 import {
   requestJoypadInterrupt
@@ -67,7 +67,7 @@ export class Joypad {
 export function getJoypadState(): u8 {
 
   // Get the joypad register
-  let joypadRegister: u8 = eightBitLoadFromGBMemorySkipTraps(Joypad.memoryLocationJoypadRegister);
+  let joypadRegister: u8 = eightBitLoadFromGBMemory(Joypad.memoryLocationJoypadRegister);
 
   // Flip all the bits
   joypadRegister = joypadRegister ^ 0xFF;
@@ -217,7 +217,7 @@ function _pressJoypadButton(buttonId: u8): void {
     }
 
     // Determine if we should request an interrupt
-    let joypadRegister: u8 = eightBitLoadFromGBMemorySkipTraps(Joypad.memoryLocationJoypadRegister);
+    let joypadRegister: u8 = eightBitLoadFromGBMemory(Joypad.memoryLocationJoypadRegister);
     let shouldRequestInterrupt = false;
 
     // Check if the game is looking for a dpad type button press

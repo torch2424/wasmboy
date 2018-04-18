@@ -16,8 +16,8 @@ export {
 } from './memory';
 
 export {
+  eightBitLoadFromGBMemoryWithTraps,
   eightBitLoadFromGBMemory,
-  eightBitLoadFromGBMemorySkipTraps,
   sixteenBitLoadFromGBMemory,
   loadBooleanDirectlyFromWasmMemory
 } from './load';

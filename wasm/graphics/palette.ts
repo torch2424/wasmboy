@@ -3,7 +3,7 @@ import {
 } from '../cpu/cpu';
 import {
   Memory,
-  eightBitLoadFromGBMemorySkipTraps,
+  eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemorySkipTraps,
   storePaletteByteInWasmMemory,
   loadPaletteByteFromWasmMemory
@@ -34,7 +34,7 @@ export function getMonochromeColorFromPalette(colorId: u8, paletteMemoryLocation
   // Return our Color (00 - white, 01 - light grey, 10 Dark grey, or 11 - Black)
   let color: u8 = colorId;
   if(!shouldRepresentColorByColorId) {
-    color = (eightBitLoadFromGBMemorySkipTraps(paletteMemoryLocation) >> (colorId * 2)) & 0x03;
+    color = (eightBitLoadFromGBMemory(paletteMemoryLocation) >> (colorId * 2)) & 0x03;
   }
 
 
@@ -65,7 +65,7 @@ export function writeColorPaletteToMemory(offset: u16, value: u16): void {
   //  Bit 0-5   Index (00-3F)
   if (offset === Palette.memoryLocationBackgroundPaletteData || offset === Palette.memoryLocationSpritePaletteData) {
     // Get the palette index
-    let paletteIndex: u8 = eightBitLoadFromGBMemorySkipTraps(offset - 1);
+    let paletteIndex: u8 = eightBitLoadFromGBMemory(offset - 1);
 
     // Clear the 6th bit, as it does nothing
     paletteIndex = resetBitOnByte(6, paletteIndex);
