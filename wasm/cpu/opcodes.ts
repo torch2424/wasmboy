@@ -89,26 +89,7 @@ export function update(): i32 {
   while(!error &&
     Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME()) {
     numberOfCycles = emulationStep();
-    if (numberOfCycles >= 0) {
-      Cpu.currentCycles += numberOfCycles;
-
-      if(Config.audioBatchProcessing) {
-        Sound.currentCycles += numberOfCycles;
-      }
-
-      if (Config.graphicsBatchProcessing) {
-        // Need to do this, since a lot of things depend on the scanline
-        // Batch processing will simply return if the number of cycles is too low
-        Graphics.currentCycles += numberOfCycles;
-        batchProcessGraphics();
-      }
-
-      if (Config.timersBatchProcessing) {
-        // Batch processing will simply return if the number of cycles is too low
-        Timers.currentCycles += numberOfCycles;
-        batchProcessTimers();
-      }
-    } else {
+    if (numberOfCycles < 0) {
       error = true;
     }
   }
@@ -182,18 +163,32 @@ export function emulationStep(): i32 {
   // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
   numberOfCycles += checkInterrupts();
 
+  // Finally, Add our number of cycles to the CPU Cycles
+  Cpu.currentCycles += numberOfCycles;
+
   if(!Cpu.isStopped) {
-    if(!Config.graphicsBatchProcessing) {
+    if(Config.graphicsBatchProcessing) {
+      // Need to do this, since a lot of things depend on the scanline
+      // Batch processing will simply return if the number of cycles is too low
+      Graphics.currentCycles += numberOfCycles;
+      batchProcessGraphics();
+    } else {
       updateGraphics(numberOfCycles);
     }
 
-    if(!Config.audioBatchProcessing) {
+    if(Config.audioBatchProcessing) {
+      Sound.currentCycles += numberOfCycles;
+    } else {
       updateSound(numberOfCycles);
     }
   }
 
   // Check other Gameboy components
-  if (!Config.timersBatchProcessing) {
+  if (Config.timersBatchProcessing) {
+    // Batch processing will simply return if the number of cycles is too low
+    Timers.currentCycles += numberOfCycles;
+    batchProcessTimers();
+  } else {
     updateTimers(numberOfCycles);
   }
 
