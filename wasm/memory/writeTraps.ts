@@ -23,7 +23,7 @@ import {
 } from './banking';
 import {
   eightBitStoreIntoGBMemory,
-  sixteenBitStoreIntoGBMemorySkipTraps
+  sixteenBitStoreIntoGBMemory
 } from './store';
 import {
   eightBitLoadFromGBMemoryWithTraps,
@@ -41,7 +41,7 @@ import {
 
 // Internal function to trap any modify data trying to be written to Gameboy memory
 // Follows the Gameboy memory map
-export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolean): boolean {
+export function checkWriteTraps(offset: u16, value: u16): boolean {
 
   // Cache globals used multiple times for performance
   let videoRamLocation: u16 = Memory.videoRamLocation;
@@ -77,11 +77,7 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
   // Hence why it is called echo
   if(offset >= Memory.echoRamLocation && offset < spriteInformationTableLocation) {
     let wramOffset: u16 = offset - 0x2000;
-    if(isEightBitStore) {
-      eightBitStoreIntoGBMemory(wramOffset, <u8>value);
-    } else {
-      sixteenBitStoreIntoGBMemorySkipTraps(wramOffset, value);
-    }
+    eightBitStoreIntoGBMemory(wramOffset, <u8>value);
 
     // Allow the original write, and return since we dont need to look anymore
     return true;

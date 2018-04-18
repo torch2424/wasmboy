@@ -24,9 +24,9 @@ export {
 
 export {
   eightBitStoreIntoGBMemoryWithTraps,
-  sixteenBitStoreIntoGBMemory,
+  sixteenBitStoreIntoGBMemoryWithTraps,
   eightBitStoreIntoGBMemory,
-  sixteenBitStoreIntoGBMemorySkipTraps,
+  sixteenBitStoreIntoGBMemory,
   storeBooleanDirectlyToWasmMemory
 } from './store';
 

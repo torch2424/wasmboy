@@ -20,7 +20,7 @@ import {
 } from '../helpers/index';
 import {
   eightBitStoreIntoGBMemoryWithTraps,
-  sixteenBitStoreIntoGBMemory,
+  sixteenBitStoreIntoGBMemoryWithTraps,
   eightBitLoadFromGBMemoryWithTraps,
   sixteenBitLoadFromGBMemory
 } from '../memory/index';

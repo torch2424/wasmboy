@@ -4,7 +4,7 @@ import {
 import {
   eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemory,
-  sixteenBitStoreIntoGBMemorySkipTraps,
+  sixteenBitStoreIntoGBMemory,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
@@ -113,7 +113,7 @@ function _handleInterrupt(bitPosition: u8): void {
 
   // Push the programCounter onto the stacks
   Cpu.stackPointer = Cpu.stackPointer - 2;
-  sixteenBitStoreIntoGBMemorySkipTraps(Cpu.stackPointer, Cpu.programCounter);
+  sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
 
   // Jump to the correct interrupt location
   // http://www.codeslinger.co.uk/pages/projects/gameboy/interupts.html

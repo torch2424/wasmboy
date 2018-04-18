@@ -50,7 +50,7 @@ import {
 import {
   Memory,
   eightBitStoreIntoGBMemoryWithTraps,
-  sixteenBitStoreIntoGBMemory,
+  sixteenBitStoreIntoGBMemoryWithTraps,
   eightBitLoadFromGBMemoryWithTraps,
   eightBitLoadFromGBMemory,
   sixteenBitLoadFromGBMemory
@@ -360,7 +360,7 @@ function handleOpcode0x(opcode: u8): i8 {
       // LD (a16),SP
       // 3  20
       // Load the stack pointer into the 16 bit address represented by the two data bytes
-      sixteenBitStoreIntoGBMemory(getConcatenatedDataByte(), Cpu.stackPointer);
+      sixteenBitStoreIntoGBMemoryWithTraps(getConcatenatedDataByte(), Cpu.stackPointer);
       Cpu.programCounter += 2;
       return 20;
     case 0x09:
@@ -1972,7 +1972,7 @@ function handleOpcodeCx(opcode: u8): i8 {
       // 3  24/12
       if (getZeroFlag() === 0) {
         Cpu.stackPointer -= 2;
-        sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
+        sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter + 2);
         Cpu.programCounter = getConcatenatedDataByte();
         return 24;
       } else {
@@ -1985,7 +1985,7 @@ function handleOpcodeCx(opcode: u8): i8 {
       // 1  16
       let registerBC5 = concatenateBytes(Cpu.registerB, Cpu.registerC);
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, registerBC5);
+      sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, registerBC5);
       return 16;
     case 0xC6:
 
@@ -2000,7 +2000,7 @@ function handleOpcodeCx(opcode: u8): i8 {
       // RST 00H
       // 1 16
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
+      sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter);
       Cpu.programCounter = 0x00;
       return 16;
     case 0xC8:
@@ -2046,7 +2046,7 @@ function handleOpcodeCx(opcode: u8): i8 {
       // 3  24/12
       if (getZeroFlag() === 1) {
         Cpu.stackPointer -= 2;
-        sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
+        sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter + 2);
         Cpu.programCounter = getConcatenatedDataByte();
         return 24;
       } else {
@@ -2058,7 +2058,7 @@ function handleOpcodeCx(opcode: u8): i8 {
       // CALL a16
       // 3  24
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
+      sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter + 2);
       Cpu.programCounter = getConcatenatedDataByte();
       return 24;
     case 0xCE:
@@ -2074,7 +2074,7 @@ function handleOpcodeCx(opcode: u8): i8 {
       // RST 08H
       // 1 16
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
+      sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter);
       Cpu.programCounter = 0x08;
       return 16;
   }
@@ -2122,7 +2122,7 @@ function handleOpcodeDx(opcode: u8): i8 {
       // 3  24/12
       if (getCarryFlag() === 0) {
         Cpu.stackPointer -= 2;
-        sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
+        sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter + 2);
         Cpu.programCounter = getConcatenatedDataByte();
         return 24;
       } else {
@@ -2135,7 +2135,7 @@ function handleOpcodeDx(opcode: u8): i8 {
       // 1 16
       let registerDE5 = concatenateBytes(Cpu.registerD, Cpu.registerE);
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, registerDE5);
+      sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, registerDE5);
       return 16;
     case 0xD6:
 
@@ -2150,7 +2150,7 @@ function handleOpcodeDx(opcode: u8): i8 {
       // RST 10H
       // 1 16
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
+      sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter);
       Cpu.programCounter = 0x10;
       return 16;
     case 0xD8:
@@ -2191,7 +2191,7 @@ function handleOpcodeDx(opcode: u8): i8 {
       // 3  24/12
       if (getCarryFlag() === 1) {
         Cpu.stackPointer -= 2;
-        sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
+        sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter + 2);
         Cpu.programCounter = getConcatenatedDataByte();
         return 24;
       } else {
@@ -2211,7 +2211,7 @@ function handleOpcodeDx(opcode: u8): i8 {
       // RST 18H
       // 1 16
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
+      sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter);
       Cpu.programCounter = 0x18;
       return 16;
   }
@@ -2258,7 +2258,7 @@ function handleOpcodeEx(opcode: u8): i8 {
       // 1 16
       let registerHL5 = concatenateBytes(Cpu.registerH, Cpu.registerL);
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, registerHL5);
+      sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, registerHL5);
       return 16;
     case 0xE6:
 
@@ -2273,7 +2273,7 @@ function handleOpcodeEx(opcode: u8): i8 {
       // RST 20H
       // 1 16
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
+      sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter);
       Cpu.programCounter = 0x20;
       return 16;
     case 0xE8:
@@ -2317,7 +2317,7 @@ function handleOpcodeEx(opcode: u8): i8 {
       // RST 28H
       // 1 16
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
+      sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter);
       Cpu.programCounter = 0x28;
       return 16;
   }
@@ -2364,7 +2364,7 @@ function handleOpcodeFx(opcode: u8): i8 {
       // 1 16
       let registerAF5 = concatenateBytes(Cpu.registerA, Cpu.registerF);
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, registerAF5);
+      sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, registerAF5);
       return 16;
     case 0xF6:
 
@@ -2379,7 +2379,7 @@ function handleOpcodeFx(opcode: u8): i8 {
       // RST 30H
       // 1 16
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
+      sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter);
       Cpu.programCounter = 0x30;
       return 16;
     case 0xF8:
@@ -2432,7 +2432,7 @@ function handleOpcodeFx(opcode: u8): i8 {
       // RST 38H
       // 1 16
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
+      sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter);
       Cpu.programCounter = 0x38;
       return 16;
   }

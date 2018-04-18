@@ -16,12 +16,12 @@ export function eightBitStoreIntoGBMemory(gameboyOffset: u16, value: u8): void {
 }
 
 export function eightBitStoreIntoGBMemoryWithTraps(offset: u16, value: u8): void {
-  if(checkWriteTraps(offset, <u16>value, true)) {
+  if(checkWriteTraps(offset, <u16>value)) {
     eightBitStoreIntoGBMemory(offset, value);
   }
 }
 
-export function sixteenBitStoreIntoGBMemory(offset: u16, value: u16): void {
+export function sixteenBitStoreIntoGBMemoryWithTraps(offset: u16, value: u16): void {
 
   // Dividing into two seperate eight bit calls to help with debugging tilemap overwrites
   // Split the value into two seperate bytes
@@ -29,16 +29,16 @@ export function sixteenBitStoreIntoGBMemory(offset: u16, value: u16): void {
   let lowByte: u8 = splitLowByte(value);
   let nextOffset: u16 = offset + 1;
 
-  if(checkWriteTraps(offset, lowByte, false)) {
+  if(checkWriteTraps(offset, lowByte)) {
     eightBitStoreIntoGBMemory(offset, lowByte);
   }
 
-  if(checkWriteTraps(nextOffset, highByte, false)) {
+  if(checkWriteTraps(nextOffset, highByte)) {
     eightBitStoreIntoGBMemory(nextOffset, highByte);
   }
 }
 
-export function sixteenBitStoreIntoGBMemorySkipTraps(offset: u16, value: u16): void {
+export function sixteenBitStoreIntoGBMemory(offset: u16, value: u16): void {
 
   // Dividing into two seperate eight bit calls to help with debugging tilemap overwrites
   // Split the value into two seperate bytes
