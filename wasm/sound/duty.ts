@@ -8,17 +8,14 @@ import {
   checkBitOnByte
 } from '../helpers/index';
 
-export function getChannelDuty(channelNumber: i32): u8 {
-  let duty = getRegister1OfChannel(channelNumber);
-  duty = (duty >> 6);
-  return (duty & 0x03);
+export function getChannelDuty(channelNumber: i32): i32 {
+  //let duty = getRegister1OfChannel(channelNumber);
+  //duty = (getRegister1OfChannel(channelNumber) >> 6);
+  return ((getRegister1OfChannel(channelNumber) >> 6) & 0x03);
 }
 
 // Since there are no 2d arrays, we will use a byte to represent duty cycles (wave form from percentages)
-export function isDutyCycleClockPositiveOrNegativeForWaveform(channelNumber: i32, waveFormPositionOnDuty: u8): boolean {
-  // Get our current Duty
-  let duty: u8 = getChannelDuty(channelNumber);
-
+export function isDutyCycleClockPositiveOrNegativeForWaveform(channelNumber: i32, waveFormPositionOnDuty: i32): boolean {
   // Get our Wave Form According to the Duty
   // Default to a duty of 1
   // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave

@@ -62,7 +62,7 @@ export class Channel2 {
 
   // Square Wave properties
   static dutyCycle: u8 = 0x00;
-  static waveFormPositionOnDuty: u8 = 0x00;
+  static waveFormPositionOnDuty: i32 = 0x00;
 
   // Save States
 
@@ -77,7 +77,7 @@ export class Channel2 {
     store<i32>(getSaveStateMemoryOffset(0x0E, Channel2.saveStateSlot), Channel2.volume);
 
     store<u8>(getSaveStateMemoryOffset(0x13, Channel2.saveStateSlot), Channel2.dutyCycle);
-    store<u8>(getSaveStateMemoryOffset(0x14, Channel2.saveStateSlot), Channel2.waveFormPositionOnDuty);
+    store<u8>(getSaveStateMemoryOffset(0x14, Channel2.saveStateSlot), <u8>Channel2.waveFormPositionOnDuty);
   }
 
   // Function to load the save state from memory

@@ -53,10 +53,10 @@ export function resetBitOnByte(bitPosition: u8, byte: u8): u8 {
   return byte & ~(0x01 << bitPosition);
 }
 
-export function checkBitOnByte(bitPosition: u8, byte: u8): boolean {
+export function checkBitOnByte(bitPosition: i32, byte: u8): boolean {
   // Perforamnce improvements
   // https://github.com/AssemblyScript/assemblyscript/issues/40
-  return (<u32>byte & (1 << bitPosition)) != 0;
+  return (<i32>byte & (1 << bitPosition)) != 0;
 }
 
 namespace env {

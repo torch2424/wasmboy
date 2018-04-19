@@ -46,7 +46,7 @@ export function resetTileCache(): void {
   TileCache.nextXIndexToPerformCacheCheck = - 1;
 }
 
-export function drawPixelsFromLineOfTile(tileId: u8, tileDataMemoryLocation: u16, vramBankId: i32, tileLineXStart: i32, tileLineXEnd: i32, tileLineY: u16, outputLineX: i32, outputLineY: u16, outputWidth: i32, wasmMemoryStart: u32, shouldRepresentMonochromeColorByColorId: boolean = false, paletteLocation: u16 = 0, bgMapAttributes: i32 = -1): i32 {
+export function drawPixelsFromLineOfTile(tileId: u8, tileDataMemoryLocation: u16, vramBankId: i32, tileLineXStart: i32, tileLineXEnd: i32, tileLineY: u16, outputLineX: i32, outputLineY: u16, outputWidth: i32, wasmMemoryStart: i32, shouldRepresentMonochromeColorByColorId: boolean = false, paletteLocation: u16 = 0, bgMapAttributes: i32 = -1): i32 {
 
   // Get our number of pixels drawn
   let pixelsDrawn: i32 = 0;
@@ -115,7 +115,7 @@ export function drawPixelsFromLineOfTile(tileId: u8, tileDataMemoryLocation: u16
 
       // Finally Lets place a pixel in memory
       // Find where our tile line would start
-      let pixelStart: u32 = getTilePixelStart(iteratedOutputX, outputLineY, outputWidth);
+      let pixelStart: i32 = getTilePixelStart(iteratedOutputX, outputLineY, outputWidth);
 
       store<u8>(wasmMemoryStart + pixelStart, red);
       store<u8>(wasmMemoryStart + pixelStart + 1, green);
@@ -139,9 +139,9 @@ export function drawPixelsFromLineOfTile(tileId: u8, tileDataMemoryLocation: u16
   return pixelsDrawn;
 }
 
-export function getTilePixelStart(outputLineX: i32, outputLineY: u16, outputWidth: i32): u32 {
+export function getTilePixelStart(outputLineX: i32, outputLineY: u16, outputWidth: i32): i32 {
   // Finally Lets place a pixel in memory
-  let pixelStart: u32 = (outputLineY * <u16>outputWidth) + <u16>outputLineX;
+  let pixelStart: i32 = (outputLineY * <u16>outputWidth) + <u16>outputLineX;
 
   // Each pixel takes 3 slots, therefore, multiply by 3!
   return pixelStart * 3;

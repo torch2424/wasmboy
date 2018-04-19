@@ -57,7 +57,7 @@ export function sixteenBitLoadFromGBMemory(offset: u16): u16 {
   return concatenateBytes(highByte, lowByte);
 }
 
-export function loadBooleanDirectlyFromWasmMemory(offset: u32): boolean {
+export function loadBooleanDirectlyFromWasmMemory(offset: i32): boolean {
   let booleanAsInt: u8 = load<u8>(offset);
   if(booleanAsInt > 0) {
     return true;

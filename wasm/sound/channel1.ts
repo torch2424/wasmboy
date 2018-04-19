@@ -64,7 +64,7 @@ export class Channel1 {
 
   // Square Wave properties
   static dutyCycle: u8 = 0x00;
-  static waveFormPositionOnDuty: u8 = 0x00;
+  static waveFormPositionOnDuty: i32 = 0x00;
 
   // Channel 1 Sweep
   static isSweepEnabled: boolean = false;
@@ -84,7 +84,7 @@ export class Channel1 {
     store<i32>(getSaveStateMemoryOffset(0x0E, Channel1.saveStateSlot), Channel1.volume);
 
     store<u8>(getSaveStateMemoryOffset(0x13, Channel1.saveStateSlot), Channel1.dutyCycle);
-    store<u8>(getSaveStateMemoryOffset(0x14, Channel1.saveStateSlot), Channel1.waveFormPositionOnDuty);
+    store<u8>(getSaveStateMemoryOffset(0x14, Channel1.saveStateSlot), <u8>Channel1.waveFormPositionOnDuty);
 
     storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x19, Channel1.saveStateSlot), Channel1.isSweepEnabled);
     store<i32>(getSaveStateMemoryOffset(0x1A, Channel1.saveStateSlot), Channel1.sweepCounter);

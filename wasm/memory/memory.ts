@@ -68,19 +68,19 @@ export class Memory {
   // ----------------------------------
   // Wasmboy Memory Map
   // ----------------------------------
-  static readonly gameBoyInternalMemoryLocation: u32 = gameBoyInternalMemoryLocation;
-  static readonly gameBoyVramLocation: u32 = gameBoyVramLocation;
-  static readonly gameBoyWramLocation: u32 = gameBoyWramLocation;
-  static readonly gameBoyMemoryRegistersLocation: u32 = gameBoyMemoryRegistersLocation;
-  static readonly videoOutputLocation: u32 = videoOutputLocation;
-  static readonly currentFrameVideoOutputLocation: u32 = currentFrameVideoOutputLocation;
-  static readonly frameInProgressVideoOutputLocation: u32 = frameInProgressVideoOutputLocation;
-  static readonly gameboyColorPaletteLocation: u32 = gameboyColorPaletteLocation;
-  static readonly soundOutputLocation: u32 = soundOutputLocation;
+  static readonly gameBoyInternalMemoryLocation: i32 = gameBoyInternalMemoryLocation;
+  static readonly gameBoyVramLocation: i32 = gameBoyVramLocation;
+  static readonly gameBoyWramLocation: i32 = gameBoyWramLocation;
+  static readonly gameBoyMemoryRegistersLocation: i32 = gameBoyMemoryRegistersLocation;
+  static readonly videoOutputLocation: i32 = videoOutputLocation;
+  static readonly currentFrameVideoOutputLocation: i32 = currentFrameVideoOutputLocation;
+  static readonly frameInProgressVideoOutputLocation: i32 = frameInProgressVideoOutputLocation;
+  static readonly gameboyColorPaletteLocation: i32 = gameboyColorPaletteLocation;
+  static readonly soundOutputLocation: i32 = soundOutputLocation;
 
   // Passed in Game backup or ROM from the user
-  static readonly gameRamBanksLocation: u32 = gameRamBanksLocation;
-  static readonly gameBytesLocation: u32 = gameBytesLocation;
+  static readonly gameRamBanksLocation: i32 = gameRamBanksLocation;
+  static readonly gameBytesLocation: i32 = gameBytesLocation;
 
 
   // ----------------------------------
@@ -225,7 +225,7 @@ export function storeFrameToBeRendered(): void {
 }
 
 // Function to set our left and right channels at the correct queue index
-export function setLeftAndRightOutputForAudioQueue(leftVolume: u8, rightVolume: u8, audioQueueIndex: u32): void {
+export function setLeftAndRightOutputForAudioQueue(leftVolume: u8, rightVolume: u8, audioQueueIndex: i32): void {
   // Get our stereo index
   let audioQueueOffset = Memory.soundOutputLocation + (audioQueueIndex * 2);
 
@@ -237,7 +237,7 @@ export function setLeftAndRightOutputForAudioQueue(leftVolume: u8, rightVolume: 
 
 // Function to shortcut the memory map, and load directly from the VRAM Bank
 export function loadFromVramBank(gameboyOffset: i32, vramBankId: i32): u8 {
-  let wasmBoyAddress: u32 = (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation + (0x2000 * (vramBankId & 0x01));
+  let wasmBoyAddress: i32 = (gameboyOffset - Memory.videoRamLocation) + Memory.gameBoyInternalMemoryLocation + (0x2000 * (vramBankId & 0x01));
   return load<u8>(wasmBoyAddress);
 }
 
@@ -245,7 +245,7 @@ export function loadFromVramBank(gameboyOffset: i32, vramBankId: i32): u8 {
 export function storePaletteByteInWasmMemory(paletteIndexByte: u8, value: u8, isSprite: boolean): void {
 
   // Clear the top two bits to just get the bottom palette Index
-  let paletteIndex: u32 = (paletteIndexByte & 0x3F);
+  let paletteIndex: i32 = (paletteIndexByte & 0x3F);
 
   // Move over the palette index to not overlap the background (has 0x3F, so Zero for Sprites is 0x40)
   if(isSprite) {
@@ -260,7 +260,7 @@ export function storePaletteByteInWasmMemory(paletteIndexByte: u8, value: u8, is
 export function loadPaletteByteFromWasmMemory(paletteIndexByte: u8, isSprite: boolean): u8 {
 
   // Clear the top two bits to just get the bottom palette Index
-  let paletteIndex: u32 = (paletteIndexByte & 0x3F);
+  let paletteIndex: i32 = (paletteIndexByte & 0x3F);
 
   // Move over the palette index to not overlap the background has 0x3F, so Zero for Sprites is 0x40)
   if(isSprite) {

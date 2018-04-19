@@ -50,7 +50,7 @@ export function sixteenBitStoreIntoGBMemory(offset: u16, value: u16): void {
   eightBitStoreIntoGBMemory(nextOffset, highByte);
 }
 
-export function storeBooleanDirectlyToWasmMemory(offset: u32, value: boolean): void {
+export function storeBooleanDirectlyToWasmMemory(offset: i32, value: boolean): void {
   if (value) {
     store<u8>(offset, 0x01);
   } else {

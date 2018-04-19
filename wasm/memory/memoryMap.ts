@@ -46,7 +46,7 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
     case 0x09:
       // Video RAM
       // 0x8000 -> 0x000400
-      let vramBankId: u32 = 0;
+      let vramBankId: i32 = 0;
       if (Cpu.GBCEnabled) {
         // Find our current VRAM Bank
         vramBankId = (eightBitLoadFromGBMemory(Memory.memoryLocationGBCVRAMBAnk) & 0x01);
@@ -74,7 +74,7 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
       // Bank 1-7 can be selected into the address space at D000-DFFF.
       // http://gbdev.gg8.se/wiki/articles/CGB_Registers#FF70_-_SVBK_-_CGB_Mode_Only_-_WRAM_Bank
       // Get the last 3 bits to find our wram ID
-      let wramBankId: u32 = 0;
+      let wramBankId: i32 = 0;
       if(Cpu.GBCEnabled) {
         wramBankId  = (eightBitLoadFromGBMemory(Memory.memoryLocationGBCWRAMBank) & 0x07);
       }

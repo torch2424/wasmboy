@@ -110,17 +110,17 @@ export function handleBanking(offset: u16, value: u16): void {
       }
 }
 
-export function getRomBankAddress(gameboyOffset: u32): u32 {
+export function getRomBankAddress(gameboyOffset: i32): i32 {
   let currentRomBank: u16 = Memory.currentRomBank;
   if(!Memory.isMBC5 && currentRomBank === 0) {
     currentRomBank = 1;
   }
 
   // Adjust our gameboy offset relative to zero for the gameboy memory map
-  return <u32>((0x4000 * currentRomBank) + (gameboyOffset - Memory.switchableCartridgeRomLocation));
+  return <i32>((0x4000 * currentRomBank) + (gameboyOffset - Memory.switchableCartridgeRomLocation));
 }
 
-export function getRamBankAddress(gameboyOffset: u32): u32 {
+export function getRamBankAddress(gameboyOffset: i32): i32 {
   // Adjust our gameboy offset relative to zero for the gameboy memory map
-  return <u32>((0x2000 * Memory.currentRamBank) + (gameboyOffset - Memory.cartridgeRamLocation));
+  return <i32>((0x2000 * Memory.currentRamBank) + (gameboyOffset - Memory.cartridgeRamLocation));
 }
