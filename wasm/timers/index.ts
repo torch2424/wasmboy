@@ -31,10 +31,10 @@ export class Timers {
     return 255;
   }
 
-  static readonly memoryLocationTIMA: u16 = 0xFF05; // Timer Modulator
-  static readonly memoryLocationTMA: u16 = 0xFF06; // Timer Counter (Actual Time Value)
-  static readonly memoryLocationTIMC: u16 = 0xFF07; // Timer Controller (A.K.A TAC)
-  static readonly memoryLocationDividerRegister: u16 = 0xFF04; // DividerRegister likes to count
+  static readonly memoryLocationTIMA: i32= 0xFF05; // Timer Modulator
+  static readonly memoryLocationTMA: i32 = 0xFF06; // Timer Counter (Actual Time Value)
+  static readonly memoryLocationTIMC: i32 = 0xFF07; // Timer Controller (A.K.A TAC)
+  static readonly memoryLocationDividerRegister: i32 = 0xFF04; // DividerRegister likes to count
 
   // Check if the timer is currently enabled
   static isEnabled: boolean = false;
@@ -56,7 +56,7 @@ export class Timers {
 
   // Save States
 
-  static readonly saveStateSlot: u16 = 5;
+  static readonly saveStateSlot: i32 = 5;
 
   // Function to save the state of the class
   // TODO: Save state for new properties on Timers
@@ -111,7 +111,7 @@ export function updateTimers(numberOfCycles: i32): void {
   while (Timers.cycleCounter >= Timers.currentMaxCycleCount) {
 
     // Update the actual timer counter
-    let tima: u8 = eightBitLoadFromGBMemory(Timers.memoryLocationTIMA);
+    let tima: i32 = eightBitLoadFromGBMemory(Timers.memoryLocationTIMA);
 
     // Reset our cycle counters
     // Not setting to zero as we do not want to drop cycles
@@ -130,7 +130,7 @@ export function updateTimers(numberOfCycles: i32): void {
 }
 
 // Function called on write to TIMC
-export function handleTIMCWrite(timc: u8): void {
+export function handleTIMCWrite(timc: i32): void {
 
   // Set if the timer is enabled
   Timers.isEnabled = checkBitOnByte(2, timc);
@@ -190,7 +190,7 @@ function _checkDividerRegister(numberOfCycles: i32): void {
     // - 255 to catch any overflow with the cycles
     Timers.dividerRegisterCycleCounter -= Timers.dividerRegisterMaxCycleCount();
 
-    let dividerRegister: u8 = eightBitLoadFromGBMemory(Timers.memoryLocationDividerRegister);
+    let dividerRegister: i32 = eightBitLoadFromGBMemory(Timers.memoryLocationDividerRegister);
     dividerRegister += 1;
     eightBitStoreIntoGBMemory(Timers.memoryLocationDividerRegister, dividerRegister);
   }

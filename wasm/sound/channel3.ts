@@ -44,31 +44,31 @@ export class Channel3 {
 
   // Voluntary Wave channel with 32 4-bit programmable samples, played in sequence.
   // NR30 -> Sound on/off (R/W)
-  static readonly memoryLocationNRx0: u16 = 0xFF1A;
+  static readonly memoryLocationNRx0: i32 = 0xFF1A;
   // NR31 -> Sound length (R/W)
-  static readonly memoryLocationNRx1: u16 = 0xFF1B;
+  static readonly memoryLocationNRx1: i32 = 0xFF1B;
   // NR32 -> Select ouput level (R/W)
-  static readonly memoryLocationNRx2: u16 = 0xFF1C;
+  static readonly memoryLocationNRx2: i32 = 0xFF1C;
   // NR33 -> Frequency lower data (W)
-  static readonly memoryLocationNRx3: u16 = 0xFF1D;
+  static readonly memoryLocationNRx3: i32 = 0xFF1D;
   // NR34 -> Frequency higher data (R/W)
-  static readonly memoryLocationNRx4: u16 = 0xFF1E;
+  static readonly memoryLocationNRx4: i32 = 0xFF1E;
 
   // Our wave table location
-  static readonly memoryLocationWaveTable: u16 = 0xFF30;
+  static readonly memoryLocationWaveTable: i32 = 0xFF30;
 
   // Channel Properties
   static readonly channelNumber: i32 = 3;
   static isEnabled: boolean = false;
   static frequencyTimer: i32 = 0x00;
   static lengthCounter: i32 = 0x00;
-  static waveTablePosition: u16 = 0x00;
-  static volumeCode: u8 = 0x00;
+  static waveTablePosition: i32 = 0x00;
+  static volumeCode: i32 = 0x00;
   static volumeCodeChanged: boolean = false;
 
   // Save States
 
-  static readonly saveStateSlot: u16 = 9;
+  static readonly saveStateSlot: i32 = 9;
 
   // Function to save the state of the class
   static saveState(): void {
@@ -138,8 +138,8 @@ export class Channel3 {
     }
 
     // Get our ourput volume
-    let outputVolume: i16 = 0;
-    let volumeCode: u8 = Channel3.volumeCode;
+    let outputVolume: i32 = 0;
+    let volumeCode: i32 = Channel3.volumeCode;
 
     // Finally to set our output volume, the channel must be enabled,
     // Our channel DAC must be enabled, and we must be in an active state
@@ -148,7 +148,7 @@ export class Channel3 {
     isChannelDacEnabled(Channel3.channelNumber)) {
       // Get our volume code
       if(Channel3.volumeCodeChanged) {
-        let volumeCode: u8 = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx2);
+        volumeCode = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx2);
         volumeCode = (volumeCode >> 5);
         volumeCode = (volumeCode & 0x0F);
         Channel3.volumeCode = volumeCode;
@@ -161,13 +161,13 @@ export class Channel3 {
     }
 
     // Get the current sample
-    let sample: i16 = 0;
+    let sample: i32 = 0;
 
     // Will Find the position, and knock off any remainder
-    let positionIndexToAdd: u16 = Channel3.waveTablePosition / 2;
-    let memoryLocationWaveSample: u16 = Channel3.memoryLocationWaveTable + positionIndexToAdd;
+    let positionIndexToAdd: i32 = Channel3.waveTablePosition / 2;
+    let memoryLocationWaveSample: i32 = Channel3.memoryLocationWaveTable + positionIndexToAdd;
 
-    sample = <i16>eightBitLoadFromGBMemory(memoryLocationWaveSample);
+    sample = eightBitLoadFromGBMemory(memoryLocationWaveSample);
 
     // Need to grab the top or lower half for the correct sample
     if (Channel3.waveTablePosition % 2 === 0) {
@@ -209,7 +209,7 @@ export class Channel3 {
 
     // Square Waves Can range from -15 - 15. Therefore simply add 15
     sample = sample + 15;
-    return <i32>sample;
+    return sample;
   }
 
   //http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Trigger_Event

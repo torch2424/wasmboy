@@ -30,8 +30,8 @@ export function setChannelLengthCounter(channelNumber: i32): void {
   lengthLoad = (lengthLoad & 0x3F);
   // Channel length is determined by 64 (or 256 if channel 3), - the length load
   // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
-  let length: u8 = 64;
-  let result: u8 = 0;
+  let length: i32 = 64;
+  let result: i32 = 0;
   if (channelNumber === 3) {
     length = 255;
     // Supposed to be 256, so subtracting 255 and then adding 1 if that makes sense

@@ -43,7 +43,7 @@ import {
   resetBitOnByte
 } from '../helpers/index';
 
-export function renderBackground(scanlineRegister:i32, tileDataMemoryLocation: i32, tileMapMemoryLocation: i32): void {
+export function renderBackground(scanlineRegister: i32, tileDataMemoryLocation: i32, tileMapMemoryLocation: i32): void {
 
   // NOTE: Camera is reffering to what you can see inside the 160x144 viewport of the entire rendered 256x256 map.
 

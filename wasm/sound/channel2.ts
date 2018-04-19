@@ -44,13 +44,13 @@ export class Channel2 {
 
   // Squarewave channel with volume envelope functions only.
   // NR21 -> Sound length/Wave pattern duty (R/W)
-  static readonly memoryLocationNRx1: u16 = 0xFF16;
+  static readonly memoryLocationNRx1: i32 = 0xFF16;
   // NR22 -> Volume Envelope (R/W)
-  static readonly memoryLocationNRx2: u16 = 0xFF17;
+  static readonly memoryLocationNRx2: i32 = 0xFF17;
   // NR23 -> Frequency lo (W)
-  static readonly memoryLocationNRx3: u16 = 0xFF18;
+  static readonly memoryLocationNRx3: i32 = 0xFF18;
   // NR24 -> Frequency hi (R/W)
-  static readonly memoryLocationNRx4: u16 = 0xFF19;
+  static readonly memoryLocationNRx4: i32 = 0xFF19;
 
   // Channel Properties
   static readonly channelNumber: i32 = 2;
@@ -61,12 +61,12 @@ export class Channel2 {
   static volume: i32 = 0x00;
 
   // Square Wave properties
-  static dutyCycle: u8 = 0x00;
+  static dutyCycle: i32 = 0x00;
   static waveFormPositionOnDuty: i32 = 0x00;
 
   // Save States
 
-  static readonly saveStateSlot: u16 = 8;
+  static readonly saveStateSlot: i32 = 8;
 
   // Function to save the state of the class
   static saveState(): void {
@@ -166,7 +166,7 @@ export class Channel2 {
 
     // Square Waves Can range from -15 - 15. Therefore simply add 15
     sample = sample + 15;
-    return <i32>sample;
+    return sample;
   }
 
   //http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Trigger_Event

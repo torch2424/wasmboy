@@ -46,13 +46,13 @@ export class Channel4 {
   // Channel 4
   // 'white noise' channel with volume envelope functions.
   // NR41 -> Sound length (R/W)
-  static readonly memoryLocationNRx1: u16 = 0xFF20;
+  static readonly memoryLocationNRx1: i32 = 0xFF20;
   // NR42 -> Volume Envelope (R/W)
-  static readonly memoryLocationNRx2: u16 = 0xFF21;
+  static readonly memoryLocationNRx2: i32 = 0xFF21;
   // NR43 -> Polynomial Counter (R/W)
-  static readonly memoryLocationNRx3: u16 = 0xFF22;
+  static readonly memoryLocationNRx3: i32 = 0xFF22;
   // NR43 -> Counter/consecutive; initial (R/W)
-  static readonly memoryLocationNRx4: u16 = 0xFF23;
+  static readonly memoryLocationNRx4: i32 = 0xFF23;
 
   // Channel Properties
   static readonly channelNumber: i32 = 4;
@@ -64,11 +64,11 @@ export class Channel4 {
 
   // Noise properties
   // NOTE: Is only 15 bits
-  static linearFeedbackShiftRegister: u16 = 0x00;
+  static linearFeedbackShiftRegister: i32 = 0x00;
 
   // Save States
 
-  static readonly saveStateSlot: u16 = 10;
+  static readonly saveStateSlot: i32 = 10;
 
   // Function to save the state of the class
   static saveState(): void {
@@ -123,8 +123,8 @@ export class Channel4 {
       // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Noise_Channel
 
       // First XOR bit zero and one
-      let lfsrBitZero: u16 = (Channel4.linearFeedbackShiftRegister & 0x01);
-      let lfsrBitOne: u16 = (Channel4.linearFeedbackShiftRegister >> 1);
+      let lfsrBitZero: i32 = (Channel4.linearFeedbackShiftRegister & 0x01);
+      let lfsrBitOne: i32 = (Channel4.linearFeedbackShiftRegister >> 1);
       lfsrBitOne = (lfsrBitOne & 0x01);
       let xorLfsrBitZeroOne = lfsrBitZero ^ lfsrBitOne;
 
@@ -161,7 +161,7 @@ export class Channel4 {
     let sample: i32 = 0;
 
     // Wave form output is bit zero of lfsr, INVERTED
-    if (!checkBitOnByte(0, <u8>Channel4.linearFeedbackShiftRegister)) {
+    if (!checkBitOnByte(0, Channel4.linearFeedbackShiftRegister)) {
       sample = 1;
     } else {
       sample = -1;
@@ -212,36 +212,36 @@ export class Channel4 {
     return true;
   }
 
-  static getNoiseChannelFrequencyPeriod(): u16 {
+  static getNoiseChannelFrequencyPeriod(): i32 {
     // Get our divisor from the divisor code
-    let divisor: u16 = Channel4.getNoiseChannelDivisorFromDivisorCode();
-    let clockShift: u8 = Channel4.getNoiseChannelClockShift();
-    let response: u16 = (divisor << clockShift);
+    let divisor: i32 = Channel4.getNoiseChannelDivisorFromDivisorCode();
+    let clockShift: i32 = Channel4.getNoiseChannelClockShift();
+    let response: i32 = (divisor << clockShift);
     if (Cpu.GBCDoubleSpeed) {
       response = response * 2;
     }
     return response;
   }
 
-  static getNoiseChannelClockShift(): u8 {
-    let registerNRx3: u8 = eightBitLoadFromGBMemory(Channel4.memoryLocationNRx3);
+  static getNoiseChannelClockShift(): i32 {
+    let registerNRx3: i32 = eightBitLoadFromGBMemory(Channel4.memoryLocationNRx3);
     // It is within the top 4 bits
     let clockShift = (registerNRx3 >> 4);
     return clockShift;
   }
 
   static isNoiseChannelWidthModeSet(): boolean {
-    let registerNRx3: u8 = eightBitLoadFromGBMemory(Channel4.memoryLocationNRx3);
+    let registerNRx3: i32 = eightBitLoadFromGBMemory(Channel4.memoryLocationNRx3);
     return checkBitOnByte(3, registerNRx3);
   }
 
-  static getNoiseChannelDivisorFromDivisorCode(): u8 {
+  static getNoiseChannelDivisorFromDivisorCode(): i32 {
     // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Noise_Channel
     // Get our divisor code
-    let registerNRx3: u8 = eightBitLoadFromGBMemory(Channel4.memoryLocationNRx3);
+    let registerNRx3: i32 = eightBitLoadFromGBMemory(Channel4.memoryLocationNRx3);
     // Get the bottom 3 bits
-    let divisorCode: u8 = registerNRx3 & 0x07;
-    let divisor: u8 = 0;
+    let divisorCode: i32 = registerNRx3 & 0x07;
+    let divisor: i32 = 0;
     if(divisorCode === 0) {
       divisor = 8;
     } else if (divisorCode === 1) {

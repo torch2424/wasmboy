@@ -36,7 +36,7 @@ import {
 export function handledWriteToSoundRegister(offset: i32, value: i32): boolean {
 
   // Get our registerNR52
-  let registerNR52: u8 = eightBitLoadFromGBMemory(Sound.memoryLocationNR52);
+  let registerNR52: i32 = eightBitLoadFromGBMemory(Sound.memoryLocationNR52);
 
   if(offset !== Sound.memoryLocationNR52 && !checkBitOnByte(7, registerNR52)) {
     // Block all writes to any sound register EXCEPT NR52!
@@ -74,20 +74,20 @@ export function handledWriteToSoundRegister(offset: i32, value: i32): boolean {
   }
 
   // Check our NRx4 registers to trap our trigger bits
-  if(offset === Channel1.memoryLocationNRx4 && checkBitOnByte(7, <u8>value)) {
+  if(offset === Channel1.memoryLocationNRx4 && checkBitOnByte(7, value)) {
     // Write the value skipping traps, and then trigger
     eightBitStoreIntoGBMemory(offset, <u8>value);
     Channel1.trigger();
     return true;
-  } else if(offset === Channel2.memoryLocationNRx4 && checkBitOnByte(7, <u8>value)) {
+  } else if(offset === Channel2.memoryLocationNRx4 && checkBitOnByte(7, value)) {
     eightBitStoreIntoGBMemory(offset, <u8>value);
     Channel2.trigger();
     return true;
-  } else if(offset === Channel3.memoryLocationNRx4 && checkBitOnByte(7, <u8>value)) {
+  } else if(offset === Channel3.memoryLocationNRx4 && checkBitOnByte(7, value)) {
     eightBitStoreIntoGBMemory(offset, <u8>value);
     Channel3.trigger();
     return true;
-  } else if(offset === Channel4.memoryLocationNRx4 && checkBitOnByte(7, <u8>value)) {
+  } else if(offset === Channel4.memoryLocationNRx4 && checkBitOnByte(7, value)) {
     eightBitStoreIntoGBMemory(offset, <u8>value);
     Channel4.trigger();
     return true;
@@ -107,14 +107,14 @@ export function handledWriteToSoundRegister(offset: i32, value: i32): boolean {
   if(offset === Sound.memoryLocationNR52) {
 
     // Reset all registers except NR52
-    if(!checkBitOnByte(7, <u8>value)) {
+    if(!checkBitOnByte(7, value)) {
       for (let i: i32 = 0xFF10; i < 0xFF26; i++) {
         eightBitStoreIntoGBMemory(i, 0x00);
       }
     }
 
     // Write our final value to NR52
-    eightBitStoreIntoGBMemory(offset, <u8>value);
+    eightBitStoreIntoGBMemory(offset, value);
 
     return true;
   }
@@ -131,7 +131,7 @@ export function handleReadToSoundRegister(offset: i32): i32  {
   // This will fix bugs in orcale of ages :)
   if (offset === Sound.memoryLocationNR52) {
     // Get our registerNR52
-    let registerNR52: u8 = eightBitLoadFromGBMemory(Sound.memoryLocationNR52);
+    let registerNR52: i32 = eightBitLoadFromGBMemory(Sound.memoryLocationNR52);
 
     // Knock off lower 7 bits
     registerNR52 = (registerNR52 & 0x80);
@@ -170,9 +170,9 @@ export function handleReadToSoundRegister(offset: i32): i32  {
   return -1;
 }
 
-export function getChannelStartingVolume(channelNumber: i32): u8 {
+export function getChannelStartingVolume(channelNumber: i32): i32 {
   // Simply need to get the top 4 bits of register 2
-  let startingVolume: u8 = getRegister2OfChannel(channelNumber);
+  let startingVolume: i32 = getRegister2OfChannel(channelNumber);
   startingVolume = (startingVolume >> 4);
   return (startingVolume & 0x0F);
 }
@@ -196,22 +196,22 @@ export function isChannelDacEnabled(channelNumber: i32): boolean {
 }
 
 export function isChannelEnabledOnLeftOutput(channelNumber: i32): boolean {
-  let registerNR51: u8 = eightBitLoadFromGBMemory(Sound.memoryLocationNR51);
+  let registerNR51: i32 = eightBitLoadFromGBMemory(Sound.memoryLocationNR51);
   // Left channel in the higher bits
-  let bitNumberOfChannel: u8 = (<u8>channelNumber - 1) + 4;
+  let bitNumberOfChannel: i32 = (channelNumber - 1) + 4;
   return checkBitOnByte(bitNumberOfChannel, registerNR51);
 }
 
 export function isChannelEnabledOnRightOutput(channelNumber: i32): boolean {
-  let registerNR51: u8 = eightBitLoadFromGBMemory(Sound.memoryLocationNR51);
+  let registerNR51: i32 = eightBitLoadFromGBMemory(Sound.memoryLocationNR51);
   // Left channel in the higher bits
-  let bitNumberOfChannel: u8 = (<u8>channelNumber - 1);
+  let bitNumberOfChannel: i32 = (channelNumber - 1);
   return checkBitOnByte(bitNumberOfChannel, registerNR51);
 }
 
 // Function to get 1st register of a channel
 // Contains Duty and Length
-export function getRegister1OfChannel(channelNumber: i32): u8 {
+export function getRegister1OfChannel(channelNumber: i32): i32 {
 
   switch(channelNumber) {
     case Channel1.channelNumber:
@@ -227,7 +227,7 @@ export function getRegister1OfChannel(channelNumber: i32): u8 {
 
 // Function to get 2nd register of a channel
 // Contains Envelope Information
-export function getRegister2OfChannel(channelNumber: i32): u8 {
+export function getRegister2OfChannel(channelNumber: i32): i32 {
 
   switch(channelNumber) {
     case Channel1.channelNumber:
@@ -243,7 +243,7 @@ export function getRegister2OfChannel(channelNumber: i32): u8 {
 
 // Function to get 3rd register of a channel
 // Contains Fequency LSB (lower 8 bits)
-export function getRegister3OfChannel(channelNumber: i32): u8 {
+export function getRegister3OfChannel(channelNumber: i32): i32 {
 
   switch(channelNumber) {
     case Channel1.channelNumber:
@@ -257,7 +257,7 @@ export function getRegister3OfChannel(channelNumber: i32): u8 {
   }
 }
 
-export function setRegister3OfChannel(channelNumber: i32, value: u8): void {
+export function setRegister3OfChannel(channelNumber: i32, value: i32): void {
 
   switch(channelNumber) {
     case Channel1.channelNumber:
@@ -277,7 +277,7 @@ export function setRegister3OfChannel(channelNumber: i32, value: u8): void {
 
 // Function to get 4th register of a channel
 // Contains Fequency MSB (higher 3 bits), and Length Information
-export function getRegister4OfChannel(channelNumber: i32): u8 {
+export function getRegister4OfChannel(channelNumber: i32): i32 {
 
   switch(channelNumber) {
     case Channel1.channelNumber:
@@ -291,7 +291,7 @@ export function getRegister4OfChannel(channelNumber: i32): u8 {
   }
 }
 
-export function setRegister4OfChannel(channelNumber: i32, value: u8): void {
+export function setRegister4OfChannel(channelNumber: i32, value: i32): void {
 
   switch(channelNumber) {
     case Channel1.channelNumber:

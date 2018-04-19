@@ -17,8 +17,8 @@ import {
 } from '../helpers/index';
 
 export class Interrupts {
-  static readonly memoryLocationInterruptEnabled: u16 = 0xFFFF;
-  static readonly memoryLocationInterruptRequest: u16 = 0xFF0F; // A.K.A interrupt Flag (IF)
+  static readonly memoryLocationInterruptEnabled: i32 = 0xFFFF;
+  static readonly memoryLocationInterruptRequest: i32 = 0xFF0F; // A.K.A interrupt Flag (IF)
 
   static masterInterruptSwitch: boolean = false;
   // According to mooneye, interrupts are not handled until AFTER
@@ -26,13 +26,13 @@ export class Interrupts {
   // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown
   static masterInterruptSwitchDelay: boolean = false;
 
-  static readonly bitPositionVBlankInterrupt: u8 = 0;
-  static readonly bitPositionLcdInterrupt: u8 = 1;
-  static readonly bitPositionTimerInterrupt: u8 = 2;
-  static readonly bitPositionJoypadInterrupt: u8 = 4;
+  static readonly bitPositionVBlankInterrupt: i32 = 0;
+  static readonly bitPositionLcdInterrupt: i32 = 1;
+  static readonly bitPositionTimerInterrupt: i32 = 2;
+  static readonly bitPositionJoypadInterrupt:  i32= 4;
 
   // Save States
-  static readonly saveStateSlot: u16 = 2;
+  static readonly saveStateSlot: i32 = 2;
 
   // Function to save the state of the class
   static saveState(): void {
@@ -101,7 +101,7 @@ export function checkInterrupts(): i32 {
   return 0;
 }
 
-function _handleInterrupt(bitPosition: u8): void {
+function _handleInterrupt(bitPosition: i32): void {
 
   // Disable the master switch
   setInterrupts(false);
@@ -133,7 +133,7 @@ function _handleInterrupt(bitPosition: u8): void {
   }
 }
 
-function _requestInterrupt(bitPosition: u8): void {
+function _requestInterrupt(bitPosition: i32): void {
 
   let interruptRequest = eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptRequest);
 

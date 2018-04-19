@@ -39,27 +39,27 @@ export class Memory {
   // https://github.com/AntonioND/giibiiadvance/blob/master/docs/TCAGBD.pdf
   // http://gameboy.mongenel.com/dmg/asmmemmap.html
   // using Arrays, first index is start, second is end
-  static readonly cartridgeRomLocation: u16 = 0x0000;
+  static readonly cartridgeRomLocation: i32 = 0x0000;
 
-  static readonly switchableCartridgeRomLocation: u16 = 0x4000;
+  static readonly switchableCartridgeRomLocation: i32 = 0x4000;
 
-  static readonly videoRamLocation: u16 = 0x8000;
+  static readonly videoRamLocation: i32 = 0x8000;
 
-  static readonly cartridgeRamLocation: u16 = 0xA000;
+  static readonly cartridgeRamLocation: i32 = 0xA000;
 
-  static readonly internalRamBankZeroLocation: u16 = 0xC000;
+  static readonly internalRamBankZeroLocation: i32 = 0xC000;
 
   // This ram bank is switchable
-  static readonly internalRamBankOneLocation: u16 = 0xD000;
+  static readonly internalRamBankOneLocation: i32 = 0xD000;
 
-  static readonly echoRamLocation: u16 = 0xE000;
+  static readonly echoRamLocation: i32 = 0xE000;
 
-  static readonly spriteInformationTableLocation: u16 = 0xFE00;
+  static readonly spriteInformationTableLocation: i32 = 0xFE00;
 
-  static readonly spriteInformationTableLocationEnd: u16 = 0xFE9F;
+  static readonly spriteInformationTableLocationEnd: i32 = 0xFE9F;
 
-  static readonly unusableMemoryLocation: u16 = 0xFEA0;
-  static readonly unusableMemoryEndLocation: u16 = 0xFEFF;
+  static readonly unusableMemoryLocation: i32 = 0xFEA0;
+  static readonly unusableMemoryEndLocation: i32 = 0xFEFF;
 
   // Hardware I/O, 0xFF00 -> 0xFF7F
   // Zero Page, 0xFF80 -> 0xFFFE
@@ -102,23 +102,23 @@ export class Memory {
   static isMBC5: boolean = false;
 
   // DMA
-  static memoryLocationHdmaSourceHigh: u16 = 0xFF51;
-  static memoryLocationHdmaSourceLow: u16 = 0xFF52;
-  static memoryLocationHdmaDestinationHigh: u16 = 0xFF53;
-  static memoryLocationHdmaDestinationLow: u16 = 0xFF54;
-  static memoryLocationHdmaTrigger: u16 = 0xFF55;
+  static memoryLocationHdmaSourceHigh: i32 = 0xFF51;
+  static memoryLocationHdmaSourceLow: i32 = 0xFF52;
+  static memoryLocationHdmaDestinationHigh: i32 = 0xFF53;
+  static memoryLocationHdmaDestinationLow: i32 = 0xFF54;
+  static memoryLocationHdmaTrigger: i32 = 0xFF55;
   // Cycles accumulated for DMA
   static DMACycles: i32 = 0;
   // Boolean we will mirror to indicate if Hdma is active
   static isHblankHdmaActive: boolean = false;
   static hblankHdmaTransferLengthRemaining: i32 = 0x00;
   // Store the source and destination for performance, and update as needed
-  static hblankHdmaSource: u16 = 0x00;
-  static hblankHdmaDestination: u16 = 0x00;
+  static hblankHdmaSource: i32 = 0x00;
+  static hblankHdmaDestination: i32 = 0x00;
 
   // GBC Registers
-  static memoryLocationGBCVRAMBAnk: u16 = 0xFF4F;
-  static memoryLocationGBCWRAMBank: u16 = 0xFF70;
+  static memoryLocationGBCVRAMBank: i32 = 0xFF4F;
+  static memoryLocationGBCWRAMBank: i32 = 0xFF70;
 
   // Save States
 
@@ -225,14 +225,14 @@ export function storeFrameToBeRendered(): void {
 }
 
 // Function to set our left and right channels at the correct queue index
-export function setLeftAndRightOutputForAudioQueue(leftVolume: u8, rightVolume: u8, audioQueueIndex: i32): void {
+export function setLeftAndRightOutputForAudioQueue(leftVolume: i32, rightVolume: i32, audioQueueIndex: i32): void {
   // Get our stereo index
   let audioQueueOffset = Memory.soundOutputLocation + (audioQueueIndex * 2);
 
   // Store our volumes
   // +1 that way we don't have empty data to ensure that the value is set
-  store<u8>(audioQueueOffset, leftVolume + 1);
-  store<u8>(audioQueueOffset + 1, rightVolume + 1);
+  store<u8>(audioQueueOffset, <u8>(leftVolume + 1));
+  store<u8>(audioQueueOffset + 1, <u8>(rightVolume + 1));
 }
 
 // Function to shortcut the memory map, and load directly from the VRAM Bank

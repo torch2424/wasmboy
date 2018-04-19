@@ -49,7 +49,7 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
       let vramBankId: i32 = 0;
       if (Cpu.GBCEnabled) {
         // Find our current VRAM Bank
-        vramBankId = (eightBitLoadFromGBMemory(Memory.memoryLocationGBCVRAMBAnk) & 0x01);
+        vramBankId = (eightBitLoadFromGBMemory(Memory.memoryLocationGBCVRAMBank) & 0x01);
         // Even though We added another 0x2000, the Cartridge ram is pulled out of our Internal Memory Space
         // Therefore, we do not need to adjust for this extra 0x2000
       }

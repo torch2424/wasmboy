@@ -69,16 +69,16 @@ export class Sound {
   }
 
   // Channel control / On-OFF / Volume (RW)
-  static readonly memoryLocationNR50: u16 = 0xFF24;
+  static readonly memoryLocationNR50: i32 = 0xFF24;
 
   // 0xFF25 selects which output each channel goes to, Referred to as NR51
-  static readonly memoryLocationNR51: u16 = 0xFF25;
+  static readonly memoryLocationNR51: i32 = 0xFF25;
 
   // Sound on/off
-  static readonly memoryLocationNR52: u16 = 0xFF26;
+  static readonly memoryLocationNR52: i32 = 0xFF26;
 
   // $FF30 -- $FF3F is the load register space for the 4-bit samples for channel 3
-  static readonly memoryLocationChannel3LoadRegisterStart: u16 = 0xFF30;
+  static readonly memoryLocationChannel3LoadRegisterStart: i32 = 0xFF30;
 
   // Need to count how often we need to increment our frame sequencer
   // Which you can read about below
@@ -103,7 +103,7 @@ export class Sound {
   // Frame sequencer controls what should be updated and and ticked
   // Everyt time the sound is updated :) It is updated everytime the
   // Cycle counter reaches the max cycle
-  static frameSequencer: u8 = 0x00;
+  static frameSequencer: i32 = 0x00;
 
   // Our current sample number we are passing back to the wasmboy memory map
   // Found that a static number of samples doesn't work well on mobile
@@ -114,7 +114,7 @@ export class Sound {
   static wasmBoyMemoryMaxBufferSize: i32 = 0x20000;
 
   // Save States
-  static readonly saveStateSlot: u16 = 6;
+  static readonly saveStateSlot: i32 = 6;
 
   // Function to save the state of the class
   static saveState(): void {
@@ -144,8 +144,8 @@ export class SoundAccumulator {
   static channel2DacEnabled: boolean = false;
   static channel3DacEnabled: boolean = false;
   static channel4DacEnabled: boolean = false;
-  static leftChannelSampleUnsignedByte: u8 = 127;
-  static rightChannelSampleUnsignedByte: u8 = 127;
+  static leftChannelSampleUnsignedByte: i32 = 127;
+  static rightChannelSampleUnsignedByte: i32 = 127;
   static mixerVolumeChanged: boolean = false;
   static mixerEnabledChanged: boolean = false;
 
@@ -234,9 +234,9 @@ function calculateSound(numberOfCycles: i32): void {
     Sound.downSampleCycleCounter -= Sound.maxDownSampleCycles();
 
     // Mixe our samples
-    let mixedSample: u16 = mixChannelSamples(channel1Sample, channel2Sample, channel3Sample, channel4Sample);
-    let leftChannelSampleUnsignedByte: u8 = splitHighByte(mixedSample);
-    let rightChannelSampleUnsignedByte: u8 = splitLowByte(mixedSample);
+    let mixedSample: i32 = mixChannelSamples(channel1Sample, channel2Sample, channel3Sample, channel4Sample);
+    let leftChannelSampleUnsignedByte: i32 = splitHighByte(mixedSample);
+    let rightChannelSampleUnsignedByte: i32 = splitLowByte(mixedSample);
 
     // Set our volumes in memory
     // +1 so it can not be zero
@@ -410,7 +410,7 @@ function updateFrameSequencer(numberOfCycles: i32): boolean {
 }
 
 
-function mixChannelSamples(channel1Sample: i32 = 15, channel2Sample: i32 = 15, channel3Sample: i32 = 15, channel4Sample: i32 = 15): u16 {
+function mixChannelSamples(channel1Sample: i32 = 15, channel2Sample: i32 = 15, channel3Sample: i32 = 15, channel4Sample: i32 = 15): i32 {
 
   // Do Some Cool mixing
   // NR50 FF24 ALLL BRRR Vin L enable, Left vol, Vin R enable, Right vol
@@ -505,8 +505,8 @@ function mixChannelSamples(channel1Sample: i32 = 15, channel2Sample: i32 = 15, c
 
   // Convert our samples from unsigned 32 to unsigned byte
   // Reason being, We want to be able to pass in wasm memory as usigned byte. Javascript will handle the conversion back
-  let leftChannelSampleUnsignedByte: u8 = getSampleAsUnsignedByte(leftChannelSample, (leftMixerVolume + 1));
-  let rightChannelSampleUnsignedByte: u8 = getSampleAsUnsignedByte(rightChannelSample, (rightMixerVolume + 1));
+  let leftChannelSampleUnsignedByte: i32 = getSampleAsUnsignedByte(leftChannelSample, (leftMixerVolume + 1));
+  let rightChannelSampleUnsignedByte: i32 = getSampleAsUnsignedByte(rightChannelSample, (rightMixerVolume + 1));
 
   // Save these samples in the accumulator
   SoundAccumulator.leftChannelSampleUnsignedByte = leftChannelSampleUnsignedByte;
@@ -515,7 +515,7 @@ function mixChannelSamples(channel1Sample: i32 = 15, channel2Sample: i32 = 15, c
   return concatenateBytes(leftChannelSampleUnsignedByte, rightChannelSampleUnsignedByte);
 }
 
-function getSampleAsUnsignedByte(sample: i32, mixerVolume: i32): u8 {
+function getSampleAsUnsignedByte(sample: i32, mixerVolume: i32): i32 {
 
   // If the sample is silence, return silence as unsigned byte
   // Silence is common, and should be checked for performance
@@ -546,5 +546,5 @@ function getSampleAsUnsignedByte(sample: i32, mixerVolume: i32): u8 {
   let maxDivider: i32 = (120 * precision) / 254;
   convertedSample = (convertedSample * precision) / maxDivider;
 
-  return <u8>(convertedSample);
+  return convertedSample;
 }

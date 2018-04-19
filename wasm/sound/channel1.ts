@@ -44,15 +44,15 @@ export class Channel1 {
 
   // Squarewave channel with volume envelope and frequency sweep functions.
   // NR10 -> Sweep Register R/W
-  static readonly memoryLocationNRx0: u16 = 0xFF10;
+  static readonly memoryLocationNRx0: i32 = 0xFF10;
   // NR11 -> Sound length/Wave pattern duty (R/W)
-  static readonly memoryLocationNRx1: u16 = 0xFF11;
+  static readonly memoryLocationNRx1: i32 = 0xFF11;
   // NR12 -> Volume Envelope (R/W)
-  static readonly memoryLocationNRx2: u16 = 0xFF12;
+  static readonly memoryLocationNRx2: i32 = 0xFF12;
   // NR13 -> Frequency lo (W)
-  static readonly memoryLocationNRx3: u16 = 0xFF13;
+  static readonly memoryLocationNRx3: i32 = 0xFF13;
   // NR14 -> Frequency hi (R/W)
-  static readonly memoryLocationNRx4: u16 = 0xFF14;
+  static readonly memoryLocationNRx4: i32 = 0xFF14;
 
   // Channel Properties
   static readonly channelNumber: i32 = 1;
@@ -63,17 +63,17 @@ export class Channel1 {
   static volume: i32 = 0x00;
 
   // Square Wave properties
-  static dutyCycle: u8 = 0x00;
+  static dutyCycle: i32 = 0x00;
   static waveFormPositionOnDuty: i32 = 0x00;
 
   // Channel 1 Sweep
   static isSweepEnabled: boolean = false;
   static sweepCounter: i32 = 0x00;
-  static sweepShadowFrequency: u16 = 0x00;
+  static sweepShadowFrequency: i32 = 0x00;
 
   // Save States
 
-  static readonly saveStateSlot: u16 = 7;
+  static readonly saveStateSlot: i32 = 7;
 
   // Function to save the state of the class
   static saveState(): void {
@@ -182,7 +182,7 @@ export class Channel1 {
 
     // Square Waves Can range from -15 - 15. Therefore simply add 15
     sample = sample + 15;
-    return <i32>sample;
+    return sample;
   }
 
   //http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Trigger_Event
@@ -299,25 +299,25 @@ export class Channel1 {
 
 // Sweep Specific functions
 
-function getSweepPeriod(): u8 {
-  let sweepRegister: u8 = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx0);
+function getSweepPeriod(): i32 {
+  let sweepRegister: i32 = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx0);
   // Get bits 4-6
-  let sweepPeriod: u8 = sweepRegister & 0x70;
+  let sweepPeriod: i32 = sweepRegister & 0x70;
   sweepPeriod = (sweepPeriod >> 4);
   return sweepPeriod;
 }
 
-function getSweepShift(): u8 {
-  let sweepRegister: u8 = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx0);
+function getSweepShift(): i32 {
+  let sweepRegister: i32 = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx0);
   // Get bits 0-2
-  let sweepShift: u8 = sweepRegister & 0x07;
+  let sweepShift: i32 = sweepRegister & 0x07;
 
   return sweepShift;
 }
 
 function calculateSweepAndCheckOverflow(): void {
 
-  let newFrequency: u16 = getNewFrequencyFromSweep();
+  let newFrequency: i32 = getNewFrequencyFromSweep();
   // 7FF is the highest value of the frequency: 111 1111 1111
   if (newFrequency <= 0x7FF && getSweepShift() > 0) {
     // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
@@ -339,14 +339,14 @@ function calculateSweepAndCheckOverflow(): void {
 }
 
 // Function to determing a new sweep in the current context
-function getNewFrequencyFromSweep(): u16 {
+function getNewFrequencyFromSweep(): i32 {
 
   // Start our new frequency, by making it equal to the "shadow frequency"
-  let newFrequency: u16 = Channel1.sweepShadowFrequency;
+  let newFrequency: i32 = Channel1.sweepShadowFrequency;
   newFrequency = (newFrequency >> getSweepShift());
 
   // Check for sweep negation
-  let sweepRegister: u8 = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx0);
+  let sweepRegister: i32 = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx0);
   if (checkBitOnByte(3, sweepRegister)) {
     newFrequency = Channel1.sweepShadowFrequency - newFrequency;
   } else {
