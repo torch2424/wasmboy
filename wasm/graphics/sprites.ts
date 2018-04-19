@@ -61,6 +61,7 @@ export function renderSprites(scanlineRegister: i32, useLargerSprites: boolean):
     // Bit2-0 Palette number  **CGB Mode Only**     (OBP0-7)
 
     // Apply sprite X and Y offset
+    // TODO: Sprites are overflowing on x if less than 8
     spriteYPosition -= 16;
     spriteXPosition -= 8;
 
