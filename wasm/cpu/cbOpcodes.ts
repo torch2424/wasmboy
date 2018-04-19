@@ -31,9 +31,9 @@ import {
 // Handle CB Opcodes
 // NOTE: Program stpes and cycles are standardized depending on the register type
 // NOTE: Doing some funny stuff to get around not having arrays or objects
-export function handleCbOpcode(cbOpcode: u8): i8 {
+export function handleCbOpcode(cbOpcode: i32): i32 {
 
-  let numberOfCycles: i8 = -1;
+  let numberOfCycles: i32 = -1;
   let handledOpcode = false;
 
   // The result of our cb logic instruction

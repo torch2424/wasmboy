@@ -116,7 +116,7 @@ export function emulationStep(): i32 {
   // Get the opcode, and additional bytes to be handled
   // Number of cycles defaults to 4, because while we're halted, we run 4 cycles (according to matt :))
   let numberOfCycles: i32 = 4;
-  let opcode: u8 = 0;
+  let opcode: i32 = 0;
 
   // Cpu Halting best explained: https://www.reddit.com/r/EmuDev/comments/5ie3k7/infinite_loop_trying_to_pass_blarggs_interrupt/db7xnbe/
   if(!Cpu.isHalted && !Cpu.isStopped) {
@@ -200,7 +200,7 @@ export function emulationStep(): i32 {
 // Setting return value to i32 instead of u16, as we want to return a negative number on error
 // https://rednex.github.io/rgbds/gbz80.7.html
 // http://pastraiser.com/cpu/gameboy/gameboyopcodes.html
-function executeOpcode(opcode: u8): i32 {
+function executeOpcode(opcode: i32): i32 {
 
   // Initialize our number of cycles
   // Return -1 if no opcode was found, representing an error
@@ -212,7 +212,7 @@ function executeOpcode(opcode: u8): i32 {
 
   // Split our opcode into a high nibble to speed up performance
   // Running 255 if statements is slow, even in wasm haha!
-  let opcodeHighNibble = (opcode & 0xF0);
+  let opcodeHighNibble: i32 = (opcode & 0xF0);
   opcodeHighNibble = opcodeHighNibble >> 4;
 
   // NOTE: @binji rule of thumb: it takes 4 cpu cycles to read one byte
@@ -273,7 +273,7 @@ function getConcatenatedDataByte(): u16 {
 }
 
 
-function handleOpcode0x(opcode: u8): i8 {
+function handleOpcode0x(opcode: i32): i32 {
   switch(opcode) {
     case 0x00:
       // NOP
@@ -436,7 +436,7 @@ function handleOpcode0x(opcode: u8): i8 {
   return -1;
 }
 
-function handleOpcode1x(opcode: u8): i8 {
+function handleOpcode1x(opcode: i32): i32 {
 
   switch (opcode) {
     case 0x10:
@@ -646,7 +646,7 @@ function handleOpcode1x(opcode: u8): i8 {
   return -1;
 }
 
-function handleOpcode2x(opcode: u8): i8 {
+function handleOpcode2x(opcode: i32): i32 {
 
   switch(opcode) {
     case 0x20:
@@ -858,7 +858,7 @@ function handleOpcode2x(opcode: u8): i8 {
   return -1;
 }
 
-function handleOpcode3x(opcode: u8): i8 {
+function handleOpcode3x(opcode: i32): i32 {
   switch (opcode) {
     case 0x30:
 
@@ -1039,7 +1039,7 @@ function handleOpcode3x(opcode: u8): i8 {
   return -1;
 }
 
-function handleOpcode4x(opcode: u8): i8 {
+function handleOpcode4x(opcode: i32): i32 {
   switch (opcode) {
     case 0x40:
       // LD B,B
@@ -1140,7 +1140,7 @@ function handleOpcode4x(opcode: u8): i8 {
   return -1;
 }
 
-function handleOpcode5x(opcode: u8): i8 {
+function handleOpcode5x(opcode: i32): i32 {
   switch (opcode) {
     case 0x50:
 
@@ -1242,7 +1242,7 @@ function handleOpcode5x(opcode: u8): i8 {
   return -1;
 }
 
-function handleOpcode6x(opcode: u8): i8 {
+function handleOpcode6x(opcode: i32): i32 {
   switch (opcode) {
     case 0x60:
 
@@ -1345,7 +1345,7 @@ function handleOpcode6x(opcode: u8): i8 {
   return -1;
 }
 
-function handleOpcode7x(opcode: u8): i8 {
+function handleOpcode7x(opcode: i32): i32 {
   switch (opcode) {
     case 0x70:
 
@@ -1456,7 +1456,7 @@ function handleOpcode7x(opcode: u8): i8 {
   return -1;
 }
 
-function handleOpcode8x(opcode: u8): i8 {
+function handleOpcode8x(opcode: i32): i32 {
   switch (opcode) {
     case 0x80:
       // ADD A,B
@@ -1560,7 +1560,7 @@ function handleOpcode8x(opcode: u8): i8 {
   return -1;
 }
 
-function handleOpcode9x(opcode: u8): i8 {
+function handleOpcode9x(opcode: i32): i32 {
   switch (opcode) {
     case 0x90:
 
@@ -1680,7 +1680,7 @@ function handleOpcode9x(opcode: u8): i8 {
   return -1;
 }
 
-function handleOpcodeAx(opcode: u8): i8 {
+function handleOpcodeAx(opcode: i32): i32 {
   switch (opcode) {
     case 0xA0:
 
@@ -1801,7 +1801,7 @@ function handleOpcodeAx(opcode: u8): i8 {
   return -1;
 }
 
-function handleOpcodeBx(opcode: u8): i8 {
+function handleOpcodeBx(opcode: i32): i32 {
   switch (opcode) {
     case 0xB0:
 
@@ -1921,7 +1921,7 @@ function handleOpcodeBx(opcode: u8): i8 {
   return -1;
 }
 
-function handleOpcodeCx(opcode: u8): i8 {
+function handleOpcodeCx(opcode: i32): i32 {
   switch (opcode) {
     case 0xC0:
 
@@ -2076,7 +2076,7 @@ function handleOpcodeCx(opcode: u8): i8 {
   return -1;
 }
 
-function handleOpcodeDx(opcode: u8): i8 {
+function handleOpcodeDx(opcode: i32): i32 {
   switch (opcode) {
     case 0xD0:
 
@@ -2213,7 +2213,7 @@ function handleOpcodeDx(opcode: u8): i8 {
   return -1;
 }
 
-function handleOpcodeEx(opcode: u8): i8 {
+function handleOpcodeEx(opcode: i32): i32 {
   switch (opcode) {
     case 0xE0:
 
@@ -2319,7 +2319,7 @@ function handleOpcodeEx(opcode: u8): i8 {
   return -1;
 }
 
-function handleOpcodeFx(opcode: u8): i8 {
+function handleOpcodeFx(opcode: i32): i32 {
   switch (opcode) {
     case 0xF0:
 

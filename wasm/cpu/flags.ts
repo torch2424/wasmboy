@@ -4,9 +4,9 @@ import {
 
 
 // Set flag bit on on register F. For instance set zero flag to zero -> (7, 0)
-function setFlagBit(flagBit: u8, flagValue: u8): u8 {
+function setFlagBit(flagBit: u8, flagValue: i32): u8 {
 
-  let bitwiseOperand: u8 = 0x01 << flagBit;
+  let bitwiseOperand: u8 = 1 << flagBit;
   if(flagValue > 0) {
     Cpu.registerF = Cpu.registerF | bitwiseOperand;
   } else {
@@ -19,19 +19,19 @@ function setFlagBit(flagBit: u8, flagValue: u8): u8 {
 }
 
 // Overload the set flag bit for ease of use
-export function setZeroFlag(value: u8): void {
+export function setZeroFlag(value: i32): void {
   setFlagBit(7, value);
 }
 
-export function setSubtractFlag(value: u8): void {
+export function setSubtractFlag(value: i32): void {
   setFlagBit(6, value)
 }
 
-export function setHalfCarryFlag(value: u8): void {
+export function setHalfCarryFlag(value: i32): void {
   setFlagBit(5, value);
 }
 
-export function setCarryFlag(value: u8): void {
+export function setCarryFlag(value: i32): void {
   setFlagBit(4, value)
 }
 
@@ -54,7 +54,7 @@ export function getCarryFlag(): u8 {
 
 // Must be run before the register actually performs the add
 // amountToAdd i16, since max number can be an u8
-export function checkAndSetEightBitHalfCarryFlag(value: u8, amountToAdd: i16): void {
+export function checkAndSetEightBitHalfCarryFlag(value: u8, amountToAdd: i32): void {
   if(amountToAdd >= 0) {
     // https://robdor.com/2016/08/10/gameboy-emulator-half-carry-flag/
     let result: u8 = (((<u8>value & 0x0F) + (<u8>amountToAdd & 0x0F)) & 0x10)
@@ -74,7 +74,7 @@ export function checkAndSetEightBitHalfCarryFlag(value: u8, amountToAdd: i16): v
   }
 }
 
-export function checkAndSetEightBitCarryFlag(value: u8, amountToAdd: i16): void {
+export function checkAndSetEightBitCarryFlag(value: u8, amountToAdd: i32): void {
   if (amountToAdd >= 0) {
     let result: u8 = value + <u8>amountToAdd;
     if (value > result) {

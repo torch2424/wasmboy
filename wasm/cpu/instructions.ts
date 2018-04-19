@@ -397,7 +397,7 @@ export function testBitOnRegister(bitPosition: u8, register: u8): u8 {
   // BIT bitPosition ,register 8-bit
   // Z 0 1 -
 
-  let testByte: u8 = (0x01 << bitPosition);
+  let testByte: u8 = 0x01 << bitPosition;
   let result = (register & testByte);
   if(result === 0x00) {
     setZeroFlag(1);
@@ -411,12 +411,12 @@ export function testBitOnRegister(bitPosition: u8, register: u8): u8 {
   return register;
 }
 
-export function setBitOnRegister(bitPosition: u8, bitValue: u8, register: u8): u8 {
+export function setBitOnRegister(bitPosition: u8, bitValue: i32, register: u8): u8 {
 
   // RES 0,B or SET 0,B depending on bit value
 
   if(bitValue > 0) {
-   let setByte: u8 = (0x01 << bitPosition);
+   let setByte: u8 = 0x01 << bitPosition;
    register = register | setByte;
   } else {
    // NOT (byte we want)
