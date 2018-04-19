@@ -188,17 +188,15 @@ export function setPixelOnFrame(x: i32, y: i32, colorId: i32, color: i32): void 
   // Currently only supports 160x144
   // Storing in X, then y
   // So need an offset
-
-  let offset: i32 = Memory.frameInProgressVideoOutputLocation + getRgbPixelStart(x, y) + colorId;
-  store<u8>(offset, <u8>color);
+  store<u8>(Memory.frameInProgressVideoOutputLocation + getRgbPixelStart(x, y) + colorId, <u8>color);
 }
 
 // Function to get the start of a RGB pixel (R, G, B)
 export function getRgbPixelStart(x: i32, y: i32): i32 {
   // Get the pixel number
-  let pixelNumber: i32 = (y * 160) + x;
+  // let pixelNumber: i32 = (y * 160) + x;
   // Each pixel takes 3 slots, therefore, multiply by 3!
-  return pixelNumber * 3;
+  return ((y * 160) + x) * 3;
 }
 
 // V-Blank occured, move our frame in progress to our render frame

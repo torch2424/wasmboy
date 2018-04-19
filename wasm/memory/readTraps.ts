@@ -6,7 +6,8 @@ import {
   batchProcessGraphics
 } from '../graphics/graphics';
 import {
-  Palette
+  Palette,
+  Lcd
 } from '../graphics/index';
 import {
   batchProcessAudio,
@@ -65,7 +66,7 @@ export function checkReadTraps(offset: i32): i32 {
   if(offset >= Memory.spriteInformationTableLocation && offset <= Memory.spriteInformationTableLocationEnd) {
     // Can only read/write from OAM During Mode 2
     // See graphics/lcd.ts
-    if (Graphics.currentLcdMode < 2) {
+    if (Lcd.currentLcdMode < 2) {
       return 0xFF;
     }
 
@@ -93,13 +94,6 @@ export function checkReadTraps(offset: i32): i32 {
   if(offset >= 0xFF30 && offset <= 0xFF3F) {
     batchProcessAudio();
   }
-
-  // Batch Process Graphics
-  // http://gameboy.mongenel.com/dmg/asmmemmap.html and http://gbdev.gg8.se/wiki/articles/Video_Display
-  // if (offset >= Graphics.memoryLocationLcdControl && offset <= Graphics.memoryLocationWindowX) {
-  //   // Not batch processing here for performance
-  //   // batchProcessGraphics();
-  // }
 
   return -1;
 }

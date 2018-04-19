@@ -15,17 +15,17 @@ import { WasmBoyDebugger, WasmBoySystemControls } from './debugger/index';
 const gamePath = './games/linksawakening.gb';
 
 const wasmBoyOptions = {
-	isGbcEnabled: true,
+	isGbcEnabled: false,
 	isAudioEnabled: true,
 	frameSkip: 1,
-	audioBatchProcessing: false,
+	audioBatchProcessing: true,
 	timersBatchProcessing: false,
-	audioAccumulateSamples: false,
+	audioAccumulateSamples: true,
 	graphicsBatchProcessing: false,
 	graphicsDisableScanlineRendering: false,
-	tileRendering: false,
-	tileCaching: false,
-	gameboySpeed: 2.0
+	tileRendering: true,
+	tileCaching: true,
+	gameboySpeed: 1.0
 };
 
 const wasmBoyOptionsString = JSON.stringify(wasmBoyOptions, null, 4);

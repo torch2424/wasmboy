@@ -7,7 +7,8 @@ import {
 } from '../graphics/graphics';
 import {
   Palette,
-  writeColorPaletteToMemory
+  writeColorPaletteToMemory,
+  Lcd
 } from '../graphics/index';
 import {
   batchProcessAudio,
@@ -89,7 +90,7 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
   if(offset >= spriteInformationTableLocation && offset <= Memory.spriteInformationTableLocationEnd) {
     // Can only read/write from OAM During Mode 2
     // See graphics/lcd.ts
-    if (Graphics.currentLcdMode < 2) {
+    if (Lcd.currentLcdMode < 2) {
       return false;
     }
     // Not batch processing here for performance
@@ -139,11 +140,17 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
     batchProcessAudio();
   }
 
-  // Other Memory effects fomr read/write to GraphicsGraphics
-  if (offset >= Graphics.memoryLocationLcdControl && offset <= Graphics.memoryLocationWindowX) {
+  // Other Memory effects fomr read/write to Lcd/Graphics
+  if (offset >= Lcd.memoryLocationLcdControl && offset <= Graphics.memoryLocationWindowX) {
 
     // Not batch processing here for performance
     // batchProcessGraphics();
+
+    if (offset === Lcd.memoryLocationLcdControl) {
+      // Shorcut for isLCD Enabled since it gets "hot"
+      Lcd.updateLcdControl(value);
+      return true;
+    }
 
     // reset the current scanline if the game tries to write to it
     if (offset === Graphics.memoryLocationScanlineRegister) {

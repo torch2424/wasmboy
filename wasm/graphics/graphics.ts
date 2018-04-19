@@ -1,7 +1,7 @@
 // Main Class and funcitons for rendering the gameboy display
 import {
-  setLcdStatus,
-  isLcdEnabled
+  Lcd,
+  setLcdStatus
 } from './lcd';
 import {
   renderBackground,
@@ -86,14 +86,7 @@ export class Graphics {
   // scanlineRegister also known as LY
   // See: http://bgb.bircd.org/pandocs.txt , and search " LY "
   static readonly memoryLocationScanlineRegister: i32 = 0xFF44;
-  static readonly memoryLocationCoincidenceCompare: i32 = 0xFF45;
   static readonly memoryLocationDmaTransfer: i32 = 0xFF46;
-
-  // Also known at STAT
-  static readonly memoryLocationLcdStatus: i32 = 0xFF41;
-  // Also known as LCDC
-  static readonly memoryLocationLcdControl: i32 = 0xFF40;
-  static currentLcdMode:i32 = 0;
 
   // Scroll and Window
   static readonly memoryLocationScrollX: i32 = 0xFF43;
@@ -124,13 +117,13 @@ export class Graphics {
   // Function to save the state of the class
   static saveState(): void {
     store<i32>(getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot), Graphics.scanlineCycleCounter);
-    store<u8>(getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot), <u8>Graphics.currentLcdMode);
+    store<u8>(getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot), <u8>Lcd.currentLcdMode);
   }
 
   // Function to load the save state from memory
   static loadState(): void {
     Graphics.scanlineCycleCounter = load<i32>(getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot));
-    Graphics.currentLcdMode = load<u8>(getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot));
+    Lcd.currentLcdMode = load<u8>(getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot));
   }
 }
 
@@ -152,11 +145,7 @@ export function batchProcessGraphics(): void {
 
 export function updateGraphics(numberOfCycles: i32): void {
 
-  // Get if the LCD is currently enabled
-  // Doing this for performance
-  let lcdEnabledStatus: boolean = isLcdEnabled();
-
-  if(lcdEnabledStatus) {
+  if(Lcd.enabled) {
 
     Graphics.scanlineCycleCounter += numberOfCycles;
 
@@ -210,27 +199,15 @@ export function updateGraphics(numberOfCycles: i32): void {
   // Games like Pokemon crystal want the vblank right as it turns to the value, and not have it increment after
   // It will break and lead to an infinite loop in crystal
   // Therefore, we want to be checking/Setting our LCD status after the scanline updates
-  setLcdStatus(lcdEnabledStatus);
+  setLcdStatus();
 }
 
 // TODO: Make this a _drawPixelOnScanline, as values can be updated while drawing a scanline
 function _drawScanline(scanlineRegister: i32): void {
-  // http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html
-  // Bit 7 - LCD Display Enable (0=Off, 1=On)
-  // Bit 6 - Window Tile Map Display Select (0=9800-9BFF, 1=9C00-9FFF)
-  // Bit 5 - Window Display Enable (0=Off, 1=On)
-  // Bit 4 - BG & Window Tile Data Select (0=8800-97FF, 1=8000-8FFF)
-  // Bit 3 - BG Tile Map Display Select (0=9800-9BFF, 1=9C00-9FFF)
-  // Bit 2 - OBJ (Sprite) Size (0=8x8, 1=8x16)
-  // Bit 1 - OBJ (Sprite) Display Enable (0=Off, 1=On)
-  // Bit 0 - BG Display (for CGB see below) (0=Off, 1=On)
-
-  // Get our lcd control, see above for usage
-  let lcdControl: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationLcdControl);
 
   // Get our seleted tile data memory location
   let tileDataMemoryLocation: i32 = Graphics.memoryLocationTileDataSelectZeroStart;
-  if(checkBitOnByte(4, lcdControl)) {
+  if(Lcd.bgWindowTileDataSelect) {
     tileDataMemoryLocation = Graphics.memoryLocationTileDataSelectOneStart;
   }
 
@@ -242,11 +219,11 @@ function _drawScanline(scanlineRegister: i32): void {
   // the sprites will be always displayed on top of background and window,
   // independently of the priority flags in OAM and BG Map attributes.
   // TODO: Enable this different feature for GBC
-  if (Cpu.GBCEnabled || checkBitOnByte(0, lcdControl)) {
+  if (Cpu.GBCEnabled || Lcd.bgDisplayEnabled) {
 
     // Get our map memory location
     let tileMapMemoryLocation: i32 = Graphics.memoryLocationTileMapSelectZeroStart;
-    if (checkBitOnByte(3, lcdControl)) {
+    if (Lcd.bgTileMapDisplaySelect) {
       tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectOneStart;
     }
 
@@ -256,11 +233,11 @@ function _drawScanline(scanlineRegister: i32): void {
 
   // Check if the window is enabled, and we are currently
   // Drawing lines on the window
-  if(checkBitOnByte(5, lcdControl)) {
+  if(Lcd.windowDisplayEnabled) {
 
     // Get our map memory location
     let tileMapMemoryLocation: i32 = Graphics.memoryLocationTileMapSelectZeroStart;
-    if (checkBitOnByte(6, lcdControl)) {
+    if (Lcd.windowTileMapDisplaySelect) {
       tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectOneStart;
     }
 
@@ -268,9 +245,9 @@ function _drawScanline(scanlineRegister: i32): void {
     renderWindow(scanlineRegister, tileDataMemoryLocation, tileMapMemoryLocation);
   }
 
-  if (checkBitOnByte(1, lcdControl)) {
+  if (Lcd.spriteDisplayEnable) {
     // Sprites are enabled, render them!
-    renderSprites(scanlineRegister, checkBitOnByte(2, lcdControl));
+    renderSprites(scanlineRegister, Lcd.tallSpriteSize);
   }
 }
 

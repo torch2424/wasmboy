@@ -3,6 +3,9 @@ import {
   Graphics
 } from './graphics';
 import {
+  Lcd
+} from './lcd';
+import {
   Cpu
 } from '../cpu/cpu';
 import {
@@ -159,7 +162,7 @@ export function renderSprites(scanlineRegister: i32, useLargerSprites: boolean):
           let shouldHideFromOamPriority: boolean = false;
           let shouldHideFromBgPriority: boolean = false;
           // LCDC Priority
-          if(Cpu.GBCEnabled && !checkBitOnByte(0, eightBitLoadFromGBMemory(Graphics.memoryLocationLcdControl))) {
+          if(Cpu.GBCEnabled && !Lcd.bgDisplayEnabled) {
             shouldShowFromLcdcPriority = true;
           }
 

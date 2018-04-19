@@ -4,8 +4,9 @@ import {
   tileDataMap
 } from '../constants/constants';
 import {
-  Graphics
-} from '../graphics/graphics';
+  Graphics,
+  Lcd
+} from '../graphics/index';
 import {
   Cpu
 } from '../cpu/cpu';
@@ -41,17 +42,14 @@ export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
   // Bit 1 - OBJ (Sprite) Display Enable (0=Off, 1=On)
   // Bit 0 - BG Display (for CGB see below) (0=Off, 1=On)
 
-  // Get our lcd control, see above for usage
-  let lcdControl: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationLcdControl);
-
   // Get our seleted tile data memory location
   let tileDataMemoryLocation = Graphics.memoryLocationTileDataSelectZeroStart;
-  if(checkBitOnByte(4, lcdControl)) {
+  if(Lcd.bgWindowTileDataSelect) {
     tileDataMemoryLocation = Graphics.memoryLocationTileDataSelectOneStart;
   }
 
   let tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectZeroStart;
-  if (checkBitOnByte(3, lcdControl)) {
+  if (Lcd.bgTileMapDisplaySelect) {
     tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectOneStart;
   }
 

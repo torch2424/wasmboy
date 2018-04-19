@@ -23,12 +23,10 @@ import {
   hexLog
 } from '../helpers/index';
 
-export function isLcdEnabled(): boolean {
-  return checkBitOnByte(7, eightBitLoadFromGBMemory(Graphics.memoryLocationLcdControl));
-}
+export class Lcd {
 
-// Pass in the lcd status for performance
-export function setLcdStatus(lcdEnabledStatus: boolean): void {
+  // Memory Locations
+  // Also known at STAT
   // LCD Status (0xFF41) bits Explanation
   // 0                0                    000                    0             00
   //       |Coicedence Interrupt|     |Mode Interrupts|  |coincidence flag|    | Mode |
@@ -37,9 +35,53 @@ export function setLcdStatus(lcdEnabledStatus: boolean): void {
   // 1 or 01: V-Blank
   // 2 or 10: Searching Sprites Atts
   // 3 or 11: Transfering Data to LCD Driver
+  static readonly memoryLocationLcdStatus: i32 = 0xFF41;
 
-  let lcdStatus: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationLcdStatus);
-  if(!lcdEnabledStatus) {
+  static readonly memoryLocationCoincidenceCompare: i32 = 0xFF45;
+
+
+  // Also known as LCDC
+  // http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html
+  // Bit 7 - LCD Display Enable (0=Off, 1=On)
+  // Bit 6 - Window Tile Map Display Select (0=9800-9BFF, 1=9C00-9FFF)
+  // Bit 5 - Window Display Enable (0=Off, 1=On)
+  // Bit 4 - BG & Window Tile Data Select (0=8800-97FF, 1=8000-8FFF)
+  // Bit 3 - BG Tile Map Display Select (0=9800-9BFF, 1=9C00-9FFF)
+  // Bit 2 - OBJ (Sprite) Size (0=8x8, 1=8x16)
+  // Bit 1 - OBJ (Sprite) Display Enable (0=Off, 1=On)
+  // Bit 0 - BG Display (for CGB see below) (0=Off, 1=On
+  static readonly memoryLocationLcdControl: i32 = 0xFF40;
+  static currentLcdMode: i32 = 0;
+
+  // Decoupled LCDC for caching
+  static enabled: boolean = true;
+  static windowTileMapDisplaySelect: boolean = false;
+  static windowDisplayEnabled: boolean = false;
+  static bgWindowTileDataSelect: boolean = false;
+  static bgTileMapDisplaySelect: boolean = false;
+  static tallSpriteSize: boolean = false;
+  static spriteDisplayEnable: boolean = false;
+  static bgDisplayEnabled: boolean = false;
+
+  // Functions called in write traps to update our hardware registers
+  static updateLcdControl(value: i32): void {
+    Lcd.enabled = checkBitOnByte(7, value);
+    Lcd.windowTileMapDisplaySelect = checkBitOnByte(6, value)
+    Lcd.windowDisplayEnabled = checkBitOnByte(5, value)
+    Lcd.bgWindowTileDataSelect = checkBitOnByte(4, value)
+    Lcd.bgTileMapDisplaySelect = checkBitOnByte(3, value)
+    Lcd.tallSpriteSize = checkBitOnByte(2, value)
+    Lcd.spriteDisplayEnable = checkBitOnByte(1, value)
+    Lcd.bgDisplayEnabled = checkBitOnByte(0, value)
+  }
+}
+
+
+// Pass in the lcd status for performance
+export function setLcdStatus(): void {
+
+  let lcdStatus: i32 = eightBitLoadFromGBMemory(Lcd.memoryLocationLcdStatus);
+  if(!Lcd.enabled) {
     // Reset scanline cycle counter
     Graphics.scanlineCycleCounter = 0;
     eightBitStoreIntoGBMemory(Graphics.memoryLocationScanlineRegister, 0);
@@ -48,10 +90,10 @@ export function setLcdStatus(lcdEnabledStatus: boolean): void {
     // https://www.reddit.com/r/EmuDev/comments/4w6479/gb_dr_mario_level_generation_issues/
     lcdStatus = resetBitOnByte(1, lcdStatus);
     lcdStatus = resetBitOnByte(0, lcdStatus);
-    Graphics.currentLcdMode = 0;
+    Lcd.currentLcdMode = 0;
 
     // Store the status in memory
-    eightBitStoreIntoGBMemory(Graphics.memoryLocationLcdStatus, lcdStatus);
+    eightBitStoreIntoGBMemory(Lcd.memoryLocationLcdStatus, lcdStatus);
     return;
   }
 
@@ -109,7 +151,7 @@ export function setLcdStatus(lcdEnabledStatus: boolean): void {
 
     // Check for the coincidence flag
     // Need to check on every mode, and not just HBLANK, as checking on hblank breaks shantae, which checks on vblank
-    let coincidenceCompare: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationCoincidenceCompare);
+    let coincidenceCompare: i32 = eightBitLoadFromGBMemory(Lcd.memoryLocationCoincidenceCompare);
     if((newLcdMode === 0 || newLcdMode === 1) &&
       scanlineRegister === coincidenceCompare) {
       lcdStatus = setBitOnByte(2, lcdStatus);
@@ -119,11 +161,11 @@ export function setLcdStatus(lcdEnabledStatus: boolean): void {
     } else {
       lcdStatus = resetBitOnByte(2, lcdStatus);
     }
+
+    // Save our lcd mode
+    Lcd.currentLcdMode = newLcdMode;
+
+    // Finally, save our status
+    eightBitStoreIntoGBMemory(Lcd.memoryLocationLcdStatus, lcdStatus);
   }
-
-  // Save our lcd mode
-  Graphics.currentLcdMode = newLcdMode;
-
-  // Finally, save our status
-  eightBitStoreIntoGBMemory(Graphics.memoryLocationLcdStatus, lcdStatus);
 }
