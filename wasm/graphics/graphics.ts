@@ -85,46 +85,46 @@ export class Graphics {
   // LCD
   // scanlineRegister also known as LY
   // See: http://bgb.bircd.org/pandocs.txt , and search " LY "
-  static readonly memoryLocationScanlineRegister: u16 = 0xFF44;
-  static readonly memoryLocationCoincidenceCompare: u16 = 0xFF45;
-  static readonly memoryLocationDmaTransfer: u16 = 0xFF46;
+  static readonly memoryLocationScanlineRegister: i32 = 0xFF44;
+  static readonly memoryLocationCoincidenceCompare: i32 = 0xFF45;
+  static readonly memoryLocationDmaTransfer: i32 = 0xFF46;
 
   // Also known at STAT
-  static readonly memoryLocationLcdStatus: u16 = 0xFF41;
+  static readonly memoryLocationLcdStatus: i32 = 0xFF41;
   // Also known as LCDC
-  static readonly memoryLocationLcdControl: u16 = 0xFF40;
-  static currentLcdMode: u8 = 0;
+  static readonly memoryLocationLcdControl: i32 = 0xFF40;
+  static currentLcdMode:i32 = 0;
 
   // Scroll and Window
-  static readonly memoryLocationScrollX: u16 = 0xFF43;
-  static readonly memoryLocationScrollY: u16 = 0xFF42;
-  static readonly memoryLocationWindowX: u16 = 0xFF4B;
-  static readonly memoryLocationWindowY: u16 = 0xFF4A;
+  static readonly memoryLocationScrollX: i32 = 0xFF43;
+  static readonly memoryLocationScrollY: i32 = 0xFF42;
+  static readonly memoryLocationWindowX: i32 = 0xFF4B;
+  static readonly memoryLocationWindowY: i32 = 0xFF4A;
 
   // Tile Maps And Data
-  static readonly memoryLocationTileMapSelectZeroStart: u16 = 0x9800;
-  static readonly memoryLocationTileMapSelectOneStart: u16 = 0x9C00;
-  static readonly memoryLocationTileDataSelectZeroStart: u16 = 0x8800;
-  static readonly memoryLocationTileDataSelectOneStart: u16 = 0x8000;
+  static readonly memoryLocationTileMapSelectZeroStart: i32 = 0x9800;
+  static readonly memoryLocationTileMapSelectOneStart: i32 = 0x9C00;
+  static readonly memoryLocationTileDataSelectZeroStart: i32 = 0x8800;
+  static readonly memoryLocationTileDataSelectOneStart: i32 = 0x8000;
 
   // Sprites
-  static readonly memoryLocationSpriteAttributesTable: u16 = 0xFE00;
+  static readonly memoryLocationSpriteAttributesTable: i32 = 0xFE00;
 
   // Palettes
-  static readonly memoryLocationBackgroundPalette: u16 = 0xFF47;
-  static readonly memoryLocationSpritePaletteOne: u16 = 0xFF48;
-  static readonly memoryLocationSpritePaletteTwo: u16 = 0xFF49;
+  static readonly memoryLocationBackgroundPalette: i32 = 0xFF47;
+  static readonly memoryLocationSpritePaletteOne: i32 = 0xFF48;
+  static readonly memoryLocationSpritePaletteTwo: i32 = 0xFF49;
 
   // Screen data needs to be stored in wasm memory
 
   // Save States
 
-  static readonly saveStateSlot: u16 = 1;
+  static readonly saveStateSlot: i32 = 1;
 
   // Function to save the state of the class
   static saveState(): void {
     store<i32>(getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot), Graphics.scanlineCycleCounter);
-    store<u8>(getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot), Graphics.currentLcdMode);
+    store<u8>(getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot), <u8>Graphics.currentLcdMode);
   }
 
   // Function to load the save state from memory
@@ -167,7 +167,7 @@ export function updateGraphics(numberOfCycles: i32): void {
       Graphics.scanlineCycleCounter -= Graphics.MAX_CYCLES_PER_SCANLINE();
 
       // Move to next scanline
-      let scanlineRegister: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationScanlineRegister);
+      let scanlineRegister: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationScanlineRegister);
 
       // Check if we've reached the last scanline
       if(scanlineRegister === 144) {
@@ -214,7 +214,7 @@ export function updateGraphics(numberOfCycles: i32): void {
 }
 
 // TODO: Make this a _drawPixelOnScanline, as values can be updated while drawing a scanline
-function _drawScanline(scanlineRegister: u8): void {
+function _drawScanline(scanlineRegister: i32): void {
   // http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html
   // Bit 7 - LCD Display Enable (0=Off, 1=On)
   // Bit 6 - Window Tile Map Display Select (0=9800-9BFF, 1=9C00-9FFF)
@@ -226,10 +226,10 @@ function _drawScanline(scanlineRegister: u8): void {
   // Bit 0 - BG Display (for CGB see below) (0=Off, 1=On)
 
   // Get our lcd control, see above for usage
-  let lcdControl: u8 = eightBitLoadFromGBMemory(Graphics.memoryLocationLcdControl);
+  let lcdControl: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationLcdControl);
 
   // Get our seleted tile data memory location
-  let tileDataMemoryLocation = Graphics.memoryLocationTileDataSelectZeroStart;
+  let tileDataMemoryLocation: i32 = Graphics.memoryLocationTileDataSelectZeroStart;
   if(checkBitOnByte(4, lcdControl)) {
     tileDataMemoryLocation = Graphics.memoryLocationTileDataSelectOneStart;
   }
@@ -245,7 +245,7 @@ function _drawScanline(scanlineRegister: u8): void {
   if (Cpu.GBCEnabled || checkBitOnByte(0, lcdControl)) {
 
     // Get our map memory location
-    let tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectZeroStart;
+    let tileMapMemoryLocation: i32 = Graphics.memoryLocationTileMapSelectZeroStart;
     if (checkBitOnByte(3, lcdControl)) {
       tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectOneStart;
     }
@@ -259,7 +259,7 @@ function _drawScanline(scanlineRegister: u8): void {
   if(checkBitOnByte(5, lcdControl)) {
 
     // Get our map memory location
-    let tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectZeroStart;
+    let tileMapMemoryLocation: i32 = Graphics.memoryLocationTileMapSelectZeroStart;
     if (checkBitOnByte(6, lcdControl)) {
       tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectOneStart;
     }

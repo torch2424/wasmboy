@@ -11,23 +11,23 @@ import {
   hexLog
 } from '../helpers/index';
 
-export function eightBitStoreIntoGBMemory(gameboyOffset: u16, value: u8): void {
-  store<u8>(getWasmBoyOffsetFromGameBoyOffset(gameboyOffset), value);
+export function eightBitStoreIntoGBMemory(gameboyOffset: i32, value: i32): void {
+  store<u8>(getWasmBoyOffsetFromGameBoyOffset(gameboyOffset), <i32>value);
 }
 
-export function eightBitStoreIntoGBMemoryWithTraps(offset: u16, value: u8): void {
-  if(checkWriteTraps(offset, <u16>value)) {
-    eightBitStoreIntoGBMemory(offset, value);
+export function eightBitStoreIntoGBMemoryWithTraps(offset: i32, value: i32): void {
+  if(checkWriteTraps(offset, value)) {
+    eightBitStoreIntoGBMemory(offset, <i32>value);
   }
 }
 
-export function sixteenBitStoreIntoGBMemoryWithTraps(offset: u16, value: u16): void {
+export function sixteenBitStoreIntoGBMemoryWithTraps(offset: i32, value: i32): void {
 
   // Dividing into two seperate eight bit calls to help with debugging tilemap overwrites
   // Split the value into two seperate bytes
-  let highByte: u8 = splitHighByte(value);
-  let lowByte: u8 = splitLowByte(value);
-  let nextOffset: u16 = offset + 1;
+  let highByte: i32 = splitHighByte(value);
+  let lowByte: i32 = splitLowByte(value);
+  let nextOffset: i32 = offset + 1;
 
   if(checkWriteTraps(offset, lowByte)) {
     eightBitStoreIntoGBMemory(offset, lowByte);
@@ -38,13 +38,13 @@ export function sixteenBitStoreIntoGBMemoryWithTraps(offset: u16, value: u16): v
   }
 }
 
-export function sixteenBitStoreIntoGBMemory(offset: u16, value: u16): void {
+export function sixteenBitStoreIntoGBMemory(offset: i32, value: i32): void {
 
   // Dividing into two seperate eight bit calls to help with debugging tilemap overwrites
   // Split the value into two seperate bytes
-  let highByte: u8 = splitHighByte(value);
-  let lowByte: u8 = splitLowByte(value);
-  let nextOffset: u16 = offset + 1;
+  let highByte: i32 = splitHighByte(value);
+  let lowByte: i32 = splitLowByte(value);
+  let nextOffset: i32 = offset + 1;
 
   eightBitStoreIntoGBMemory(offset, lowByte);
   eightBitStoreIntoGBMemory(nextOffset, highByte);

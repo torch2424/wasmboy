@@ -88,8 +88,8 @@ export class Memory {
   // ----------------------------------
   // http://gbdev.gg8.se/wiki/articles/Memory_Bank_Controllers#MBC3_.28max_2MByte_ROM_and.2For_32KByte_RAM_and_Timer.29
   // http://www.codeslinger.co.uk/pages/projects/gameboy/banking.html
-  static currentRomBank: u16 = 0x00;
-  static currentRamBank: u16 = 0x00;
+  static currentRomBank: i32 = 0x00;
+  static currentRamBank: i32 = 0x00;
   static isRamBankingEnabled: boolean = false;
   static isMBC1RomModeEnabled: boolean = true;
 
@@ -184,13 +184,13 @@ export function initializeCartridge(): void {
 }
 
 // Also need to store current frame in memory to be read by JS
-export function setPixelOnFrame(x: i32, y: i32, colorId: i32, color: u8): void {
+export function setPixelOnFrame(x: i32, y: i32, colorId: i32, color: i32): void {
   // Currently only supports 160x144
   // Storing in X, then y
   // So need an offset
 
   let offset: i32 = Memory.frameInProgressVideoOutputLocation + getRgbPixelStart(x, y) + colorId;
-  store<u8>(offset, color);
+  store<u8>(offset, <u8>color);
 }
 
 // Function to get the start of a RGB pixel (R, G, B)
@@ -242,7 +242,7 @@ export function loadFromVramBank(gameboyOffset: i32, vramBankId: i32): u8 {
 }
 
 // Function to store a byte to our Gbc Palette memory
-export function storePaletteByteInWasmMemory(paletteIndexByte: u8, value: u8, isSprite: boolean): void {
+export function storePaletteByteInWasmMemory(paletteIndexByte: i32, value: i32, isSprite: boolean): void {
 
   // Clear the top two bits to just get the bottom palette Index
   let paletteIndex: i32 = (paletteIndexByte & 0x3F);
@@ -252,12 +252,12 @@ export function storePaletteByteInWasmMemory(paletteIndexByte: u8, value: u8, is
     paletteIndex += 0x40;
   }
 
-  store<u8>(Memory.gameboyColorPaletteLocation + paletteIndex, value);
+  store<u8>(Memory.gameboyColorPaletteLocation + paletteIndex, <u8>value);
 }
 
 // Function to load a byte from our Gbc Palette memory
 // Function to store a byte to our Gbc Palette memory
-export function loadPaletteByteFromWasmMemory(paletteIndexByte: u8, isSprite: boolean): u8 {
+export function loadPaletteByteFromWasmMemory(paletteIndexByte: i32, isSprite: boolean): u8 {
 
   // Clear the top two bits to just get the bottom palette Index
   let paletteIndex: i32 = (paletteIndexByte & 0x3F);
@@ -274,8 +274,7 @@ export function loadPaletteByteFromWasmMemory(paletteIndexByte: u8, isSprite: bo
 // Function to return an address to store into save state memory
 // this is to regulate our 20 slots
 // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
-export function getSaveStateMemoryOffset(offset: u16, saveStateSlot: u16): u16 {
-  // 50 byutes per save state memory partiton slot
-  let address: u16 = offset + (50 * saveStateSlot);
-  return address;
+export function getSaveStateMemoryOffset(offset: i32, saveStateSlot: i32): i32 {
+  // 50 byutes per save state memory partiton sli32
+  return offset + (50 * saveStateSlot);
 }

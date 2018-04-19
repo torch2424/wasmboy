@@ -9,7 +9,7 @@ import {
   hexLog
 } from '../helpers/index';
 
-export function handleBanking(offset: u16, value: u16): void {
+export function handleBanking(offset: i32, value: i32): void {
       // Is rom Only does not bank
       if(Memory.isRomOnly) {
         return;
@@ -57,8 +57,8 @@ export function handleBanking(offset: u16, value: u16): void {
           return;
         } else {
           // TODO: MBC5 High bits Rom bank, check if this works, not sure about the value
-          let highByte: u8 = 0;
-          let lowByte: u8 = splitLowByte(Memory.currentRomBank);
+          let highByte: i32 = 0;
+          let lowByte: i32 = splitLowByte(Memory.currentRomBank);
           if(value > 0) {
             highByte = 1;
           }
@@ -84,7 +84,7 @@ export function handleBanking(offset: u16, value: u16): void {
           }
         }
 
-        let ramBankBits = value;
+        let ramBankBits: i32 = value;
 
         if(!Memory.isMBC5) {
           // Get the bottom 2 bits
@@ -111,7 +111,7 @@ export function handleBanking(offset: u16, value: u16): void {
 }
 
 export function getRomBankAddress(gameboyOffset: i32): i32 {
-  let currentRomBank: u16 = Memory.currentRomBank;
+  let currentRomBank: i32 = Memory.currentRomBank;
   if(!Memory.isMBC5 && currentRomBank === 0) {
     currentRomBank = 1;
   }

@@ -27,10 +27,10 @@ import {
 } from '../helpers/index';
 
 // Returns -1 if no trap found, otherwise returns a value that should be fed for the address
-export function checkReadTraps(offset: u16): i32 {
+export function checkReadTraps(offset: i32): i32 {
 
   // Cache globals used multiple times for performance
-  let videoRamLocation: u16 = Memory.videoRamLocation;
+  let videoRamLocation: i32 = Memory.videoRamLocation;
 
   // Try to break early for most common scenario
   if (offset < videoRamLocation) {
@@ -86,7 +86,7 @@ export function checkReadTraps(offset: u16): i32 {
     if(soundReadResponse < 0) {
       return -1;
     }
-    return <u8>soundReadResponse;
+    return soundReadResponse;
   }
   // FF27 - FF2F not used
   // Final Wave Table for Channel 3

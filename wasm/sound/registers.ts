@@ -33,7 +33,7 @@ import {
 } from '../helpers/index';
 
 // Function to check and handle writes to sound registers
-export function handledWriteToSoundRegister(offset: u16, value: u16): boolean {
+export function handledWriteToSoundRegister(offset: i32, value: i32): boolean {
 
   // Get our registerNR52
   let registerNR52: u8 = eightBitLoadFromGBMemory(Sound.memoryLocationNR52);
@@ -108,7 +108,7 @@ export function handledWriteToSoundRegister(offset: u16, value: u16): boolean {
 
     // Reset all registers except NR52
     if(!checkBitOnByte(7, <u8>value)) {
-      for (let i: u16 = 0xFF10; i < 0xFF26; i++) {
+      for (let i: i32 = 0xFF10; i < 0xFF26; i++) {
         eightBitStoreIntoGBMemory(i, 0x00);
       }
     }
@@ -124,7 +124,7 @@ export function handledWriteToSoundRegister(offset: u16, value: u16): boolean {
 }
 
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
-export function handleReadToSoundRegister(offset: u16): i32  {
+export function handleReadToSoundRegister(offset: i32): i32  {
 
   // TODO: OR All Registers
 

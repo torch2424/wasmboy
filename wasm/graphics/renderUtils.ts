@@ -8,7 +8,7 @@ import {
   resetBitOnByte
 } from '../helpers/index';
 
-export function getTileDataAddress(tileDataMemoryLocation: u16, tileIdFromTileMap: u8): u16 {
+export function getTileDataAddress(tileDataMemoryLocation: i32, tileIdFromTileMap: i32): i32 {
 
   // Watch this part of The ultimate gameboy talk: https://youtu.be/HyzD8pNlpwI?t=30m50s
   // A line of 8 pixels on a single tile, is represented by 2 bytes.
@@ -25,13 +25,13 @@ export function getTileDataAddress(tileDataMemoryLocation: u16, tileIdFromTileMa
     // Treat the tile Id as a signed int, subtract an offset of 128
     // if the tileId was 0 then the tile would be in memory region 0x9000-0x900F
     // NOTE: Assemblyscript, Can't cast to i16, need to make negative manually
-    let signedTileId: i16 = tileIdFromTileMap + 128;
+    let signedTileId: i32 = tileIdFromTileMap + 128;
     if (checkBitOnByte(7, tileIdFromTileMap)) {
-      signedTileId = <i16>tileIdFromTileMap - 128;
+      signedTileId = <i32>tileIdFromTileMap - 128;
     }
-    return tileDataMemoryLocation + <u16>(signedTileId * 16);
+    return tileDataMemoryLocation + signedTileId * 16;
   } else {
     // if the background layout gave us the tileId 0, then the tile data would be between 0x8000-0x800F.
-    return tileDataMemoryLocation + <u16>tileIdFromTileMap * 16;
+    return tileDataMemoryLocation + tileIdFromTileMap * 16;
   }
 }

@@ -10,11 +10,11 @@ import {
   performanceTimestamp
 } from '../helpers/index';
 
-export function eightBitLoadFromGBMemory(gameboyOffset: u16): u8 {
+export function eightBitLoadFromGBMemory(gameboyOffset: i32): u8 {
   return load<u8>(getWasmBoyOffsetFromGameBoyOffset(gameboyOffset));
 }
 
-export function eightBitLoadFromGBMemoryWithTraps(offset: u16): u8 {
+export function eightBitLoadFromGBMemoryWithTraps(offset: i32): u8 {
   let readTrapResult: i32 = checkReadTraps(offset);
   switch (readTrapResult) {
     case -1:
@@ -24,32 +24,32 @@ export function eightBitLoadFromGBMemoryWithTraps(offset: u16): u8 {
   }
 }
 
-export function sixteenBitLoadFromGBMemory(offset: u16): u16 {
+export function sixteenBitLoadFromGBMemory(offset: i32): u16 {
 
   // Get our low byte
-  let lowByte: u8 = 0;
+  let lowByte: i32 = 0;
   let lowByteReadTrapResult: i32 = checkReadTraps(offset);
   switch (lowByteReadTrapResult) {
     case -1:
       lowByte = eightBitLoadFromGBMemory(offset);
       break;
     default:
-      lowByte = <u8>lowByteReadTrapResult;
+      lowByte = lowByteReadTrapResult;
       break;
   }
 
   // Get the next offset for the second byte
-  let nextOffset: u16 = offset + 1;
+  let nextOffset: i32 = offset + 1;
 
   // Get our high byte
-  let highByte: u8 = 0;
+  let highByte: i32 = 0;
   let highByteReadTrapResult: i32 = checkReadTraps(nextOffset);
   switch (highByteReadTrapResult) {
     case -1:
       highByte = eightBitLoadFromGBMemory(nextOffset);
       break;
     default:
-      highByte = <u8>highByteReadTrapResult;
+      highByte = highByteReadTrapResult;
       break;
   }
 
@@ -58,7 +58,7 @@ export function sixteenBitLoadFromGBMemory(offset: u16): u16 {
 }
 
 export function loadBooleanDirectlyFromWasmMemory(offset: i32): boolean {
-  let booleanAsInt: u8 = load<u8>(offset);
+  let booleanAsInt: i32 = load<u8>(offset);
   if(booleanAsInt > 0) {
     return true;
   }

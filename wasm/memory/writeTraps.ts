@@ -41,11 +41,11 @@ import {
 
 // Internal function to trap any modify data trying to be written to Gameboy memory
 // Follows the Gameboy memory map
-export function checkWriteTraps(offset: u16, value: u16): boolean {
+export function checkWriteTraps(offset: i32, value: i32): boolean {
 
   // Cache globals used multiple times for performance
-  let videoRamLocation: u16 = Memory.videoRamLocation;
-  let spriteInformationTableLocation: u16 = Memory.spriteInformationTableLocation;
+  let videoRamLocation: i32 = Memory.videoRamLocation;
+  let spriteInformationTableLocation: i32 = Memory.spriteInformationTableLocation;
 
   // Handle banking
   if(offset < videoRamLocation) {
@@ -76,7 +76,7 @@ export function checkWriteTraps(offset: u16, value: u16): boolean {
   // Codeslinger: The ECHO memory region (0xE000-0xFDFF) is quite different because any data written here is also written in the equivelent ram memory region 0xC000-0xDDFF.
   // Hence why it is called echo
   if(offset >= Memory.echoRamLocation && offset < spriteInformationTableLocation) {
-    let wramOffset: u16 = offset - 0x2000;
+    let wramOffset: i32 = offset - 0x2000;
     eightBitStoreIntoGBMemory(wramOffset, <u8>value);
 
     // Allow the original write, and return since we dont need to look anymore
