@@ -122,7 +122,7 @@ export class Memory {
 
   // Save States
 
-  static readonly saveStateSlot: u16 = 4;
+  static readonly saveStateSlot: i32 = 4;
 
   // Function to save the state of the class
   static saveState(): void {

@@ -69,11 +69,11 @@ export function addAThroughCarryRegister(register: u8): void {
 
 export function subARegister(register: u8): void {
   // Need to convert the register on one line, and flip the sign on another
-  let negativeRegister: i16 = <i16>register;
+  let negativeRegister: i32 = register;
   negativeRegister = negativeRegister * -1;
 
-  checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeRegister);
-  checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
+  checkAndSetEightBitHalfCarryFlag(Cpu.registerA, negativeRegister);
+  checkAndSetEightBitCarryFlag(Cpu.registerA, negativeRegister);
   Cpu.registerA -= register;
   if (Cpu.registerA === 0) {
     setZeroFlag(1);
@@ -153,11 +153,11 @@ export function cpARegister(register: u8): void {
   // CP B
   // 1  4
   // Z 1 H C
-  let negativeRegister: i16 = <i16>register;
+  let negativeRegister: i32 = register;
   negativeRegister = negativeRegister * -1;
-  checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeRegister);
-  checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
-  let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeRegister;
+  checkAndSetEightBitHalfCarryFlag(Cpu.registerA, negativeRegister);
+  checkAndSetEightBitCarryFlag(Cpu.registerA, negativeRegister);
+  let tempResult: i32 = <i32>Cpu.registerA + negativeRegister;
   if (tempResult === 0) {
     setZeroFlag(1);
   } else {

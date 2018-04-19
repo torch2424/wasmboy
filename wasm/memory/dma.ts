@@ -128,7 +128,7 @@ export function updateHblankHdma(): void {
 
 // Simple Function to transfer the bytes from a destination to a source for a general pourpose or Hblank HDMA
 function hdmaTransfer(hdmaSource: i32, hdmaDestination: i32, transferLength: i32): void {
-  for(let i: i32 = 0; i < <u16>transferLength; i++) {
+  for(let i: i32 = 0; i < transferLength; i++) {
     let sourceByte: i32 = eightBitLoadFromGBMemoryWithTraps(hdmaSource + i);
     // get the hdmaDestination with wrapping
     // See issue #61: https://github.com/torch2424/wasmBoy/issues/61

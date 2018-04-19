@@ -48,12 +48,12 @@ export class Joypad {
   static select: boolean = false;
   static start: boolean = false;
 
-  static readonly memoryLocationJoypadRegister: u16 = 0xFF00;
+  static readonly memoryLocationJoypadRegister: i32 = 0xFF00;
 
   // Save States
   // Not doing anything for Joypad for now
 
-  static readonly saveStateSlot: u16 = 3;
+  static readonly saveStateSlot: i32 = 3;
 
   // Function to save the state of the class
   static saveState(): void {
@@ -64,10 +64,10 @@ export class Joypad {
   }
 }
 
-export function getJoypadState(): u8 {
+export function getJoypadState(): i32 {
 
   // Get the joypad register
-  let joypadRegister: u8 = eightBitLoadFromGBMemory(Joypad.memoryLocationJoypadRegister);
+  let joypadRegister: i32 = eightBitLoadFromGBMemory(Joypad.memoryLocationJoypadRegister);
 
   // Flip all the bits
   joypadRegister = joypadRegister ^ 0xFF;
@@ -143,7 +143,7 @@ export function getJoypadState(): u8 {
   return joypadRegister;
 }
 
-export function setJoypadState(up: i8, right: i8, down: i8, left: i8, a: i8, b: i8, select: i8, start: i8): void {
+export function setJoypadState(up: i32, right: i32, down: i32, left: i32, a: i32, b: i32, select: i32, start: i32): void {
 
   if (up > 0) {
     _pressJoypadButton(0);
@@ -194,7 +194,7 @@ export function setJoypadState(up: i8, right: i8, down: i8, left: i8, a: i8, b: 
   }
 }
 
-function _pressJoypadButton(buttonId: u8): void {
+function _pressJoypadButton(buttonId: i32): void {
 
   // Un stop the CPU
   Cpu.isStopped = false;
@@ -217,7 +217,7 @@ function _pressJoypadButton(buttonId: u8): void {
     }
 
     // Determine if we should request an interrupt
-    let joypadRegister: u8 = eightBitLoadFromGBMemory(Joypad.memoryLocationJoypadRegister);
+    let joypadRegister: i32 = eightBitLoadFromGBMemory(Joypad.memoryLocationJoypadRegister);
     let shouldRequestInterrupt = false;
 
     // Check if the game is looking for a dpad type button press
@@ -237,12 +237,12 @@ function _pressJoypadButton(buttonId: u8): void {
   }
 }
 
-function _releaseJoypadButton(buttonId: u8): void {
+function _releaseJoypadButton(buttonId: i32): void {
   // Set our joypad state
   _setJoypadButtonStateFromButtonId(buttonId, false);
 }
 
-function _getBitNumberForButtonId(buttonId: u8): u8 {
+function _getBitNumberForButtonId(buttonId: i32): i32 {
   if (buttonId === 1 || buttonId === 4) {
     return 0;
   } else if (buttonId === 3 || buttonId === 5) {
@@ -256,7 +256,7 @@ function _getBitNumberForButtonId(buttonId: u8): u8 {
   return 0;
 }
 
-function _getJoypadButtonStateFromButtonId(buttonId: u8): boolean {
+function _getJoypadButtonStateFromButtonId(buttonId: i32): boolean {
   switch(buttonId) {
     case 0:
       return Joypad.up;
@@ -279,7 +279,7 @@ function _getJoypadButtonStateFromButtonId(buttonId: u8): boolean {
   }
 }
 
-function _setJoypadButtonStateFromButtonId(buttonId: u8, isPressed: boolean):  void {
+function _setJoypadButtonStateFromButtonId(buttonId: i32, isPressed: boolean):  void {
   switch(buttonId) {
     case 0:
       Joypad.up = isPressed;
