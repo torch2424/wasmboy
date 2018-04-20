@@ -47,16 +47,55 @@ export class Channel4 {
   // 'white noise' channel with volume envelope functions.
   // NR41 -> Sound length (R/W)
   static readonly memoryLocationNRx1: i32 = 0xFF20;
+  // --LL LLLL Length load (64-L)
+  static NRx1LengthLoad: i32 = 0;
+  static updateNRx1(value: i32): void {
+    Channel4.NRx1LengthLoad = (value & 0x3F);
+
+    // Also need to set our length counter. Taken from the old, setChannelLengthCounter
+    // Channel length is determined by 64 (or 256 if channel 3), - the length load
+    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
+    // Note, this will be different for channel 3
+    Channel4.lengthCounter = 64 - Channel4.NRx1LengthLoad;
+  }
+
   // NR42 -> Volume Envelope (R/W)
   static readonly memoryLocationNRx2: i32 = 0xFF21;
+  // VVVV APPP Starting volume, Envelope add mode, period
+  static NRx2StartingVolume: i32 = 0;
+  static NRx2EnvelopeAddMode: boolean = false;
+  static NRx2EnvelopePeriod: i32 = 0;
+  static updateNRx2(value: i32): void {
+    Channel4.NRx2StartingVolume = ((value >> 4) & 0x0F);
+    Channel4.NRx2EnvelopeAddMode = checkBitOnByte(3, value);
+    Channel4.NRx2EnvelopePeriod = value & 0x07;
+
+    // Also, get our channel is dac enabled
+    Channel4.isDacEnabled = (value & 0xF8) > 0;
+  }
+
   // NR43 -> Polynomial Counter (R/W)
   static readonly memoryLocationNRx3: i32 = 0xFF22;
-  // NR43 -> Counter/consecutive; initial (R/W)
+  // SSSS WDDD Clock shift, Width mode of LFSR, Divisor code
+  static NRx3ClockShift: i32 = 0;
+  static NRx3WidthMode: boolean = false;
+  static NRx3DivisorCode: i32 = 0;
+  static updateNRx3(value: i32): void {
+
+  }
+
+  // NR44 -> Trigger, Length Enable
   static readonly memoryLocationNRx4: i32 = 0xFF23;
+  // TL-- ---- Trigger, Length enable
+  static NRx4LengthEnabled: boolean = false;
+  static updateNRx4(value: i32): void {
+    Channel4.NRx4LengthEnabled = checkBitOnByte(6, value);
+  }
 
   // Channel Properties
   static readonly channelNumber: i32 = 4;
   static isEnabled: boolean = false;
+  static isDacEnabled: boolean = false;
   static frequencyTimer: i32 = 0x00;
   static envelopeCounter: i32 = 0x00;
   static lengthCounter: i32 = 0x00;

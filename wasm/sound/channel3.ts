@@ -45,14 +45,60 @@ export class Channel3 {
   // Voluntary Wave channel with 32 4-bit programmable samples, played in sequence.
   // NR30 -> Sound on/off (R/W)
   static readonly memoryLocationNRx0: i32 = 0xFF1A;
+  // E--- ---- DAC power
+  updateNRx0(value: i32): void {
+    Channel3.isDacEnabled = checkBitOnByte(7, value);
+  }
+
   // NR31 -> Sound length (R/W)
   static readonly memoryLocationNRx1: i32 = 0xFF1B;
+  // LLLL LLLL Length load (256-L)
+  static NRx1LengthLoad: i32 = 0;
+  static updateNRx1(value: i32): void {
+    Channel3.NRx1LengthLoad = value;
+
+    // Also need to set our length counter. Taken from the old, setChannelLengthCounter
+    // Channel length is determined by 64 (or 256 if channel 3), - the length load
+    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
+    // Note, this will be different for channel 3
+    // Supposed to be 256, so subtracting 255 and then adding 1 if that makes sense
+    Channel3.lengthCounter = 256 - Channel3.NRx1LengthLoad;
+  }
+
   // NR32 -> Select ouput level (R/W)
   static readonly memoryLocationNRx2: i32 = 0xFF1C;
+  // -VV- ---- Volume code (00=0%, 01=100%, 10=50%, 11=25%)
+  static NRx2VolumeCode: i32 = 0;
+  static updateNRx2(value: i32): void {
+    Channel3.NRx2VolumeCode = ((value >> 5) & 0x0F);
+  }
+
   // NR33 -> Frequency lower data (W)
   static readonly memoryLocationNRx3: i32 = 0xFF1D;
+  // FFFF FFFF Frequency LSB
+  static NRx3FrequencyLSB: i32 = 0;
+  static updateNRx3(value: i32): void {
+    Channel3.NRx3FrequencyLSB = value;
+
+    // Update Channel Frequency
+    let frequency: i32 = ((Channel3.NRx4FrequencyMSB << 8) & Channel3.NRx3FrequencyLSB);
+    Channel3.frequency = frequency;
+  }
+
   // NR34 -> Frequency higher data (R/W)
   static readonly memoryLocationNRx4: i32 = 0xFF1E;
+  // TL-- -FFF Trigger, Length enable, Frequency MSB
+  static NRx4LengthEnabled: boolean = false;
+  static NRx4FrequencyMSB: i32 = 0;
+  static updateNRx4(value: i32): void {
+    Channel3.NRx4LengthEnabled = checkBitOnByte(6, value);
+    Channel3.NRx4FrequencyMSB = (value & 0x07);
+
+    // Update Channel Frequency
+    let frequency: i32 = ((Channel3.NRx4FrequencyMSB << 8) & Channel3.NRx3FrequencyLSB);
+    Channel3.frequency = frequency;
+  }
+
 
   // Our wave table location
   static readonly memoryLocationWaveTable: i32 = 0xFF30;
@@ -60,6 +106,8 @@ export class Channel3 {
   // Channel Properties
   static readonly channelNumber: i32 = 3;
   static isEnabled: boolean = false;
+  static isDacEnabled: boolean = false;
+  static frequency: i32 = 0;
   static frequencyTimer: i32 = 0x00;
   static lengthCounter: i32 = 0x00;
   static waveTablePosition: i32 = 0x00;
@@ -106,7 +154,7 @@ export class Channel3 {
 
   // Function to reset our timer, useful for GBC double speed mode
   static resetTimer(): void {
-    Channel3.frequencyTimer = (2048 - getChannelFrequency(Channel3.channelNumber)) * 2;
+    Channel3.frequencyTimer = (2048 - Channel3.frequency) * 2;
 
     // TODO: Ensure this is correct for GBC Double Speed Mode
     if (Cpu.GBCDoubleSpeed) {
@@ -145,7 +193,7 @@ export class Channel3 {
     // Our channel DAC must be enabled, and we must be in an active state
     // Of our duty cycle
     if(Channel3.isEnabled &&
-    isChannelDacEnabled(Channel3.channelNumber)) {
+    Channel3.isDacEnabled) {
       // Get our volume code
       if(Channel3.volumeCodeChanged) {
         volumeCode = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx2);
@@ -227,7 +275,7 @@ export class Channel3 {
     Channel3.waveTablePosition = 0;
 
     // Finally if DAC is off, channel is still disabled
-    if(!isChannelDacEnabled(Channel3.channelNumber)) {
+    if(!Channel3.isDacEnabled) {
       Channel3.isEnabled = false;
     }
   }
@@ -249,7 +297,7 @@ export class Channel3 {
   }
 
   static updateLength(): void {
-    if(Channel3.lengthCounter > 0 && isChannelLengthEnabled(Channel3.channelNumber)) {
+    if(Channel3.lengthCounter > 0 && Channel3.NRx4LengthEnabled) {
       Channel3.lengthCounter -= 1;
     }
 

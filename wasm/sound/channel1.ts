@@ -44,8 +44,8 @@ export class Channel1 {
 
   // Squarewave channel with volume envelope and frequency sweep functions.
   // NR10 -> Sweep Register R/W
-  // -PPP NSSS Sweep period, negate, shift
   static readonly memoryLocationNRx0: i32 = 0xFF10;
+  // -PPP NSSS Sweep period, negate, shift
   static NRx0SweepPeriod: i32  = 0;
   static NRx0Negate: boolean = false;
   static NRx0SweepShift: i32 = 0;
@@ -56,8 +56,8 @@ export class Channel1 {
   }
 
   // NR11 -> Sound length/Wave pattern duty (R/W)
-  // DDLL LLLL Duty, Length load (64-L)
   static readonly memoryLocationNRx1: i32 = 0xFF11;
+  // DDLL LLLL Duty, Length load (64-L)
   static NRx1Duty: i32 = 0;
   static NRx1LengthLoad: i32 = 0;
   static updateNRx1(value: i32): void {
@@ -72,8 +72,8 @@ export class Channel1 {
   }
 
   // NR12 -> Volume Envelope (R/W)
-  // VVVV APPP Starting volume, Envelope add mode, period
   static readonly memoryLocationNRx2: i32 = 0xFF12;
+  // VVVV APPP Starting volume, Envelope add mode, period
   static NRx2StartingVolume: i32 = 0;
   static NRx2EnvelopeAddMode: boolean = false;
   static NRx2EnvelopePeriod: i32 = 0;
@@ -81,11 +81,14 @@ export class Channel1 {
     Channel1.NRx2StartingVolume = ((value >> 4) & 0x0F);
     Channel1.NRx2EnvelopeAddMode = checkBitOnByte(3, value);
     Channel1.NRx2EnvelopePeriod = value & 0x07;
+
+    // Also, get our channel is dac enabled
+    Channel1.isDacEnabled = (value & 0xF8) > 0;
   }
 
   // NR13 -> Frequency lo (W)
-  // FFFF FFFF Frequency LSB
   static readonly memoryLocationNRx3: i32 = 0xFF13;
+  // FFFF FFFF Frequency LSB
   static NRx3FrequencyLSB: i32 = 0;
   static updateNRx3(value: i32): void {
     Channel1.NRx3FrequencyLSB = value;
@@ -96,8 +99,8 @@ export class Channel1 {
   }
 
   // NR14 -> Frequency hi (R/W)
-  // TL-- -FFF Trigger, Length enable, Frequency MSB
   static readonly memoryLocationNRx4: i32 = 0xFF14;
+  // TL-- -FFF Trigger, Length enable, Frequency MSB
   static NRx4LengthEnabled: boolean = false;
   static NRx4FrequencyMSB: i32 = 0;
   static updateNRx4(value: i32): void {
@@ -112,6 +115,7 @@ export class Channel1 {
   // Channel Properties
   static readonly channelNumber: i32 = 1;
   static isEnabled: boolean = false;
+  static isDacEnabled: boolean = false;
   static frequency: i32 = 0;
   static frequencyTimer: i32 = 0x00;
   static envelopeCounter: i32 = 0x00;
@@ -219,7 +223,7 @@ export class Channel1 {
     // Our channel DAC must be enabled, and we must be in an active state
     // Of our duty cycle
     if(Channel1.isEnabled &&
-    isChannelDacEnabled(Channel1.channelNumber)) {
+    Channel1.isDacEnabled) {
       outputVolume = Channel1.volume;
     } else {
       // Return silence
@@ -276,7 +280,7 @@ export class Channel1 {
     }
 
     // Finally if DAC is off, channel is still disabled
-    if(!isChannelDacEnabled(Channel1.channelNumber)) {
+    if(!Channel1.isDacEnabled) {
       Channel1.isEnabled = false;
     }
   }

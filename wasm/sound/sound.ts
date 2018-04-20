@@ -341,26 +341,26 @@ function accumulateSound(numberOfCycles: i32): void {
 function didChannelDacChange(channelNumber: i32): boolean {
   switch(channelNumber) {
     case Channel1.channelNumber:
-      if(SoundAccumulator.channel1DacEnabled !== isChannelDacEnabled(Channel1.channelNumber)) {
-        SoundAccumulator.channel1DacEnabled = isChannelDacEnabled(Channel1.channelNumber);
+      if(SoundAccumulator.channel1DacEnabled !== Channel1.isDacEnabled) {
+        SoundAccumulator.channel1DacEnabled = Channel1.isDacEnabled;
         return true;
       }
       return false;
     case Channel2.channelNumber:
-      if(SoundAccumulator.channel2DacEnabled !== isChannelDacEnabled(Channel2.channelNumber)) {
-        SoundAccumulator.channel2DacEnabled = isChannelDacEnabled(Channel2.channelNumber);
+      if(SoundAccumulator.channel2DacEnabled !== Channel2.isDacEnabled) {
+        SoundAccumulator.channel2DacEnabled = Channel2.isDacEnabled;
         return true;
       }
       return false;
     case Channel3.channelNumber:
-      if(SoundAccumulator.channel3DacEnabled !== isChannelDacEnabled(Channel3.channelNumber)) {
-        SoundAccumulator.channel3DacEnabled = isChannelDacEnabled(Channel3.channelNumber);
+      if(SoundAccumulator.channel3DacEnabled !== Channel3.isDacEnabled) {
+        SoundAccumulator.channel3DacEnabled = Channel3.isDacEnabled;
         return true;
       }
       return false;
     case Channel4.channelNumber:
-      if(SoundAccumulator.channel4DacEnabled !== isChannelDacEnabled(Channel4.channelNumber)) {
-        SoundAccumulator.channel4DacEnabled = isChannelDacEnabled(Channel4.channelNumber);
+      if(SoundAccumulator.channel4DacEnabled !== Channel4.isDacEnabled) {
+        SoundAccumulator.channel4DacEnabled = Channel4.isDacEnabled;
         return true;
       }
       return false;
@@ -453,12 +453,6 @@ function mixChannelSamples(channel1Sample: i32 = 15, channel2Sample: i32 = 15, c
   // TODO: Vin Mixing
 
   SoundAccumulator.mixerVolumeChanged = false;
-
-  // cache channel numbers for performance
-  let channel1ChannelNumber: i32 = Channel1.channelNumber;
-  let channel2ChannelNumber: i32 = Channel2.channelNumber;
-  let channel3ChannelNumber: i32 = Channel3.channelNumber;
-  let channel4ChannelNumber: i32 = Channel4.channelNumber;
 
   // Get our channel volume for left/right
   let leftChannelSample: i32 = 0;
