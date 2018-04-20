@@ -22,8 +22,6 @@ import {
     Channel4
 } from './channel4';
 import {
-  isChannelEnabledOnLeftOutput,
-  isChannelEnabledOnRightOutput,
   isChannelDacEnabled
 } from './registers';
 import {
@@ -41,6 +39,7 @@ import {
   storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
 import {
+  checkBitOnByte,
   concatenateBytes,
   splitLowByte,
   splitHighByte,
@@ -70,12 +69,40 @@ export class Sound {
 
   // Channel control / On-OFF / Volume (RW)
   static readonly memoryLocationNR50: i32 = 0xFF24;
+  static NR50LeftMixerVolume: i32 = 0;
+  static NR50RightMixerVolume: i32 = 0;
+  static updateNR50(value: i32): void {
+    Sound.NR50LeftMixerVolume = (value >> 4) & 0x07;
+    Sound.NR50RightMixerVolume = value & 0x07;
+  }
 
   // 0xFF25 selects which output each channel goes to, Referred to as NR51
   static readonly memoryLocationNR51: i32 = 0xFF25;
+  static NR51IsChannel1EnabledOnLeftOutput: boolean = true;
+  static NR51IsChannel2EnabledOnLeftOutput: boolean = true;
+  static NR51IsChannel3EnabledOnLeftOutput: boolean = true;
+  static NR51IsChannel4EnabledOnLeftOutput: boolean = true;
+  static NR51IsChannel1EnabledOnRightOutput: boolean = true;
+  static NR51IsChannel2EnabledOnRightOutput: boolean = true;
+  static NR51IsChannel3EnabledOnRightOutput: boolean = true;
+  static NR51IsChannel4EnabledOnRightOutput: boolean = true;
+  static updateNR51(value: i32): void {
+    Sound.NR51IsChannel4EnabledOnLeftOutput = checkBitOnByte(7, value);
+    Sound.NR51IsChannel3EnabledOnLeftOutput = checkBitOnByte(6, value);
+    Sound.NR51IsChannel2EnabledOnLeftOutput = checkBitOnByte(5, value);
+    Sound.NR51IsChannel1EnabledOnLeftOutput = checkBitOnByte(4, value);
+    Sound.NR51IsChannel4EnabledOnRightOutput = checkBitOnByte(3, value);
+    Sound.NR51IsChannel3EnabledOnRightOutput = checkBitOnByte(2, value);
+    Sound.NR51IsChannel2EnabledOnRightOutput = checkBitOnByte(1, value);
+    Sound.NR51IsChannel1EnabledOnRightOutput = checkBitOnByte(0, value);
+  }
 
   // Sound on/off
   static readonly memoryLocationNR52: i32 = 0xFF26;
+  static NR52IsSoundEnabled: boolean = true;
+  static updateNR52(value: i32): void {
+    Sound.NR52IsSoundEnabled = checkBitOnByte(7, value);
+  }
 
   // $FF30 -- $FF3F is the load register space for the 4-bit samples for channel 3
   static readonly memoryLocationChannel3LoadRegisterStart: i32 = 0xFF30;
@@ -425,15 +452,6 @@ function mixChannelSamples(channel1Sample: i32 = 15, channel2Sample: i32 = 15, c
 
   // TODO: Vin Mixing
 
-  // Simply get the left/right volume, add up the values, and put into memory!
-  let registerNR50 = eightBitLoadFromGBMemory(Sound.memoryLocationNR50);
-  // Want bits 6-4
-  let leftMixerVolume: i32 = (registerNR50 >> 4);
-  leftMixerVolume = leftMixerVolume & 0x07;
-  // Want bits 0-2
-  let rightMixerVolume: i32 = registerNR50;
-  rightMixerVolume = rightMixerVolume & 0x07;
-
   SoundAccumulator.mixerVolumeChanged = false;
 
   // cache channel numbers for performance
@@ -448,22 +466,22 @@ function mixChannelSamples(channel1Sample: i32 = 15, channel2Sample: i32 = 15, c
 
   // Find the sample for the left if enabled
   // other wise add silence (15) for the channel
-  if (isChannelEnabledOnLeftOutput(channel1ChannelNumber)) {
+  if (Sound.NR51IsChannel1EnabledOnLeftOutput) {
     leftChannelSample += channel1Sample;
   } else {
     leftChannelSample += 15;
   }
-  if (isChannelEnabledOnLeftOutput(channel2ChannelNumber)) {
+  if (Sound.NR51IsChannel2EnabledOnLeftOutput) {
     leftChannelSample += channel2Sample;
   } else {
     leftChannelSample += 15;
   }
-  if (isChannelEnabledOnLeftOutput(channel3ChannelNumber)) {
+  if (Sound.NR51IsChannel3EnabledOnLeftOutput) {
     leftChannelSample += channel3Sample;
   } else {
     leftChannelSample += 15;
   }
-  if (isChannelEnabledOnLeftOutput(channel4ChannelNumber)) {
+  if (Sound.NR51IsChannel4EnabledOnLeftOutput) {
     leftChannelSample += channel4Sample;
   } else {
     leftChannelSample += 15;
@@ -472,22 +490,22 @@ function mixChannelSamples(channel1Sample: i32 = 15, channel2Sample: i32 = 15, c
 
   // Find the sample for the right if enabled
   // other wise add silence (15) for the channel
-  if (isChannelEnabledOnRightOutput(channel1ChannelNumber)) {
+  if (Sound.NR51IsChannel1EnabledOnRightOutput) {
     rightChannelSample += channel1Sample;
   } else {
     rightChannelSample += 15;
   }
-  if (isChannelEnabledOnRightOutput(channel2ChannelNumber)) {
+  if (Sound.NR51IsChannel2EnabledOnRightOutput) {
     rightChannelSample += channel2Sample;
   } else {
     rightChannelSample += 15;
   }
-  if (isChannelEnabledOnRightOutput(channel3ChannelNumber)) {
+  if (Sound.NR51IsChannel3EnabledOnRightOutput) {
     rightChannelSample += channel3Sample;
   } else {
     rightChannelSample += 15;
   }
-  if (isChannelEnabledOnRightOutput(channel4ChannelNumber)) {
+  if (Sound.NR51IsChannel4EnabledOnRightOutput) {
     rightChannelSample += channel4Sample;
   } else {
     rightChannelSample += 15;
@@ -505,8 +523,8 @@ function mixChannelSamples(channel1Sample: i32 = 15, channel2Sample: i32 = 15, c
 
   // Convert our samples from unsigned 32 to unsigned byte
   // Reason being, We want to be able to pass in wasm memory as usigned byte. Javascript will handle the conversion back
-  let leftChannelSampleUnsignedByte: i32 = getSampleAsUnsignedByte(leftChannelSample, (leftMixerVolume + 1));
-  let rightChannelSampleUnsignedByte: i32 = getSampleAsUnsignedByte(rightChannelSample, (rightMixerVolume + 1));
+  let leftChannelSampleUnsignedByte: i32 = getSampleAsUnsignedByte(leftChannelSample, (Sound.NR50LeftMixerVolume + 1));
+  let rightChannelSampleUnsignedByte: i32 = getSampleAsUnsignedByte(rightChannelSample, (Sound.NR50RightMixerVolume + 1));
 
   // Save these samples in the accumulator
   SoundAccumulator.leftChannelSampleUnsignedByte = leftChannelSampleUnsignedByte;

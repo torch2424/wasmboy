@@ -15,11 +15,12 @@ export function getChannelDuty(channelNumber: i32): i32 {
 }
 
 // Since there are no 2d arrays, we will use a byte to represent duty cycles (wave form from percentages)
-export function isDutyCycleClockPositiveOrNegativeForWaveform(channelNumber: i32, waveFormPositionOnDuty: i32): boolean {
+// TODO: Pass in Channel Duty
+export function isDutyCycleClockPositiveOrNegativeForWaveform(channelDuty: i32, waveFormPositionOnDuty: i32): boolean {
   // Get our Wave Form According to the Duty
   // Default to a duty of 1
   // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
-  switch(getChannelDuty(channelNumber)) {
+  switch(channelDuty) {
     case 0x01:
       // 1000 0001
       return checkBitOnByte(waveFormPositionOnDuty, 0x81);

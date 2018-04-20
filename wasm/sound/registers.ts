@@ -35,10 +35,7 @@ import {
 // Function to check and handle writes to sound registers
 export function handledWriteToSoundRegister(offset: i32, value: i32): boolean {
 
-  // Get our registerNR52
-  let registerNR52: i32 = eightBitLoadFromGBMemory(Sound.memoryLocationNR52);
-
-  if(offset !== Sound.memoryLocationNR52 && !checkBitOnByte(7, registerNR52)) {
+  if(offset !== Sound.memoryLocationNR52 && !Sound.NR52IsSoundEnabled) {
     // Block all writes to any sound register EXCEPT NR52!
     // This is under the assumption that the check for
     // offset >= 0xFF10 && offset <= 0xFF26
@@ -48,11 +45,14 @@ export function handledWriteToSoundRegister(offset: i32, value: i32): boolean {
   }
 
   switch(offset) {
-    // Set length counter on channels
+    // Handle NRx0 on Channels
+    case Channel1.memoryLocationNRx0:
+      Channel1.updateNRx0(value);
+      return false;
+    // Handle NRx1 (Length Counter) on Channels
     case Channel1.memoryLocationNRx1:
-      eightBitStoreIntoGBMemory(offset, <u8>value);
-      setChannelLengthCounter(Channel1.channelNumber);
-      return true;
+      Channel1.updateNRx1(value);
+      return false;
     case Channel2.memoryLocationNRx1:
       eightBitStoreIntoGBMemory(offset, <u8>value);
       setChannelLengthCounter(Channel2.channelNumber);
@@ -65,58 +65,55 @@ export function handledWriteToSoundRegister(offset: i32, value: i32): boolean {
       eightBitStoreIntoGBMemory(offset, <u8>value);
       setChannelLengthCounter(Channel4.channelNumber);
       return true;
-  }
-
-  // Check if channel 3's volume code was written too
-  // This is handcy to know for accumulation of samples
-  if (offset === Channel3.memoryLocationNRx2) {
-    Channel3.volumeCodeChanged = true;
-  }
-
-  // Check our NRx4 registers to trap our trigger bits
-  if(offset === Channel1.memoryLocationNRx4 && checkBitOnByte(7, value)) {
-    // Write the value skipping traps, and then trigger
-    eightBitStoreIntoGBMemory(offset, <u8>value);
-    Channel1.trigger();
-    return true;
-  } else if(offset === Channel2.memoryLocationNRx4 && checkBitOnByte(7, value)) {
-    eightBitStoreIntoGBMemory(offset, <u8>value);
-    Channel2.trigger();
-    return true;
-  } else if(offset === Channel3.memoryLocationNRx4 && checkBitOnByte(7, value)) {
-    eightBitStoreIntoGBMemory(offset, <u8>value);
-    Channel3.trigger();
-    return true;
-  } else if(offset === Channel4.memoryLocationNRx4 && checkBitOnByte(7, value)) {
-    eightBitStoreIntoGBMemory(offset, <u8>value);
-    Channel4.trigger();
-    return true;
-  }
-
-  // Tell the sound accumulator if volumes changes
-  if(offset === Sound.memoryLocationNR50) {
-    SoundAccumulator.mixerVolumeChanged = true;
-  }
-
-  // Tell the sound accumulator if the Mixer Enabled changes
-  if(offset === Sound.memoryLocationNR50) {
-    SoundAccumulator.mixerEnabledChanged = true;
-  }
-
-  // Write 0 to the 7th bit of NR52, resets all sound registers, and stops them from receiving writes
-  if(offset === Sound.memoryLocationNR52) {
-
-    // Reset all registers except NR52
-    if(!checkBitOnByte(7, value)) {
-      for (let i: i32 = 0xFF10; i < 0xFF26; i++) {
-        eightBitStoreIntoGBMemory(i, 0x00);
+    case Channel3.memoryLocationNRx2:
+      // Check if channel 3's volume code was written too
+      // This is handcy to know for accumulation of samples
+      Channel3.volumeCodeChanged = true;
+      return false;
+    // Check our NRx4 registers to trap our trigger bits
+    case Channel1.memoryLocationNRx4:
+      if (checkBitOnByte(7, value)) {
+        eightBitStoreIntoGBMemory(offset, value);
+        Channel1.trigger();
       }
-    }
-
-    // Write our final value to NR52
-    eightBitStoreIntoGBMemory(offset, value);
-
-    return true;
+      return true;
+    case Channel2.memoryLocationNRx4:
+      if (checkBitOnByte(7, value)) {
+        eightBitStoreIntoGBMemory(offset, value);
+        Channel2.trigger();
+      }
+      return true;
+    case Channel3.memoryLocationNRx4:
+      if (checkBitOnByte(7, value)) {
+        eightBitStoreIntoGBMemory(offset, value);
+        Channel3.trigger();
+      }
+      return true;
+    case Channel4.memoryLocationNRx4:
+      if (checkBitOnByte(7, value)) {
+        eightBitStoreIntoGBMemory(offset, value);
+        Channel4.trigger();
+      }
+      return true;
+    // Tell the sound accumulator if volumes changes
+    case Sound.memoryLocationNR50:
+      Sound.updateNR50(value);
+      SoundAccumulator.mixerVolumeChanged = true;
+      return false;
+    // Tell the sound accumulator if volumes changes
+    case Sound.memoryLocationNR51:
+      Sound.updateNR51(value);
+      SoundAccumulator.mixerEnabledChanged = true;
+      return false;
+    case Sound.memoryLocationNR52:
+      // Reset all registers except NR52
+      Sound.updateNR52(value);
+      if(!checkBitOnByte(7, value)) {
+        for (let i: i32 = 0xFF10; i < 0xFF26; i++) {
+          eightBitStoreIntoGBMemory(i, 0x00);
+        }
+      }
+      return false;
   }
 
   // We did not handle the write, return false
@@ -193,20 +190,6 @@ export function isChannelDacEnabled(channelNumber: i32): boolean {
     let register3 = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx0);
     return checkBitOnByte(7, register3);
   }
-}
-
-export function isChannelEnabledOnLeftOutput(channelNumber: i32): boolean {
-  let registerNR51: i32 = eightBitLoadFromGBMemory(Sound.memoryLocationNR51);
-  // Left channel in the higher bits
-  let bitNumberOfChannel: i32 = (channelNumber - 1) + 4;
-  return checkBitOnByte(bitNumberOfChannel, registerNR51);
-}
-
-export function isChannelEnabledOnRightOutput(channelNumber: i32): boolean {
-  let registerNR51: i32 = eightBitLoadFromGBMemory(Sound.memoryLocationNR51);
-  // Left channel in the higher bits
-  let bitNumberOfChannel: i32 = (channelNumber - 1);
-  return checkBitOnByte(bitNumberOfChannel, registerNR51);
 }
 
 // Function to get 1st register of a channel
