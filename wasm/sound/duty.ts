@@ -2,17 +2,8 @@
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
 
 import {
-  getRegister1OfChannel
-} from './registers';
-import {
   checkBitOnByte
 } from '../helpers/index';
-
-export function getChannelDuty(channelNumber: i32): i32 {
-  //let duty = getRegister1OfChannel(channelNumber);
-  //duty = (getRegister1OfChannel(channelNumber) >> 6);
-  return ((getRegister1OfChannel(channelNumber) >> 6) & 0x03);
-}
 
 // Since there are no 2d arrays, we will use a byte to represent duty cycles (wave form from percentages)
 // TODO: Pass in Channel Duty

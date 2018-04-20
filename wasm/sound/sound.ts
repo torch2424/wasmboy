@@ -22,9 +22,6 @@ import {
     Channel4
 } from './channel4';
 import {
-  isChannelDacEnabled
-} from './registers';
-import {
   Cpu
 } from '../cpu/index';
 import {

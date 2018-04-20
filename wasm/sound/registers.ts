@@ -19,9 +19,6 @@ import {
     Channel4
 } from './channel4';
 import {
-  setChannelLengthCounter
-} from '../sound/length';
-import {
   eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemory
 } from '../memory/index';
@@ -49,52 +46,76 @@ export function handledWriteToSoundRegister(offset: i32, value: i32): boolean {
     case Channel1.memoryLocationNRx0:
       Channel1.updateNRx0(value);
       return false;
+    case Channel3.memoryLocationNRx0:
+      Channel3.updateNRx0(value);
+      return false;
     // Handle NRx1 (Length Counter) on Channels
     case Channel1.memoryLocationNRx1:
       Channel1.updateNRx1(value);
       return false;
     case Channel2.memoryLocationNRx1:
-      eightBitStoreIntoGBMemory(offset, <u8>value);
-      setChannelLengthCounter(Channel2.channelNumber);
-      return true;
+      Channel2.updateNRx1(value);
+      return false;
     case Channel3.memoryLocationNRx1:
-      eightBitStoreIntoGBMemory(offset, <u8>value);
-      setChannelLengthCounter(Channel3.channelNumber);
-      return true;
+      Channel3.updateNRx1(value);
+      return false;
     case Channel4.memoryLocationNRx1:
-      eightBitStoreIntoGBMemory(offset, <u8>value);
-      setChannelLengthCounter(Channel4.channelNumber);
-      return true;
+      Channel4.updateNRx1(value);
+      return false;
+    // Handle NRx2 (Envelope / Volume) on Channels
+    case Channel1.memoryLocationNRx2:
+      Channel1.updateNRx2(value);
+      return false;
+    case Channel2.memoryLocationNRx2:
+      Channel2.updateNRx2(value);
+      return false;
     case Channel3.memoryLocationNRx2:
       // Check if channel 3's volume code was written too
       // This is handcy to know for accumulation of samples
       Channel3.volumeCodeChanged = true;
+      Channel3.updateNRx2(value);
+      return false;
+    case Channel4.memoryLocationNRx2:
+      Channel4.updateNRx2(value);
+      return false;
+    // Handle NRx3 (Frequency / Noise Properties) on Channels
+    case Channel1.memoryLocationNRx3:
+      Channel1.updateNRx3(value);
+      return false;
+    case Channel2.memoryLocationNRx3:
+      Channel2.updateNRx3(value);
+      return false;
+    case Channel3.memoryLocationNRx3:
+      Channel3.updateNRx3(value);
+      return false;
+    case Channel4.memoryLocationNRx3:
+      Channel4.updateNRx3(value);
       return false;
     // Check our NRx4 registers to trap our trigger bits
     case Channel1.memoryLocationNRx4:
       if (checkBitOnByte(7, value)) {
-        eightBitStoreIntoGBMemory(offset, value);
+        Channel1.updateNRx4(value);
         Channel1.trigger();
       }
-      return true;
+      return false;
     case Channel2.memoryLocationNRx4:
       if (checkBitOnByte(7, value)) {
-        eightBitStoreIntoGBMemory(offset, value);
+        Channel2.updateNRx4(value);
         Channel2.trigger();
       }
-      return true;
+      return false;
     case Channel3.memoryLocationNRx4:
       if (checkBitOnByte(7, value)) {
-        eightBitStoreIntoGBMemory(offset, value);
+        Channel3.updateNRx4(value);
         Channel3.trigger();
       }
-      return true;
+      return false;
     case Channel4.memoryLocationNRx4:
       if (checkBitOnByte(7, value)) {
-        eightBitStoreIntoGBMemory(offset, value);
+        Channel4.updateNRx4(value);
         Channel4.trigger();
       }
-      return true;
+      return false;
     // Tell the sound accumulator if volumes changes
     case Sound.memoryLocationNR50:
       Sound.updateNR50(value);
@@ -165,129 +186,4 @@ export function handleReadToSoundRegister(offset: i32): i32  {
   }
 
   return -1;
-}
-
-export function getChannelStartingVolume(channelNumber: i32): i32 {
-  // Simply need to get the top 4 bits of register 2
-  let startingVolume: i32 = getRegister2OfChannel(channelNumber);
-  startingVolume = (startingVolume >> 4);
-  return (startingVolume & 0x0F);
-}
-
-export function isChannelDacEnabled(channelNumber: i32): boolean {
-  // DAC power is controlled by the upper 5 bits of NRx2 (top bit of NR30 for wave channel).
-  // If these bits are not all clear, the DAC is on, otherwise it's off and outputs 0 volts.
-  if(channelNumber !== 3) {
-    let register2 = getRegister2OfChannel(channelNumber);
-    // Clear bottom 3 bits
-    let dacStatus = (register2 & 0xF8);
-    if (dacStatus > 0) {
-      return true;
-    } else {
-      return false;
-    }
-  } else {
-    let register3 = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx0);
-    return checkBitOnByte(7, register3);
-  }
-}
-
-// Function to get 1st register of a channel
-// Contains Duty and Length
-export function getRegister1OfChannel(channelNumber: i32): i32 {
-
-  switch(channelNumber) {
-    case Channel1.channelNumber:
-      return eightBitLoadFromGBMemory(Channel1.memoryLocationNRx1);
-    case Channel2.channelNumber:
-      return eightBitLoadFromGBMemory(Channel2.memoryLocationNRx1);
-    case Channel3.channelNumber:
-      return eightBitLoadFromGBMemory(Channel3.memoryLocationNRx1);
-    default:
-      return eightBitLoadFromGBMemory(Channel4.memoryLocationNRx1);
-  }
-}
-
-// Function to get 2nd register of a channel
-// Contains Envelope Information
-export function getRegister2OfChannel(channelNumber: i32): i32 {
-
-  switch(channelNumber) {
-    case Channel1.channelNumber:
-      return eightBitLoadFromGBMemory(Channel1.memoryLocationNRx2);
-    case Channel2.channelNumber:
-      return eightBitLoadFromGBMemory(Channel2.memoryLocationNRx2);
-    case Channel3.channelNumber:
-      return eightBitLoadFromGBMemory(Channel3.memoryLocationNRx2);
-    default:
-      return eightBitLoadFromGBMemory(Channel4.memoryLocationNRx2);
-  }
-}
-
-// Function to get 3rd register of a channel
-// Contains Fequency LSB (lower 8 bits)
-export function getRegister3OfChannel(channelNumber: i32): i32 {
-
-  switch(channelNumber) {
-    case Channel1.channelNumber:
-      return eightBitLoadFromGBMemory(Channel1.memoryLocationNRx3);
-    case Channel2.channelNumber:
-      return eightBitLoadFromGBMemory(Channel2.memoryLocationNRx3);
-    case Channel3.channelNumber:
-      return eightBitLoadFromGBMemory(Channel3.memoryLocationNRx3);
-    default:
-      return eightBitLoadFromGBMemory(Channel4.memoryLocationNRx3);
-  }
-}
-
-export function setRegister3OfChannel(channelNumber: i32, value: i32): void {
-
-  switch(channelNumber) {
-    case Channel1.channelNumber:
-      eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx3, value);
-      break;
-    case Channel2.channelNumber:
-      eightBitStoreIntoGBMemory(Channel2.memoryLocationNRx3, value);
-      break;
-    case Channel3.channelNumber:
-      eightBitStoreIntoGBMemory(Channel3.memoryLocationNRx3, value);
-      break;
-    default:
-      eightBitStoreIntoGBMemory(Channel4.memoryLocationNRx3, value);
-      break;
-  }
-}
-
-// Function to get 4th register of a channel
-// Contains Fequency MSB (higher 3 bits), and Length Information
-export function getRegister4OfChannel(channelNumber: i32): i32 {
-
-  switch(channelNumber) {
-    case Channel1.channelNumber:
-      return eightBitLoadFromGBMemory(Channel1.memoryLocationNRx4);
-    case Channel2.channelNumber:
-      return eightBitLoadFromGBMemory(Channel2.memoryLocationNRx4);
-    case Channel3.channelNumber:
-      return eightBitLoadFromGBMemory(Channel3.memoryLocationNRx4);
-    default:
-      return eightBitLoadFromGBMemory(Channel4.memoryLocationNRx4);
-  }
-}
-
-export function setRegister4OfChannel(channelNumber: i32, value: i32): void {
-
-  switch(channelNumber) {
-    case Channel1.channelNumber:
-      eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx4, value);
-      break;
-    case Channel2.channelNumber:
-      eightBitStoreIntoGBMemory(Channel2.memoryLocationNRx4, value);
-      break;
-    case Channel3.channelNumber:
-      eightBitStoreIntoGBMemory(Channel3.memoryLocationNRx4, value);
-      break;
-    default:
-      eightBitStoreIntoGBMemory(Channel4.memoryLocationNRx4, value);
-      break;
-  }
 }

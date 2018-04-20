@@ -5,21 +5,6 @@
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Frequency_Sweep
 
 import {
-  getChannelStartingVolume,
-  isChannelDacEnabled
-} from './registers';
-import {
-  getChannelFrequency,
-  setChannelFrequency
-} from './frequency';
-import {
-  isChannelLengthEnabled
-} from './length';
-import {
-  getChannelEnvelopePeriod,
-  getChannelEnvelopeAddMode
-} from './envelope';
-import {
   isDutyCycleClockPositiveOrNegativeForWaveform
 } from './duty';
 import {

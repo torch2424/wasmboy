@@ -4,22 +4,6 @@
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Noise_Channel
 
 import {
-  getChannelStartingVolume,
-  isChannelDacEnabled,
-  getRegister2OfChannel
-} from './registers';
-import {
-  getChannelFrequency,
-  setChannelFrequency
-} from './frequency';
-import {
-  isChannelLengthEnabled
-} from './length';
-import {
-  getChannelEnvelopePeriod,
-  getChannelEnvelopeAddMode
-} from './envelope';
-import {
   isDutyCycleClockPositiveOrNegativeForWaveform
 } from './duty';
 import {

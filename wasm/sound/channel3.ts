@@ -4,22 +4,6 @@
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Wave_Channel
 
 import {
-  getChannelStartingVolume,
-  isChannelDacEnabled,
-  getRegister2OfChannel
-} from './registers';
-import {
-  getChannelFrequency,
-  setChannelFrequency
-} from './frequency';
-import {
-  isChannelLengthEnabled
-} from './length';
-import {
-  getChannelEnvelopePeriod,
-  getChannelEnvelopeAddMode
-} from './envelope';
-import {
   isDutyCycleClockPositiveOrNegativeForWaveform
 } from './duty';
 import {
@@ -46,7 +30,7 @@ export class Channel3 {
   // NR30 -> Sound on/off (R/W)
   static readonly memoryLocationNRx0: i32 = 0xFF1A;
   // E--- ---- DAC power
-  updateNRx0(value: i32): void {
+  static updateNRx0(value: i32): void {
     Channel3.isDacEnabled = checkBitOnByte(7, value);
   }
 
