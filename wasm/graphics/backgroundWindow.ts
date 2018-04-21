@@ -265,7 +265,6 @@ function drawColorPixelFromTileId(xPixel: i32, yPixel: i32, pixelXPositionInMap:
   if (checkBitOnByte(6, bgMapAttributes)) {
     // We are mirroring the tile, therefore, we need to opposite byte
     // So if our pixel was 0 our of 8, it wild become 7 :)
-    // TODO: This may be wrong :p
     pixelYInTile = 7 - (pixelYInTile);
   }
 
@@ -416,6 +415,12 @@ function drawLineOfTileFromTileId(xPixel: i32, yPixel: i32, pixelXPositionInMap:
     if (checkBitOnByte(3, <u8>bgMapAttributes)) {
       vramBankId = 1;
     }
+  }
+
+  if (checkBitOnByte(6, bgMapAttributes)) {
+    // We are mirroring the tile, therefore, we need to opposite byte
+    // So if our pixel was 0 our of 8, it wild become 7 :)
+    tileLineY = 7 - (tileLineY);
   }
 
   // Return the number of pixels drawn
