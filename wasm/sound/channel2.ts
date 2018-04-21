@@ -81,7 +81,7 @@ export class Channel2 {
     Channel2.NRx4FrequencyMSB = (value & 0x07);
 
     // Update Channel Frequency
-    let frequency: i32 = ((Channel2.NRx4FrequencyMSB << 8) & Channel2.NRx3FrequencyLSB);
+    let frequency: i32 = ((Channel2.NRx4FrequencyMSB << 8) | Channel2.NRx3FrequencyLSB);
     Channel2.frequency = frequency;
   }
 

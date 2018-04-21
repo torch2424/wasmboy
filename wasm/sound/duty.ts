@@ -6,7 +6,6 @@ import {
 } from '../helpers/index';
 
 // Since there are no 2d arrays, we will use a byte to represent duty cycles (wave form from percentages)
-// TODO: Pass in Channel Duty
 export function isDutyCycleClockPositiveOrNegativeForWaveform(channelDuty: i32, waveFormPositionOnDuty: i32): boolean {
   // Get our Wave Form According to the Duty
   // Default to a duty of 1
