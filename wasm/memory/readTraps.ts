@@ -11,7 +11,7 @@ import {
 } from '../graphics/index';
 import {
   batchProcessAudio,
-  handleReadToSoundRegister
+  SoundRegisterReadTraps
 } from '../sound/index';
 import {
   eightBitStoreIntoGBMemory
@@ -83,11 +83,7 @@ export function checkReadTraps(offset: i32): i32 {
   // TODO: Put these bounds on the Sound Class
   if(offset >= 0xFF10 && offset <= 0xFF26) {
     batchProcessAudio();
-    let soundReadResponse: i32 = handleReadToSoundRegister(offset);
-    if(soundReadResponse < 0) {
-      return -1;
-    }
-    return soundReadResponse;
+    return SoundRegisterReadTraps(offset);
   }
   // FF27 - FF2F not used
   // Final Wave Table for Channel 3

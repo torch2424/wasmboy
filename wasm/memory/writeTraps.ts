@@ -12,7 +12,7 @@ import {
 } from '../graphics/index';
 import {
   batchProcessAudio,
-  handledWriteToSoundRegister
+  SoundRegisterWriteTraps
 } from '../sound/index';
 import {
   Timers,
@@ -130,9 +130,7 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
   // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
   if(offset >= 0xFF10 && offset <= 0xFF26) {
     batchProcessAudio();
-    if(handledWriteToSoundRegister(offset, value)) {
-      return false;
-    }
+    return SoundRegisterWriteTraps(offset, value);
   }
   // FF27 - FF2F not used
   // Final Wave Table for Channel 3

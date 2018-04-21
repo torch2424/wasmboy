@@ -8,8 +8,8 @@ export {
 } from './sound';
 
 export {
-  handledWriteToSoundRegister,
-  handleReadToSoundRegister
+  SoundRegisterWriteTraps,
+  SoundRegisterReadTraps
 } from './registers';
 
 export {
