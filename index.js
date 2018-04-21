@@ -23,8 +23,8 @@ const wasmBoyOptions = {
 	audioAccumulateSamples: false,
 	graphicsBatchProcessing: false,
 	graphicsDisableScanlineRendering: false,
-	tileRendering: true,
-	tileCaching: true,
+	tileRendering: false,
+	tileCaching: false,
 	gameboySpeed: 2.0
 };
 
