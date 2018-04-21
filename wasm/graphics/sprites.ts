@@ -151,72 +151,74 @@ export function renderSprites(scanlineRegister: i32, useLargerSprites: boolean):
         if (spriteColorId !== 0) {
 
           // Find our actual X pixel location on the gameboy "camera" view
+          // This cannot be less than zero, i32 will overflow
           let spriteXPixelLocationInCameraView: i32 = spriteXPosition + (7 - tilePixel);
-
-          // There are two cases where wouldnt draw the pixel on top of the Bg/window
-          // 1. if isSpritePriorityBehindWindowAndBackground, sprite can only draw over color 0
-          // 2. if bit 2 of our priority is set, then BG-to-OAM Priority from pandoc
-          //  is active, meaning BG tile will have priority above all OBJs
-          //  (regardless of the priority bits in OAM memory)
-          // But if GBC and Bit 0 of LCDC is set, we always draw the object
-          let shouldShowFromLcdcPriority: boolean = false;
-          let shouldHideFromOamPriority: boolean = false;
-          let shouldHideFromBgPriority: boolean = false;
-          // LCDC Priority
-          if(Cpu.GBCEnabled && !Lcd.bgDisplayEnabled) {
-            shouldShowFromLcdcPriority = true;
-          }
-
-          if(!shouldShowFromLcdcPriority) {
-            // Now that we have our coordinates, check for sprite priority
-            // Lets get the priority byte we put in memory
-            let bgPriorityByte: i32 = getPriorityforPixel(spriteXPixelLocationInCameraView, scanlineRegister);
-
-            // Doing an else if, since either will automatically stop drawing the pixel
-            if(isSpritePriorityBehindWindowAndBackground && (bgPriorityByte & 0x03) > 0) {
-              // OAM Priority
-              shouldHideFromOamPriority = true;
-            } else if(Cpu.GBCEnabled && checkBitOnByte(2, bgPriorityByte)) {
-              // Bg priority
-              shouldHideFromBgPriority = true;
+          if (spriteXPixelLocationInCameraView >= 0 && spriteXPixelLocationInCameraView <= 160) {
+            // There are two cases where wouldnt draw the pixel on top of the Bg/window
+            // 1. if isSpritePriorityBehindWindowAndBackground, sprite can only draw over color 0
+            // 2. if bit 2 of our priority is set, then BG-to-OAM Priority from pandoc
+            //  is active, meaning BG tile will have priority above all OBJs
+            //  (regardless of the priority bits in OAM memory)
+            // But if GBC and Bit 0 of LCDC is set, we always draw the object
+            let shouldShowFromLcdcPriority: boolean = false;
+            let shouldHideFromOamPriority: boolean = false;
+            let shouldHideFromBgPriority: boolean = false;
+            // LCDC Priority
+            if(Cpu.GBCEnabled && !Lcd.bgDisplayEnabled) {
+              shouldShowFromLcdcPriority = true;
             }
-          }
 
-          if (shouldShowFromLcdcPriority || (!shouldHideFromOamPriority && !shouldHideFromBgPriority)) {
+            if(!shouldShowFromLcdcPriority) {
+              // Now that we have our coordinates, check for sprite priority
+              // Lets get the priority byte we put in memory
+              let bgPriorityByte: i32 = getPriorityforPixel(spriteXPixelLocationInCameraView, scanlineRegister);
 
-            if(!Cpu.GBCEnabled) {
-              // Get our monochrome color RGB from the current sprite pallete
-              // Get our sprite pallete
-              let spritePaletteLocation: i32 = Graphics.memoryLocationSpritePaletteOne;
-              if (checkBitOnByte(4, spriteAttributes)) {
-                spritePaletteLocation = Graphics.memoryLocationSpritePaletteTwo;
+              // Doing an else if, since either will automatically stop drawing the pixel
+              if(isSpritePriorityBehindWindowAndBackground && (bgPriorityByte & 0x03) > 0) {
+                // OAM Priority
+                shouldHideFromOamPriority = true;
+              } else if(Cpu.GBCEnabled && checkBitOnByte(2, bgPriorityByte)) {
+                // Bg priority
+                shouldHideFromBgPriority = true;
               }
-              let spritePixelColorFromPalette: i32 = getMonochromeColorFromPalette(spriteColorId, spritePaletteLocation);
+            }
 
-              // Finally set the pixel!
-              setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, 0, spritePixelColorFromPalette);
-              setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, 1, spritePixelColorFromPalette);
-              setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, 2, spritePixelColorFromPalette);
-            } else {
+            if (shouldShowFromLcdcPriority || (!shouldHideFromOamPriority && !shouldHideFromBgPriority)) {
 
-              // Get our RGB Color
+              if(!Cpu.GBCEnabled) {
+                // Get our monochrome color RGB from the current sprite pallete
+                // Get our sprite pallete
+                let spritePaletteLocation: i32 = Graphics.memoryLocationSpritePaletteOne;
+                if (checkBitOnByte(4, spriteAttributes)) {
+                  spritePaletteLocation = Graphics.memoryLocationSpritePaletteTwo;
+                }
+                let spritePixelColorFromPalette: i32 = getMonochromeColorFromPalette(spriteColorId, spritePaletteLocation);
 
-              // Finally lets add some, C O L O R
-              // Want the botom 3 bits
-              let bgPalette: i32 = (spriteAttributes & 0x07);
+                // Finally set the pixel!
+                setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, 0, spritePixelColorFromPalette);
+                setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, 1, spritePixelColorFromPalette);
+                setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, 2, spritePixelColorFromPalette);
+              } else {
 
-              // Call the helper function to grab the correct color from the palette
-              let rgbColorPalette: i32 = getRgbColorFromPalette(bgPalette, spriteColorId, true);
+                // Get our RGB Color
 
-              // Split off into red green and blue
-              let red: i32 = getColorComponentFromRgb(0, rgbColorPalette);
-              let green: i32 = getColorComponentFromRgb(1, rgbColorPalette);
-              let blue: i32 = getColorComponentFromRgb(2, rgbColorPalette);
+                // Finally lets add some, C O L O R
+                // Want the botom 3 bits
+                let bgPalette: i32 = (spriteAttributes & 0x07);
 
-              // Finally Place our colors on the things
-              setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, 0, red);
-              setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, 1, green);
-              setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, 2, blue);
+                // Call the helper function to grab the correct color from the palette
+                let rgbColorPalette: i32 = getRgbColorFromPalette(bgPalette, spriteColorId, true);
+
+                // Split off into red green and blue
+                let red: i32 = getColorComponentFromRgb(0, rgbColorPalette);
+                let green: i32 = getColorComponentFromRgb(1, rgbColorPalette);
+                let blue: i32 = getColorComponentFromRgb(2, rgbColorPalette);
+
+                // Finally Place our colors on the things
+                setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, 0, red);
+                setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, 1, green);
+                setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, 2, blue);
+              }
             }
           }
         }
