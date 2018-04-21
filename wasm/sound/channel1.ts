@@ -79,7 +79,7 @@ export class Channel1 {
     Channel1.NRx3FrequencyLSB = value;
 
     // Update Channel Frequency
-    let frequency: i32 = ((Channel1.NRx4FrequencyMSB << 8) & Channel1.NRx3FrequencyLSB);
+    let frequency: i32 = ((Channel1.NRx4FrequencyMSB << 8) | Channel1.NRx3FrequencyLSB);
     Channel1.frequency = frequency;
   }
 
@@ -356,7 +356,7 @@ export class Channel1 {
     // Save the frequency for ourselves without triggering memory traps
     Channel1.NRx3FrequencyLSB = passedFrequencyLowBits;
     Channel1.NRx4FrequencyMSB = passedFrequencyHighBits;
-    Channel1.frequency = (passedFrequencyHighBits | passedFrequencyLowBits);
+    Channel1.frequency = ((Channel1.NRx4FrequencyMSB << 8) | Channel1.NRx3FrequencyLSB);
   }
   // Done!
 }
@@ -374,7 +374,7 @@ function calculateSweepAndCheckOverflow(): void {
     // then frequency calculation and overflow check are run AGAIN immediately using this new value,
     // but this second new frequency is not written back.
     Channel1.sweepShadowFrequency = newFrequency;
-    Channel1.setFrequency(newFrequency)
+    Channel1.setFrequency(newFrequency);
 
     // Re calculate the new frequency
     newFrequency = getNewFrequencyFromSweep();

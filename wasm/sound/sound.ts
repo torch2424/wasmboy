@@ -242,6 +242,11 @@ function calculateSound(numberOfCycles: i32): void {
   let channel2Sample: i32 = Channel2.getSample(numberOfCycles);
   let channel3Sample: i32 = Channel3.getSample(numberOfCycles);
   let channel4Sample: i32 = Channel4.getSample(numberOfCycles);
+  // TODO: Allow individual channels to be muted
+  // let channel1Sample: i32 = 15;
+  // let channel2Sample: i32 = 15;
+  // let channel3Sample: i32 = 15;
+  // let channel4Sample: i32 = 15;
 
   // Save the samples in the accumulator
   SoundAccumulator.channel1Sample = channel1Sample;

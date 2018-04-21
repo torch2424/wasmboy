@@ -12,7 +12,7 @@ import { WasmBoyDebugger, WasmBoySystemControls } from './debugger/index';
 // 	graphicsDisableScanlineRendering: true
 // });
 
-const gamePath = './games/linksawakening.gb';
+const gamePath = './games/pokemoncrystal.gbc';
 
 const wasmBoyOptions = {
 	isGbcEnabled: true,
@@ -25,7 +25,7 @@ const wasmBoyOptions = {
 	graphicsDisableScanlineRendering: false,
 	tileRendering: false,
 	tileCaching: false,
-	gameboySpeed: 2.0
+	gameboySpeed: 1.0
 };
 
 const wasmBoyOptionsString = JSON.stringify(wasmBoyOptions, null, 4);

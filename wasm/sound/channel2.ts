@@ -67,7 +67,7 @@ export class Channel2 {
     Channel2.NRx3FrequencyLSB = value;
 
     // Update Channel Frequency
-    let frequency: i32 = ((Channel2.NRx4FrequencyMSB << 8) & Channel2.NRx3FrequencyLSB);
+    let frequency: i32 = ((Channel2.NRx4FrequencyMSB << 8) | Channel2.NRx3FrequencyLSB);
     Channel2.frequency = frequency;
   }
 
@@ -290,7 +290,7 @@ export class Channel2 {
     // Save the frequency for ourselves without triggering memory traps
     Channel2.NRx3FrequencyLSB = passedFrequencyLowBits;
     Channel2.NRx4FrequencyMSB = passedFrequencyHighBits;
-    Channel2.frequency = (passedFrequencyHighBits | passedFrequencyLowBits);
+    Channel2.frequency = ((Channel2.NRx4FrequencyMSB << 8) | Channel2.NRx3FrequencyLSB);
   }
   // Done!
 }
