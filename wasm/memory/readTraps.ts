@@ -49,8 +49,7 @@ export function checkReadTraps(offset: i32): i32 {
     //   return 0xFF;
     // }
 
-    // Not batch processing here for performance
-    // batchProcessGraphics();
+    return -1;
   }
 
   // ECHO Ram, E000	FDFF	Mirror of C000~DDFF (ECHO RAM)
@@ -72,10 +71,20 @@ export function checkReadTraps(offset: i32): i32 {
 
     // Not batch processing here for performance
     // batchProcessGraphics();
+
+    return -1;
   }
 
   if(offset === Joypad.memoryLocationJoypadRegister) {
     return getJoypadState();
+  }
+
+  // Graphics
+  // Not batch processing here for performance
+  // batchProcessGraphics();
+  if (offset === Graphics.memoryLocationScanlineRegister) {
+    eightBitStoreIntoGBMemory(offset, Graphics.scanlineRegister);
+    return Graphics.scanlineRegister;
   }
 
   // Sound
@@ -89,6 +98,7 @@ export function checkReadTraps(offset: i32): i32 {
   // Final Wave Table for Channel 3
   if(offset >= 0xFF30 && offset <= 0xFF3F) {
     batchProcessAudio();
+    return -1;
   }
 
   return -1;

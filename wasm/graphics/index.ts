@@ -1,6 +1,7 @@
 export {
   Graphics,
   batchProcessGraphics,
+  initializeGraphics,
   updateGraphics
 } from './graphics';
 

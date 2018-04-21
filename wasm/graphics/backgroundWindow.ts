@@ -48,8 +48,10 @@ export function renderBackground(scanlineRegister: i32, tileDataMemoryLocation: 
   // NOTE: Camera is reffering to what you can see inside the 160x144 viewport of the entire rendered 256x256 map.
 
   // Get our scrollX and scrollY (u16 to play nice with assemblyscript)
-  let scrollX: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationScrollX);
-  let scrollY: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationScrollY);
+  // let scrollX: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationScrollX);
+  // let scrollY: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationScrollY);
+  let scrollX: i32 = Graphics.scrollX;
+  let scrollY: i32 = Graphics.scrollY;
 
   // Get our current pixel y positon on the 160x144 camera (Row that the scanline draws across)
   // this is done by getting the current scroll Y position,
@@ -71,8 +73,10 @@ export function renderBackground(scanlineRegister: i32, tileDataMemoryLocation: 
 export function renderWindow(scanlineRegister:i32, tileDataMemoryLocation: i32, tileMapMemoryLocation: i32): void {
 
   // Get our windowX and windowY
-  let windowX: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationWindowX);
-  let windowY: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationWindowY);
+  // let windowX: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationWindowX);
+  // let windowY: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationWindowY);
+  let windowX: i32 = Graphics.windowX;
+  let windowY: i32 = Graphics.windowY;
 
   // NOTE: Camera is reffering to what you can see inside the 160x144 viewport of the entire rendered 256x256 map.
 

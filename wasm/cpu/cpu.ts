@@ -10,8 +10,12 @@ import {
 } from '../memory/index';
 
 import {
+  initializeGraphics
+} from '../graphics/index';
+
+import {
   initializeSound
-} from '../sound/index'
+} from '../sound/index';
 
 import {
   log,
@@ -154,13 +158,7 @@ export function initialize(useGBCMode: i32 = 1, includeBootRom: i32 = 0): void {
       Cpu.stackPointer = 0xFFFE;
 
       // LCD / Graphics
-      eightBitStoreIntoGBMemory(0xFF40, 0x91);
-      eightBitStoreIntoGBMemory(0xFF41, 0x81);
-      // 0xFF42 -> 0xFF43 = 0x00
-      eightBitStoreIntoGBMemory(0xFF44, 0x90);
-      // 0xFF45 -> 0xFF46 = 0x00
-      eightBitStoreIntoGBMemory(0xFF47, 0xFC);
-      // 0xFF48 -> 0xFF4B = 0x00
+      // In initializeGraphics()
 
       // Various other registers
       eightBitStoreIntoGBMemory(0xFF70, 0xF8);
@@ -212,14 +210,7 @@ export function initialize(useGBCMode: i32 = 1, includeBootRom: i32 = 0): void {
       Cpu.stackPointer = 0xFFFE;
 
       // LCD / Graphics
-      eightBitStoreIntoGBMemory(0xFF40, 0x91);
-      eightBitStoreIntoGBMemory(0xFF41, 0x85);
-      // 0xFF42 -> 0xFF45 = 0x00
-      eightBitStoreIntoGBMemory(0xFF46, 0xFF);
-      eightBitStoreIntoGBMemory(0xFF47, 0xFC);
-      eightBitStoreIntoGBMemory(0xFF48, 0xFF);
-      eightBitStoreIntoGBMemory(0xFF49, 0xFF);
-      // 0xFF4A -> 0xFF4B = 0x00
+      // In initializeGraphics
 
       // Various other registers
       eightBitStoreIntoGBMemory(0xFF70, 0xFF);
@@ -255,6 +246,9 @@ export function initialize(useGBCMode: i32 = 1, includeBootRom: i32 = 0): void {
 
     // Call our memory to initialize our cartridge type
     initializeCartridge();
+
+    // Initialize our graphics registers
+    initializeGraphics();
 
     // Initialize our sound registers
     initializeSound();

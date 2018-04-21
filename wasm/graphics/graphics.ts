@@ -86,13 +86,18 @@ export class Graphics {
   // scanlineRegister also known as LY
   // See: http://bgb.bircd.org/pandocs.txt , and search " LY "
   static readonly memoryLocationScanlineRegister: i32 = 0xFF44;
+  static scanlineRegister: i32 = 0;
   static readonly memoryLocationDmaTransfer: i32 = 0xFF46;
 
   // Scroll and Window
   static readonly memoryLocationScrollX: i32 = 0xFF43;
+  static scrollX: i32 = 0;
   static readonly memoryLocationScrollY: i32 = 0xFF42;
+  static scrollY: i32 = 0;
   static readonly memoryLocationWindowX: i32 = 0xFF4B;
+  static windowX: i32 = 0;
   static readonly memoryLocationWindowY: i32 = 0xFF4A;
+  static windowY: i32 = 0;
 
   // Tile Maps And Data
   static readonly memoryLocationTileMapSelectZeroStart: i32 = 0x9800;
@@ -143,6 +148,29 @@ export function batchProcessGraphics(): void {
   }
 }
 
+export function initializeGraphics(): void {
+  if (Cpu.GBCEnabled) {
+    Graphics.scanlineRegister = 0x91;
+    eightBitStoreIntoGBMemory(0xFF40, 0x91);
+    eightBitStoreIntoGBMemory(0xFF41, 0x81);
+    // 0xFF42 -> 0xFF43 = 0x00
+    eightBitStoreIntoGBMemory(0xFF44, 0x90);
+    // 0xFF45 -> 0xFF46 = 0x00
+    eightBitStoreIntoGBMemory(0xFF47, 0xFC);
+    // 0xFF48 -> 0xFF4B = 0x00
+  } else {
+    Graphics.scanlineRegister = 0x91;
+    eightBitStoreIntoGBMemory(0xFF40, 0x91);
+    eightBitStoreIntoGBMemory(0xFF41, 0x85);
+    // 0xFF42 -> 0xFF45 = 0x00
+    eightBitStoreIntoGBMemory(0xFF46, 0xFF);
+    eightBitStoreIntoGBMemory(0xFF47, 0xFC);
+    eightBitStoreIntoGBMemory(0xFF48, 0xFF);
+    eightBitStoreIntoGBMemory(0xFF49, 0xFF);
+    // 0xFF4A -> 0xFF4B = 0x00
+  }
+}
+
 export function updateGraphics(numberOfCycles: i32): void {
 
   if(Lcd.enabled) {
@@ -156,7 +184,8 @@ export function updateGraphics(numberOfCycles: i32): void {
       Graphics.scanlineCycleCounter -= Graphics.MAX_CYCLES_PER_SCANLINE();
 
       // Move to next scanline
-      let scanlineRegister: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationScanlineRegister);
+      // let scanlineRegister: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationScanlineRegister);
+      let scanlineRegister: i32 = Graphics.scanlineRegister;
 
       // Check if we've reached the last scanline
       if(scanlineRegister === 144) {
@@ -192,7 +221,8 @@ export function updateGraphics(numberOfCycles: i32): void {
       }
 
       // Store our new scanline value
-      eightBitStoreIntoGBMemory(Graphics.memoryLocationScanlineRegister, scanlineRegister);
+      Graphics.scanlineRegister = scanlineRegister;
+      // eightBitStoreIntoGBMemory(Graphics.memoryLocationScanlineRegister, scanlineRegister);
     }
   }
 

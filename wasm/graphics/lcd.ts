@@ -84,6 +84,7 @@ export function setLcdStatus(): void {
   if(!Lcd.enabled) {
     // Reset scanline cycle counter
     Graphics.scanlineCycleCounter = 0;
+    Graphics.scanlineRegister = 0;
     eightBitStoreIntoGBMemory(Graphics.memoryLocationScanlineRegister, 0);
 
     // Set to mode 0
@@ -98,7 +99,7 @@ export function setLcdStatus(): void {
   }
 
   // Get our current scanline, and lcd mode
-  let scanlineRegister: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationScanlineRegister);
+  let scanlineRegister: i32 = Graphics.scanlineRegister;
   let lcdMode: i32 = lcdStatus & 0x03;
 
   let newLcdMode: i32 = 0;

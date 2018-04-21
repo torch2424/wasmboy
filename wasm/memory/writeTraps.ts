@@ -132,6 +132,7 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
     batchProcessAudio();
     return SoundRegisterWriteTraps(offset, value);
   }
+
   // FF27 - FF2F not used
   // Final Wave Table for Channel 3
   if(offset >= 0xFF30 && offset <= 0xFF3F) {
@@ -152,6 +153,7 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
 
     // reset the current scanline if the game tries to write to it
     if (offset === Graphics.memoryLocationScanlineRegister) {
+      Graphics.scanlineRegister = 0;
       eightBitStoreIntoGBMemory(offset, 0);
       return false;
     }
@@ -164,6 +166,22 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
       // And allow the original write
       startDmaTransfer(value);
       return true;
+    }
+
+    // Scroll and Window XY
+    switch (offset) {
+      case Graphics.memoryLocationScrollX:
+        Graphics.scrollX = value;
+        return true;
+      case Graphics.memoryLocationScrollY:
+        Graphics.scrollY = value;
+        return true;
+      case Graphics.memoryLocationWindowX:
+        Graphics.windowX = value;
+        return true;
+      case Graphics.memoryLocationWindowY:
+        Graphics.windowY = value;
+        return true;
     }
 
 
