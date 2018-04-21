@@ -36,8 +36,10 @@ export class Lcd {
   // 2 or 10: Searching Sprites Atts
   // 3 or 11: Transfering Data to LCD Driver
   static readonly memoryLocationLcdStatus: i32 = 0xFF41;
+  static currentLcdMode: i32 = 0;
 
   static readonly memoryLocationCoincidenceCompare: i32 = 0xFF45;
+  static coincidenceCompare: i32 = 0;
 
 
   // Also known as LCDC
@@ -51,8 +53,6 @@ export class Lcd {
   // Bit 1 - OBJ (Sprite) Display Enable (0=Off, 1=On)
   // Bit 0 - BG Display (for CGB see below) (0=Off, 1=On
   static readonly memoryLocationLcdControl: i32 = 0xFF40;
-  static currentLcdMode: i32 = 0;
-
   // Decoupled LCDC for caching
   static enabled: boolean = true;
   static windowTileMapDisplaySelect: boolean = false;

@@ -40,9 +40,6 @@ export {
   emulationStep
 } from './cpu/opcodes';
 export {
-  areInterruptsEnabled
-} from './interrupts/index';
-export {
   setJoypadState
 } from './joypad/index';
 export {

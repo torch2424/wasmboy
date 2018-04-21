@@ -61,10 +61,9 @@ import {
   updateTimers
 } from '../timers/index';
 import {
+  Interrupts,
   setInterrupts,
-  checkInterrupts,
-  areInterruptsEnabled,
-  areInterruptsPending
+  checkInterrupts
 } from '../interrupts/index';
 import {
   Graphics,
@@ -124,7 +123,7 @@ export function emulationStep(): i32 {
     numberOfCycles = executeOpcode(opcode);
   } else {
     // if we were halted, and interrupts were disabled but interrupts are pending, stop waiting
-    if(Cpu.isHalted && !areInterruptsEnabled() && areInterruptsPending()) {
+    if(Cpu.isHalted && !Interrupts.masterInterruptSwitch && Interrupts.areInterruptsPending()) {
       Cpu.isHalted = false;
       Cpu.isStopped = false;
 

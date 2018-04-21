@@ -18,7 +18,10 @@ import {
   Timers,
   batchProcessTimers,
   handleTIMCWrite
-} from '../timers/index'
+} from '../timers/index';
+import {
+  Interrupts
+} from '../interrupts/index';
 import {
   handleBanking
 } from './banking';
@@ -158,6 +161,12 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
       return false;
     }
 
+    // Cache our coincidence compare
+    if (offset === Lcd.memoryLocationCoincidenceCompare) {
+      Lcd.coincidenceCompare = value;
+      return true;
+    }
+
     // Do the direct memory access transfer for spriteInformationTable
     // Check the graphics mode to see if we can write to VRAM
     // http://gbdev.gg8.se/wiki/articles/Video_Display#Accessing_VRAM_and_OAM
@@ -210,6 +219,16 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
   if (offset >= Palette.memoryLocationBackgroundPaletteIndex && offset <= Palette.memoryLocationSpritePaletteData) {
     // Incremeenting the palette handled by the write
     writeColorPaletteToMemory(offset, value);
+    return true;
+  }
+
+  // Handle Interrupt writes
+  if(offset === Interrupts.memoryLocationInterruptRequest) {
+    Interrupts.updateInterruptRequested(value);
+    return true;
+  }
+  if(offset === Interrupts.memoryLocationInterruptEnabled) {
+    Interrupts.updateInterruptEnabled(value);
     return true;
   }
 
