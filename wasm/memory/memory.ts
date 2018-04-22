@@ -158,7 +158,7 @@ export class Memory {
 export function initializeCartridge(): void {
   // Get our game MBC type from the cartridge header
   // http://gbdev.gg8.se/wiki/articles/The_Cartridge_Header
-  let cartridgeType: u8 = eightBitLoadFromGBMemory(0x0147);
+  let cartridgeType: i32 = eightBitLoadFromGBMemory(0x0147);
 
   // Reset our Cartridge types
   Memory.isRomOnly = false;

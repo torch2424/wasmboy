@@ -12,6 +12,7 @@ import { WasmBoyDebugger, WasmBoySystemControls } from './debugger/index';
 // 	graphicsDisableScanlineRendering: true
 // });
 
+//const gamePath = './test/accuracy/testroms/blargg/cpu_instrs.gb';
 const gamePath = './games/linksawakening.gb';
 
 const wasmBoyOptions = {

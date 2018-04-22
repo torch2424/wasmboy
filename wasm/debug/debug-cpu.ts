@@ -47,5 +47,5 @@ export function getStackPointer(): u16 {
 }
 
 export function getOpcodeAtProgramCounter(): u8 {
-  return eightBitLoadFromGBMemory(Cpu.programCounter);
+  return <u8>eightBitLoadFromGBMemory(Cpu.programCounter);
 }

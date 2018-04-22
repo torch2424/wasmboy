@@ -12,12 +12,12 @@ import {
 } from '../helpers/index';
 
 export function eightBitStoreIntoGBMemory(gameboyOffset: i32, value: i32): void {
-  store<u8>(getWasmBoyOffsetFromGameBoyOffset(gameboyOffset), <i32>value);
+  store<u8>(getWasmBoyOffsetFromGameBoyOffset(gameboyOffset), value);
 }
 
 export function eightBitStoreIntoGBMemoryWithTraps(offset: i32, value: i32): void {
   if(checkWriteTraps(offset, value)) {
-    eightBitStoreIntoGBMemory(offset, <i32>value);
+    eightBitStoreIntoGBMemory(offset, value);
   }
 }
 

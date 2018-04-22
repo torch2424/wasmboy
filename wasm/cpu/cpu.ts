@@ -125,7 +125,7 @@ export function initialize(useGBCMode: i32 = 1, includeBootRom: i32 = 0): void {
   // First, try to switch to Gameboy Color Mode
   // Get our GBC support from the cartridge header
   // http://gbdev.gg8.se/wiki/articles/The_Cartridge_Header
-  let gbcType: u8 = eightBitLoadFromGBMemory(0x0143);
+  let gbcType: i32 = eightBitLoadFromGBMemory(0x0143);
 
   // Detecting GBC http://bgb.bircd.org/pandocs.htm#cgbregisters
   if (gbcType === 0xC0 ||

@@ -66,7 +66,7 @@ export function handleCbOpcode(cbOpcode: i32): i32 {
       break;
     case 6:
       // Value at register HL
-      instructionRegisterValue = eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
+      instructionRegisterValue = <u8>eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
       break;
     case 7:
       instructionRegisterValue = Cpu.registerA;

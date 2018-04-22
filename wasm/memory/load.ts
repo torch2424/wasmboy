@@ -10,11 +10,11 @@ import {
   performanceTimestamp
 } from '../helpers/index';
 
-export function eightBitLoadFromGBMemory(gameboyOffset: i32): u8 {
-  return load<u8>(getWasmBoyOffsetFromGameBoyOffset(gameboyOffset));
+export function eightBitLoadFromGBMemory(gameboyOffset: i32): i32 {
+  return <i32>load<u8>(getWasmBoyOffsetFromGameBoyOffset(gameboyOffset));
 }
 
-export function eightBitLoadFromGBMemoryWithTraps(offset: i32): u8 {
+export function eightBitLoadFromGBMemoryWithTraps(offset: i32): i32 {
   let readTrapResult: i32 = checkReadTraps(offset);
   switch (readTrapResult) {
     case -1:
@@ -24,7 +24,7 @@ export function eightBitLoadFromGBMemoryWithTraps(offset: i32): u8 {
   }
 }
 
-export function sixteenBitLoadFromGBMemory(offset: i32): u16 {
+export function sixteenBitLoadFromGBMemory(offset: i32): i32 {
 
   // Get our low byte
   let lowByte: i32 = 0;
