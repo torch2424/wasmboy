@@ -24,7 +24,6 @@ export class Timers {
 
   // Number of cycles to run in each batch process
   static batchProcessCycles(): i32 {
-
     return 256;
   }
 
@@ -33,6 +32,10 @@ export class Timers {
   static updateDividerRegister(value: i32): void {
     Timers.dividerRegister = 0;
     eightBitStoreIntoGBMemory(Timers.memoryLocationDividerRegister, 0);
+
+    // Also, mooneye tests, resetting DIV resets the timer
+    Timers.cycleCounter = 0;
+    Timers.timerCounter = Timers.timerModulo;
   }
   static readonly memoryLocationTimerCounter: i32 = 0xFF05; // TIMA
   static timerCounter: i32 = 0;
@@ -101,6 +104,22 @@ export class Timers {
     Timers.cycleCounter = load<i32>(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot));
     Timers.currentMaxCycleCount = load<i32>(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot));
     Timers.dividerRegisterCycleCounter = load<i32>(getSaveStateMemoryOffset(0x08, Timers.saveStateSlot));
+  }
+}
+
+export function initializeTimers(): void {
+  if(Cpu.GBCEnabled) {
+    eightBitStoreIntoGBMemory(0xFF04, 0x2F);
+    Timers.dividerRegister = 0x2F;
+    // 0xFF05 -> 0xFF06 = 0x00
+    eightBitStoreIntoGBMemory(0xFF07, 0xF8);
+    Timers.updateTimerControl(0xF8);
+  } else {
+    eightBitStoreIntoGBMemory(0xFF04, 0xAB);
+    Timers.dividerRegister = 0xAB;
+    // 0xFF05 -> 0xFF06 = 0x00
+    eightBitStoreIntoGBMemory(0xFF07, 0xF8);
+    Timers.updateTimerControl(0xF8);
   }
 }
 
@@ -181,6 +200,7 @@ function getFrequencyFromInputClockSelect(): i32 {
   // Returns value equivalent to
   // Cpu.CLOCK_SPEED / timc frequency
   // TIMC -> 16382
+  // Default to 0x03
   let cycleCount: i32 = 256;
   if (Cpu.GBCDoubleSpeed) {
     cycleCount = 512;
@@ -195,6 +215,7 @@ function getFrequencyFromInputClockSelect(): i32 {
       return cycleCount;
     case 0x01:
       // TIMC -> 262144
+      // TODO: Fix tests involving the 16 cycle timer mode. This is the reason why blargg tests break
       cycleCount = 16;
       if (Cpu.GBCDoubleSpeed) {
         cycleCount = 32;

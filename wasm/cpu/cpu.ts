@@ -18,6 +18,10 @@ import {
 } from '../sound/index';
 
 import {
+  initializeTimers
+} from '../timers/index';
+
+import {
   log,
   hexLog
 } from '../helpers/index';
@@ -167,9 +171,9 @@ export function initializeCpu(useGBCMode: i32 = 1, includeBootRom: i32 = 0): voi
       eightBitStoreIntoGBMemory(0xFF00, 0xCF);
       // FF01 = 0x00
       eightBitStoreIntoGBMemory(0xFF02, 0x7C);
-      eightBitStoreIntoGBMemory(0xFF04, 0x2F);
-      // 0xFF05 -> 0xFF06 = 0x00
-      eightBitStoreIntoGBMemory(0xFF07, 0xF8);
+
+      // Handled by Updatye timers
+
       eightBitStoreIntoGBMemory(0xFF0F, 0xE1);
       // 0xFFFF = 0x00
 
@@ -219,9 +223,9 @@ export function initializeCpu(useGBCMode: i32 = 1, includeBootRom: i32 = 0): voi
       eightBitStoreIntoGBMemory(0xFF00, 0xCF);
       // FF01 = 0x00
       eightBitStoreIntoGBMemory(0xFF02, 0x7E);
-      eightBitStoreIntoGBMemory(0xFF04, 0xAB);
-      // 0xFF05 -> 0xFF06 = 0x00
-      eightBitStoreIntoGBMemory(0xFF07, 0xF8);
+
+      // handled by initializxeTimers
+
       eightBitStoreIntoGBMemory(0xFF0F, 0xE1);
       // 0xFFFF = 0x00
 
@@ -252,5 +256,7 @@ export function initializeCpu(useGBCMode: i32 = 1, includeBootRom: i32 = 0): voi
 
     // Initialize our sound registers
     initializeSound();
+
+    initializeTimers();
   }
 }

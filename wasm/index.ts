@@ -185,6 +185,7 @@ export function emulationStep(): i32 {
   // Finally, Add our number of cycles to the CPU Cycles
   Cpu.currentCycles += numberOfCycles;
 
+  // Check other Gameboy components
   if(!Cpu.isStopped) {
     if(Config.graphicsBatchProcessing) {
       // Need to do this, since a lot of things depend on the scanline
@@ -202,7 +203,6 @@ export function emulationStep(): i32 {
     }
   }
 
-  // Check other Gameboy components
   if (Config.timersBatchProcessing) {
     // Batch processing will simply return if the number of cycles is too low
     Timers.currentCycles += numberOfCycles;
