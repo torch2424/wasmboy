@@ -120,7 +120,7 @@ export class Cpu {
   }
 }
 
-export function initialize(useGBCMode: i32 = 1, includeBootRom: i32 = 0): void {
+export function initializeCpu(useGBCMode: i32 = 1, includeBootRom: i32 = 0): void {
 
   // First, try to switch to Gameboy Color Mode
   // Get our GBC support from the cartridge header
