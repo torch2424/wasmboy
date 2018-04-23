@@ -23,6 +23,9 @@ import {
   Interrupts
 } from '../interrupts/index';
 import {
+  Joypad
+} from '../joypad/index';
+import {
   handleBanking
 } from './banking';
 import {
@@ -220,6 +223,11 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
     // Incremeenting the palette handled by the write
     writeColorPaletteToMemory(offset, value);
     return true;
+  }
+
+  // Handle Joypad writes for HW reg caching
+  if(offset === Joypad.memoryLocationJoypadRegister) {
+    Joypad.updateJoypad(value);
   }
 
   // Handle Interrupt writes

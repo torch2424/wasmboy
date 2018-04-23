@@ -49,6 +49,15 @@ export class Joypad {
   static start: boolean = false;
 
   static readonly memoryLocationJoypadRegister: i32 = 0xFF00;
+  // Cache some values on the Joypad register
+  static joypadRegisterFlipped: i32 = 0;
+  static isDpadType: boolean = false;
+  static isButtonType: boolean = false;
+  static updateJoypad(value: i32): void {
+    Joypad.joypadRegisterFlipped = value ^ 0xFF;
+    Joypad.isDpadType = checkBitOnByte(4, Joypad.joypadRegisterFlipped);
+    Joypad.isButtonType = checkBitOnByte(5, Joypad.joypadRegisterFlipped);
+  }
 
   // Save States
   // Not doing anything for Joypad for now
@@ -67,49 +76,10 @@ export class Joypad {
 export function getJoypadState(): i32 {
 
   // Get the joypad register
-  let joypadRegister: i32 = eightBitLoadFromGBMemory(Joypad.memoryLocationJoypadRegister);
+  let joypadRegister: i32 = Joypad.joypadRegisterFlipped;
 
-  // Flip all the bits
-  joypadRegister = joypadRegister ^ 0xFF;
-
-  // Check the button type buttons
-  if(!checkBitOnByte(4, joypadRegister)) {
-
-    // Set the top 4 bits to on
-    joypadRegister = joypadRegister | 0xF0;
-
-    // A
-    if (Joypad.a) {
-      joypadRegister = resetBitOnByte(0, joypadRegister);
-    } else {
-      joypadRegister = setBitOnByte(0, joypadRegister);
-    }
-
-    // B
-    if (Joypad.b) {
-      joypadRegister = resetBitOnByte(1, joypadRegister);
-    } else {
-      joypadRegister = setBitOnByte(1, joypadRegister);
-    }
-
-    // Select
-    if (Joypad.select) {
-      joypadRegister = resetBitOnByte(2, joypadRegister);
-    } else {
-      joypadRegister = setBitOnByte(2, joypadRegister);
-    }
-
-    // Start
-    if (Joypad.start) {
-      joypadRegister = resetBitOnByte(3, joypadRegister);
-    } else {
-      joypadRegister = setBitOnByte(3, joypadRegister);
-    }
-  } else if (!checkBitOnByte(5, joypadRegister)) {
+  if (Joypad.isDpadType) {
     // D-pad buttons
-
-    // Set the top 4 bits to on
-    joypadRegister = joypadRegister | 0xF0;
 
     // Up
     if (Joypad.up) {
@@ -138,7 +108,39 @@ export function getJoypadState(): i32 {
     } else {
       joypadRegister = setBitOnByte(1, joypadRegister);
     }
+  } else if(Joypad.isButtonType) {
+
+    // A
+    if (Joypad.a) {
+      joypadRegister = resetBitOnByte(0, joypadRegister);
+    } else {
+      joypadRegister = setBitOnByte(0, joypadRegister);
+    }
+
+    // B
+    if (Joypad.b) {
+      joypadRegister = resetBitOnByte(1, joypadRegister);
+    } else {
+      joypadRegister = setBitOnByte(1, joypadRegister);
+    }
+
+    // Select
+    if (Joypad.select) {
+      joypadRegister = resetBitOnByte(2, joypadRegister);
+    } else {
+      joypadRegister = setBitOnByte(2, joypadRegister);
+    }
+
+    // Start
+    if (Joypad.start) {
+      joypadRegister = resetBitOnByte(3, joypadRegister);
+    } else {
+      joypadRegister = setBitOnByte(3, joypadRegister);
+    }
   }
+
+  // Set the top 4 bits to on
+  joypadRegister = joypadRegister | 0xF0;
 
   return joypadRegister;
 }
@@ -217,16 +219,17 @@ function _pressJoypadButton(buttonId: i32): void {
     }
 
     // Determine if we should request an interrupt
-    let joypadRegister: i32 = eightBitLoadFromGBMemory(Joypad.memoryLocationJoypadRegister);
+    let joypadRegister: i32 = Joypad.joypadRegisterFlipped;
+
     let shouldRequestInterrupt = false;
 
     // Check if the game is looking for a dpad type button press
-    if(checkBitOnByte(4, joypadRegister) && isDpadTypeButton) {
+    if(Joypad.isDpadType && isDpadTypeButton) {
       shouldRequestInterrupt = true;
     }
 
     // Check if the game is looking for a button type button press
-    if(checkBitOnByte(5, joypadRegister) && !isDpadTypeButton) {
+    if(Joypad.isButtonType && !isDpadTypeButton) {
       shouldRequestInterrupt = true;
     }
 
@@ -240,20 +243,6 @@ function _pressJoypadButton(buttonId: i32): void {
 function _releaseJoypadButton(buttonId: i32): void {
   // Set our joypad state
   _setJoypadButtonStateFromButtonId(buttonId, false);
-}
-
-function _getBitNumberForButtonId(buttonId: i32): i32 {
-  if (buttonId === 1 || buttonId === 4) {
-    return 0;
-  } else if (buttonId === 3 || buttonId === 5) {
-    return 1;
-  } else if (buttonId === 0 || buttonId === 6) {
-    return 2;
-  } else if (buttonId === 2 || buttonId === 7) {
-    return 3;
-  }
-
-  return 0;
 }
 
 function _getJoypadButtonStateFromButtonId(buttonId: i32): boolean {
