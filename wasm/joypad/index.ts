@@ -13,7 +13,8 @@ import {
 import {
   checkBitOnByte,
   setBitOnByte,
-  resetBitOnByte
+  resetBitOnByte,
+  hexLog
 } from '../helpers/index';
 
 // http://www.codeslinger.co.uk/pages/projects/gameboy/joypad.html
@@ -146,6 +147,8 @@ export function getJoypadState(): i32 {
 }
 
 export function setJoypadState(up: i32, right: i32, down: i32, left: i32, a: i32, b: i32, select: i32, start: i32): void {
+
+  hexLog(0x420);
 
   if (up > 0) {
     _pressJoypadButton(0);
