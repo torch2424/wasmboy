@@ -16,8 +16,7 @@ import {
 } from '../sound/index';
 import {
   Timers,
-  batchProcessTimers,
-  handleTIMCWrite
+  batchProcessTimers
 } from '../timers/index';
 import {
   Interrupts
@@ -110,28 +109,6 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
     return false;
   }
 
-  // Timers
-  if (offset >= Timers.memoryLocationDividerRegister && offset <= Timers.memoryLocationTIMC) {
-
-    // Batch Process
-    batchProcessTimers();
-
-    // Trap our divider register from our timers
-    if(offset === Timers.memoryLocationDividerRegister) {
-      eightBitStoreIntoGBMemory(offset, 0);
-      return false;
-    }
-
-    // Trap our TIMC writes
-    if(offset === Timers.memoryLocationTIMC) {
-      handleTIMCWrite(value);
-      return true;
-    }
-
-    // Allow the original Write
-    return true;
-  }
-
   // Sound
   // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
   if(offset >= 0xFF10 && offset <= 0xFF26) {
@@ -222,6 +199,30 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
   if (offset >= Palette.memoryLocationBackgroundPaletteIndex && offset <= Palette.memoryLocationSpritePaletteData) {
     // Incremeenting the palette handled by the write
     writeColorPaletteToMemory(offset, value);
+    return true;
+  }
+
+  // Handle timer writes
+  if(offset >= Timers.memoryLocationDividerRegister && offset <= Timers.memoryLocationTimerControl) {
+
+    // Batch Process
+    batchProcessTimers();
+
+    switch(offset) {
+      case Timers.memoryLocationDividerRegister:
+        Timers.updateDividerRegister(value);
+        return false;
+      case Timers.memoryLocationTimerCounter:
+        Timers.updateTimerCounter(value);
+        return true;
+      case Timers.memoryLocationTimerModulo:
+        Timers.updateTimerModulo(value);
+        return true;
+      case Timers.memoryLocationTimerControl:
+        Timers.updateTimerControl(value);
+        return true;
+    }
+
     return true;
   }
 

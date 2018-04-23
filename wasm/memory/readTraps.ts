@@ -22,7 +22,10 @@ import {
 import {
   Joypad,
   getJoypadState
-} from '../joypad/index'
+} from '../joypad/index';
+import {
+  Timers
+} from '../timers/index';
 import {
   hexLog
 } from '../helpers/index';
@@ -75,10 +78,6 @@ export function checkReadTraps(offset: i32): i32 {
     return -1;
   }
 
-  if(offset === Joypad.memoryLocationJoypadRegister) {
-    return getJoypadState();
-  }
-
   // Graphics
   // Not batch processing here for performance
   // batchProcessGraphics();
@@ -100,6 +99,22 @@ export function checkReadTraps(offset: i32): i32 {
     batchProcessAudio();
     return -1;
   }
+
+  // Timers
+  if(offset === Timers.memoryLocationDividerRegister) {
+    eightBitStoreIntoGBMemory(offset, Timers.dividerRegister);
+    return Timers.dividerRegister;
+  }
+  if(offset === Timers.memoryLocationTimerCounter) {
+    eightBitStoreIntoGBMemory(offset, Timers.timerCounter);
+    return Timers.timerCounter;
+  }
+
+  // Joypad
+  if(offset === Joypad.memoryLocationJoypadRegister) {
+    return getJoypadState();
+  }
+
 
   return -1;
 }

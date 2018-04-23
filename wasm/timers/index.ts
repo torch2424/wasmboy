@@ -24,20 +24,48 @@ export class Timers {
 
   // Number of cycles to run in each batch process
   static batchProcessCycles(): i32 {
-  if (Cpu.GBCDoubleSpeed) {
-    return 140448;
+
+    return 256;
   }
 
-    return 255;
+  static readonly memoryLocationDividerRegister: i32 = 0xFF04; // DIV
+  static dividerRegister: i32 = 0;
+  static updateDividerRegister(value: i32): void {
+    Timers.dividerRegister = 0;
+    eightBitStoreIntoGBMemory(Timers.memoryLocationDividerRegister, 0);
+  }
+  static readonly memoryLocationTimerCounter: i32 = 0xFF05; // TIMA
+  static timerCounter: i32 = 0;
+  static updateTimerCounter(value: i32): void {
+    Timers.timerCounter = value;
+  }
+  static readonly memoryLocationTimerModulo: i32 = 0xFF06; // TMA
+  static timerModulo: i32 = 0;
+  static updateTimerModulo(value: i32): void {
+    Timers.timerModulo = value;
   }
 
-  static readonly memoryLocationTIMA: i32= 0xFF05; // Timer Modulator
-  static readonly memoryLocationTMA: i32 = 0xFF06; // Timer Counter (Actual Time Value)
-  static readonly memoryLocationTIMC: i32 = 0xFF07; // Timer Controller (A.K.A TAC)
-  static readonly memoryLocationDividerRegister: i32 = 0xFF04; // DividerRegister likes to count
+  static readonly memoryLocationTimerControl: i32 = 0xFF07; // TAC
+  // Bit 2    - Timer Stop  (0=Stop, 1=Start)
+  // Bits 1-0 - Input Clock Select
+  //            00:   4096 Hz    (~4194 Hz SGB)
+  //            01: 262144 Hz  (~268400 Hz SGB)
+  //            10:  65536 Hz   (~67110 Hz SGB)
+  //            11:  16384 Hz   (~16780 Hz SGB)
+  static timerEnabled: boolean = false;
+  static timerInputClock: i32 = 0;
+  static updateTimerControl(value: i32): void {
+    Timers.timerEnabled = checkBitOnByte(2, value);
+    if(!Timers.timerEnabled) {
+      return;
+    }
 
-  // Check if the timer is currently enabled
-  static isEnabled: boolean = false;
+    Timers.timerInputClock = value & 0x03;
+
+    // Set our new current max, and reset the cycle counter
+    Timers.cycleCounter = 0;
+    Timers.currentMaxCycleCount = getFrequencyFromInputClockSelect();
+  }
 
   // Cycle counter. This is used to determine if we should increment the REAL timer
   // I know this is weird, but it's all to make sure the emulation is in sync :p
@@ -45,13 +73,15 @@ export class Timers {
   static currentMaxCycleCount: i32 = 256;
 
   // Another timer, that doesn't fire intterupts, but jsut counts to 255, and back to zero :p
+  // In Cgb mode, this still counts at the same rate since the CPU doubles and so does this counter
+  // RealBoy Blog Post:
+  // we also know that we have to increment the DIV register 16384 times per second.
+  // Recall that the CPU frequency is 4194304 Hz, which means that every second the CPU produces 4194304 cycles.
+  // We want to know the amount of cycles required for the DIV register to be incremented;
+  // we get that 4194304/16384=256 CPU cycles are required before incrementing the DIV register.
   static dividerRegisterCycleCounter: i32 = 0x00;
   static dividerRegisterMaxCycleCount(): i32 {
-    if (Cpu.GBCDoubleSpeed) {
-      return 140448;
-    }
-
-    return 255;
+    return 256;
   }
 
   // Save States
@@ -83,7 +113,7 @@ export function batchProcessTimers(): void {
   // This will depend on the least amount of cycles we need to update
   // Something
   let batchProcessCycles: i32 = Timers.batchProcessCycles();
-  if (Timers.isEnabled && Timers.currentMaxCycleCount < batchProcessCycles) {
+  if (Timers.timerEnabled && Timers.currentMaxCycleCount < batchProcessCycles) {
     batchProcessCycles = Timers.currentMaxCycleCount;
   }
 
@@ -101,7 +131,7 @@ export function updateTimers(numberOfCycles: i32): void {
 
   _checkDividerRegister(numberOfCycles);
 
-  if(!Timers.isEnabled) {
+  if(!Timers.timerEnabled) {
     return;
   }
 
@@ -110,72 +140,20 @@ export function updateTimers(numberOfCycles: i32): void {
 
   while (Timers.cycleCounter >= Timers.currentMaxCycleCount) {
 
-    // Update the actual timer counter
-    let tima: i32 = eightBitLoadFromGBMemory(Timers.memoryLocationTIMA);
-
     // Reset our cycle counters
     // Not setting to zero as we do not want to drop cycles
     Timers.cycleCounter -= Timers.currentMaxCycleCount;
 
-    if(tima >= 255) {
+    if(Timers.timerCounter >= 255) {
       // Store Timer Modulator inside of TIMA
-      eightBitStoreIntoGBMemory(Timers.memoryLocationTIMA, eightBitLoadFromGBMemory(Timers.memoryLocationTMA));
+      Timers.timerCounter = Timers.timerModulo;
 
       // Fire off timer interrupt
       requestTimerInterrupt();
     } else {
-      eightBitStoreIntoGBMemory(Timers.memoryLocationTIMA, tima + 1);
+      Timers.timerCounter += 1;
     }
   }
-}
-
-// Function called on write to TIMC
-export function handleTIMCWrite(timc: i32): void {
-
-  // Set if the timer is enabled
-  Timers.isEnabled = checkBitOnByte(2, timc);
-
-  if(!Timers.isEnabled) {
-    return;
-  }
-
-  // Clear the top byte
-  timc = timc & 0x03;
-
-  // Returns value equivalent to
-  // Cpu.CLOCK_SPEED / timc frequency
-  // TIMC -> 16382
-  let cycleCount: i32 = 256;
-  if (Cpu.GBCDoubleSpeed) {
-    cycleCount = 512;
-  }
-  switch(timc) {
-    case 0x00:
-      // TIMC -> 4096
-      cycleCount = 1024;
-      if (Cpu.GBCDoubleSpeed) {
-        cycleCount = 2048;
-      }
-      break;
-    case 0x01:
-      // TIMC -> 262144
-      cycleCount = 16;
-      if (Cpu.GBCDoubleSpeed) {
-        cycleCount = 32;
-      }
-      break;
-    case 0x02:
-      // TIMC -> 65536
-      cycleCount = 64;
-      if (Cpu.GBCDoubleSpeed) {
-        cycleCount = 126;
-      }
-      break;
-  }
-
-  // Set our new current max, and reset the cycle counter
-  Timers.cycleCounter = 0;
-  Timers.currentMaxCycleCount = cycleCount;
 }
 
 // Function to update our divider register
@@ -184,14 +162,52 @@ function _checkDividerRegister(numberOfCycles: i32): void {
   // Every 256 clock cycles need to increment
   Timers.dividerRegisterCycleCounter += numberOfCycles;
 
-  if(Timers.dividerRegisterCycleCounter >= Timers.dividerRegisterMaxCycleCount()) {
+  if (Timers.dividerRegisterCycleCounter >= Timers.dividerRegisterMaxCycleCount()) {
 
     // Reset the cycle counter
     // - 255 to catch any overflow with the cycles
     Timers.dividerRegisterCycleCounter -= Timers.dividerRegisterMaxCycleCount();
 
-    let dividerRegister: i32 = eightBitLoadFromGBMemory(Timers.memoryLocationDividerRegister);
-    dividerRegister += 1;
-    eightBitStoreIntoGBMemory(Timers.memoryLocationDividerRegister, dividerRegister);
+    Timers.dividerRegister += 1;
+
+    if(Timers.dividerRegister > 0xFF) {
+      Timers.dividerRegister = 0;
+    }
   }
+}
+
+// Function to get a cycle count froma  passed Timer clock
+function getFrequencyFromInputClockSelect(): i32 {
+  // Returns value equivalent to
+  // Cpu.CLOCK_SPEED / timc frequency
+  // TIMC -> 16382
+  let cycleCount: i32 = 256;
+  if (Cpu.GBCDoubleSpeed) {
+    cycleCount = 512;
+  }
+  switch(Timers.timerInputClock) {
+    case 0x00:
+      // TIMC -> 4096
+      cycleCount = 1024;
+      if (Cpu.GBCDoubleSpeed) {
+        cycleCount = 2048;
+      }
+      return cycleCount;
+    case 0x01:
+      // TIMC -> 262144
+      cycleCount = 16;
+      if (Cpu.GBCDoubleSpeed) {
+        cycleCount = 32;
+      }
+      return cycleCount;
+    case 0x02:
+      // TIMC -> 65536
+      cycleCount = 64;
+      if (Cpu.GBCDoubleSpeed) {
+        cycleCount = 126;
+      }
+      return cycleCount;
+  }
+
+  return cycleCount;
 }
