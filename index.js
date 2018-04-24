@@ -26,7 +26,12 @@ const wasmBoyOptions = {
 	graphicsDisableScanlineRendering: false,
 	tileRendering: false,
 	tileCaching: false,
-	gameboySpeed: 2.0
+	gameboySpeed: 2.0,
+	saveStateCallback: (saveStateObject) => {
+		// Function called everytime a savestate occurs
+		saveStateObject.screenshotCanvasDataURL = WasmBoyGraphics.canvasElement.toDataURL();
+		return saveStateObject;
+	}
 };
 
 const wasmBoyOptionsString = JSON.stringify(wasmBoyOptions, null, 4);
@@ -109,7 +114,7 @@ export default class App extends Component {
 						} />
         </div>
 				<div class="wasmboy__systemControls">
-					<WasmBoySystemControls wasmboy={WasmBoy}></WasmBoySystemControls>
+					<WasmBoySystemControls wasmboy={WasmBoy} wasmboyMemory={WasmBoyMemory}></WasmBoySystemControls>
 				</div>
 				<div className="wasmboy__canvas-container">
     			<canvas className="wasmboy__canvas-container__canvas">
