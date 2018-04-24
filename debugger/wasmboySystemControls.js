@@ -36,7 +36,6 @@ export class WasmBoySystemControls extends Component {
 
     // Get our save states
     this.props.wasmboyMemory.getCartridgeObject().then((cartridgeObject) => {
-      console.log(cartridgeObject);
       newState.saveStates = cartridgeObject.saveStates;
       this.setState(newState);
     });
@@ -69,7 +68,7 @@ export class WasmBoySystemControls extends Component {
         let saveStateDateString = new Date(saveState.date);
         saveStateDateString = saveStateDateString.toLocaleString();
         saveStateElements.unshift((
-          <div class="saveState">
+          <div class="saveState" onClick={() => {props.wasmboy.loadState(saveState); this.closeSaveStates();}}>
             <img src={saveState.screenshotCanvasDataURL} />
             <h3>Date:</h3>
             {saveStateDateString}
