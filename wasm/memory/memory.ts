@@ -1,6 +1,7 @@
 // WasmBoy memory map:
 // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
 import {
+  wasmBoyInternalStateLocation,
   wasmMemorySize,
   gameBoyInternalMemoryLocation,
   videoOutputLocation,
@@ -274,5 +275,5 @@ export function loadPaletteByteFromWasmMemory(paletteIndexByte: i32, isSprite: b
 // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
 export function getSaveStateMemoryOffset(offset: i32, saveStateSlot: i32): i32 {
   // 50 byutes per save state memory partiton sli32
-  return offset + (50 * saveStateSlot);
+  return wasmBoyInternalStateLocation + offset + (50 * saveStateSlot);
 }

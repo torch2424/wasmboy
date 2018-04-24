@@ -30,6 +30,7 @@ const wasmBoyOptions = {
 	saveStateCallback: (saveStateObject) => {
 		// Function called everytime a savestate occurs
 		saveStateObject.screenshotCanvasDataURL = WasmBoyGraphics.canvasElement.toDataURL();
+		console.log('Save state', saveStateObject);
 		return saveStateObject;
 	}
 };
