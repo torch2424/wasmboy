@@ -13,7 +13,7 @@ import { WasmBoyDebugger, WasmBoySystemControls } from './debugger/index';
 // });
 
 //const gamePath = './test/accuracy/testroms/blargg/cpu_instrs.gb';
-const gamePath = './games/linksawakening.gb';
+const gamePath = './games/blue.gb';
 
 const wasmBoyOptions = {
 	isGbcEnabled: true,
