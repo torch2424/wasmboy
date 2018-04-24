@@ -71,6 +71,8 @@ export class Joypad {
 
   // Function to load the save state from memory
   static loadState(): void {
+
+  Joypad.updateJoypad(eightBitLoadFromGBMemory(Joypad.memoryLocationJoypadRegister));
   }
 }
 

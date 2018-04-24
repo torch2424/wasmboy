@@ -97,6 +97,9 @@ export class Timers {
     store<i32>(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot), Timers.cycleCounter);
     store<i32>(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot), Timers.currentMaxCycleCount);
     store<i32>(getSaveStateMemoryOffset(0x08, Timers.saveStateSlot), Timers.dividerRegisterCycleCounter);
+
+    eightBitStoreIntoGBMemory(Timers.memoryLocationDividerRegister, Timers.dividerRegister);
+    eightBitStoreIntoGBMemory(Timers.memoryLocationTimerCounter, Timers.timerCounter);
   }
 
   // Function to load the save state from memory
@@ -104,6 +107,11 @@ export class Timers {
     Timers.cycleCounter = load<i32>(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot));
     Timers.currentMaxCycleCount = load<i32>(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot));
     Timers.dividerRegisterCycleCounter = load<i32>(getSaveStateMemoryOffset(0x08, Timers.saveStateSlot));
+
+    Timers.dividerRegister = eightBitLoadFromGBMemory(Timers.memoryLocationDividerRegister);
+    Timers.updateTimerCounter(eightBitLoadFromGBMemory(Timers.memoryLocationTimerCounter));
+    Timers.updateTimerModulo(eightBitLoadFromGBMemory(Timers.memoryLocationTimerModulo));
+    Timers.updateTimerControl(eightBitLoadFromGBMemory(Timers.memoryLocationTimerControl));
   }
 }
 

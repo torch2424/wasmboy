@@ -39,6 +39,9 @@ import {
 import {
   Config
 } from './config';
+import {
+  hexLog
+} from './helpers/index';
 
 // Public Exports
 export {
@@ -61,6 +64,7 @@ export {
   currentFrameVideoOutputLocation,
   frameInProgressVideoOutputLocation,
   gameboyColorPaletteLocation,
+  gameboyColorPaletteSize,
   backgroundMapLocation,
   tileDataMap,
   soundOutputLocation,
@@ -86,13 +90,27 @@ export {
   drawTileDataToWasmMemory
 } from './debug/debug';
 
+// Function to track if the core has started
+let hasStarted: boolean = false;;
+export function hasCoreStarted(): i32 {
+  if(hasStarted) {
+    return 1;
+  }
+
+  return 0;
+}
+
 // Grow our memory to the specified size
 if(current_memory() < wasmPages) {
   grow_memory(wasmPages - current_memory());
 }
 
+// Function to initiialize the core
 export function initialize(useGBCMode: i32 = 1, includeBootRom: i32 = 0): void {
   initializeCpu(useGBCMode, includeBootRom);
+
+  // Reset hasStarted, since we are now reset
+  hasStarted = false;
 }
 
 // Public funciton to run opcodes until an event occurs.
@@ -132,6 +150,10 @@ export function update(): i32 {
 // Function to execute an opcode, and update other gameboy hardware.
 // http://www.codeslinger.co.uk/pages/projects/gameboy/beginning.html
 export function emulationStep(): i32 {
+
+  // Set has started to 1 since we ran a emulation step
+  hasStarted = true;
+
   // Get the opcode, and additional bytes to be handled
   // Number of cycles defaults to 4, because while we're halted, we run 4 cycles (according to matt :))
   let numberOfCycles: i32 = 4;
@@ -242,4 +264,7 @@ export function loadState(): void {
   Channel2.loadState();
   Channel3.loadState();
   Channel4.loadState();
+
+  // Reset hasStarted, since we are now reset
+  hasStarted = false;
 }

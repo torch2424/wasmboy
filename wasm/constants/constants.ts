@@ -25,6 +25,7 @@ export const gameBoyMemoryRegistersLocation: i32 = 0x00C800;
 // Video output
 export const videoOutputLocation: i32 = 0x010800;
 export const gameboyColorPaletteLocation: i32 = 0x010800;
+export const gameboyColorPaletteSize: i32 = 0x200;
 export const bgPriorityMapLocation: i32 = 0x011000;
 export const frameInProgressVideoOutputLocation: i32 = 0x016C00;
 export const currentFrameVideoOutputLocation: i32 = 0x027C00;
