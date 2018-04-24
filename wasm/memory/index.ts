@@ -7,7 +7,6 @@ export {
   initializeCartridge,
   setPixelOnFrame,
   getRgbPixelStart,
-  storeFrameToBeRendered,
   setLeftAndRightOutputForAudioQueue,
   storePaletteByteInWasmMemory,
   loadPaletteByteFromWasmMemory,

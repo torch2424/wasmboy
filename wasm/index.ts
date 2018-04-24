@@ -61,7 +61,6 @@ export {
   gameBoyInternalMemoryLocation,
   gameBoyInternalMemorySize,
   videoOutputLocation,
-  currentFrameVideoOutputLocation,
   frameInProgressVideoOutputLocation,
   gameboyColorPaletteLocation,
   gameboyColorPaletteSize,

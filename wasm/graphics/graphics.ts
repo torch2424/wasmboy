@@ -25,7 +25,6 @@ import {
 import {
   eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemory,
-  storeFrameToBeRendered,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
@@ -200,9 +199,6 @@ export function updateGraphics(numberOfCycles: i32): void {
         } else {
           _renderEntireFrame();
         }
-
-        // Store the frame to be rendered
-        storeFrameToBeRendered();
 
         // Clear the priority map
         clearPriorityMap();

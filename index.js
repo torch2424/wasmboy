@@ -13,7 +13,7 @@ import { WasmBoyDebugger, WasmBoySystemControls } from './debugger/index';
 // });
 
 //const gamePath = './test/accuracy/testroms/blargg/cpu_instrs.gb';
-const gamePath = './games/blue.gb';
+const gamePath = './games/linksawakening.gb';
 
 const wasmBoyOptions = {
 	isGbcEnabled: true,
@@ -29,8 +29,8 @@ const wasmBoyOptions = {
 	gameboySpeed: 2.0,
 	saveStateCallback: (saveStateObject) => {
 		// Function called everytime a savestate occurs
+		// Used by the WasmBoySystemControls to show screenshots on save states
 		saveStateObject.screenshotCanvasDataURL = WasmBoyGraphics.canvasElement.toDataURL();
-		console.log('Save state', saveStateObject);
 		return saveStateObject;
 	}
 };

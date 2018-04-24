@@ -5,7 +5,6 @@ import {
   wasmMemorySize,
   gameBoyInternalMemoryLocation,
   videoOutputLocation,
-  currentFrameVideoOutputLocation,
   frameInProgressVideoOutputLocation,
   gameboyColorPaletteLocation,
   soundOutputLocation,
@@ -74,7 +73,6 @@ export class Memory {
   static readonly gameBoyWramLocation: i32 = gameBoyWramLocation;
   static readonly gameBoyMemoryRegistersLocation: i32 = gameBoyMemoryRegistersLocation;
   static readonly videoOutputLocation: i32 = videoOutputLocation;
-  static readonly currentFrameVideoOutputLocation: i32 = currentFrameVideoOutputLocation;
   static readonly frameInProgressVideoOutputLocation: i32 = frameInProgressVideoOutputLocation;
   static readonly gameboyColorPaletteLocation: i32 = gameboyColorPaletteLocation;
   static readonly soundOutputLocation: i32 = soundOutputLocation;
@@ -189,7 +187,7 @@ export function setPixelOnFrame(x: i32, y: i32, colorId: i32, color: i32): void 
   // Currently only supports 160x144
   // Storing in X, then y
   // So need an offset
-  store<u8>(Memory.frameInProgressVideoOutputLocation + getRgbPixelStart(x, y) + colorId, <u8>color);
+  store<u8>(Memory.frameInProgressVideoOutputLocation + getRgbPixelStart(x, y) + colorId, color);
 }
 
 // Function to get the start of a RGB pixel (R, G, B)
@@ -198,29 +196,6 @@ export function getRgbPixelStart(x: i32, y: i32): i32 {
   // let pixelNumber: i32 = (y * 160) + x;
   // Each pixel takes 3 slots, therefore, multiply by 3!
   return ((y * 160) + x) * 3;
-}
-
-// V-Blank occured, move our frame in progress to our render frame
-export function storeFrameToBeRendered(): void {
-
-  // Cache our constant for performance
-  let currentFrameVideoOutputLocation: i32 = Memory.currentFrameVideoOutputLocation;
-  let frameInProgressVideoOutputLocation: i32 = Memory.frameInProgressVideoOutputLocation;
-
-  // Not using getPixelOnFrame() for performance
-
-  for(let y: i32 = 0; y < 144; y++) {
-    for (let x: i32 = 0; x < 160; x++) {
-      // Store three times for each pixel
-      let pixelStart: i32 = getRgbPixelStart(x, y);
-      for (let colorId: i32 = 0; colorId < 3; colorId++) {
-        store<u8>(
-          currentFrameVideoOutputLocation + pixelStart + colorId,
-          load<u8>(frameInProgressVideoOutputLocation + pixelStart + colorId)
-        )
-      }
-    }
-  }
 }
 
 // Function to set our left and right channels at the correct queue index

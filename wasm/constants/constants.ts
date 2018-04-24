@@ -28,7 +28,6 @@ export const gameboyColorPaletteLocation: i32 = 0x010800;
 export const gameboyColorPaletteSize: i32 = 0x200;
 export const bgPriorityMapLocation: i32 = 0x011000;
 export const frameInProgressVideoOutputLocation: i32 = 0x016C00;
-export const currentFrameVideoOutputLocation: i32 = 0x027C00;
 export const backgroundMapLocation: i32 = 0x038C00;
 export const tileDataMap: i32 = 0x068C00;
 export const oamTiles: i32 = 0x08CC00;

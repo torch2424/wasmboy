@@ -80,7 +80,7 @@ export class Lcd {
 // Pass in the lcd status for performance
 export function setLcdStatus(): void {
 
-  let lcdStatus: i32 = eightBitLoadFromGBMemory(Lcd.memoryLocationLcdStatus);
+  // Check if the Lcd was disabled
   if(!Lcd.enabled) {
     // Reset scanline cycle counter
     Graphics.scanlineCycleCounter = 0;
@@ -89,6 +89,7 @@ export function setLcdStatus(): void {
 
     // Set to mode 0
     // https://www.reddit.com/r/EmuDev/comments/4w6479/gb_dr_mario_level_generation_issues/
+    let lcdStatus: i32 = eightBitLoadFromGBMemory(Lcd.memoryLocationLcdStatus);
     lcdStatus = resetBitOnByte(1, lcdStatus);
     lcdStatus = resetBitOnByte(0, lcdStatus);
     Lcd.currentLcdMode = 0;
@@ -100,40 +101,58 @@ export function setLcdStatus(): void {
 
   // Get our current scanline, and lcd mode
   let scanlineRegister: i32 = Graphics.scanlineRegister;
-  let lcdMode: i32 = lcdStatus & 0x03;
+  let lcdMode: i32 = Lcd.currentLcdMode;
 
+  // Default to  H-Blank
   let newLcdMode: i32 = 0;
-  let shouldRequestInterrupt: boolean = false;
 
   // Find our newLcd mode
   if(scanlineRegister >= 144) {
     // VBlank mode
     newLcdMode = 1;
-    lcdStatus = resetBitOnByte(1, lcdStatus);
-    lcdStatus = setBitOnByte(0, lcdStatus);
-    shouldRequestInterrupt = checkBitOnByte(4, lcdStatus);
   } else {
     if (Graphics.scanlineCycleCounter >= Graphics.MIN_CYCLES_SPRITES_LCD_MODE()) {
       // Searching Sprites Atts
       newLcdMode = 2;
-      lcdStatus = resetBitOnByte(0, lcdStatus);
-      lcdStatus = setBitOnByte(1, lcdStatus);
-      shouldRequestInterrupt = checkBitOnByte(5, lcdStatus);
     } else if (Graphics.scanlineCycleCounter >= Graphics.MIN_CYCLES_TRANSFER_DATA_LCD_MODE()) {
       // Transferring data to lcd
       newLcdMode = 3;
-      lcdStatus = setBitOnByte(0, lcdStatus);
-      lcdStatus = setBitOnByte(1, lcdStatus);
-    } else {
-      // H-Blank
-      newLcdMode = 0;
-      lcdStatus = resetBitOnByte(0, lcdStatus);
-      lcdStatus = resetBitOnByte(1, lcdStatus);
-      shouldRequestInterrupt = checkBitOnByte(3, lcdStatus);
     }
   }
 
   if (lcdMode !== newLcdMode) {
+
+    // Get our lcd status
+    let lcdStatus: i32 = eightBitLoadFromGBMemory(Lcd.memoryLocationLcdStatus);
+
+    // Save our lcd mode
+    Lcd.currentLcdMode = newLcdMode;
+
+    let shouldRequestInterrupt: boolean = false;
+
+    // Set our LCD Statuc accordingly
+    switch(newLcdMode) {
+      case 0x00:
+        lcdStatus = resetBitOnByte(0, lcdStatus);
+        lcdStatus = resetBitOnByte(1, lcdStatus);
+        shouldRequestInterrupt = checkBitOnByte(3, lcdStatus);
+        break;
+      case 0x01:
+        lcdStatus = resetBitOnByte(1, lcdStatus);
+        lcdStatus = setBitOnByte(0, lcdStatus);
+        shouldRequestInterrupt = checkBitOnByte(4, lcdStatus);
+        break;
+      case 0x02:
+        lcdStatus = resetBitOnByte(0, lcdStatus);
+        lcdStatus = setBitOnByte(1, lcdStatus);
+        shouldRequestInterrupt = checkBitOnByte(5, lcdStatus);
+        break;
+      case 0x03:
+        lcdStatus = setBitOnByte(0, lcdStatus);
+        lcdStatus = setBitOnByte(1, lcdStatus);
+        break;
+    }
+
     // Check if we want to request an interrupt, and we JUST changed modes
     if(shouldRequestInterrupt) {
       requestLcdInterrupt();
@@ -152,7 +171,7 @@ export function setLcdStatus(): void {
 
     // Check for the coincidence flag
     // Need to check on every mode, and not just HBLANK, as checking on hblank breaks shantae, which checks on vblank
-    let coincidenceCompare: i32 = eightBitLoadFromGBMemory(Lcd.memoryLocationCoincidenceCompare);
+    let coincidenceCompare: i32 = Lcd.coincidenceCompare;
     if((newLcdMode === 0 || newLcdMode === 1) &&
       scanlineRegister === coincidenceCompare) {
       lcdStatus = setBitOnByte(2, lcdStatus);
@@ -162,9 +181,6 @@ export function setLcdStatus(): void {
     } else {
       lcdStatus = resetBitOnByte(2, lcdStatus);
     }
-
-    // Save our lcd mode
-    Lcd.currentLcdMode = newLcdMode;
 
     // Finally, save our status
     eightBitStoreIntoGBMemory(Lcd.memoryLocationLcdStatus, lcdStatus);
