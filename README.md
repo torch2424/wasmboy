@@ -33,8 +33,8 @@
 * Emulates the Gameboy / Gameboy Color 🎮👾🕹️
 * Outputs graphics to a scalable / responsive HTML5 canvas 🖼️, and audio through the Web Audio API 🔊
 * Support for In-game saves, and save states 💾
-* Configurable options to increase performance for low end devices 🔥
-* Importable into other projects as a dependency ♻️
+* Configurable options to increase performance for low(er) end devices 🔥
+* *WIP:* Importable into other projects as a dependency ♻️
 * Built with Web Assembly 🕸️
 * Keyboard and gamepad input support using [responsive gamepad](https://www.npmjs.com/package/responsive-gamepad) ⌨️ 🎮
 * Debugger with a value table (I/O map), Tile Data visualizer, and Background Map with Scroll Indicators 🐛
@@ -51,9 +51,9 @@
 
 ![Links Awakening](./docs/images/wasmBoyLinksAwakening.png) ![L s d j](./docs/images/wasmBoyLsdj.png) ![Megaman extreme 2](./docs/images/wasmBoyMegamanXtreme2.png) ![Pokemon Silver](./docs/images/wasmBoyPokemonSilver.png) ![Pokemon Yellow](./docs/images/wasmBoyPokemonYellow.png) ![back to color demo](./test/performance/testroms/back-to-color/back-to-color.gbc.noPerformanceOptions.png)
 
-**Save States**
+**Options & Save States**
 
-![wasm boy save state](https://user-images.githubusercontent.com/1448289/37084052-45e35e62-21a6-11e8-96d0-539c5649c197.gif)
+![Wasm boy options and save states gif](./docs/images/wasmBoySaveStateOptions.gif)
 
 **Debugger**
 
