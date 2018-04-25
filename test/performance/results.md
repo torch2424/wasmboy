@@ -9,29 +9,39 @@ This is a Auto-generated file to give users some understanding of expected perfo
 
 This currently runs 1250 frames of each rom, and averages the results of 2 iterations of running the number of frames.
 
+The Options passed into the emulator on each run are:
+
+```
+{
+    "headless": true,
+    "gameboySpeed": 100,
+    "isGbcEnabled": true
+}
+```
+
 
  ## back-to-color.gbc 
 
  | Performance Option               | Time (milliseconds) |
 | -------------------------------- | ------------------- |
-| noPerformanceOptions             | 5528.661            |
-| tileRendering                    | 4719.1455           |
-| tileCaching                      | 4813.519            |
-| audioBatchProcessing             | 2771.9449999999997  |
-| timersBatchProcessing            | 5713.2195           |
-| audioAccumulateSamples           | 4552.74             |
-| graphicsBatchProcessing          | 4439.154500000001   |
-| graphicsDisableScanlineRendering | 4881.7375           | 
+| noPerformanceOptions             | 5458.0195           |
+| tileRendering                    | 4897.6865           |
+| tileCaching                      | 4795.406            |
+| audioBatchProcessing             | 2698.0910000000003  |
+| timersBatchProcessing            | 4804.1044999999995  |
+| audioAccumulateSamples           | 4528.1245           |
+| graphicsBatchProcessing          | 4444.3835           |
+| graphicsDisableScanlineRendering | 4853.2985           | 
 
  ## tobutobugirl.gb 
 
  | Performance Option               | Time (milliseconds) |
 | -------------------------------- | ------------------- |
-| noPerformanceOptions             | 2796.9314999999997  |
-| tileRendering                    | 2754.9515           |
-| tileCaching                      | 2808.1575000000003  |
-| audioBatchProcessing             | 1939.3110000000001  |
-| timersBatchProcessing            | 2799.0135           |
-| audioAccumulateSamples           | 2625.92             |
-| graphicsBatchProcessing          | 2644.11             |
-| graphicsDisableScanlineRendering | 2795.5125           | 
+| noPerformanceOptions             | 2840.8675           |
+| tileRendering                    | 2845.0335           |
+| tileCaching                      | 2776.5635           |
+| audioBatchProcessing             | 1986.751            |
+| timersBatchProcessing            | 2734.7195           |
+| audioAccumulateSamples           | 2613.41             |
+| graphicsBatchProcessing          | 2638.9984999999997  |
+| graphicsDisableScanlineRendering | 2766.915            | 

@@ -62,6 +62,12 @@ This is a Auto-generated file to give users some understanding of expected perfo
 
 This currently runs ${NUMBER_OF_FRAMES} frames of each rom, and averages the results of ${PERFORMANCE_OPTION_ITERATIONS} iterations of running the number of frames.
 
+The Options passed into the emulator on each run are:
+
+\`\`\`
+${JSON.stringify(WASMBOY_INITIALIZE_OPTIONS, null, 4)}
+\`\`\`
+
 `;
 
 const performanceTablePath = './test/performance/results.md';
