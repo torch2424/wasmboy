@@ -7,27 +7,33 @@ import {
 } from '../graphics/graphics';
 import {
   Palette,
-  writeColorPaletteToMemory
+  writeColorPaletteToMemory,
+  Lcd
 } from '../graphics/index';
 import {
   batchProcessAudio,
-  handledWriteToSoundRegister
+  SoundRegisterWriteTraps
 } from '../sound/index';
 import {
   Timers,
-  batchProcessTimers,
-  handleTIMCWrite
-} from '../timers/index'
+  batchProcessTimers
+} from '../timers/index';
+import {
+  Interrupts
+} from '../interrupts/index';
+import {
+  Joypad
+} from '../joypad/index';
 import {
   handleBanking
 } from './banking';
 import {
-  eightBitStoreIntoGBMemorySkipTraps,
-  sixteenBitStoreIntoGBMemorySkipTraps
+  eightBitStoreIntoGBMemory,
+  sixteenBitStoreIntoGBMemory
 } from './store';
 import {
+  eightBitLoadFromGBMemoryWithTraps,
   eightBitLoadFromGBMemory,
-  eightBitLoadFromGBMemorySkipTraps,
   sixteenBitLoadFromGBMemory
 } from './load';
 import {
@@ -41,11 +47,11 @@ import {
 
 // Internal function to trap any modify data trying to be written to Gameboy memory
 // Follows the Gameboy memory map
-export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolean): boolean {
+export function checkWriteTraps(offset: i32, value: i32): boolean {
 
   // Cache globals used multiple times for performance
-  let videoRamLocation: u16 = Memory.videoRamLocation;
-  let spriteInformationTableLocation: u16 = Memory.spriteInformationTableLocation;
+  let videoRamLocation: i32 = Memory.videoRamLocation;
+  let spriteInformationTableLocation: i32 = Memory.spriteInformationTableLocation;
 
   // Handle banking
   if(offset < videoRamLocation) {
@@ -76,12 +82,8 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
   // Codeslinger: The ECHO memory region (0xE000-0xFDFF) is quite different because any data written here is also written in the equivelent ram memory region 0xC000-0xDDFF.
   // Hence why it is called echo
   if(offset >= Memory.echoRamLocation && offset < spriteInformationTableLocation) {
-    let wramOffset: u16 = offset - 0x2000;
-    if(isEightBitStore) {
-      eightBitStoreIntoGBMemorySkipTraps(wramOffset, <u8>value);
-    } else {
-      sixteenBitStoreIntoGBMemorySkipTraps(wramOffset, value);
-    }
+    let wramOffset: i32 = offset - 0x2000;
+    eightBitStoreIntoGBMemory(wramOffset, value);
 
     // Allow the original write, and return since we dont need to look anymore
     return true;
@@ -93,7 +95,7 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
   if(offset >= spriteInformationTableLocation && offset <= Memory.spriteInformationTableLocationEnd) {
     // Can only read/write from OAM During Mode 2
     // See graphics/lcd.ts
-    if (Graphics.currentLcdMode < 2) {
+    if (Lcd.currentLcdMode < 2) {
       return false;
     }
     // Not batch processing here for performance
@@ -107,52 +109,42 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
     return false;
   }
 
-  // Timers
-  if (offset >= Timers.memoryLocationDividerRegister && offset <= Timers.memoryLocationTIMC) {
-
-    // Batch Process
-    batchProcessTimers();
-
-    // Trap our divider register from our timers
-    if(offset === Timers.memoryLocationDividerRegister) {
-      eightBitStoreIntoGBMemorySkipTraps(offset, 0);
-      return false;
-    }
-
-    // Trap our TIMC writes
-    if(offset === Timers.memoryLocationTIMC) {
-      handleTIMCWrite(<u8>value);
-      return true;
-    }
-
-    // Allow the original Write
-    return true;
-  }
-
   // Sound
   // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
   if(offset >= 0xFF10 && offset <= 0xFF26) {
     batchProcessAudio();
-    if(handledWriteToSoundRegister(offset, value)) {
-      return false;
-    }
+    return SoundRegisterWriteTraps(offset, value);
   }
+
   // FF27 - FF2F not used
   // Final Wave Table for Channel 3
   if(offset >= 0xFF30 && offset <= 0xFF3F) {
     batchProcessAudio();
   }
 
-  // Other Memory effects fomr read/write to GraphicsGraphics
-  if (offset >= Graphics.memoryLocationLcdControl && offset <= Graphics.memoryLocationWindowX) {
+  // Other Memory effects fomr read/write to Lcd/Graphics
+  if (offset >= Lcd.memoryLocationLcdControl && offset <= Graphics.memoryLocationWindowX) {
 
     // Not batch processing here for performance
     // batchProcessGraphics();
 
+    if (offset === Lcd.memoryLocationLcdControl) {
+      // Shorcut for isLCD Enabled since it gets "hot"
+      Lcd.updateLcdControl(value);
+      return true;
+    }
+
     // reset the current scanline if the game tries to write to it
     if (offset === Graphics.memoryLocationScanlineRegister) {
-      eightBitStoreIntoGBMemorySkipTraps(offset, 0);
+      Graphics.scanlineRegister = 0;
+      eightBitStoreIntoGBMemory(offset, 0);
       return false;
+    }
+
+    // Cache our coincidence compare
+    if (offset === Lcd.memoryLocationCoincidenceCompare) {
+      Lcd.coincidenceCompare = value;
+      return true;
     }
 
     // Do the direct memory access transfer for spriteInformationTable
@@ -161,8 +153,24 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
     if (offset === Graphics.memoryLocationDmaTransfer) {
       // otherwise, perform a DMA transfer
       // And allow the original write
-      startDmaTransfer(<u8>value);
+      startDmaTransfer(value);
       return true;
+    }
+
+    // Scroll and Window XY
+    switch (offset) {
+      case Graphics.memoryLocationScrollX:
+        Graphics.scrollX = value;
+        return true;
+      case Graphics.memoryLocationScrollY:
+        Graphics.scrollY = value;
+        return true;
+      case Graphics.memoryLocationWindowX:
+        Graphics.windowX = value;
+        return true;
+      case Graphics.memoryLocationWindowY:
+        Graphics.windowY = value;
+        return true;
     }
 
 
@@ -172,13 +180,13 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
 
   // Do an HDMA
   if(offset === Memory.memoryLocationHdmaTrigger) {
-    startHdmaTransfer(<u8>value);
+    startHdmaTransfer(value);
     return false;
   }
 
   // Don't allow banking if we are doing an Hblank HDM transfer
   // https://gist.github.com/drhelius/3394856
-  if(offset === Memory.memoryLocationGBCWRAMBank || offset === Memory.memoryLocationGBCVRAMBAnk) {
+  if(offset === Memory.memoryLocationGBCWRAMBank || offset === Memory.memoryLocationGBCVRAMBank) {
     if (Memory.isHblankHdmaActive) {
       if((Memory.hblankHdmaSource >= 0x4000 && Memory.hblankHdmaSource <= 0x7FFF) ||
         (Memory.hblankHdmaSource >= 0xD000 && Memory.hblankHdmaSource <= 0xDFFF)) {
@@ -191,6 +199,45 @@ export function checkWriteTraps(offset: u16, value: u16, isEightBitStore: boolea
   if (offset >= Palette.memoryLocationBackgroundPaletteIndex && offset <= Palette.memoryLocationSpritePaletteData) {
     // Incremeenting the palette handled by the write
     writeColorPaletteToMemory(offset, value);
+    return true;
+  }
+
+  // Handle timer writes
+  if(offset >= Timers.memoryLocationDividerRegister && offset <= Timers.memoryLocationTimerControl) {
+
+    // Batch Process
+    batchProcessTimers();
+
+    switch(offset) {
+      case Timers.memoryLocationDividerRegister:
+        Timers.updateDividerRegister(value);
+        return false;
+      case Timers.memoryLocationTimerCounter:
+        Timers.updateTimerCounter(value);
+        return true;
+      case Timers.memoryLocationTimerModulo:
+        Timers.updateTimerModulo(value);
+        return true;
+      case Timers.memoryLocationTimerControl:
+        Timers.updateTimerControl(value);
+        return true;
+    }
+
+    return true;
+  }
+
+  // Handle Joypad writes for HW reg caching
+  if(offset === Joypad.memoryLocationJoypadRegister) {
+    Joypad.updateJoypad(value);
+  }
+
+  // Handle Interrupt writes
+  if(offset === Interrupts.memoryLocationInterruptRequest) {
+    Interrupts.updateInterruptRequested(value);
+    return true;
+  }
+  if(offset === Interrupts.memoryLocationInterruptEnabled) {
+    Interrupts.updateInterruptEnabled(value);
     return true;
   }
 

@@ -7,7 +7,6 @@ export {
   initializeCartridge,
   setPixelOnFrame,
   getRgbPixelStart,
-  storeFrameToBeRendered,
   setLeftAndRightOutputForAudioQueue,
   storePaletteByteInWasmMemory,
   loadPaletteByteFromWasmMemory,
@@ -16,17 +15,17 @@ export {
 } from './memory';
 
 export {
+  eightBitLoadFromGBMemoryWithTraps,
   eightBitLoadFromGBMemory,
-  eightBitLoadFromGBMemorySkipTraps,
   sixteenBitLoadFromGBMemory,
   loadBooleanDirectlyFromWasmMemory
 } from './load';
 
 export {
+  eightBitStoreIntoGBMemoryWithTraps,
+  sixteenBitStoreIntoGBMemoryWithTraps,
   eightBitStoreIntoGBMemory,
   sixteenBitStoreIntoGBMemory,
-  eightBitStoreIntoGBMemorySkipTraps,
-  sixteenBitStoreIntoGBMemorySkipTraps,
   storeBooleanDirectlyToWasmMemory
 } from './store';
 

@@ -3,7 +3,7 @@ import {
   Cpu
 } from'../cpu/cpu';
 import {
-  eightBitLoadFromGBMemorySkipTraps
+  eightBitLoadFromGBMemory
 } from '../memory/index';
 
 export function getRegisterA(): u8 {
@@ -47,5 +47,5 @@ export function getStackPointer(): u16 {
 }
 
 export function getOpcodeAtProgramCounter(): u8 {
-  return eightBitLoadFromGBMemorySkipTraps(Cpu.programCounter);
+  return <u8>eightBitLoadFromGBMemory(Cpu.programCounter);
 }

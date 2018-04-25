@@ -9,14 +9,14 @@ import {
   setBitOnByte
 } from '../helpers/index';
 
-export function addPriorityforPixel(x: i32, y: i32, colorId: u8 = 0, hasGbcBgPriority: boolean = false): void {
+export function addPriorityforPixel(x: i32, y: i32, colorId: i32 = 0, hasGbcBgPriority: boolean = false): void {
 
-  let bgPriorityByte: u8 = (colorId & 0x03);
+  let bgPriorityByte: i32 = (colorId & 0x03);
   if(hasGbcBgPriority) {
     bgPriorityByte = setBitOnByte(2, bgPriorityByte);
   }
 
-  store<u8>(bgPriorityMapLocation + getPixelStart(x, y), bgPriorityByte);
+  store<u8>(bgPriorityMapLocation + getPixelStart(x, y), <u8>bgPriorityByte);
 }
 
 export function getPriorityforPixel(x: i32, y: i32): u8 {

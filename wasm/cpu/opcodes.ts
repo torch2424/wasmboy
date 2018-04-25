@@ -49,10 +49,10 @@ import {
 } from '../helpers/index';
 import {
   Memory,
-  eightBitStoreIntoGBMemory,
-  sixteenBitStoreIntoGBMemory,
+  eightBitStoreIntoGBMemoryWithTraps,
+  sixteenBitStoreIntoGBMemoryWithTraps,
+  eightBitLoadFromGBMemoryWithTraps,
   eightBitLoadFromGBMemory,
-  eightBitLoadFromGBMemorySkipTraps,
   sixteenBitLoadFromGBMemory
 } from '../memory/index';
 import {
@@ -61,10 +61,9 @@ import {
   updateTimers
 } from '../timers/index';
 import {
+  Interrupts,
   setInterrupts,
-  checkInterrupts,
-  areInterruptsEnabled,
-  areInterruptsPending
+  checkInterrupts
 } from '../interrupts/index';
 import {
   Graphics,
@@ -76,136 +75,12 @@ import {
   updateSound
 } from '../sound/index';
 
-// Public funciton to run opcodes until an event occurs.
-// Return values:
-// -1 = error
-// 1 = render a frame
-// 2 = replace boot rom
-export function update(): i32 {
-
-  let error: boolean = false;
-  let numberOfCycles: i32 = -1;
-
-  while(!error &&
-    Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME()) {
-    numberOfCycles = emulationStep();
-    if (numberOfCycles >= 0) {
-      Cpu.currentCycles += numberOfCycles;
-
-      if(Config.audioBatchProcessing) {
-        Sound.currentCycles += numberOfCycles;
-      }
-
-      if (Config.graphicsBatchProcessing) {
-        // Need to do this, since a lot of things depend on the scanline
-        // Batch processing will simply return if the number of cycles is too low
-        Graphics.currentCycles += numberOfCycles;
-        batchProcessGraphics();
-      }
-
-      if (Config.timersBatchProcessing) {
-        // Batch processing will simply return if the number of cycles is too low
-        Timers.currentCycles += numberOfCycles;
-        batchProcessTimers();
-      }
-    } else {
-      error = true;
-    }
-  }
-
-  // Find our exit reason
-  if (Cpu.currentCycles >= Cpu.MAX_CYCLES_PER_FRAME()) {
-    // Render a frame
-
-    // Reset our currentCycles
-    Cpu.currentCycles -= Cpu.MAX_CYCLES_PER_FRAME();
-
-    return 1;
-  }
-  // TODO: Boot ROM handling
-
-  // There was an error, return -1, and push the program counter back to grab the error opcode
-  Cpu.programCounter -= 1;
-  return -1;
-}
-
-// Function to execute an opcode, and update other gameboy hardware.
-// http://www.codeslinger.co.uk/pages/projects/gameboy/beginning.html
-export function emulationStep(): i32 {
-  // Get the opcode, and additional bytes to be handled
-  // Number of cycles defaults to 4, because while we're halted, we run 4 cycles (according to matt :))
-  let numberOfCycles: i32 = 4;
-  let opcode: u8 = 0;
-
-  // Cpu Halting best explained: https://www.reddit.com/r/EmuDev/comments/5ie3k7/infinite_loop_trying_to_pass_blarggs_interrupt/db7xnbe/
-  if(!Cpu.isHalted && !Cpu.isStopped) {
-    opcode = eightBitLoadFromGBMemory(Cpu.programCounter);
-    numberOfCycles = executeOpcode(opcode);
-  } else {
-    // if we were halted, and interrupts were disabled but interrupts are pending, stop waiting
-    if(Cpu.isHalted && !areInterruptsEnabled() && areInterruptsPending()) {
-      Cpu.isHalted = false;
-      Cpu.isStopped = false;
-
-      // Need to run the next opcode twice, it's a bug menitoned in
-      // The reddit comment mentioned above
-
-      // CTRL+F "low-power" on gameboy cpu manual
-      // http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf
-      // E.g
-      // 0x76 - halt
-      // FA 34 12 - ld a,(1234)
-      // Becomes
-      // FA FA 34 ld a,(34FA)
-      // 12 ld (de),a
-      opcode = eightBitLoadFromGBMemory(Cpu.programCounter);
-      numberOfCycles = executeOpcode(opcode);
-      Cpu.programCounter -= 1;
-    }
-  }
-
-  // blarggFixes, don't allow register F to have the bottom nibble
-  Cpu.registerF = Cpu.registerF & 0xF0;
-
-  // Check if there was an error decoding the opcode
-  if(numberOfCycles <= 0) {
-    return numberOfCycles;
-  }
-
-  // Check if we did a DMA TRansfer, if we did add the cycles
-  if (Memory.DMACycles > 0) {
-    numberOfCycles += Memory.DMACycles;
-    Memory.DMACycles = 0;
-  }
-
-  // Interrupt Handling requires 20 cycles
-  // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
-  numberOfCycles += checkInterrupts();
-
-  if(!Cpu.isStopped) {
-    if(!Config.graphicsBatchProcessing) {
-      updateGraphics(numberOfCycles);
-    }
-
-    if(!Config.audioBatchProcessing) {
-      updateSound(numberOfCycles);
-    }
-  }
-
-  // Check other Gameboy components
-  if (!Config.timersBatchProcessing) {
-    updateTimers(numberOfCycles);
-  }
-
-  return numberOfCycles;
-}
-
 // Take in any opcode, and decode it, and return the number of cycles
 // Program counter can be gotten from getProgramCounter();
 // Setting return value to i32 instead of u16, as we want to return a negative number on error
 // https://rednex.github.io/rgbds/gbz80.7.html
 // http://pastraiser.com/cpu/gameboy/gameboyopcodes.html
-function executeOpcode(opcode: u8): i32 {
+export function executeOpcode(opcode: i32): i32 {
 
   // Initialize our number of cycles
   // Return -1 if no opcode was found, representing an error
@@ -217,7 +92,7 @@ function executeOpcode(opcode: u8): i32 {
 
   // Split our opcode into a high nibble to speed up performance
   // Running 255 if statements is slow, even in wasm haha!
-  let opcodeHighNibble = (opcode & 0xF0);
+  let opcodeHighNibble: i32 = (opcode & 0xF0);
   opcodeHighNibble = opcodeHighNibble >> 4;
 
   // NOTE: @binji rule of thumb: it takes 4 cpu cycles to read one byte
@@ -265,20 +140,20 @@ function executeOpcode(opcode: u8): i32 {
 
 // Functions to access the next operands of a opcode, reffering to them as "dataBytes"
 function getDataByteOne(): u8 {
-    return eightBitLoadFromGBMemorySkipTraps(Cpu.programCounter);
+    return <u8>eightBitLoadFromGBMemory(Cpu.programCounter);
 }
 
 function getDataByteTwo(): u8 {
-  return eightBitLoadFromGBMemorySkipTraps(Cpu.programCounter + 1);
+  return <u8>eightBitLoadFromGBMemory(Cpu.programCounter + 1);
 }
 // Get our concatenated databyte one and getDataByteTwo()
 // Find and replace with : getConcatenatedDataByte()
 function getConcatenatedDataByte(): u16 {
-  return concatenateBytes(getDataByteTwo(), getDataByteOne());
+  return <u16>concatenateBytes(getDataByteTwo(), getDataByteOne());
 }
 
 
-function handleOpcode0x(opcode: u8): i8 {
+function handleOpcode0x(opcode: i32): i32 {
   switch(opcode) {
     case 0x00:
       // NOP
@@ -289,24 +164,23 @@ function handleOpcode0x(opcode: u8): i8 {
       // LD BC,d16
       // 3  12
 
-      Cpu.registerB = splitHighByte(getConcatenatedDataByte());
-      Cpu.registerC = splitLowByte(getConcatenatedDataByte());
+      Cpu.registerB = <u8>splitHighByte(getConcatenatedDataByte());
+      Cpu.registerC = <u8>splitLowByte(getConcatenatedDataByte());
       Cpu.programCounter += 2;
       return 12;
     case 0x02:
       // LD (BC),A
       // 1  8
       // () means load into address pointed by BC
-      let registerBC2: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC)
-      eightBitStoreIntoGBMemory(registerBC2, Cpu.registerA);
+      eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerB, Cpu.registerC), Cpu.registerA);
       return 8;
     case 0x03:
       // INC BC
       // 1  8
-      let registerBC3: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC);
+      let registerBC3: u16 = <u16>concatenateBytes(Cpu.registerB, Cpu.registerC);
       registerBC3++;
-      Cpu.registerB = splitHighByte((<u16>registerBC3));
-      Cpu.registerC = splitLowByte((<u16>registerBC3));
+      Cpu.registerB = <u8>splitHighByte(registerBC3);
+      Cpu.registerC = <u8>splitLowByte(registerBC3);
       return 8;
     case 0x04:
       // INC B
@@ -360,34 +234,33 @@ function handleOpcode0x(opcode: u8): i8 {
       // LD (a16),SP
       // 3  20
       // Load the stack pointer into the 16 bit address represented by the two data bytes
-      sixteenBitStoreIntoGBMemory(getConcatenatedDataByte(), Cpu.stackPointer);
+      sixteenBitStoreIntoGBMemoryWithTraps(getConcatenatedDataByte(), Cpu.stackPointer);
       Cpu.programCounter += 2;
       return 20;
     case 0x09:
       // ADD HL,BC
       // 1 8
       // - 0 H C
-      let registerHL: u16 = concatenateBytes(Cpu.registerH, Cpu.registerL);
-      let registerBC9: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC);
+      let registerHL: u16 = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
+      let registerBC9: u16 = <u16>concatenateBytes(Cpu.registerB, Cpu.registerC);
       checkAndSetSixteenBitFlagsAddOverflow(<u16>registerHL, <u16>registerBC9, false);
       let result: u16 = <u16>(registerHL + registerBC9);
-      Cpu.registerH = splitHighByte(<u16>result);
-      Cpu.registerL = splitLowByte(<u16>result);
+      Cpu.registerH = <u8>splitHighByte(<u16>result);
+      Cpu.registerL = <u8>splitLowByte(<u16>result);
       setSubtractFlag(0);
       return 8;
     case 0x0A:
       // LD A,(BC)
       // 1 8
-      let registerBCA: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC)
-      Cpu.registerA = eightBitLoadFromGBMemory(registerBCA);
+      Cpu.registerA = <u8>eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerB, Cpu.registerC));
       return 8;
     case 0x0B:
       // DEC BC
       // 1  8
-      let registerBCB: u16 = concatenateBytes(Cpu.registerB, Cpu.registerC);
+      let registerBCB: u16 = <u16>concatenateBytes(Cpu.registerB, Cpu.registerC);
       registerBCB -= 1;
-      Cpu.registerB = splitHighByte(registerBCB);
-      Cpu.registerC = splitLowByte(registerBCB);
+      Cpu.registerB = <u8>splitHighByte(registerBCB);
+      Cpu.registerC = <u8>splitLowByte(registerBCB);
       return 8;
     case 0x0C:
       // INC C
@@ -441,7 +314,7 @@ function handleOpcode0x(opcode: u8): i8 {
   return -1;
 }
 
-function handleOpcode1x(opcode: u8): i8 {
+function handleOpcode1x(opcode: i32): i32 {
 
   switch (opcode) {
     case 0x10:
@@ -455,7 +328,7 @@ function handleOpcode1x(opcode: u8): i8 {
       // If we are in gameboy color mode, set the new speed
       if (Cpu.GBCEnabled) {
 
-        let speedSwitch: u8 = eightBitLoadFromGBMemory(Cpu.memoryLocationSpeedSwitch);
+        let speedSwitch: i32 = eightBitLoadFromGBMemoryWithTraps(Cpu.memoryLocationSpeedSwitch);
         if(checkBitOnByte(0, speedSwitch)) {
 
           // Reset the prepare bit
@@ -471,7 +344,7 @@ function handleOpcode1x(opcode: u8): i8 {
           }
 
           // Store the final speed switch
-          eightBitStoreIntoGBMemory(Cpu.memoryLocationSpeedSwitch, speedSwitch);
+          eightBitStoreIntoGBMemoryWithTraps(Cpu.memoryLocationSpeedSwitch, speedSwitch);
 
           // Cycle accurate gameboy docs says this takes 76 clocks
           return 76;
@@ -485,23 +358,22 @@ function handleOpcode1x(opcode: u8): i8 {
     case 0x11:
       // LD DE,d16
       // 3  12
-      Cpu.registerD = splitHighByte(getConcatenatedDataByte());
-      Cpu.registerE = splitLowByte(getConcatenatedDataByte());
+      Cpu.registerD = <u8>splitHighByte(getConcatenatedDataByte());
+      Cpu.registerE = <u8>splitLowByte(getConcatenatedDataByte());
       Cpu.programCounter += 2;
       return 12;
     case 0x12:
       // LD (DE),A
       // 1 8
-      let registerDE2: u16 = concatenateBytes(Cpu.registerD, Cpu.registerE);
-      eightBitStoreIntoGBMemory(registerDE2, Cpu.registerA);
+      eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerD, Cpu.registerE), Cpu.registerA);
       return 8;
     case 0x13:
       // INC DE
       // 1 8
-      let registerDE3 = concatenateBytes(Cpu.registerD, Cpu.registerE);
+      let registerDE3 = <u16>concatenateBytes(Cpu.registerD, Cpu.registerE);
       registerDE3 += 1;
-      Cpu.registerD = splitHighByte(registerDE3);
-      Cpu.registerE = splitLowByte(registerDE3);
+      Cpu.registerD = <u8>splitHighByte(registerDE3);
+      Cpu.registerE = <u8>splitLowByte(registerDE3);
       return 8;
     case 0x14:
       // INC D
@@ -570,27 +442,27 @@ function handleOpcode1x(opcode: u8): i8 {
       // ADD HL,DE
       // 1  8
       // - 0 H C
-      let registerHL: u16 = concatenateBytes(Cpu.registerH, Cpu.registerL);
-      let registerDE9: u16 = concatenateBytes(Cpu.registerD, Cpu.registerE);
+      let registerHL: u16 = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
+      let registerDE9: u16 = <u16>concatenateBytes(Cpu.registerD, Cpu.registerE);
       checkAndSetSixteenBitFlagsAddOverflow(<u16>registerHL, <u16>registerDE9, false);
       let result: u16 = <u16>(registerHL + registerDE9);
-      Cpu.registerH = splitHighByte(<u16>result);
-      Cpu.registerL = splitLowByte(<u16>result);
+      Cpu.registerH = <u8>splitHighByte(<u16>result);
+      Cpu.registerL = <u8>splitLowByte(<u16>result);
       setSubtractFlag(0);
       return 8;
     case 0x1A:
       // LD A,(DE)
       // 1 8
-      let registerDEA: u16 = concatenateBytes(Cpu.registerD, Cpu.registerE);
-      Cpu.registerA = eightBitLoadFromGBMemory(registerDEA);
+      let registerDEA: u16 = <u16>concatenateBytes(Cpu.registerD, Cpu.registerE);
+      Cpu.registerA = <u8>eightBitLoadFromGBMemoryWithTraps(registerDEA);
       return 8;
     case 0x1B:
       // DEC DE
       // 1 8
-      let registerDEB: u16 = concatenateBytes(Cpu.registerD, Cpu.registerE);
+      let registerDEB: u16 = <u16>concatenateBytes(Cpu.registerD, Cpu.registerE);
       registerDEB -= 1;
-      Cpu.registerD = splitHighByte(registerDEB);
-      Cpu.registerE = splitLowByte(registerDEB);
+      Cpu.registerD = <u8>splitHighByte(registerDEB);
+      Cpu.registerE = <u8>splitLowByte(registerDEB);
       return 8;
     case 0x1C:
       // INC E
@@ -651,7 +523,7 @@ function handleOpcode1x(opcode: u8): i8 {
   return -1;
 }
 
-function handleOpcode2x(opcode: u8): i8 {
+function handleOpcode2x(opcode: i32): i32 {
 
   switch(opcode) {
     case 0x20:
@@ -673,28 +545,28 @@ function handleOpcode2x(opcode: u8): i8 {
       // LD HL,d16
       // 3  12
       let sixteenBitDataByte = getConcatenatedDataByte();
-      Cpu.registerH = splitHighByte(sixteenBitDataByte);
-      Cpu.registerL = splitLowByte(sixteenBitDataByte);
+      Cpu.registerH = <u8>splitHighByte(sixteenBitDataByte);
+      Cpu.registerL = <u8>splitLowByte(sixteenBitDataByte);
       Cpu.programCounter += 2;
       return 12;
     case 0x22:
 
       // LD (HL+),A
       // 1 8
-      let registerHL2: u16 = concatenateBytes(Cpu.registerH, Cpu.registerL);
-      eightBitStoreIntoGBMemory(registerHL2, Cpu.registerA);
+      let registerHL2: u16 = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
+      eightBitStoreIntoGBMemoryWithTraps(registerHL2, Cpu.registerA);
       registerHL2 += 1;
-      Cpu.registerH = splitHighByte(registerHL2);
-      Cpu.registerL = splitLowByte(registerHL2);
+      Cpu.registerH = <u8>splitHighByte(registerHL2);
+      Cpu.registerL = <u8>splitLowByte(registerHL2);
       return 8;
     case 0x23:
 
       // INC HL
       // 1  8
-      let registerHL3 = concatenateBytes(Cpu.registerH, Cpu.registerL);
+      let registerHL3 = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
       registerHL3 += 1;
-      Cpu.registerH = splitHighByte(registerHL3);
-      Cpu.registerL = splitLowByte(registerHL3);
+      Cpu.registerH = <u8>splitHighByte(registerHL3);
+      Cpu.registerL = <u8>splitLowByte(registerHL3);
       return 8;
     case 0x24:
 
@@ -790,31 +662,31 @@ function handleOpcode2x(opcode: u8): i8 {
       // ADD HL,HL
       // 1  8
       // - 0 H C
-      let registerHL9: u16 = concatenateBytes(Cpu.registerH, Cpu.registerL);
+      let registerHL9: u16 = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
       checkAndSetSixteenBitFlagsAddOverflow(registerHL9, registerHL9, false);
       registerHL9 = registerHL9 * 2;
-      Cpu.registerH = splitHighByte(registerHL9);
-      Cpu.registerL = splitLowByte(registerHL9);
+      Cpu.registerH = <u8>splitHighByte(registerHL9);
+      Cpu.registerL = <u8>splitLowByte(registerHL9);
       setSubtractFlag(0);
       return 8;
     case 0x2A:
 
       // LD A,(HL+)
       // 1  8
-      let registerHLA: u16 = concatenateBytes(Cpu.registerH, Cpu.registerL);
-      Cpu.registerA = eightBitLoadFromGBMemory(registerHLA);
+      let registerHLA: u16 = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
+      Cpu.registerA = <u8>eightBitLoadFromGBMemoryWithTraps(registerHLA);
       registerHLA += 1;
-      Cpu.registerH = splitHighByte(registerHLA);
-      Cpu.registerL = splitLowByte(registerHLA);
+      Cpu.registerH = <u8>splitHighByte(registerHLA);
+      Cpu.registerL = <u8>splitLowByte(registerHLA);
       return 8;
     case 0x2B:
 
       // DEC HL
       // 1 8
-      let registerHLB = concatenateBytes(Cpu.registerH, Cpu.registerL);
+      let registerHLB = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
       registerHLB -= 1;
-      Cpu.registerH = splitHighByte(registerHLB);
-      Cpu.registerL = splitLowByte(registerHLB);
+      Cpu.registerH = <u8>splitHighByte(registerHLB);
+      Cpu.registerL = <u8>splitLowByte(registerHLB);
       return 8;
     case 0x2C:
 
@@ -863,7 +735,7 @@ function handleOpcode2x(opcode: u8): i8 {
   return -1;
 }
 
-function handleOpcode3x(opcode: u8): i8 {
+function handleOpcode3x(opcode: i32): i32 {
   switch (opcode) {
     case 0x30:
 
@@ -886,11 +758,11 @@ function handleOpcode3x(opcode: u8): i8 {
     case 0x32:
       // LD (HL-),A
       // 1 8
-      let registerHL2: u16 = concatenateBytes(Cpu.registerH, Cpu.registerL);
-      eightBitStoreIntoGBMemory(registerHL2, Cpu.registerA);
+      let registerHL2: u16 = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
+      eightBitStoreIntoGBMemoryWithTraps(registerHL2, Cpu.registerA);
       registerHL2 -= 1;
-      Cpu.registerH = splitHighByte(registerHL2);
-      Cpu.registerL = splitLowByte(registerHL2);
+      Cpu.registerH = <u8>splitHighByte(registerHL2);
+      Cpu.registerL = <u8>splitLowByte(registerHL2);
       return 8;
     case 0x33:
       // INC SP
@@ -902,8 +774,8 @@ function handleOpcode3x(opcode: u8): i8 {
       // INC (HL)
       // 1  12
       // Z 0 H -
-      let registerHL4: u16 = concatenateBytes(Cpu.registerH, Cpu.registerL);
-      let valueAtHL4: u8 = <u8>eightBitLoadFromGBMemory(registerHL4);
+      let registerHL4: u16 = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
+      let valueAtHL4: u8 = <u8>eightBitLoadFromGBMemoryWithTraps(registerHL4);
       // Creating a varible for this to fix assemblyscript overflow bug
       // Requires explicit casting
       // https://github.com/AssemblyScript/assemblyscript/issues/26
@@ -917,15 +789,15 @@ function handleOpcode3x(opcode: u8): i8 {
         setZeroFlag(0);
       }
       setSubtractFlag(0);
-      eightBitStoreIntoGBMemory(registerHL4, <u8>valueAtHL4);
+      eightBitStoreIntoGBMemoryWithTraps(registerHL4, <u8>valueAtHL4);
       return 12;
     case 0x35:
 
       // DEC (HL)
       // 1  12
       // Z 1 H -
-      let registerHL5: u16 = concatenateBytes(Cpu.registerH, Cpu.registerL);
-      let valueAtHL5: u8 = eightBitLoadFromGBMemory(registerHL5);
+      let registerHL5: u16 = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
+      let valueAtHL5: u8 = <u8>eightBitLoadFromGBMemoryWithTraps(registerHL5);
       // NOTE: This opcode may not overflow correctly,
       // Please see previous opcode
       checkAndSetEightBitHalfCarryFlag(<u8>valueAtHL5, -1);
@@ -936,12 +808,12 @@ function handleOpcode3x(opcode: u8): i8 {
         setZeroFlag(0);
       }
       setSubtractFlag(1);
-      eightBitStoreIntoGBMemory(registerHL5, <u8>valueAtHL5);
+      eightBitStoreIntoGBMemoryWithTraps(registerHL5, <u8>valueAtHL5);
       return 12;
     case 0x36:
       // LD (HL),d8
       // 2  12
-      eightBitStoreIntoGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL), getDataByteOne());
+      eightBitStoreIntoGBMemoryWithTraps(<u16>concatenateBytes(Cpu.registerH, Cpu.registerL), getDataByteOne());
       Cpu.programCounter += 1;
       return 12;
     case 0x37:
@@ -970,22 +842,22 @@ function handleOpcode3x(opcode: u8): i8 {
       // ADD HL,SP
       // 1 8
       // - 0 H C
-      let registerHL9: u16 = concatenateBytes(Cpu.registerH, Cpu.registerL);
+      let registerHL9: u16 = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
       checkAndSetSixteenBitFlagsAddOverflow(<u16>registerHL9, Cpu.stackPointer, false);
       let result: u16 = <u16>(registerHL9 + Cpu.stackPointer);
-      Cpu.registerH = splitHighByte(<u16>result);
-      Cpu.registerL = splitLowByte(<u16>result);
+      Cpu.registerH = <u8>splitHighByte(<u16>result);
+      Cpu.registerL = <u8>splitLowByte(<u16>result);
       setSubtractFlag(0);
       return 8;
     case 0x3A:
 
       // LD A,(HL-)
       // 1 8
-      let registerHLA: u16 = concatenateBytes(Cpu.registerH, Cpu.registerL);
-      Cpu.registerA = eightBitLoadFromGBMemory(registerHLA);
+      let registerHLA: u16 = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
+      Cpu.registerA = <u8>eightBitLoadFromGBMemoryWithTraps(registerHLA);
       registerHLA -= 1;
-      Cpu.registerH = splitHighByte(registerHLA);
-      Cpu.registerL = splitLowByte(registerHLA);
+      Cpu.registerH = <u8>splitHighByte(registerHLA);
+      Cpu.registerL = <u8>splitLowByte(registerHLA);
       return 8;
     case 0x3B:
       // DEC SP
@@ -1044,7 +916,7 @@ function handleOpcode3x(opcode: u8): i8 {
   return -1;
 }
 
-function handleOpcode4x(opcode: u8): i8 {
+function handleOpcode4x(opcode: i32): i32 {
   switch (opcode) {
     case 0x40:
       // LD B,B
@@ -1085,7 +957,7 @@ function handleOpcode4x(opcode: u8): i8 {
 
       // LD B,(HL)
       // 1 8
-      Cpu.registerB = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
+      Cpu.registerB = <u8>eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
       return 8;
     case 0x47:
 
@@ -1133,7 +1005,7 @@ function handleOpcode4x(opcode: u8): i8 {
 
       // LD C,(HL)
       // 1 8
-      Cpu.registerC = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
+      Cpu.registerC = <u8>eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
       return 8;
     case 0x4F:
 
@@ -1145,7 +1017,7 @@ function handleOpcode4x(opcode: u8): i8 {
   return -1;
 }
 
-function handleOpcode5x(opcode: u8): i8 {
+function handleOpcode5x(opcode: i32): i32 {
   switch (opcode) {
     case 0x50:
 
@@ -1187,7 +1059,7 @@ function handleOpcode5x(opcode: u8): i8 {
 
       // LD D,(HL)
       // 1 8
-      Cpu.registerD = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
+      Cpu.registerD = <u8>eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
       return 8;
     case 0x57:
 
@@ -1235,7 +1107,7 @@ function handleOpcode5x(opcode: u8): i8 {
 
       // LD E,(HL)
       // 1 4
-      Cpu.registerE = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
+      Cpu.registerE = <u8>eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
       return 4;
     case 0x5F:
 
@@ -1247,7 +1119,7 @@ function handleOpcode5x(opcode: u8): i8 {
   return -1;
 }
 
-function handleOpcode6x(opcode: u8): i8 {
+function handleOpcode6x(opcode: i32): i32 {
   switch (opcode) {
     case 0x60:
 
@@ -1290,7 +1162,7 @@ function handleOpcode6x(opcode: u8): i8 {
 
       // LD H,(HL)
       // 1 8
-      Cpu.registerH = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
+      Cpu.registerH = <u8>eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
       return 8;
     case 0x67:
 
@@ -1338,7 +1210,7 @@ function handleOpcode6x(opcode: u8): i8 {
 
       // LD L,(HL)
       // 1 8
-      Cpu.registerL = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
+      Cpu.registerL = <u8>eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
       return 8;
     case 0x6F:
 
@@ -1350,43 +1222,43 @@ function handleOpcode6x(opcode: u8): i8 {
   return -1;
 }
 
-function handleOpcode7x(opcode: u8): i8 {
+function handleOpcode7x(opcode: i32): i32 {
   switch (opcode) {
     case 0x70:
 
       // LD (HL),B
       // 1 8
-      eightBitStoreIntoGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerB);
+      eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerB);
       return 8;
     case 0x71:
 
       // LD (HL),C
       // 1 8
-      eightBitStoreIntoGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerC);
+      eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerC);
       return 8;
     case 0x72:
 
       // LD (HL),D
       // 1 8
-      eightBitStoreIntoGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerD);
+      eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerD);
       return 8;
     case 0x73:
 
       // LD (HL),E
       // 1 8
-      eightBitStoreIntoGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerE);
+      eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerE);
       return 8;
     case 0x74:
 
       // LD (HL),H
       // 1 8
-      eightBitStoreIntoGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerH);
+      eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerH);
       return 8;
     case 0x75:
 
       // LD (HL),L
       // 1 8
-      eightBitStoreIntoGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerL);
+      eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerL);
       return 8;
     case 0x76:
 
@@ -1406,7 +1278,7 @@ function handleOpcode7x(opcode: u8): i8 {
 
       // LD (HL),A
       // 1 8
-      eightBitStoreIntoGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerA);
+      eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerA);
       return 8;
     case 0x78:
 
@@ -1449,7 +1321,7 @@ function handleOpcode7x(opcode: u8): i8 {
       // LD A,(HL)
       // 1 8
       // NOTE: Thanks to @binji for catching that this should be 8 cycles, not 4
-      Cpu.registerA = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
+      Cpu.registerA = <u8>eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
       return 8;
     case 0x7F:
 
@@ -1461,7 +1333,7 @@ function handleOpcode7x(opcode: u8): i8 {
   return -1;
 }
 
-function handleOpcode8x(opcode: u8): i8 {
+function handleOpcode8x(opcode: i32): i32 {
   switch (opcode) {
     case 0x80:
       // ADD A,B
@@ -1503,7 +1375,7 @@ function handleOpcode8x(opcode: u8): i8 {
       // ADD A,(HL)
       // 1 8
       // Z 0 H C
-      let valueAtHL6: u8 = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
+      let valueAtHL6: u8 = <u8>eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
       addARegister(<u8>valueAtHL6);
       return 8;
     case 0x87:
@@ -1552,7 +1424,7 @@ function handleOpcode8x(opcode: u8): i8 {
       // ADC A,(HL)
       // 1 8
       // Z 0 H C
-      let valueAtHLE: u8 = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
+      let valueAtHLE: u8 = <u8>eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
       addAThroughCarryRegister(<u8>valueAtHLE);
       return 8;
     case 0x8F:
@@ -1565,7 +1437,7 @@ function handleOpcode8x(opcode: u8): i8 {
   return -1;
 }
 
-function handleOpcode9x(opcode: u8): i8 {
+function handleOpcode9x(opcode: i32): i32 {
   switch (opcode) {
     case 0x90:
 
@@ -1614,7 +1486,7 @@ function handleOpcode9x(opcode: u8): i8 {
       // SUB (HL)
       // 1  8
       // Z 1 H C
-      let valueAtHL6: u8 = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
+      let valueAtHL6: u8 = <u8>eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
       subARegister(<u8>valueAtHL6);
       return 8;
     case 0x97:
@@ -1671,7 +1543,7 @@ function handleOpcode9x(opcode: u8): i8 {
       // SBC A,(HL)
       // 1  8
       // Z 1 H C
-      let valueAtHLE: u8 = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
+      let valueAtHLE: u8 = <u8>eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
       subAThroughCarryRegister(<u8>valueAtHLE);
       return 8;
     case 0x9F:
@@ -1685,7 +1557,7 @@ function handleOpcode9x(opcode: u8): i8 {
   return -1;
 }
 
-function handleOpcodeAx(opcode: u8): i8 {
+function handleOpcodeAx(opcode: i32): i32 {
   switch (opcode) {
     case 0xA0:
 
@@ -1734,7 +1606,7 @@ function handleOpcodeAx(opcode: u8): i8 {
       // AND (HL)
       // 1  8
       // Z 0 1 0
-      let valueAtHL6: u8 = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
+      let valueAtHL6: u8 = <u8>eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
       andARegister(<u8>valueAtHL6);
       return 8;
     case 0xA7:
@@ -1792,7 +1664,7 @@ function handleOpcodeAx(opcode: u8): i8 {
       // XOR (HL)
       // 1  8
       // Z 0 0 0
-      let valueAtHLE: u8 = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
+      let valueAtHLE: u8 = <u8>eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
       xorARegister(<u8>valueAtHLE);
       return 8;
     case 0xAF:
@@ -1806,7 +1678,7 @@ function handleOpcodeAx(opcode: u8): i8 {
   return -1;
 }
 
-function handleOpcodeBx(opcode: u8): i8 {
+function handleOpcodeBx(opcode: i32): i32 {
   switch (opcode) {
     case 0xB0:
 
@@ -1855,7 +1727,7 @@ function handleOpcodeBx(opcode: u8): i8 {
       // OR (HL)
       // 1  8
       // Z 0 0 0
-      let valueAtHL6: u8 = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
+      let valueAtHL6: u8 = <u8>eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
       orARegister(<u8>valueAtHL6);
       return 8;
     case 0xB7:
@@ -1912,7 +1784,7 @@ function handleOpcodeBx(opcode: u8): i8 {
       // CP (HL)
       // 1  8
       // Z 1 H C
-      let valueAtHLE: u8 = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
+      let valueAtHLE: u8 = <u8>eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
       cpARegister(<u8>valueAtHLE);
       return 8;
     case 0xBF:
@@ -1926,14 +1798,14 @@ function handleOpcodeBx(opcode: u8): i8 {
   return -1;
 }
 
-function handleOpcodeCx(opcode: u8): i8 {
+function handleOpcodeCx(opcode: i32): i32 {
   switch (opcode) {
     case 0xC0:
 
       // RET NZ
       // 1  20/8
       if (getZeroFlag() === 0) {
-        Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
+        Cpu.programCounter = <u16>sixteenBitLoadFromGBMemory(Cpu.stackPointer);
         Cpu.stackPointer += 2;
         return 20;
       } else {
@@ -1943,11 +1815,10 @@ function handleOpcodeCx(opcode: u8): i8 {
 
       // POP BC
       // 1  12
-      let registerBC1 = concatenateBytes(Cpu.registerB, Cpu.registerC);
-      registerBC1 = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
+      let registerBC1: i32 = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
       Cpu.stackPointer += 2;
-      Cpu.registerB = splitHighByte(registerBC1);
-      Cpu.registerC = splitLowByte(registerBC1);
+      Cpu.registerB = <u8>splitHighByte(registerBC1);
+      Cpu.registerC = <u8>splitLowByte(registerBC1);
       return 12;
     case 0xC2:
 
@@ -1972,7 +1843,7 @@ function handleOpcodeCx(opcode: u8): i8 {
       // 3  24/12
       if (getZeroFlag() === 0) {
         Cpu.stackPointer -= 2;
-        sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
+        sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter + 2);
         Cpu.programCounter = getConcatenatedDataByte();
         return 24;
       } else {
@@ -1983,9 +1854,8 @@ function handleOpcodeCx(opcode: u8): i8 {
 
       // PUSH BC
       // 1  16
-      let registerBC5 = concatenateBytes(Cpu.registerB, Cpu.registerC);
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, registerBC5);
+      sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, concatenateBytes(Cpu.registerB, Cpu.registerC));
       return 16;
     case 0xC6:
 
@@ -2000,7 +1870,7 @@ function handleOpcodeCx(opcode: u8): i8 {
       // RST 00H
       // 1 16
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
+      sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter);
       Cpu.programCounter = 0x00;
       return 16;
     case 0xC8:
@@ -2008,7 +1878,7 @@ function handleOpcodeCx(opcode: u8): i8 {
       // RET Z
       // 1  20/8
       if (getZeroFlag() === 1) {
-        Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
+        Cpu.programCounter = <u16>sixteenBitLoadFromGBMemory(Cpu.stackPointer);
         Cpu.stackPointer += 2;
         return 20;
       } else {
@@ -2018,7 +1888,7 @@ function handleOpcodeCx(opcode: u8): i8 {
 
       // RET
       // 1 16
-      Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
+      Cpu.programCounter = <u16>sixteenBitLoadFromGBMemory(Cpu.stackPointer);
       Cpu.stackPointer += 2;
       return 16;
     case 0xCA:
@@ -2046,7 +1916,7 @@ function handleOpcodeCx(opcode: u8): i8 {
       // 3  24/12
       if (getZeroFlag() === 1) {
         Cpu.stackPointer -= 2;
-        sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
+        sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter + 2);
         Cpu.programCounter = getConcatenatedDataByte();
         return 24;
       } else {
@@ -2058,7 +1928,7 @@ function handleOpcodeCx(opcode: u8): i8 {
       // CALL a16
       // 3  24
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
+      sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter + 2);
       Cpu.programCounter = getConcatenatedDataByte();
       return 24;
     case 0xCE:
@@ -2074,21 +1944,21 @@ function handleOpcodeCx(opcode: u8): i8 {
       // RST 08H
       // 1 16
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
+      sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter);
       Cpu.programCounter = 0x08;
       return 16;
   }
   return -1;
 }
 
-function handleOpcodeDx(opcode: u8): i8 {
+function handleOpcodeDx(opcode: i32): i32 {
   switch (opcode) {
     case 0xD0:
 
       // RET NC
       // 1  20/8
       if (getCarryFlag() === 0) {
-        Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
+        Cpu.programCounter = <u16>sixteenBitLoadFromGBMemory(Cpu.stackPointer);
         Cpu.stackPointer += 2;
         return 20;
       } else {
@@ -2098,11 +1968,10 @@ function handleOpcodeDx(opcode: u8): i8 {
 
       // POP DE
       // 1  12
-      let registerDE1 = concatenateBytes(Cpu.registerD, Cpu.registerE);
-      registerDE1 = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
+      let registerDE1: i32 = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
       Cpu.stackPointer += 2;
-      Cpu.registerD = splitHighByte(registerDE1);
-      Cpu.registerE = splitLowByte(registerDE1);
+      Cpu.registerD = <u8>splitHighByte(registerDE1);
+      Cpu.registerE = <u8>splitLowByte(registerDE1);
       return 12;
     case 0xD2:
 
@@ -2122,7 +1991,7 @@ function handleOpcodeDx(opcode: u8): i8 {
       // 3  24/12
       if (getCarryFlag() === 0) {
         Cpu.stackPointer -= 2;
-        sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
+        sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter + 2);
         Cpu.programCounter = getConcatenatedDataByte();
         return 24;
       } else {
@@ -2133,9 +2002,8 @@ function handleOpcodeDx(opcode: u8): i8 {
 
       // PUSH DE
       // 1 16
-      let registerDE5 = concatenateBytes(Cpu.registerD, Cpu.registerE);
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, registerDE5);
+      sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, concatenateBytes(Cpu.registerD, Cpu.registerE));
       return 16;
     case 0xD6:
 
@@ -2150,7 +2018,7 @@ function handleOpcodeDx(opcode: u8): i8 {
       // RST 10H
       // 1 16
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
+      sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter);
       Cpu.programCounter = 0x10;
       return 16;
     case 0xD8:
@@ -2158,7 +2026,7 @@ function handleOpcodeDx(opcode: u8): i8 {
       // RET C
       // 1  20/8
       if (getCarryFlag() === 1) {
-        Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
+        Cpu.programCounter = <u16>sixteenBitLoadFromGBMemory(Cpu.stackPointer);
         Cpu.stackPointer += 2;
         return 20;
       } else {
@@ -2168,7 +2036,7 @@ function handleOpcodeDx(opcode: u8): i8 {
 
       // RETI
       // 1  16
-      Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
+      Cpu.programCounter = <u16>sixteenBitLoadFromGBMemory(Cpu.stackPointer);
       // Enable interrupts
       setInterrupts(true);
       Cpu.stackPointer += 2;
@@ -2191,7 +2059,7 @@ function handleOpcodeDx(opcode: u8): i8 {
       // 3  24/12
       if (getCarryFlag() === 1) {
         Cpu.stackPointer -= 2;
-        sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 2);
+        sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter + 2);
         Cpu.programCounter = getConcatenatedDataByte();
         return 24;
       } else {
@@ -2211,14 +2079,14 @@ function handleOpcodeDx(opcode: u8): i8 {
       // RST 18H
       // 1 16
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
+      sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter);
       Cpu.programCounter = 0x18;
       return 16;
   }
   return -1;
 }
 
-function handleOpcodeEx(opcode: u8): i8 {
+function handleOpcodeEx(opcode: i32): i32 {
   switch (opcode) {
     case 0xE0:
 
@@ -2226,19 +2094,18 @@ function handleOpcodeEx(opcode: u8): i8 {
       // 2  12
 
       // Store value in high RAM ($FF00 + a8)
-      let largeDataByteOne: u16 = getDataByteOne();
-      eightBitStoreIntoGBMemory(0xFF00 + largeDataByteOne, Cpu.registerA);
+      let largeDataByteOne: i32 = getDataByteOne();
+      eightBitStoreIntoGBMemoryWithTraps(0xFF00 + largeDataByteOne, Cpu.registerA);
       Cpu.programCounter += 1;
       return 12;
     case 0xE1:
 
       // POP HL
       // 1  12
-      let registerHL1 = concatenateBytes(Cpu.registerH, Cpu.registerL);
-      registerHL1 = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
+      let registerHL1: i32 = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
       Cpu.stackPointer += 2;
-      Cpu.registerH = splitHighByte(registerHL1);
-      Cpu.registerL = splitLowByte(registerHL1);
+      Cpu.registerH = <u8>splitHighByte(registerHL1);
+      Cpu.registerL = <u8>splitLowByte(registerHL1);
       return 12;
     case 0xE2:
 
@@ -2249,16 +2116,15 @@ function handleOpcodeEx(opcode: u8): i8 {
       // Also should change 0xF2
 
       // Store value in high RAM ($FF00 + register c)
-      eightBitStoreIntoGBMemory(0xFF00 + Cpu.registerC, Cpu.registerA);
+      eightBitStoreIntoGBMemoryWithTraps(0xFF00 + <i32>(Cpu.registerC), Cpu.registerA);
       return 8;
     /* No Opcode for: 0xE3, 0xE4 */
     case 0xE5:
 
       // PUSH HL
       // 1 16
-      let registerHL5 = concatenateBytes(Cpu.registerH, Cpu.registerL);
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, registerHL5);
+      sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, concatenateBytes(Cpu.registerH, Cpu.registerL));
       return 16;
     case 0xE6:
 
@@ -2273,7 +2139,7 @@ function handleOpcodeEx(opcode: u8): i8 {
       // RST 20H
       // 1 16
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
+      sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter);
       Cpu.programCounter = 0x20;
       return 16;
     case 0xE8:
@@ -2294,13 +2160,13 @@ function handleOpcodeEx(opcode: u8): i8 {
 
       // JP HL
       // 1 4
-      Cpu.programCounter = concatenateBytes(Cpu.registerH, Cpu.registerL);
+      Cpu.programCounter = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
       return 4;
     case 0xEA:
 
       // LD (a16),A
       // 3 16
-      eightBitStoreIntoGBMemory(getConcatenatedDataByte(), Cpu.registerA);
+      eightBitStoreIntoGBMemoryWithTraps(getConcatenatedDataByte(), Cpu.registerA);
       Cpu.programCounter += 2;
       return 16;
     /* No Opcode for: 0xEB, 0xEC, 0xED */
@@ -2317,21 +2183,21 @@ function handleOpcodeEx(opcode: u8): i8 {
       // RST 28H
       // 1 16
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
+      sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter);
       Cpu.programCounter = 0x28;
       return 16;
   }
   return -1;
 }
 
-function handleOpcodeFx(opcode: u8): i8 {
+function handleOpcodeFx(opcode: i32): i32 {
   switch (opcode) {
     case 0xF0:
 
       // LDH A,(a8)
       // 2 12
-      let largeDataByteOne: u16 = getDataByteOne();
-      Cpu.registerA = eightBitLoadFromGBMemory(0xFF00 + largeDataByteOne);
+      let largeDataByteOne: i32 = getDataByteOne();
+      Cpu.registerA = <u8>eightBitLoadFromGBMemoryWithTraps(0xFF00 + largeDataByteOne);
       Cpu.programCounter += 1;
       return 12;
     case 0xF1:
@@ -2339,17 +2205,16 @@ function handleOpcodeFx(opcode: u8): i8 {
       // POP AF
       // 1 12
       // Z N H C (But No work require, flags are already set)
-      let registerAF1 = concatenateBytes(Cpu.registerA, Cpu.registerF);
-      registerAF1 = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
+      let registerAF1: i32 = <u16>sixteenBitLoadFromGBMemory(Cpu.stackPointer);
       Cpu.stackPointer += 2;
-      Cpu.registerA = splitHighByte(registerAF1);
-      Cpu.registerF = splitLowByte(registerAF1);
+      Cpu.registerA = <u8>splitHighByte(registerAF1);
+      Cpu.registerF = <u8>splitLowByte(registerAF1);
       return 12;
     case 0xF2:
 
       // LD A,(C)
       // 1 8
-      Cpu.registerA = eightBitLoadFromGBMemory(0xFF00 + Cpu.registerC);
+      Cpu.registerA = <u8>eightBitLoadFromGBMemoryWithTraps(0xFF00 + <i32>(Cpu.registerC));
       return 8;
     case 0xF3:
 
@@ -2362,9 +2227,8 @@ function handleOpcodeFx(opcode: u8): i8 {
 
       // PUSH AF
       // 1 16
-      let registerAF5 = concatenateBytes(Cpu.registerA, Cpu.registerF);
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, registerAF5);
+      sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, concatenateBytes(Cpu.registerA, Cpu.registerF));
       return 16;
     case 0xF6:
 
@@ -2379,7 +2243,7 @@ function handleOpcodeFx(opcode: u8): i8 {
       // RST 30H
       // 1 16
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
+      sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter);
       Cpu.programCounter = 0x30;
       return 16;
     case 0xF8:
@@ -2395,21 +2259,21 @@ function handleOpcodeFx(opcode: u8): i8 {
       setSubtractFlag(0);
       checkAndSetSixteenBitFlagsAddOverflow(Cpu.stackPointer, signedDataByteOne, true);
       let registerHL = Cpu.stackPointer + signedDataByteOne;
-      Cpu.registerH = splitHighByte(registerHL);
-      Cpu.registerL = splitLowByte(registerHL);
+      Cpu.registerH = <u8>splitHighByte(registerHL);
+      Cpu.registerL = <u8>splitLowByte(registerHL);
       Cpu.programCounter += 1;
       return 12;
     case 0xF9:
 
       // LD SP,HL
       // 1 8
-      Cpu.stackPointer = concatenateBytes(Cpu.registerH, Cpu.registerL);
+      Cpu.stackPointer = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
       return 8;
     case 0xFA:
 
       // LD A,(a16)
       // 3 16
-      Cpu.registerA = eightBitLoadFromGBMemory(getConcatenatedDataByte());
+      Cpu.registerA = <u8>eightBitLoadFromGBMemoryWithTraps(getConcatenatedDataByte());
       Cpu.programCounter += 2;
       return 16;
     case 0xFB:
@@ -2432,7 +2296,7 @@ function handleOpcodeFx(opcode: u8): i8 {
       // RST 38H
       // 1 16
       Cpu.stackPointer -= 2;
-      sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
+      sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter);
       Cpu.programCounter = 0x38;
       return 16;
   }

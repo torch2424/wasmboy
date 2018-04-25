@@ -18,5 +18,9 @@ export {
 
 export {
   Cpu,
-  initialize
+  initializeCpu
 } from './cpu';
+
+export {
+  executeOpcode
+} from './opcodes';

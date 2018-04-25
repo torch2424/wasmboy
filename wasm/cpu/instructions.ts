@@ -69,11 +69,11 @@ export function addAThroughCarryRegister(register: u8): void {
 
 export function subARegister(register: u8): void {
   // Need to convert the register on one line, and flip the sign on another
-  let negativeRegister: i16 = <i16>register;
+  let negativeRegister: i32 = register;
   negativeRegister = negativeRegister * -1;
 
-  checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeRegister);
-  checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
+  checkAndSetEightBitHalfCarryFlag(Cpu.registerA, negativeRegister);
+  checkAndSetEightBitCarryFlag(Cpu.registerA, negativeRegister);
   Cpu.registerA -= register;
   if (Cpu.registerA === 0) {
     setZeroFlag(1);
@@ -153,11 +153,11 @@ export function cpARegister(register: u8): void {
   // CP B
   // 1  4
   // Z 1 H C
-  let negativeRegister: i16 = <i16>register;
+  let negativeRegister: i32 = register;
   negativeRegister = negativeRegister * -1;
-  checkAndSetEightBitHalfCarryFlag(Cpu.registerA, <i16>negativeRegister);
-  checkAndSetEightBitCarryFlag(Cpu.registerA, <i16>negativeRegister);
-  let tempResult: i16 = <i16>Cpu.registerA + <i16>negativeRegister;
+  checkAndSetEightBitHalfCarryFlag(Cpu.registerA, negativeRegister);
+  checkAndSetEightBitCarryFlag(Cpu.registerA, negativeRegister);
+  let tempResult: i32 = <i32>Cpu.registerA + negativeRegister;
   if (tempResult === 0) {
     setZeroFlag(1);
   } else {
@@ -397,7 +397,7 @@ export function testBitOnRegister(bitPosition: u8, register: u8): u8 {
   // BIT bitPosition ,register 8-bit
   // Z 0 1 -
 
-  let testByte: u8 = (0x01 << bitPosition);
+  let testByte: u8 = 0x01 << bitPosition;
   let result = (register & testByte);
   if(result === 0x00) {
     setZeroFlag(1);
@@ -411,12 +411,12 @@ export function testBitOnRegister(bitPosition: u8, register: u8): u8 {
   return register;
 }
 
-export function setBitOnRegister(bitPosition: u8, bitValue: u8, register: u8): u8 {
+export function setBitOnRegister(bitPosition: u8, bitValue: i32, register: u8): u8 {
 
   // RES 0,B or SET 0,B depending on bit value
 
   if(bitValue > 0) {
-   let setByte: u8 = (0x01 << bitPosition);
+   let setByte: u8 = 0x01 << bitPosition;
    register = register | setByte;
   } else {
    // NOT (byte we want)

@@ -1,8 +1,8 @@
 import {
+  eightBitStoreIntoGBMemoryWithTraps,
   eightBitStoreIntoGBMemory,
-  eightBitStoreIntoGBMemorySkipTraps,
+  eightBitLoadFromGBMemoryWithTraps,
   eightBitLoadFromGBMemory,
-  eightBitLoadFromGBMemorySkipTraps,
   initializeCartridge,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
@@ -10,8 +10,16 @@ import {
 } from '../memory/index';
 
 import {
+  initializeGraphics
+} from '../graphics/index';
+
+import {
   initializeSound
-} from '../sound/index'
+} from '../sound/index';
+
+import {
+  initializeTimers
+} from '../timers/index';
 
 import {
   log,
@@ -116,12 +124,12 @@ export class Cpu {
   }
 }
 
-export function initialize(useGBCMode: i32 = 1, includeBootRom: i32 = 0): void {
+export function initializeCpu(useGBCMode: i32 = 1, includeBootRom: i32 = 0): void {
 
   // First, try to switch to Gameboy Color Mode
   // Get our GBC support from the cartridge header
   // http://gbdev.gg8.se/wiki/articles/The_Cartridge_Header
-  let gbcType: u8 = eightBitLoadFromGBMemorySkipTraps(0x0143);
+  let gbcType: i32 = eightBitLoadFromGBMemory(0x0143);
 
   // Detecting GBC http://bgb.bircd.org/pandocs.htm#cgbregisters
   if (gbcType === 0xC0 ||
@@ -154,47 +162,41 @@ export function initialize(useGBCMode: i32 = 1, includeBootRom: i32 = 0): void {
       Cpu.stackPointer = 0xFFFE;
 
       // LCD / Graphics
-      eightBitStoreIntoGBMemorySkipTraps(0xFF40, 0x91);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF41, 0x81);
-      // 0xFF42 -> 0xFF43 = 0x00
-      eightBitStoreIntoGBMemorySkipTraps(0xFF44, 0x90);
-      // 0xFF45 -> 0xFF46 = 0x00
-      eightBitStoreIntoGBMemorySkipTraps(0xFF47, 0xFC);
-      // 0xFF48 -> 0xFF4B = 0x00
+      // In initializeGraphics()
 
       // Various other registers
-      eightBitStoreIntoGBMemorySkipTraps(0xFF70, 0xF8);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF4F, 0xFE);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF4D, 0x7E);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF00, 0xCF);
+      eightBitStoreIntoGBMemory(0xFF70, 0xF8);
+      eightBitStoreIntoGBMemory(0xFF4F, 0xFE);
+      eightBitStoreIntoGBMemory(0xFF4D, 0x7E);
+      eightBitStoreIntoGBMemory(0xFF00, 0xCF);
       // FF01 = 0x00
-      eightBitStoreIntoGBMemorySkipTraps(0xFF02, 0x7C);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF04, 0x2F);
-      // 0xFF05 -> 0xFF06 = 0x00
-      eightBitStoreIntoGBMemorySkipTraps(0xFF07, 0xF8);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF0F, 0xE1);
+      eightBitStoreIntoGBMemory(0xFF02, 0x7C);
+
+      // Handled by Updatye timers
+
+      eightBitStoreIntoGBMemory(0xFF0F, 0xE1);
       // 0xFFFF = 0x00
 
       // GBC Palettes
-      eightBitStoreIntoGBMemorySkipTraps(0xFF68, 0xC0);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF69, 0xFF);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF6A, 0xC1);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF6B, 0x0D);
+      eightBitStoreIntoGBMemory(0xFF68, 0xC0);
+      eightBitStoreIntoGBMemory(0xFF69, 0xFF);
+      eightBitStoreIntoGBMemory(0xFF6A, 0xC1);
+      eightBitStoreIntoGBMemory(0xFF6B, 0x0D);
 
       // GBC Banks
-      eightBitStoreIntoGBMemorySkipTraps(0xFF4F, 0x00);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF70, 0x01);
+      eightBitStoreIntoGBMemory(0xFF4F, 0x00);
+      eightBitStoreIntoGBMemory(0xFF70, 0x01);
 
       // GBC DMA
-      eightBitStoreIntoGBMemorySkipTraps(0xFF51, 0xFF);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF52, 0xFF);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF53, 0xFF);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF54, 0xFF);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF55, 0xFF);
+      eightBitStoreIntoGBMemory(0xFF51, 0xFF);
+      eightBitStoreIntoGBMemory(0xFF52, 0xFF);
+      eightBitStoreIntoGBMemory(0xFF53, 0xFF);
+      eightBitStoreIntoGBMemory(0xFF54, 0xFF);
+      eightBitStoreIntoGBMemory(0xFF55, 0xFF);
 
       // Undocumented from Pandocs
-      eightBitStoreIntoGBMemorySkipTraps(0xFF6C, 0xFE);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF75, 0x8F);
+      eightBitStoreIntoGBMemory(0xFF6C, 0xFE);
+      eightBitStoreIntoGBMemory(0xFF75, 0x8F);
 
     } else {
       // Cpu Registers
@@ -212,51 +214,49 @@ export function initialize(useGBCMode: i32 = 1, includeBootRom: i32 = 0): void {
       Cpu.stackPointer = 0xFFFE;
 
       // LCD / Graphics
-      eightBitStoreIntoGBMemorySkipTraps(0xFF40, 0x91);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF41, 0x85);
-      // 0xFF42 -> 0xFF45 = 0x00
-      eightBitStoreIntoGBMemorySkipTraps(0xFF46, 0xFF);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF47, 0xFC);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF48, 0xFF);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF49, 0xFF);
-      // 0xFF4A -> 0xFF4B = 0x00
+      // In initializeGraphics
 
       // Various other registers
-      eightBitStoreIntoGBMemorySkipTraps(0xFF70, 0xFF);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF4F, 0xFF);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF4D, 0xFF);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF00, 0xCF);
+      eightBitStoreIntoGBMemory(0xFF70, 0xFF);
+      eightBitStoreIntoGBMemory(0xFF4F, 0xFF);
+      eightBitStoreIntoGBMemory(0xFF4D, 0xFF);
+      eightBitStoreIntoGBMemory(0xFF00, 0xCF);
       // FF01 = 0x00
-      eightBitStoreIntoGBMemorySkipTraps(0xFF02, 0x7E);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF04, 0xAB);
-      // 0xFF05 -> 0xFF06 = 0x00
-      eightBitStoreIntoGBMemorySkipTraps(0xFF07, 0xF8);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF0F, 0xE1);
+      eightBitStoreIntoGBMemory(0xFF02, 0x7E);
+
+      // handled by initializxeTimers
+
+      eightBitStoreIntoGBMemory(0xFF0F, 0xE1);
       // 0xFFFF = 0x00
 
 
       // GBC Palettes
-      eightBitStoreIntoGBMemorySkipTraps(0xFF68, 0xFF);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF69, 0xFF);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF6A, 0xFF);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF6B, 0xFF);
+      eightBitStoreIntoGBMemory(0xFF68, 0xFF);
+      eightBitStoreIntoGBMemory(0xFF69, 0xFF);
+      eightBitStoreIntoGBMemory(0xFF6A, 0xFF);
+      eightBitStoreIntoGBMemory(0xFF6B, 0xFF);
 
       // GBC Banks
-      eightBitStoreIntoGBMemorySkipTraps(0xFF4F, 0x00);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF70, 0x01);
+      eightBitStoreIntoGBMemory(0xFF4F, 0x00);
+      eightBitStoreIntoGBMemory(0xFF70, 0x01);
 
       // GBC DMA
-      eightBitStoreIntoGBMemorySkipTraps(0xFF51, 0xFF);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF52, 0xFF);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF53, 0xFF);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF54, 0xFF);
-      eightBitStoreIntoGBMemorySkipTraps(0xFF55, 0xFF);
+      eightBitStoreIntoGBMemory(0xFF51, 0xFF);
+      eightBitStoreIntoGBMemory(0xFF52, 0xFF);
+      eightBitStoreIntoGBMemory(0xFF53, 0xFF);
+      eightBitStoreIntoGBMemory(0xFF54, 0xFF);
+      eightBitStoreIntoGBMemory(0xFF55, 0xFF);
     }
 
     // Call our memory to initialize our cartridge type
     initializeCartridge();
 
+    // Initialize our graphics registers
+    initializeGraphics();
+
     // Initialize our sound registers
     initializeSound();
+
+    initializeTimers();
   }
 }

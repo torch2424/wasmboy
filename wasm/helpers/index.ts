@@ -5,17 +5,17 @@ import {
 // Grouped registers
 // possible overload these later to performace actions
 // AF, BC, DE, HL
-export function concatenateBytes(highByte: u8, lowByte: u8): u16 {
+export function concatenateBytes(highByte: i32, lowByte: i32): i32 {
   //https://stackoverflow.com/questions/38298412/convert-two-bytes-into-signed-16-bit-integer-in-javascript
-  return (((<u16>highByte & 0xFF) << 8) | (lowByte & 0xFF))
+  return (((highByte & 0xFF) << 8) | (lowByte & 0xFF))
 }
 
-export function splitHighByte(groupedByte: u16): u8 {
-  return <u8>((groupedByte & 0xFF00) >> 8);
+export function splitHighByte(groupedByte: i32): i32 {
+  return ((groupedByte & 0xFF00) >> 8);
 }
 
-export function splitLowByte(groupedByte: u16): u8 {
-  return <u8>groupedByte & 0x00FF;
+export function splitLowByte(groupedByte: i32): i32 {
+  return groupedByte & 0x00FF;
 }
 
 export function rotateByteLeft(value: u8): u8 {
@@ -45,18 +45,18 @@ export function rotateByteRightThroughCarry(value: u8): u8 {
   return (value >> 1) | (getCarryFlag() << 7);
 }
 
-export function setBitOnByte(bitPosition: u8, byte: u8): u8 {
-  return byte | (0x01 << bitPosition);
+export function setBitOnByte(bitPosition: i32, byte: i32): i32 {
+  return (byte | (0x01 << bitPosition));
 }
 
-export function resetBitOnByte(bitPosition: u8, byte: u8): u8 {
-  return byte & ~(0x01 << bitPosition);
+export function resetBitOnByte(bitPosition: i32, byte: i32): i32 {
+  return (byte & ~(0x01 << bitPosition));
 }
 
-export function checkBitOnByte(bitPosition: u8, byte: u8): boolean {
+export function checkBitOnByte(bitPosition: i32, byte: i32): boolean {
   // Perforamnce improvements
   // https://github.com/AssemblyScript/assemblyscript/issues/40
-  return (<u32>byte & (1 << bitPosition)) != 0;
+  return (byte & (1 << bitPosition)) != 0;
 }
 
 namespace env {

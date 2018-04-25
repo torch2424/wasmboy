@@ -19,11 +19,8 @@ import {
     Channel4
 } from './channel4';
 import {
-  setChannelLengthCounter
-} from '../sound/length';
-import {
-  eightBitLoadFromGBMemorySkipTraps,
-  eightBitStoreIntoGBMemorySkipTraps
+  eightBitLoadFromGBMemory,
+  eightBitStoreIntoGBMemory
 } from '../memory/index';
 import {
   checkBitOnByte,
@@ -33,105 +30,126 @@ import {
 } from '../helpers/index';
 
 // Function to check and handle writes to sound registers
-export function handledWriteToSoundRegister(offset: u16, value: u16): boolean {
+export function SoundRegisterWriteTraps(offset: i32, value: i32): boolean {
 
-  // Get our registerNR52
-  let registerNR52: u8 = eightBitLoadFromGBMemorySkipTraps(Sound.memoryLocationNR52);
-
-  if(offset !== Sound.memoryLocationNR52 && !checkBitOnByte(7, registerNR52)) {
+  if(offset !== Sound.memoryLocationNR52 && !Sound.NR52IsSoundEnabled) {
     // Block all writes to any sound register EXCEPT NR52!
     // This is under the assumption that the check for
     // offset >= 0xFF10 && offset <= 0xFF26
     // is done in writeTraps.ts (which it is)
     // NOTE: Except on DMG, length can still be written (whatever that means)
-    return true;
+    return false;
   }
 
   switch(offset) {
-    // Set length counter on channels
+    // Handle NRx0 on Channels
+    case Channel1.memoryLocationNRx0:
+      Channel1.updateNRx0(value);
+      return true;
+    case Channel3.memoryLocationNRx0:
+      Channel3.updateNRx0(value);
+      return true;
+    // Handle NRx1 (Length Counter) on Channels
     case Channel1.memoryLocationNRx1:
-      eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
-      setChannelLengthCounter(Channel1.channelNumber);
+      Channel1.updateNRx1(value);
       return true;
     case Channel2.memoryLocationNRx1:
-      eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
-      setChannelLengthCounter(Channel2.channelNumber);
+      Channel2.updateNRx1(value);
       return true;
     case Channel3.memoryLocationNRx1:
-      eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
-      setChannelLengthCounter(Channel3.channelNumber);
+      Channel3.updateNRx1(value);
       return true;
     case Channel4.memoryLocationNRx1:
-      eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
-      setChannelLengthCounter(Channel4.channelNumber);
+      Channel4.updateNRx1(value);
+      return true;
+    // Handle NRx2 (Envelope / Volume) on Channels
+    case Channel1.memoryLocationNRx2:
+      Channel1.updateNRx2(value);
+      return true;
+    case Channel2.memoryLocationNRx2:
+      Channel2.updateNRx2(value);
+      return true;
+    case Channel3.memoryLocationNRx2:
+      // Check if channel 3's volume code was written too
+      // This is handcy to know for accumulation of samples
+      Channel3.volumeCodeChanged = true;
+      Channel3.updateNRx2(value);
+      return true;
+    case Channel4.memoryLocationNRx2:
+      Channel4.updateNRx2(value);
+      return true;
+    // Handle NRx3 (Frequency / Noise Properties) on Channels
+    case Channel1.memoryLocationNRx3:
+      Channel1.updateNRx3(value);
+      return true;
+    case Channel2.memoryLocationNRx3:
+      Channel2.updateNRx3(value);
+      return true;
+    case Channel3.memoryLocationNRx3:
+      Channel3.updateNRx3(value);
+      return true;
+    case Channel4.memoryLocationNRx3:
+      Channel4.updateNRx3(value);
+      return true;
+    // Check our NRx4 registers to trap our trigger bits
+    case Channel1.memoryLocationNRx4:
+      if (checkBitOnByte(7, value)) {
+        Channel1.updateNRx4(value);
+        Channel1.trigger();
+      }
+      return true;
+    case Channel2.memoryLocationNRx4:
+      if (checkBitOnByte(7, value)) {
+        Channel2.updateNRx4(value);
+        Channel2.trigger();
+      }
+      return true;
+    case Channel3.memoryLocationNRx4:
+      if (checkBitOnByte(7, value)) {
+        Channel3.updateNRx4(value);
+        Channel3.trigger();
+      }
+      return true;
+    case Channel4.memoryLocationNRx4:
+      if (checkBitOnByte(7, value)) {
+        Channel4.updateNRx4(value);
+        Channel4.trigger();
+      }
+      return true;
+    // Tell the sound accumulator if volumes changes
+    case Sound.memoryLocationNR50:
+      Sound.updateNR50(value);
+      SoundAccumulator.mixerVolumeChanged = true;
+      return true;
+    // Tell the sound accumulator if volumes changes
+    case Sound.memoryLocationNR51:
+      Sound.updateNR51(value);
+      SoundAccumulator.mixerEnabledChanged = true;
+      return true;
+    case Sound.memoryLocationNR52:
+      // Reset all registers except NR52
+      Sound.updateNR52(value);
+      if(!checkBitOnByte(7, value)) {
+        for (let i: i32 = 0xFF10; i < 0xFF26; i++) {
+          eightBitStoreIntoGBMemory(i, 0x00);
+        }
+      }
       return true;
   }
 
-  // Check if channel 3's volume code was written too
-  // This is handcy to know for accumulation of samples
-  if (offset === Channel3.memoryLocationNRx2) {
-    Channel3.volumeCodeChanged = true;
-  }
-
-  // Check our NRx4 registers to trap our trigger bits
-  if(offset === Channel1.memoryLocationNRx4 && checkBitOnByte(7, <u8>value)) {
-    // Write the value skipping traps, and then trigger
-    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
-    Channel1.trigger();
-    return true;
-  } else if(offset === Channel2.memoryLocationNRx4 && checkBitOnByte(7, <u8>value)) {
-    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
-    Channel2.trigger();
-    return true;
-  } else if(offset === Channel3.memoryLocationNRx4 && checkBitOnByte(7, <u8>value)) {
-    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
-    Channel3.trigger();
-    return true;
-  } else if(offset === Channel4.memoryLocationNRx4 && checkBitOnByte(7, <u8>value)) {
-    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
-    Channel4.trigger();
-    return true;
-  }
-
-  // Tell the sound accumulator if volumes changes
-  if(offset === Sound.memoryLocationNR50) {
-    SoundAccumulator.mixerVolumeChanged = true;
-  }
-
-  // Tell the sound accumulator if the Mixer Enabled changes
-  if(offset === Sound.memoryLocationNR50) {
-    SoundAccumulator.mixerEnabledChanged = true;
-  }
-
-  // Write 0 to the 7th bit of NR52, resets all sound registers, and stops them from receiving writes
-  if(offset === Sound.memoryLocationNR52) {
-
-    // Reset all registers except NR52
-    if(!checkBitOnByte(7, <u8>value)) {
-      for (let i: u16 = 0xFF10; i < 0xFF26; i++) {
-        eightBitStoreIntoGBMemorySkipTraps(i, 0x00);
-      }
-    }
-
-    // Write our final value to NR52
-    eightBitStoreIntoGBMemorySkipTraps(offset, <u8>value);
-
-    return true;
-  }
-
-  // We did not handle the write, return false
-  return false;
+  // We did not handle the write, Allow the write
+  return true;
 }
 
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
-export function handleReadToSoundRegister(offset: u16): i32  {
+export function SoundRegisterReadTraps(offset: i32): i32  {
 
   // TODO: OR All Registers
 
   // This will fix bugs in orcale of ages :)
   if (offset === Sound.memoryLocationNR52) {
     // Get our registerNR52
-    let registerNR52: u8 = eightBitLoadFromGBMemorySkipTraps(Sound.memoryLocationNR52);
+    let registerNR52: i32 = eightBitLoadFromGBMemory(Sound.memoryLocationNR52);
 
     // Knock off lower 7 bits
     registerNR52 = (registerNR52 & 0x80);
@@ -168,143 +186,4 @@ export function handleReadToSoundRegister(offset: u16): i32  {
   }
 
   return -1;
-}
-
-export function getChannelStartingVolume(channelNumber: i32): u8 {
-  // Simply need to get the top 4 bits of register 2
-  let startingVolume: u8 = getRegister2OfChannel(channelNumber);
-  startingVolume = (startingVolume >> 4);
-  return (startingVolume & 0x0F);
-}
-
-export function isChannelDacEnabled(channelNumber: i32): boolean {
-  // DAC power is controlled by the upper 5 bits of NRx2 (top bit of NR30 for wave channel).
-  // If these bits are not all clear, the DAC is on, otherwise it's off and outputs 0 volts.
-  if(channelNumber !== 3) {
-    let register2 = getRegister2OfChannel(channelNumber);
-    // Clear bottom 3 bits
-    let dacStatus = (register2 & 0xF8);
-    if (dacStatus > 0) {
-      return true;
-    } else {
-      return false;
-    }
-  } else {
-    let register3 = eightBitLoadFromGBMemorySkipTraps(Channel3.memoryLocationNRx0);
-    return checkBitOnByte(7, register3);
-  }
-}
-
-export function isChannelEnabledOnLeftOutput(channelNumber: i32): boolean {
-  let registerNR51: u8 = eightBitLoadFromGBMemorySkipTraps(Sound.memoryLocationNR51);
-  // Left channel in the higher bits
-  let bitNumberOfChannel: u8 = (<u8>channelNumber - 1) + 4;
-  return checkBitOnByte(bitNumberOfChannel, registerNR51);
-}
-
-export function isChannelEnabledOnRightOutput(channelNumber: i32): boolean {
-  let registerNR51: u8 = eightBitLoadFromGBMemorySkipTraps(Sound.memoryLocationNR51);
-  // Left channel in the higher bits
-  let bitNumberOfChannel: u8 = (<u8>channelNumber - 1);
-  return checkBitOnByte(bitNumberOfChannel, registerNR51);
-}
-
-// Function to get 1st register of a channel
-// Contains Duty and Length
-export function getRegister1OfChannel(channelNumber: i32): u8 {
-
-  switch(channelNumber) {
-    case Channel1.channelNumber:
-      return eightBitLoadFromGBMemorySkipTraps(Channel1.memoryLocationNRx1);
-    case Channel2.channelNumber:
-      return eightBitLoadFromGBMemorySkipTraps(Channel2.memoryLocationNRx1);
-    case Channel3.channelNumber:
-      return eightBitLoadFromGBMemorySkipTraps(Channel3.memoryLocationNRx1);
-    default:
-      return eightBitLoadFromGBMemorySkipTraps(Channel4.memoryLocationNRx1);
-  }
-}
-
-// Function to get 2nd register of a channel
-// Contains Envelope Information
-export function getRegister2OfChannel(channelNumber: i32): u8 {
-
-  switch(channelNumber) {
-    case Channel1.channelNumber:
-      return eightBitLoadFromGBMemorySkipTraps(Channel1.memoryLocationNRx2);
-    case Channel2.channelNumber:
-      return eightBitLoadFromGBMemorySkipTraps(Channel2.memoryLocationNRx2);
-    case Channel3.channelNumber:
-      return eightBitLoadFromGBMemorySkipTraps(Channel3.memoryLocationNRx2);
-    default:
-      return eightBitLoadFromGBMemorySkipTraps(Channel4.memoryLocationNRx2);
-  }
-}
-
-// Function to get 3rd register of a channel
-// Contains Fequency LSB (lower 8 bits)
-export function getRegister3OfChannel(channelNumber: i32): u8 {
-
-  switch(channelNumber) {
-    case Channel1.channelNumber:
-      return eightBitLoadFromGBMemorySkipTraps(Channel1.memoryLocationNRx3);
-    case Channel2.channelNumber:
-      return eightBitLoadFromGBMemorySkipTraps(Channel2.memoryLocationNRx3);
-    case Channel3.channelNumber:
-      return eightBitLoadFromGBMemorySkipTraps(Channel3.memoryLocationNRx3);
-    default:
-      return eightBitLoadFromGBMemorySkipTraps(Channel4.memoryLocationNRx3);
-  }
-}
-
-export function setRegister3OfChannel(channelNumber: i32, value: u8): void {
-
-  switch(channelNumber) {
-    case Channel1.channelNumber:
-      eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx3, value);
-      break;
-    case Channel2.channelNumber:
-      eightBitStoreIntoGBMemorySkipTraps(Channel2.memoryLocationNRx3, value);
-      break;
-    case Channel3.channelNumber:
-      eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx3, value);
-      break;
-    default:
-      eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx3, value);
-      break;
-  }
-}
-
-// Function to get 4th register of a channel
-// Contains Fequency MSB (higher 3 bits), and Length Information
-export function getRegister4OfChannel(channelNumber: i32): u8 {
-
-  switch(channelNumber) {
-    case Channel1.channelNumber:
-      return eightBitLoadFromGBMemorySkipTraps(Channel1.memoryLocationNRx4);
-    case Channel2.channelNumber:
-      return eightBitLoadFromGBMemorySkipTraps(Channel2.memoryLocationNRx4);
-    case Channel3.channelNumber:
-      return eightBitLoadFromGBMemorySkipTraps(Channel3.memoryLocationNRx4);
-    default:
-      return eightBitLoadFromGBMemorySkipTraps(Channel4.memoryLocationNRx4);
-  }
-}
-
-export function setRegister4OfChannel(channelNumber: i32, value: u8): void {
-
-  switch(channelNumber) {
-    case Channel1.channelNumber:
-      eightBitStoreIntoGBMemorySkipTraps(Channel1.memoryLocationNRx4, value);
-      break;
-    case Channel2.channelNumber:
-      eightBitStoreIntoGBMemorySkipTraps(Channel2.memoryLocationNRx4, value);
-      break;
-    case Channel3.channelNumber:
-      eightBitStoreIntoGBMemorySkipTraps(Channel3.memoryLocationNRx4, value);
-      break;
-    default:
-      eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx4, value);
-      break;
-  }
 }

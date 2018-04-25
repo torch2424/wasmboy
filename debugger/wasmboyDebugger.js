@@ -197,11 +197,12 @@ export class WasmBoyDebugger extends Component {
     valueTable.timers['DIV/Divider Register - 0xFF04'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFF04, wasmboy)];
 
     // Update interrupts valueTable
-    if(wasmboy.wasmInstance.exports.areInterruptsEnabled()) {
-      valueTable.interrupts['Interrupt Master Switch'] = 0x01;
-    } else {
-      valueTable.interrupts['Interrupt Master Switch'] = 0x00;
-    }
+    // TODO: Interrupot master switch
+    // if(wasmboy.wasmInstance.exports.areInterruptsEnabled()) {
+    //   valueTable.interrupts['Interrupt Master Switch'] = 0x01;
+    // } else {
+    //   valueTable.interrupts['Interrupt Master Switch'] = 0x00;
+    // }
     valueTable.interrupts['IE/Interrupt Enabled - 0xFFFF'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFFFF, wasmboy)];
     valueTable.interrupts['IF/Interrupt Request - 0xFF0F'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFF0F, wasmboy)];
 

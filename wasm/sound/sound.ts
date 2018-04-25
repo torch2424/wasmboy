@@ -22,25 +22,21 @@ import {
     Channel4
 } from './channel4';
 import {
-  isChannelEnabledOnLeftOutput,
-  isChannelEnabledOnRightOutput,
-  isChannelDacEnabled
-} from './registers';
-import {
   Cpu
 } from '../cpu/index';
 import {
   Config
 } from '../config';
 import {
-  eightBitLoadFromGBMemorySkipTraps,
-  eightBitStoreIntoGBMemorySkipTraps,
+  eightBitLoadFromGBMemory,
+  eightBitStoreIntoGBMemory,
   setLeftAndRightOutputForAudioQueue,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
 import {
+  checkBitOnByte,
   concatenateBytes,
   splitLowByte,
   splitHighByte,
@@ -69,16 +65,44 @@ export class Sound {
   }
 
   // Channel control / On-OFF / Volume (RW)
-  static readonly memoryLocationNR50: u16 = 0xFF24;
+  static readonly memoryLocationNR50: i32 = 0xFF24;
+  static NR50LeftMixerVolume: i32 = 0;
+  static NR50RightMixerVolume: i32 = 0;
+  static updateNR50(value: i32): void {
+    Sound.NR50LeftMixerVolume = (value >> 4) & 0x07;
+    Sound.NR50RightMixerVolume = value & 0x07;
+  }
 
   // 0xFF25 selects which output each channel goes to, Referred to as NR51
-  static readonly memoryLocationNR51: u16 = 0xFF25;
+  static readonly memoryLocationNR51: i32 = 0xFF25;
+  static NR51IsChannel1EnabledOnLeftOutput: boolean = true;
+  static NR51IsChannel2EnabledOnLeftOutput: boolean = true;
+  static NR51IsChannel3EnabledOnLeftOutput: boolean = true;
+  static NR51IsChannel4EnabledOnLeftOutput: boolean = true;
+  static NR51IsChannel1EnabledOnRightOutput: boolean = true;
+  static NR51IsChannel2EnabledOnRightOutput: boolean = true;
+  static NR51IsChannel3EnabledOnRightOutput: boolean = true;
+  static NR51IsChannel4EnabledOnRightOutput: boolean = true;
+  static updateNR51(value: i32): void {
+    Sound.NR51IsChannel4EnabledOnLeftOutput = checkBitOnByte(7, value);
+    Sound.NR51IsChannel3EnabledOnLeftOutput = checkBitOnByte(6, value);
+    Sound.NR51IsChannel2EnabledOnLeftOutput = checkBitOnByte(5, value);
+    Sound.NR51IsChannel1EnabledOnLeftOutput = checkBitOnByte(4, value);
+    Sound.NR51IsChannel4EnabledOnRightOutput = checkBitOnByte(3, value);
+    Sound.NR51IsChannel3EnabledOnRightOutput = checkBitOnByte(2, value);
+    Sound.NR51IsChannel2EnabledOnRightOutput = checkBitOnByte(1, value);
+    Sound.NR51IsChannel1EnabledOnRightOutput = checkBitOnByte(0, value);
+  }
 
   // Sound on/off
-  static readonly memoryLocationNR52: u16 = 0xFF26;
+  static readonly memoryLocationNR52: i32 = 0xFF26;
+  static NR52IsSoundEnabled: boolean = true;
+  static updateNR52(value: i32): void {
+    Sound.NR52IsSoundEnabled = checkBitOnByte(7, value);
+  }
 
   // $FF30 -- $FF3F is the load register space for the 4-bit samples for channel 3
-  static readonly memoryLocationChannel3LoadRegisterStart: u16 = 0xFF30;
+  static readonly memoryLocationChannel3LoadRegisterStart: i32 = 0xFF30;
 
   // Need to count how often we need to increment our frame sequencer
   // Which you can read about below
@@ -103,7 +127,7 @@ export class Sound {
   // Frame sequencer controls what should be updated and and ticked
   // Everyt time the sound is updated :) It is updated everytime the
   // Cycle counter reaches the max cycle
-  static frameSequencer: u8 = 0x00;
+  static frameSequencer: i32 = 0x00;
 
   // Our current sample number we are passing back to the wasmboy memory map
   // Found that a static number of samples doesn't work well on mobile
@@ -114,7 +138,7 @@ export class Sound {
   static wasmBoyMemoryMaxBufferSize: i32 = 0x20000;
 
   // Save States
-  static readonly saveStateSlot: u16 = 6;
+  static readonly saveStateSlot: i32 = 6;
 
   // Function to save the state of the class
   static saveState(): void {
@@ -144,8 +168,8 @@ export class SoundAccumulator {
   static channel2DacEnabled: boolean = false;
   static channel3DacEnabled: boolean = false;
   static channel4DacEnabled: boolean = false;
-  static leftChannelSampleUnsignedByte: u8 = 127;
-  static rightChannelSampleUnsignedByte: u8 = 127;
+  static leftChannelSampleUnsignedByte: i32 = 127;
+  static rightChannelSampleUnsignedByte: i32 = 127;
   static mixerVolumeChanged: boolean = false;
   static mixerEnabledChanged: boolean = false;
 
@@ -164,9 +188,9 @@ export function initializeSound(): void {
   Channel4.initialize();
 
   // Other Sound Registers
-  eightBitStoreIntoGBMemorySkipTraps(Sound.memoryLocationNR50, 0x77);
-  eightBitStoreIntoGBMemorySkipTraps(Sound.memoryLocationNR51, 0xF3);
-  eightBitStoreIntoGBMemorySkipTraps(Sound.memoryLocationNR52, 0xF1);
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR50, 0x77);
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR51, 0xF3);
+  eightBitStoreIntoGBMemory(Sound.memoryLocationNR52, 0xF1);
 
   SoundAccumulator.mixerVolumeChanged = true;
   SoundAccumulator.mixerEnabledChanged = true;
@@ -218,6 +242,11 @@ function calculateSound(numberOfCycles: i32): void {
   let channel2Sample: i32 = Channel2.getSample(numberOfCycles);
   let channel3Sample: i32 = Channel3.getSample(numberOfCycles);
   let channel4Sample: i32 = Channel4.getSample(numberOfCycles);
+  // TODO: Allow individual channels to be muted
+  // let channel1Sample: i32 = 15;
+  // let channel2Sample: i32 = 15;
+  // let channel3Sample: i32 = 15;
+  // let channel4Sample: i32 = 15;
 
   // Save the samples in the accumulator
   SoundAccumulator.channel1Sample = channel1Sample;
@@ -234,9 +263,9 @@ function calculateSound(numberOfCycles: i32): void {
     Sound.downSampleCycleCounter -= Sound.maxDownSampleCycles();
 
     // Mixe our samples
-    let mixedSample: u16 = mixChannelSamples(channel1Sample, channel2Sample, channel3Sample, channel4Sample);
-    let leftChannelSampleUnsignedByte: u8 = splitHighByte(mixedSample);
-    let rightChannelSampleUnsignedByte: u8 = splitLowByte(mixedSample);
+    let mixedSample: i32 = mixChannelSamples(channel1Sample, channel2Sample, channel3Sample, channel4Sample);
+    let leftChannelSampleUnsignedByte: i32 = splitHighByte(mixedSample);
+    let rightChannelSampleUnsignedByte: i32 = splitLowByte(mixedSample);
 
     // Set our volumes in memory
     // +1 so it can not be zero
@@ -314,26 +343,26 @@ function accumulateSound(numberOfCycles: i32): void {
 function didChannelDacChange(channelNumber: i32): boolean {
   switch(channelNumber) {
     case Channel1.channelNumber:
-      if(SoundAccumulator.channel1DacEnabled !== isChannelDacEnabled(Channel1.channelNumber)) {
-        SoundAccumulator.channel1DacEnabled = isChannelDacEnabled(Channel1.channelNumber);
+      if(SoundAccumulator.channel1DacEnabled !== Channel1.isDacEnabled) {
+        SoundAccumulator.channel1DacEnabled = Channel1.isDacEnabled;
         return true;
       }
       return false;
     case Channel2.channelNumber:
-      if(SoundAccumulator.channel2DacEnabled !== isChannelDacEnabled(Channel2.channelNumber)) {
-        SoundAccumulator.channel2DacEnabled = isChannelDacEnabled(Channel2.channelNumber);
+      if(SoundAccumulator.channel2DacEnabled !== Channel2.isDacEnabled) {
+        SoundAccumulator.channel2DacEnabled = Channel2.isDacEnabled;
         return true;
       }
       return false;
     case Channel3.channelNumber:
-      if(SoundAccumulator.channel3DacEnabled !== isChannelDacEnabled(Channel3.channelNumber)) {
-        SoundAccumulator.channel3DacEnabled = isChannelDacEnabled(Channel3.channelNumber);
+      if(SoundAccumulator.channel3DacEnabled !== Channel3.isDacEnabled) {
+        SoundAccumulator.channel3DacEnabled = Channel3.isDacEnabled;
         return true;
       }
       return false;
     case Channel4.channelNumber:
-      if(SoundAccumulator.channel4DacEnabled !== isChannelDacEnabled(Channel4.channelNumber)) {
-        SoundAccumulator.channel4DacEnabled = isChannelDacEnabled(Channel4.channelNumber);
+      if(SoundAccumulator.channel4DacEnabled !== Channel4.isDacEnabled) {
+        SoundAccumulator.channel4DacEnabled = Channel4.isDacEnabled;
         return true;
       }
       return false;
@@ -410,7 +439,7 @@ function updateFrameSequencer(numberOfCycles: i32): boolean {
 }
 
 
-function mixChannelSamples(channel1Sample: i32 = 15, channel2Sample: i32 = 15, channel3Sample: i32 = 15, channel4Sample: i32 = 15): u16 {
+function mixChannelSamples(channel1Sample: i32 = 15, channel2Sample: i32 = 15, channel3Sample: i32 = 15, channel4Sample: i32 = 15): i32 {
 
   // Do Some Cool mixing
   // NR50 FF24 ALLL BRRR Vin L enable, Left vol, Vin R enable, Right vol
@@ -425,22 +454,7 @@ function mixChannelSamples(channel1Sample: i32 = 15, channel2Sample: i32 = 15, c
 
   // TODO: Vin Mixing
 
-  // Simply get the left/right volume, add up the values, and put into memory!
-  let registerNR50 = eightBitLoadFromGBMemorySkipTraps(Sound.memoryLocationNR50);
-  // Want bits 6-4
-  let leftMixerVolume: i32 = (registerNR50 >> 4);
-  leftMixerVolume = leftMixerVolume & 0x07;
-  // Want bits 0-2
-  let rightMixerVolume: i32 = registerNR50;
-  rightMixerVolume = rightMixerVolume & 0x07;
-
   SoundAccumulator.mixerVolumeChanged = false;
-
-  // cache channel numbers for performance
-  let channel1ChannelNumber: i32 = Channel1.channelNumber;
-  let channel2ChannelNumber: i32 = Channel2.channelNumber;
-  let channel3ChannelNumber: i32 = Channel3.channelNumber;
-  let channel4ChannelNumber: i32 = Channel4.channelNumber;
 
   // Get our channel volume for left/right
   let leftChannelSample: i32 = 0;
@@ -448,22 +462,22 @@ function mixChannelSamples(channel1Sample: i32 = 15, channel2Sample: i32 = 15, c
 
   // Find the sample for the left if enabled
   // other wise add silence (15) for the channel
-  if (isChannelEnabledOnLeftOutput(channel1ChannelNumber)) {
+  if (Sound.NR51IsChannel1EnabledOnLeftOutput) {
     leftChannelSample += channel1Sample;
   } else {
     leftChannelSample += 15;
   }
-  if (isChannelEnabledOnLeftOutput(channel2ChannelNumber)) {
+  if (Sound.NR51IsChannel2EnabledOnLeftOutput) {
     leftChannelSample += channel2Sample;
   } else {
     leftChannelSample += 15;
   }
-  if (isChannelEnabledOnLeftOutput(channel3ChannelNumber)) {
+  if (Sound.NR51IsChannel3EnabledOnLeftOutput) {
     leftChannelSample += channel3Sample;
   } else {
     leftChannelSample += 15;
   }
-  if (isChannelEnabledOnLeftOutput(channel4ChannelNumber)) {
+  if (Sound.NR51IsChannel4EnabledOnLeftOutput) {
     leftChannelSample += channel4Sample;
   } else {
     leftChannelSample += 15;
@@ -472,22 +486,22 @@ function mixChannelSamples(channel1Sample: i32 = 15, channel2Sample: i32 = 15, c
 
   // Find the sample for the right if enabled
   // other wise add silence (15) for the channel
-  if (isChannelEnabledOnRightOutput(channel1ChannelNumber)) {
+  if (Sound.NR51IsChannel1EnabledOnRightOutput) {
     rightChannelSample += channel1Sample;
   } else {
     rightChannelSample += 15;
   }
-  if (isChannelEnabledOnRightOutput(channel2ChannelNumber)) {
+  if (Sound.NR51IsChannel2EnabledOnRightOutput) {
     rightChannelSample += channel2Sample;
   } else {
     rightChannelSample += 15;
   }
-  if (isChannelEnabledOnRightOutput(channel3ChannelNumber)) {
+  if (Sound.NR51IsChannel3EnabledOnRightOutput) {
     rightChannelSample += channel3Sample;
   } else {
     rightChannelSample += 15;
   }
-  if (isChannelEnabledOnRightOutput(channel4ChannelNumber)) {
+  if (Sound.NR51IsChannel4EnabledOnRightOutput) {
     rightChannelSample += channel4Sample;
   } else {
     rightChannelSample += 15;
@@ -505,8 +519,8 @@ function mixChannelSamples(channel1Sample: i32 = 15, channel2Sample: i32 = 15, c
 
   // Convert our samples from unsigned 32 to unsigned byte
   // Reason being, We want to be able to pass in wasm memory as usigned byte. Javascript will handle the conversion back
-  let leftChannelSampleUnsignedByte: u8 = getSampleAsUnsignedByte(leftChannelSample, (leftMixerVolume + 1));
-  let rightChannelSampleUnsignedByte: u8 = getSampleAsUnsignedByte(rightChannelSample, (rightMixerVolume + 1));
+  let leftChannelSampleUnsignedByte: i32 = getSampleAsUnsignedByte(leftChannelSample, (Sound.NR50LeftMixerVolume + 1));
+  let rightChannelSampleUnsignedByte: i32 = getSampleAsUnsignedByte(rightChannelSample, (Sound.NR50RightMixerVolume + 1));
 
   // Save these samples in the accumulator
   SoundAccumulator.leftChannelSampleUnsignedByte = leftChannelSampleUnsignedByte;
@@ -515,7 +529,7 @@ function mixChannelSamples(channel1Sample: i32 = 15, channel2Sample: i32 = 15, c
   return concatenateBytes(leftChannelSampleUnsignedByte, rightChannelSampleUnsignedByte);
 }
 
-function getSampleAsUnsignedByte(sample: i32, mixerVolume: i32): u8 {
+function getSampleAsUnsignedByte(sample: i32, mixerVolume: i32): i32 {
 
   // If the sample is silence, return silence as unsigned byte
   // Silence is common, and should be checked for performance
@@ -546,5 +560,5 @@ function getSampleAsUnsignedByte(sample: i32, mixerVolume: i32): u8 {
   let maxDivider: i32 = (120 * precision) / 254;
   convertedSample = (convertedSample * precision) / maxDivider;
 
-  return <u8>(convertedSample);
+  return convertedSample;
 }

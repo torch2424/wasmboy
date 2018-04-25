@@ -54,6 +54,35 @@ button {
 	text-align: center;
 }
 
+.system-controls button {
+	margin: 10px;
+}
+
+.system-controls__file-input {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.wasmboy__options {
+	margin-left: auto;
+	margin-right: auto;
+	padding: 10px;
+	max-width: 600px;
+}
+
+.wasmboy__options__info {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.wasmboy__options__inputs div {
+	margin: 5px;
+}
+
+.wasmboy__options__apply {
+	margin-top: 10px;
+}
+
 
 .wasmboy__gamepad {
 	position: fixed;
@@ -160,4 +189,84 @@ button {
 	width: 100%;
 	margin-top: 10px;
 	margin-bottom: 10px;
+}
+
+.popup-shadow-container {
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	z-index: 100;
+
+	width: 100vw;
+	height: 100vh;
+
+	background-color: rgba(0, 0, 0, 0.5);
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.popup {
+	border: 5px solid rgba(0, 0, 0, 0.75);
+	background-color: #F5F5F5;
+	color: #020202;
+
+	width: 80vw;
+	height: 70vh;
+
+	max-width: 800px;
+	max-height: 700px;
+
+	overflow: auto;
+
+	z-index: 101;
+}
+
+.saveStateContainer {
+
+	margin-left: auto;
+	margin-right: auto;
+
+	display: flex;
+	justify-content: flex-start;
+	align-items: flex-start;
+	flex-wrap: wrap;
+	flex-direction: row;
+}
+
+.saveState {
+	margin-left: 5px;
+	margin-right: 5px;
+	padding: 5px;
+
+
+	word-wrap: break-word;
+
+	transition: background-color 0.25s;
+}
+
+.saveState:hover {
+	background-color: rgba(0, 0, 0, 0.25);
+	cursor: pointer;
+}
+
+
+/* https://atomiks.github.io/30-seconds-of-css/ */
+@keyframes donut-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.donut {
+  display: inline-block;
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #7983ff;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: donut-spin 1.2s linear infinite;
 }

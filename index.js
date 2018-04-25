@@ -1,7 +1,7 @@
 import './style';
 import { Component } from 'preact';
 import { WasmBoy, WasmBoyGraphics, WasmBoyAudio, WasmBoyController, WasmBoyMemory } from './lib/wasmboy.js';
-import { WasmBoyDebugger, WasmBoySystemControls } from './debugger/index';
+import { WasmBoyDebugger, WasmBoySystemControls, WasmBoyOptions } from './debugger/index';
 
 // Old Perf Options
 // WasmBoy.initialize(canvasElement, {
@@ -12,9 +12,10 @@ import { WasmBoyDebugger, WasmBoySystemControls } from './debugger/index';
 // 	graphicsDisableScanlineRendering: true
 // });
 
-const gamePath = './games/shantae.gbc';
+//const defaultGamePath = './test/accuracy/testroms/blargg/cpu_instrs.gb';
+const defaultGamePath = './games/linksawakening.gb';
 
-const wasmBoyOptions = {
+const wasmBoyDefaultOptions = {
 	isGbcEnabled: true,
 	isAudioEnabled: true,
 	frameSkip: 1,
@@ -25,10 +26,17 @@ const wasmBoyOptions = {
 	graphicsDisableScanlineRendering: false,
 	tileRendering: true,
 	tileCaching: true,
-	gameboySpeed: 1.0
+	gameboySpeed: 1.0,
+	saveStateCallback: (saveStateObject) => {
+		// Function called everytime a savestate occurs
+		// Used by the WasmBoySystemControls to show screenshots on save states
+		saveStateObject.screenshotCanvasDataURL = WasmBoyGraphics.canvasElement.toDataURL();
+		return saveStateObject;
+	}
 };
 
-const wasmBoyOptionsString = JSON.stringify(wasmBoyOptions, null, 4);
+// Our canvas element
+let canvasElement = undefined;
 
 export default class App extends Component {
 
@@ -36,17 +44,18 @@ export default class App extends Component {
 		super();
 
 		this.state = {
-			showDebugger: false
+			showDebugger: false,
+			showOptions: false
 		}
 	}
 
 	// Using componentDidMount to wait for the canvas element to be inserted in DOM
 	componentDidMount() {
 		// Get our canvas element
-		const canvasElement = document.querySelector(".wasmboy__canvas-container__canvas");
+		canvasElement = document.querySelector(".wasmboy__canvas-container__canvas");
 
 		// Load our game
-		WasmBoy.initialize(canvasElement, wasmBoyOptions);
+		WasmBoy.initialize(canvasElement, wasmBoyDefaultOptions);
 
 		// Add our touch inputs
 		// Add our touch inputs
@@ -66,7 +75,7 @@ export default class App extends Component {
 		WasmBoyController.addTouchInput('SELECT', selectElement, 'BUTTON');
 
 		//WasmBoy.loadGame('./test/testroms/blargg/cpu_instrs.gb')
-		WasmBoy.loadGame(gamePath)
+		WasmBoy.loadGame(defaultGamePath)
 		.then(() => {
 			console.log('Wasmboy Ready!');
 		}).catch((error) => {
@@ -75,6 +84,18 @@ export default class App extends Component {
 	}
 
 	render() {
+
+		// Optionally render the options
+		let optionsComponent = (
+			<div></div>
+		)
+		if (this.state.showOptions) {
+			optionsComponent = (
+				<div className={ "wasmboy__options" }>
+					<WasmBoyOptions wasmBoy={WasmBoy} defaultOptions={wasmBoyDefaultOptions}></WasmBoyOptions>
+				</div>
+			)
+		}
 
 		// optionally render the debugger
 		let debuggerComponent = (
@@ -90,10 +111,23 @@ export default class App extends Component {
 
 		return (
 			<div>
-				<h1>WasmBoy</h1>
-				<p>Build Options:</p>
-				<p><i>(Currently built for Mobile Performance testing. Accuracy is lowered.)</i></p>
-				<p>{wasmBoyOptionsString}</p>
+				<h1>WasmBoy Demo</h1>
+				<div style="text-align: center">
+          <label for="showOptions">Show Options</label>
+          <input
+            id="showOptions"
+            type="checkbox"
+            checked={ this.state.showOptions }
+            onChange={ () => {
+								const newState = Object.assign({}, this.state);
+								newState.showOptions = !newState.showOptions;
+								this.setState(newState);
+							}
+						} />
+        </div>
+
+				{optionsComponent}
+
 				<div style="text-align: center">
           <label for="showDebugger">Show Debugger</label>
           <input
@@ -107,15 +141,16 @@ export default class App extends Component {
 							}
 						} />
         </div>
+
+				{debuggerComponent}
+
 				<div class="wasmboy__systemControls">
-					<WasmBoySystemControls wasmboy={WasmBoy}></WasmBoySystemControls>
+					<WasmBoySystemControls wasmboy={WasmBoy} wasmboyMemory={WasmBoyMemory}></WasmBoySystemControls>
 				</div>
 				<div className="wasmboy__canvas-container">
     			<canvas className="wasmboy__canvas-container__canvas">
           </canvas>
         </div>
-
-				{debuggerComponent}
 
 				<div class="wasmboy__gamepad">
 

@@ -19,9 +19,9 @@ import {
   performanceTimestamp
 } from '../helpers/index';
 import {
-  eightBitStoreIntoGBMemory,
-  sixteenBitStoreIntoGBMemory,
-  eightBitLoadFromGBMemory,
+  eightBitStoreIntoGBMemoryWithTraps,
+  sixteenBitStoreIntoGBMemoryWithTraps,
+  eightBitLoadFromGBMemoryWithTraps,
   sixteenBitLoadFromGBMemory
 } from '../memory/index';
 
@@ -31,9 +31,9 @@ import {
 // Handle CB Opcodes
 // NOTE: Program stpes and cycles are standardized depending on the register type
 // NOTE: Doing some funny stuff to get around not having arrays or objects
-export function handleCbOpcode(cbOpcode: u8): i8 {
+export function handleCbOpcode(cbOpcode: i32): i32 {
 
-  let numberOfCycles: i8 = -1;
+  let numberOfCycles: i32 = -1;
   let handledOpcode = false;
 
   // The result of our cb logic instruction
@@ -66,7 +66,7 @@ export function handleCbOpcode(cbOpcode: u8): i8 {
       break;
     case 6:
       // Value at register HL
-      instructionRegisterValue = eightBitLoadFromGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL));
+      instructionRegisterValue = <u8>eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
       break;
     case 7:
       instructionRegisterValue = Cpu.registerA;
@@ -312,7 +312,7 @@ export function handleCbOpcode(cbOpcode: u8): i8 {
       break;
     case 6:
       // Value at register HL
-      eightBitStoreIntoGBMemory(concatenateBytes(Cpu.registerH, Cpu.registerL), instructionRegisterResult);
+      eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL), instructionRegisterResult);
       break;
     case 7:
       Cpu.registerA = instructionRegisterResult;

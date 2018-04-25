@@ -5,7 +5,7 @@ import {
   Memory
 } from './memory';
 import {
-  eightBitLoadFromGBMemorySkipTraps
+  eightBitLoadFromGBMemory
 } from './load';
 import {
   getRomBankAddress,
@@ -46,10 +46,10 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
     case 0x09:
       // Video RAM
       // 0x8000 -> 0x000400
-      let vramBankId: u32 = 0;
+      let vramBankId: i32 = 0;
       if (Cpu.GBCEnabled) {
         // Find our current VRAM Bank
-        vramBankId = (eightBitLoadFromGBMemorySkipTraps(Memory.memoryLocationGBCVRAMBAnk) & 0x01);
+        vramBankId = (eightBitLoadFromGBMemory(Memory.memoryLocationGBCVRAMBank) & 0x01);
         // Even though We added another 0x2000, the Cartridge ram is pulled out of our Internal Memory Space
         // Therefore, we do not need to adjust for this extra 0x2000
       }
@@ -74,9 +74,9 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
       // Bank 1-7 can be selected into the address space at D000-DFFF.
       // http://gbdev.gg8.se/wiki/articles/CGB_Registers#FF70_-_SVBK_-_CGB_Mode_Only_-_WRAM_Bank
       // Get the last 3 bits to find our wram ID
-      let wramBankId: u32 = 0;
+      let wramBankId: i32 = 0;
       if(Cpu.GBCEnabled) {
-        wramBankId  = (eightBitLoadFromGBMemorySkipTraps(Memory.memoryLocationGBCWRAMBank) & 0x07);
+        wramBankId  = (eightBitLoadFromGBMemory(Memory.memoryLocationGBCWRAMBank) & 0x07);
       }
       if (wramBankId < 1) {
         wramBankId = 1;

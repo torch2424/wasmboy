@@ -4,31 +4,15 @@
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Noise_Channel
 
 import {
-  getChannelStartingVolume,
-  isChannelDacEnabled,
-  getRegister2OfChannel
-} from './registers';
-import {
-  getChannelFrequency,
-  setChannelFrequency
-} from './frequency';
-import {
-  isChannelLengthEnabled
-} from './length';
-import {
-  getChannelEnvelopePeriod,
-  getChannelEnvelopeAddMode
-} from './envelope';
-import {
   isDutyCycleClockPositiveOrNegativeForWaveform
 } from './duty';
 import {
   Cpu
 } from '../cpu/cpu';
 import {
-  eightBitLoadFromGBMemorySkipTraps,
+  eightBitLoadFromGBMemory,
+  eightBitStoreIntoGBMemoryWithTraps,
   eightBitStoreIntoGBMemory,
-  eightBitStoreIntoGBMemorySkipTraps,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
@@ -46,29 +30,99 @@ export class Channel4 {
   // Channel 4
   // 'white noise' channel with volume envelope functions.
   // NR41 -> Sound length (R/W)
-  static readonly memoryLocationNRx1: u16 = 0xFF20;
+  static readonly memoryLocationNRx1: i32 = 0xFF20;
+  // --LL LLLL Length load (64-L)
+  static NRx1LengthLoad: i32 = 0;
+  static updateNRx1(value: i32): void {
+    Channel4.NRx1LengthLoad = (value & 0x3F);
+
+    // Also need to set our length counter. Taken from the old, setChannelLengthCounter
+    // Channel length is determined by 64 (or 256 if channel 3), - the length load
+    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
+    // Note, this will be different for channel 3
+    Channel4.lengthCounter = 64 - Channel4.NRx1LengthLoad;
+  }
+
   // NR42 -> Volume Envelope (R/W)
-  static readonly memoryLocationNRx2: u16 = 0xFF21;
+  static readonly memoryLocationNRx2: i32 = 0xFF21;
+  // VVVV APPP Starting volume, Envelope add mode, period
+  static NRx2StartingVolume: i32 = 0;
+  static NRx2EnvelopeAddMode: boolean = false;
+  static NRx2EnvelopePeriod: i32 = 0;
+  static updateNRx2(value: i32): void {
+    Channel4.NRx2StartingVolume = ((value >> 4) & 0x0F);
+    Channel4.NRx2EnvelopeAddMode = checkBitOnByte(3, value);
+    Channel4.NRx2EnvelopePeriod = value & 0x07;
+
+    // Also, get our channel is dac enabled
+    Channel4.isDacEnabled = (value & 0xF8) > 0;
+  }
+
   // NR43 -> Polynomial Counter (R/W)
-  static readonly memoryLocationNRx3: u16 = 0xFF22;
-  // NR43 -> Counter/consecutive; initial (R/W)
-  static readonly memoryLocationNRx4: u16 = 0xFF23;
+  static readonly memoryLocationNRx3: i32 = 0xFF22;
+  // SSSS WDDD Clock shift, Width mode of LFSR, Divisor code
+  static NRx3ClockShift: i32 = 0;
+  static NRx3WidthMode: boolean = false;
+  static NRx3DivisorCode: i32 = 0;
+  static updateNRx3(value: i32): void {
+    Channel4.NRx3ClockShift = (value >> 4);
+    Channel4.NRx3WidthMode = checkBitOnByte(3, value);
+    Channel4.NRx3DivisorCode = (value & 0x07);
+
+    // Also, get our divisor
+    switch(Channel4.NRx3DivisorCode) {
+      case 0:
+        Channel4.divisor = 8;
+        return;
+      case 1:
+        Channel4.divisor = 16;
+        return;
+      case 2:
+        Channel4.divisor = 32;
+        return;
+      case 3:
+        Channel4.divisor = 48;
+        return;
+      case 4:
+        Channel4.divisor = 64;
+        return;
+      case 5:
+        Channel4.divisor = 80;
+        return;
+      case 6:
+        Channel4.divisor = 96;
+        return;
+      case 7:
+        Channel4.divisor = 112;
+        return;
+    }
+  }
+
+  // NR44 -> Trigger, Length Enable
+  static readonly memoryLocationNRx4: i32 = 0xFF23;
+  // TL-- ---- Trigger, Length enable
+  static NRx4LengthEnabled: boolean = false;
+  static updateNRx4(value: i32): void {
+    Channel4.NRx4LengthEnabled = checkBitOnByte(6, value);
+  }
 
   // Channel Properties
   static readonly channelNumber: i32 = 4;
   static isEnabled: boolean = false;
+  static isDacEnabled: boolean = false;
   static frequencyTimer: i32 = 0x00;
   static envelopeCounter: i32 = 0x00;
   static lengthCounter: i32 = 0x00;
   static volume: i32 = 0x00;
+  static divisor: i32 = 0;
 
   // Noise properties
   // NOTE: Is only 15 bits
-  static linearFeedbackShiftRegister: u16 = 0x00;
+  static linearFeedbackShiftRegister: i32 = 0x00;
 
   // Save States
 
-  static readonly saveStateSlot: u16 = 10;
+  static readonly saveStateSlot: i32 = 10;
 
   // Function to save the state of the class
   static saveState(): void {
@@ -91,11 +145,11 @@ export class Channel4 {
   }
 
   static initialize(): void {
-    eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx1 - 1, 0xFF);
-    eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx1, 0xFF);
-    eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx2, 0x00);
-    eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx3, 0x00);
-    eightBitStoreIntoGBMemorySkipTraps(Channel4.memoryLocationNRx4, 0xBF);
+    eightBitStoreIntoGBMemory(Channel4.memoryLocationNRx1 - 1, 0xFF);
+    eightBitStoreIntoGBMemory(Channel4.memoryLocationNRx1, 0xFF);
+    eightBitStoreIntoGBMemory(Channel4.memoryLocationNRx2, 0x00);
+    eightBitStoreIntoGBMemory(Channel4.memoryLocationNRx3, 0x00);
+    eightBitStoreIntoGBMemory(Channel4.memoryLocationNRx4, 0xBF);
   }
 
   // Function to get a sample using the cycle counter on the channel
@@ -123,8 +177,8 @@ export class Channel4 {
       // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Noise_Channel
 
       // First XOR bit zero and one
-      let lfsrBitZero: u16 = (Channel4.linearFeedbackShiftRegister & 0x01);
-      let lfsrBitOne: u16 = (Channel4.linearFeedbackShiftRegister >> 1);
+      let lfsrBitZero: i32 = (Channel4.linearFeedbackShiftRegister & 0x01);
+      let lfsrBitOne: i32 = (Channel4.linearFeedbackShiftRegister >> 1);
       lfsrBitOne = (lfsrBitOne & 0x01);
       let xorLfsrBitZeroOne = lfsrBitZero ^ lfsrBitOne;
 
@@ -135,7 +189,7 @@ export class Channel4 {
       Channel4.linearFeedbackShiftRegister = Channel4.linearFeedbackShiftRegister | (xorLfsrBitZeroOne << 14);
 
       // If the width mode is set, set xor on bit 6, and make lfsr 7 bit
-      if(Channel4.isNoiseChannelWidthModeSet()) {
+      if(Channel4.NRx3WidthMode) {
         // Make 7 bit, by knocking off lower bits. Want to keeps bits 8 - 16, and then or on 7
         Channel4.linearFeedbackShiftRegister = Channel4.linearFeedbackShiftRegister & (~0x40);
         Channel4.linearFeedbackShiftRegister = Channel4.linearFeedbackShiftRegister | (xorLfsrBitZeroOne << 6);
@@ -149,7 +203,7 @@ export class Channel4 {
     // Our channel DAC must be enabled, and we must be in an active state
     // Of our duty cycle
     if(Channel4.isEnabled &&
-    isChannelDacEnabled(Channel4.channelNumber)) {
+    Channel4.isDacEnabled) {
       outputVolume = Channel4.volume;
     } else {
       // Return silence
@@ -161,7 +215,7 @@ export class Channel4 {
     let sample: i32 = 0;
 
     // Wave form output is bit zero of lfsr, INVERTED
-    if (!checkBitOnByte(0, <u8>Channel4.linearFeedbackShiftRegister)) {
+    if (!checkBitOnByte(0, Channel4.linearFeedbackShiftRegister)) {
       sample = 1;
     } else {
       sample = -1;
@@ -184,15 +238,15 @@ export class Channel4 {
     // Reset our timers
     Channel4.frequencyTimer = Channel4.getNoiseChannelFrequencyPeriod();
 
-    Channel4.envelopeCounter = getChannelEnvelopePeriod(Channel4.channelNumber);
+    Channel4.envelopeCounter = Channel4.NRx2EnvelopePeriod;
 
-    Channel4.volume = getChannelStartingVolume(Channel4.channelNumber);
+    Channel4.volume = Channel4.NRx2StartingVolume;
 
     // Noise channel's LFSR bits are all set to 1.
     Channel4.linearFeedbackShiftRegister = 0x7FFF;
 
     // Finally if DAC is off, channel is still disabled
-    if(!isChannelDacEnabled(Channel4.channelNumber)) {
+    if(!Channel4.isDacEnabled) {
       Channel4.isEnabled = false;
     }
   }
@@ -212,58 +266,17 @@ export class Channel4 {
     return true;
   }
 
-  static getNoiseChannelFrequencyPeriod(): u16 {
-    // Get our divisor from the divisor code
-    let divisor: u16 = Channel4.getNoiseChannelDivisorFromDivisorCode();
-    let clockShift: u8 = Channel4.getNoiseChannelClockShift();
-    let response: u16 = (divisor << clockShift);
+  static getNoiseChannelFrequencyPeriod(): i32 {
+    // Get our divisor from the divisor code, and shift by the clock shift
+    let response: i32 = (Channel4.divisor << Channel4.NRx3ClockShift);
     if (Cpu.GBCDoubleSpeed) {
       response = response * 2;
     }
     return response;
   }
 
-  static getNoiseChannelClockShift(): u8 {
-    let registerNRx3: u8 = eightBitLoadFromGBMemorySkipTraps(Channel4.memoryLocationNRx3);
-    // It is within the top 4 bits
-    let clockShift = (registerNRx3 >> 4);
-    return clockShift;
-  }
-
-  static isNoiseChannelWidthModeSet(): boolean {
-    let registerNRx3: u8 = eightBitLoadFromGBMemorySkipTraps(Channel4.memoryLocationNRx3);
-    return checkBitOnByte(3, registerNRx3);
-  }
-
-  static getNoiseChannelDivisorFromDivisorCode(): u8 {
-    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Noise_Channel
-    // Get our divisor code
-    let registerNRx3: u8 = eightBitLoadFromGBMemorySkipTraps(Channel4.memoryLocationNRx3);
-    // Get the bottom 3 bits
-    let divisorCode: u8 = registerNRx3 & 0x07;
-    let divisor: u8 = 0;
-    if(divisorCode === 0) {
-      divisor = 8;
-    } else if (divisorCode === 1) {
-      divisor = 16;
-    } else if (divisorCode === 2) {
-      divisor = 32;
-    } else if (divisorCode === 3) {
-      divisor = 48;
-    } else if (divisorCode === 4) {
-      divisor = 64;
-    } else if (divisorCode === 5) {
-      divisor = 80;
-    } else if (divisorCode === 6) {
-      divisor = 96;
-    } else if (divisorCode === 7) {
-      divisor = 112;
-    }
-    return divisor;
-  }
-
   static updateLength(): void {
-    if(Channel4.lengthCounter > 0 && isChannelLengthEnabled(Channel4.channelNumber)) {
+    if(Channel4.lengthCounter > 0 && Channel4.NRx4LengthEnabled) {
       Channel4.lengthCounter -= 1;
     }
 
@@ -279,14 +292,14 @@ export class Channel4 {
 
     Channel4.envelopeCounter -= 1;
     if (Channel4.envelopeCounter <= 0) {
-      Channel4.envelopeCounter = getChannelEnvelopePeriod(Channel4.channelNumber);
+      Channel4.envelopeCounter = Channel4.NRx2EnvelopePeriod;
 
       // When the timer generates a clock and the envelope period is NOT zero, a new volume is calculated
       // NOTE: There is some weiirrdd obscure behavior where zero can equal 8, so watch out for that
       if(Channel4.envelopeCounter !== 0) {
-        if(getChannelEnvelopeAddMode(Channel4.channelNumber) && Channel4.volume < 15) {
+        if(Channel4.NRx2EnvelopeAddMode && Channel4.volume < 15) {
           Channel4.volume += 1;
-        } else if (!getChannelEnvelopeAddMode(Channel4.channelNumber) && Channel4.volume > 0) {
+        } else if (!Channel4.NRx2EnvelopeAddMode && Channel4.volume > 0) {
           Channel4.volume -= 1;
         }
       }

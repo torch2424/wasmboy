@@ -28,7 +28,7 @@ import {
 // using Skip Traps, because LCD has unrestricted access
 // http://gbdev.gg8.se/wiki/articles/Video_Display#LCD_OAM_DMA_Transfers
 import {
-  eightBitLoadFromGBMemorySkipTraps
+  eightBitLoadFromGBMemory
 } from '../memory/load';
 import {
   Memory,
@@ -43,18 +43,20 @@ import {
   resetBitOnByte
 } from '../helpers/index';
 
-export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u16, tileMapMemoryLocation: u16): void {
+export function renderBackground(scanlineRegister: i32, tileDataMemoryLocation: i32, tileMapMemoryLocation: i32): void {
 
   // NOTE: Camera is reffering to what you can see inside the 160x144 viewport of the entire rendered 256x256 map.
 
   // Get our scrollX and scrollY (u16 to play nice with assemblyscript)
-  let scrollX: u16 = <u16>eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationScrollX);
-  let scrollY: u16 = <u16>eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationScrollY);
+  // let scrollX: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationScrollX);
+  // let scrollY: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationScrollY);
+  let scrollX: i32 = Graphics.scrollX;
+  let scrollY: i32 = Graphics.scrollY;
 
   // Get our current pixel y positon on the 160x144 camera (Row that the scanline draws across)
   // this is done by getting the current scroll Y position,
   // and adding it do what Y Value the scanline is drawing on the camera.
-  let pixelYPositionInMap: u16 = <u16>scanlineRegister + scrollY;
+  let pixelYPositionInMap: i32 = scanlineRegister + scrollY;
 
   // Gameboy camera will "wrap" around the background map,
   // meaning that if the pixelValue is 350, then we need to subtract 256 (decimal) to get it's actual value
@@ -68,16 +70,18 @@ export function renderBackground(scanlineRegister: u8, tileDataMemoryLocation: u
   drawBackgroundWindowScanline(scanlineRegister, tileDataMemoryLocation, tileMapMemoryLocation, pixelYPositionInMap, 0, scrollX);
 }
 
-export function renderWindow(scanlineRegister: u8, tileDataMemoryLocation: u16, tileMapMemoryLocation: u16): void {
+export function renderWindow(scanlineRegister:i32, tileDataMemoryLocation: i32, tileMapMemoryLocation: i32): void {
 
   // Get our windowX and windowY
-  let windowX: u16 = <u16>eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationWindowX);
-  let windowY: u16 = <u16>eightBitLoadFromGBMemorySkipTraps(Graphics.memoryLocationWindowY);
+  // let windowX: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationWindowX);
+  // let windowY: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationWindowY);
+  let windowX: i32 = Graphics.windowX;
+  let windowY: i32 = Graphics.windowY;
 
   // NOTE: Camera is reffering to what you can see inside the 160x144 viewport of the entire rendered 256x256 map.
 
   // First ensure that the scanline is greater than our window
-  if(scanlineRegister < <u8>windowY) {
+  if(scanlineRegister < windowY) {
     // Window is not within the current camera view
     return;
   }
@@ -86,17 +90,20 @@ export function renderWindow(scanlineRegister: u8, tileDataMemoryLocation: u16, 
   windowX = windowX - 7;
 
   // Get our current pixel y positon on the 160x144 camera (Row that the scanline draws across)
-  let pixelYPositionInMap: u16 = <u16>scanlineRegister - windowY;
+  let pixelYPositionInMap: i32 = scanlineRegister - windowY;
 
-  // xOffset is simply a neagat5ive window x
-  let xOffset: i32 = -1 * (<i32>windowX);
+  // xOffset is simply a neagative window x
+  let xOffset: i32 = -1 * windowX;
 
   // Draw the Background scanline
   drawBackgroundWindowScanline(scanlineRegister, tileDataMemoryLocation, tileMapMemoryLocation, pixelYPositionInMap, windowX, xOffset);
 }
 
 // Function frankenstein'd together to allow background and window to share the same draw scanline function
-function drawBackgroundWindowScanline(scanlineRegister: u8, tileDataMemoryLocation: u16, tileMapMemoryLocation: u16, pixelYPositionInMap: u16, iStart: i32, xOffset: i32): void {
+function drawBackgroundWindowScanline(scanlineRegister: i32, tileDataMemoryLocation: i32, tileMapMemoryLocation: i32, pixelYPositionInMap: i32, iStart: i32, xOffset: i32): void {
+
+  // Get our tile Y position in the map
+  let tileYPositionInMap: i32 = pixelYPositionInMap >> 3;
 
   // Loop through x to draw the line like a CRT
   for (let i: i32 = iStart; i < 160; i++) {
@@ -117,7 +124,6 @@ function drawBackgroundWindowScanline(scanlineRegister: u8, tileDataMemoryLocati
     // Also, bitshifting by 3, do do a division by 8
     // Need to use u16s, as they will be used to compute an address, which will cause weird errors and overflows
     let tileXPositionInMap: i32 = pixelXPositionInMap >> 3;
-    let tileYPositionInMap: i32 = pixelYPositionInMap >> 3;
 
 
     // Get our tile address on the tileMap
@@ -127,10 +133,10 @@ function drawBackgroundWindowScanline(scanlineRegister: u8, tileDataMemoryLocati
     // And we have x pixel 160. 160 / 8 = 20.
     // * 32, because remember, this is NOT only for the camera, the actual map is 32x32. Therefore, the next tile line of the map, is 32 byte offset.
     // Think like indexing a 2d array, as a 1d array and it make sense :)
-    let tileMapAddress: u16 = tileMapMemoryLocation + <u16>(tileYPositionInMap * 32) + <u16>tileXPositionInMap;
+    let tileMapAddress: i32 = tileMapMemoryLocation + tileYPositionInMap * 32 + tileXPositionInMap;
 
     // Get the tile Id on the Tile Map
-    let tileIdFromTileMap: u8 = loadFromVramBank(tileMapAddress, 0);
+    let tileIdFromTileMap: i32 = loadFromVramBank(tileMapAddress, 0);
 
     // Now that we have our Tile Id, let's check our Tile Cache
     let usedTileCache: boolean = false;
@@ -152,6 +158,7 @@ function drawBackgroundWindowScanline(scanlineRegister: u8, tileDataMemoryLocati
       }
     } else if(!usedTileCache) {
       if (Cpu.GBCEnabled) {
+        
         // Draw the individual pixel
         drawColorPixelFromTileId(i, scanlineRegister, pixelXPositionInMap, pixelYPositionInMap, tileMapAddress, tileDataMemoryLocation, tileIdFromTileMap);
 
@@ -165,15 +172,14 @@ function drawBackgroundWindowScanline(scanlineRegister: u8, tileDataMemoryLocati
 }
 
 // Function to draw a pixel for the standard GB
-// TODO: Make this match our new RGB scheme for placing pixels in memory
-function drawMonochromePixelFromTileId(xPixel: i32, yPixel: u8, pixelXPositionInMap: i32, pixelYPositionInMap: u16, tileDataMemoryLocation: u16, tileIdFromTileMap: u8): void {
+function drawMonochromePixelFromTileId(xPixel: i32, yPixel: i32, pixelXPositionInMap: i32, pixelYPositionInMap: i32, tileDataMemoryLocation: i32, tileIdFromTileMap: i32): void {
   // Now we can process the the individual bytes that represent the pixel on a tile
 
   // Now get our tileDataAddress for the corresponding tileID we found in the map
   // Read the comments in _getTileDataAddress() to see what's going on.
   // tl;dr if we had the tile map of "a b c d", and wanted tileId 2.
   // This funcitons returns the start of memory locaiton for the tile 'c'.
-  let tileDataAddress: u16 = getTileDataAddress(tileDataMemoryLocation, tileIdFromTileMap);
+  let tileDataAddress: i32 = getTileDataAddress(tileDataMemoryLocation, tileIdFromTileMap);
 
   // Get the y pixel of the 8 by 8 tile.
   // Simply modulo the scanline.
@@ -184,13 +190,13 @@ function drawMonochromePixelFromTileId(xPixel: i32, yPixel: u8, pixelXPositionIn
   // yPixel = 144. 144 % 8 = 0.
   // 0 Represents last line of pixels in a tile, 1 represents first. 1 2 3 4 5 6 7 0.
   // Because remember, we are counting lines on the display NOT including zero
-  let pixelYInTile: u16 = pixelYPositionInMap % 8;
+  let pixelYInTile: i32 = pixelYPositionInMap % 8;
 
   // Remember to represent a single line of 8 pixels on a tile, we need two bytes.
   // Therefore, we need to times our modulo by 2, to get the correct line of pixels on the tile.
   // Again, think like you had to map a 2d array as a 1d.
-  let byteOneForLineOfTilePixels: u8 = loadFromVramBank(tileDataAddress + (pixelYInTile * 2), 0)
-  let byteTwoForLineOfTilePixels: u8 = loadFromVramBank(tileDataAddress + (pixelYInTile * 2) + 1, 0);
+  let byteOneForLineOfTilePixels: i32 = loadFromVramBank(tileDataAddress + (pixelYInTile * 2), 0)
+  let byteTwoForLineOfTilePixels: i32 = loadFromVramBank(tileDataAddress + (pixelYInTile * 2) + 1, 0);
 
   // Same logic as pixelYInTile.
   // However, We need to reverse our byte,
@@ -198,7 +204,7 @@ function drawMonochromePixelFromTileId(xPixel: i32, yPixel: u8, pixelXPositionIn
   // Therefore, is pixelX was 2, then really is need to be 5
   // So 2 - 7 = -5, * 1 = 5
   // Or to simplify, 7 - 2 = 5 haha!
-  let pixelXInTile: u8 = <u8>(pixelXPositionInMap) % 8;
+  let pixelXInTile: i32 = pixelXPositionInMap % 8;
   pixelXInTile = 7 - pixelXInTile;
 
   // Now we can get the color for that pixel
@@ -207,12 +213,12 @@ function drawMonochromePixelFromTileId(xPixel: i32, yPixel: u8, pixelXPositionIn
   // For example, the result of the color id is 0000 00[xPixelByteTwo][xPixelByteOne]
   // See: How to draw a tile/sprite from memory: http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html
   let paletteColorId: u8 = 0;
-  if (checkBitOnByte(<u8>pixelXInTile, byteTwoForLineOfTilePixels)) {
+  if (checkBitOnByte(pixelXInTile, byteTwoForLineOfTilePixels)) {
     // Byte one represents the second bit in our color id, so bit shift
     paletteColorId += 1;
     paletteColorId = (paletteColorId << 1);
   }
-  if (checkBitOnByte(<u8>pixelXInTile, byteOneForLineOfTilePixels)) {
+  if (checkBitOnByte(pixelXInTile, byteOneForLineOfTilePixels)) {
     paletteColorId += 1;
   }
 
@@ -225,7 +231,7 @@ function drawMonochromePixelFromTileId(xPixel: i32, yPixel: u8, pixelXPositionIn
   // FINALLY, RENDER THAT PIXEL!
   // Only rendering camera for now, so coordinates are for the camera.
   // Get the rgb value for the color Id, will be repeated into R, G, B
-  let monochromeColor: u8 = getMonochromeColorFromPalette(paletteColorId, Graphics.memoryLocationBackgroundPalette);
+  let monochromeColor: i32 = getMonochromeColorFromPalette(paletteColorId, Graphics.memoryLocationBackgroundPalette);
   setPixelOnFrame(xPixel, yPixel, 0, monochromeColor);
   setPixelOnFrame(xPixel, yPixel, 1, monochromeColor);
   setPixelOnFrame(xPixel, yPixel, 2, monochromeColor);
@@ -239,13 +245,13 @@ function drawMonochromePixelFromTileId(xPixel: i32, yPixel: u8, pixelXPositionIn
 
 // Function to draw a pixel from a tile in C O L O R
 // See above for more context on some variables
-function drawColorPixelFromTileId(xPixel: i32, yPixel: u8, pixelXPositionInMap: i32, pixelYPositionInMap: u16, tileMapAddress: u16, tileDataMemoryLocation: u16, tileIdFromTileMap: u8): void {
+function drawColorPixelFromTileId(xPixel: i32, yPixel: i32, pixelXPositionInMap: i32, pixelYPositionInMap: i32, tileMapAddress: i32, tileDataMemoryLocation: i32, tileIdFromTileMap: i32): void {
 
   // Now get our tileDataAddress for the corresponding tileID we found in the map
   // Read the comments in _getTileDataAddress() to see what's going on.
   // tl;dr if we had the tile map of "a b c d", and wanted tileId 2.
   // This funcitons returns the start of memory locaiton for the tile 'c'.
-  let tileDataAddress: u16 = getTileDataAddress(tileDataMemoryLocation, tileIdFromTileMap);
+  let tileDataAddress: i32 = getTileDataAddress(tileDataMemoryLocation, tileIdFromTileMap);
 
   // Get the GB Map Attributes
   // Bit 0-2  Background Palette number  (BGP0-7)
@@ -254,14 +260,13 @@ function drawColorPixelFromTileId(xPixel: i32, yPixel: u8, pixelXPositionInMap: 
   // Bit 5    Horizontal Flip            (0=Normal, 1=Mirror horizontally)
   // Bit 6    Vertical Flip              (0=Normal, 1=Mirror vertically)
   // Bit 7    BG-to-OAM Priority         (0=Use OAM priority bit, 1=BG Priority)
-  let bgMapAttributes: u8 = loadFromVramBank(tileMapAddress, 1);
+  let bgMapAttributes: i32 = loadFromVramBank(tileMapAddress, 1);
 
   // See above for explanation
-  let pixelYInTile: u16 = pixelYPositionInMap % 8;
+  let pixelYInTile: i32 = pixelYPositionInMap % 8;
   if (checkBitOnByte(6, bgMapAttributes)) {
     // We are mirroring the tile, therefore, we need to opposite byte
     // So if our pixel was 0 our of 8, it wild become 7 :)
-    // TODO: This may be wrong :p
     pixelYInTile = 7 - (pixelYInTile);
   }
 
@@ -272,12 +277,12 @@ function drawColorPixelFromTileId(xPixel: i32, yPixel: u8, pixelXPositionInMap: 
   if (checkBitOnByte(3, bgMapAttributes)) {
     vramBankId = 1;
   }
-  let byteOneForLineOfTilePixels: u8 = loadFromVramBank(tileDataAddress + (pixelYInTile * 2), vramBankId)
-  let byteTwoForLineOfTilePixels: u8 = loadFromVramBank(tileDataAddress + (pixelYInTile * 2) + 1, vramBankId);
+  let byteOneForLineOfTilePixels: i32 = loadFromVramBank(tileDataAddress + (pixelYInTile * 2), vramBankId)
+  let byteTwoForLineOfTilePixels: i32 = loadFromVramBank(tileDataAddress + (pixelYInTile * 2) + 1, vramBankId);
 
   // Get our X pixel. Need to NOT reverse it if it was flipped.
   // See above, you have to reverse this normally
-  let pixelXInTile: u8 = <u8>(pixelXPositionInMap) % 8;
+  let pixelXInTile: i32 = pixelXPositionInMap % 8;
   if(!checkBitOnByte(5, bgMapAttributes)) {
     pixelXInTile = 7 - pixelXInTile;
   }
@@ -287,27 +292,27 @@ function drawColorPixelFromTileId(xPixel: i32, yPixel: u8, pixelXPositionInMap: 
   // To Get the color Id.
   // For example, the result of the color id is 0000 00[xPixelByteTwo][xPixelByteOne]
   // See: How to draw a tile/sprite from memory: http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html
-  let paletteColorId: u8 = 0;
-  if (checkBitOnByte(<u8>pixelXInTile, byteTwoForLineOfTilePixels)) {
+  let paletteColorId: i32 = 0;
+  if (checkBitOnByte(pixelXInTile, byteTwoForLineOfTilePixels)) {
     // Byte one represents the second bit in our color id, so bit shift
     paletteColorId += 1;
     paletteColorId = (paletteColorId << 1);
   }
-  if (checkBitOnByte(<u8>pixelXInTile, byteOneForLineOfTilePixels)) {
+  if (checkBitOnByte(pixelXInTile, byteOneForLineOfTilePixels)) {
     paletteColorId += 1;
   }
 
   // Finally lets add some, C O L O R
   // Want the botom 3 bits
-  let bgPalette: u8 = (bgMapAttributes & 0x07);
+  let bgPalette: i32 = (bgMapAttributes & 0x07);
 
   // Call the helper function to grab the correct color from the palette
-  let rgbColorPalette: u16 = getRgbColorFromPalette(bgPalette, paletteColorId, false);
+  let rgbColorPalette: i32 = getRgbColorFromPalette(bgPalette, paletteColorId, false);
 
   // Split off into red green and blue
-  let red: u8 = getColorComponentFromRgb(0, rgbColorPalette);
-  let green: u8 = getColorComponentFromRgb(1, rgbColorPalette);
-  let blue: u8 = getColorComponentFromRgb(2, rgbColorPalette);
+  let red: i32 = getColorComponentFromRgb(0, rgbColorPalette);
+  let green: i32 = getColorComponentFromRgb(1, rgbColorPalette);
+  let blue: i32 = getColorComponentFromRgb(2, rgbColorPalette);
 
   // Finally Place our colors on the things
   setPixelOnFrame(xPixel, yPixel, 0, red);
@@ -322,7 +327,7 @@ function drawColorPixelFromTileId(xPixel: i32, yPixel: u8, pixelXPositionInMap: 
 }
 
 // Function to attempt to draw the tile from the tile cache
-function drawLineOfTileFromTileCache(xPixel: i32, yPixel: u8, pixelXPositionInMap: i32, pixelYPositionInMap: u16, tileMapAddress: u16, tileDataMemoryLocation: u16, tileIdFromTileMap: u8): i32 {
+function drawLineOfTileFromTileCache(xPixel: i32, yPixel: i32, pixelXPositionInMap: i32, pixelYPositionInMap: i32, tileMapAddress: i32, tileDataMemoryLocation: i32, tileIdFromTileMap: i32): i32 {
 
   // First, initialize how many pixels we have drawn
   let pixelsDrawn: i32 = 0;
@@ -334,10 +339,10 @@ function drawLineOfTileFromTileCache(xPixel: i32, yPixel: u8, pixelXPositionInMa
     // Was last tile flipped
     let wasLastTileHorizontallyFlipped: boolean = false;
     let isCurrentTileHorizontallyFlipped: boolean = false;
-    if (checkBitOnByte(5, eightBitLoadFromGBMemorySkipTraps(tileMapAddress - 1))) {
+    if (checkBitOnByte(5, eightBitLoadFromGBMemory(tileMapAddress - 1))) {
       wasLastTileHorizontallyFlipped = true;
     }
-    if (checkBitOnByte(5, eightBitLoadFromGBMemorySkipTraps(tileMapAddress))) {
+    if (checkBitOnByte(5, eightBitLoadFromGBMemory(tileMapAddress))) {
       isCurrentTileHorizontallyFlipped = true;
     }
 
@@ -361,7 +366,7 @@ function drawLineOfTileFromTileCache(xPixel: i32, yPixel: u8, pixelXPositionInMa
         }
 
         // Copy the priority for the pixel
-        let pixelPriority: u8 = getPriorityforPixel(previousXPixel, yPixel);
+        let pixelPriority: i32 = getPriorityforPixel(previousXPixel, yPixel);
         addPriorityforPixel(xPixel + tileCacheIndex, yPixel, resetBitOnByte(2, pixelPriority), checkBitOnByte(2, pixelPriority));
 
         pixelsDrawn++;
@@ -386,10 +391,10 @@ function drawLineOfTileFromTileCache(xPixel: i32, yPixel: u8, pixelXPositionInMa
 
 // Function to draw a line of a tile in Color
 // This is for tile rendering shortcuts
-function drawLineOfTileFromTileId(xPixel: i32, yPixel: u8, pixelXPositionInMap: i32, pixelYPositionInMap: u16, tileMapAddress: u16, tileDataMemoryLocation: u16, tileIdFromTileMap: u8): i32 {
+function drawLineOfTileFromTileId(xPixel: i32, yPixel: i32, pixelXPositionInMap: i32, pixelYPositionInMap: i32, tileMapAddress: i32, tileDataMemoryLocation: i32, tileIdFromTileMap: i32): i32 {
 
   // Get the which line of the tile we are rendering
-  let tileLineY: u16 = pixelYPositionInMap % 8;
+  let tileLineY: i32 = pixelYPositionInMap % 8;
 
   // Now lets find our tileX start and end
   // This is for the case where i = 0, but scroll X was 3.
@@ -411,6 +416,12 @@ function drawLineOfTileFromTileId(xPixel: i32, yPixel: u8, pixelXPositionInMap: 
     bgMapAttributes = loadFromVramBank(tileMapAddress, 1);
     if (checkBitOnByte(3, <u8>bgMapAttributes)) {
       vramBankId = 1;
+    }
+
+    if (checkBitOnByte(6, bgMapAttributes)) {
+      // We are mirroring the tile, therefore, we need to opposite byte
+      // So if our pixel was 0 our of 8, it wild become 7 :)
+      tileLineY = 7 - (tileLineY);
     }
   }
 

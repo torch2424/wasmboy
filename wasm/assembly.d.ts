@@ -17,7 +17,7 @@ declare type u8 = number;
 /** A 16-bit unsigned integer. */
 declare type u16 = number;
 /** A 32-bit unsigned integer. */
-declare type u32 = number;
+declare type i32 = number;
 /** A 64-bit unsigned integer. */
 declare type u64 = number;
 /** A 32-bit unsigned integer when targeting 32-bit WebAssembly or a 64-bit unsigned integer when targeting 64-bit WebAssembly. */
@@ -30,73 +30,73 @@ declare type f32 = number;
 declare type f64 = number;
 
 /** Converts any other numeric value to an 8-bit signed integer. */
-declare function i8(value: i8 | i16 | i32 | i64 | isize | u8 | u16 | u32 | u64 | usize | bool | f32 | f64): i8;
+declare function i8(value: i8 | i16 | i32 | i64 | isize | u8 | u16 | i32 | u64 | usize | bool | f32 | f64): i8;
 declare namespace i8 {
   export const MIN_VALUE: i8;
   export const MAX_VALUE: i8;
 }
 /** Converts any other numeric value to a 16-bit signed integer. */
-declare function i16(value: i8 | i16 | i32 | i64 | isize | u8 | u16 | u32 | u64 | usize | bool | f32 | f64): i8;
+declare function i16(value: i8 | i16 | i32 | i64 | isize | u8 | u16 | i32 | u64 | usize | bool | f32 | f64): i8;
 declare namespace i16 {
   export const MIN_VALUE: i16;
   export const MAX_VALUE: i16;
 }
 /** Converts any other numeric value to a 32-bit signed integer. */
-declare function i32(value: i8 | i16 | i32 | i64 | isize | u8 | u16 | u32 | u64 | usize | bool | f32 | f64): i32;
+declare function i32(value: i8 | i16 | i32 | i64 | isize | u8 | u16 | i32 | u64 | usize | bool | f32 | f64): i32;
 declare namespace i32 {
   export const MIN_VALUE: i32;
   export const MAX_VALUE: i32;
 }
 /** Converts any other numeric value to a 64-bit signed integer. */
-declare function i64(value: i8 | i16 | i32 | i64 | isize | u8 | u16 | u32 | u64 | usize | bool | f32 | f64): i64;
+declare function i64(value: i8 | i16 | i32 | i64 | isize | u8 | u16 | i32 | u64 | usize | bool | f32 | f64): i64;
 declare namespace i64 {
   export const MIN_VALUE: i64;
   export const MAX_VALUE: i64;
 }
 /** Converts any other numeric value to a 32-bit (in WASM32) respectivel 64-bit (in WASM64) signed integer. */
-declare function isize(value: i8 | i16 | i32 | i64 | isize | u8 | u16 | u32 | u64 | usize | bool | f32 | f64): isize;
+declare function isize(value: i8 | i16 | i32 | i64 | isize | u8 | u16 | i32 | u64 | usize | bool | f32 | f64): isize;
 declare namespace isize {
   export const MIN_VALUE: isize;
   export const MAX_VALUE: isize;
 }
 /** Converts any other numeric value to an 8-bit unsigned integer. */
-declare function u8(value: i8 | i16 | i32 | i64 | isize | u8 | u16 | u32 | u64 | usize | bool | f32 | f64): i8;
+declare function u8(value: i8 | i16 | i32 | i64 | isize | u8 | u16 | i32 | u64 | usize | bool | f32 | f64): i8;
 declare namespace u8 {
   export const MIN_VALUE: u8;
   export const MAX_VALUE: u8;
 }
 /** Converts any other numeric value to a 16-bit unsigned integer. */
-declare function u16(value: i8 | i16 | i32 | i64 | isize | u8 | u16 | u32 | u64 | usize | bool | f32 | f64): i8;
+declare function u16(value: i8 | i16 | i32 | i64 | isize | u8 | u16 | i32 | u64 | usize | bool | f32 | f64): i8;
 declare namespace u16 {
   export const MIN_VALUE: u16;
   export const MAX_VALUE: u16;
 }
 /** Converts any other numeric value to a 32-bit unsigned integer. */
-declare function u32(value: i8 | i16 | i32 | i64 | isize | u8 | u16 | u32 | u64 | usize | bool | f32 | f64): i32;
-declare namespace u32 {
-  export const MIN_VALUE: u32;
-  export const MAX_VALUE: u32;
+declare function i32(value: i8 | i16 | i32 | i64 | isize | u8 | u16 | i32 | u64 | usize | bool | f32 | f64): i32;
+declare namespace i32 {
+  export const MIN_VALUE: i32;
+  export const MAX_VALUE: i32;
 }
 /** Converts any other numeric value to a 64-bit unsigned integer. */
-declare function u64(value: i8 | i16 | i32 | i64 | isize | u8 | u16 | u32 | u64 | usize | bool | f32 | f64): i64;
+declare function u64(value: i8 | i16 | i32 | i64 | isize | u8 | u16 | i32 | u64 | usize | bool | f32 | f64): i64;
 declare namespace u64 {
   export const MIN_VALUE: u64;
   export const MAX_VALUE: u64;
 }
 /** Converts any other numeric value to a 32-bit (in WASM32) respectivel 64-bit (in WASM64) unsigned integer. */
-declare function usize(value: i8 | i16 | i32 | i64 | isize | u8 | u16 | u32 | u64 | usize | bool | f32 | f64): isize;
+declare function usize(value: i8 | i16 | i32 | i64 | isize | u8 | u16 | i32 | u64 | usize | bool | f32 | f64): isize;
 declare namespace usize {
   export const MIN_VALUE: usize;
   export const MAX_VALUE: usize;
 }
 /** Converts any other numeric value to a 1-bit unsigned integer. */
-declare function bool(value: i8 | i16 | i32 | i64 | isize | u8 | u16 | u32 | u64 | usize | bool | f32 | f64): bool;
+declare function bool(value: i8 | i16 | i32 | i64 | isize | u8 | u16 | i32 | u64 | usize | bool | f32 | f64): bool;
 declare namespace bool {
   export const MIN_VALUE: bool;
   export const MAX_VALUE: bool;
 }
 /** Converts any other numeric value to a 32-bit float. */
-declare function f32(value: i8 | i16 | i32 | i64 | isize | u8 | u16 | u32 | u64 | usize | bool | f32 | f64): f32;
+declare function f32(value: i8 | i16 | i32 | i64 | isize | u8 | u16 | i32 | u64 | usize | bool | f32 | f64): f32;
 declare namespace f32 {
   export const MIN_VALUE: f32;
   export const MAX_VALUE: f32;
@@ -108,7 +108,7 @@ declare namespace f32 {
   export const EPSILON: f32;
 }
 /** Converts any other numeric value to a 64-bit float. */
-declare function f64(value: i8 | i16 | i32 | i64 | isize | u8 | u16 | u32 | u64 | usize | bool | f32 | f64): f64;
+declare function f64(value: i8 | i16 | i32 | i64 | isize | u8 | u16 | i32 | u64 | usize | bool | f32 | f64): f64;
 declare namespace f64 {
   export const MIN_VALUE: f64;
   export const MAX_VALUE: f64;
@@ -146,7 +146,7 @@ declare function copysign<T = f32 | f64>(x: T, y: T): T;
 declare function floor<T = f32 | f64>(value: T): T;
 /** Rounds to the nearest integer tied to even of a 32-bit or 64-bit float. */
 declare function nearest<T = f32 | f64>(value: T): T;
-/** Reinterprets the bits of the specified value as type `T`. Valid reinterpretations are u32/i32 to/from f32 and u64/i64 to/from f64. */
+/** Reinterprets the bits of the specified value as type `T`. Valid reinterpretations are i32/i32 to/from f32 and u64/i64 to/from f64. */
 declare function reinterpret<T = i32 | i64 | f32 | f64>(value: number): T;
 /** Selects one of two pre-evaluated values depending on the condition. */
 declare function select<T>(ifTrue: T, ifFalse: T, condition: bool): T;
@@ -230,16 +230,16 @@ declare class String {
   static fromCodePoint(cp: i32): string;
   static fromCodePoints(arr: i32[]): string;
 
-  readonly length: u32;
+  readonly length: i32;
 
-  charAt(index: u32): string;
-  charCodeAt(index: u32): u16;
+  charAt(index: i32): string;
+  charCodeAt(index: i32): u16;
   concat(other: string): string;
   endsWith(other: string): bool;
-  indexOf(other: string): u32;
+  indexOf(other: string): i32;
   startsWith(other: string): bool;
-  substr(start: u32, length?: u32): string;
-  substring(start: u32, end?: u32): string;
+  substr(start: i32, length?: i32): string;
+  substring(start: i32, end?: i32): string;
   trim(): string;
   trimLeft(): string;
   trimRight(): string;

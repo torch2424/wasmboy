@@ -6,31 +6,35 @@ import {
   batchProcessGraphics
 } from '../graphics/graphics';
 import {
-  Palette
+  Palette,
+  Lcd
 } from '../graphics/index';
 import {
   batchProcessAudio,
-  handleReadToSoundRegister
+  SoundRegisterReadTraps
 } from '../sound/index';
 import {
-  eightBitStoreIntoGBMemorySkipTraps
+  eightBitStoreIntoGBMemory
 } from './store';
 import {
-  eightBitLoadFromGBMemorySkipTraps
+  eightBitLoadFromGBMemory
 } from './load';
 import {
   Joypad,
   getJoypadState
-} from '../joypad/index'
+} from '../joypad/index';
+import {
+  Timers
+} from '../timers/index';
 import {
   hexLog
 } from '../helpers/index';
 
 // Returns -1 if no trap found, otherwise returns a value that should be fed for the address
-export function checkReadTraps(offset: u16): i32 {
+export function checkReadTraps(offset: i32): i32 {
 
   // Cache globals used multiple times for performance
-  let videoRamLocation: u16 = Memory.videoRamLocation;
+  let videoRamLocation: i32 = Memory.videoRamLocation;
 
   // Try to break early for most common scenario
   if (offset < videoRamLocation) {
@@ -48,15 +52,14 @@ export function checkReadTraps(offset: u16): i32 {
     //   return 0xFF;
     // }
 
-    // Not batch processing here for performance
-    // batchProcessGraphics();
+    return -1;
   }
 
   // ECHO Ram, E000	FDFF	Mirror of C000~DDFF (ECHO RAM)
   // http://gbdev.gg8.se/wiki/articles/Memory_Map
   if(offset >= Memory.echoRamLocation && offset < Memory.spriteInformationTableLocation) {
     // Simply return the mirror'd value
-    return eightBitLoadFromGBMemorySkipTraps(offset - 0x2000);
+    return eightBitLoadFromGBMemory(offset - 0x2000);
   }
 
   // Check for individal writes
@@ -65,16 +68,22 @@ export function checkReadTraps(offset: u16): i32 {
   if(offset >= Memory.spriteInformationTableLocation && offset <= Memory.spriteInformationTableLocationEnd) {
     // Can only read/write from OAM During Mode 2
     // See graphics/lcd.ts
-    if (Graphics.currentLcdMode < 2) {
+    if (Lcd.currentLcdMode < 2) {
       return 0xFF;
     }
 
     // Not batch processing here for performance
     // batchProcessGraphics();
+
+    return -1;
   }
 
-  if(offset === Joypad.memoryLocationJoypadRegister) {
-    return getJoypadState();
+  // Graphics
+  // Not batch processing here for performance
+  // batchProcessGraphics();
+  if (offset === Graphics.memoryLocationScanlineRegister) {
+    eightBitStoreIntoGBMemory(offset, Graphics.scanlineRegister);
+    return Graphics.scanlineRegister;
   }
 
   // Sound
@@ -82,24 +91,30 @@ export function checkReadTraps(offset: u16): i32 {
   // TODO: Put these bounds on the Sound Class
   if(offset >= 0xFF10 && offset <= 0xFF26) {
     batchProcessAudio();
-    let soundReadResponse: i32 = handleReadToSoundRegister(offset);
-    if(soundReadResponse < 0) {
-      return -1;
-    }
-    return <u8>soundReadResponse;
+    return SoundRegisterReadTraps(offset);
   }
   // FF27 - FF2F not used
   // Final Wave Table for Channel 3
   if(offset >= 0xFF30 && offset <= 0xFF3F) {
     batchProcessAudio();
+    return -1;
   }
 
-  // Batch Process Graphics
-  // http://gameboy.mongenel.com/dmg/asmmemmap.html and http://gbdev.gg8.se/wiki/articles/Video_Display
-  // if (offset >= Graphics.memoryLocationLcdControl && offset <= Graphics.memoryLocationWindowX) {
-  //   // Not batch processing here for performance
-  //   // batchProcessGraphics();
-  // }
+  // Timers
+  if(offset === Timers.memoryLocationDividerRegister) {
+    eightBitStoreIntoGBMemory(offset, Timers.dividerRegister);
+    return Timers.dividerRegister;
+  }
+  if(offset === Timers.memoryLocationTimerCounter) {
+    eightBitStoreIntoGBMemory(offset, Timers.timerCounter);
+    return Timers.timerCounter;
+  }
+
+  // Joypad
+  if(offset === Joypad.memoryLocationJoypadRegister) {
+    return getJoypadState();
+  }
+
 
   return -1;
 }
