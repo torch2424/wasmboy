@@ -31,7 +31,7 @@ const PERFORMANCE_OPTION_ITERATIONS = 2;
 // Initialize wasmBoy headless, with a speed option
 const WASMBOY_INITIALIZE_OPTIONS = {
     headless: true,
-    gameboySpeed: 1.0,
+    gameboySpeed: 100.0,
     isGbcEnabled: true
 };
 
