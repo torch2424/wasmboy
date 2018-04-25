@@ -81,7 +81,9 @@ export class WasmBoySystemControls extends Component {
 
     return (
       <div className="system-controls">
-        <input type="file" onChange={(event) => {this.loadGame(props.wasmboy, event)}}></input>
+        <div className="system-controls__file-input">
+          <input type="file" onChange={(event) => {this.loadGame(props.wasmboy, event)}}></input>
+        </div>
         <button onclick={() => {props.wasmboy.startGame();}}>Start Game</button>
         <button onclick={() => {props.wasmboy.pauseGame();}}>Pause Game</button>
         <button onclick={() => {props.wasmboy.resumeGame();}}>Resume Game</button>

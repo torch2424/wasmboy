@@ -27,11 +27,11 @@ export function getTileDataAddress(tileDataMemoryLocation: i32, tileIdFromTileMa
     // NOTE: Assemblyscript, Can't cast to i16, need to make negative manually
     let signedTileId: i32 = tileIdFromTileMap + 128;
     if (checkBitOnByte(7, tileIdFromTileMap)) {
-      signedTileId = <i32>tileIdFromTileMap - 128;
+      signedTileId = tileIdFromTileMap - 128;
     }
     return tileDataMemoryLocation + signedTileId * 16;
-  } else {
-    // if the background layout gave us the tileId 0, then the tile data would be between 0x8000-0x800F.
-    return tileDataMemoryLocation + tileIdFromTileMap * 16;
   }
+
+  // if the background layout gave us the tileId 0, then the tile data would be between 0x8000-0x800F.
+  return tileDataMemoryLocation + tileIdFromTileMap * 16;
 }

@@ -54,6 +54,15 @@ button {
 	text-align: center;
 }
 
+.system-controls button {
+	margin: 10px;
+}
+
+.system-controls__file-input {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
 
 .wasmboy__gamepad {
 	position: fixed;

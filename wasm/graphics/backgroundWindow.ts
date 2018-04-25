@@ -102,6 +102,9 @@ export function renderWindow(scanlineRegister:i32, tileDataMemoryLocation: i32, 
 // Function frankenstein'd together to allow background and window to share the same draw scanline function
 function drawBackgroundWindowScanline(scanlineRegister: i32, tileDataMemoryLocation: i32, tileMapMemoryLocation: i32, pixelYPositionInMap: i32, iStart: i32, xOffset: i32): void {
 
+  // Get our tile Y position in the map
+  let tileYPositionInMap: i32 = pixelYPositionInMap >> 3;
+
   // Loop through x to draw the line like a CRT
   for (let i: i32 = iStart; i < 160; i++) {
 
@@ -121,7 +124,6 @@ function drawBackgroundWindowScanline(scanlineRegister: i32, tileDataMemoryLocat
     // Also, bitshifting by 3, do do a division by 8
     // Need to use u16s, as they will be used to compute an address, which will cause weird errors and overflows
     let tileXPositionInMap: i32 = pixelXPositionInMap >> 3;
-    let tileYPositionInMap: i32 = pixelYPositionInMap >> 3;
 
 
     // Get our tile address on the tileMap
@@ -156,6 +158,7 @@ function drawBackgroundWindowScanline(scanlineRegister: i32, tileDataMemoryLocat
       }
     } else if(!usedTileCache) {
       if (Cpu.GBCEnabled) {
+        
         // Draw the individual pixel
         drawColorPixelFromTileId(i, scanlineRegister, pixelXPositionInMap, pixelYPositionInMap, tileMapAddress, tileDataMemoryLocation, tileIdFromTileMap);
 
@@ -169,7 +172,6 @@ function drawBackgroundWindowScanline(scanlineRegister: i32, tileDataMemoryLocat
 }
 
 // Function to draw a pixel for the standard GB
-// TODO: Make this match our new RGB scheme for placing pixels in memory
 function drawMonochromePixelFromTileId(xPixel: i32, yPixel: i32, pixelXPositionInMap: i32, pixelYPositionInMap: i32, tileDataMemoryLocation: i32, tileIdFromTileMap: i32): void {
   // Now we can process the the individual bytes that represent the pixel on a tile
 
