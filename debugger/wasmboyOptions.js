@@ -61,13 +61,17 @@ export class WasmBoyOptions extends Component {
     });
 
     return (
-      <div>
+      <div class="wasmboy__options">
         <h1>Options:</h1>
-        <div>
-          <i>Applying options will reset any currently running game without saving</i>
+        <div class="wasmboy__options__info">
+          <i>Applying options will reset any currently running game without saving. Information on the <a href="https://github.com/torch2424/wasmBoy/blob/master/test/performance/results.md" target="_blank">effectiveness of performance improving options can be found here</a></i>
         </div>
-        {options}
-        <button onClick={() => {this.applyOptions()}}>Apply</button>
+
+        <div class="wasmboy__options__inputs">
+          {options}
+        </div>
+
+        <button class="wasmboy__options__apply" onClick={() => {this.applyOptions()}}>Apply</button>
       </div>
     )
   }

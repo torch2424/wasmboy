@@ -63,6 +63,26 @@ button {
 	margin-bottom: 10px;
 }
 
+.wasmboy__options {
+	margin-left: auto;
+	margin-right: auto;
+	padding: 10px;
+	max-width: 600px;
+}
+
+.wasmboy__options__info {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.wasmboy__options__inputs div {
+	margin: 5px;
+}
+
+.wasmboy__options__apply {
+	margin-top: 10px;
+}
+
 
 .wasmboy__gamepad {
 	position: fixed;
