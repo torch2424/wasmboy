@@ -1,7 +1,7 @@
 import './style';
 import { Component } from 'preact';
 import { WasmBoy, WasmBoyGraphics, WasmBoyAudio, WasmBoyController, WasmBoyMemory } from './lib/wasmboy.js';
-import { WasmBoyDebugger, WasmBoySystemControls } from './debugger/index';
+import { WasmBoyDebugger, WasmBoySystemControls, WasmBoyOptions } from './debugger/index';
 
 // Old Perf Options
 // WasmBoy.initialize(canvasElement, {
@@ -35,6 +35,9 @@ const wasmBoyDefaultOptions = {
 	}
 };
 
+// Our canvas element
+let canvasElement = undefined;
+
 export default class App extends Component {
 
 	constructor() {
@@ -49,7 +52,7 @@ export default class App extends Component {
 	// Using componentDidMount to wait for the canvas element to be inserted in DOM
 	componentDidMount() {
 		// Get our canvas element
-		const canvasElement = document.querySelector(".wasmboy__canvas-container__canvas");
+		canvasElement = document.querySelector(".wasmboy__canvas-container__canvas");
 
 		// Load our game
 		WasmBoy.initialize(canvasElement, wasmBoyDefaultOptions);
@@ -89,7 +92,7 @@ export default class App extends Component {
 		if (this.state.showOptions) {
 			optionsComponent = (
 				<div className={ "wasmboy__options" }>
-					TODO
+					<WasmBoyOptions wasmBoy={WasmBoy} defaultOptions={wasmBoyDefaultOptions}></WasmBoyOptions>
 				</div>
 			)
 		}
@@ -122,6 +125,9 @@ export default class App extends Component {
 							}
 						} />
         </div>
+
+				{optionsComponent}
+
 				<div style="text-align: center">
           <label for="showDebugger">Show Debugger</label>
           <input
@@ -135,6 +141,9 @@ export default class App extends Component {
 							}
 						} />
         </div>
+
+				{debuggerComponent}
+
 				<div class="wasmboy__systemControls">
 					<WasmBoySystemControls wasmboy={WasmBoy} wasmboyMemory={WasmBoyMemory}></WasmBoySystemControls>
 				</div>
@@ -142,10 +151,6 @@ export default class App extends Component {
     			<canvas className="wasmboy__canvas-container__canvas">
           </canvas>
         </div>
-
-				{optionsComponent}
-
-				{debuggerComponent}
 
 				<div class="wasmboy__gamepad">
 
