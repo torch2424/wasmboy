@@ -3,6 +3,7 @@ import 'bulma/css/bulma.css';
 import '@fortawesome/fontawesome-free-webfonts/css/fontawesome.css';
 import '@fortawesome/fontawesome-free-webfonts/css/fa-regular.css';
 import '@fortawesome/fontawesome-free-webfonts/css/fa-solid.css';
+import 'animate.css/animate.css'
 import { Component } from 'preact';
 import { WasmBoy, WasmBoyGraphics, WasmBoyAudio, WasmBoyController, WasmBoyMemory } from './lib/wasmboy.js';
 import { WasmBoyDebugger, WasmBoySystemControls, WasmBoyOptions, WasmBoyGamepad } from './debugger/index';
@@ -114,7 +115,7 @@ export default class App extends Component {
 		}
 
 		return (
-			<div>
+			<div class="wasmboy animated fadeIn">
 
 				<h1 class="wasmboy__title">WasmBoy Demo</h1>
 				<div style="text-align: center">

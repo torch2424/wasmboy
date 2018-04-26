@@ -229,44 +229,48 @@ export class WasmBoyDebugger extends Component {
 
 	render(props) {
 		return (
-      <div className={ "wasmboy__debugger" }>
+      <div class="wasmboy__debugger animated fadeIn">
           <h1>Debugger</h1>
 
           <h2>Control Flow Actions:</h2>
 
           <div class="debuggerAction">
-            <button onclick={() => {this.stepOpcode(props.wasmboy, props.wasmboyGraphics).then(() => {})}}>Step Opcode</button>
+            <button class="button" onclick={() => {this.stepOpcode(props.wasmboy, props.wasmboyGraphics).then(() => {})}}>Step Opcode</button>
           </div>
 
           <div class="debuggerAction">
+            Run Specified Number of Opcodes:
             <input type="number"
+             class="input"
              value={this.state.opcodesToRun }
              onChange={(evt) => { this.state.opcodesToRun = evt.target.value; }} />
-            <button onclick={() => {this.runNumberOfOpcodes(props.wasmboy, props.wasmboyGraphics).then(() => {})}}>Run number of opcodes</button>
+            <button class="button" onclick={() => {this.runNumberOfOpcodes(props.wasmboy, props.wasmboyGraphics).then(() => {})}}>Run number of opcodes</button>
           </div>
 
           <div class="debuggerAction">
-            Breakpoint Line Number: 0x<input type="string"
+            Breakpoint Line Number: 0x<input
+             type="string"
+             class="input"
              value={this.state.breakPoint }
              onChange={(evt) => { this.state.breakPoint = evt.target.value; }} />
-            <button onclick={() => {this.breakPoint(props.wasmboy, props.wasmboyGraphics)}}>Run To Breakpoint</button>
+            <button class="button" onclick={() => {this.breakPoint(props.wasmboy, props.wasmboyGraphics)}}>Run To Breakpoint</button>
           </div>
 
           <h2>Wasmboy State Actions:</h2>
 
           <div class="debuggerAction">
-            <button onclick={() => {this.logWasmBoyMemory(props.wasmboy)}}>Log Memory to console</button>
+            <button class="button" onclick={() => {this.logWasmBoyMemory(props.wasmboy)}}>Log Memory to console</button>
           </div>
 
           <div class="debuggerAction">
-            <button onclick={() => {props.wasmboyAudio.debugSaveCurrentAudioBufferToWav()}}>Save Current Audio buffer to wav</button>
+            <button class="button" onclick={() => {props.wasmboyAudio.debugSaveCurrentAudioBufferToWav()}}>Save Current Audio buffer to wav</button>
           </div>
 
           <div class="debuggerAction">
-            <button onclick={() => { this.state.showValueTable = true; this.updateValueTable(props.wasmboy)}}>Update Value Table</button>
+            <button class="button" onclick={() => { this.state.showValueTable = true; this.updateValueTable(props.wasmboy)}}>Update Value Table</button>
           </div>
 
-          <h2>Debugger Options:</h2>
+          <h2>Debugger Elements:</h2>
 
           <div>
             <label class="checkbox" for="showValueTable">

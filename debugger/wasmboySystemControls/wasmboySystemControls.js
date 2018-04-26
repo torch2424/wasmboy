@@ -108,11 +108,11 @@ export class WasmBoySystemControls extends Component {
         </div>
 
 
-        <button onclick={() => {props.wasmboy.startGame();}}>Start Game</button>
-        <button onclick={() => {props.wasmboy.pauseGame();}}>Pause Game</button>
-        <button onclick={() => {props.wasmboy.resumeGame();}}>Resume Game</button>
-        <button onclick={() => {props.wasmboy.saveState();}}>Save State</button>
-        <button onclick={() => {this.openSaveStates();}}>Load State</button>
+        <button class="button" onclick={() => {props.wasmboy.startGame();}}>Start Game</button>
+        <button class="button" onclick={() => {props.wasmboy.pauseGame();}}>Pause Game</button>
+        <button class="button" onclick={() => {props.wasmboy.resumeGame();}}>Resume Game</button>
+        <button class="button" onclick={() => {props.wasmboy.saveState();}}>Save State</button>
+        <button class="button" onclick={() => {this.openSaveStates();}}>Load State</button>
         <div>Gameboy FPS: {this.state.fps}</div>
 
         { this.state.showSaveStates ? (
