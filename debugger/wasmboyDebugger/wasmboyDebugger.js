@@ -1,7 +1,7 @@
 import { Component } from 'preact';
-import { NumberBaseTable } from './numberBaseTable';
-import { WasmBoyBackgroundMap } from './wasmboyBackgroundMap';
-import { WasmBoyTileData } from './wasmboyTileData';
+import { NumberBaseTable } from './numberBaseTable/numberBaseTable';
+import { WasmBoyBackgroundMap } from './wasmboyBackgroundMap/wasmboyBackgroundMap';
+import { WasmBoyTileData } from './wasmboyTileData/wasmboyTileData';
 import './wasmboyDebugger.css';
 
 // Function to get a value in gameboy memory, to wasmboy memory
