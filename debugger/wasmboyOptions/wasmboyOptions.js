@@ -38,12 +38,14 @@ export class WasmBoyOptions extends Component {
       if (typeof(this.state[stateOptionKey]) === typeof(true)) {
         options.push((
           <div>
-            <label for={stateOptionKey}>{stateOptionKey}</label>
-            <input
-              id={stateOptionKey}
-              type="checkbox"
-              checked={ this.state[stateOptionKey] }
-              onChange={ () => { this.setStateKey(stateOptionKey, !this.state[stateOptionKey]); } } />
+            <label class="checkbox" for={stateOptionKey}>
+              {stateOptionKey}
+              <input
+                id={stateOptionKey}
+                type="checkbox"
+                checked={ this.state[stateOptionKey] }
+                onChange={ () => { this.setStateKey(stateOptionKey, !this.state[stateOptionKey]); } } />
+            </label>
           </div>
         ));
       }
@@ -52,7 +54,7 @@ export class WasmBoyOptions extends Component {
       if (typeof(this.state[stateOptionKey]) === "number") {
         options.push((
           <div>
-            <label>
+            <label class="checkbox">
               {stateOptionKey}
               <input type="number" name={stateOptionKey} value={this.state[stateOptionKey]} onChange={(event) => {this.setStateKey(stateOptionKey, parseFloat(event.target.value))}} />
             </label>

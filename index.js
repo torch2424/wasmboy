@@ -1,5 +1,8 @@
 import './style';
 import 'bulma/css/bulma.css';
+import '@fortawesome/fontawesome-free-webfonts/css/fontawesome.css';
+import '@fortawesome/fontawesome-free-webfonts/css/fa-regular.css';
+import '@fortawesome/fontawesome-free-webfonts/css/fa-solid.css';
 import { Component } from 'preact';
 import { WasmBoy, WasmBoyGraphics, WasmBoyAudio, WasmBoyController, WasmBoyMemory } from './lib/wasmboy.js';
 import { WasmBoyDebugger, WasmBoySystemControls, WasmBoyOptions, WasmBoyGamepad } from './debugger/index';
@@ -92,9 +95,9 @@ export default class App extends Component {
 		)
 		if (this.state.showOptions) {
 			optionsComponent = (
-				<div className={ "wasmboy__options" }>
+				<section>
 					<WasmBoyOptions wasmBoy={WasmBoy} defaultOptions={wasmBoyDefaultOptions}></WasmBoyOptions>
-				</div>
+				</section>
 			)
 		}
 
@@ -104,54 +107,59 @@ export default class App extends Component {
 		)
 		if (this.state.showDebugger) {
 			debuggerComponent = (
-				<div className={ "wasmboy__debugger" }>
+				<section>
 					<WasmBoyDebugger wasmboy={WasmBoy} wasmboyGraphics={WasmBoyGraphics} wasmboyAudio={WasmBoyAudio}></WasmBoyDebugger>
-				</div>
+				</section>
 			)
 		}
 
 		return (
 			<div>
-				<h1>WasmBoy Demo</h1>
+
+				<h1 class="wasmboy__title">WasmBoy Demo</h1>
 				<div style="text-align: center">
-          <label for="showOptions">Show Options</label>
-          <input
-            id="showOptions"
-            type="checkbox"
-            checked={ this.state.showOptions }
-            onChange={ () => {
-								const newState = Object.assign({}, this.state);
-								newState.showOptions = !newState.showOptions;
-								this.setState(newState);
-							}
-						} />
+          <label class="checkbox">
+						Show Options
+						<input
+	            id="showOptions"
+	            type="checkbox"
+	            checked={ this.state.showOptions }
+	            onChange={ () => {
+									const newState = Object.assign({}, this.state);
+									newState.showOptions = !newState.showOptions;
+									this.setState(newState);
+								}
+							} />
+					</label>
         </div>
 
 				{optionsComponent}
 
 				<div style="text-align: center">
-          <label for="showDebugger">Show Debugger</label>
-          <input
-            id="showDebugger"
-            type="checkbox"
-            checked={ this.state.showDebugger }
-            onChange={ () => {
-								const newState = Object.assign({}, this.state);
-								newState.showDebugger = !newState.showDebugger;
-								this.setState(newState);
-							}
-						} />
+          <label class="checkbox">
+						Show Debugger
+						<input
+	            type="checkbox"
+	            checked={ this.state.showDebugger }
+	            onChange={ () => {
+									const newState = Object.assign({}, this.state);
+									newState.showDebugger = !newState.showDebugger;
+									this.setState(newState);
+								}
+							} />
+					</label>
         </div>
 
 				{debuggerComponent}
 
-				<div class="wasmboy__systemControls">
+				<div>
 					<WasmBoySystemControls wasmboy={WasmBoy} wasmboyMemory={WasmBoyMemory}></WasmBoySystemControls>
 				</div>
-				<div className="wasmboy__canvas-container">
+
+				<main className="wasmboy__canvas-container">
     			<canvas className="wasmboy__canvas-container__canvas">
           </canvas>
-        </div>
+        </main>
 
 				<WasmBoyGamepad></WasmBoyGamepad>
 

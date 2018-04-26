@@ -1,4 +1,4 @@
-/* General styles for the debugger */
+/* General styles for the debugger, and the index component */
 
 html, body {
 	font: 14px/1.21 'Helvetica Neue', arial, sans-serif;
@@ -22,6 +22,16 @@ p {
 button {
 	margin-left: 5px;
 	margin-right: 5px;
+}
+
+input[type="checkbox"] {
+	margin-left: 5px;
+}
+
+.wasmboy__title {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	font-size: 1rem;
 }
 
 .hide {

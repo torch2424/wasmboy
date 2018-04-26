@@ -9,6 +9,7 @@ export class WasmBoySystemControls extends Component {
 		// set our state to if we are initialized or not
 		this.state = {
       showSaveStates: false,
+      currentFileName: 'No File Chosen...',
       saveStates: []
     };
 
@@ -55,6 +56,11 @@ export class WasmBoySystemControls extends Component {
     .then(() => {
       console.log('wasmboy Ready!');
     });
+
+    // Set our file name
+    const newState = Object.assign({}, this.state);
+    newState.currentFileName = event.target.files[0].name;
+    this.setState(newState);
   }
 
   render(props) {
@@ -81,10 +87,27 @@ export class WasmBoySystemControls extends Component {
     }
 
     return (
-      <div className="system-controls">
-        <div className="system-controls__file-input">
-          <input type="file" onChange={(event) => {this.loadGame(props.wasmboy, event)}}></input>
+      <div className="wasmboy__systemControls system-controls">
+
+        {/* Bulma file picker */}
+        <div class="system-controls__file-input file is-centered has-name is-boxed">
+          <label class="file-label">
+            <input class="file-input" type="file" name="resume" onChange={(event) => {this.loadGame(props.wasmboy, event)}} />
+            <span class="file-cta">
+              <span class="file-icon">
+                <i class="fas fa-upload"></i>
+              </span>
+              <span class="file-label">
+                Choose a file…
+              </span>
+            </span>
+            <span class="file-name">
+              {this.state.currentFileName}
+            </span>
+          </label>
         </div>
+
+
         <button onclick={() => {props.wasmboy.startGame();}}>Start Game</button>
         <button onclick={() => {props.wasmboy.pauseGame();}}>Pause Game</button>
         <button onclick={() => {props.wasmboy.resumeGame();}}>Resume Game</button>
