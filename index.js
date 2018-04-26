@@ -117,7 +117,7 @@ export default class App extends Component {
 		return (
 			<div class="wasmboy animated fadeIn">
 
-				<h1 class="wasmboy__title">WasmBoy Demo</h1>
+				<h1 class="wasmboy__title">WasmBoy Demo / Debugger</h1>
 				<div style="text-align: center">
           <label class="checkbox">
 						Show Options
