@@ -1,0 +1,19 @@
+.wasmboy__debugger {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 800px;
+}
+
+.wasmboy__debugger canvas {
+	max-width: 600px;
+	width: 100%;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.debuggerAction {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}

@@ -1,4 +1,5 @@
 import { Component } from 'preact';
+import './wasmboyOptions.css';
 
 export class WasmBoyOptions extends Component {
   constructor(props) {

@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import { NumberBaseTable } from './numberBaseTable';
 import { WasmBoyBackgroundMap } from './wasmboyBackgroundMap';
 import { WasmBoyTileData } from './wasmboyTileData';
+import './wasmboyDebugger.css';
 
 // Function to get a value in gameboy memory, to wasmboy memory
 const getWasmBoyOffsetFromGameBoyOffset = (gameboyOffset, wasmboy) => {

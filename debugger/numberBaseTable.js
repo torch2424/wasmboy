@@ -1,4 +1,5 @@
 import { Component } from 'preact';
+import './numberBaseTable.css';
 
 // Component that takes in a JSON object, where the Keys are the column name,
 // And the Rows will represent each base value of the number in the value of the key

@@ -1,3 +1,5 @@
+/* General styles for the debugger */
+
 html, body {
 	font: 14px/1.21 'Helvetica Neue', arial, sans-serif;
 	font-weight: 400;
@@ -7,6 +9,7 @@ html, body {
 
 h1 {
 	text-align: center;
+	font-weight: bold !important;
 }
 
 p {
@@ -25,11 +28,6 @@ button {
 	display: none;
 }
 
-.debuggerAction {
-	margin-top: 10px;
-	margin-bottom: 10px;
-}
-
 .wasmboy__canvas-container {
 	text-align: center;
 }
@@ -46,211 +44,6 @@ button {
 	max-width: 640px;
 	max-height: 576px;
 }
-
-
-.wasmboy__systemControls {
-	margin-top: 10px;
-	margin-bottom: 10px;
-	text-align: center;
-}
-
-.system-controls button {
-	margin: 10px;
-}
-
-.system-controls__file-input {
-	margin-top: 10px;
-	margin-bottom: 10px;
-}
-
-.wasmboy__options {
-	margin-left: auto;
-	margin-right: auto;
-	padding: 10px;
-	max-width: 600px;
-}
-
-.wasmboy__options__info {
-	margin-top: 10px;
-	margin-bottom: 10px;
-}
-
-.wasmboy__options__inputs div {
-	margin: 5px;
-}
-
-.wasmboy__options__apply {
-	margin-top: 10px;
-}
-
-
-.wasmboy__gamepad {
-	position: fixed;
-	pointer-events: none;
-	top: 0;
-	left: 0;
-
-	width: 100vw;
-	height: 90vh;
-	opacity: 0.65;
-
-	/* Shown in media query at bottom */
-	display: none;
-}
-
-.wasmboy__gamepad svg {
-	position: absolute;
-	pointer-events: auto;
-	fill: #b967ff;
-}
-
-#gamepadDpad {
-	left: 0;
-	bottom: 50px;
-
-	width: 175px;
-	height: 175px;
-}
-
-#gamepadSelect {
-	left: calc(50vw - 125px);
-	bottom: 0;
-
-	width: 125px;
-	height: 50px;
-}
-
-#gamepadStart {
-	right: calc(50vw - 125px);
-	bottom: 0;
-
-	width: 125px;
-	height: 50px;
-}
-
-#gamepadB {
-	right: 125px;
-	bottom: 60px;
-
-	width: 110px;
-	height: 110px;
-}
-
-#gamepadA {
-	right: 0px;
-	bottom: 120px;
-
-	width: 110px;
-	height: 110px;
-}
-
-/* Only display on phones */
-@media screen and (max-width: 800px) {
-	.wasmboy__gamepad {
-		display: block;
-	}
-}
-
-.number-base-table-container {
-	width: 100%;
-	min-width: 1024px;
-	margin-top: 10px;
-	overflow-x: auto;
-}
-
-.number-base-table {
-	border-collapse: collapse;
-	width: 100%;
-}
-
-.number-base-table th {
-    height: 50px;
-		font-weight: bold;
-		background-color: #9bbc0f;
-}
-
-.number-base-table td {
-	width: 75px;
-}
-
-.number-base-table tr:hover {
-	background-color: #f5f5f5;
-}
-
-.number-base-table th, .number-base-table td, .number-base-table tr {
-	text-align: left;
-	border: 1px solid black;
-	padding: 5px;
-	min-width: 150px;
-}
-
-.wasmboy__debugger canvas {
-	max-width: 600px;
-	width: 100%;
-	margin-top: 10px;
-	margin-bottom: 10px;
-}
-
-.popup-shadow-container {
-	position: fixed;
-	top: 0px;
-	left: 0px;
-	z-index: 100;
-
-	width: 100vw;
-	height: 100vh;
-
-	background-color: rgba(0, 0, 0, 0.5);
-
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
-
-.popup {
-	border: 5px solid rgba(0, 0, 0, 0.75);
-	background-color: #F5F5F5;
-	color: #020202;
-
-	width: 80vw;
-	height: 70vh;
-
-	max-width: 800px;
-	max-height: 700px;
-
-	overflow: auto;
-
-	z-index: 101;
-}
-
-.saveStateContainer {
-
-	margin-left: auto;
-	margin-right: auto;
-
-	display: flex;
-	justify-content: flex-start;
-	align-items: flex-start;
-	flex-wrap: wrap;
-	flex-direction: row;
-}
-
-.saveState {
-	margin-left: 5px;
-	margin-right: 5px;
-	padding: 5px;
-
-
-	word-wrap: break-word;
-
-	transition: background-color 0.25s;
-}
-
-.saveState:hover {
-	background-color: rgba(0, 0, 0, 0.25);
-	cursor: pointer;
-}
-
 
 /* https://atomiks.github.io/30-seconds-of-css/ */
 @keyframes donut-spin {
