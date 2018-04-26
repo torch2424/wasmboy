@@ -35,12 +35,8 @@
 	color: #020202;
 
 	width: 80vw;
-	height: 70vh;
 
 	max-width: 800px;
-	max-height: 700px;
-
-	overflow: auto;
 
 	z-index: 101;
 }
@@ -51,16 +47,22 @@
 	margin-right: auto;
 
 	display: flex;
-	justify-content: flex-start;
+	justify-content: space-around;
 	align-items: flex-start;
 	flex-wrap: wrap;
 	flex-direction: row;
+
+	overflow: auto;
+
+	height: 65vh;
+	max-height: 650px;
+	padding-bottom: 10px;
 }
 
 .saveState {
 	margin-left: 5px;
 	margin-right: 5px;
-	padding: 5px;
+	padding: 10px;
 
 
 	word-wrap: break-word;
