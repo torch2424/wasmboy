@@ -4,18 +4,6 @@ import { Component } from 'preact';
 import { WasmBoy, WasmBoyGraphics, WasmBoyAudio, WasmBoyController, WasmBoyMemory } from './lib/wasmboy.js';
 import { WasmBoyDebugger, WasmBoySystemControls, WasmBoyFilePicker, WasmBoyOptions, WasmBoyGamepad } from './debugger/index';
 
-// Old Perf Options
-// WasmBoy.initialize(canvasElement, {
-// 	frameSkip: 1,
-// 	audioBatchProcessing: true,
-// 	timersBatchProcessing: true,
-// 	audioAccumulateSamples: true,
-// 	graphicsDisableScanlineRendering: true
-// });
-
-//const defaultGamePath = './test/accuracy/testroms/blargg/cpu_instrs.gb';
-const defaultGamePath = './games/linksawakening.gb';
-
 const wasmBoyDefaultOptions = {
 	isGbcEnabled: true,
 	isAudioEnabled: true,
@@ -80,16 +68,6 @@ export default class App extends Component {
 		WasmBoyController.addTouchInput('B', bElement, 'BUTTON');
 		WasmBoyController.addTouchInput('START', startElement, 'BUTTON');
 		WasmBoyController.addTouchInput('SELECT', selectElement, 'BUTTON');
-
-		//WasmBoy.loadGame('./test/testroms/blargg/cpu_instrs.gb')
-		WasmBoy.loadGame(defaultGamePath)
-		.then(() => {
-			console.log('Wasmboy Ready!');
-			this.showNotification('Game Loaded! 🎉');
-		}).catch((error) => {
-			console.log('Load Game Error:', error);
-			this.showNotification('Game Load Error! 😞');
-		});
 	}
 
 	// Function to show notifications to the user
