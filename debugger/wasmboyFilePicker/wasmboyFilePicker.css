@@ -4,6 +4,10 @@
   margin-bottom: 10px;
 }
 
+.wasmboy__filePicker h2 {
+  text-align: center;
+}
+
 .wasmboy__filePicker__services {
     display: flex;
     flex-direction: row;
@@ -12,10 +16,10 @@
     flex-wrap: wrap;
 }
 
-.wasmboy__filePicker h2 {
-  text-align: center;
+.wasmboy__filePicker__services .donut {
+  margin-top: 10px;
 }
 
-.wasmboy__filePicker .file {
+.wasmboy__filePicker__services .file {
   margin: 10px;
 }

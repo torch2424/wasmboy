@@ -16,19 +16,23 @@ export class WasmBoyFilePicker extends Component {
     // set our state to if we are initialized or not
     this.state = {
       currentFileName: 'No Game Selected...',
+      isFileLoading: false
     };
   }
 
   // Allow passing a file
   // https://gist.github.com/AshikNesin/e44b1950f6a24cfcd85330ffc1713513
   loadLocalFile(event) {
+    this.setFileLoadingStatus(true);
     this.props.wasmboy.loadGame(event.target.files[0])
     .then(() => {
 			console.log('Wasmboy Ready!');
 			this.props.showNotification('Game Loaded! 🎉');
+      this.setFileLoadingStatus(false);
 		}).catch((error) => {
 			console.log('Load Game Error:', error);
 			this.props.showNotification('Game Load Error! 😞');
+      this.setFileLoadingStatus(false);
 		});
 
     // Set our file name
@@ -47,6 +51,8 @@ export class WasmBoyFilePicker extends Component {
       const oAuthHeaders = new Headers({
         'Authorization': 'Bearer ' + googlePickerOAuthToken
       });
+
+      this.setFileLoadingStatus(true);
 
       // First Fetch the Information about the file
       fetch('https://www.googleapis.com/drive/v2/files/' + googlePickerFileObject.id, {
@@ -72,6 +78,7 @@ export class WasmBoyFilePicker extends Component {
             .then(() => {
         			console.log('Wasmboy Ready!');
         			this.props.showNotification('Game Loaded! 🎉');
+              this.setFileLoadingStatus(false);
 
               // Set our file name
               const newState = Object.assign({}, this.state);
@@ -80,30 +87,42 @@ export class WasmBoyFilePicker extends Component {
         		}).catch((error) => {
         			console.log('Load Game Error:', error);
         			this.props.showNotification('Game Load Error! 😞');
+              this.setFileLoadingStatus(false);
         		});
 
           }).catch((error) => {
             console.log(error);
             this.props.showNotification('Error getting file from google drive 💔');
+            this.setFileLoadingStatus(true);
           });
         }).catch((error) => {
           console.log(error);
           this.props.showNotification('Error getting file from google drive 💔');
+          this.setFileLoadingStatus(true);
         });
 
       }).catch((error) => {
         this.props.showNotification('Error getting file from google drive 💔');
+        this.setFileLoadingStatus(true);
       });
     }
   }
 
-  render() {
-    return (
-      <div class="wasmboy__filePicker">
-        <h1>Load Game</h1>
-        <h2>Supported file types: ".gb", ".gbc", ".zip"</h2>
-        <h2>{this.state.currentFileName}</h2>
+  setFileLoadingStatus(isLoading) {
+		const newState = Object.assign({}, this.state);
+		newState.isFileLoading = isLoading;
+		this.setState(newState);
+	}
 
+  render() {
+
+    let fileInput = (
+      <div class="wasmboy__filePicker__services">
+        <div class="donut"></div>
+      </div>
+    )
+    if(!this.state.isFileLoading) {
+      fileInput = (
         <div class="wasmboy__filePicker__services">
 
           {/* Bulma file picker */}
@@ -152,6 +171,15 @@ export class WasmBoyFilePicker extends Component {
             </div>
           </GooglePicker>
         </div>
+      );
+    }
+
+    return (
+      <div class="wasmboy__filePicker">
+        <h1>Load Game</h1>
+        <h2>Supported file types: ".gb", ".gbc", ".zip"</h2>
+        <h2>{this.state.currentFileName}</h2>
+        {fileInput}
       </div>
     )
   }

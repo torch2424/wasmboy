@@ -50,7 +50,7 @@ export default class App extends Component {
 		this.state = {
 			showDebugger: false,
 			showOptions: false,
-			notification: (<div></div>),
+			notification: (<div></div>)
 		}
 	}
 
