@@ -9,7 +9,7 @@ export class WasmBoySystemControls extends Component {
 		// set our state to if we are initialized or not
 		this.state = {
       showSaveStates: false,
-      currentFileName: 'Please add a ".gb", ".gbc", ".zip" file',
+      currentFileName: 'Choose a file...',
       saveStates: [],
       saveStateError: false
     };
@@ -147,7 +147,7 @@ export class WasmBoySystemControls extends Component {
                 </svg>
               </span>
               <span class="file-label">
-                Choose a file…
+                ".gb", ".gbc", ".zip"
               </span>
             </span>
             <span class="file-name">

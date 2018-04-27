@@ -14,7 +14,7 @@ import { WasmBoyDebugger, WasmBoySystemControls, WasmBoyOptions, WasmBoyGamepad 
 // });
 
 //const defaultGamePath = './test/accuracy/testroms/blargg/cpu_instrs.gb';
-const defaultGamePath = './games/kirbysdreamland.zip';
+const defaultGamePath = './games/linksawakening.gb';
 
 const wasmBoyDefaultOptions = {
 	isGbcEnabled: true,
