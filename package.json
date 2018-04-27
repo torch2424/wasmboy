@@ -70,6 +70,7 @@
     "gh-pages": "^1.1.0",
     "if-env": "^1.0.0",
     "jsdom": "^11.6.2",
+    "load-script": "^1.0.0",
     "markdown-table": "^1.1.1",
     "mocha": "^5.0.1",
     "performance-now": "^2.1.0",

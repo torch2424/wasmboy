@@ -26,6 +26,7 @@ export class WasmBoyOptions extends Component {
   // Simply resets wasmboy with the current options
   applyOptions() {
     this.props.wasmBoy.reset(this.state);
+    this.props.showNotification('Applied Options! 🛠️')
   }
 
   render() {

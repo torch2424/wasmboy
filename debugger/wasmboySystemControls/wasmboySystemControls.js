@@ -9,7 +9,7 @@ export class WasmBoySystemControls extends Component {
 		// set our state to if we are initialized or not
 		this.state = {
       showSaveStates: false,
-      currentFileName: 'Choose a file...',
+      currentFileName: 'No Game Selected...',
       saveStates: [],
       saveStateError: false
     };
@@ -52,24 +52,6 @@ export class WasmBoySystemControls extends Component {
     newState.showSaveStates = false;
     newState.saveStates = [];
     newState.saveStateError = false;
-    this.setState(newState);
-  }
-
-  // Allow passing a file
-  // https://gist.github.com/AshikNesin/e44b1950f6a24cfcd85330ffc1713513
-  loadGame(wasmboy, event) {
-    wasmboy.loadGame(event.target.files[0])
-    .then(() => {
-			console.log('Wasmboy Ready!');
-			this.props.showNotification('Game Loaded! 🎉');
-		}).catch((error) => {
-			console.log('Load Game Error:', error);
-			this.props.showNotification('Game Load Error! 😞');
-		});
-
-    // Set our file name
-    const newState = Object.assign({}, this.state);
-    newState.currentFileName = event.target.files[0].name;
     this.setState(newState);
   }
 
@@ -133,29 +115,6 @@ export class WasmBoySystemControls extends Component {
 
     return (
       <div className="wasmboy__systemControls system-controls">
-
-        {/* Bulma file picker */}
-        <div class="system-controls__file-input file is-centered has-name is-boxed">
-          <label class="file-label">
-            <input class="file-input" type="file" accept=".gb, .gbc, .zip" name="resume" onChange={(event) => {this.loadGame(props.wasmboy, event)}} />
-            <span class="file-cta">
-              <span class="file-icon">
-                {/* Material file svg https://material.io/icons/#ic_insert_drive_file */}
-                <svg fill="#020202" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M6 2c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6H6zm7 7V3.5L18.5 9H13z"/>
-                    <path d="M0 0h24v24H0z" fill="none"/>
-                </svg>
-              </span>
-              <span class="file-label">
-                ".gb", ".gbc", ".zip"
-              </span>
-            </span>
-            <span class="file-name">
-              {this.state.currentFileName}
-            </span>
-          </label>
-        </div>
-
 
         <button className={ this.getStartButtonClass() + " button" } onclick={() => {this.startGame()}}>Start Game</button>
         <button class="button" onclick={() => {props.wasmboy.pauseGame();}}>Pause Game</button>
