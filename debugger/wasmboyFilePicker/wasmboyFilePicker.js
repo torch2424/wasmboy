@@ -91,12 +91,10 @@ export class WasmBoyFilePicker extends Component {
         		});
 
           }).catch((error) => {
-            console.log(error);
             this.props.showNotification('Error getting file from google drive 💔');
             this.setFileLoadingStatus(true);
           });
         }).catch((error) => {
-          console.log(error);
           this.props.showNotification('Error getting file from google drive 💔');
           this.setFileLoadingStatus(true);
         });

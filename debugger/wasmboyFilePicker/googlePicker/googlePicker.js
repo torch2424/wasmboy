@@ -71,7 +71,6 @@ export default class GooglePicker extends Component {
   }
 
   onChoose(event) {
-    console.log('yooo', event);
     if (!this.isGoogleReady() || !this.isGoogleAuthReady() || !this.isGooglePickerReady() || this.props.disabled) {
       return null;
     }
