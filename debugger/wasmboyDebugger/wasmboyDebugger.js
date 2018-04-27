@@ -316,7 +316,7 @@ export class WasmBoyDebugger extends Component {
             </label>
           </div>
 
-          <div className={ this.getStateClass('showValueTable') }>
+          <div className={ this.getStateClass('showValueTable') + " animated fadeIn" }>
             <h2>Value Table</h2>
 
             <h3>Cpu Info:</h3>
@@ -340,14 +340,14 @@ export class WasmBoyDebugger extends Component {
             <NumberBaseTable object={this.state.valueTable.interrupts}></NumberBaseTable>
           </div>
 
-          <div className={ this.getStateClass('showBackgroundMap') } >
+          <div className={ this.getStateClass('showBackgroundMap') + " animated fadeIn" } >
             <WasmBoyBackgroundMap
               wasmboy={props.wasmboy}
               shouldUpdate={this.state.showBackgroundMap}
               getWasmBoyOffsetFromGameBoyOffset={getWasmBoyOffsetFromGameBoyOffset}></WasmBoyBackgroundMap>
           </div>
 
-          <div className={ this.getStateClass('showTileData') } >
+          <div className={ this.getStateClass('showTileData') + " animated fadeIn" } >
             <WasmBoyTileData
               wasmboy={props.wasmboy}
               shouldUpdate={this.state.showTileData}

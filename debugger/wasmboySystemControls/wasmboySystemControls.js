@@ -9,8 +9,9 @@ export class WasmBoySystemControls extends Component {
 		// set our state to if we are initialized or not
 		this.state = {
       showSaveStates: false,
-      currentFileName: 'No File Chosen...',
-      saveStates: []
+      currentFileName: 'Please add a ".gb", ".gbc", ".zip" file',
+      saveStates: [],
+      saveStateError: false
     };
 
     let fpsCounter;
@@ -40,12 +41,17 @@ export class WasmBoySystemControls extends Component {
     this.props.wasmboyMemory.getCartridgeObject().then((cartridgeObject) => {
       newState.saveStates = cartridgeObject.saveStates;
       this.setState(newState);
+    }).catch(() => {
+      newState.saveStateError = true;
+      this.setState(newState);
     });
   }
 
   closeSaveStates() {
     const newState = Object.assign({}, this.state);
     newState.showSaveStates = false;
+    newState.saveStates = [];
+    newState.saveStateError = false;
     this.setState(newState);
   }
 
@@ -54,8 +60,12 @@ export class WasmBoySystemControls extends Component {
   loadGame(wasmboy, event) {
     wasmboy.loadGame(event.target.files[0])
     .then(() => {
-      console.log('wasmboy Ready!');
-    });
+			console.log('Wasmboy Ready!');
+			this.props.showNotification('Game Loaded! 🎉');
+		}).catch((error) => {
+			console.log('Load Game Error:', error);
+			this.props.showNotification('Game Load Error! 😞');
+		});
 
     // Set our file name
     const newState = Object.assign({}, this.state);
@@ -63,27 +73,62 @@ export class WasmBoySystemControls extends Component {
     this.setState(newState);
   }
 
+  startGame() {
+    if(!this.props.wasmboy.ready) {
+      this.props.showNotification('Please load a game. ⏏️');
+    } else {
+      this.props.wasmboy.startGame();
+    }
+  }
+
+  saveState() {
+    this.props.wasmboy.saveState();
+    this.props.showNotification('State Saved! 💾');
+  }
+
+  loadState(saveState) {
+    this.closeSaveStates();
+    this.props.wasmboy.loadState(saveState);
+    this.props.showNotification('State Loaded! 😀');
+  }
+
+  getStartButtonClass() {
+    if(this.props.wasmboy && this.props.wasmboy.ready) {
+      return "is-success";
+    }
+
+    return "is-danger"
+  }
+
   render(props) {
 
     let saveStateElements = (
       <div class="donut"></div>
     )
-    if (this.state.showSaveStates && this.state.saveStates.length > 0) {
-      // Loop through save states
-      saveStateElements = [];
-      this.state.saveStates.forEach((saveState) => {
-        let saveStateDateString = new Date(saveState.date);
-        saveStateDateString = saveStateDateString.toLocaleString();
-        saveStateElements.unshift((
-          <div class="saveState" onClick={() => {props.wasmboy.loadState(saveState); this.closeSaveStates();}}>
-            <img src={saveState.screenshotCanvasDataURL} />
-            <h3>Date:</h3>
-            {saveStateDateString}
-            <h3>Auto:</h3>
-            {saveState.isAuto ? "true" : "false"}
-          </div>
-        ))
-      });
+    if (this.state.showSaveStates) {
+      if (this.state.saveStates.length > 0) {
+        // Loop through save states
+        saveStateElements = [];
+        this.state.saveStates.forEach((saveState) => {
+          let saveStateDateString = new Date(saveState.date);
+          saveStateDateString = saveStateDateString.toLocaleString();
+          saveStateElements.unshift((
+            <div class="saveState" onClick={() => {this.loadState(saveState)}}>
+              <img src={saveState.screenshotCanvasDataURL} />
+              <h3>Date:</h3>
+              {saveStateDateString}
+              <h3>Auto:</h3>
+              {saveState.isAuto ? "true" : "false"}
+            </div>
+          ))
+        });
+      }
+
+      if(this.state.saveStateError) {
+        saveStateElements = (
+          <h1>No Save States Found 😞</h1>
+        )
+      }
     }
 
     return (
@@ -92,10 +137,14 @@ export class WasmBoySystemControls extends Component {
         {/* Bulma file picker */}
         <div class="system-controls__file-input file is-centered has-name is-boxed">
           <label class="file-label">
-            <input class="file-input" type="file" name="resume" onChange={(event) => {this.loadGame(props.wasmboy, event)}} />
+            <input class="file-input" type="file" accept=".gb, .gbc, .zip" name="resume" onChange={(event) => {this.loadGame(props.wasmboy, event)}} />
             <span class="file-cta">
               <span class="file-icon">
-                <i class="fas fa-upload"></i>
+                {/* Material file svg https://material.io/icons/#ic_insert_drive_file */}
+                <svg fill="#020202" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 2c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6H6zm7 7V3.5L18.5 9H13z"/>
+                    <path d="M0 0h24v24H0z" fill="none"/>
+                </svg>
               </span>
               <span class="file-label">
                 Choose a file…
@@ -108,21 +157,24 @@ export class WasmBoySystemControls extends Component {
         </div>
 
 
-        <button class="button" onclick={() => {props.wasmboy.startGame();}}>Start Game</button>
+        <button className={ this.getStartButtonClass() + " button" } onclick={() => {this.startGame()}}>Start Game</button>
         <button class="button" onclick={() => {props.wasmboy.pauseGame();}}>Pause Game</button>
         <button class="button" onclick={() => {props.wasmboy.resumeGame();}}>Resume Game</button>
-        <button class="button" onclick={() => {props.wasmboy.saveState();}}>Save State</button>
+        <button class="button" onclick={() => {this.saveState();}}>Save State</button>
         <button class="button" onclick={() => {this.openSaveStates();}}>Load State</button>
         <div>Gameboy FPS: {this.state.fps}</div>
 
         { this.state.showSaveStates ? (
           <Portal into="body">
-            <div class="popup-shadow-container" onClick={() => {this.closeSaveStates();}}>
-              <div class="popup">
-                <h1>Load Save State For Current Game</h1>
-                <div class="saveStateContainer">
-                  {saveStateElements}
+            <div class="modal is-active">
+              <div class="modal-background" onClick={() => {this.closeSaveStates();}}>
+                <div class="modal-content">
+                  <h1>Load Save State For Current Game</h1>
+                  <div class="saveStateContainer">
+                    {saveStateElements}
+                  </div>
                 </div>
+                <button class="modal-close is-large" aria-label="close" onClick={() => {this.closeSaveStates();}}></button>
               </div>
             </div>
           </Portal>

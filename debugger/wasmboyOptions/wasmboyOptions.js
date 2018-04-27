@@ -11,8 +11,8 @@ export class WasmBoyOptions extends Component {
   componentDidMount() {
     // Add all of our default options from the props to our component state
     const newState = Object.assign({}, this.state);
-    Object.keys(this.props.defaultOptions).forEach((optionKey) => {
-      newState[optionKey] = this.props.defaultOptions[optionKey]
+    Object.keys(this.props.availableOptions).forEach((optionKey) => {
+      newState[optionKey] = this.props.wasmBoy[optionKey]
     });
     this.setState(newState);
   }

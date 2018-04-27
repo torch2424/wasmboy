@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import Promise from 'promise-polyfill';
+import './wasmboyTileData.css';
 
 const canvasId = 'WasmBoyTileData';
 const tileDataXPixels = 0x1F * 8;
@@ -102,8 +103,11 @@ export class WasmBoyTileData extends Component {
   render() {
     return (
       <div>
-        <canvas id={canvasId} width={tileDataXPixels} height={tileDataYPixels}>
-        </canvas>
+        <h1>Tile Data</h1>
+        <div class="wasmboy__tileData">
+          <canvas id={canvasId} width={tileDataXPixels} height={tileDataYPixels}>
+          </canvas>
+        </div>
       </div>
     )
   }

@@ -1,9 +1,5 @@
 import './style';
 import 'bulma/css/bulma.css';
-import '@fortawesome/fontawesome-free-webfonts/css/fontawesome.css';
-import '@fortawesome/fontawesome-free-webfonts/css/fa-regular.css';
-import '@fortawesome/fontawesome-free-webfonts/css/fa-solid.css';
-import 'animate.css/animate.css'
 import { Component } from 'preact';
 import { WasmBoy, WasmBoyGraphics, WasmBoyAudio, WasmBoyController, WasmBoyMemory } from './lib/wasmboy.js';
 import { WasmBoyDebugger, WasmBoySystemControls, WasmBoyOptions, WasmBoyGamepad } from './debugger/index';
@@ -18,7 +14,7 @@ import { WasmBoyDebugger, WasmBoySystemControls, WasmBoyOptions, WasmBoyGamepad 
 // });
 
 //const defaultGamePath = './test/accuracy/testroms/blargg/cpu_instrs.gb';
-const defaultGamePath = './games/linksawakening.gb';
+const defaultGamePath = './games/kirbysdreamland.zip';
 
 const wasmBoyDefaultOptions = {
 	isGbcEnabled: true,
@@ -31,7 +27,7 @@ const wasmBoyDefaultOptions = {
 	graphicsDisableScanlineRendering: false,
 	tileRendering: true,
 	tileCaching: true,
-	gameboySpeed: 1.0,
+	gameboyFrameRate: 60,
 	saveStateCallback: (saveStateObject) => {
 		// Function called everytime a savestate occurs
 		// Used by the WasmBoySystemControls to show screenshots on save states
@@ -43,6 +39,9 @@ const wasmBoyDefaultOptions = {
 // Our canvas element
 let canvasElement = undefined;
 
+// Our notification timeout
+let notificationTimeout = undefined;
+
 export default class App extends Component {
 
 	constructor() {
@@ -50,12 +49,15 @@ export default class App extends Component {
 
 		this.state = {
 			showDebugger: false,
-			showOptions: false
+			showOptions: false,
+			notification: (<div></div>),
 		}
 	}
 
 	// Using componentDidMount to wait for the canvas element to be inserted in DOM
 	componentDidMount() {
+
+
 		// Get our canvas element
 		canvasElement = document.querySelector(".wasmboy__canvas-container__canvas");
 
@@ -83,9 +85,39 @@ export default class App extends Component {
 		WasmBoy.loadGame(defaultGamePath)
 		.then(() => {
 			console.log('Wasmboy Ready!');
+			this.showNotification('Game Loaded! 🎉');
 		}).catch((error) => {
 			console.log('Load Game Error:', error);
+			this.showNotification('Game Load Error! 😞');
 		});
+	}
+
+	// Function to show notifications to the user
+	showNotification(notificationText) {
+
+		if (notificationTimeout) {
+			clearTimeout(notificationTimeout);
+			notificationTimeout = undefined;
+		}
+
+		const closeNotification = () => {
+			const newState = Object.assign({}, this.state);
+			newState.notification = (<div></div>)
+			this.setState(newState);
+		}
+
+		const newState = Object.assign({}, this.state);
+		newState.notification = (
+			<div class="notification animated fadeIn">
+			  <button class="delete" onClick={() => {closeNotification()}}></button>
+			  {notificationText}
+			</div>
+		)
+		this.setState(newState);
+
+		notificationTimeout = setTimeout(() => {
+			closeNotification();
+		}, 3000);
 	}
 
 	render() {
@@ -97,7 +129,7 @@ export default class App extends Component {
 		if (this.state.showOptions) {
 			optionsComponent = (
 				<section>
-					<WasmBoyOptions wasmBoy={WasmBoy} defaultOptions={wasmBoyDefaultOptions}></WasmBoyOptions>
+					<WasmBoyOptions wasmBoy={WasmBoy} availableOptions={wasmBoyDefaultOptions} showNotification={(text) => {this.showNotification(text)}}></WasmBoyOptions>
 				</section>
 			)
 		}
@@ -115,9 +147,9 @@ export default class App extends Component {
 		}
 
 		return (
-			<div class="wasmboy animated fadeIn">
+			<div class="wasmboy">
 
-				<h1 class="wasmboy__title">WasmBoy Demo / Debugger</h1>
+				<h1 class="wasmboy__title">WasmBoy (Debugger / Demo)</h1>
 				<div style="text-align: center">
           <label class="checkbox">
 						Show Options
@@ -154,7 +186,7 @@ export default class App extends Component {
 				{debuggerComponent}
 
 				<div>
-					<WasmBoySystemControls wasmboy={WasmBoy} wasmboyMemory={WasmBoyMemory}></WasmBoySystemControls>
+					<WasmBoySystemControls wasmboy={WasmBoy} wasmboyMemory={WasmBoyMemory} showNotification={(text) => {this.showNotification(text)}}></WasmBoySystemControls>
 				</div>
 
 				<main className="wasmboy__canvas-container">
@@ -164,6 +196,7 @@ export default class App extends Component {
 
 				<WasmBoyGamepad></WasmBoyGamepad>
 
+				{this.state.notification}
 			</div>
 		);
 	}
