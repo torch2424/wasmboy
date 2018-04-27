@@ -1,7 +1,8 @@
 import { Component } from 'preact';
-import { NumberBaseTable } from './numberBaseTable';
-import { WasmBoyBackgroundMap } from './wasmboyBackgroundMap';
-import { WasmBoyTileData } from './wasmboyTileData';
+import { NumberBaseTable } from './numberBaseTable/numberBaseTable';
+import { WasmBoyBackgroundMap } from './wasmboyBackgroundMap/wasmboyBackgroundMap';
+import { WasmBoyTileData } from './wasmboyTileData/wasmboyTileData';
+import './wasmboyDebugger.css';
 
 // Function to get a value in gameboy memory, to wasmboy memory
 const getWasmBoyOffsetFromGameBoyOffset = (gameboyOffset, wasmboy) => {
@@ -228,82 +229,94 @@ export class WasmBoyDebugger extends Component {
 
 	render(props) {
 		return (
-      <div>
+      <div class="wasmboy__debugger animated fadeIn">
           <h1>Debugger</h1>
 
           <h2>Control Flow Actions:</h2>
 
           <div class="debuggerAction">
-            <button onclick={() => {this.stepOpcode(props.wasmboy, props.wasmboyGraphics).then(() => {})}}>Step Opcode</button>
+            <button class="button" onclick={() => {this.stepOpcode(props.wasmboy, props.wasmboyGraphics).then(() => {})}}>Step Opcode</button>
           </div>
 
           <div class="debuggerAction">
+            Run Specified Number of Opcodes:
             <input type="number"
+             class="input"
              value={this.state.opcodesToRun }
              onChange={(evt) => { this.state.opcodesToRun = evt.target.value; }} />
-            <button onclick={() => {this.runNumberOfOpcodes(props.wasmboy, props.wasmboyGraphics).then(() => {})}}>Run number of opcodes</button>
+            <button class="button" onclick={() => {this.runNumberOfOpcodes(props.wasmboy, props.wasmboyGraphics).then(() => {})}}>Run number of opcodes</button>
           </div>
 
           <div class="debuggerAction">
-            Breakpoint Line Number: 0x<input type="string"
+            Breakpoint Line Number: 0x<input
+             type="string"
+             class="input"
              value={this.state.breakPoint }
              onChange={(evt) => { this.state.breakPoint = evt.target.value; }} />
-            <button onclick={() => {this.breakPoint(props.wasmboy, props.wasmboyGraphics)}}>Run To Breakpoint</button>
+            <button class="button" onclick={() => {this.breakPoint(props.wasmboy, props.wasmboyGraphics)}}>Run To Breakpoint</button>
           </div>
 
           <h2>Wasmboy State Actions:</h2>
 
           <div class="debuggerAction">
-            <button onclick={() => {this.logWasmBoyMemory(props.wasmboy)}}>Log Memory to console</button>
+            <button class="button" onclick={() => {this.logWasmBoyMemory(props.wasmboy)}}>Log Memory to console</button>
           </div>
 
           <div class="debuggerAction">
-            <button onclick={() => {props.wasmboyAudio.debugSaveCurrentAudioBufferToWav()}}>Save Current Audio buffer to wav</button>
+            <button class="button" onclick={() => {props.wasmboyAudio.debugSaveCurrentAudioBufferToWav()}}>Save Current Audio buffer to wav</button>
           </div>
 
           <div class="debuggerAction">
-            <button onclick={() => { this.state.showValueTable = true; this.updateValueTable(props.wasmboy)}}>Update Value Table</button>
+            <button class="button" onclick={() => { this.state.showValueTable = true; this.updateValueTable(props.wasmboy)}}>Update Value Table</button>
           </div>
 
-          <h2>Debugger Options:</h2>
+          <h2>Debugger Elements:</h2>
 
           <div>
-            <label for="showValueTable">Show Value Table</label>
-            <input
-              id="showValueTable"
-              type="checkbox"
-              checked={ this.state.showValueTable }
-              onChange={ () => { this.flipShowStatus('showValueTable'); this.updateValueTable(props.wasmboy) } } />
-          </div>
-
-          <div>
-            <label for="autoUpdateValueTable">Auto Update Value Table</label>
-            <input
-              id="autoUpdateValueTable"
-              type="checkbox"
-              checked={ this.state.autoUpdateValueTable }
-              onChange={ () => { this.state.showValueTable = true; this.flipShowStatus('autoUpdateValueTable', props.wasmboy); } } />
+            <label class="checkbox" for="showValueTable">
+              Show Value Table
+              <input
+                id="showValueTable"
+                type="checkbox"
+                checked={ this.state.showValueTable }
+                onChange={ () => { this.flipShowStatus('showValueTable'); this.updateValueTable(props.wasmboy) } } />
+            </label>
           </div>
 
           <div>
-            <label for="showBackgroundMap">Show Background Map</label>
-            <input
-              id="showBackgroundMap"
-              type="checkbox"
-              checked={ this.state.showBackgroundMap }
-              onChange={ () => { this.flipShowStatus('showBackgroundMap'); } } />
+            <label class="checkbox" for="autoUpdateValueTable">
+              Auto Update Value Table
+              <input
+                id="autoUpdateValueTable"
+                type="checkbox"
+                checked={ this.state.autoUpdateValueTable }
+                onChange={ () => { this.state.showValueTable = true; this.flipShowStatus('autoUpdateValueTable', props.wasmboy); } } />
+            </label>
           </div>
 
           <div>
-            <label for="showTileData">Show Tile Data</label>
-            <input
-              id="showTileData"
-              type="checkbox"
-              checked={ this.state.showTileData }
-              onChange={ () => { this.flipShowStatus('showTileData'); } } />
+            <label class="checkbox" for="showBackgroundMap">
+              Show Background Map
+              <input
+                id="showBackgroundMap"
+                type="checkbox"
+                checked={ this.state.showBackgroundMap }
+                onChange={ () => { this.flipShowStatus('showBackgroundMap'); } } />
+            </label>
           </div>
 
-          <div className={ this.getStateClass('showValueTable') }>
+          <div>
+            <label class="checkbox" for="showTileData">
+              Show Tile Data
+              <input
+                id="showTileData"
+                type="checkbox"
+                checked={ this.state.showTileData }
+                onChange={ () => { this.flipShowStatus('showTileData'); } } />
+            </label>
+          </div>
+
+          <div className={ this.getStateClass('showValueTable') + " animated fadeIn" }>
             <h2>Value Table</h2>
 
             <h3>Cpu Info:</h3>
@@ -327,14 +340,14 @@ export class WasmBoyDebugger extends Component {
             <NumberBaseTable object={this.state.valueTable.interrupts}></NumberBaseTable>
           </div>
 
-          <div className={ this.getStateClass('showBackgroundMap') } >
+          <div className={ this.getStateClass('showBackgroundMap') + " animated fadeIn" } >
             <WasmBoyBackgroundMap
               wasmboy={props.wasmboy}
               shouldUpdate={this.state.showBackgroundMap}
               getWasmBoyOffsetFromGameBoyOffset={getWasmBoyOffsetFromGameBoyOffset}></WasmBoyBackgroundMap>
           </div>
 
-          <div className={ this.getStateClass('showTileData') } >
+          <div className={ this.getStateClass('showTileData') + " animated fadeIn" } >
             <WasmBoyTileData
               wasmboy={props.wasmboy}
               shouldUpdate={this.state.showTileData}

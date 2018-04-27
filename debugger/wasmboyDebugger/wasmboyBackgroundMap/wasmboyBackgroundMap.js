@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import Promise from 'promise-polyfill';
+import './wasmboyBackgroundMap.css';
 
 export class WasmBoyBackgroundMap extends Component {
   constructor(props) {
@@ -139,8 +140,11 @@ export class WasmBoyBackgroundMap extends Component {
   render() {
     return (
       <div>
-        <canvas id="WasmBoyBackgroundMap" width="256" height="256">
-        </canvas>
+        <h1>Background Map</h1>
+        <div class="wasmboy__backgroundMap">
+          <canvas id="WasmBoyBackgroundMap" width="256" height="256">
+          </canvas>
+        </div>
       </div>
     )
   }

@@ -1,0 +1,68 @@
+.wasmboy__systemControls {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	text-align: center;
+}
+
+.system-controls button {
+	margin: 10px;
+}
+
+.system-controls__file-input {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.modal-background {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.modal-content {
+	border: 5px solid rgba(0, 0, 0, 0.75);
+	border-radius: 5px;
+	background-color: #F5F5F5;
+	color: #020202;
+
+	width: 80vw;
+
+	max-width: 800px;
+
+	z-index: 101;
+}
+
+.saveStateContainer {
+
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 25px;
+
+	display: flex;
+	justify-content: space-around;
+	align-items: flex-start;
+	flex-wrap: wrap;
+	flex-direction: row;
+
+	overflow: auto;
+
+	height: 65vh;
+	max-height: 650px;
+	padding-bottom: 10px;
+}
+
+.saveState {
+	margin-left: 5px;
+	margin-right: 5px;
+	padding: 10px;
+
+
+	word-wrap: break-word;
+
+	transition: background-color 0.25s;
+}
+
+.saveState:hover {
+	background-color: rgba(0, 0, 0, 0.25);
+	cursor: pointer;
+}

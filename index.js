@@ -1,7 +1,8 @@
 import './style';
+import 'bulma/css/bulma.css';
 import { Component } from 'preact';
 import { WasmBoy, WasmBoyGraphics, WasmBoyAudio, WasmBoyController, WasmBoyMemory } from './lib/wasmboy.js';
-import { WasmBoyDebugger, WasmBoySystemControls, WasmBoyOptions } from './debugger/index';
+import { WasmBoyDebugger, WasmBoySystemControls, WasmBoyOptions, WasmBoyGamepad } from './debugger/index';
 
 // Old Perf Options
 // WasmBoy.initialize(canvasElement, {
@@ -26,7 +27,7 @@ const wasmBoyDefaultOptions = {
 	graphicsDisableScanlineRendering: false,
 	tileRendering: true,
 	tileCaching: true,
-	gameboySpeed: 1.0,
+	gameboyFrameRate: 60,
 	saveStateCallback: (saveStateObject) => {
 		// Function called everytime a savestate occurs
 		// Used by the WasmBoySystemControls to show screenshots on save states
@@ -38,6 +39,9 @@ const wasmBoyDefaultOptions = {
 // Our canvas element
 let canvasElement = undefined;
 
+// Our notification timeout
+let notificationTimeout = undefined;
+
 export default class App extends Component {
 
 	constructor() {
@@ -45,12 +49,15 @@ export default class App extends Component {
 
 		this.state = {
 			showDebugger: false,
-			showOptions: false
+			showOptions: false,
+			notification: (<div></div>),
 		}
 	}
 
 	// Using componentDidMount to wait for the canvas element to be inserted in DOM
 	componentDidMount() {
+
+
 		// Get our canvas element
 		canvasElement = document.querySelector(".wasmboy__canvas-container__canvas");
 
@@ -78,9 +85,39 @@ export default class App extends Component {
 		WasmBoy.loadGame(defaultGamePath)
 		.then(() => {
 			console.log('Wasmboy Ready!');
+			this.showNotification('Game Loaded! 🎉');
 		}).catch((error) => {
 			console.log('Load Game Error:', error);
+			this.showNotification('Game Load Error! 😞');
 		});
+	}
+
+	// Function to show notifications to the user
+	showNotification(notificationText) {
+
+		if (notificationTimeout) {
+			clearTimeout(notificationTimeout);
+			notificationTimeout = undefined;
+		}
+
+		const closeNotification = () => {
+			const newState = Object.assign({}, this.state);
+			newState.notification = (<div></div>)
+			this.setState(newState);
+		}
+
+		const newState = Object.assign({}, this.state);
+		newState.notification = (
+			<div class="notification animated fadeIn">
+			  <button class="delete" onClick={() => {closeNotification()}}></button>
+			  {notificationText}
+			</div>
+		)
+		this.setState(newState);
+
+		notificationTimeout = setTimeout(() => {
+			closeNotification();
+		}, 3000);
 	}
 
 	render() {
@@ -91,9 +128,9 @@ export default class App extends Component {
 		)
 		if (this.state.showOptions) {
 			optionsComponent = (
-				<div className={ "wasmboy__options" }>
-					<WasmBoyOptions wasmBoy={WasmBoy} defaultOptions={wasmBoyDefaultOptions}></WasmBoyOptions>
-				</div>
+				<section>
+					<WasmBoyOptions wasmBoy={WasmBoy} availableOptions={wasmBoyDefaultOptions} showNotification={(text) => {this.showNotification(text)}}></WasmBoyOptions>
+				</section>
 			)
 		}
 
@@ -103,92 +140,63 @@ export default class App extends Component {
 		)
 		if (this.state.showDebugger) {
 			debuggerComponent = (
-				<div className={ "wasmboy__debugger" }>
+				<section>
 					<WasmBoyDebugger wasmboy={WasmBoy} wasmboyGraphics={WasmBoyGraphics} wasmboyAudio={WasmBoyAudio}></WasmBoyDebugger>
-				</div>
+				</section>
 			)
 		}
 
 		return (
-			<div>
-				<h1>WasmBoy Demo</h1>
+			<div class="wasmboy">
+
+				<h1 class="wasmboy__title">WasmBoy (Debugger / Demo)</h1>
 				<div style="text-align: center">
-          <label for="showOptions">Show Options</label>
-          <input
-            id="showOptions"
-            type="checkbox"
-            checked={ this.state.showOptions }
-            onChange={ () => {
-								const newState = Object.assign({}, this.state);
-								newState.showOptions = !newState.showOptions;
-								this.setState(newState);
-							}
-						} />
+          <label class="checkbox">
+						Show Options
+						<input
+	            id="showOptions"
+	            type="checkbox"
+	            checked={ this.state.showOptions }
+	            onChange={ () => {
+									const newState = Object.assign({}, this.state);
+									newState.showOptions = !newState.showOptions;
+									this.setState(newState);
+								}
+							} />
+					</label>
         </div>
 
 				{optionsComponent}
 
 				<div style="text-align: center">
-          <label for="showDebugger">Show Debugger</label>
-          <input
-            id="showDebugger"
-            type="checkbox"
-            checked={ this.state.showDebugger }
-            onChange={ () => {
-								const newState = Object.assign({}, this.state);
-								newState.showDebugger = !newState.showDebugger;
-								this.setState(newState);
-							}
-						} />
+          <label class="checkbox">
+						Show Debugger
+						<input
+	            type="checkbox"
+	            checked={ this.state.showDebugger }
+	            onChange={ () => {
+									const newState = Object.assign({}, this.state);
+									newState.showDebugger = !newState.showDebugger;
+									this.setState(newState);
+								}
+							} />
+					</label>
         </div>
 
 				{debuggerComponent}
 
-				<div class="wasmboy__systemControls">
-					<WasmBoySystemControls wasmboy={WasmBoy} wasmboyMemory={WasmBoyMemory}></WasmBoySystemControls>
+				<div>
+					<WasmBoySystemControls wasmboy={WasmBoy} wasmboyMemory={WasmBoyMemory} showNotification={(text) => {this.showNotification(text)}}></WasmBoySystemControls>
 				</div>
-				<div className="wasmboy__canvas-container">
+
+				<main className="wasmboy__canvas-container">
     			<canvas className="wasmboy__canvas-container__canvas">
           </canvas>
-        </div>
+        </main>
 
-				<div class="wasmboy__gamepad">
+				<WasmBoyGamepad></WasmBoyGamepad>
 
-					{/* DPAD */}
-					<svg id="gamepadDpad" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
-					    <path d="M0 0h24v24H0z" fill="none"/>
-					    <path d="M15 7.5V2H9v5.5l3 3 3-3zM7.5 9H2v6h5.5l3-3-3-3zM9 16.5V22h6v-5.5l-3-3-3 3zM16.5 9l-3 3 3 3H22V9h-5.5z"/>
-					</svg>
-
-					{/* Start */}
-					<svg id="gamepadStart" height="24" viewBox="6 6 12 12" width="24" xmlns="http://www.w3.org/2000/svg">
-					    <path d="M19 13H5v-2h14v2z"/>
-					    <path d="M0 0h24v24H0z" fill="none"/>
-							<text x="21" y="55" transform="scale(0.325)">Start</text>
-					</svg>
-
-					{/* Select */}
-					<svg id="gamepadSelect" height="24" viewBox="6 6 12 12" width="24" xmlns="http://www.w3.org/2000/svg">
-					    <path d="M19 13H5v-2h14v2z"/>
-					    <path d="M0 0h24v24H0z" fill="none"/>
-							<text x="16" y="55" transform="scale(0.325)">Select</text>
-					</svg>
-
-					{/* A */}
-					<svg id="gamepadA" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
-					    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
-					    <path d="M0 0h24v24H0z" fill="none"/>
-							<text x="7.5" y="16.25">A</text>
-					</svg>
-
-					{/* B */}
-					<svg id="gamepadB" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
-					    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
-					    <path d="M0 0h24v24H0z" fill="none"/>
-							<text x="7.5" y="17.25">B</text>
-					</svg>
-				</div>
-
+				{this.state.notification}
 			</div>
 		);
 	}
