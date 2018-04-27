@@ -2,7 +2,7 @@ import './style';
 import 'bulma/css/bulma.css';
 import { Component } from 'preact';
 import { WasmBoy, WasmBoyGraphics, WasmBoyAudio, WasmBoyController, WasmBoyMemory } from './lib/wasmboy.js';
-import { WasmBoyDebugger, WasmBoySystemControls, WasmBoyOptions, WasmBoyGamepad } from './debugger/index';
+import { WasmBoyDebugger, WasmBoySystemControls, WasmBoyFilePicker, WasmBoyOptions, WasmBoyGamepad } from './debugger/index';
 
 // Old Perf Options
 // WasmBoy.initialize(canvasElement, {
@@ -50,7 +50,7 @@ export default class App extends Component {
 		this.state = {
 			showDebugger: false,
 			showOptions: false,
-			notification: (<div></div>),
+			notification: (<div></div>)
 		}
 	}
 
@@ -184,6 +184,10 @@ export default class App extends Component {
         </div>
 
 				{debuggerComponent}
+
+				<WasmBoyFilePicker wasmboy={WasmBoy}
+					showNotification={(text) => {this.showNotification(text)}}>
+				</WasmBoyFilePicker>
 
 				<div>
 					<WasmBoySystemControls wasmboy={WasmBoy} wasmboyMemory={WasmBoyMemory} showNotification={(text) => {this.showNotification(text)}}></WasmBoySystemControls>
