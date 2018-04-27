@@ -6483,6 +6483,430 @@ var WasmBoy = new wasmboy_WasmBoyLib();
 
 // TODO: Remove this, and consolidate public api in Wasmboy
 
+// EXTERNAL MODULE: ./node_modules/load-script/index.js
+var load_script = __webpack_require__("PirY");
+var load_script_default = /*#__PURE__*/__webpack_require__.n(load_script);
+
+// CONCATENATED MODULE: ./debugger/wasmboyFilePicker/googlePicker/googlePicker.js
+var _class, _temp;
+
+
+
+function googlePicker__classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+// Taken & Preact-ified from: https://github.com/sdoomz/react-google-picker
+// And only using OAuth: https://stackoverflow.com/questions/22435410/google-drive-picker-developer-key-is-invalid-error?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+// Picker API is super out of date :p
+
+
+
+
+var GOOGLE_SDK_URL = 'https://apis.google.com/js/api.js';
+
+var scriptLoadingStarted = false;
+
+var _ref2 = Object(preact_min["h"])(
+  'button',
+  null,
+  'Open google chooser'
+);
+
+var googlePicker_GooglePicker = (_temp = _class = function (_Component) {
+  _inherits(GooglePicker, _Component);
+
+  function GooglePicker(props) {
+    googlePicker__classCallCheck(this, GooglePicker);
+
+    var _this = _possibleConstructorReturn(this, _Component.call(this, props));
+
+    _this.onApiLoad = _this.onApiLoad.bind(_this);
+    _this.onChoose = _this.onChoose.bind(_this);
+    return _this;
+  }
+
+  GooglePicker.prototype.componentDidMount = function componentDidMount() {
+    if (this.isGoogleReady()) {
+      // google api is already exists
+      // init immediately
+      this.onApiLoad();
+    } else if (!scriptLoadingStarted) {
+      // load google api and the init
+      scriptLoadingStarted = true;
+      load_script_default()(GOOGLE_SDK_URL, this.onApiLoad);
+    } else {
+      // is loading
+    }
+  };
+
+  GooglePicker.prototype.isGoogleReady = function isGoogleReady() {
+    return !!window.gapi;
+  };
+
+  GooglePicker.prototype.isGoogleAuthReady = function isGoogleAuthReady() {
+    return !!window.gapi.auth;
+  };
+
+  GooglePicker.prototype.isGooglePickerReady = function isGooglePickerReady() {
+    return !!window.google.picker;
+  };
+
+  GooglePicker.prototype.onApiLoad = function onApiLoad() {
+    window.gapi.load('auth');
+    window.gapi.load('picker');
+  };
+
+  GooglePicker.prototype.doAuth = function doAuth(callback) {
+    window.gapi.auth.authorize({
+      client_id: this.props.clientId,
+      scope: this.props.scope,
+      immediate: this.props.authImmediate
+    }, callback);
+  };
+
+  GooglePicker.prototype.onChoose = function onChoose(event) {
+    var _this2 = this;
+
+    console.log('yooo', event);
+    if (!this.isGoogleReady() || !this.isGoogleAuthReady() || !this.isGooglePickerReady() || this.props.disabled) {
+      return null;
+    }
+
+    var token = window.gapi.auth.getToken();
+    var oauthToken = token && token.access_token;
+
+    if (oauthToken) {
+      this.createPicker(oauthToken);
+    } else {
+      this.doAuth(function (_ref) {
+        var access_token = _ref.access_token;
+        return _this2.createPicker(access_token);
+      });
+    }
+  };
+
+  GooglePicker.prototype.createPicker = function createPicker(oauthToken) {
+
+    this.props.onAuthenticate(oauthToken);
+
+    if (this.props.createPicker) {
+      return this.props.createPicker(google, oauthToken);
+    }
+
+    var googleViewId = google.picker.ViewId[this.props.viewId];
+    var view = new window.google.picker.View(googleViewId);
+
+    if (this.props.mimeTypes) {
+      view.setMimeTypes(this.props.mimeTypes.join(','));
+    }
+
+    if (!view) {
+      throw new Error('Can\'t find view by viewId');
+    }
+
+    var picker = new window.google.picker.PickerBuilder().addView(view).setOAuthToken(oauthToken).setCallback(this.props.onChange);
+
+    if (this.props.origin) {
+      picker.setOrigin(this.props.origin);
+    }
+
+    if (this.props.navHidden) {
+      picker.enableFeature(window.google.picker.Feature.NAV_HIDDEN);
+    }
+
+    if (this.props.multiselect) {
+      picker.enableFeature(window.google.picker.Feature.MULTISELECT_ENABLED);
+    }
+
+    picker.build().setVisible(true);
+  };
+
+  GooglePicker.prototype.render = function render() {
+    return Object(preact_min["h"])(
+      'div',
+      { onClick: this.onChoose },
+      this.props.children ? this.props.children : _ref2
+    );
+  };
+
+  return GooglePicker;
+}(preact_min["Component"]), _class.defaultProps = {
+  onChange: function onChange() {},
+  onAuthenticate: function onAuthenticate() {},
+  scope: ['https://www.googleapis.com/auth/drive.readonly'],
+  viewId: 'DOCS',
+  authImmediate: false,
+  multiselect: false,
+  navHidden: false,
+  disabled: false
+}, _temp);
+
+// EXTERNAL MODULE: ./debugger/wasmboyFilePicker/wasmboyFilePicker.css
+var wasmboyFilePicker = __webpack_require__("uCBp");
+var wasmboyFilePicker_default = /*#__PURE__*/__webpack_require__.n(wasmboyFilePicker);
+
+// CONCATENATED MODULE: ./debugger/wasmboyFilePicker/wasmboyFilePicker.js
+var wasmboyFilePicker__extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+
+
+function wasmboyFilePicker__classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function wasmboyFilePicker__possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function wasmboyFilePicker__inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+
+
+
+
+
+// Public Keys for Google Drive API
+var WASMBOY_DEBUGGER_GOOGLE_PICKER_CLIENT_ID = '427833658710-bntpbmf6pimh8trt0n4c36gteomseg61.apps.googleusercontent.com';
+
+// OAuth Key for Google Drive
+var googlePickerOAuthToken = '';
+
+var _ref = Object(preact_min["h"])(
+  'div',
+  { 'class': 'wasmboy__filePicker__services' },
+  Object(preact_min["h"])('div', { 'class': 'donut' })
+);
+
+var wasmboyFilePicker__ref2 = Object(preact_min["h"])(
+  'svg',
+  { fill: '#020202', height: '24', viewBox: '0 0 24 24', width: '24', xmlns: 'http://www.w3.org/2000/svg' },
+  Object(preact_min["h"])('path', { d: 'M6 2c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6H6zm7 7V3.5L18.5 9H13z' }),
+  Object(preact_min["h"])('path', { d: 'M0 0h24v24H0z', fill: 'none' })
+);
+
+var _ref3 = Object(preact_min["h"])(
+  'span',
+  { 'class': 'file-label' },
+  'Upload from Device'
+);
+
+var _ref4 = Object(preact_min["h"])(
+  'svg',
+  { fill: '#020202', height: '24', viewBox: '0 0 24 24', width: '24', xmlns: 'http://www.w3.org/2000/svg' },
+  Object(preact_min["h"])('path', { d: 'M0 0h24v24H0z', fill: 'none' }),
+  Object(preact_min["h"])('path', { d: 'M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z' })
+);
+
+var _ref5 = Object(preact_min["h"])(
+  'span',
+  { 'class': 'file-label' },
+  'Get from Google Drive'
+);
+
+var _ref6 = Object(preact_min["h"])(
+  'h1',
+  null,
+  'Load Game'
+);
+
+var _ref7 = Object(preact_min["h"])(
+  'h2',
+  null,
+  'Supported file types: ".gb", ".gbc", ".zip"'
+);
+
+var wasmboyFilePicker_WasmBoyFilePicker = function (_Component) {
+  wasmboyFilePicker__inherits(WasmBoyFilePicker, _Component);
+
+  function WasmBoyFilePicker(props) {
+    wasmboyFilePicker__classCallCheck(this, WasmBoyFilePicker);
+
+    // set our state to if we are initialized or not
+    var _this = wasmboyFilePicker__possibleConstructorReturn(this, _Component.call(this, props));
+
+    _this.state = {
+      currentFileName: 'No Game Selected...',
+      isFileLoading: false
+    };
+    return _this;
+  }
+
+  // Allow passing a file
+  // https://gist.github.com/AshikNesin/e44b1950f6a24cfcd85330ffc1713513
+
+
+  WasmBoyFilePicker.prototype.loadLocalFile = function loadLocalFile(event) {
+    var _this2 = this;
+
+    this.setFileLoadingStatus(true);
+    this.props.wasmboy.loadGame(event.target.files[0]).then(function () {
+      console.log('Wasmboy Ready!');
+      _this2.props.showNotification('Game Loaded! 🎉');
+      _this2.setFileLoadingStatus(false);
+    }).catch(function (error) {
+      console.log('Load Game Error:', error);
+      _this2.props.showNotification('Game Load Error! 😞');
+      _this2.setFileLoadingStatus(false);
+    });
+
+    // Set our file name
+    var newState = wasmboyFilePicker__extends({}, this.state);
+    newState.currentFileName = event.target.files[0].name;
+    this.setState(newState);
+  };
+
+  WasmBoyFilePicker.prototype.loadGoogleDriveFile = function loadGoogleDriveFile(data) {
+    var _this3 = this;
+
+    if (data.action === 'picked') {
+      // Fetch from the drive api to download the file
+      // https://developers.google.com/drive/v3/web/picker
+      // https://developers.google.com/drive/v2/reference/files/get
+
+      var googlePickerFileObject = data.docs[0];
+      var oAuthHeaders = new Headers({
+        'Authorization': 'Bearer ' + googlePickerOAuthToken
+      });
+
+      this.setFileLoadingStatus(true);
+
+      // First Fetch the Information about the file
+      unfetch_es('https://www.googleapis.com/drive/v2/files/' + googlePickerFileObject.id, {
+        headers: oAuthHeaders
+      }).then(function (response) {
+        return response.json();
+      }).then(function (responseJson) {
+
+        // Finally fetch the file
+        unfetch_es(responseJson.downloadUrl, {
+          headers: oAuthHeaders
+        }).then(function (blob) {
+          if (!blob.ok) {
+            return Promise.reject(blob);
+          }
+
+          return blob.arrayBuffer();
+        }).then(function (bytes) {
+
+          // Use Wasm Boy to possibly Unzip, and then pass the bytes to be loaded
+          _this3.props.wasmboy._getGameFromArrayBuffer(googlePickerFileObject.name, bytes).then(function (byteArray) {
+            _this3.props.wasmboy.loadGame(byteArray).then(function () {
+              console.log('Wasmboy Ready!');
+              _this3.props.showNotification('Game Loaded! 🎉');
+              _this3.setFileLoadingStatus(false);
+
+              // Set our file name
+              var newState = wasmboyFilePicker__extends({}, _this3.state);
+              newState.currentFileName = googlePickerFileObject.name;
+              _this3.setState(newState);
+            }).catch(function (error) {
+              console.log('Load Game Error:', error);
+              _this3.props.showNotification('Game Load Error! 😞');
+              _this3.setFileLoadingStatus(false);
+            });
+          }).catch(function (error) {
+            console.log(error);
+            _this3.props.showNotification('Error getting file from google drive 💔');
+            _this3.setFileLoadingStatus(true);
+          });
+        }).catch(function (error) {
+          console.log(error);
+          _this3.props.showNotification('Error getting file from google drive 💔');
+          _this3.setFileLoadingStatus(true);
+        });
+      }).catch(function (error) {
+        _this3.props.showNotification('Error getting file from google drive 💔');
+        _this3.setFileLoadingStatus(true);
+      });
+    }
+  };
+
+  WasmBoyFilePicker.prototype.setFileLoadingStatus = function setFileLoadingStatus(isLoading) {
+    var newState = wasmboyFilePicker__extends({}, this.state);
+    newState.isFileLoading = isLoading;
+    this.setState(newState);
+  };
+
+  WasmBoyFilePicker.prototype.render = function render() {
+    var _this4 = this;
+
+    var fileInput = _ref;
+    if (!this.state.isFileLoading) {
+      fileInput = Object(preact_min["h"])(
+        'div',
+        { 'class': 'wasmboy__filePicker__services' },
+        Object(preact_min["h"])(
+          'div',
+          { 'class': 'file' },
+          Object(preact_min["h"])(
+            'label',
+            { 'class': 'file-label' },
+            Object(preact_min["h"])('input', { 'class': 'file-input', type: 'file', accept: '.gb, .gbc, .zip', name: 'resume', onChange: function onChange(event) {
+                _this4.loadLocalFile(event);
+              } }),
+            Object(preact_min["h"])(
+              'span',
+              { 'class': 'file-cta' },
+              Object(preact_min["h"])(
+                'span',
+                { 'class': 'file-icon' },
+                wasmboyFilePicker__ref2
+              ),
+              _ref3
+            )
+          )
+        ),
+        Object(preact_min["h"])(
+          googlePicker_GooglePicker,
+          { clientId: WASMBOY_DEBUGGER_GOOGLE_PICKER_CLIENT_ID,
+            scope: ['https://www.googleapis.com/auth/drive.readonly'],
+            onChange: function onChange(data) {
+              _this4.loadGoogleDriveFile(data);
+            },
+            onAuthenticate: function onAuthenticate(token) {
+              googlePickerOAuthToken = token;
+            },
+            multiselect: false,
+            navHidden: true,
+            authImmediate: false,
+            viewId: 'DOCS' },
+          Object(preact_min["h"])(
+            'div',
+            { 'class': 'file' },
+            Object(preact_min["h"])(
+              'label',
+              { 'class': 'file-label' },
+              Object(preact_min["h"])(
+                'span',
+                { 'class': 'file-cta' },
+                Object(preact_min["h"])(
+                  'span',
+                  { 'class': 'file-icon' },
+                  _ref4
+                ),
+                _ref5
+              )
+            )
+          )
+        )
+      );
+    }
+
+    return Object(preact_min["h"])(
+      'div',
+      { 'class': 'wasmboy__filePicker' },
+      _ref6,
+      _ref7,
+      Object(preact_min["h"])(
+        'h2',
+        null,
+        this.state.currentFileName
+      ),
+      fileInput
+    );
+  };
+
+  return WasmBoyFilePicker;
+}(preact_min["Component"]);
 // EXTERNAL MODULE: ./node_modules/preact-portal/dist/preact-portal.js
 var preact_portal = __webpack_require__("JsWE");
 var preact_portal_default = /*#__PURE__*/__webpack_require__.n(preact_portal);
@@ -6498,65 +6922,52 @@ var wasmboySystemControls__extends = Object.assign || function (target) { for (v
 
 function wasmboySystemControls__classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function wasmboySystemControls__possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-
+function wasmboySystemControls__inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 
 
-var _ref = Object(preact_min["h"])('div', { 'class': 'donut' });
 
-var _ref2 = Object(preact_min["h"])(
+
+var wasmboySystemControls__ref = Object(preact_min["h"])('div', { 'class': 'donut' });
+
+var wasmboySystemControls__ref2 = Object(preact_min["h"])(
   'h3',
   null,
   'Date:'
 );
 
-var _ref3 = Object(preact_min["h"])(
+var wasmboySystemControls__ref3 = Object(preact_min["h"])(
   'h3',
   null,
   'Auto:'
 );
 
-var _ref4 = Object(preact_min["h"])(
+var wasmboySystemControls__ref4 = Object(preact_min["h"])(
   'h1',
   null,
   'No Save States Found \uD83D\uDE1E'
 );
 
-var _ref5 = Object(preact_min["h"])(
-  'svg',
-  { fill: '#020202', height: '24', viewBox: '0 0 24 24', width: '24', xmlns: 'http://www.w3.org/2000/svg' },
-  Object(preact_min["h"])('path', { d: 'M6 2c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6H6zm7 7V3.5L18.5 9H13z' }),
-  Object(preact_min["h"])('path', { d: 'M0 0h24v24H0z', fill: 'none' })
-);
-
-var _ref6 = Object(preact_min["h"])(
-  'span',
-  { 'class': 'file-label' },
-  '".gb", ".gbc", ".zip"'
-);
-
-var _ref7 = Object(preact_min["h"])(
+var wasmboySystemControls__ref5 = Object(preact_min["h"])(
   'h1',
   null,
   'Load Save State For Current Game'
 );
 
 var wasmboySystemControls_WasmBoySystemControls = function (_Component) {
-  _inherits(WasmBoySystemControls, _Component);
+  wasmboySystemControls__inherits(WasmBoySystemControls, _Component);
 
   function WasmBoySystemControls(props) {
     wasmboySystemControls__classCallCheck(this, WasmBoySystemControls);
 
     // set our state to if we are initialized or not
-    var _this = _possibleConstructorReturn(this, _Component.call(this, props));
+    var _this = wasmboySystemControls__possibleConstructorReturn(this, _Component.call(this, props));
 
     _this.state = {
       showSaveStates: false,
-      currentFileName: 'Choose a file...',
+      currentFileName: 'No Game Selected...',
       saveStates: [],
       saveStateError: false
     };
@@ -6606,27 +7017,6 @@ var wasmboySystemControls_WasmBoySystemControls = function (_Component) {
     this.setState(newState);
   };
 
-  // Allow passing a file
-  // https://gist.github.com/AshikNesin/e44b1950f6a24cfcd85330ffc1713513
-
-
-  WasmBoySystemControls.prototype.loadGame = function loadGame(wasmboy, event) {
-    var _this3 = this;
-
-    wasmboy.loadGame(event.target.files[0]).then(function () {
-      console.log('Wasmboy Ready!');
-      _this3.props.showNotification('Game Loaded! 🎉');
-    }).catch(function (error) {
-      console.log('Load Game Error:', error);
-      _this3.props.showNotification('Game Load Error! 😞');
-    });
-
-    // Set our file name
-    var newState = wasmboySystemControls__extends({}, this.state);
-    newState.currentFileName = event.target.files[0].name;
-    this.setState(newState);
-  };
-
   WasmBoySystemControls.prototype.startGame = function startGame() {
     if (!this.props.wasmboy.ready) {
       this.props.showNotification('Please load a game. ⏏️');
@@ -6655,9 +7045,9 @@ var wasmboySystemControls_WasmBoySystemControls = function (_Component) {
   };
 
   WasmBoySystemControls.prototype.render = function render(props) {
-    var _this4 = this;
+    var _this3 = this;
 
-    var saveStateElements = _ref;
+    var saveStateElements = wasmboySystemControls__ref;
     if (this.state.showSaveStates) {
       if (this.state.saveStates.length > 0) {
         // Loop through save states
@@ -6668,19 +7058,19 @@ var wasmboySystemControls_WasmBoySystemControls = function (_Component) {
           saveStateElements.unshift(Object(preact_min["h"])(
             'div',
             { 'class': 'saveState', onClick: function onClick() {
-                _this4.loadState(saveState);
+                _this3.loadState(saveState);
               } },
             Object(preact_min["h"])('img', { src: saveState.screenshotCanvasDataURL }),
-            _ref2,
+            wasmboySystemControls__ref2,
             saveStateDateString,
-            _ref3,
+            wasmboySystemControls__ref3,
             saveState.isAuto ? "true" : "false"
           ));
         });
       }
 
       if (this.state.saveStateError) {
-        saveStateElements = _ref4;
+        saveStateElements = wasmboySystemControls__ref4;
       }
     }
 
@@ -6688,35 +7078,9 @@ var wasmboySystemControls_WasmBoySystemControls = function (_Component) {
       'div',
       { className: 'wasmboy__systemControls system-controls' },
       Object(preact_min["h"])(
-        'div',
-        { 'class': 'system-controls__file-input file is-centered has-name is-boxed' },
-        Object(preact_min["h"])(
-          'label',
-          { 'class': 'file-label' },
-          Object(preact_min["h"])('input', { 'class': 'file-input', type: 'file', accept: '.gb, .gbc, .zip', name: 'resume', onChange: function onChange(event) {
-              _this4.loadGame(props.wasmboy, event);
-            } }),
-          Object(preact_min["h"])(
-            'span',
-            { 'class': 'file-cta' },
-            Object(preact_min["h"])(
-              'span',
-              { 'class': 'file-icon' },
-              _ref5
-            ),
-            _ref6
-          ),
-          Object(preact_min["h"])(
-            'span',
-            { 'class': 'file-name' },
-            this.state.currentFileName
-          )
-        )
-      ),
-      Object(preact_min["h"])(
         'button',
         { className: this.getStartButtonClass() + " button", onclick: function onclick() {
-            _this4.startGame();
+            _this3.startGame();
           } },
         'Start Game'
       ),
@@ -6737,14 +7101,14 @@ var wasmboySystemControls_WasmBoySystemControls = function (_Component) {
       Object(preact_min["h"])(
         'button',
         { 'class': 'button', onclick: function onclick() {
-            _this4.saveState();
+            _this3.saveState();
           } },
         'Save State'
       ),
       Object(preact_min["h"])(
         'button',
         { 'class': 'button', onclick: function onclick() {
-            _this4.openSaveStates();
+            _this3.openSaveStates();
           } },
         'Load State'
       ),
@@ -6763,12 +7127,12 @@ var wasmboySystemControls_WasmBoySystemControls = function (_Component) {
           Object(preact_min["h"])(
             'div',
             { 'class': 'modal-background', onClick: function onClick() {
-                _this4.closeSaveStates();
+                _this3.closeSaveStates();
               } },
             Object(preact_min["h"])(
               'div',
               { 'class': 'modal-content' },
-              _ref7,
+              wasmboySystemControls__ref5,
               Object(preact_min["h"])(
                 'div',
                 { 'class': 'saveStateContainer' },
@@ -6776,7 +7140,7 @@ var wasmboySystemControls_WasmBoySystemControls = function (_Component) {
               )
             ),
             Object(preact_min["h"])('button', { 'class': 'modal-close is-large', 'aria-label': 'close', onClick: function onClick() {
-                _this4.closeSaveStates();
+                _this3.closeSaveStates();
               } })
           )
         )
@@ -7918,6 +8282,7 @@ var wasmboyOptions_WasmBoyOptions = function (_Component) {
 
   WasmBoyOptions.prototype.applyOptions = function applyOptions() {
     this.props.wasmBoy.reset(this.state);
+    this.props.showNotification('Applied Options! 🛠️');
   };
 
   WasmBoyOptions.prototype.render = function render() {
@@ -8087,6 +8452,7 @@ var wasmboyGamepad_WasmBoyGamepad = function (_Component) {
     return WasmBoyGamepad;
 }(preact_min["Component"]);
 // CONCATENATED MODULE: ./debugger/index.js
+
 
 
 
@@ -8325,6 +8691,10 @@ var index_App = function (_Component) {
 				)
 			),
 			debuggerComponent,
+			Object(preact_min["h"])(wasmboyFilePicker_WasmBoyFilePicker, { wasmboy: WasmBoy,
+				showNotification: function showNotification(text) {
+					_this4.showNotification(text);
+				} }),
 			Object(preact_min["h"])(
 				'div',
 				null,
@@ -9902,6 +10272,77 @@ module.exports = function (it) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+
+/***/ "PirY":
+/***/ (function(module, exports) {
+
+
+module.exports = function load(src, opts, cb) {
+  var head = document.head || document.getElementsByTagName('head')[0];
+  var script = document.createElement('script');
+
+  if (typeof opts === 'function') {
+    cb = opts;
+    opts = {};
+  }
+
+  opts = opts || {};
+  cb = cb || function () {};
+
+  script.type = opts.type || 'text/javascript';
+  script.charset = opts.charset || 'utf8';
+  script.async = 'async' in opts ? !!opts.async : true;
+  script.src = src;
+
+  if (opts.attrs) {
+    setAttributes(script, opts.attrs);
+  }
+
+  if (opts.text) {
+    script.text = '' + opts.text;
+  }
+
+  var onend = 'onload' in script ? stdOnEnd : ieOnEnd;
+  onend(script, cb);
+
+  // some good legacy browsers (firefox) fail the 'in' detection above
+  // so as a fallback we always set onload
+  // old IE will ignore this and new IE will set onload
+  if (!script.onload) {
+    stdOnEnd(script, cb);
+  }
+
+  head.appendChild(script);
+};
+
+function setAttributes(script, attrs) {
+  for (var attr in attrs) {
+    script.setAttribute(attr, attrs[attr]);
+  }
+}
+
+function stdOnEnd(script, cb) {
+  script.onload = function () {
+    this.onerror = this.onload = null;
+    cb(null, script);
+  };
+  script.onerror = function () {
+    // this.onload = null here is necessary
+    // because even IE9 works not like others
+    this.onerror = this.onload = null;
+    cb(new Error('Failed to load ' + this.src), script);
+  };
+}
+
+function ieOnEnd(script, cb) {
+  script.onreadystatechange = function () {
+    if (this.readyState != 'complete' && this.readyState != 'loaded') return;
+    this.onreadystatechange = null;
+    cb(null, script); // there is no way to catch loading errors in IE8
+  };
+}
 
 /***/ }),
 
@@ -18717,6 +19158,13 @@ Crc32Probe.prototype.processChunk = function (chunk) {
   this.push(chunk);
 };
 module.exports = Crc32Probe;
+
+/***/ }),
+
+/***/ "uCBp":
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
 
 /***/ }),
 
