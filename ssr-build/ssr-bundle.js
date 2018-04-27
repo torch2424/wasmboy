@@ -4473,7 +4473,7 @@ var audio_WasmBoyAudioService = function () {
       var timeUntilNextSample = void 0;
       if (_this.audioPlaytime) {
         timeUntilNextSample = _this.audioPlaytime - _this.audioContext.currentTime;
-        if (timeUntilNextSample > WASMBOY_MIN_TIME_REMAINING_IN_SECONDS) {
+        if (timeUntilNextSample > WASMBOY_MIN_TIME_REMAINING_IN_SECONDS && _this.audioContext.currentTime > 0) {
           resolve();
           return;
         }
@@ -4489,6 +4489,7 @@ var audio_WasmBoyAudioService = function () {
         // We took too long, or something happen and hiccup'd the emulator, reset audio playback times
         //console.log(`[Wasmboy] Reseting Audio Playback time: ${this.audioPlaytime.toFixed(2)} < ${audioContextCurrentTimeWithLatency.toFixed(2)}, Audio Queue Index: ${this.wasmInstance.exports.getAudioQueueIndex()}`);
         _this.cancelAllAudio();
+        _this.wasmInstance.exports.resetAudioQueue();
         _this.audioPlaytime = audioContextCurrentTimeWithLatency;
         resolve();
         return;
@@ -5521,8 +5522,7 @@ var memory_WasmBoyMemoryService = function () {
 
     this._initializeConstants();
 
-    // Set listeners to ensure we save our cartridge ram before closing
-    window.addEventListener("beforeunload", function () {
+    var unloadHandler = function unloadHandler() {
       // Need to add a retrun value, and force all code in the block to be sync
       // https://stackoverflow.com/questions/7255649/window-onbeforeunload-not-working
       // http://vaughnroyko.com/idbonbeforeunload/
@@ -5560,6 +5560,17 @@ var memory_WasmBoyMemoryService = function () {
       }));
 
       return null;
+    };
+
+    // Set listeners to ensure we save our cartridge ram before closing
+    window.addEventListener("beforeunload", function () {
+      unloadHandler();
+    }, false);
+    window.addEventListener("unload", function () {
+      unloadHandler();
+    }, false);
+    window.addEventListener("pagehide", function () {
+      unloadHandler();
     }, false);
 
     return new src(function (resolve, reject) {
@@ -6389,6 +6400,8 @@ var wasmboy_WasmBoyLib = function () {
         // Run our initialization on the core
         _this7.wasmInstance.exports.config(_this7.audioBatchProcessing ? 1 : 0, _this7.graphicsBatchProcessing ? 1 : 0, _this7.timersBatchProcessing ? 1 : 0, _this7.graphicsDisableScanlineRendering ? 1 : 0, _this7.audioAccumulateSamples ? 1 : 0, _this7.tileRendering ? 1 : 0, _this7.tileCaching ? 1 : 0);
         resolve(_this7.wasmInstance);
+      }).catch(function (error) {
+        reject(error);
       });
     });
   };
