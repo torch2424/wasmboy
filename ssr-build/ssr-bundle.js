@@ -6399,8 +6399,6 @@ var wasmboy_WasmBoyLib = function () {
   WasmBoyLib.prototype._fetchGameAsByteArray = function _fetchGameAsByteArray(game) {
     var _this8 = this;
 
-    console.log(game);
-
     return new src(function (resolve, reject) {
       if (ArrayBuffer.isView(game) && game.constructor === Uint8Array) {
         // Simply resolve with the input
@@ -6570,7 +6568,6 @@ var googlePicker_GooglePicker = (_temp = _class = function (_Component) {
   GooglePicker.prototype.onChoose = function onChoose(event) {
     var _this2 = this;
 
-    console.log('yooo', event);
     if (!this.isGoogleReady() || !this.isGoogleAuthReady() || !this.isGooglePickerReady() || this.props.disabled) {
       return null;
     }
@@ -6804,12 +6801,10 @@ var wasmboyFilePicker_WasmBoyFilePicker = function (_Component) {
               _this3.setFileLoadingStatus(false);
             });
           }).catch(function (error) {
-            console.log(error);
             _this3.props.showNotification('Error getting file from google drive 💔');
             _this3.setFileLoadingStatus(true);
           });
         }).catch(function (error) {
-          console.log(error);
           _this3.props.showNotification('Error getting file from google drive 💔');
           _this3.setFileLoadingStatus(true);
         });
@@ -8475,18 +8470,6 @@ function index__inherits(subClass, superClass) { if (typeof superClass !== "func
 
 
 
-// Old Perf Options
-// WasmBoy.initialize(canvasElement, {
-// 	frameSkip: 1,
-// 	audioBatchProcessing: true,
-// 	timersBatchProcessing: true,
-// 	audioAccumulateSamples: true,
-// 	graphicsDisableScanlineRendering: true
-// });
-
-//const defaultGamePath = './test/accuracy/testroms/blargg/cpu_instrs.gb';
-var defaultGamePath = './games/linksawakening.gb';
-
 var wasmBoyDefaultOptions = {
 	isGbcEnabled: true,
 	isAudioEnabled: true,
@@ -8561,7 +8544,6 @@ var index_App = function (_Component) {
 
 
 	App.prototype.componentDidMount = function componentDidMount() {
-		var _this2 = this;
 
 		// Get our canvas element
 		index_canvasElement = document.querySelector(".wasmboy__canvas-container__canvas");
@@ -8585,22 +8567,13 @@ var index_App = function (_Component) {
 		WasmBoyController.addTouchInput('B', bElement, 'BUTTON');
 		WasmBoyController.addTouchInput('START', startElement, 'BUTTON');
 		WasmBoyController.addTouchInput('SELECT', selectElement, 'BUTTON');
-
-		//WasmBoy.loadGame('./test/testroms/blargg/cpu_instrs.gb')
-		WasmBoy.loadGame(defaultGamePath).then(function () {
-			console.log('Wasmboy Ready!');
-			_this2.showNotification('Game Loaded! 🎉');
-		}).catch(function (error) {
-			console.log('Load Game Error:', error);
-			_this2.showNotification('Game Load Error! 😞');
-		});
 	};
 
 	// Function to show notifications to the user
 
 
 	App.prototype.showNotification = function showNotification(notificationText) {
-		var _this3 = this;
+		var _this2 = this;
 
 		if (notificationTimeout) {
 			clearTimeout(notificationTimeout);
@@ -8608,9 +8581,9 @@ var index_App = function (_Component) {
 		}
 
 		var closeNotification = function closeNotification() {
-			var newState = index__extends({}, _this3.state);
+			var newState = index__extends({}, _this2.state);
 			newState.notification = index__ref2;
-			_this3.setState(newState);
+			_this2.setState(newState);
 		};
 
 		var newState = index__extends({}, this.state);
@@ -8630,7 +8603,7 @@ var index_App = function (_Component) {
 	};
 
 	App.prototype.render = function render() {
-		var _this4 = this;
+		var _this3 = this;
 
 		// Optionally render the options
 		var optionsComponent = index__ref3;
@@ -8639,7 +8612,7 @@ var index_App = function (_Component) {
 				'section',
 				null,
 				Object(preact_min["h"])(wasmboyOptions_WasmBoyOptions, { wasmBoy: WasmBoy, availableOptions: wasmBoyDefaultOptions, showNotification: function showNotification(text) {
-						_this4.showNotification(text);
+						_this3.showNotification(text);
 					} })
 			);
 		}
@@ -8666,9 +8639,9 @@ var index_App = function (_Component) {
 						type: 'checkbox',
 						checked: this.state.showOptions,
 						onChange: function onChange() {
-							var newState = index__extends({}, _this4.state);
+							var newState = index__extends({}, _this3.state);
 							newState.showOptions = !newState.showOptions;
-							_this4.setState(newState);
+							_this3.setState(newState);
 						} })
 				)
 			),
@@ -8684,22 +8657,22 @@ var index_App = function (_Component) {
 						type: 'checkbox',
 						checked: this.state.showDebugger,
 						onChange: function onChange() {
-							var newState = index__extends({}, _this4.state);
+							var newState = index__extends({}, _this3.state);
 							newState.showDebugger = !newState.showDebugger;
-							_this4.setState(newState);
+							_this3.setState(newState);
 						} })
 				)
 			),
 			debuggerComponent,
 			Object(preact_min["h"])(wasmboyFilePicker_WasmBoyFilePicker, { wasmboy: WasmBoy,
 				showNotification: function showNotification(text) {
-					_this4.showNotification(text);
+					_this3.showNotification(text);
 				} }),
 			Object(preact_min["h"])(
 				'div',
 				null,
 				Object(preact_min["h"])(wasmboySystemControls_WasmBoySystemControls, { wasmboy: WasmBoy, wasmboyMemory: WasmBoyMemory, showNotification: function showNotification(text) {
-						_this4.showNotification(text);
+						_this3.showNotification(text);
 					} })
 			),
 			index__ref7,
