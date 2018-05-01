@@ -1,78 +1,57 @@
 // Imports
-import {
-  Cpu,
-  initializeCpu,
-  executeOpcode
-} from './cpu/index';
-import {
-  Graphics,
-  updateGraphics,
-  batchProcessGraphics
-} from './graphics/index';
-import {
-  Interrupts,
-  checkInterrupts
-} from './interrupts/index';
-import {
-  Joypad
-} from './joypad/index';
-import {
-  Memory,
-  eightBitLoadFromGBMemory
-} from './memory/index';
-import {
-  Timers,
-  updateTimers,
-  batchProcessTimers
-} from './timers/index';
-import {
-  Sound,
-  Channel1,
-  Channel2,
-  Channel3,
-  Channel4,
-  updateSound
-} from './sound/index';
-import {
-  wasmPages
-} from './constants/constants';
-import {
-  Config
-} from './config';
-import {
-  hexLog
-} from './helpers/index';
+import { Cpu, initializeCpu, executeOpcode } from './cpu/index';
+import { Graphics, updateGraphics, batchProcessGraphics } from './graphics/index';
+import { Interrupts, checkInterrupts } from './interrupts/index';
+import { Joypad } from './joypad/index';
+import { Memory, eightBitLoadFromGBMemory } from './memory/index';
+import { Timers, updateTimers, batchProcessTimers } from './timers/index';
+import { Sound, Channel1, Channel2, Channel3, Channel4, updateSound } from './sound/index';
+import { WASMBOY_WASM_PAGES } from './constants';
+import { Config } from './config';
+import { hexLog } from './helpers/index';
 
 // Public Exports
+export { config } from './config';
+export { setJoypadState } from './joypad/index';
+export { getAudioQueueIndex, resetAudioQueue } from './sound/index';
 export {
-  config
-} from './config';
-export {
-  setJoypadState
-} from './joypad/index';
-export {
-  getAudioQueueIndex,
-  resetAudioQueue
-} from './sound/index';
-export {
-  wasmMemorySize,
-  wasmBoyInternalStateLocation,
-  wasmBoyInternalStateSize,
-  gameBoyInternalMemoryLocation,
-  gameBoyInternalMemorySize,
-  videoOutputLocation,
-  frameInProgressVideoOutputLocation,
-  gameboyColorPaletteLocation,
-  gameboyColorPaletteSize,
-  backgroundMapLocation,
-  tileDataMap,
-  soundOutputLocation,
-  gameBytesLocation,
-  gameRamBanksLocation
-} from './constants/constants';
-export {
-  getWasmBoyOffsetFromGameBoyOffset
-} from './memory/memoryMap';
+  WASMBOY_MEMORY_LOCATION,
+  WASMBOY_MEMORY_SIZE,
+  WASMBOY_WASM_PAGES,
+  ASSEMBLYSCRIPT_MEMORY_LOCATION,
+  ASSEMBLYSCRIPT_MEMORY_SIZE,
+  WASMBOY_STATE_LOCATION,
+  WASMBOY_STATE_SIZE,
+  GAMEBOY_INTERNAL_MEMORY_LOCATION,
+  GAMEBOY_INTERNAL_MEMORY_SIZE,
+  VIDEO_RAM_LOCATION,
+  VIDEO_RAM_SIZE,
+  WORK_RAM_LOCATION,
+  WORK_RAM_SIZE,
+  OTHER_GAMEBOY_INTERNAL_MEMORY_LOCATION,
+  OTHER_GAMEBOY_INTERNAL_MEMORY_SIZE,
+  GRAPHICS_OUTPUT_LOCATION,
+  GRAPHICS_OUTPUT_SIZE,
+  GBC_PALETTE_LOCATION,
+  GBC_PALETTE_SIZE,
+  BG_PRIORITY_MAP_LOCATION,
+  BG_PRIORITY_MAP_SIZE,
+  FRAME_LOCATION,
+  FRAME_SIZE,
+  BACKGROUND_MAP_LOCATION,
+  BACKGROUND_MAP_SIZE,
+  TILE_DATA_LOCATION,
+  TILE_DATA_SIZE,
+  OAM_TILES_LOCATION,
+  OAM_TILES_SIZE,
+  AUDIO_BUFFER_LOCATION,
+  AUDIO_BUFFER_SIZE,
+  CARTRIDGE_RAM_LOCATION,
+  CARTRIDGE_RAM_SIZE,
+  CARTRIDGE_ROM_LOCATION,
+  CARTRIDGE_ROM_SIZE
+} from './constants';
+export { getWasmBoyOffsetFromGameBoyOffset } from './memory/memoryMap';
 export {
   getRegisterA,
   getRegisterB,
@@ -88,11 +67,27 @@ export {
   drawBackgroundMapToWasmMemory,
   drawTileDataToWasmMemory
 } from './debug/debug';
+export {
+  wasmMemorySize,
+  wasmBoyInternalStateLocation,
+  wasmBoyInternalStateSize,
+  gameBoyInternalMemoryLocation,
+  gameBoyInternalMemorySize,
+  videoOutputLocation,
+  frameInProgressVideoOutputLocation,
+  gameboyColorPaletteLocation,
+  gameboyColorPaletteSize,
+  backgroundMapLocation,
+  tileDataMap,
+  soundOutputLocation,
+  gameBytesLocation,
+  gameRamBanksLocation
+} from './legacy';
 
 // Function to track if the core has started
-let hasStarted: boolean = false;;
+let hasStarted: boolean = false;
 export function hasCoreStarted(): i32 {
-  if(hasStarted) {
+  if (hasStarted) {
     return 1;
   }
 
@@ -100,8 +95,8 @@ export function hasCoreStarted(): i32 {
 }
 
 // Grow our memory to the specified size
-if(current_memory() < wasmPages) {
-  grow_memory(wasmPages - current_memory());
+if (current_memory() < WASMBOY_WASM_PAGES) {
+  grow_memory(WASMBOY_WASM_PAGES - current_memory());
 }
 
 // Function to initiialize the core
@@ -118,12 +113,10 @@ export function initialize(useGBCMode: i32 = 1, includeBootRom: i32 = 0): void {
 // 1 = render a frame
 // 2 = replace boot rom
 export function update(): i32 {
-
   let error: boolean = false;
   let numberOfCycles: i32 = -1;
 
-  while(!error &&
-    Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME()) {
+  while (!error && Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME()) {
     numberOfCycles = emulationStep();
     if (numberOfCycles < 0) {
       error = true;
@@ -149,7 +142,6 @@ export function update(): i32 {
 // Function to execute an opcode, and update other gameboy hardware.
 // http://www.codeslinger.co.uk/pages/projects/gameboy/beginning.html
 export function emulationStep(): i32 {
-
   // Set has started to 1 since we ran a emulation step
   hasStarted = true;
 
@@ -159,12 +151,12 @@ export function emulationStep(): i32 {
   let opcode: i32 = 0;
 
   // Cpu Halting best explained: https://www.reddit.com/r/EmuDev/comments/5ie3k7/infinite_loop_trying_to_pass_blarggs_interrupt/db7xnbe/
-  if(!Cpu.isHalted && !Cpu.isStopped) {
+  if (!Cpu.isHalted && !Cpu.isStopped) {
     opcode = <u8>eightBitLoadFromGBMemory(Cpu.programCounter);
     numberOfCycles = executeOpcode(opcode);
   } else {
     // if we were halted, and interrupts were disabled but interrupts are pending, stop waiting
-    if(Cpu.isHalted && !Interrupts.masterInterruptSwitch && Interrupts.areInterruptsPending()) {
+    if (Cpu.isHalted && !Interrupts.masterInterruptSwitch && Interrupts.areInterruptsPending()) {
       Cpu.isHalted = false;
       Cpu.isStopped = false;
 
@@ -186,10 +178,10 @@ export function emulationStep(): i32 {
   }
 
   // blarggFixes, don't allow register F to have the bottom nibble
-  Cpu.registerF = Cpu.registerF & 0xF0;
+  Cpu.registerF = Cpu.registerF & 0xf0;
 
   // Check if there was an error decoding the opcode
-  if(numberOfCycles <= 0) {
+  if (numberOfCycles <= 0) {
     return numberOfCycles;
   }
 
@@ -207,8 +199,8 @@ export function emulationStep(): i32 {
   Cpu.currentCycles += numberOfCycles;
 
   // Check other Gameboy components
-  if(!Cpu.isStopped) {
-    if(Config.graphicsBatchProcessing) {
+  if (!Cpu.isStopped) {
+    if (Config.graphicsBatchProcessing) {
       // Need to do this, since a lot of things depend on the scanline
       // Batch processing will simply return if the number of cycles is too low
       Graphics.currentCycles += numberOfCycles;
@@ -217,7 +209,7 @@ export function emulationStep(): i32 {
       updateGraphics(numberOfCycles);
     }
 
-    if(Config.audioBatchProcessing) {
+    if (Config.audioBatchProcessing) {
       Sound.currentCycles += numberOfCycles;
     } else {
       updateSound(numberOfCycles);

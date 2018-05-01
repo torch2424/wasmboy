@@ -1,5 +1,5 @@
 // Functions to debug graphical output
-import { backgroundMapLocation, tileDataMap } from '../constants/constants';
+import { BACKGROUND_MAP_LOCATION, TILE_DATA_LOCATION } from '../constants';
 import { Graphics, Lcd } from '../graphics/index';
 import { Cpu } from '../cpu/cpu';
 import { getTileDataAddress } from '../graphics/renderUtils';
@@ -152,7 +152,7 @@ export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
         let green: i32 = getColorComponentFromRgb(1, rgbColorPalette);
         let blue: i32 = getColorComponentFromRgb(2, rgbColorPalette);
 
-        let offset: i32 = backgroundMapLocation + pixelStart;
+        let offset: i32 = BACKGROUND_MAP_LOCATION + pixelStart;
         store<u8>(offset, <u8>red);
         store<u8>(offset + 1, <u8>green);
         store<u8>(offset + 2, <u8>blue);
@@ -162,7 +162,7 @@ export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
         let monochromeColor: i32 = getMonochromeColorFromPalette(paletteColorId, Graphics.memoryLocationBackgroundPalette);
 
         for (let i: i32 = 0; i < 3; i++) {
-          let offset: i32 = backgroundMapLocation + pixelStart + i;
+          let offset: i32 = BACKGROUND_MAP_LOCATION + pixelStart + i;
           store<u8>(offset, <u8>monochromeColor);
         }
       }
@@ -209,7 +209,7 @@ export function drawTileDataToWasmMemory(): void {
           tileDataMapGridX * 8,
           tileDataMapGridY * 8 + tileLineY,
           0x1f * 8,
-          tileDataMap,
+          TILE_DATA_LOCATION,
           true
         );
       }

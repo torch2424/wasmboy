@@ -1,4 +1,5 @@
 // Functions for rendering the background
+import { FRAME_LOCATION } from '../constants';
 import { Cpu } from '../cpu/cpu';
 import { Config } from '../config';
 import { Graphics } from './graphics';
@@ -376,7 +377,7 @@ function drawLineOfTileFromTileCache(
       if (xPixel + tileCacheIndex <= 160) {
         // Get the pixel location in memory of the tile
         let previousXPixel = xPixel - (8 - tileCacheIndex);
-        let previousTilePixelLocation = Memory.frameInProgressVideoOutputLocation + getRgbPixelStart(xPixel + tileCacheIndex, yPixel);
+        let previousTilePixelLocation = FRAME_LOCATION + getRgbPixelStart(xPixel + tileCacheIndex, yPixel);
 
         // Cycle through the RGB
         for (let tileCacheRgb = 0; tileCacheRgb < 3; tileCacheRgb++) {
@@ -461,7 +462,7 @@ function drawLineOfTileFromTileId(
     xPixel,
     yPixel,
     160,
-    Memory.frameInProgressVideoOutputLocation,
+    FRAME_LOCATION,
     false,
     0,
     bgMapAttributes

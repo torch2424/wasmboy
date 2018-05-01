@@ -1,19 +1,24 @@
 // WasmBoy memory map:
 // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
 import {
-  wasmBoyInternalStateLocation,
-  wasmMemorySize,
-  gameBoyInternalMemoryLocation,
-  videoOutputLocation,
-  frameInProgressVideoOutputLocation,
-  gameboyColorPaletteLocation,
-  soundOutputLocation,
-  gameBytesLocation,
-  gameRamBanksLocation,
-  gameBoyVramLocation,
-  gameBoyWramLocation,
-  gameBoyMemoryRegistersLocation
-} from '../constants/constants';
+  WASMBOY_MEMORY_LOCATION,
+  ASSEMBLYSCRIPT_MEMORY_LOCATION,
+  WASMBOY_STATE_LOCATION,
+  GAMEBOY_INTERNAL_MEMORY_LOCATION,
+  VIDEO_RAM_LOCATION,
+  WORK_RAM_LOCATION,
+  OTHER_GAMEBOY_INTERNAL_MEMORY_LOCATION,
+  GRAPHICS_OUTPUT_LOCATION,
+  GBC_PALETTE_LOCATION,
+  BG_PRIORITY_MAP_LOCATION,
+  FRAME_LOCATION,
+  BACKGROUND_MAP_LOCATION,
+  TILE_DATA_LOCATION,
+  OAM_TILES_LOCATION,
+  AUDIO_BUFFER_LOCATION,
+  CARTRIDGE_RAM_LOCATION,
+  CARTRIDGE_ROM_LOCATION
+} from '../constants';
 import { eightBitLoadFromGBMemory, loadBooleanDirectlyFromWasmMemory } from './load';
 import { eightBitStoreIntoGBMemory, storeBooleanDirectlyToWasmMemory } from './store';
 import { handleBanking } from './banking';
@@ -51,22 +56,6 @@ export class Memory {
   // Hardware I/O, 0xFF00 -> 0xFF7F
   // Zero Page, 0xFF80 -> 0xFFFE
   // Intterupt Enable Flag, 0xFFFF
-
-  // ----------------------------------
-  // Wasmboy Memory Map
-  // ----------------------------------
-  static readonly gameBoyInternalMemoryLocation: i32 = gameBoyInternalMemoryLocation;
-  static readonly gameBoyVramLocation: i32 = gameBoyVramLocation;
-  static readonly gameBoyWramLocation: i32 = gameBoyWramLocation;
-  static readonly gameBoyMemoryRegistersLocation: i32 = gameBoyMemoryRegistersLocation;
-  static readonly videoOutputLocation: i32 = videoOutputLocation;
-  static readonly frameInProgressVideoOutputLocation: i32 = frameInProgressVideoOutputLocation;
-  static readonly gameboyColorPaletteLocation: i32 = gameboyColorPaletteLocation;
-  static readonly soundOutputLocation: i32 = soundOutputLocation;
-
-  // Passed in Game backup or ROM from the user
-  static readonly gameRamBanksLocation: i32 = gameRamBanksLocation;
-  static readonly gameBytesLocation: i32 = gameBytesLocation;
 
   // ----------------------------------
   // Rom/Ram Banking
@@ -173,7 +162,7 @@ export function setPixelOnFrame(x: i32, y: i32, colorId: i32, color: i32): void 
   // Currently only supports 160x144
   // Storing in X, then y
   // So need an offset
-  store<u8>(Memory.frameInProgressVideoOutputLocation + getRgbPixelStart(x, y) + colorId, color);
+  store<u8>(FRAME_LOCATION + getRgbPixelStart(x, y) + colorId, color);
 }
 
 // Function to get the start of a RGB pixel (R, G, B)
@@ -187,7 +176,7 @@ export function getRgbPixelStart(x: i32, y: i32): i32 {
 // Function to set our left and right channels at the correct queue index
 export function setLeftAndRightOutputForAudioQueue(leftVolume: i32, rightVolume: i32, audioQueueIndex: i32): void {
   // Get our stereo index
-  let audioQueueOffset = Memory.soundOutputLocation + audioQueueIndex * 2;
+  let audioQueueOffset = AUDIO_BUFFER_LOCATION + audioQueueIndex * 2;
 
   // Store our volumes
   // +1 that way we don't have empty data to ensure that the value is set
@@ -197,7 +186,7 @@ export function setLeftAndRightOutputForAudioQueue(leftVolume: i32, rightVolume:
 
 // Function to shortcut the memory map, and load directly from the VRAM Bank
 export function loadFromVramBank(gameboyOffset: i32, vramBankId: i32): u8 {
-  let wasmBoyAddress: i32 = gameboyOffset - Memory.videoRamLocation + Memory.gameBoyInternalMemoryLocation + 0x2000 * (vramBankId & 0x01);
+  let wasmBoyAddress: i32 = gameboyOffset - Memory.videoRamLocation + GAMEBOY_INTERNAL_MEMORY_LOCATION + 0x2000 * (vramBankId & 0x01);
   return load<u8>(wasmBoyAddress);
 }
 
@@ -211,7 +200,7 @@ export function storePaletteByteInWasmMemory(paletteIndexByte: i32, value: i32, 
     paletteIndex += 0x40;
   }
 
-  store<u8>(Memory.gameboyColorPaletteLocation + paletteIndex, <u8>value);
+  store<u8>(GBC_PALETTE_LOCATION + paletteIndex, <u8>value);
 }
 
 // Function to load a byte from our Gbc Palette memory
@@ -225,7 +214,7 @@ export function loadPaletteByteFromWasmMemory(paletteIndexByte: i32, isSprite: b
     paletteIndex += 0x40;
   }
 
-  return load<u8>(Memory.gameboyColorPaletteLocation + paletteIndex);
+  return load<u8>(GBC_PALETTE_LOCATION + paletteIndex);
 }
 
 // Function to return an address to store into save state memory
@@ -233,5 +222,5 @@ export function loadPaletteByteFromWasmMemory(paletteIndexByte: i32, isSprite: b
 // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
 export function getSaveStateMemoryOffset(offset: i32, saveStateSlot: i32): i32 {
   // 50 byutes per save state memory partiton sli32
-  return wasmBoyInternalStateLocation + offset + 50 * saveStateSlot;
+  return WASMBOY_STATE_LOCATION + offset + 50 * saveStateSlot;
 }
