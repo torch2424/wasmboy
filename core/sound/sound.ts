@@ -8,7 +8,7 @@
 // getSampleAsUnsignedByte() will do the conversion of getting the total
 // of all the channels, times the (mixer volume + 1), to give us an unsigned
 // byte from 0 (-1.0) to 254 (1.0)
-
+import { AUDIO_BUFFER_LOCATION } from '../constants';
 import { Channel1 } from './channel1';
 import { Channel2 } from './channel2';
 import { Channel3 } from './channel3';
@@ -18,7 +18,6 @@ import { Config } from '../config';
 import {
   eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemory,
-  setLeftAndRightOutputForAudioQueue,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
@@ -534,4 +533,15 @@ function getSampleAsUnsignedByte(sample: i32, mixerVolume: i32): i32 {
   convertedSample = convertedSample * precision / maxDivider;
 
   return convertedSample;
+}
+
+// Function to set our left and right channels at the correct queue index
+export function setLeftAndRightOutputForAudioQueue(leftVolume: i32, rightVolume: i32, audioQueueIndex: i32): void {
+  // Get our stereo index
+  let audioQueueOffset = AUDIO_BUFFER_LOCATION + audioQueueIndex * 2;
+
+  // Store our volumes
+  // +1 that way we don't have empty data to ensure that the value is set
+  store<u8>(audioQueueOffset, <u8>(leftVolume + 1));
+  store<u8>(audioQueueOffset + 1, <u8>(rightVolume + 1));
 }

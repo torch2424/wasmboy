@@ -1,4 +1,4 @@
-export { Graphics, batchProcessGraphics, initializeGraphics, updateGraphics } from './graphics';
+export { Graphics, batchProcessGraphics, initializeGraphics, updateGraphics, loadFromVramBank } from './graphics';
 
 export { Lcd } from './lcd';
 

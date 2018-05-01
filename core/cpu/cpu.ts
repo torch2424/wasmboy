@@ -46,7 +46,8 @@ export class Cpu {
     return 4194304;
   }
 
-  // cycles = 154 scanlines, 456 cycles per line
+  // Cycles Per Frame = Clock Speed / fps
+  // So: 4194304 / 59.73
   static MAX_CYCLES_PER_FRAME(): i32 {
     if (Cpu.GBCDoubleSpeed) {
       return 140448;

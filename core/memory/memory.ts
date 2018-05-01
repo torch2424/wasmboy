@@ -157,66 +157,6 @@ export function initializeCartridge(): void {
   Memory.currentRamBank = 0x00;
 }
 
-// Also need to store current frame in memory to be read by JS
-export function setPixelOnFrame(x: i32, y: i32, colorId: i32, color: i32): void {
-  // Currently only supports 160x144
-  // Storing in X, then y
-  // So need an offset
-  store<u8>(FRAME_LOCATION + getRgbPixelStart(x, y) + colorId, color);
-}
-
-// Function to get the start of a RGB pixel (R, G, B)
-export function getRgbPixelStart(x: i32, y: i32): i32 {
-  // Get the pixel number
-  // let pixelNumber: i32 = (y * 160) + x;
-  // Each pixel takes 3 slots, therefore, multiply by 3!
-  return (y * 160 + x) * 3;
-}
-
-// Function to set our left and right channels at the correct queue index
-export function setLeftAndRightOutputForAudioQueue(leftVolume: i32, rightVolume: i32, audioQueueIndex: i32): void {
-  // Get our stereo index
-  let audioQueueOffset = AUDIO_BUFFER_LOCATION + audioQueueIndex * 2;
-
-  // Store our volumes
-  // +1 that way we don't have empty data to ensure that the value is set
-  store<u8>(audioQueueOffset, <u8>(leftVolume + 1));
-  store<u8>(audioQueueOffset + 1, <u8>(rightVolume + 1));
-}
-
-// Function to shortcut the memory map, and load directly from the VRAM Bank
-export function loadFromVramBank(gameboyOffset: i32, vramBankId: i32): u8 {
-  let wasmBoyAddress: i32 = gameboyOffset - Memory.videoRamLocation + GAMEBOY_INTERNAL_MEMORY_LOCATION + 0x2000 * (vramBankId & 0x01);
-  return load<u8>(wasmBoyAddress);
-}
-
-// Function to store a byte to our Gbc Palette memory
-export function storePaletteByteInWasmMemory(paletteIndexByte: i32, value: i32, isSprite: boolean): void {
-  // Clear the top two bits to just get the bottom palette Index
-  let paletteIndex: i32 = paletteIndexByte & 0x3f;
-
-  // Move over the palette index to not overlap the background (has 0x3F, so Zero for Sprites is 0x40)
-  if (isSprite) {
-    paletteIndex += 0x40;
-  }
-
-  store<u8>(GBC_PALETTE_LOCATION + paletteIndex, <u8>value);
-}
-
-// Function to load a byte from our Gbc Palette memory
-// Function to store a byte to our Gbc Palette memory
-export function loadPaletteByteFromWasmMemory(paletteIndexByte: i32, isSprite: boolean): u8 {
-  // Clear the top two bits to just get the bottom palette Index
-  let paletteIndex: i32 = paletteIndexByte & 0x3f;
-
-  // Move over the palette index to not overlap the background has 0x3F, so Zero for Sprites is 0x40)
-  if (isSprite) {
-    paletteIndex += 0x40;
-  }
-
-  return load<u8>(GBC_PALETTE_LOCATION + paletteIndex);
-}
-
 // Function to return an address to store into save state memory
 // this is to regulate our 20 slots
 // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing

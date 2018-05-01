@@ -7,10 +7,11 @@ import {
   drawPixelsFromLineOfTile,
   getMonochromeColorFromPalette,
   getRgbColorFromPalette,
-  getColorComponentFromRgb
+  getColorComponentFromRgb,
+  loadFromVramBank
 } from '../graphics/index';
 import { Cpu } from '../cpu/index';
-import { eightBitLoadFromGBMemory, Memory, loadFromVramBank } from '../memory/index';
+import { eightBitLoadFromGBMemory, Memory } from '../memory/index';
 import { checkBitOnByte, hexLog } from '../helpers/index';
 
 export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {

@@ -1,5 +1,5 @@
 // Functions for rendering the sprites
-import { Graphics } from './graphics';
+import { Graphics, loadFromVramBank, setPixelOnFrame } from './graphics';
 import { Lcd } from './lcd';
 import { Cpu } from '../cpu/index';
 import { getTileDataAddress } from './tiles';
@@ -9,7 +9,6 @@ import { getPriorityforPixel } from './priority';
 // using Skip Traps, because LCD has unrestricted access
 // http://gbdev.gg8.se/wiki/articles/Video_Display#LCD_OAM_DMA_Transfers
 import { eightBitLoadFromGBMemory } from '../memory/load';
-import { loadFromVramBank, setPixelOnFrame } from '../memory/memory';
 import { checkBitOnByte, setBitOnByte, resetBitOnByte, hexLog } from '../helpers/index';
 
 export function renderSprites(scanlineRegister: i32, useLargerSprites: boolean): void {

@@ -1,11 +1,6 @@
+import { GBC_PALETTE_LOCATION } from '../constants';
 import { Cpu } from '../cpu/index';
-import {
-  Memory,
-  eightBitLoadFromGBMemory,
-  eightBitStoreIntoGBMemory,
-  storePaletteByteInWasmMemory,
-  loadPaletteByteFromWasmMemory
-} from '../memory/index';
+import { Memory, eightBitLoadFromGBMemory, eightBitStoreIntoGBMemory } from '../memory/index';
 import { checkBitOnByte, resetBitOnByte, setBitOnByte, concatenateBytes, hexLog } from '../helpers/index';
 
 // Class for GBC Color palletes
@@ -137,4 +132,30 @@ export function getColorComponentFromRgb(colorId: i32, colorRgb: i32): i32 {
   // Goal is to reach 254 for each color, so 255 / 31 (0x1F) ~8 TODO: Make exact
   // Want 5 bits for each
   return colorValue * 8;
+}
+
+// Function to load a byte from our Gbc Palette memory
+export function loadPaletteByteFromWasmMemory(paletteIndexByte: i32, isSprite: boolean): u8 {
+  // Clear the top two bits to just get the bottom palette Index
+  let paletteIndex: i32 = paletteIndexByte & 0x3f;
+
+  // Move over the palette index to not overlap the background has 0x3F, so Zero for Sprites is 0x40)
+  if (isSprite) {
+    paletteIndex += 0x40;
+  }
+
+  return load<u8>(GBC_PALETTE_LOCATION + paletteIndex);
+}
+
+// Function to store a byte to our Gbc Palette memory
+export function storePaletteByteInWasmMemory(paletteIndexByte: i32, value: i32, isSprite: boolean): void {
+  // Clear the top two bits to just get the bottom palette Index
+  let paletteIndex: i32 = paletteIndexByte & 0x3f;
+
+  // Move over the palette index to not overlap the background (has 0x3F, so Zero for Sprites is 0x40)
+  if (isSprite) {
+    paletteIndex += 0x40;
+  }
+
+  store<u8>(GBC_PALETTE_LOCATION + paletteIndex, <u8>value);
 }

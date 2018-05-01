@@ -1,14 +1,14 @@
 // Functions for performance hacks, and debugging tiles
 
 import { Cpu } from '../cpu/index';
-import { Graphics } from './graphics';
+import { Graphics, loadFromVramBank, setPixelOnFrame } from './graphics';
 import { getMonochromeColorFromPalette, getRgbColorFromPalette, getColorComponentFromRgb } from './palette';
 import { addPriorityforPixel } from './priority';
 // Assembly script really not feeling the reexport
 // using Skip Traps, because LCD has unrestricted access
 // http://gbdev.gg8.se/wiki/articles/Video_Display#LCD_OAM_DMA_Transfers
 import { eightBitLoadFromGBMemory } from '../memory/load';
-import { Memory, loadFromVramBank, setPixelOnFrame } from '../memory/memory';
+import { Memory } from '../memory/memory';
 import { hexLog, checkBitOnByte, setBitOnByte, resetBitOnByte } from '../helpers/index';
 
 export class TileCache {

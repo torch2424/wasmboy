@@ -2,7 +2,7 @@
 import { FRAME_LOCATION } from '../constants';
 import { Cpu } from '../cpu/index';
 import { Config } from '../config';
-import { Graphics } from './graphics';
+import { Graphics, loadFromVramBank, setPixelOnFrame, getRgbPixelStart } from './graphics';
 import { getMonochromeColorFromPalette, getRgbColorFromPalette, getColorComponentFromRgb } from './palette';
 import { addPriorityforPixel, getPriorityforPixel } from './priority';
 import { TileCache, drawPixelsFromLineOfTile, getTileDataAddress } from './tiles';
@@ -10,7 +10,7 @@ import { TileCache, drawPixelsFromLineOfTile, getTileDataAddress } from './tiles
 // using Skip Traps, because LCD has unrestricted access
 // http://gbdev.gg8.se/wiki/articles/Video_Display#LCD_OAM_DMA_Transfers
 import { eightBitLoadFromGBMemory } from '../memory/load';
-import { Memory, loadFromVramBank, setPixelOnFrame, getRgbPixelStart } from '../memory/memory';
+import { Memory } from '../memory/memory';
 import { hexLog, checkBitOnByte, setBitOnByte, resetBitOnByte } from '../helpers/index';
 
 export function renderBackground(scanlineRegister: i32, tileDataMemoryLocation: i32, tileMapMemoryLocation: i32): void {
