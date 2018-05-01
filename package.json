@@ -12,11 +12,9 @@
     "watch": "npm run start",
     "build": "npm run core:build && npm run lib:build",
     "test": "npm run build && npx mocha test/accuracy/accuracy-test.js --exit",
-    "test:accuracy":
-      "npm run build && npx mocha test/accuracy/accuracy-test.js --exit",
+    "test:accuracy": "npm run build && npx mocha test/accuracy/accuracy-test.js --exit",
     "test:perf": "npm run test:performance",
-    "test:performance":
-      "npm run build && npx mocha test/performance/performance-test.js --exit",
+    "test:performance": "npm run build && npx mocha test/performance/performance-test.js --exit",
     "debugger:watch": "preact watch",
     "debugger:serve": "preact build && preact serve",
     "debugger:build": "preact build",
@@ -28,9 +26,8 @@
     "lib:build": "npx rollup -c",
     "prettier": "npm run prettier:fix",
     "prettier:lint":
-      " echo \"Listing unlinted files, will show nothing if everything is fine.\" && npx prettier --list-different index.js style.css debugger/**/*.js debugger/**/*.css lib/**/*.js core/**/*.ts",
-    "prettier:fix":
-      "npx prettier --write index.js style.css debugger/**/*.js debugger/**/*.css lib/**/*.js core/**/*.ts",
+      " echo \"Listing unlinted files, will show nothing if everything is fine.\" && npx prettier --list-different index.js preact.config.js style.css debugger/**/*.js debugger/**/*.css lib/**/*.js core/**/*.ts",
+    "prettier:fix": "npx prettier --write index.js preact.config.js style.css debugger/**/*.js debugger/**/*.css lib/**/*.js core/**/*.ts",
     "precommit": "npx pretty-quick --staged"
   },
   "files": ["dist", "README.md", "LICENSE"],
@@ -60,8 +57,7 @@
     "unfetch": "^3.0.0"
   },
   "devDependencies": {
-    "assemblyscript":
-      "github:AssemblyScript/assemblyscript#31633899f9b54b5f7819ffb4ff365b5a94acdb40",
+    "assemblyscript": "github:AssemblyScript/assemblyscript#31633899f9b54b5f7819ffb4ff365b5a94acdb40",
     "audiobuffer-to-wav": "^1.0.0",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-env": "^1.6.1",
