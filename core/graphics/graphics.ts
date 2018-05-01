@@ -4,7 +4,7 @@ import { renderBackground, renderWindow } from './backgroundWindow';
 import { renderSprites } from './sprites';
 import { clearPriorityMap } from './priority';
 import { resetTileCache } from './tiles';
-import { Cpu } from '../cpu/cpu';
+import { Cpu } from '../cpu/index';
 import { Config } from '../config';
 import {
   eightBitLoadFromGBMemory,

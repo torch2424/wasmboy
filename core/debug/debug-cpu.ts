@@ -1,5 +1,5 @@
 // Functions to get information about the emulator for debugging purposes
-import { Cpu } from '../cpu/cpu';
+import { Cpu } from '../cpu/index';
 import { eightBitLoadFromGBMemory } from '../memory/index';
 
 export function getRegisterA(): u8 {

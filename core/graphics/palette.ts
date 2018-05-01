@@ -1,4 +1,4 @@
-import { Cpu } from '../cpu/cpu';
+import { Cpu } from '../cpu/index';
 import {
   Memory,
   eightBitLoadFromGBMemory,

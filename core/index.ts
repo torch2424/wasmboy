@@ -54,7 +54,7 @@ export {
   getOpcodeAtProgramCounter,
   drawBackgroundMapToWasmMemory,
   drawTileDataToWasmMemory
-} from './debug/debug';
+} from './debug/index';
 export {
   update,
   emulationStep,

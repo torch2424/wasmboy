@@ -10,7 +10,7 @@
 // https://github.com/AssemblyScript/assemblyscript/wiki/Built-in-functions
 // https://github.com/nakardo/node-gameboy/blob/master/lib/cpu/opcodes.js
 
-export { setZeroFlag, getZeroFlag } from './flags';
+export { setZeroFlag, getZeroFlag, getCarryFlag } from './flags';
 
 export { Cpu, initializeCpu } from './cpu';
 

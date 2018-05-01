@@ -4,7 +4,7 @@
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
 
 import { isDutyCycleClockPositiveOrNegativeForWaveform } from './duty';
-import { Cpu } from '../cpu/cpu';
+import { Cpu } from '../cpu/index';
 import {
   eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemory,

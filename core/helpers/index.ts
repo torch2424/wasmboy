@@ -1,4 +1,4 @@
-import { getCarryFlag } from '../cpu/flags';
+import { getCarryFlag } from '../cpu/index';
 
 // Grouped registers
 // possible overload these later to performace actions

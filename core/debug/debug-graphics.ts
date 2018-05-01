@@ -1,10 +1,15 @@
 // Functions to debug graphical output
 import { BACKGROUND_MAP_LOCATION, TILE_DATA_LOCATION } from '../constants';
-import { Graphics, Lcd } from '../graphics/index';
-import { Cpu } from '../cpu/cpu';
-import { getTileDataAddress } from '../graphics/renderUtils';
-import { getMonochromeColorFromPalette, getRgbColorFromPalette, getColorComponentFromRgb } from '../graphics/palette';
-import { drawPixelsFromLineOfTile } from '../graphics/tiles';
+import {
+  Graphics,
+  Lcd,
+  getTileDataAddress,
+  drawPixelsFromLineOfTile,
+  getMonochromeColorFromPalette,
+  getRgbColorFromPalette,
+  getColorComponentFromRgb
+} from '../graphics/index';
+import { Cpu } from '../cpu/index';
 import { eightBitLoadFromGBMemory, Memory, loadFromVramBank } from '../memory/index';
 import { checkBitOnByte, hexLog } from '../helpers/index';
 

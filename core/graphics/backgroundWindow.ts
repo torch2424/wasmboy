@@ -1,12 +1,11 @@
 // Functions for rendering the background
 import { FRAME_LOCATION } from '../constants';
-import { Cpu } from '../cpu/cpu';
+import { Cpu } from '../cpu/index';
 import { Config } from '../config';
 import { Graphics } from './graphics';
-import { getTileDataAddress } from './renderUtils';
 import { getMonochromeColorFromPalette, getRgbColorFromPalette, getColorComponentFromRgb } from './palette';
 import { addPriorityforPixel, getPriorityforPixel } from './priority';
-import { drawPixelsFromLineOfTile, TileCache } from './tiles';
+import { TileCache, drawPixelsFromLineOfTile, getTileDataAddress } from './tiles';
 // Assembly script really not feeling the reexport
 // using Skip Traps, because LCD has unrestricted access
 // http://gbdev.gg8.se/wiki/articles/Video_Display#LCD_OAM_DMA_Transfers

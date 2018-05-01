@@ -1,8 +1,8 @@
 // Functions for rendering the sprites
 import { Graphics } from './graphics';
 import { Lcd } from './lcd';
-import { Cpu } from '../cpu/cpu';
-import { getTileDataAddress } from './renderUtils';
+import { Cpu } from '../cpu/index';
+import { getTileDataAddress } from './tiles';
 import { getMonochromeColorFromPalette, getRgbColorFromPalette, getColorComponentFromRgb } from './palette';
 import { getPriorityforPixel } from './priority';
 // Assembly script really not feeling the reexport

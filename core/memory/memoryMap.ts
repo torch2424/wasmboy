@@ -22,7 +22,7 @@ import {
 import { Memory } from './memory';
 import { eightBitLoadFromGBMemory } from './load';
 import { getRomBankAddress, getRamBankAddress } from './banking';
-import { Cpu } from '../cpu/cpu';
+import { Cpu } from '../cpu/index';
 import { hexLog } from '../helpers/index';
 
 // Private function to translate a offset meant for the gameboy memory map

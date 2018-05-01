@@ -60,7 +60,7 @@ export function checkAndSetEightBitHalfCarryFlag(value: u8, amountToAdd: i32): v
       setHalfCarryFlag(0);
     }
   } else {
-    // From: https://github.com/djhworld/gomeboycolor/blob/master/src/cpu/cpu.go
+    // From: https://github.com/djhworld/gomeboycolor/blob/master/src/cpu/index.go
     // CTRL+F "subBytes(a, b byte)"
     if (<u8>(abs(amountToAdd) & 0x0f) > (value & 0x0f)) {
       setHalfCarryFlag(1);
@@ -113,7 +113,7 @@ export function checkAndSetSixteenBitFlagsAddOverflow(valueOne: u16, valueTwo: i
       setCarryFlag(0);
     }
   } else {
-    // Logic from: https://github.com/djhworld/gomeboycolor/blob/master/src/cpu/cpu.go
+    // Logic from: https://github.com/djhworld/gomeboycolor/blob/master/src/cpu/index.go
     // CTRL+F addWords
     // Value two is not signed
     let result: u16 = valueOne + <u16>valueTwo;
