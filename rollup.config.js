@@ -1,7 +1,7 @@
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
-import webAssembly from 'rollup-plugin-webassembly';
+import url from "rollup-plugin-url"
 import pkg from './package.json';
 
 export default [
@@ -15,7 +15,10 @@ export default [
 		},
 		plugins: [
 			resolve(), // so Rollup can find node modules
-			webAssembly(),
+			url({
+				limit: 100 * 1024, // 100Kb
+  			include: ["**/*.wasm"],
+			}),
 			commonjs(), // so Rollup can convert node module to an ES module
       babel({ // so Rollup can convert unsupported es6 code to es5
 				exclude: ['node_modules/**']
@@ -37,7 +40,10 @@ export default [
 		],
     plugins: [
       resolve(), // so Rollup can find node modules
-			webAssembly(),
+			url({
+				limit: 100 * 1024, // 100Kb
+  			include: ["**/*.wasm"],
+			}),
 			babel({
 				exclude: ['node_modules/**']
 			})

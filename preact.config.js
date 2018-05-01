@@ -34,9 +34,16 @@ export default function (config, env, helpers) {
    config.output.publicPath = "/wasmBoy/";
   }
 
-
   // Add a wasm loader
   // https://github.com/developit/preact-cli/issues/464
-  config.module.loaders.push({test: /\.wasm$/, loader: ['wasm-loader']});
+  // https://github.com/webpack-contrib/url-loader
+  config.module.loaders.push({
+    loader: 'url-loader',
+    test: /\.wasm$/,
+    options: {
+      limit: 100 * 1024,
+      mimetype: 'application/wasm'
+    }
+  });
   config.resolve.extensions.push(".wasm");
 }

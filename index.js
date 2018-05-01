@@ -1,6 +1,7 @@
 import './style';
 import 'bulma/css/bulma.css';
 import { Component } from 'preact';
+// The following line can be changed to './dist/wasmboy.esm.js', to test the built lib
 import { WasmBoy, WasmBoyGraphics, WasmBoyAudio, WasmBoyController, WasmBoyMemory } from './lib/wasmboy.js';
 import { WasmBoyDebugger, WasmBoySystemControls, WasmBoyFilePicker, WasmBoyOptions, WasmBoyGamepad } from './debugger/index';
 
