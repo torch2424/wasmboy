@@ -2,4 +2,4 @@ export { Graphics, batchProcessGraphics, initializeGraphics, updateGraphics } fr
 
 export { Lcd } from './lcd';
 
-export { Palette, writeColorPaletteToMemory } from './palette';
+export { Palette, initializePalette, writeColorPaletteToMemory } from './palette';

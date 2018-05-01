@@ -1,19 +1,15 @@
+import { Config } from '../config';
 import {
   eightBitStoreIntoGBMemoryWithTraps,
   eightBitStoreIntoGBMemory,
   eightBitLoadFromGBMemoryWithTraps,
   eightBitLoadFromGBMemory,
   initializeCartridge,
+  initializeDma,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
-
-import { initializeGraphics } from '../graphics/index';
-
-import { initializeSound } from '../sound/index';
-
-import { initializeTimers } from '../timers/index';
 
 import { log, hexLog } from '../helpers/index';
 
@@ -114,133 +110,34 @@ export class Cpu {
   }
 }
 
-export function initializeCpu(useGBCMode: i32 = 1, includeBootRom: i32 = 0): void {
-  // First, try to switch to Gameboy Color Mode
-  // Get our GBC support from the cartridge header
-  // http://gbdev.gg8.se/wiki/articles/The_Cartridge_Header
-  let gbcType: i32 = eightBitLoadFromGBMemory(0x0143);
+export function initializeCpu(): void {
+  if (Cpu.GBCEnabled) {
+    // CPU Registers
+    Cpu.registerA = 0x11;
+    Cpu.registerF = 0x80;
+    Cpu.registerB = 0x00;
+    Cpu.registerC = 0x00;
+    Cpu.registerD = 0xff;
+    Cpu.registerE = 0x56;
+    Cpu.registerH = 0x00;
+    Cpu.registerL = 0x0d;
 
-  // Detecting GBC http://bgb.bircd.org/pandocs.htm#cgbregisters
-  if (gbcType === 0xc0 || (useGBCMode > 0 && gbcType === 0x80)) {
-    Cpu.GBCEnabled = true;
-  }
+    // Cpu Control Flow
+    Cpu.programCounter = 0x100;
+    Cpu.stackPointer = 0xfffe;
+  } else {
+    // Cpu Registers
+    Cpu.registerA = 0x01;
+    Cpu.registerF = 0xb0;
+    Cpu.registerB = 0x00;
+    Cpu.registerC = 0x13;
+    Cpu.registerD = 0x00;
+    Cpu.registerE = 0xd8;
+    Cpu.registerH = 0x01;
+    Cpu.registerL = 0x4d;
 
-  // TODO: depending on the boot rom, initialization may be different
-  // From: http://www.codeslinger.co.uk/pages/projects/gameboy/hardware.html
-  // All values default to zero in memory, so not setting them yet
-  log('initializing (includeBootRom=$0)', 1, includeBootRom);
-  if (includeBootRom <= 0) {
-    // Initialization variables from BGB
-
-    if (Cpu.GBCEnabled) {
-      // CPU Registers
-      Cpu.registerA = 0x11;
-      Cpu.registerF = 0x80;
-      Cpu.registerB = 0x00;
-      Cpu.registerC = 0x00;
-      Cpu.registerD = 0xff;
-      Cpu.registerE = 0x56;
-      Cpu.registerH = 0x00;
-      Cpu.registerL = 0x0d;
-
-      // Cpu Control Flow
-      Cpu.programCounter = 0x100;
-      Cpu.stackPointer = 0xfffe;
-
-      // LCD / Graphics
-      // In initializeGraphics()
-
-      // Various other registers
-      eightBitStoreIntoGBMemory(0xff70, 0xf8);
-      eightBitStoreIntoGBMemory(0xff4f, 0xfe);
-      eightBitStoreIntoGBMemory(0xff4d, 0x7e);
-      eightBitStoreIntoGBMemory(0xff00, 0xcf);
-      // FF01 = 0x00
-      eightBitStoreIntoGBMemory(0xff02, 0x7c);
-
-      // Handled by Updatye timers
-
-      eightBitStoreIntoGBMemory(0xff0f, 0xe1);
-      // 0xFFFF = 0x00
-
-      // GBC Palettes
-      eightBitStoreIntoGBMemory(0xff68, 0xc0);
-      eightBitStoreIntoGBMemory(0xff69, 0xff);
-      eightBitStoreIntoGBMemory(0xff6a, 0xc1);
-      eightBitStoreIntoGBMemory(0xff6b, 0x0d);
-
-      // GBC Banks
-      eightBitStoreIntoGBMemory(0xff4f, 0x00);
-      eightBitStoreIntoGBMemory(0xff70, 0x01);
-
-      // GBC DMA
-      eightBitStoreIntoGBMemory(0xff51, 0xff);
-      eightBitStoreIntoGBMemory(0xff52, 0xff);
-      eightBitStoreIntoGBMemory(0xff53, 0xff);
-      eightBitStoreIntoGBMemory(0xff54, 0xff);
-      eightBitStoreIntoGBMemory(0xff55, 0xff);
-
-      // Undocumented from Pandocs
-      eightBitStoreIntoGBMemory(0xff6c, 0xfe);
-      eightBitStoreIntoGBMemory(0xff75, 0x8f);
-    } else {
-      // Cpu Registers
-      Cpu.registerA = 0x01;
-      Cpu.registerF = 0xb0;
-      Cpu.registerB = 0x00;
-      Cpu.registerC = 0x13;
-      Cpu.registerD = 0x00;
-      Cpu.registerE = 0xd8;
-      Cpu.registerH = 0x01;
-      Cpu.registerL = 0x4d;
-
-      // Cpu Control Flow
-      Cpu.programCounter = 0x100;
-      Cpu.stackPointer = 0xfffe;
-
-      // LCD / Graphics
-      // In initializeGraphics
-
-      // Various other registers
-      eightBitStoreIntoGBMemory(0xff70, 0xff);
-      eightBitStoreIntoGBMemory(0xff4f, 0xff);
-      eightBitStoreIntoGBMemory(0xff4d, 0xff);
-      eightBitStoreIntoGBMemory(0xff00, 0xcf);
-      // FF01 = 0x00
-      eightBitStoreIntoGBMemory(0xff02, 0x7e);
-
-      // handled by initializxeTimers
-
-      eightBitStoreIntoGBMemory(0xff0f, 0xe1);
-      // 0xFFFF = 0x00
-
-      // GBC Palettes
-      eightBitStoreIntoGBMemory(0xff68, 0xff);
-      eightBitStoreIntoGBMemory(0xff69, 0xff);
-      eightBitStoreIntoGBMemory(0xff6a, 0xff);
-      eightBitStoreIntoGBMemory(0xff6b, 0xff);
-
-      // GBC Banks
-      eightBitStoreIntoGBMemory(0xff4f, 0x00);
-      eightBitStoreIntoGBMemory(0xff70, 0x01);
-
-      // GBC DMA
-      eightBitStoreIntoGBMemory(0xff51, 0xff);
-      eightBitStoreIntoGBMemory(0xff52, 0xff);
-      eightBitStoreIntoGBMemory(0xff53, 0xff);
-      eightBitStoreIntoGBMemory(0xff54, 0xff);
-      eightBitStoreIntoGBMemory(0xff55, 0xff);
-    }
-
-    // Call our memory to initialize our cartridge type
-    initializeCartridge();
-
-    // Initialize our graphics registers
-    initializeGraphics();
-
-    // Initialize our sound registers
-    initializeSound();
-
-    initializeTimers();
+    // Cpu Control Flow
+    Cpu.programCounter = 0x100;
+    Cpu.stackPointer = 0xfffe;
   }
 }

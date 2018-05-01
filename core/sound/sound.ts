@@ -133,7 +133,7 @@ export class Sound {
     Sound.downSampleCycleCounter = load<u8>(getSaveStateMemoryOffset(0x04, Sound.saveStateSlot));
     Sound.frameSequencer = load<u8>(getSaveStateMemoryOffset(0x05, Sound.saveStateSlot));
 
-    resetAudioQueue();
+    clearAudioBuffer();
   }
 }
 
@@ -200,12 +200,12 @@ export function updateSound(numberOfCycles: i32): void {
 }
 
 // Funciton to get the current Audio Queue index
-export function getAudioQueueIndex(): i32 {
+export function getNumberOfSamplesInAudioBuffer(): i32 {
   return Sound.audioQueueIndex;
 }
 
 // Function to reset the audio queue
-export function resetAudioQueue(): void {
+export function clearAudioBuffer(): void {
   Sound.audioQueueIndex = 0;
 }
 

@@ -17,6 +17,22 @@ export class Palette {
   static memoryLocationSpritePaletteData: i32 = 0xff6b;
 }
 
+export function initializePalette(): void {
+  if (Cpu.GBCEnabled) {
+    // GBC Palettes
+    eightBitStoreIntoGBMemory(0xff68, 0xc0);
+    eightBitStoreIntoGBMemory(0xff69, 0xff);
+    eightBitStoreIntoGBMemory(0xff6a, 0xc1);
+    eightBitStoreIntoGBMemory(0xff6b, 0x0d);
+  } else {
+    // GBC Palettes
+    eightBitStoreIntoGBMemory(0xff68, 0xff);
+    eightBitStoreIntoGBMemory(0xff69, 0xff);
+    eightBitStoreIntoGBMemory(0xff6a, 0xff);
+    eightBitStoreIntoGBMemory(0xff6b, 0xff);
+  }
+}
+
 // Simple get pallete color or monochroime GB
 // shouldRepresentColorByColorId is good for debugging tile data for GBC games that don't have
 // monochromePalettes

@@ -4,6 +4,24 @@ import { eightBitLoadFromGBMemoryWithTraps, eightBitLoadFromGBMemory } from './l
 import { eightBitStoreIntoGBMemoryWithTraps, eightBitStoreIntoGBMemory } from './store';
 import { concatenateBytes, checkBitOnByte, setBitOnByte, resetBitOnByte, hexLog } from '../helpers/index';
 
+export function initializeDma(): void {
+  if (Cpu.GBCEnabled) {
+    // GBC DMA
+    eightBitStoreIntoGBMemory(0xff51, 0xff);
+    eightBitStoreIntoGBMemory(0xff52, 0xff);
+    eightBitStoreIntoGBMemory(0xff53, 0xff);
+    eightBitStoreIntoGBMemory(0xff54, 0xff);
+    eightBitStoreIntoGBMemory(0xff55, 0xff);
+  } else {
+    // GBC DMA
+    eightBitStoreIntoGBMemory(0xff51, 0xff);
+    eightBitStoreIntoGBMemory(0xff52, 0xff);
+    eightBitStoreIntoGBMemory(0xff53, 0xff);
+    eightBitStoreIntoGBMemory(0xff54, 0xff);
+    eightBitStoreIntoGBMemory(0xff55, 0xff);
+  }
+}
+
 export function startDmaTransfer(sourceAddressOffset: i32): void {
   let sourceAddress: i32 = sourceAddressOffset;
   sourceAddress = sourceAddress << 8;

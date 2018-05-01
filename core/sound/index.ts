@@ -1,4 +1,4 @@
-export { initializeSound, batchProcessAudio, updateSound, getAudioQueueIndex, resetAudioQueue, Sound } from './sound';
+export { initializeSound, batchProcessAudio, updateSound, getNumberOfSamplesInAudioBuffer, clearAudioBuffer, Sound } from './sound';
 
 export { SoundRegisterWriteTraps, SoundRegisterReadTraps } from './registers';
 

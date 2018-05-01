@@ -1,5 +1,20 @@
 // These are legacy aliases for the original WasmBoy api
 
+/******************
+
+  Functions
+
+*******************/
+
+export { executeFrame as update, executeStep as emulationStep } from './core';
+
+export { getNumberOfSamplesInAudioBuffer as getAudioQueueIndex, clearAudioBuffer as resetAudioQueue } from './sound/index';
+
+/******************
+
+  Memory Constants
+
+*******************/
 import {
   WASMBOY_MEMORY_LOCATION,
   WASMBOY_MEMORY_SIZE,

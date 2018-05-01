@@ -1,4 +1,9 @@
 export class Config {
+  // Boot Rom
+  static enableBootRom: boolean = false;
+
+  // GBC Preference
+  static useGbcWhenAvailable: boolean = true;
 
   // Batch Processing
   static audioBatchProcessing: boolean = false;
@@ -14,55 +19,4 @@ export class Config {
   // Tile Rednering
   static tileRendering: boolean = false;
   static tileCaching: boolean = false;
-}
-
-export function config(audioBatchProcessing: i32 = 0,
-  graphicsBatchProcessing: i32 = 0,
-  timersBatchProcessing: i32 = 0,
-  graphicsDisableScanlineRendering: i32 = 0,
-  audioAccumulateSamples: i32 = 0,
-  tileRendering: i32 = 0,
-  tileCaching: i32 = 0): void {
-
-  if(audioBatchProcessing > 0) {
-    Config.audioBatchProcessing = true;
-  } else {
-    Config.audioBatchProcessing = false;
-  }
-
-  if(graphicsBatchProcessing > 0) {
-    Config.graphicsBatchProcessing = true;
-  } else {
-    Config.graphicsBatchProcessing = false;
-  }
-
-  if(timersBatchProcessing > 0) {
-    Config.timersBatchProcessing = true;
-  } else {
-    Config.timersBatchProcessing = false;
-  }
-
-  if(graphicsDisableScanlineRendering > 0) {
-    Config.graphicsDisableScanlineRendering = true;
-  } else {
-    Config.graphicsDisableScanlineRendering = false;
-  }
-
-  if(audioAccumulateSamples > 0) {
-    Config.audioAccumulateSamples = true;
-  } else {
-    Config.audioAccumulateSamples = false;
-  }
-
-  if(tileRendering > 0) {
-    Config.tileRendering = true;
-  } else {
-    Config.tileRendering = false;
-  }
-
-  if(tileCaching > 0) {
-    Config.tileCaching = true;
-  } else {
-    Config.tileCaching = false;
-  }
 }

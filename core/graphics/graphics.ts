@@ -138,6 +138,10 @@ export function initializeGraphics(): void {
     // 0xFF45 -> 0xFF46 = 0x00
     eightBitStoreIntoGBMemory(0xff47, 0xfc);
     // 0xFF48 -> 0xFF4B = 0x00
+
+    // GBC VRAM Banks
+    eightBitStoreIntoGBMemory(0xff4f, 0x00);
+    eightBitStoreIntoGBMemory(0xff70, 0x01);
   } else {
     Graphics.scanlineRegister = 0x91;
     eightBitStoreIntoGBMemory(0xff40, 0x91);
@@ -148,6 +152,10 @@ export function initializeGraphics(): void {
     eightBitStoreIntoGBMemory(0xff48, 0xff);
     eightBitStoreIntoGBMemory(0xff49, 0xff);
     // 0xFF4A -> 0xFF4B = 0x00
+
+    // GBC VRAM Banks
+    eightBitStoreIntoGBMemory(0xff4f, 0x00);
+    eightBitStoreIntoGBMemory(0xff70, 0x01);
   }
 }
 

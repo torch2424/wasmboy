@@ -29,4 +29,4 @@ export {
   storeBooleanDirectlyToWasmMemory
 } from './store';
 
-export { updateHblankHdma } from './dma';
+export { initializeDma, updateHblankHdma } from './dma';
