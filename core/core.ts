@@ -1,4 +1,5 @@
 // Imports
+import { WASMBOY_STATE_LOCATION } from './constants';
 import { Cpu, initializeCpu, executeOpcode } from './cpu/index';
 import { Graphics, initializeGraphics, initializePalette, updateGraphics, batchProcessGraphics } from './graphics/index';
 import { Interrupts, checkInterrupts } from './interrupts/index';
@@ -271,6 +272,14 @@ export function executeStep(): i32 {
   }
 
   return numberOfCycles;
+}
+
+// Function to return an address to store into save state memory
+// this is to regulate our 20 slots
+// https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
+export function getSaveStateMemoryOffset(offset: i32, saveStateSlot: i32): i32 {
+  // 50 byutes per save state memory partiton sli32
+  return WASMBOY_STATE_LOCATION + offset + 50 * saveStateSlot;
 }
 
 // Function to save state to memory for all of our classes

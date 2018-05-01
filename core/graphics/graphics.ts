@@ -1,5 +1,6 @@
 // Main Class and funcitons for rendering the gameboy display
 import { FRAME_LOCATION, GAMEBOY_INTERNAL_MEMORY_LOCATION } from '../constants';
+import { getSaveStateMemoryOffset } from '../core';
 import { Lcd, setLcdStatus } from './lcd';
 import { renderBackground, renderWindow } from './backgroundWindow';
 import { renderSprites } from './sprites';
@@ -11,7 +12,6 @@ import {
   Memory,
   eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemory,
-  getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
 } from '../memory/index';

@@ -1,4 +1,5 @@
 import { Config } from '../config';
+import { getSaveStateMemoryOffset } from '../core';
 import {
   eightBitStoreIntoGBMemoryWithTraps,
   eightBitStoreIntoGBMemory,
@@ -6,7 +7,6 @@ import {
   eightBitLoadFromGBMemory,
   initializeCartridge,
   initializeDma,
-  getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
 } from '../memory/index';

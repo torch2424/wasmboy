@@ -19,6 +19,7 @@ import {
   CARTRIDGE_RAM_LOCATION,
   CARTRIDGE_ROM_LOCATION
 } from '../constants';
+import { getSaveStateMemoryOffset } from '../core';
 import { eightBitLoadFromGBMemory, loadBooleanDirectlyFromWasmMemory } from './load';
 import { eightBitStoreIntoGBMemory, storeBooleanDirectlyToWasmMemory } from './store';
 import { handleBanking } from './banking';
@@ -155,12 +156,4 @@ export function initializeCartridge(): void {
 
   Memory.currentRomBank = 0x01;
   Memory.currentRamBank = 0x00;
-}
-
-// Function to return an address to store into save state memory
-// this is to regulate our 20 slots
-// https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
-export function getSaveStateMemoryOffset(offset: i32, saveStateSlot: i32): i32 {
-  // 50 byutes per save state memory partiton sli32
-  return WASMBOY_STATE_LOCATION + offset + 50 * saveStateSlot;
 }

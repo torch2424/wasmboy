@@ -2,14 +2,13 @@
 
 // Noise Channel
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Noise_Channel
-
+import { getSaveStateMemoryOffset } from '../core';
 import { isDutyCycleClockPositiveOrNegativeForWaveform } from './duty';
 import { Cpu } from '../cpu/index';
 import {
   eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemoryWithTraps,
   eightBitStoreIntoGBMemory,
-  getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
 } from '../memory/index';

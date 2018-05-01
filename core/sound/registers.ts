@@ -2,7 +2,8 @@
 // Information of bits on every register can be found at: https://gist.github.com/drhelius/3652407
 // Passing channel number to make things simpler than passing around memory addresses, to avoid bugs in choosing the wrong address
 
-import { Sound, SoundAccumulator } from './sound';
+import { Sound } from './sound';
+import { SoundAccumulator } from './accumulator';
 import { Channel1 } from './channel1';
 import { Channel2 } from './channel2';
 import { Channel3 } from './channel3';

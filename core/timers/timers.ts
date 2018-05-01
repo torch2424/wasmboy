@@ -1,8 +1,8 @@
+import { getSaveStateMemoryOffset } from '../core';
 import { Cpu } from '../cpu/index';
 import {
   eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemory,
-  getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
 } from '../memory/index';

@@ -2,13 +2,12 @@
 
 // Simple Square Channel
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
-
+import { getSaveStateMemoryOffset } from '../core';
 import { isDutyCycleClockPositiveOrNegativeForWaveform } from './duty';
 import { Cpu } from '../cpu/index';
 import {
   eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemory,
-  getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
