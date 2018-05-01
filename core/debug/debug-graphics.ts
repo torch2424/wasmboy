@@ -1,20 +1,12 @@
 // Functions to debug graphical output
-import { backgroundMapLocation, tileDataMap } from "../constants/constants";
-import { Graphics, Lcd } from "../graphics/index";
-import { Cpu } from "../cpu/cpu";
-import { getTileDataAddress } from "../graphics/renderUtils";
-import {
-  getMonochromeColorFromPalette,
-  getRgbColorFromPalette,
-  getColorComponentFromRgb
-} from "../graphics/palette";
-import { drawPixelsFromLineOfTile } from "../graphics/tiles";
-import {
-  eightBitLoadFromGBMemory,
-  Memory,
-  loadFromVramBank
-} from "../memory/index";
-import { checkBitOnByte, hexLog } from "../helpers/index";
+import { backgroundMapLocation, tileDataMap } from '../constants/constants';
+import { Graphics, Lcd } from '../graphics/index';
+import { Cpu } from '../cpu/cpu';
+import { getTileDataAddress } from '../graphics/renderUtils';
+import { getMonochromeColorFromPalette, getRgbColorFromPalette, getColorComponentFromRgb } from '../graphics/palette';
+import { drawPixelsFromLineOfTile } from '../graphics/tiles';
+import { eightBitLoadFromGBMemory, Memory, loadFromVramBank } from '../memory/index';
+import { checkBitOnByte, hexLog } from '../helpers/index';
 
 export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
   // http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html
@@ -63,8 +55,7 @@ export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
       // And we have x pixel 160. 160 / 8 = 20.
       // * 32, because remember, this is NOT only for the camera, the actual map is 32x32. Therefore, the next tile line of the map, is 32 byte offset.
       // Think like indexing a 2d array, as a 1d array and it make sense :)
-      let tileMapAddress: i32 =
-        tileMapMemoryLocation + tileYPositionInMap * 32 + tileXPositionInMap;
+      let tileMapAddress: i32 = tileMapMemoryLocation + tileYPositionInMap * 32 + tileXPositionInMap;
 
       // Get the tile Id on the Tile Map
       let tileIdFromTileMap: i32 = loadFromVramBank(tileMapAddress, 0);
@@ -73,10 +64,7 @@ export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
       // Read the comments in _getTileDataAddress() to see what's going on.
       // tl;dr if we had the tile map of "a b c d", and wanted tileId 2.
       // This funcitons returns the start of memory locaiton for the tile 'c'.
-      let tileDataAddress: i32 = getTileDataAddress(
-        tileDataMemoryLocation,
-        tileIdFromTileMap
-      );
+      let tileDataAddress: i32 = getTileDataAddress(tileDataMemoryLocation, tileIdFromTileMap);
 
       // Now we can process the the individual bytes that represent the pixel on a tile
 
@@ -130,14 +118,8 @@ export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
       // Remember to represent a single line of 8 pixels on a tile, we need two bytes.
       // Therefore, we need to times our modulo by 2, to get the correct line of pixels on the tile.
       // Again, think like you had to map a 2d array as a 1d.
-      let byteOneForLineOfTilePixels: i32 = loadFromVramBank(
-        tileDataAddress + pixelYInTile * 2,
-        vramBankId
-      );
-      let byteTwoForLineOfTilePixels: i32 = loadFromVramBank(
-        tileDataAddress + pixelYInTile * 2 + 1,
-        vramBankId
-      );
+      let byteOneForLineOfTilePixels: i32 = loadFromVramBank(tileDataAddress + pixelYInTile * 2, vramBankId);
+      let byteTwoForLineOfTilePixels: i32 = loadFromVramBank(tileDataAddress + pixelYInTile * 2 + 1, vramBankId);
 
       // Now we can get the color for that pixel
       // Colors are represented by getting X position of ByteTwo, and X positon of Byte One
@@ -163,11 +145,7 @@ export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
         let bgPalette: i32 = bgMapAttributes & 0x07;
 
         // Call the helper function to grab the correct color from the palette
-        let rgbColorPalette: i32 = getRgbColorFromPalette(
-          bgPalette,
-          paletteColorId,
-          false
-        );
+        let rgbColorPalette: i32 = getRgbColorFromPalette(bgPalette, paletteColorId, false);
 
         // Split off into red green and blue
         let red: i32 = getColorComponentFromRgb(0, rgbColorPalette);
@@ -181,10 +159,7 @@ export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
       } else {
         // Only rendering camera for now, so coordinates are for the camera.
         // Get the rgb value for the color Id, will be repeated into R, G, B
-        let monochromeColor: i32 = getMonochromeColorFromPalette(
-          paletteColorId,
-          Graphics.memoryLocationBackgroundPalette
-        );
+        let monochromeColor: i32 = getMonochromeColorFromPalette(paletteColorId, Graphics.memoryLocationBackgroundPalette);
 
         for (let i: i32 = 0; i < 3; i++) {
           let offset: i32 = backgroundMapLocation + pixelStart + i;
@@ -196,16 +171,8 @@ export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
 }
 
 export function drawTileDataToWasmMemory(): void {
-  for (
-    let tileDataMapGridY: i32 = 0;
-    tileDataMapGridY < 0x17;
-    tileDataMapGridY++
-  ) {
-    for (
-      let tileDataMapGridX: i32 = 0;
-      tileDataMapGridX < 0x1f;
-      tileDataMapGridX++
-    ) {
+  for (let tileDataMapGridY: i32 = 0; tileDataMapGridY < 0x17; tileDataMapGridY++) {
+    for (let tileDataMapGridX: i32 = 0; tileDataMapGridX < 0x1f; tileDataMapGridX++) {
       // Get Our VramBankID
       let vramBankId: i32 = 0;
       if (tileDataMapGridX > 0x0f) {
@@ -225,8 +192,7 @@ export function drawTileDataToWasmMemory(): void {
       }
 
       // Finally get our tile Data location
-      let tileDataMemoryLocation: i32 =
-        Graphics.memoryLocationTileDataSelectOneStart;
+      let tileDataMemoryLocation: i32 = Graphics.memoryLocationTileDataSelectOneStart;
       if (tileDataMapGridY > 0x0f) {
         tileDataMemoryLocation = Graphics.memoryLocationTileDataSelectZeroStart;
       }

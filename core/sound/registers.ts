@@ -2,21 +2,13 @@
 // Information of bits on every register can be found at: https://gist.github.com/drhelius/3652407
 // Passing channel number to make things simpler than passing around memory addresses, to avoid bugs in choosing the wrong address
 
-import { Sound, SoundAccumulator } from "./sound";
-import { Channel1 } from "./channel1";
-import { Channel2 } from "./channel2";
-import { Channel3 } from "./channel3";
-import { Channel4 } from "./channel4";
-import {
-  eightBitLoadFromGBMemory,
-  eightBitStoreIntoGBMemory
-} from "../memory/index";
-import {
-  checkBitOnByte,
-  setBitOnByte,
-  resetBitOnByte,
-  hexLog
-} from "../helpers/index";
+import { Sound, SoundAccumulator } from './sound';
+import { Channel1 } from './channel1';
+import { Channel2 } from './channel2';
+import { Channel3 } from './channel3';
+import { Channel4 } from './channel4';
+import { eightBitLoadFromGBMemory, eightBitStoreIntoGBMemory } from '../memory/index';
+import { checkBitOnByte, setBitOnByte, resetBitOnByte, hexLog } from '../helpers/index';
 
 // Function to check and handle writes to sound registers
 export function SoundRegisterWriteTraps(offset: i32, value: i32): boolean {

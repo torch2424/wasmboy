@@ -13,17 +13,11 @@ import {
   gameBoyVramLocation,
   gameBoyWramLocation,
   gameBoyMemoryRegistersLocation
-} from "../constants/constants";
-import {
-  eightBitLoadFromGBMemory,
-  loadBooleanDirectlyFromWasmMemory
-} from "./load";
-import {
-  eightBitStoreIntoGBMemory,
-  storeBooleanDirectlyToWasmMemory
-} from "./store";
-import { handleBanking } from "./banking";
-import { checkBitOnByte, resetBitOnByte, hexLog } from "../helpers/index";
+} from '../constants/constants';
+import { eightBitLoadFromGBMemory, loadBooleanDirectlyFromWasmMemory } from './load';
+import { eightBitStoreIntoGBMemory, storeBooleanDirectlyToWasmMemory } from './store';
+import { handleBanking } from './banking';
+import { checkBitOnByte, resetBitOnByte, hexLog } from '../helpers/index';
 
 export class Memory {
   // ----------------------------------
@@ -117,77 +111,32 @@ export class Memory {
 
   // Function to save the state of the class
   static saveState(): void {
-    store<u16>(
-      getSaveStateMemoryOffset(0x00, Memory.saveStateSlot),
-      Memory.currentRomBank
-    );
-    store<u16>(
-      getSaveStateMemoryOffset(0x02, Memory.saveStateSlot),
-      Memory.currentRamBank
-    );
+    store<u16>(getSaveStateMemoryOffset(0x00, Memory.saveStateSlot), Memory.currentRomBank);
+    store<u16>(getSaveStateMemoryOffset(0x02, Memory.saveStateSlot), Memory.currentRamBank);
 
-    storeBooleanDirectlyToWasmMemory(
-      getSaveStateMemoryOffset(0x04, Memory.saveStateSlot),
-      Memory.isRamBankingEnabled
-    );
-    storeBooleanDirectlyToWasmMemory(
-      getSaveStateMemoryOffset(0x05, Memory.saveStateSlot),
-      Memory.isMBC1RomModeEnabled
-    );
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x04, Memory.saveStateSlot), Memory.isRamBankingEnabled);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x05, Memory.saveStateSlot), Memory.isMBC1RomModeEnabled);
 
-    storeBooleanDirectlyToWasmMemory(
-      getSaveStateMemoryOffset(0x06, Memory.saveStateSlot),
-      Memory.isRomOnly
-    );
-    storeBooleanDirectlyToWasmMemory(
-      getSaveStateMemoryOffset(0x07, Memory.saveStateSlot),
-      Memory.isMBC1
-    );
-    storeBooleanDirectlyToWasmMemory(
-      getSaveStateMemoryOffset(0x08, Memory.saveStateSlot),
-      Memory.isMBC2
-    );
-    storeBooleanDirectlyToWasmMemory(
-      getSaveStateMemoryOffset(0x09, Memory.saveStateSlot),
-      Memory.isMBC3
-    );
-    storeBooleanDirectlyToWasmMemory(
-      getSaveStateMemoryOffset(0x0a, Memory.saveStateSlot),
-      Memory.isMBC5
-    );
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x06, Memory.saveStateSlot), Memory.isRomOnly);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x07, Memory.saveStateSlot), Memory.isMBC1);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x08, Memory.saveStateSlot), Memory.isMBC2);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x09, Memory.saveStateSlot), Memory.isMBC3);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0a, Memory.saveStateSlot), Memory.isMBC5);
   }
 
   // Function to load the save state from memory
   static loadState(): void {
-    Memory.currentRomBank = load<u16>(
-      getSaveStateMemoryOffset(0x00, Memory.saveStateSlot)
-    );
-    Memory.currentRamBank = load<u16>(
-      getSaveStateMemoryOffset(0x02, Memory.saveStateSlot)
-    );
+    Memory.currentRomBank = load<u16>(getSaveStateMemoryOffset(0x00, Memory.saveStateSlot));
+    Memory.currentRamBank = load<u16>(getSaveStateMemoryOffset(0x02, Memory.saveStateSlot));
 
-    Memory.isRamBankingEnabled = loadBooleanDirectlyFromWasmMemory(
-      getSaveStateMemoryOffset(0x04, Memory.saveStateSlot)
-    );
-    Memory.isMBC1RomModeEnabled = loadBooleanDirectlyFromWasmMemory(
-      getSaveStateMemoryOffset(0x05, Memory.saveStateSlot)
-    );
+    Memory.isRamBankingEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x04, Memory.saveStateSlot));
+    Memory.isMBC1RomModeEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x05, Memory.saveStateSlot));
 
-    Memory.isRomOnly = loadBooleanDirectlyFromWasmMemory(
-      getSaveStateMemoryOffset(0x06, Memory.saveStateSlot)
-    );
-    Memory.isMBC1 = loadBooleanDirectlyFromWasmMemory(
-      getSaveStateMemoryOffset(0x07, Memory.saveStateSlot)
-    );
-    Memory.isMBC2 = loadBooleanDirectlyFromWasmMemory(
-      getSaveStateMemoryOffset(0x08, Memory.saveStateSlot)
-    );
-    Memory.isMBC3 = loadBooleanDirectlyFromWasmMemory(
-      getSaveStateMemoryOffset(0x09, Memory.saveStateSlot)
-    );
-    Memory.isMBC5 = loadBooleanDirectlyFromWasmMemory(
-      getSaveStateMemoryOffset(0x0a, Memory.saveStateSlot)
-    );
+    Memory.isRomOnly = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x06, Memory.saveStateSlot));
+    Memory.isMBC1 = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x07, Memory.saveStateSlot));
+    Memory.isMBC2 = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x08, Memory.saveStateSlot));
+    Memory.isMBC3 = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x09, Memory.saveStateSlot));
+    Memory.isMBC5 = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0a, Memory.saveStateSlot));
   }
 }
 
@@ -220,21 +169,11 @@ export function initializeCartridge(): void {
 }
 
 // Also need to store current frame in memory to be read by JS
-export function setPixelOnFrame(
-  x: i32,
-  y: i32,
-  colorId: i32,
-  color: i32
-): void {
+export function setPixelOnFrame(x: i32, y: i32, colorId: i32, color: i32): void {
   // Currently only supports 160x144
   // Storing in X, then y
   // So need an offset
-  store<u8>(
-    Memory.frameInProgressVideoOutputLocation +
-      getRgbPixelStart(x, y) +
-      colorId,
-    color
-  );
+  store<u8>(Memory.frameInProgressVideoOutputLocation + getRgbPixelStart(x, y) + colorId, color);
 }
 
 // Function to get the start of a RGB pixel (R, G, B)
@@ -246,11 +185,7 @@ export function getRgbPixelStart(x: i32, y: i32): i32 {
 }
 
 // Function to set our left and right channels at the correct queue index
-export function setLeftAndRightOutputForAudioQueue(
-  leftVolume: i32,
-  rightVolume: i32,
-  audioQueueIndex: i32
-): void {
+export function setLeftAndRightOutputForAudioQueue(leftVolume: i32, rightVolume: i32, audioQueueIndex: i32): void {
   // Get our stereo index
   let audioQueueOffset = Memory.soundOutputLocation + audioQueueIndex * 2;
 
@@ -262,20 +197,12 @@ export function setLeftAndRightOutputForAudioQueue(
 
 // Function to shortcut the memory map, and load directly from the VRAM Bank
 export function loadFromVramBank(gameboyOffset: i32, vramBankId: i32): u8 {
-  let wasmBoyAddress: i32 =
-    gameboyOffset -
-    Memory.videoRamLocation +
-    Memory.gameBoyInternalMemoryLocation +
-    0x2000 * (vramBankId & 0x01);
+  let wasmBoyAddress: i32 = gameboyOffset - Memory.videoRamLocation + Memory.gameBoyInternalMemoryLocation + 0x2000 * (vramBankId & 0x01);
   return load<u8>(wasmBoyAddress);
 }
 
 // Function to store a byte to our Gbc Palette memory
-export function storePaletteByteInWasmMemory(
-  paletteIndexByte: i32,
-  value: i32,
-  isSprite: boolean
-): void {
+export function storePaletteByteInWasmMemory(paletteIndexByte: i32, value: i32, isSprite: boolean): void {
   // Clear the top two bits to just get the bottom palette Index
   let paletteIndex: i32 = paletteIndexByte & 0x3f;
 
@@ -289,10 +216,7 @@ export function storePaletteByteInWasmMemory(
 
 // Function to load a byte from our Gbc Palette memory
 // Function to store a byte to our Gbc Palette memory
-export function loadPaletteByteFromWasmMemory(
-  paletteIndexByte: i32,
-  isSprite: boolean
-): u8 {
+export function loadPaletteByteFromWasmMemory(paletteIndexByte: i32, isSprite: boolean): u8 {
   // Clear the top two bits to just get the bottom palette Index
   let paletteIndex: i32 = paletteIndexByte & 0x3f;
 

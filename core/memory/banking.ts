@@ -1,11 +1,6 @@
 // Function to handle rom/rambanking
-import { Memory } from "./memory";
-import {
-  concatenateBytes,
-  checkBitOnByte,
-  splitLowByte,
-  hexLog
-} from "../helpers/index";
+import { Memory } from './memory';
+import { concatenateBytes, checkBitOnByte, splitLowByte, hexLog } from '../helpers/index';
 
 export function handleBanking(offset: i32, value: i32): void {
   // Is rom Only does not bank
@@ -111,12 +106,10 @@ export function getRomBankAddress(gameboyOffset: i32): i32 {
   }
 
   // Adjust our gameboy offset relative to zero for the gameboy memory map
-  return <i32>(0x4000 * currentRomBank +
-    (gameboyOffset - Memory.switchableCartridgeRomLocation));
+  return <i32>(0x4000 * currentRomBank + (gameboyOffset - Memory.switchableCartridgeRomLocation));
 }
 
 export function getRamBankAddress(gameboyOffset: i32): i32 {
   // Adjust our gameboy offset relative to zero for the gameboy memory map
-  return <i32>(0x2000 * Memory.currentRamBank +
-    (gameboyOffset - Memory.cartridgeRamLocation));
+  return <i32>(0x2000 * Memory.currentRamBank + (gameboyOffset - Memory.cartridgeRamLocation));
 }

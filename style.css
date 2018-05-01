@@ -2,7 +2,7 @@
 
 html,
 body {
-  font: 14px/1.21 "Helvetica Neue", arial, sans-serif;
+  font: 14px/1.21 'Helvetica Neue', arial, sans-serif;
   font-weight: 400;
   /* For mobile phones to be able to scroll the view into place */
   min-height: 600px;
@@ -25,7 +25,7 @@ button {
   margin-right: 5px;
 }
 
-input[type="checkbox"] {
+input[type='checkbox'] {
   margin-left: 5px;
 }
 

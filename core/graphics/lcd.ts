@@ -1,19 +1,11 @@
 // Funcitons for setting and checking the LCD
-import { Graphics } from "./graphics";
+import { Graphics } from './graphics';
 // Assembly script really not feeling the reexport
-import { eightBitLoadFromGBMemory } from "../memory/load";
-import { eightBitStoreIntoGBMemory } from "../memory/store";
-import { updateHblankHdma } from "../memory/index";
-import {
-  requestLcdInterrupt,
-  requestVBlankInterrupt
-} from "../interrupts/index";
-import {
-  checkBitOnByte,
-  setBitOnByte,
-  resetBitOnByte,
-  hexLog
-} from "../helpers/index";
+import { eightBitLoadFromGBMemory } from '../memory/load';
+import { eightBitStoreIntoGBMemory } from '../memory/store';
+import { updateHblankHdma } from '../memory/index';
+import { requestLcdInterrupt, requestVBlankInterrupt } from '../interrupts/index';
+import { checkBitOnByte, setBitOnByte, resetBitOnByte, hexLog } from '../helpers/index';
 
 export class Lcd {
   // Memory Locations
@@ -99,15 +91,10 @@ export function setLcdStatus(): void {
     // VBlank mode
     newLcdMode = 1;
   } else {
-    if (
-      Graphics.scanlineCycleCounter >= Graphics.MIN_CYCLES_SPRITES_LCD_MODE()
-    ) {
+    if (Graphics.scanlineCycleCounter >= Graphics.MIN_CYCLES_SPRITES_LCD_MODE()) {
       // Searching Sprites Atts
       newLcdMode = 2;
-    } else if (
-      Graphics.scanlineCycleCounter >=
-      Graphics.MIN_CYCLES_TRANSFER_DATA_LCD_MODE()
-    ) {
+    } else if (Graphics.scanlineCycleCounter >= Graphics.MIN_CYCLES_TRANSFER_DATA_LCD_MODE()) {
       // Transferring data to lcd
       newLcdMode = 3;
     }
@@ -164,10 +151,7 @@ export function setLcdStatus(): void {
     // Check for the coincidence flag
     // Need to check on every mode, and not just HBLANK, as checking on hblank breaks shantae, which checks on vblank
     let coincidenceCompare: i32 = Lcd.coincidenceCompare;
-    if (
-      (newLcdMode === 0 || newLcdMode === 1) &&
-      scanlineRegister === coincidenceCompare
-    ) {
+    if ((newLcdMode === 0 || newLcdMode === 1) && scanlineRegister === coincidenceCompare) {
       lcdStatus = setBitOnByte(2, lcdStatus);
       if (checkBitOnByte(6, lcdStatus)) {
         requestLcdInterrupt();

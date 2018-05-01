@@ -1,21 +1,9 @@
-import "./style";
-import "bulma/css/bulma.css";
-import { Component } from "preact";
+import './style';
+import 'bulma/css/bulma.css';
+import { Component } from 'preact';
 // The following line can be changed to './dist/wasmboy.esm.js', to test the built lib
-import {
-  WasmBoy,
-  WasmBoyGraphics,
-  WasmBoyAudio,
-  WasmBoyController,
-  WasmBoyMemory
-} from "./lib/wasmboy.js";
-import {
-  WasmBoyDebugger,
-  WasmBoySystemControls,
-  WasmBoyFilePicker,
-  WasmBoyOptions,
-  WasmBoyGamepad
-} from "./debugger/index";
+import { WasmBoy, WasmBoyGraphics, WasmBoyAudio, WasmBoyController, WasmBoyMemory } from './lib/wasmboy.js';
+import { WasmBoyDebugger, WasmBoySystemControls, WasmBoyFilePicker, WasmBoyOptions, WasmBoyGamepad } from './debugger/index';
 
 const wasmBoyDefaultOptions = {
   isGbcEnabled: true,
@@ -57,29 +45,27 @@ export default class App extends Component {
   // Using componentDidMount to wait for the canvas element to be inserted in DOM
   componentDidMount() {
     // Get our canvas element
-    canvasElement = document.querySelector(
-      ".wasmboy__canvas-container__canvas"
-    );
+    canvasElement = document.querySelector('.wasmboy__canvas-container__canvas');
 
     // Load our game
     WasmBoy.initialize(canvasElement, wasmBoyDefaultOptions);
 
     // Add our touch inputs
     // Add our touch inputs
-    const dpadElement = document.getElementById("gamepadDpad");
-    const startElement = document.getElementById("gamepadStart");
-    const selectElement = document.getElementById("gamepadSelect");
-    const aElement = document.getElementById("gamepadA");
-    const bElement = document.getElementById("gamepadB");
+    const dpadElement = document.getElementById('gamepadDpad');
+    const startElement = document.getElementById('gamepadStart');
+    const selectElement = document.getElementById('gamepadSelect');
+    const aElement = document.getElementById('gamepadA');
+    const bElement = document.getElementById('gamepadB');
 
-    WasmBoyController.addTouchInput("UP", dpadElement, "DPAD", "UP");
-    WasmBoyController.addTouchInput("RIGHT", dpadElement, "DPAD", "RIGHT");
-    WasmBoyController.addTouchInput("DOWN", dpadElement, "DPAD", "DOWN");
-    WasmBoyController.addTouchInput("LEFT", dpadElement, "DPAD", "LEFT");
-    WasmBoyController.addTouchInput("A", aElement, "BUTTON");
-    WasmBoyController.addTouchInput("B", bElement, "BUTTON");
-    WasmBoyController.addTouchInput("START", startElement, "BUTTON");
-    WasmBoyController.addTouchInput("SELECT", selectElement, "BUTTON");
+    WasmBoyController.addTouchInput('UP', dpadElement, 'DPAD', 'UP');
+    WasmBoyController.addTouchInput('RIGHT', dpadElement, 'DPAD', 'RIGHT');
+    WasmBoyController.addTouchInput('DOWN', dpadElement, 'DPAD', 'DOWN');
+    WasmBoyController.addTouchInput('LEFT', dpadElement, 'DPAD', 'LEFT');
+    WasmBoyController.addTouchInput('A', aElement, 'BUTTON');
+    WasmBoyController.addTouchInput('B', bElement, 'BUTTON');
+    WasmBoyController.addTouchInput('START', startElement, 'BUTTON');
+    WasmBoyController.addTouchInput('SELECT', selectElement, 'BUTTON');
   }
 
   // Function to show notifications to the user
@@ -136,11 +122,7 @@ export default class App extends Component {
     if (this.state.showDebugger) {
       debuggerComponent = (
         <section>
-          <WasmBoyDebugger
-            wasmboy={WasmBoy}
-            wasmboyGraphics={WasmBoyGraphics}
-            wasmboyAudio={WasmBoyAudio}
-          />
+          <WasmBoyDebugger wasmboy={WasmBoy} wasmboyGraphics={WasmBoyGraphics} wasmboyAudio={WasmBoyAudio} />
         </section>
       );
     }

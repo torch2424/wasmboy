@@ -3,16 +3,16 @@
 // Wave Channel
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Wave_Channel
 
-import { isDutyCycleClockPositiveOrNegativeForWaveform } from "./duty";
-import { Cpu } from "../cpu/cpu";
+import { isDutyCycleClockPositiveOrNegativeForWaveform } from './duty';
+import { Cpu } from '../cpu/cpu';
 import {
   eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemory,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
-} from "../memory/index";
-import { checkBitOnByte, hexLog } from "../helpers/index";
+} from '../memory/index';
+import { checkBitOnByte, hexLog } from '../helpers/index';
 
 export class Channel3 {
   // Cycle Counter for our sound accumulator
@@ -57,8 +57,7 @@ export class Channel3 {
     Channel3.NRx3FrequencyLSB = value;
 
     // Update Channel Frequency
-    let frequency: i32 =
-      (Channel3.NRx4FrequencyMSB << 8) | Channel3.NRx3FrequencyLSB;
+    let frequency: i32 = (Channel3.NRx4FrequencyMSB << 8) | Channel3.NRx3FrequencyLSB;
     Channel3.frequency = frequency;
   }
 
@@ -72,8 +71,7 @@ export class Channel3 {
     Channel3.NRx4FrequencyMSB = value & 0x07;
 
     // Update Channel Frequency
-    let frequency: i32 =
-      (Channel3.NRx4FrequencyMSB << 8) | Channel3.NRx3FrequencyLSB;
+    let frequency: i32 = (Channel3.NRx4FrequencyMSB << 8) | Channel3.NRx3FrequencyLSB;
     Channel3.frequency = frequency;
   }
 
@@ -97,38 +95,18 @@ export class Channel3 {
 
   // Function to save the state of the class
   static saveState(): void {
-    storeBooleanDirectlyToWasmMemory(
-      getSaveStateMemoryOffset(0x00, Channel3.saveStateSlot),
-      Channel3.isEnabled
-    );
-    store<i32>(
-      getSaveStateMemoryOffset(0x01, Channel3.saveStateSlot),
-      Channel3.frequencyTimer
-    );
-    store<i32>(
-      getSaveStateMemoryOffset(0x05, Channel3.saveStateSlot),
-      Channel3.lengthCounter
-    );
-    store<u16>(
-      getSaveStateMemoryOffset(0x09, Channel3.saveStateSlot),
-      Channel3.waveTablePosition
-    );
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x00, Channel3.saveStateSlot), Channel3.isEnabled);
+    store<i32>(getSaveStateMemoryOffset(0x01, Channel3.saveStateSlot), Channel3.frequencyTimer);
+    store<i32>(getSaveStateMemoryOffset(0x05, Channel3.saveStateSlot), Channel3.lengthCounter);
+    store<u16>(getSaveStateMemoryOffset(0x09, Channel3.saveStateSlot), Channel3.waveTablePosition);
   }
 
   // Function to load the save state from memory
   static loadState(): void {
-    Channel3.isEnabled = loadBooleanDirectlyFromWasmMemory(
-      getSaveStateMemoryOffset(0x00, Channel3.saveStateSlot)
-    );
-    Channel3.frequencyTimer = load<i32>(
-      getSaveStateMemoryOffset(0x01, Channel3.saveStateSlot)
-    );
-    Channel3.lengthCounter = load<i32>(
-      getSaveStateMemoryOffset(0x05, Channel3.saveStateSlot)
-    );
-    Channel3.waveTablePosition = load<u16>(
-      getSaveStateMemoryOffset(0x09, Channel3.saveStateSlot)
-    );
+    Channel3.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x00, Channel3.saveStateSlot));
+    Channel3.frequencyTimer = load<i32>(getSaveStateMemoryOffset(0x01, Channel3.saveStateSlot));
+    Channel3.lengthCounter = load<i32>(getSaveStateMemoryOffset(0x05, Channel3.saveStateSlot));
+    Channel3.waveTablePosition = load<u16>(getSaveStateMemoryOffset(0x09, Channel3.saveStateSlot));
   }
 
   static initialize(): void {
@@ -206,8 +184,7 @@ export class Channel3 {
 
     // Will Find the position, and knock off any remainder
     let positionIndexToAdd: i32 = Channel3.waveTablePosition / 2;
-    let memoryLocationWaveSample: i32 =
-      Channel3.memoryLocationWaveTable + positionIndexToAdd;
+    let memoryLocationWaveSample: i32 = Channel3.memoryLocationWaveTable + positionIndexToAdd;
 
     sample = eightBitLoadFromGBMemory(memoryLocationWaveSample);
 
@@ -281,10 +258,7 @@ export class Channel3 {
     Channel3.cycleCounter += numberOfCycles;
 
     // Dac enabled status cached by accumulator
-    if (
-      Channel3.frequencyTimer - Channel3.cycleCounter > 0 &&
-      !Channel3.volumeCodeChanged
-    ) {
+    if (Channel3.frequencyTimer - Channel3.cycleCounter > 0 && !Channel3.volumeCodeChanged) {
       return false;
     }
 

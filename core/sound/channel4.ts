@@ -3,8 +3,8 @@
 // Noise Channel
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Noise_Channel
 
-import { isDutyCycleClockPositiveOrNegativeForWaveform } from "./duty";
-import { Cpu } from "../cpu/cpu";
+import { isDutyCycleClockPositiveOrNegativeForWaveform } from './duty';
+import { Cpu } from '../cpu/cpu';
 import {
   eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemoryWithTraps,
@@ -12,8 +12,8 @@ import {
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
-} from "../memory/index";
-import { checkBitOnByte, hexLog } from "../helpers/index";
+} from '../memory/index';
+import { checkBitOnByte, hexLog } from '../helpers/index';
 
 export class Channel4 {
   // Cycle Counter for our sound accumulator
@@ -118,52 +118,22 @@ export class Channel4 {
 
   // Function to save the state of the class
   static saveState(): void {
-    storeBooleanDirectlyToWasmMemory(
-      getSaveStateMemoryOffset(0x00, Channel4.saveStateSlot),
-      Channel4.isEnabled
-    );
-    store<i32>(
-      getSaveStateMemoryOffset(0x01, Channel4.saveStateSlot),
-      Channel4.frequencyTimer
-    );
-    store<i32>(
-      getSaveStateMemoryOffset(0x05, Channel4.saveStateSlot),
-      Channel4.envelopeCounter
-    );
-    store<i32>(
-      getSaveStateMemoryOffset(0x09, Channel4.saveStateSlot),
-      Channel4.lengthCounter
-    );
-    store<i32>(
-      getSaveStateMemoryOffset(0x0e, Channel4.saveStateSlot),
-      Channel4.volume
-    );
-    store<u16>(
-      getSaveStateMemoryOffset(0x13, Channel4.saveStateSlot),
-      Channel4.linearFeedbackShiftRegister
-    );
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x00, Channel4.saveStateSlot), Channel4.isEnabled);
+    store<i32>(getSaveStateMemoryOffset(0x01, Channel4.saveStateSlot), Channel4.frequencyTimer);
+    store<i32>(getSaveStateMemoryOffset(0x05, Channel4.saveStateSlot), Channel4.envelopeCounter);
+    store<i32>(getSaveStateMemoryOffset(0x09, Channel4.saveStateSlot), Channel4.lengthCounter);
+    store<i32>(getSaveStateMemoryOffset(0x0e, Channel4.saveStateSlot), Channel4.volume);
+    store<u16>(getSaveStateMemoryOffset(0x13, Channel4.saveStateSlot), Channel4.linearFeedbackShiftRegister);
   }
 
   // Function to load the save state from memory
   static loadState(): void {
-    Channel4.isEnabled = loadBooleanDirectlyFromWasmMemory(
-      getSaveStateMemoryOffset(0x00, Channel4.saveStateSlot)
-    );
-    Channel4.frequencyTimer = load<i32>(
-      getSaveStateMemoryOffset(0x01, Channel4.saveStateSlot)
-    );
-    Channel4.envelopeCounter = load<i32>(
-      getSaveStateMemoryOffset(0x05, Channel4.saveStateSlot)
-    );
-    Channel4.lengthCounter = load<i32>(
-      getSaveStateMemoryOffset(0x09, Channel4.saveStateSlot)
-    );
-    Channel4.volume = load<i32>(
-      getSaveStateMemoryOffset(0x0e, Channel4.saveStateSlot)
-    );
-    Channel4.linearFeedbackShiftRegister = load<u16>(
-      getSaveStateMemoryOffset(0x13, Channel4.saveStateSlot)
-    );
+    Channel4.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x00, Channel4.saveStateSlot));
+    Channel4.frequencyTimer = load<i32>(getSaveStateMemoryOffset(0x01, Channel4.saveStateSlot));
+    Channel4.envelopeCounter = load<i32>(getSaveStateMemoryOffset(0x05, Channel4.saveStateSlot));
+    Channel4.lengthCounter = load<i32>(getSaveStateMemoryOffset(0x09, Channel4.saveStateSlot));
+    Channel4.volume = load<i32>(getSaveStateMemoryOffset(0x0e, Channel4.saveStateSlot));
+    Channel4.linearFeedbackShiftRegister = load<u16>(getSaveStateMemoryOffset(0x13, Channel4.saveStateSlot));
   }
 
   static initialize(): void {
@@ -203,20 +173,16 @@ export class Channel4 {
       let xorLfsrBitZeroOne = lfsrBitZero ^ lfsrBitOne;
 
       // Shift all lsfr bits by one
-      Channel4.linearFeedbackShiftRegister =
-        Channel4.linearFeedbackShiftRegister >> 1;
+      Channel4.linearFeedbackShiftRegister = Channel4.linearFeedbackShiftRegister >> 1;
 
       // Place the XOR result on bit 15
-      Channel4.linearFeedbackShiftRegister =
-        Channel4.linearFeedbackShiftRegister | (xorLfsrBitZeroOne << 14);
+      Channel4.linearFeedbackShiftRegister = Channel4.linearFeedbackShiftRegister | (xorLfsrBitZeroOne << 14);
 
       // If the width mode is set, set xor on bit 6, and make lfsr 7 bit
       if (Channel4.NRx3WidthMode) {
         // Make 7 bit, by knocking off lower bits. Want to keeps bits 8 - 16, and then or on 7
-        Channel4.linearFeedbackShiftRegister =
-          Channel4.linearFeedbackShiftRegister & ~0x40;
-        Channel4.linearFeedbackShiftRegister =
-          Channel4.linearFeedbackShiftRegister | (xorLfsrBitZeroOne << 6);
+        Channel4.linearFeedbackShiftRegister = Channel4.linearFeedbackShiftRegister & ~0x40;
+        Channel4.linearFeedbackShiftRegister = Channel4.linearFeedbackShiftRegister | (xorLfsrBitZeroOne << 6);
       }
     }
 

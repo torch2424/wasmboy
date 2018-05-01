@@ -1,5 +1,5 @@
 // Imports
-import { Cpu } from "./index";
+import { Cpu } from './index';
 import {
   setZeroFlag,
   getZeroFlag,
@@ -12,7 +12,7 @@ import {
   checkAndSetEightBitCarryFlag,
   checkAndSetEightBitHalfCarryFlag,
   checkAndSetSixteenBitFlagsAddOverflow
-} from "./flags";
+} from './flags';
 import {
   rotateByteLeft,
   rotateByteLeftThroughCarry,
@@ -20,7 +20,7 @@ import {
   rotateByteRightThroughCarry,
   concatenateBytes,
   hexLog
-} from "../helpers/index";
+} from '../helpers/index';
 
 // General Logic Instructions
 // Such as the ones found on the CB table and 0x40 - 0xBF
@@ -49,8 +49,7 @@ export function addAThroughCarryRegister(register: u8): void {
     setHalfCarryFlag(0);
   }
 
-  let overflowedResult: u16 =
-    <u16>Cpu.registerA + <u16>register + <u16>getCarryFlag();
+  let overflowedResult: u16 = <u16>Cpu.registerA + <u16>register + <u16>getCarryFlag();
   if ((overflowedResult & 0x100) > 0) {
     setCarryFlag(1);
   } else {
@@ -94,8 +93,7 @@ export function subAThroughCarryRegister(register: u8): void {
     setHalfCarryFlag(0);
   }
 
-  let overflowedResult: u16 =
-    <u16>Cpu.registerA - <u16>register - <u16>getCarryFlag();
+  let overflowedResult: u16 = <u16>Cpu.registerA - <u16>register - <u16>getCarryFlag();
   if ((overflowedResult & 0x100) > 0) {
     setCarryFlag(1);
   } else {
@@ -403,11 +401,7 @@ export function testBitOnRegister(bitPosition: u8, register: u8): u8 {
   return register;
 }
 
-export function setBitOnRegister(
-  bitPosition: u8,
-  bitValue: i32,
-  register: u8
-): u8 {
+export function setBitOnRegister(bitPosition: u8, bitValue: i32, register: u8): u8 {
   // RES 0,B or SET 0,B depending on bit value
 
   if (bitValue > 0) {

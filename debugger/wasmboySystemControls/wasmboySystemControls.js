@@ -1,6 +1,6 @@
-import { Component } from "preact";
-import Portal from "preact-portal";
-import "./wasmBoySystemControls.css";
+import { Component } from 'preact';
+import Portal from 'preact-portal';
+import './wasmBoySystemControls.css';
 
 export class WasmBoySystemControls extends Component {
   constructor(props) {
@@ -8,7 +8,7 @@ export class WasmBoySystemControls extends Component {
     // set our state to if we are initialized or not
     this.state = {
       showSaveStates: false,
-      currentFileName: "No Game Selected...",
+      currentFileName: 'No Game Selected...',
       saveStates: [],
       saveStateError: false
     };
@@ -58,7 +58,7 @@ export class WasmBoySystemControls extends Component {
 
   startGame() {
     if (!this.props.wasmboy.ready) {
-      this.props.showNotification("Please load a game. ⏏️");
+      this.props.showNotification('Please load a game. ⏏️');
     } else {
       this.props.wasmboy.startGame();
     }
@@ -66,21 +66,21 @@ export class WasmBoySystemControls extends Component {
 
   saveState() {
     this.props.wasmboy.saveState();
-    this.props.showNotification("State Saved! 💾");
+    this.props.showNotification('State Saved! 💾');
   }
 
   loadState(saveState) {
     this.closeSaveStates();
     this.props.wasmboy.loadState(saveState);
-    this.props.showNotification("State Loaded! 😀");
+    this.props.showNotification('State Loaded! 😀');
   }
 
   getStartButtonClass() {
     if (this.props.wasmboy && this.props.wasmboy.ready) {
-      return "is-success";
+      return 'is-success';
     }
 
-    return "is-danger";
+    return 'is-danger';
   }
 
   render(props) {
@@ -103,7 +103,7 @@ export class WasmBoySystemControls extends Component {
               <h3>Date:</h3>
               {saveStateDateString}
               <h3>Auto:</h3>
-              {saveState.isAuto ? "true" : "false"}
+              {saveState.isAuto ? 'true' : 'false'}
             </div>
           );
         });
@@ -117,7 +117,7 @@ export class WasmBoySystemControls extends Component {
     return (
       <div className="wasmboy__systemControls system-controls">
         <button
-          className={this.getStartButtonClass() + " button"}
+          className={this.getStartButtonClass() + ' button'}
           onclick={() => {
             this.startGame();
           }}

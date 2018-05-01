@@ -9,12 +9,12 @@
 // of all the channels, times the (mixer volume + 1), to give us an unsigned
 // byte from 0 (-1.0) to 254 (1.0)
 
-import { Channel1 } from "./channel1";
-import { Channel2 } from "./channel2";
-import { Channel3 } from "./channel3";
-import { Channel4 } from "./channel4";
-import { Cpu } from "../cpu/index";
-import { Config } from "../config";
+import { Channel1 } from './channel1';
+import { Channel2 } from './channel2';
+import { Channel3 } from './channel3';
+import { Channel4 } from './channel4';
+import { Cpu } from '../cpu/index';
+import { Config } from '../config';
 import {
   eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemory,
@@ -22,15 +22,8 @@ import {
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
-} from "../memory/index";
-import {
-  checkBitOnByte,
-  concatenateBytes,
-  splitLowByte,
-  splitHighByte,
-  hexLog,
-  performanceTimestamp
-} from "../helpers/index";
+} from '../memory/index';
+import { checkBitOnByte, concatenateBytes, splitLowByte, splitHighByte, hexLog, performanceTimestamp } from '../helpers/index';
 
 export class Sound {
   // Current cycles
@@ -129,31 +122,16 @@ export class Sound {
 
   // Function to save the state of the class
   static saveState(): void {
-    store<i32>(
-      getSaveStateMemoryOffset(0x00, Sound.saveStateSlot),
-      Sound.frameSequenceCycleCounter
-    );
-    store<u8>(
-      getSaveStateMemoryOffset(0x04, Sound.saveStateSlot),
-      Sound.downSampleCycleCounter
-    );
-    store<u8>(
-      getSaveStateMemoryOffset(0x05, Sound.saveStateSlot),
-      Sound.frameSequencer
-    );
+    store<i32>(getSaveStateMemoryOffset(0x00, Sound.saveStateSlot), Sound.frameSequenceCycleCounter);
+    store<u8>(getSaveStateMemoryOffset(0x04, Sound.saveStateSlot), Sound.downSampleCycleCounter);
+    store<u8>(getSaveStateMemoryOffset(0x05, Sound.saveStateSlot), Sound.frameSequencer);
   }
 
   // Function to load the save state from memory
   static loadState(): void {
-    Sound.frameSequenceCycleCounter = load<i32>(
-      getSaveStateMemoryOffset(0x00, Sound.saveStateSlot)
-    );
-    Sound.downSampleCycleCounter = load<u8>(
-      getSaveStateMemoryOffset(0x04, Sound.saveStateSlot)
-    );
-    Sound.frameSequencer = load<u8>(
-      getSaveStateMemoryOffset(0x05, Sound.saveStateSlot)
-    );
+    Sound.frameSequenceCycleCounter = load<i32>(getSaveStateMemoryOffset(0x00, Sound.saveStateSlot));
+    Sound.downSampleCycleCounter = load<u8>(getSaveStateMemoryOffset(0x04, Sound.saveStateSlot));
+    Sound.frameSequencer = load<u8>(getSaveStateMemoryOffset(0x05, Sound.saveStateSlot));
 
     resetAudioQueue();
   }
@@ -253,30 +231,20 @@ function calculateSound(numberOfCycles: i32): void {
   SoundAccumulator.channel4Sample = channel4Sample;
 
   // Do Some downsampling magic
-  Sound.downSampleCycleCounter +=
-    numberOfCycles * Sound.downSampleCycleMultiplier;
+  Sound.downSampleCycleCounter += numberOfCycles * Sound.downSampleCycleMultiplier;
   if (Sound.downSampleCycleCounter >= Sound.maxDownSampleCycles()) {
     // Reset the downsample counter
     // Don't set to zero to catch overflowed cycles
     Sound.downSampleCycleCounter -= Sound.maxDownSampleCycles();
 
     // Mixe our samples
-    let mixedSample: i32 = mixChannelSamples(
-      channel1Sample,
-      channel2Sample,
-      channel3Sample,
-      channel4Sample
-    );
+    let mixedSample: i32 = mixChannelSamples(channel1Sample, channel2Sample, channel3Sample, channel4Sample);
     let leftChannelSampleUnsignedByte: i32 = splitHighByte(mixedSample);
     let rightChannelSampleUnsignedByte: i32 = splitLowByte(mixedSample);
 
     // Set our volumes in memory
     // +1 so it can not be zero
-    setLeftAndRightOutputForAudioQueue(
-      leftChannelSampleUnsignedByte + 1,
-      rightChannelSampleUnsignedByte + 1,
-      Sound.audioQueueIndex
-    );
+    setLeftAndRightOutputForAudioQueue(leftChannelSampleUnsignedByte + 1, rightChannelSampleUnsignedByte + 1, Sound.audioQueueIndex);
     Sound.audioQueueIndex += 1;
 
     // Don't allow our audioQueueIndex to overflow into other parts of the wasmBoy memory map
@@ -290,18 +258,10 @@ function calculateSound(numberOfCycles: i32): void {
 
 function accumulateSound(numberOfCycles: i32): void {
   // Check if any of the individual channels will update
-  let channel1WillUpdate: boolean =
-    Channel1.willChannelUpdate(numberOfCycles) ||
-    didChannelDacChange(Channel1.channelNumber);
-  let channel2WillUpdate: boolean =
-    Channel2.willChannelUpdate(numberOfCycles) ||
-    didChannelDacChange(Channel2.channelNumber);
-  let channel3WillUpdate: boolean =
-    Channel3.willChannelUpdate(numberOfCycles) ||
-    didChannelDacChange(Channel3.channelNumber);
-  let channel4WillUpdate: boolean =
-    Channel4.willChannelUpdate(numberOfCycles) ||
-    didChannelDacChange(Channel4.channelNumber);
+  let channel1WillUpdate: boolean = Channel1.willChannelUpdate(numberOfCycles) || didChannelDacChange(Channel1.channelNumber);
+  let channel2WillUpdate: boolean = Channel2.willChannelUpdate(numberOfCycles) || didChannelDacChange(Channel2.channelNumber);
+  let channel3WillUpdate: boolean = Channel3.willChannelUpdate(numberOfCycles) || didChannelDacChange(Channel3.channelNumber);
+  let channel4WillUpdate: boolean = Channel4.willChannelUpdate(numberOfCycles) || didChannelDacChange(Channel4.channelNumber);
 
   if (channel1WillUpdate) {
     SoundAccumulator.channel1Sample = Channel1.getSampleFromCycleCounter();
@@ -317,28 +277,18 @@ function accumulateSound(numberOfCycles: i32): void {
   }
 
   // If any channel updated, we need to re-mix our samples
-  if (
-    channel1WillUpdate ||
-    channel2WillUpdate ||
-    channel3WillUpdate ||
-    channel4WillUpdate
-  ) {
+  if (channel1WillUpdate || channel2WillUpdate || channel3WillUpdate || channel4WillUpdate) {
     SoundAccumulator.needToRemixSamples = true;
   }
 
   // Do Some downsampling magic
-  Sound.downSampleCycleCounter +=
-    numberOfCycles * Sound.downSampleCycleMultiplier;
+  Sound.downSampleCycleCounter += numberOfCycles * Sound.downSampleCycleMultiplier;
   if (Sound.downSampleCycleCounter >= Sound.maxDownSampleCycles()) {
     // Reset the downsample counter
     // Don't set to zero to catch overflowed cycles
     Sound.downSampleCycleCounter -= Sound.maxDownSampleCycles();
 
-    if (
-      SoundAccumulator.needToRemixSamples ||
-      SoundAccumulator.mixerVolumeChanged ||
-      SoundAccumulator.mixerEnabledChanged
-    ) {
+    if (SoundAccumulator.needToRemixSamples || SoundAccumulator.mixerVolumeChanged || SoundAccumulator.mixerEnabledChanged) {
       mixChannelSamples(
         SoundAccumulator.channel1Sample,
         SoundAccumulator.channel2Sample,
@@ -465,12 +415,7 @@ function updateFrameSequencer(numberOfCycles: i32): boolean {
   return false;
 }
 
-function mixChannelSamples(
-  channel1Sample: i32 = 15,
-  channel2Sample: i32 = 15,
-  channel3Sample: i32 = 15,
-  channel4Sample: i32 = 15
-): i32 {
+function mixChannelSamples(channel1Sample: i32 = 15, channel2Sample: i32 = 15, channel3Sample: i32 = 15, channel4Sample: i32 = 15): i32 {
   // Do Some Cool mixing
   // NR50 FF24 ALLL BRRR Vin L enable, Left vol, Vin R enable, Right vol
   // NR51 FF25 NW21 NW21 Left enables, Right enables
@@ -548,23 +493,14 @@ function mixChannelSamples(
 
   // Convert our samples from unsigned 32 to unsigned byte
   // Reason being, We want to be able to pass in wasm memory as usigned byte. Javascript will handle the conversion back
-  let leftChannelSampleUnsignedByte: i32 = getSampleAsUnsignedByte(
-    leftChannelSample,
-    Sound.NR50LeftMixerVolume + 1
-  );
-  let rightChannelSampleUnsignedByte: i32 = getSampleAsUnsignedByte(
-    rightChannelSample,
-    Sound.NR50RightMixerVolume + 1
-  );
+  let leftChannelSampleUnsignedByte: i32 = getSampleAsUnsignedByte(leftChannelSample, Sound.NR50LeftMixerVolume + 1);
+  let rightChannelSampleUnsignedByte: i32 = getSampleAsUnsignedByte(rightChannelSample, Sound.NR50RightMixerVolume + 1);
 
   // Save these samples in the accumulator
   SoundAccumulator.leftChannelSampleUnsignedByte = leftChannelSampleUnsignedByte;
   SoundAccumulator.rightChannelSampleUnsignedByte = rightChannelSampleUnsignedByte;
 
-  return concatenateBytes(
-    leftChannelSampleUnsignedByte,
-    rightChannelSampleUnsignedByte
-  );
+  return concatenateBytes(leftChannelSampleUnsignedByte, rightChannelSampleUnsignedByte);
 }
 
 function getSampleAsUnsignedByte(sample: i32, mixerVolume: i32): i32 {

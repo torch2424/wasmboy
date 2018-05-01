@@ -1,4 +1,4 @@
-import { getCarryFlag } from "../cpu/flags";
+import { getCarryFlag } from '../cpu/flags';
 
 // Grouped registers
 // possible overload these later to performace actions
@@ -58,23 +58,8 @@ export function checkBitOnByte(bitPosition: i32, byte: i32): boolean {
 }
 
 namespace env {
-  export declare function log(
-    message: string,
-    arg0: i32,
-    arg1: i32,
-    arg2: i32,
-    arg3: i32,
-    arg4: i32,
-    arg5: i32
-  ): void;
-  export declare function hexLog(
-    arg0: i32,
-    arg1: i32,
-    arg2: i32,
-    arg3: i32,
-    arg4: i32,
-    arg5: i32
-  ): void;
+  export declare function log(message: string, arg0: i32, arg1: i32, arg2: i32, arg3: i32, arg4: i32, arg5: i32): void;
+  export declare function hexLog(arg0: i32, arg1: i32, arg2: i32, arg3: i32, arg4: i32, arg5: i32): void;
   export declare function performanceTimestamp(id: i32, value: i32): void;
 }
 
@@ -101,9 +86,6 @@ export function hexLog(
   env.hexLog(arg0, arg1, arg2, arg3, arg4, arg5);
 }
 
-export function performanceTimestamp(
-  id: i32 = -9999,
-  value: i32 = -9999
-): void {
+export function performanceTimestamp(id: i32 = -9999, value: i32 = -9999): void {
   env.performanceTimestamp(id, value);
 }

@@ -1,13 +1,8 @@
-import { Cpu } from "../cpu/index";
-import { eightBitStoreIntoGBMemory } from "../memory/store";
-import { eightBitLoadFromGBMemory } from "../memory/load";
-import { requestJoypadInterrupt } from "../interrupts/index";
-import {
-  checkBitOnByte,
-  setBitOnByte,
-  resetBitOnByte,
-  hexLog
-} from "../helpers/index";
+import { Cpu } from '../cpu/index';
+import { eightBitStoreIntoGBMemory } from '../memory/store';
+import { eightBitLoadFromGBMemory } from '../memory/load';
+import { requestJoypadInterrupt } from '../interrupts/index';
+import { checkBitOnByte, setBitOnByte, resetBitOnByte, hexLog } from '../helpers/index';
 
 // http://www.codeslinger.co.uk/pages/projects/gameboy/joypad.html
 // Joypad Register
@@ -62,9 +57,7 @@ export class Joypad {
 
   // Function to load the save state from memory
   static loadState(): void {
-    Joypad.updateJoypad(
-      eightBitLoadFromGBMemory(Joypad.memoryLocationJoypadRegister)
-    );
+    Joypad.updateJoypad(eightBitLoadFromGBMemory(Joypad.memoryLocationJoypadRegister));
   }
 }
 
@@ -138,16 +131,7 @@ export function getJoypadState(): i32 {
   return joypadRegister;
 }
 
-export function setJoypadState(
-  up: i32,
-  right: i32,
-  down: i32,
-  left: i32,
-  a: i32,
-  b: i32,
-  select: i32,
-  start: i32
-): void {
+export function setJoypadState(up: i32, right: i32, down: i32, left: i32, a: i32, b: i32, select: i32, start: i32): void {
   if (up > 0) {
     _pressJoypadButton(0);
   } else {
@@ -268,10 +252,7 @@ function _getJoypadButtonStateFromButtonId(buttonId: i32): boolean {
   }
 }
 
-function _setJoypadButtonStateFromButtonId(
-  buttonId: i32,
-  isPressed: boolean
-): void {
+function _setJoypadButtonStateFromButtonId(buttonId: i32, isPressed: boolean): void {
   switch (buttonId) {
     case 0:
       Joypad.up = isPressed;

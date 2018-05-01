@@ -1,30 +1,22 @@
-import { Memory } from "./memory";
-import { Graphics, batchProcessGraphics } from "../graphics/graphics";
-import { Palette, writeColorPaletteToMemory, Lcd } from "../graphics/index";
-import { batchProcessAudio, SoundRegisterWriteTraps } from "../sound/index";
-import { Timers, batchProcessTimers } from "../timers/index";
-import { Interrupts } from "../interrupts/index";
-import { Joypad } from "../joypad/index";
-import { handleBanking } from "./banking";
-import {
-  eightBitStoreIntoGBMemory,
-  sixteenBitStoreIntoGBMemory
-} from "./store";
-import {
-  eightBitLoadFromGBMemoryWithTraps,
-  eightBitLoadFromGBMemory,
-  sixteenBitLoadFromGBMemory
-} from "./load";
-import { startDmaTransfer, startHdmaTransfer } from "./dma";
-import { checkBitOnByte, hexLog } from "../helpers/index";
+import { Memory } from './memory';
+import { Graphics, batchProcessGraphics } from '../graphics/graphics';
+import { Palette, writeColorPaletteToMemory, Lcd } from '../graphics/index';
+import { batchProcessAudio, SoundRegisterWriteTraps } from '../sound/index';
+import { Timers, batchProcessTimers } from '../timers/index';
+import { Interrupts } from '../interrupts/index';
+import { Joypad } from '../joypad/index';
+import { handleBanking } from './banking';
+import { eightBitStoreIntoGBMemory, sixteenBitStoreIntoGBMemory } from './store';
+import { eightBitLoadFromGBMemoryWithTraps, eightBitLoadFromGBMemory, sixteenBitLoadFromGBMemory } from './load';
+import { startDmaTransfer, startHdmaTransfer } from './dma';
+import { checkBitOnByte, hexLog } from '../helpers/index';
 
 // Internal function to trap any modify data trying to be written to Gameboy memory
 // Follows the Gameboy memory map
 export function checkWriteTraps(offset: i32, value: i32): boolean {
   // Cache globals used multiple times for performance
   let videoRamLocation: i32 = Memory.videoRamLocation;
-  let spriteInformationTableLocation: i32 =
-    Memory.spriteInformationTableLocation;
+  let spriteInformationTableLocation: i32 = Memory.spriteInformationTableLocation;
 
   // Handle banking
   if (offset < videoRamLocation) {
@@ -53,10 +45,7 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
   // Be sure to copy everything in EchoRam to Work Ram
   // Codeslinger: The ECHO memory region (0xE000-0xFDFF) is quite different because any data written here is also written in the equivelent ram memory region 0xC000-0xDDFF.
   // Hence why it is called echo
-  if (
-    offset >= Memory.echoRamLocation &&
-    offset < spriteInformationTableLocation
-  ) {
+  if (offset >= Memory.echoRamLocation && offset < spriteInformationTableLocation) {
     let wramOffset: i32 = offset - 0x2000;
     eightBitStoreIntoGBMemory(wramOffset, value);
 
@@ -67,10 +56,7 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
   // Also check for individal writes
   // Can only read/write from OAM During Modes 0 - 1
   // See graphics/lcd.ts
-  if (
-    offset >= spriteInformationTableLocation &&
-    offset <= Memory.spriteInformationTableLocationEnd
-  ) {
+  if (offset >= spriteInformationTableLocation && offset <= Memory.spriteInformationTableLocationEnd) {
     // Can only read/write from OAM During Mode 2
     // See graphics/lcd.ts
     if (Lcd.currentLcdMode < 2) {
@@ -83,10 +69,7 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
     return true;
   }
 
-  if (
-    offset >= Memory.unusableMemoryLocation &&
-    offset <= Memory.unusableMemoryEndLocation
-  ) {
+  if (offset >= Memory.unusableMemoryLocation && offset <= Memory.unusableMemoryEndLocation) {
     return false;
   }
 
@@ -104,10 +87,7 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
   }
 
   // Other Memory effects fomr read/write to Lcd/Graphics
-  if (
-    offset >= Lcd.memoryLocationLcdControl &&
-    offset <= Graphics.memoryLocationWindowX
-  ) {
+  if (offset >= Lcd.memoryLocationLcdControl && offset <= Graphics.memoryLocationWindowX) {
     // Not batch processing here for performance
     // batchProcessGraphics();
 
@@ -168,14 +148,10 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
 
   // Don't allow banking if we are doing an Hblank HDM transfer
   // https://gist.github.com/drhelius/3394856
-  if (
-    offset === Memory.memoryLocationGBCWRAMBank ||
-    offset === Memory.memoryLocationGBCVRAMBank
-  ) {
+  if (offset === Memory.memoryLocationGBCWRAMBank || offset === Memory.memoryLocationGBCVRAMBank) {
     if (Memory.isHblankHdmaActive) {
       if (
-        (Memory.hblankHdmaSource >= 0x4000 &&
-          Memory.hblankHdmaSource <= 0x7fff) ||
+        (Memory.hblankHdmaSource >= 0x4000 && Memory.hblankHdmaSource <= 0x7fff) ||
         (Memory.hblankHdmaSource >= 0xd000 && Memory.hblankHdmaSource <= 0xdfff)
       ) {
         return false;
@@ -184,20 +160,14 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
   }
 
   // Handle GBC Pallete Write
-  if (
-    offset >= Palette.memoryLocationBackgroundPaletteIndex &&
-    offset <= Palette.memoryLocationSpritePaletteData
-  ) {
+  if (offset >= Palette.memoryLocationBackgroundPaletteIndex && offset <= Palette.memoryLocationSpritePaletteData) {
     // Incremeenting the palette handled by the write
     writeColorPaletteToMemory(offset, value);
     return true;
   }
 
   // Handle timer writes
-  if (
-    offset >= Timers.memoryLocationDividerRegister &&
-    offset <= Timers.memoryLocationTimerControl
-  ) {
+  if (offset >= Timers.memoryLocationDividerRegister && offset <= Timers.memoryLocationTimerControl) {
     // Batch Process
     batchProcessTimers();
 

@@ -1,5 +1,5 @@
-import { Component } from "preact";
-import "./wasmboyOptions.css";
+import { Component } from 'preact';
+import './wasmboyOptions.css';
 
 export class WasmBoyOptions extends Component {
   constructor(props) {
@@ -26,7 +26,7 @@ export class WasmBoyOptions extends Component {
   // Simply resets wasmboy with the current options
   applyOptions() {
     this.props.wasmBoy.reset(this.state);
-    this.props.showNotification("Applied Options! 🛠️");
+    this.props.showNotification('Applied Options! 🛠️');
   }
 
   render() {
@@ -53,7 +53,7 @@ export class WasmBoyOptions extends Component {
       }
 
       // Number Input Fields
-      if (typeof this.state[stateOptionKey] === "number") {
+      if (typeof this.state[stateOptionKey] === 'number') {
         options.push(
           <div>
             <label class="checkbox">
@@ -64,10 +64,7 @@ export class WasmBoyOptions extends Component {
                 name={stateOptionKey}
                 value={this.state[stateOptionKey]}
                 onChange={event => {
-                  this.setStateKey(
-                    stateOptionKey,
-                    parseFloat(event.target.value)
-                  );
+                  this.setStateKey(stateOptionKey, parseFloat(event.target.value));
                 }}
               />
             </label>
@@ -81,13 +78,9 @@ export class WasmBoyOptions extends Component {
         <h1>Options:</h1>
         <div class="wasmboy__options__info">
           <i>
-            Applying options will reset any currently running game without
-            saving. It is reccomended you apply your options before loading your
-            game. Information on the{" "}
-            <a
-              href="https://github.com/torch2424/wasmBoy/blob/master/test/performance/results.md"
-              target="_blank"
-            >
+            Applying options will reset any currently running game without saving. It is reccomended you apply your options before loading
+            your game. Information on the{' '}
+            <a href="https://github.com/torch2424/wasmBoy/blob/master/test/performance/results.md" target="_blank">
               effectiveness of performance improving options can be found here
             </a>
           </i>

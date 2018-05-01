@@ -1,7 +1,7 @@
 // Load/Read functionality for memory
-import { checkReadTraps } from "./readTraps";
-import { getWasmBoyOffsetFromGameBoyOffset } from "./memoryMap";
-import { concatenateBytes, performanceTimestamp } from "../helpers/index";
+import { checkReadTraps } from './readTraps';
+import { getWasmBoyOffsetFromGameBoyOffset } from './memoryMap';
+import { concatenateBytes, performanceTimestamp } from '../helpers/index';
 
 export function eightBitLoadFromGBMemory(gameboyOffset: i32): i32 {
   return <i32>load<u8>(getWasmBoyOffsetFromGameBoyOffset(gameboyOffset));

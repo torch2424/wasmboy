@@ -7,15 +7,15 @@ import {
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
-} from "../memory/index";
+} from '../memory/index';
 
-import { initializeGraphics } from "../graphics/index";
+import { initializeGraphics } from '../graphics/index';
 
-import { initializeSound } from "../sound/index";
+import { initializeSound } from '../sound/index';
 
-import { initializeTimers } from "../timers/index";
+import { initializeTimers } from '../timers/index';
 
-import { log, hexLog } from "../helpers/index";
+import { log, hexLog } from '../helpers/index';
 
 // Everything Static as class instances just aren't quite there yet
 // https://github.com/AssemblyScript/assemblyscript/blob/master/tests/compiler/showcase.ts
@@ -83,28 +83,13 @@ export class Cpu {
     store<u8>(getSaveStateMemoryOffset(0x06, Cpu.saveStateSlot), Cpu.registerL);
     store<u8>(getSaveStateMemoryOffset(0x07, Cpu.saveStateSlot), Cpu.registerF);
 
-    store<u16>(
-      getSaveStateMemoryOffset(0x08, Cpu.saveStateSlot),
-      Cpu.stackPointer
-    );
-    store<u16>(
-      getSaveStateMemoryOffset(0x0a, Cpu.saveStateSlot),
-      Cpu.programCounter
-    );
+    store<u16>(getSaveStateMemoryOffset(0x08, Cpu.saveStateSlot), Cpu.stackPointer);
+    store<u16>(getSaveStateMemoryOffset(0x0a, Cpu.saveStateSlot), Cpu.programCounter);
 
-    store<i32>(
-      getSaveStateMemoryOffset(0x0c, Cpu.saveStateSlot),
-      Cpu.currentCycles
-    );
+    store<i32>(getSaveStateMemoryOffset(0x0c, Cpu.saveStateSlot), Cpu.currentCycles);
 
-    storeBooleanDirectlyToWasmMemory(
-      getSaveStateMemoryOffset(0x11, Cpu.saveStateSlot),
-      Cpu.isHalted
-    );
-    storeBooleanDirectlyToWasmMemory(
-      getSaveStateMemoryOffset(0x12, Cpu.saveStateSlot),
-      Cpu.isStopped
-    );
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x11, Cpu.saveStateSlot), Cpu.isHalted);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x12, Cpu.saveStateSlot), Cpu.isStopped);
   }
 
   // Function to load the save state from memory
@@ -119,30 +104,17 @@ export class Cpu {
     Cpu.registerL = load<u8>(getSaveStateMemoryOffset(0x06, Cpu.saveStateSlot));
     Cpu.registerF = load<u8>(getSaveStateMemoryOffset(0x07, Cpu.saveStateSlot));
 
-    Cpu.stackPointer = load<u16>(
-      getSaveStateMemoryOffset(0x08, Cpu.saveStateSlot)
-    );
-    Cpu.programCounter = load<u16>(
-      getSaveStateMemoryOffset(0x0a, Cpu.saveStateSlot)
-    );
+    Cpu.stackPointer = load<u16>(getSaveStateMemoryOffset(0x08, Cpu.saveStateSlot));
+    Cpu.programCounter = load<u16>(getSaveStateMemoryOffset(0x0a, Cpu.saveStateSlot));
 
-    Cpu.currentCycles = load<i32>(
-      getSaveStateMemoryOffset(0x0c, Cpu.saveStateSlot)
-    );
+    Cpu.currentCycles = load<i32>(getSaveStateMemoryOffset(0x0c, Cpu.saveStateSlot));
 
-    Cpu.isHalted = loadBooleanDirectlyFromWasmMemory(
-      getSaveStateMemoryOffset(0x11, Cpu.saveStateSlot)
-    );
-    Cpu.isStopped = loadBooleanDirectlyFromWasmMemory(
-      getSaveStateMemoryOffset(0x12, Cpu.saveStateSlot)
-    );
+    Cpu.isHalted = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x11, Cpu.saveStateSlot));
+    Cpu.isStopped = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x12, Cpu.saveStateSlot));
   }
 }
 
-export function initializeCpu(
-  useGBCMode: i32 = 1,
-  includeBootRom: i32 = 0
-): void {
+export function initializeCpu(useGBCMode: i32 = 1, includeBootRom: i32 = 0): void {
   // First, try to switch to Gameboy Color Mode
   // Get our GBC support from the cartridge header
   // http://gbdev.gg8.se/wiki/articles/The_Cartridge_Header
@@ -156,7 +128,7 @@ export function initializeCpu(
   // TODO: depending on the boot rom, initialization may be different
   // From: http://www.codeslinger.co.uk/pages/projects/gameboy/hardware.html
   // All values default to zero in memory, so not setting them yet
-  log("initializing (includeBootRom=$0)", 1, includeBootRom);
+  log('initializing (includeBootRom=$0)', 1, includeBootRom);
   if (includeBootRom <= 0) {
     // Initialization variables from BGB
 

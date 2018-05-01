@@ -3,16 +3,16 @@
 // Simple Square Channel
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
 
-import { isDutyCycleClockPositiveOrNegativeForWaveform } from "./duty";
-import { Cpu } from "../cpu/cpu";
+import { isDutyCycleClockPositiveOrNegativeForWaveform } from './duty';
+import { Cpu } from '../cpu/cpu';
 import {
   eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemory,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
-} from "../memory/index";
-import { checkBitOnByte, hexLog } from "../helpers/index";
+} from '../memory/index';
+import { checkBitOnByte, hexLog } from '../helpers/index';
 
 export class Channel2 {
   // Cycle Counter for our sound accumulator
@@ -59,8 +59,7 @@ export class Channel2 {
     Channel2.NRx3FrequencyLSB = value;
 
     // Update Channel Frequency
-    let frequency: i32 =
-      (Channel2.NRx4FrequencyMSB << 8) | Channel2.NRx3FrequencyLSB;
+    let frequency: i32 = (Channel2.NRx4FrequencyMSB << 8) | Channel2.NRx3FrequencyLSB;
     Channel2.frequency = frequency;
   }
 
@@ -74,8 +73,7 @@ export class Channel2 {
     Channel2.NRx4FrequencyMSB = value & 0x07;
 
     // Update Channel Frequency
-    let frequency: i32 =
-      (Channel2.NRx4FrequencyMSB << 8) | Channel2.NRx3FrequencyLSB;
+    let frequency: i32 = (Channel2.NRx4FrequencyMSB << 8) | Channel2.NRx3FrequencyLSB;
     Channel2.frequency = frequency;
   }
 
@@ -99,61 +97,26 @@ export class Channel2 {
 
   // Function to save the state of the class
   static saveState(): void {
-    storeBooleanDirectlyToWasmMemory(
-      getSaveStateMemoryOffset(0x00, Channel2.saveStateSlot),
-      Channel2.isEnabled
-    );
-    store<i32>(
-      getSaveStateMemoryOffset(0x01, Channel2.saveStateSlot),
-      Channel2.frequencyTimer
-    );
-    store<i32>(
-      getSaveStateMemoryOffset(0x05, Channel2.saveStateSlot),
-      Channel2.envelopeCounter
-    );
-    store<i32>(
-      getSaveStateMemoryOffset(0x09, Channel2.saveStateSlot),
-      Channel2.lengthCounter
-    );
-    store<i32>(
-      getSaveStateMemoryOffset(0x0e, Channel2.saveStateSlot),
-      Channel2.volume
-    );
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x00, Channel2.saveStateSlot), Channel2.isEnabled);
+    store<i32>(getSaveStateMemoryOffset(0x01, Channel2.saveStateSlot), Channel2.frequencyTimer);
+    store<i32>(getSaveStateMemoryOffset(0x05, Channel2.saveStateSlot), Channel2.envelopeCounter);
+    store<i32>(getSaveStateMemoryOffset(0x09, Channel2.saveStateSlot), Channel2.lengthCounter);
+    store<i32>(getSaveStateMemoryOffset(0x0e, Channel2.saveStateSlot), Channel2.volume);
 
-    store<u8>(
-      getSaveStateMemoryOffset(0x13, Channel2.saveStateSlot),
-      Channel2.dutyCycle
-    );
-    store<u8>(
-      getSaveStateMemoryOffset(0x14, Channel2.saveStateSlot),
-      <u8>Channel2.waveFormPositionOnDuty
-    );
+    store<u8>(getSaveStateMemoryOffset(0x13, Channel2.saveStateSlot), Channel2.dutyCycle);
+    store<u8>(getSaveStateMemoryOffset(0x14, Channel2.saveStateSlot), <u8>Channel2.waveFormPositionOnDuty);
   }
 
   // Function to load the save state from memory
   static loadState(): void {
-    Channel2.isEnabled = loadBooleanDirectlyFromWasmMemory(
-      getSaveStateMemoryOffset(0x00, Channel2.saveStateSlot)
-    );
-    Channel2.frequencyTimer = load<i32>(
-      getSaveStateMemoryOffset(0x01, Channel2.saveStateSlot)
-    );
-    Channel2.envelopeCounter = load<i32>(
-      getSaveStateMemoryOffset(0x05, Channel2.saveStateSlot)
-    );
-    Channel2.lengthCounter = load<i32>(
-      getSaveStateMemoryOffset(0x09, Channel2.saveStateSlot)
-    );
-    Channel2.volume = load<i32>(
-      getSaveStateMemoryOffset(0x0e, Channel2.saveStateSlot)
-    );
+    Channel2.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x00, Channel2.saveStateSlot));
+    Channel2.frequencyTimer = load<i32>(getSaveStateMemoryOffset(0x01, Channel2.saveStateSlot));
+    Channel2.envelopeCounter = load<i32>(getSaveStateMemoryOffset(0x05, Channel2.saveStateSlot));
+    Channel2.lengthCounter = load<i32>(getSaveStateMemoryOffset(0x09, Channel2.saveStateSlot));
+    Channel2.volume = load<i32>(getSaveStateMemoryOffset(0x0e, Channel2.saveStateSlot));
 
-    Channel2.dutyCycle = load<u8>(
-      getSaveStateMemoryOffset(0x13, Channel2.saveStateSlot)
-    );
-    Channel2.waveFormPositionOnDuty = load<u8>(
-      getSaveStateMemoryOffset(0x14, Channel2.saveStateSlot)
-    );
+    Channel2.dutyCycle = load<u8>(getSaveStateMemoryOffset(0x13, Channel2.saveStateSlot));
+    Channel2.waveFormPositionOnDuty = load<u8>(getSaveStateMemoryOffset(0x14, Channel2.saveStateSlot));
   }
 
   static initialize(): void {
@@ -219,12 +182,7 @@ export class Channel2 {
 
     // Get the current sampleValue
     let sample: i32 = 1;
-    if (
-      !isDutyCycleClockPositiveOrNegativeForWaveform(
-        Channel2.NRx1Duty,
-        Channel2.waveFormPositionOnDuty
-      )
-    ) {
+    if (!isDutyCycleClockPositiveOrNegativeForWaveform(Channel2.NRx1Duty, Channel2.waveFormPositionOnDuty)) {
       sample = sample * -1;
     }
 
@@ -313,17 +271,13 @@ export class Channel2 {
     newRegister4 = newRegister4 | passedFrequencyHighBits;
 
     // Set the registers
-    eightBitStoreIntoGBMemory(
-      Channel2.memoryLocationNRx3,
-      passedFrequencyLowBits
-    );
+    eightBitStoreIntoGBMemory(Channel2.memoryLocationNRx3, passedFrequencyLowBits);
     eightBitStoreIntoGBMemory(Channel2.memoryLocationNRx4, newRegister4);
 
     // Save the frequency for ourselves without triggering memory traps
     Channel2.NRx3FrequencyLSB = passedFrequencyLowBits;
     Channel2.NRx4FrequencyMSB = passedFrequencyHighBits;
-    Channel2.frequency =
-      (Channel2.NRx4FrequencyMSB << 8) | Channel2.NRx3FrequencyLSB;
+    Channel2.frequency = (Channel2.NRx4FrequencyMSB << 8) | Channel2.NRx3FrequencyLSB;
   }
   // Done!
 }

@@ -1,25 +1,19 @@
 // Main Class and funcitons for rendering the gameboy display
-import { Lcd, setLcdStatus } from "./lcd";
-import { renderBackground, renderWindow } from "./backgroundWindow";
-import { renderSprites } from "./sprites";
-import { clearPriorityMap } from "./priority";
-import { resetTileCache } from "./tiles";
-import { Cpu } from "../cpu/cpu";
-import { Config } from "../config";
+import { Lcd, setLcdStatus } from './lcd';
+import { renderBackground, renderWindow } from './backgroundWindow';
+import { renderSprites } from './sprites';
+import { clearPriorityMap } from './priority';
+import { resetTileCache } from './tiles';
+import { Cpu } from '../cpu/cpu';
+import { Config } from '../config';
 import {
   eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemory,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
-} from "../memory/index";
-import {
-  checkBitOnByte,
-  setBitOnByte,
-  resetBitOnByte,
-  performanceTimestamp,
-  hexLog
-} from "../helpers/index";
+} from '../memory/index';
+import { checkBitOnByte, setBitOnByte, resetBitOnByte, performanceTimestamp, hexLog } from '../helpers/index';
 
 export class Graphics {
   // Current cycles
@@ -103,36 +97,19 @@ export class Graphics {
 
   // Function to save the state of the class
   static saveState(): void {
-    store<i32>(
-      getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot),
-      Graphics.scanlineCycleCounter
-    );
-    store<u8>(
-      getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot),
-      <u8>Lcd.currentLcdMode
-    );
+    store<i32>(getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot), Graphics.scanlineCycleCounter);
+    store<u8>(getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot), <u8>Lcd.currentLcdMode);
 
-    eightBitStoreIntoGBMemory(
-      Graphics.memoryLocationScanlineRegister,
-      Graphics.scanlineRegister
-    );
+    eightBitStoreIntoGBMemory(Graphics.memoryLocationScanlineRegister, Graphics.scanlineRegister);
   }
 
   // Function to load the save state from memory
   static loadState(): void {
-    Graphics.scanlineCycleCounter = load<i32>(
-      getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot)
-    );
-    Lcd.currentLcdMode = load<u8>(
-      getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot)
-    );
+    Graphics.scanlineCycleCounter = load<i32>(getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot));
+    Lcd.currentLcdMode = load<u8>(getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot));
 
-    Graphics.scanlineRegister = eightBitLoadFromGBMemory(
-      Graphics.memoryLocationScanlineRegister
-    );
-    Lcd.updateLcdControl(
-      eightBitLoadFromGBMemory(Lcd.memoryLocationLcdControl)
-    );
+    Graphics.scanlineRegister = eightBitLoadFromGBMemory(Graphics.memoryLocationScanlineRegister);
+    Lcd.updateLcdControl(eightBitLoadFromGBMemory(Lcd.memoryLocationLcdControl));
   }
 }
 
@@ -147,8 +124,7 @@ export function batchProcessGraphics(): void {
 
   while (Graphics.currentCycles >= Graphics.batchProcessCycles()) {
     updateGraphics(Graphics.batchProcessCycles());
-    Graphics.currentCycles =
-      Graphics.currentCycles - Graphics.batchProcessCycles();
+    Graphics.currentCycles = Graphics.currentCycles - Graphics.batchProcessCycles();
   }
 }
 
@@ -233,8 +209,7 @@ export function updateGraphics(numberOfCycles: i32): void {
 // TODO: Make this a _drawPixelOnScanline, as values can be updated while drawing a scanline
 function _drawScanline(scanlineRegister: i32): void {
   // Get our seleted tile data memory location
-  let tileDataMemoryLocation: i32 =
-    Graphics.memoryLocationTileDataSelectZeroStart;
+  let tileDataMemoryLocation: i32 = Graphics.memoryLocationTileDataSelectZeroStart;
   if (Lcd.bgWindowTileDataSelect) {
     tileDataMemoryLocation = Graphics.memoryLocationTileDataSelectOneStart;
   }
@@ -248,36 +223,26 @@ function _drawScanline(scanlineRegister: i32): void {
   // TODO: Enable this different feature for GBC
   if (Cpu.GBCEnabled || Lcd.bgDisplayEnabled) {
     // Get our map memory location
-    let tileMapMemoryLocation: i32 =
-      Graphics.memoryLocationTileMapSelectZeroStart;
+    let tileMapMemoryLocation: i32 = Graphics.memoryLocationTileMapSelectZeroStart;
     if (Lcd.bgTileMapDisplaySelect) {
       tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectOneStart;
     }
 
     // Finally, pass everything to draw the background
-    renderBackground(
-      scanlineRegister,
-      tileDataMemoryLocation,
-      tileMapMemoryLocation
-    );
+    renderBackground(scanlineRegister, tileDataMemoryLocation, tileMapMemoryLocation);
   }
 
   // Check if the window is enabled, and we are currently
   // Drawing lines on the window
   if (Lcd.windowDisplayEnabled) {
     // Get our map memory location
-    let tileMapMemoryLocation: i32 =
-      Graphics.memoryLocationTileMapSelectZeroStart;
+    let tileMapMemoryLocation: i32 = Graphics.memoryLocationTileMapSelectZeroStart;
     if (Lcd.windowTileMapDisplaySelect) {
       tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectOneStart;
     }
 
     // Finally, pass everything to draw the background
-    renderWindow(
-      scanlineRegister,
-      tileDataMemoryLocation,
-      tileMapMemoryLocation
-    );
+    renderWindow(scanlineRegister, tileDataMemoryLocation, tileMapMemoryLocation);
   }
 
   if (Lcd.spriteDisplayEnable) {

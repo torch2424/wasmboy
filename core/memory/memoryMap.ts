@@ -1,11 +1,11 @@
 // WasmBoy memory map:
 // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
 
-import { Memory } from "./memory";
-import { eightBitLoadFromGBMemory } from "./load";
-import { getRomBankAddress, getRamBankAddress } from "./banking";
-import { Cpu } from "../cpu/cpu";
-import { hexLog } from "../helpers/index";
+import { Memory } from './memory';
+import { eightBitLoadFromGBMemory } from './load';
+import { getRomBankAddress, getRamBankAddress } from './banking';
+import { Cpu } from '../cpu/cpu';
+import { hexLog } from '../helpers/index';
 
 // Private function to translate a offset meant for the gameboy memory map
 // To the wasmboy memory map
@@ -37,18 +37,12 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
       let vramBankId: i32 = 0;
       if (Cpu.GBCEnabled) {
         // Find our current VRAM Bank
-        vramBankId =
-          eightBitLoadFromGBMemory(Memory.memoryLocationGBCVRAMBank) & 0x01;
+        vramBankId = eightBitLoadFromGBMemory(Memory.memoryLocationGBCVRAMBank) & 0x01;
         // Even though We added another 0x2000, the Cartridge ram is pulled out of our Internal Memory Space
         // Therefore, we do not need to adjust for this extra 0x2000
       }
 
-      return (
-        gameboyOffset -
-        Memory.videoRamLocation +
-        Memory.gameBoyVramLocation +
-        0x2000 * vramBankId
-      );
+      return gameboyOffset - Memory.videoRamLocation + Memory.gameBoyVramLocation + 0x2000 * vramBankId;
     case 0x0a:
     case 0x0b:
       // Cartridge RAM - A.K.A External RAM
@@ -58,11 +52,7 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
       // Gameboy Ram Bank 0
       // 0xC000 -> 0x000400
       // Don't need to add head, since we move out 0x200 from the cartridge ram
-      return (
-        gameboyOffset -
-        Memory.internalRamBankZeroLocation +
-        Memory.gameBoyWramLocation
-      );
+      return gameboyOffset - Memory.internalRamBankZeroLocation + Memory.gameBoyWramLocation;
     case 0x0d:
       // Gameboy Ram Banks, Switchable in GBC Mode
       // 0xD000 -> 0x000400
@@ -74,8 +64,7 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
       // Get the last 3 bits to find our wram ID
       let wramBankId: i32 = 0;
       if (Cpu.GBCEnabled) {
-        wramBankId =
-          eightBitLoadFromGBMemory(Memory.memoryLocationGBCWRAMBank) & 0x07;
+        wramBankId = eightBitLoadFromGBMemory(Memory.memoryLocationGBCWRAMBank) & 0x07;
       }
       if (wramBankId < 1) {
         wramBankId = 1;
@@ -83,20 +72,11 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
       // (0x1000 * (wramBankId - 1)) -> To find the correct wram bank.
       // wramBankId - 1, because we alreayd have the space for wramBank 1, and are currently in it
       // So need to address space for 6 OTHER banks
-      return (
-        gameboyOffset -
-        Memory.internalRamBankZeroLocation +
-        Memory.gameBoyWramLocation +
-        0x1000 * (wramBankId - 1)
-      );
+      return gameboyOffset - Memory.internalRamBankZeroLocation + Memory.gameBoyWramLocation + 0x1000 * (wramBankId - 1);
     default:
       // Everything Else after Gameboy Ram Banks
       // 0xE000 -> 0x000400
       // 0x6000 For the Extra WRAM Banks
-      return (
-        gameboyOffset -
-        Memory.echoRamLocation +
-        Memory.gameBoyMemoryRegistersLocation
-      );
+      return gameboyOffset - Memory.echoRamLocation + Memory.gameBoyMemoryRegistersLocation;
   }
 }

@@ -2,15 +2,10 @@
 // Bits 0 & 1 will represent the color Id drawn by the BG/Window
 // Bit 2 will represent if the Bg/Window has GBC priority.
 
-import { bgPriorityMapLocation } from "../constants/constants";
-import { setBitOnByte } from "../helpers/index";
+import { bgPriorityMapLocation } from '../constants/constants';
+import { setBitOnByte } from '../helpers/index';
 
-export function addPriorityforPixel(
-  x: i32,
-  y: i32,
-  colorId: i32 = 0,
-  hasGbcBgPriority: boolean = false
-): void {
+export function addPriorityforPixel(x: i32, y: i32, colorId: i32 = 0, hasGbcBgPriority: boolean = false): void {
   let bgPriorityByte: i32 = colorId & 0x03;
   if (hasGbcBgPriority) {
     bgPriorityByte = setBitOnByte(2, bgPriorityByte);

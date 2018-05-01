@@ -1,4 +1,4 @@
-import { Cpu } from "../cpu/index";
+import { Cpu } from '../cpu/index';
 import {
   eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemory,
@@ -6,13 +6,8 @@ import {
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
-} from "../memory/index";
-import {
-  setBitOnByte,
-  resetBitOnByte,
-  checkBitOnByte,
-  hexLog
-} from "../helpers/index";
+} from '../memory/index';
+import { setBitOnByte, resetBitOnByte, checkBitOnByte, hexLog } from '../helpers/index';
 
 export class Interrupts {
   static masterInterruptSwitch: boolean = false;
@@ -35,22 +30,10 @@ export class Interrupts {
   static isTimerInterruptEnabled: boolean = false;
   static isJoypadInterruptEnabled: boolean = false;
   static updateInterruptEnabled(value: i32): void {
-    Interrupts.isVBlankInterruptEnabled = checkBitOnByte(
-      Interrupts.bitPositionVBlankInterrupt,
-      value
-    );
-    Interrupts.isLcdInterruptEnabled = checkBitOnByte(
-      Interrupts.bitPositionLcdInterrupt,
-      value
-    );
-    Interrupts.isTimerInterruptEnabled = checkBitOnByte(
-      Interrupts.bitPositionTimerInterrupt,
-      value
-    );
-    Interrupts.isJoypadInterruptEnabled = checkBitOnByte(
-      Interrupts.bitPositionJoypadInterrupt,
-      value
-    );
+    Interrupts.isVBlankInterruptEnabled = checkBitOnByte(Interrupts.bitPositionVBlankInterrupt, value);
+    Interrupts.isLcdInterruptEnabled = checkBitOnByte(Interrupts.bitPositionLcdInterrupt, value);
+    Interrupts.isTimerInterruptEnabled = checkBitOnByte(Interrupts.bitPositionTimerInterrupt, value);
+    Interrupts.isJoypadInterruptEnabled = checkBitOnByte(Interrupts.bitPositionJoypadInterrupt, value);
 
     Interrupts.interruptsEnabledValue = value;
   }
@@ -63,33 +46,17 @@ export class Interrupts {
   static isTimerInterruptRequested: boolean = false;
   static isJoypadInterruptRequested: boolean = false;
   static updateInterruptRequested(value: i32): void {
-    Interrupts.isVBlankInterruptRequested = checkBitOnByte(
-      Interrupts.bitPositionVBlankInterrupt,
-      value
-    );
-    Interrupts.isLcdInterruptRequested = checkBitOnByte(
-      Interrupts.bitPositionLcdInterrupt,
-      value
-    );
-    Interrupts.isTimerInterruptRequested = checkBitOnByte(
-      Interrupts.bitPositionTimerInterrupt,
-      value
-    );
-    Interrupts.isJoypadInterruptRequested = checkBitOnByte(
-      Interrupts.bitPositionJoypadInterrupt,
-      value
-    );
+    Interrupts.isVBlankInterruptRequested = checkBitOnByte(Interrupts.bitPositionVBlankInterrupt, value);
+    Interrupts.isLcdInterruptRequested = checkBitOnByte(Interrupts.bitPositionLcdInterrupt, value);
+    Interrupts.isTimerInterruptRequested = checkBitOnByte(Interrupts.bitPositionTimerInterrupt, value);
+    Interrupts.isJoypadInterruptRequested = checkBitOnByte(Interrupts.bitPositionJoypadInterrupt, value);
 
     Interrupts.interruptsRequestedValue = value;
   }
 
   // Function to return if we have any pending interrupts
   static areInterruptsPending(): boolean {
-    return (
-      (Interrupts.interruptsRequestedValue &
-        Interrupts.interruptsEnabledValue) >
-      0
-    );
+    return (Interrupts.interruptsRequestedValue & Interrupts.interruptsEnabledValue) > 0;
   }
 
   // Save States
@@ -97,68 +64,38 @@ export class Interrupts {
 
   // Function to save the state of the class
   static saveState(): void {
-    storeBooleanDirectlyToWasmMemory(
-      getSaveStateMemoryOffset(0x00, Interrupts.saveStateSlot),
-      Interrupts.masterInterruptSwitch
-    );
-    storeBooleanDirectlyToWasmMemory(
-      getSaveStateMemoryOffset(0x01, Interrupts.saveStateSlot),
-      Interrupts.masterInterruptSwitchDelay
-    );
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x00, Interrupts.saveStateSlot), Interrupts.masterInterruptSwitch);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x01, Interrupts.saveStateSlot), Interrupts.masterInterruptSwitchDelay);
   }
 
   // Function to load the save state from memory
   static loadState(): void {
-    Interrupts.masterInterruptSwitch = loadBooleanDirectlyFromWasmMemory(
-      getSaveStateMemoryOffset(0x00, Interrupts.saveStateSlot)
-    );
-    Interrupts.masterInterruptSwitchDelay = loadBooleanDirectlyFromWasmMemory(
-      getSaveStateMemoryOffset(0x01, Interrupts.saveStateSlot)
-    );
+    Interrupts.masterInterruptSwitch = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x00, Interrupts.saveStateSlot));
+    Interrupts.masterInterruptSwitchDelay = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x01, Interrupts.saveStateSlot));
 
-    Interrupts.updateInterruptEnabled(
-      eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptEnabled)
-    );
-    Interrupts.updateInterruptRequested(
-      eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptRequest)
-    );
+    Interrupts.updateInterruptEnabled(eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptEnabled));
+    Interrupts.updateInterruptRequested(eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptRequest));
   }
 }
 
 export function checkInterrupts(): i32 {
-  if (
-    Interrupts.masterInterruptSwitch &&
-    Interrupts.interruptsEnabledValue > 0 &&
-    Interrupts.interruptsRequestedValue > 0
-  ) {
+  if (Interrupts.masterInterruptSwitch && Interrupts.interruptsEnabledValue > 0 && Interrupts.interruptsRequestedValue > 0) {
     // Boolean to track if interrupts were handled
     // Interrupt handling requires 20 cycles
     // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
     let wasInterruptHandled: boolean = false;
 
     // Check our interrupts
-    if (
-      Interrupts.isVBlankInterruptEnabled &&
-      Interrupts.isVBlankInterruptRequested
-    ) {
+    if (Interrupts.isVBlankInterruptEnabled && Interrupts.isVBlankInterruptRequested) {
       _handleInterrupt(Interrupts.bitPositionVBlankInterrupt);
       wasInterruptHandled = true;
-    } else if (
-      Interrupts.isLcdInterruptEnabled &&
-      Interrupts.isLcdInterruptRequested
-    ) {
+    } else if (Interrupts.isLcdInterruptEnabled && Interrupts.isLcdInterruptRequested) {
       _handleInterrupt(Interrupts.bitPositionLcdInterrupt);
       wasInterruptHandled = true;
-    } else if (
-      Interrupts.isTimerInterruptEnabled &&
-      Interrupts.isTimerInterruptRequested
-    ) {
+    } else if (Interrupts.isTimerInterruptEnabled && Interrupts.isTimerInterruptRequested) {
       _handleInterrupt(Interrupts.bitPositionTimerInterrupt);
       wasInterruptHandled = true;
-    } else if (
-      Interrupts.isJoypadInterruptEnabled &&
-      Interrupts.isJoypadInterruptRequested
-    ) {
+    } else if (Interrupts.isJoypadInterruptEnabled && Interrupts.isJoypadInterruptRequested) {
       _handleInterrupt(Interrupts.bitPositionJoypadInterrupt);
       wasInterruptHandled = true;
     }
@@ -185,15 +122,10 @@ function _handleInterrupt(bitPosition: i32): void {
   setInterrupts(false);
 
   // Disable the bit on the interruptRequest
-  let interruptRequest = eightBitLoadFromGBMemory(
-    Interrupts.memoryLocationInterruptRequest
-  );
+  let interruptRequest = eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptRequest);
   interruptRequest = resetBitOnByte(bitPosition, interruptRequest);
   Interrupts.interruptsRequestedValue = interruptRequest;
-  eightBitStoreIntoGBMemory(
-    Interrupts.memoryLocationInterruptRequest,
-    interruptRequest
-  );
+  eightBitStoreIntoGBMemory(Interrupts.memoryLocationInterruptRequest, interruptRequest);
 
   // Push the programCounter onto the stacks
   Cpu.stackPointer = Cpu.stackPointer - 2;
@@ -223,19 +155,14 @@ function _handleInterrupt(bitPosition: i32): void {
 }
 
 function _requestInterrupt(bitPosition: i32): void {
-  let interruptRequest = eightBitLoadFromGBMemory(
-    Interrupts.memoryLocationInterruptRequest
-  );
+  let interruptRequest = eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptRequest);
 
   // Pass to set the correct interrupt bit on interruptRequest
   interruptRequest = setBitOnByte(bitPosition, interruptRequest);
 
   Interrupts.interruptsRequestedValue = interruptRequest;
 
-  eightBitStoreIntoGBMemory(
-    Interrupts.memoryLocationInterruptRequest,
-    interruptRequest
-  );
+  eightBitStoreIntoGBMemory(Interrupts.memoryLocationInterruptRequest, interruptRequest);
 }
 
 export function setInterrupts(value: boolean): void {

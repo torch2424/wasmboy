@@ -1,5 +1,5 @@
 // Imports
-import { Cpu } from "./index";
+import { Cpu } from './index';
 import {
   rotateRegisterLeft,
   rotateRegisterRight,
@@ -11,14 +11,14 @@ import {
   shiftRightLogicalRegister,
   testBitOnRegister,
   setBitOnRegister
-} from "./instructions";
-import { concatenateBytes, performanceTimestamp } from "../helpers/index";
+} from './instructions';
+import { concatenateBytes, performanceTimestamp } from '../helpers/index';
 import {
   eightBitStoreIntoGBMemoryWithTraps,
   sixteenBitStoreIntoGBMemoryWithTraps,
   eightBitLoadFromGBMemoryWithTraps,
   sixteenBitLoadFromGBMemory
-} from "../memory/index";
+} from '../memory/index';
 
 // Handle CB Opcodes
 // NOTE: Program stpes and cycles are standardized depending on the register type
@@ -57,9 +57,7 @@ export function handleCbOpcode(cbOpcode: i32): i32 {
       break;
     case 6:
       // Value at register HL
-      instructionRegisterValue = <u8>eightBitLoadFromGBMemoryWithTraps(
-        concatenateBytes(Cpu.registerH, Cpu.registerL)
-      );
+      instructionRegisterValue = <u8>eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
       break;
     case 7:
       instructionRegisterValue = Cpu.registerA;
@@ -76,16 +74,12 @@ export function handleCbOpcode(cbOpcode: i32): i32 {
       if (cbOpcode <= 0x07) {
         // RLC register 8-bit
         // Z 0 0 C
-        instructionRegisterResult = rotateRegisterLeft(
-          instructionRegisterValue
-        );
+        instructionRegisterResult = rotateRegisterLeft(instructionRegisterValue);
         handledOpcode = true;
       } else if (cbOpcode <= 0x0f) {
         // RRC register 8-bit
         // Z 0 0 C
-        instructionRegisterResult = rotateRegisterRight(
-          instructionRegisterValue
-        );
+        instructionRegisterResult = rotateRegisterRight(instructionRegisterValue);
         handledOpcode = true;
       }
       break;
@@ -93,16 +87,12 @@ export function handleCbOpcode(cbOpcode: i32): i32 {
       if (cbOpcode <= 0x17) {
         // RL register 8-bit
         // Z 0 0 C
-        instructionRegisterResult = rotateRegisterLeftThroughCarry(
-          instructionRegisterValue
-        );
+        instructionRegisterResult = rotateRegisterLeftThroughCarry(instructionRegisterValue);
         handledOpcode = true;
       } else if (cbOpcode <= 0x1f) {
         // RR register 8-bit
         // Z 0 0 C
-        instructionRegisterResult = rotateRegisterRightThroughCarry(
-          instructionRegisterValue
-        );
+        instructionRegisterResult = rotateRegisterRightThroughCarry(instructionRegisterValue);
         handledOpcode = true;
       }
       break;
@@ -115,9 +105,7 @@ export function handleCbOpcode(cbOpcode: i32): i32 {
       } else if (cbOpcode <= 0x2f) {
         // SRA register 8-bit
         // Z 0 0 0
-        instructionRegisterResult = shiftRightArithmeticRegister(
-          instructionRegisterValue
-        );
+        instructionRegisterResult = shiftRightArithmeticRegister(instructionRegisterValue);
         handledOpcode = true;
       }
       break;
@@ -125,16 +113,12 @@ export function handleCbOpcode(cbOpcode: i32): i32 {
       if (cbOpcode <= 0x37) {
         // SWAP register 8-bit
         // Z 0 0 0
-        instructionRegisterResult = swapNibblesOnRegister(
-          instructionRegisterValue
-        );
+        instructionRegisterResult = swapNibblesOnRegister(instructionRegisterValue);
         handledOpcode = true;
       } else if (cbOpcode <= 0x3f) {
         // SRL B
         // Z 0 0 C
-        instructionRegisterResult = shiftRightLogicalRegister(
-          instructionRegisterValue
-        );
+        instructionRegisterResult = shiftRightLogicalRegister(instructionRegisterValue);
         handledOpcode = true;
       }
       break;
@@ -143,18 +127,12 @@ export function handleCbOpcode(cbOpcode: i32): i32 {
         // BIT 0,register 8-bit
         // Z 0 1 -
         //TODO: Optimize this not to do logic of setting register back
-        instructionRegisterResult = testBitOnRegister(
-          0,
-          instructionRegisterValue
-        );
+        instructionRegisterResult = testBitOnRegister(0, instructionRegisterValue);
         handledOpcode = true;
       } else if (cbOpcode <= 0x4f) {
         // BIT 1,register 8-bit
         // Z 0 1 -
-        instructionRegisterResult = testBitOnRegister(
-          1,
-          instructionRegisterValue
-        );
+        instructionRegisterResult = testBitOnRegister(1, instructionRegisterValue);
         handledOpcode = true;
       }
       break;
@@ -162,18 +140,12 @@ export function handleCbOpcode(cbOpcode: i32): i32 {
       if (cbOpcode <= 0x57) {
         // BIT 2,register 8-bit
         // Z 0 1 -
-        instructionRegisterResult = testBitOnRegister(
-          2,
-          instructionRegisterValue
-        );
+        instructionRegisterResult = testBitOnRegister(2, instructionRegisterValue);
         handledOpcode = true;
       } else if (cbOpcode <= 0x5f) {
         // BIT 3,register 8-bit
         // Z 0 1 -
-        instructionRegisterResult = testBitOnRegister(
-          3,
-          instructionRegisterValue
-        );
+        instructionRegisterResult = testBitOnRegister(3, instructionRegisterValue);
         handledOpcode = true;
       }
       break;
@@ -181,18 +153,12 @@ export function handleCbOpcode(cbOpcode: i32): i32 {
       if (cbOpcode <= 0x67) {
         // BIT 4,register 8-bit
         // Z 0 1 -
-        instructionRegisterResult = testBitOnRegister(
-          4,
-          instructionRegisterValue
-        );
+        instructionRegisterResult = testBitOnRegister(4, instructionRegisterValue);
         handledOpcode = true;
       } else if (cbOpcode <= 0x6f) {
         // BIT 5,register 8-bit
         // Z 0 1 -
-        instructionRegisterResult = testBitOnRegister(
-          5,
-          instructionRegisterValue
-        );
+        instructionRegisterResult = testBitOnRegister(5, instructionRegisterValue);
         handledOpcode = true;
       }
       break;
@@ -200,18 +166,12 @@ export function handleCbOpcode(cbOpcode: i32): i32 {
       if (cbOpcode <= 0x77) {
         // BIT 6,register 8-bit
         // Z 0 1 -
-        instructionRegisterResult = testBitOnRegister(
-          6,
-          instructionRegisterValue
-        );
+        instructionRegisterResult = testBitOnRegister(6, instructionRegisterValue);
         handledOpcode = true;
       } else if (cbOpcode <= 0x7f) {
         // BIT 7,register 8-bit
         // Z 0 1 -
-        instructionRegisterResult = testBitOnRegister(
-          7,
-          instructionRegisterValue
-        );
+        instructionRegisterResult = testBitOnRegister(7, instructionRegisterValue);
         handledOpcode = true;
       }
       break;
@@ -219,20 +179,12 @@ export function handleCbOpcode(cbOpcode: i32): i32 {
       if (cbOpcode <= 0x87) {
         // Res 0,register 8-bit
         // - - - -
-        instructionRegisterResult = setBitOnRegister(
-          0,
-          0,
-          instructionRegisterValue
-        );
+        instructionRegisterResult = setBitOnRegister(0, 0, instructionRegisterValue);
         handledOpcode = true;
       } else if (cbOpcode <= 0x8f) {
         // Res 1,register 8-bit
         // - - - -
-        instructionRegisterResult = setBitOnRegister(
-          1,
-          0,
-          instructionRegisterValue
-        );
+        instructionRegisterResult = setBitOnRegister(1, 0, instructionRegisterValue);
         handledOpcode = true;
       }
       break;
@@ -240,20 +192,12 @@ export function handleCbOpcode(cbOpcode: i32): i32 {
       if (cbOpcode <= 0x97) {
         // Res 2,register 8-bit
         // - - - -
-        instructionRegisterResult = setBitOnRegister(
-          2,
-          0,
-          instructionRegisterValue
-        );
+        instructionRegisterResult = setBitOnRegister(2, 0, instructionRegisterValue);
         handledOpcode = true;
       } else if (cbOpcode <= 0x9f) {
         // Res 3,register 8-bit
         // - - - -
-        instructionRegisterResult = setBitOnRegister(
-          3,
-          0,
-          instructionRegisterValue
-        );
+        instructionRegisterResult = setBitOnRegister(3, 0, instructionRegisterValue);
         handledOpcode = true;
       }
       break;
@@ -261,20 +205,12 @@ export function handleCbOpcode(cbOpcode: i32): i32 {
       if (cbOpcode <= 0xa7) {
         // Res 4,register 8-bit
         // - - - -
-        instructionRegisterResult = setBitOnRegister(
-          4,
-          0,
-          instructionRegisterValue
-        );
+        instructionRegisterResult = setBitOnRegister(4, 0, instructionRegisterValue);
         handledOpcode = true;
       } else if (cbOpcode <= 0xaf) {
         // Res 5,register 8-bit
         // - - - -
-        instructionRegisterResult = setBitOnRegister(
-          5,
-          0,
-          instructionRegisterValue
-        );
+        instructionRegisterResult = setBitOnRegister(5, 0, instructionRegisterValue);
         handledOpcode = true;
       }
       break;
@@ -282,20 +218,12 @@ export function handleCbOpcode(cbOpcode: i32): i32 {
       if (cbOpcode <= 0xb7) {
         // Res 6,register 8-bit
         // - - - -
-        instructionRegisterResult = setBitOnRegister(
-          6,
-          0,
-          instructionRegisterValue
-        );
+        instructionRegisterResult = setBitOnRegister(6, 0, instructionRegisterValue);
         handledOpcode = true;
       } else if (cbOpcode <= 0xbf) {
         // Res 7,register 8-bit
         // - - - -
-        instructionRegisterResult = setBitOnRegister(
-          7,
-          0,
-          instructionRegisterValue
-        );
+        instructionRegisterResult = setBitOnRegister(7, 0, instructionRegisterValue);
         handledOpcode = true;
       }
       break;
@@ -303,20 +231,12 @@ export function handleCbOpcode(cbOpcode: i32): i32 {
       if (cbOpcode <= 0xc7) {
         // SET 0,register 8-bit
         // - - - -
-        instructionRegisterResult = setBitOnRegister(
-          0,
-          1,
-          instructionRegisterValue
-        );
+        instructionRegisterResult = setBitOnRegister(0, 1, instructionRegisterValue);
         handledOpcode = true;
       } else if (cbOpcode <= 0xcf) {
         // SET 1,register 8-bit
         // - - - -
-        instructionRegisterResult = setBitOnRegister(
-          1,
-          1,
-          instructionRegisterValue
-        );
+        instructionRegisterResult = setBitOnRegister(1, 1, instructionRegisterValue);
         handledOpcode = true;
       }
       break;
@@ -324,20 +244,12 @@ export function handleCbOpcode(cbOpcode: i32): i32 {
       if (cbOpcode <= 0xd7) {
         // SET 2,register 8-bit
         // - - - -
-        instructionRegisterResult = setBitOnRegister(
-          2,
-          1,
-          instructionRegisterValue
-        );
+        instructionRegisterResult = setBitOnRegister(2, 1, instructionRegisterValue);
         handledOpcode = true;
       } else if (cbOpcode <= 0xdf) {
         // SET 3,register 8-bit
         // - - - -
-        instructionRegisterResult = setBitOnRegister(
-          3,
-          1,
-          instructionRegisterValue
-        );
+        instructionRegisterResult = setBitOnRegister(3, 1, instructionRegisterValue);
         handledOpcode = true;
       }
       break;
@@ -345,20 +257,12 @@ export function handleCbOpcode(cbOpcode: i32): i32 {
       if (cbOpcode <= 0xe7) {
         // SET 4,register 8-bit
         // - - - -
-        instructionRegisterResult = setBitOnRegister(
-          4,
-          1,
-          instructionRegisterValue
-        );
+        instructionRegisterResult = setBitOnRegister(4, 1, instructionRegisterValue);
         handledOpcode = true;
       } else if (cbOpcode <= 0xef) {
         // SET 5,register 8-bit
         // - - - -
-        instructionRegisterResult = setBitOnRegister(
-          5,
-          1,
-          instructionRegisterValue
-        );
+        instructionRegisterResult = setBitOnRegister(5, 1, instructionRegisterValue);
         handledOpcode = true;
       }
       break;
@@ -366,20 +270,12 @@ export function handleCbOpcode(cbOpcode: i32): i32 {
       if (cbOpcode <= 0xf7) {
         // SET 6,register 8-bit
         // - - - -
-        instructionRegisterResult = setBitOnRegister(
-          6,
-          1,
-          instructionRegisterValue
-        );
+        instructionRegisterResult = setBitOnRegister(6, 1, instructionRegisterValue);
         handledOpcode = true;
       } else if (cbOpcode <= 0xff) {
         // SET 7,register 8-bit
         // - - - -
-        instructionRegisterResult = setBitOnRegister(
-          7,
-          1,
-          instructionRegisterValue
-        );
+        instructionRegisterResult = setBitOnRegister(7, 1, instructionRegisterValue);
         handledOpcode = true;
       }
       break;
@@ -407,10 +303,7 @@ export function handleCbOpcode(cbOpcode: i32): i32 {
       break;
     case 6:
       // Value at register HL
-      eightBitStoreIntoGBMemoryWithTraps(
-        concatenateBytes(Cpu.registerH, Cpu.registerL),
-        instructionRegisterResult
-      );
+      eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL), instructionRegisterResult);
       break;
     case 7:
       Cpu.registerA = instructionRegisterResult;

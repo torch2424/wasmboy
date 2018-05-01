@@ -1,18 +1,12 @@
-import { Cpu } from "../cpu/cpu";
+import { Cpu } from '../cpu/cpu';
 import {
   Memory,
   eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemory,
   storePaletteByteInWasmMemory,
   loadPaletteByteFromWasmMemory
-} from "../memory/index";
-import {
-  checkBitOnByte,
-  resetBitOnByte,
-  setBitOnByte,
-  concatenateBytes,
-  hexLog
-} from "../helpers/index";
+} from '../memory/index';
+import { checkBitOnByte, resetBitOnByte, setBitOnByte, concatenateBytes, hexLog } from '../helpers/index';
 
 // Class for GBC Color palletes
 // http://gbdev.gg8.se/wiki/articles/Video_Display#FF68_-_BCPS.2FBGPI_-_CGB_Mode_Only_-_Background_Palette_Index
@@ -36,10 +30,7 @@ export function getMonochromeColorFromPalette(
   // Return our Color (00 - white, 01 - light grey, 10 Dark grey, or 11 - Black)
   let color: i32 = colorId;
   if (!shouldRepresentColorByColorId) {
-    color =
-      ((<i32>eightBitLoadFromGBMemory(paletteMemoryLocation)) >>
-        (colorId * 2)) &
-      0x03;
+    color = ((<i32>eightBitLoadFromGBMemory(paletteMemoryLocation)) >> (colorId * 2)) & 0x03;
   }
 
   // Since our max is 254, and max is 3.
@@ -67,10 +58,7 @@ export function getMonochromeColorFromPalette(
 export function writeColorPaletteToMemory(offset: i32, value: i32): void {
   // FF68
   //  Bit 0-5   Index (00-3F)
-  if (
-    offset === Palette.memoryLocationBackgroundPaletteData ||
-    offset === Palette.memoryLocationSpritePaletteData
-  ) {
+  if (offset === Palette.memoryLocationBackgroundPaletteData || offset === Palette.memoryLocationSpritePaletteData) {
     // Get the palette index
     let paletteIndex: i32 = eightBitLoadFromGBMemory(offset - 1);
 
@@ -110,24 +98,14 @@ function incrementPaletteIndexIfSet(paletteIndex: i32, offset: i32): void {
 // Index is 00-0x3F because the means 0 - 63 (64),
 // and apparently there are 8 bytes per pallete to describe Color 0-3 (4 colors),
 // and 0-7 (8 palltetes). Therefore, 64!
-export function getRgbColorFromPalette(
-  paletteId: i32,
-  colorId: i32,
-  isSprite: boolean
-): i32 {
+export function getRgbColorFromPalette(paletteId: i32, colorId: i32, isSprite: boolean): i32 {
   // Each Pallete takes 8 bytes, so multiply by 8 to get the pallete
   // And Each color takes 2 bytes, therefore, multiple by 2 for the correct color bytes in the palette
   let paletteIndex: i32 = paletteId * 8 + colorId * 2;
 
   // Load the Color that is seperated into two bytes
-  let paletteHighByte: i32 = loadPaletteByteFromWasmMemory(
-    paletteIndex + 1,
-    isSprite
-  );
-  let paletteLowByte: i32 = loadPaletteByteFromWasmMemory(
-    paletteIndex,
-    isSprite
-  );
+  let paletteHighByte: i32 = loadPaletteByteFromWasmMemory(paletteIndex + 1, isSprite);
+  let paletteLowByte: i32 = loadPaletteByteFromWasmMemory(paletteIndex, isSprite);
 
   // Return the concatenated color byte
   return <i32>concatenateBytes(paletteHighByte, paletteLowByte);

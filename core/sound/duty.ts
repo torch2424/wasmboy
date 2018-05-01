@@ -1,13 +1,10 @@
 // Functions to help with Handling Duty on Square Channels
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
 
-import { checkBitOnByte } from "../helpers/index";
+import { checkBitOnByte } from '../helpers/index';
 
 // Since there are no 2d arrays, we will use a byte to represent duty cycles (wave form from percentages)
-export function isDutyCycleClockPositiveOrNegativeForWaveform(
-  channelDuty: i32,
-  waveFormPositionOnDuty: i32
-): boolean {
+export function isDutyCycleClockPositiveOrNegativeForWaveform(channelDuty: i32, waveFormPositionOnDuty: i32): boolean {
   // Get our Wave Form According to the Duty
   // Default to a duty of 1
   // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave

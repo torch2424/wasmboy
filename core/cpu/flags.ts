@@ -1,4 +1,4 @@
-import { Cpu } from "./index";
+import { Cpu } from './index';
 
 // Set flag bit on on register F. For instance set zero flag to zero -> (7, 0)
 function setFlagBit(flagBit: u8, flagValue: i32): u8 {
@@ -50,10 +50,7 @@ export function getCarryFlag(): u8 {
 
 // Must be run before the register actually performs the add
 // amountToAdd i16, since max number can be an u8
-export function checkAndSetEightBitHalfCarryFlag(
-  value: u8,
-  amountToAdd: i32
-): void {
+export function checkAndSetEightBitHalfCarryFlag(value: u8, amountToAdd: i32): void {
   if (amountToAdd >= 0) {
     // https://robdor.com/2016/08/10/gameboy-emulator-half-carry-flag/
     let result: u8 = (((<u8>value) & 0x0f) + ((<u8>amountToAdd) & 0x0f)) & 0x10;
@@ -73,10 +70,7 @@ export function checkAndSetEightBitHalfCarryFlag(
   }
 }
 
-export function checkAndSetEightBitCarryFlag(
-  value: u8,
-  amountToAdd: i32
-): void {
+export function checkAndSetEightBitCarryFlag(value: u8, amountToAdd: i32): void {
   if (amountToAdd >= 0) {
     let result: u8 = value + <u8>amountToAdd;
     if (value > result) {
@@ -95,11 +89,7 @@ export function checkAndSetEightBitCarryFlag(
 
 // Function to handle 16 bit addition overflow, and set the carry flags accordingly
 // i32 on valueTwo to support passing signed immedaite values
-export function checkAndSetSixteenBitFlagsAddOverflow(
-  valueOne: u16,
-  valueTwo: i32,
-  useStackPointerBits: boolean
-): void {
+export function checkAndSetSixteenBitFlagsAddOverflow(valueOne: u16, valueTwo: i32, useStackPointerBits: boolean): void {
   // need to differentiate between HL and SP
   // HL carries are at 11 and 15, SP carries are at 3 and 7 :p
   if (useStackPointerBits) {

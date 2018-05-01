@@ -12,14 +12,14 @@ export {
   loadPaletteByteFromWasmMemory,
   getSaveStateMemoryOffset,
   loadFromVramBank
-} from "./memory";
+} from './memory';
 
 export {
   eightBitLoadFromGBMemoryWithTraps,
   eightBitLoadFromGBMemory,
   sixteenBitLoadFromGBMemory,
   loadBooleanDirectlyFromWasmMemory
-} from "./load";
+} from './load';
 
 export {
   eightBitStoreIntoGBMemoryWithTraps,
@@ -27,6 +27,6 @@ export {
   eightBitStoreIntoGBMemory,
   sixteenBitStoreIntoGBMemory,
   storeBooleanDirectlyToWasmMemory
-} from "./store";
+} from './store';
 
-export { updateHblankHdma } from "./dma";
+export { updateHblankHdma } from './dma';

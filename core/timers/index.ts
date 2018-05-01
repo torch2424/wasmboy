@@ -1,13 +1,13 @@
-import { Cpu } from "../cpu/index";
+import { Cpu } from '../cpu/index';
 import {
   eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemory,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
-} from "../memory/index";
-import { requestTimerInterrupt } from "../interrupts/index";
-import { checkBitOnByte, hexLog } from "../helpers/index";
+} from '../memory/index';
+import { requestTimerInterrupt } from '../interrupts/index';
+import { checkBitOnByte, hexLog } from '../helpers/index';
 
 export class Timers {
   // Current cycles
@@ -86,53 +86,24 @@ export class Timers {
   // Function to save the state of the class
   // TODO: Save state for new properties on Timers
   static saveState(): void {
-    store<i32>(
-      getSaveStateMemoryOffset(0x00, Timers.saveStateSlot),
-      Timers.cycleCounter
-    );
-    store<i32>(
-      getSaveStateMemoryOffset(0x04, Timers.saveStateSlot),
-      Timers.currentMaxCycleCount
-    );
-    store<i32>(
-      getSaveStateMemoryOffset(0x08, Timers.saveStateSlot),
-      Timers.dividerRegisterCycleCounter
-    );
+    store<i32>(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot), Timers.cycleCounter);
+    store<i32>(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot), Timers.currentMaxCycleCount);
+    store<i32>(getSaveStateMemoryOffset(0x08, Timers.saveStateSlot), Timers.dividerRegisterCycleCounter);
 
-    eightBitStoreIntoGBMemory(
-      Timers.memoryLocationDividerRegister,
-      Timers.dividerRegister
-    );
-    eightBitStoreIntoGBMemory(
-      Timers.memoryLocationTimerCounter,
-      Timers.timerCounter
-    );
+    eightBitStoreIntoGBMemory(Timers.memoryLocationDividerRegister, Timers.dividerRegister);
+    eightBitStoreIntoGBMemory(Timers.memoryLocationTimerCounter, Timers.timerCounter);
   }
 
   // Function to load the save state from memory
   static loadState(): void {
-    Timers.cycleCounter = load<i32>(
-      getSaveStateMemoryOffset(0x00, Timers.saveStateSlot)
-    );
-    Timers.currentMaxCycleCount = load<i32>(
-      getSaveStateMemoryOffset(0x04, Timers.saveStateSlot)
-    );
-    Timers.dividerRegisterCycleCounter = load<i32>(
-      getSaveStateMemoryOffset(0x08, Timers.saveStateSlot)
-    );
+    Timers.cycleCounter = load<i32>(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot));
+    Timers.currentMaxCycleCount = load<i32>(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot));
+    Timers.dividerRegisterCycleCounter = load<i32>(getSaveStateMemoryOffset(0x08, Timers.saveStateSlot));
 
-    Timers.dividerRegister = eightBitLoadFromGBMemory(
-      Timers.memoryLocationDividerRegister
-    );
-    Timers.updateTimerCounter(
-      eightBitLoadFromGBMemory(Timers.memoryLocationTimerCounter)
-    );
-    Timers.updateTimerModulo(
-      eightBitLoadFromGBMemory(Timers.memoryLocationTimerModulo)
-    );
-    Timers.updateTimerControl(
-      eightBitLoadFromGBMemory(Timers.memoryLocationTimerControl)
-    );
+    Timers.dividerRegister = eightBitLoadFromGBMemory(Timers.memoryLocationDividerRegister);
+    Timers.updateTimerCounter(eightBitLoadFromGBMemory(Timers.memoryLocationTimerCounter));
+    Timers.updateTimerModulo(eightBitLoadFromGBMemory(Timers.memoryLocationTimerModulo));
+    Timers.updateTimerControl(eightBitLoadFromGBMemory(Timers.memoryLocationTimerControl));
   }
 }
 
@@ -206,9 +177,7 @@ function _checkDividerRegister(numberOfCycles: i32): void {
   // Every 256 clock cycles need to increment
   Timers.dividerRegisterCycleCounter += numberOfCycles;
 
-  if (
-    Timers.dividerRegisterCycleCounter >= Timers.dividerRegisterMaxCycleCount()
-  ) {
+  if (Timers.dividerRegisterCycleCounter >= Timers.dividerRegisterMaxCycleCount()) {
     // Reset the cycle counter
     // - 255 to catch any overflow with the cycles
     Timers.dividerRegisterCycleCounter -= Timers.dividerRegisterMaxCycleCount();
