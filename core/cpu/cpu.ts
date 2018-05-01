@@ -7,29 +7,19 @@ import {
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
-} from '../memory/index';
+} from "../memory/index";
 
-import {
-  initializeGraphics
-} from '../graphics/index';
+import { initializeGraphics } from "../graphics/index";
 
-import {
-  initializeSound
-} from '../sound/index';
+import { initializeSound } from "../sound/index";
 
-import {
-  initializeTimers
-} from '../timers/index';
+import { initializeTimers } from "../timers/index";
 
-import {
-  log,
-  hexLog
-} from '../helpers/index';
+import { log, hexLog } from "../helpers/index";
 
 // Everything Static as class instances just aren't quite there yet
 // https://github.com/AssemblyScript/assemblyscript/blob/master/tests/compiler/showcase.ts
 export class Cpu {
-
   // Status to track if we are in Gameboy Color Mode, and GBC State
   static GBCEnabled: boolean = false;
   static GBCDoubleSpeed: boolean = false;
@@ -76,7 +66,7 @@ export class Cpu {
   static isStopped: boolean = false;
 
   // Memory Location for the GBC Speed switch
-  static readonly memoryLocationSpeedSwitch: u16 = 0xFF4D;
+  static readonly memoryLocationSpeedSwitch: u16 = 0xff4d;
 
   // Save States
   static readonly saveStateSlot: u16 = 0;
@@ -93,13 +83,28 @@ export class Cpu {
     store<u8>(getSaveStateMemoryOffset(0x06, Cpu.saveStateSlot), Cpu.registerL);
     store<u8>(getSaveStateMemoryOffset(0x07, Cpu.saveStateSlot), Cpu.registerF);
 
-    store<u16>(getSaveStateMemoryOffset(0x08, Cpu.saveStateSlot), Cpu.stackPointer);
-    store<u16>(getSaveStateMemoryOffset(0x0A, Cpu.saveStateSlot), Cpu.programCounter);
+    store<u16>(
+      getSaveStateMemoryOffset(0x08, Cpu.saveStateSlot),
+      Cpu.stackPointer
+    );
+    store<u16>(
+      getSaveStateMemoryOffset(0x0a, Cpu.saveStateSlot),
+      Cpu.programCounter
+    );
 
-    store<i32>(getSaveStateMemoryOffset(0x0C, Cpu.saveStateSlot), Cpu.currentCycles);
+    store<i32>(
+      getSaveStateMemoryOffset(0x0c, Cpu.saveStateSlot),
+      Cpu.currentCycles
+    );
 
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x11, Cpu.saveStateSlot), Cpu.isHalted);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x12, Cpu.saveStateSlot), Cpu.isStopped);
+    storeBooleanDirectlyToWasmMemory(
+      getSaveStateMemoryOffset(0x11, Cpu.saveStateSlot),
+      Cpu.isHalted
+    );
+    storeBooleanDirectlyToWasmMemory(
+      getSaveStateMemoryOffset(0x12, Cpu.saveStateSlot),
+      Cpu.isStopped
+    );
   }
 
   // Function to load the save state from memory
@@ -114,26 +119,37 @@ export class Cpu {
     Cpu.registerL = load<u8>(getSaveStateMemoryOffset(0x06, Cpu.saveStateSlot));
     Cpu.registerF = load<u8>(getSaveStateMemoryOffset(0x07, Cpu.saveStateSlot));
 
-    Cpu.stackPointer = load<u16>(getSaveStateMemoryOffset(0x08, Cpu.saveStateSlot));
-    Cpu.programCounter = load<u16>(getSaveStateMemoryOffset(0x0A, Cpu.saveStateSlot));
+    Cpu.stackPointer = load<u16>(
+      getSaveStateMemoryOffset(0x08, Cpu.saveStateSlot)
+    );
+    Cpu.programCounter = load<u16>(
+      getSaveStateMemoryOffset(0x0a, Cpu.saveStateSlot)
+    );
 
-    Cpu.currentCycles = load<i32>(getSaveStateMemoryOffset(0x0C, Cpu.saveStateSlot));
+    Cpu.currentCycles = load<i32>(
+      getSaveStateMemoryOffset(0x0c, Cpu.saveStateSlot)
+    );
 
-    Cpu.isHalted = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x11, Cpu.saveStateSlot));
-    Cpu.isStopped = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x12, Cpu.saveStateSlot));
+    Cpu.isHalted = loadBooleanDirectlyFromWasmMemory(
+      getSaveStateMemoryOffset(0x11, Cpu.saveStateSlot)
+    );
+    Cpu.isStopped = loadBooleanDirectlyFromWasmMemory(
+      getSaveStateMemoryOffset(0x12, Cpu.saveStateSlot)
+    );
   }
 }
 
-export function initializeCpu(useGBCMode: i32 = 1, includeBootRom: i32 = 0): void {
-
+export function initializeCpu(
+  useGBCMode: i32 = 1,
+  includeBootRom: i32 = 0
+): void {
   // First, try to switch to Gameboy Color Mode
   // Get our GBC support from the cartridge header
   // http://gbdev.gg8.se/wiki/articles/The_Cartridge_Header
   let gbcType: i32 = eightBitLoadFromGBMemory(0x0143);
 
   // Detecting GBC http://bgb.bircd.org/pandocs.htm#cgbregisters
-  if (gbcType === 0xC0 ||
-    (useGBCMode > 0 && gbcType === 0x80)) {
+  if (gbcType === 0xc0 || (useGBCMode > 0 && gbcType === 0x80)) {
     Cpu.GBCEnabled = true;
   }
 
@@ -141,111 +157,107 @@ export function initializeCpu(useGBCMode: i32 = 1, includeBootRom: i32 = 0): voi
   // From: http://www.codeslinger.co.uk/pages/projects/gameboy/hardware.html
   // All values default to zero in memory, so not setting them yet
   log("initializing (includeBootRom=$0)", 1, includeBootRom);
-  if(includeBootRom <= 0) {
-
+  if (includeBootRom <= 0) {
     // Initialization variables from BGB
 
-    if(Cpu.GBCEnabled) {
-
+    if (Cpu.GBCEnabled) {
       // CPU Registers
       Cpu.registerA = 0x11;
       Cpu.registerF = 0x80;
       Cpu.registerB = 0x00;
       Cpu.registerC = 0x00;
-      Cpu.registerD = 0xFF;
+      Cpu.registerD = 0xff;
       Cpu.registerE = 0x56;
       Cpu.registerH = 0x00;
-      Cpu.registerL = 0x0D;
+      Cpu.registerL = 0x0d;
 
       // Cpu Control Flow
       Cpu.programCounter = 0x100;
-      Cpu.stackPointer = 0xFFFE;
+      Cpu.stackPointer = 0xfffe;
 
       // LCD / Graphics
       // In initializeGraphics()
 
       // Various other registers
-      eightBitStoreIntoGBMemory(0xFF70, 0xF8);
-      eightBitStoreIntoGBMemory(0xFF4F, 0xFE);
-      eightBitStoreIntoGBMemory(0xFF4D, 0x7E);
-      eightBitStoreIntoGBMemory(0xFF00, 0xCF);
+      eightBitStoreIntoGBMemory(0xff70, 0xf8);
+      eightBitStoreIntoGBMemory(0xff4f, 0xfe);
+      eightBitStoreIntoGBMemory(0xff4d, 0x7e);
+      eightBitStoreIntoGBMemory(0xff00, 0xcf);
       // FF01 = 0x00
-      eightBitStoreIntoGBMemory(0xFF02, 0x7C);
+      eightBitStoreIntoGBMemory(0xff02, 0x7c);
 
       // Handled by Updatye timers
 
-      eightBitStoreIntoGBMemory(0xFF0F, 0xE1);
+      eightBitStoreIntoGBMemory(0xff0f, 0xe1);
       // 0xFFFF = 0x00
 
       // GBC Palettes
-      eightBitStoreIntoGBMemory(0xFF68, 0xC0);
-      eightBitStoreIntoGBMemory(0xFF69, 0xFF);
-      eightBitStoreIntoGBMemory(0xFF6A, 0xC1);
-      eightBitStoreIntoGBMemory(0xFF6B, 0x0D);
+      eightBitStoreIntoGBMemory(0xff68, 0xc0);
+      eightBitStoreIntoGBMemory(0xff69, 0xff);
+      eightBitStoreIntoGBMemory(0xff6a, 0xc1);
+      eightBitStoreIntoGBMemory(0xff6b, 0x0d);
 
       // GBC Banks
-      eightBitStoreIntoGBMemory(0xFF4F, 0x00);
-      eightBitStoreIntoGBMemory(0xFF70, 0x01);
+      eightBitStoreIntoGBMemory(0xff4f, 0x00);
+      eightBitStoreIntoGBMemory(0xff70, 0x01);
 
       // GBC DMA
-      eightBitStoreIntoGBMemory(0xFF51, 0xFF);
-      eightBitStoreIntoGBMemory(0xFF52, 0xFF);
-      eightBitStoreIntoGBMemory(0xFF53, 0xFF);
-      eightBitStoreIntoGBMemory(0xFF54, 0xFF);
-      eightBitStoreIntoGBMemory(0xFF55, 0xFF);
+      eightBitStoreIntoGBMemory(0xff51, 0xff);
+      eightBitStoreIntoGBMemory(0xff52, 0xff);
+      eightBitStoreIntoGBMemory(0xff53, 0xff);
+      eightBitStoreIntoGBMemory(0xff54, 0xff);
+      eightBitStoreIntoGBMemory(0xff55, 0xff);
 
       // Undocumented from Pandocs
-      eightBitStoreIntoGBMemory(0xFF6C, 0xFE);
-      eightBitStoreIntoGBMemory(0xFF75, 0x8F);
-
+      eightBitStoreIntoGBMemory(0xff6c, 0xfe);
+      eightBitStoreIntoGBMemory(0xff75, 0x8f);
     } else {
       // Cpu Registers
       Cpu.registerA = 0x01;
-      Cpu.registerF = 0xB0;
+      Cpu.registerF = 0xb0;
       Cpu.registerB = 0x00;
       Cpu.registerC = 0x13;
       Cpu.registerD = 0x00;
-      Cpu.registerE = 0xD8;
+      Cpu.registerE = 0xd8;
       Cpu.registerH = 0x01;
-      Cpu.registerL = 0x4D;
+      Cpu.registerL = 0x4d;
 
       // Cpu Control Flow
       Cpu.programCounter = 0x100;
-      Cpu.stackPointer = 0xFFFE;
+      Cpu.stackPointer = 0xfffe;
 
       // LCD / Graphics
       // In initializeGraphics
 
       // Various other registers
-      eightBitStoreIntoGBMemory(0xFF70, 0xFF);
-      eightBitStoreIntoGBMemory(0xFF4F, 0xFF);
-      eightBitStoreIntoGBMemory(0xFF4D, 0xFF);
-      eightBitStoreIntoGBMemory(0xFF00, 0xCF);
+      eightBitStoreIntoGBMemory(0xff70, 0xff);
+      eightBitStoreIntoGBMemory(0xff4f, 0xff);
+      eightBitStoreIntoGBMemory(0xff4d, 0xff);
+      eightBitStoreIntoGBMemory(0xff00, 0xcf);
       // FF01 = 0x00
-      eightBitStoreIntoGBMemory(0xFF02, 0x7E);
+      eightBitStoreIntoGBMemory(0xff02, 0x7e);
 
       // handled by initializxeTimers
 
-      eightBitStoreIntoGBMemory(0xFF0F, 0xE1);
+      eightBitStoreIntoGBMemory(0xff0f, 0xe1);
       // 0xFFFF = 0x00
 
-
       // GBC Palettes
-      eightBitStoreIntoGBMemory(0xFF68, 0xFF);
-      eightBitStoreIntoGBMemory(0xFF69, 0xFF);
-      eightBitStoreIntoGBMemory(0xFF6A, 0xFF);
-      eightBitStoreIntoGBMemory(0xFF6B, 0xFF);
+      eightBitStoreIntoGBMemory(0xff68, 0xff);
+      eightBitStoreIntoGBMemory(0xff69, 0xff);
+      eightBitStoreIntoGBMemory(0xff6a, 0xff);
+      eightBitStoreIntoGBMemory(0xff6b, 0xff);
 
       // GBC Banks
-      eightBitStoreIntoGBMemory(0xFF4F, 0x00);
-      eightBitStoreIntoGBMemory(0xFF70, 0x01);
+      eightBitStoreIntoGBMemory(0xff4f, 0x00);
+      eightBitStoreIntoGBMemory(0xff70, 0x01);
 
       // GBC DMA
-      eightBitStoreIntoGBMemory(0xFF51, 0xFF);
-      eightBitStoreIntoGBMemory(0xFF52, 0xFF);
-      eightBitStoreIntoGBMemory(0xFF53, 0xFF);
-      eightBitStoreIntoGBMemory(0xFF54, 0xFF);
-      eightBitStoreIntoGBMemory(0xFF55, 0xFF);
+      eightBitStoreIntoGBMemory(0xff51, 0xff);
+      eightBitStoreIntoGBMemory(0xff52, 0xff);
+      eightBitStoreIntoGBMemory(0xff53, 0xff);
+      eightBitStoreIntoGBMemory(0xff54, 0xff);
+      eightBitStoreIntoGBMemory(0xff55, 0xff);
     }
 
     // Call our memory to initialize our cartridge type

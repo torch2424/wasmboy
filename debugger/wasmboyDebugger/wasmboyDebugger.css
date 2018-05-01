@@ -7,13 +7,13 @@
 }
 
 .wasmboy__debugger canvas {
-	max-width: 600px;
-	width: 100%;
-	margin-top: 10px;
-	margin-bottom: 10px;
+  max-width: 600px;
+  width: 100%;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .debuggerAction {
-	margin-top: 15px;
-	margin-bottom: 15px;
+  margin-top: 15px;
+  margin-bottom: 15px;
 }

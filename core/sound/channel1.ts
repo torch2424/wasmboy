@@ -4,50 +4,42 @@
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Frequency_Sweep
 
-import {
-  isDutyCycleClockPositiveOrNegativeForWaveform
-} from './duty';
-import {
-  Cpu
-} from '../cpu/cpu';
+import { isDutyCycleClockPositiveOrNegativeForWaveform } from "./duty";
+import { Cpu } from "../cpu/cpu";
 import {
   eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemory,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
-} from '../memory/index';
-import {
-  checkBitOnByte,
-  hexLog
-} from '../helpers/index';
+} from "../memory/index";
+import { checkBitOnByte, hexLog } from "../helpers/index";
 
 export class Channel1 {
-
   // Cycle Counter for our sound accumulator
   static cycleCounter: i32 = 0;
 
   // Squarewave channel with volume envelope and frequency sweep functions.
   // NR10 -> Sweep Register R/W
-  static readonly memoryLocationNRx0: i32 = 0xFF10;
+  static readonly memoryLocationNRx0: i32 = 0xff10;
   // -PPP NSSS Sweep period, negate, shift
-  static NRx0SweepPeriod: i32  = 0;
+  static NRx0SweepPeriod: i32 = 0;
   static NRx0Negate: boolean = false;
   static NRx0SweepShift: i32 = 0;
   static updateNRx0(value: i32): void {
-    Channel1.NRx0SweepPeriod = ((value & 0x70) >> 4);
+    Channel1.NRx0SweepPeriod = (value & 0x70) >> 4;
     Channel1.NRx0Negate = checkBitOnByte(3, value);
     Channel1.NRx0SweepShift = value & 0x07;
   }
 
   // NR11 -> Sound length/Wave pattern duty (R/W)
-  static readonly memoryLocationNRx1: i32 = 0xFF11;
+  static readonly memoryLocationNRx1: i32 = 0xff11;
   // DDLL LLLL Duty, Length load (64-L)
   static NRx1Duty: i32 = 0;
   static NRx1LengthLoad: i32 = 0;
   static updateNRx1(value: i32): void {
-    Channel1.NRx1Duty = ((value >> 6) & 0x03);
-    Channel1.NRx1LengthLoad = (value & 0x3F);
+    Channel1.NRx1Duty = (value >> 6) & 0x03;
+    Channel1.NRx1LengthLoad = value & 0x3f;
 
     // Also need to set our length counter. Taken from the old, setChannelLengthCounter
     // Channel length is determined by 64 (or 256 if channel 3), - the length load
@@ -57,43 +49,45 @@ export class Channel1 {
   }
 
   // NR12 -> Volume Envelope (R/W)
-  static readonly memoryLocationNRx2: i32 = 0xFF12;
+  static readonly memoryLocationNRx2: i32 = 0xff12;
   // VVVV APPP Starting volume, Envelope add mode, period
   static NRx2StartingVolume: i32 = 0;
   static NRx2EnvelopeAddMode: boolean = false;
   static NRx2EnvelopePeriod: i32 = 0;
   static updateNRx2(value: i32): void {
-    Channel1.NRx2StartingVolume = ((value >> 4) & 0x0F);
+    Channel1.NRx2StartingVolume = (value >> 4) & 0x0f;
     Channel1.NRx2EnvelopeAddMode = checkBitOnByte(3, value);
     Channel1.NRx2EnvelopePeriod = value & 0x07;
 
     // Also, get our channel is dac enabled
-    Channel1.isDacEnabled = (value & 0xF8) > 0;
+    Channel1.isDacEnabled = (value & 0xf8) > 0;
   }
 
   // NR13 -> Frequency lo (W)
-  static readonly memoryLocationNRx3: i32 = 0xFF13;
+  static readonly memoryLocationNRx3: i32 = 0xff13;
   // FFFF FFFF Frequency LSB
   static NRx3FrequencyLSB: i32 = 0;
   static updateNRx3(value: i32): void {
     Channel1.NRx3FrequencyLSB = value;
 
     // Update Channel Frequency
-    let frequency: i32 = ((Channel1.NRx4FrequencyMSB << 8) | Channel1.NRx3FrequencyLSB);
+    let frequency: i32 =
+      (Channel1.NRx4FrequencyMSB << 8) | Channel1.NRx3FrequencyLSB;
     Channel1.frequency = frequency;
   }
 
   // NR14 -> Frequency hi (R/W)
-  static readonly memoryLocationNRx4: i32 = 0xFF14;
+  static readonly memoryLocationNRx4: i32 = 0xff14;
   // TL-- -FFF Trigger, Length enable, Frequency MSB
   static NRx4LengthEnabled: boolean = false;
   static NRx4FrequencyMSB: i32 = 0;
   static updateNRx4(value: i32): void {
     Channel1.NRx4LengthEnabled = checkBitOnByte(6, value);
-    Channel1.NRx4FrequencyMSB = (value & 0x07);
+    Channel1.NRx4FrequencyMSB = value & 0x07;
 
     // Update Channel Frequency
-    let frequency: i32 = ((Channel1.NRx4FrequencyMSB << 8) | Channel1.NRx3FrequencyLSB);
+    let frequency: i32 =
+      (Channel1.NRx4FrequencyMSB << 8) | Channel1.NRx3FrequencyLSB;
     Channel1.frequency = frequency;
   }
 
@@ -121,43 +115,92 @@ export class Channel1 {
 
   // Function to save the state of the class
   static saveState(): void {
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x00, Channel1.saveStateSlot), Channel1.isEnabled);
-    store<i32>(getSaveStateMemoryOffset(0x01, Channel1.saveStateSlot), Channel1.frequencyTimer);
-    store<i32>(getSaveStateMemoryOffset(0x05, Channel1.saveStateSlot), Channel1.envelopeCounter);
-    store<i32>(getSaveStateMemoryOffset(0x09, Channel1.saveStateSlot), Channel1.lengthCounter);
-    store<i32>(getSaveStateMemoryOffset(0x0E, Channel1.saveStateSlot), Channel1.volume);
+    storeBooleanDirectlyToWasmMemory(
+      getSaveStateMemoryOffset(0x00, Channel1.saveStateSlot),
+      Channel1.isEnabled
+    );
+    store<i32>(
+      getSaveStateMemoryOffset(0x01, Channel1.saveStateSlot),
+      Channel1.frequencyTimer
+    );
+    store<i32>(
+      getSaveStateMemoryOffset(0x05, Channel1.saveStateSlot),
+      Channel1.envelopeCounter
+    );
+    store<i32>(
+      getSaveStateMemoryOffset(0x09, Channel1.saveStateSlot),
+      Channel1.lengthCounter
+    );
+    store<i32>(
+      getSaveStateMemoryOffset(0x0e, Channel1.saveStateSlot),
+      Channel1.volume
+    );
 
-    store<u8>(getSaveStateMemoryOffset(0x13, Channel1.saveStateSlot), Channel1.dutyCycle);
-    store<u8>(getSaveStateMemoryOffset(0x14, Channel1.saveStateSlot), <u8>Channel1.waveFormPositionOnDuty);
+    store<u8>(
+      getSaveStateMemoryOffset(0x13, Channel1.saveStateSlot),
+      Channel1.dutyCycle
+    );
+    store<u8>(
+      getSaveStateMemoryOffset(0x14, Channel1.saveStateSlot),
+      <u8>Channel1.waveFormPositionOnDuty
+    );
 
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x19, Channel1.saveStateSlot), Channel1.isSweepEnabled);
-    store<i32>(getSaveStateMemoryOffset(0x1A, Channel1.saveStateSlot), Channel1.sweepCounter);
-    store<u16>(getSaveStateMemoryOffset(0x1F, Channel1.saveStateSlot), Channel1.sweepShadowFrequency);
+    storeBooleanDirectlyToWasmMemory(
+      getSaveStateMemoryOffset(0x19, Channel1.saveStateSlot),
+      Channel1.isSweepEnabled
+    );
+    store<i32>(
+      getSaveStateMemoryOffset(0x1a, Channel1.saveStateSlot),
+      Channel1.sweepCounter
+    );
+    store<u16>(
+      getSaveStateMemoryOffset(0x1f, Channel1.saveStateSlot),
+      Channel1.sweepShadowFrequency
+    );
   }
 
   // Function to load the save state from memory
   static loadState(): void {
-    Channel1.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x00, Channel1.saveStateSlot));
-    Channel1.frequencyTimer = load<i32>(getSaveStateMemoryOffset(0x01, Channel1.saveStateSlot));
-    Channel1.envelopeCounter = load<i32>(getSaveStateMemoryOffset(0x05, Channel1.saveStateSlot));
-    Channel1.lengthCounter = load<i32>(getSaveStateMemoryOffset(0x09, Channel1.saveStateSlot));
-    Channel1.volume = load<i32>(getSaveStateMemoryOffset(0x0E, Channel1.saveStateSlot));
+    Channel1.isEnabled = loadBooleanDirectlyFromWasmMemory(
+      getSaveStateMemoryOffset(0x00, Channel1.saveStateSlot)
+    );
+    Channel1.frequencyTimer = load<i32>(
+      getSaveStateMemoryOffset(0x01, Channel1.saveStateSlot)
+    );
+    Channel1.envelopeCounter = load<i32>(
+      getSaveStateMemoryOffset(0x05, Channel1.saveStateSlot)
+    );
+    Channel1.lengthCounter = load<i32>(
+      getSaveStateMemoryOffset(0x09, Channel1.saveStateSlot)
+    );
+    Channel1.volume = load<i32>(
+      getSaveStateMemoryOffset(0x0e, Channel1.saveStateSlot)
+    );
 
-    Channel1.dutyCycle = load<u8>(getSaveStateMemoryOffset(0x13, Channel1.saveStateSlot));
-    Channel1.waveFormPositionOnDuty = load<u8>(getSaveStateMemoryOffset(0x14, Channel1.saveStateSlot));
+    Channel1.dutyCycle = load<u8>(
+      getSaveStateMemoryOffset(0x13, Channel1.saveStateSlot)
+    );
+    Channel1.waveFormPositionOnDuty = load<u8>(
+      getSaveStateMemoryOffset(0x14, Channel1.saveStateSlot)
+    );
 
-    Channel1.isSweepEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x19, Channel1.saveStateSlot));
-    Channel1.sweepCounter = load<i32>(getSaveStateMemoryOffset(0x1A, Channel1.saveStateSlot));
-    Channel1.sweepShadowFrequency = load<u16>(getSaveStateMemoryOffset(0x1F, Channel1.saveStateSlot));
+    Channel1.isSweepEnabled = loadBooleanDirectlyFromWasmMemory(
+      getSaveStateMemoryOffset(0x19, Channel1.saveStateSlot)
+    );
+    Channel1.sweepCounter = load<i32>(
+      getSaveStateMemoryOffset(0x1a, Channel1.saveStateSlot)
+    );
+    Channel1.sweepShadowFrequency = load<u16>(
+      getSaveStateMemoryOffset(0x1f, Channel1.saveStateSlot)
+    );
   }
-
 
   static initialize(): void {
     eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx0, 0x80);
-    eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx1, 0xBF);
-    eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx2, 0xF3);
-    eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx3, 0xC1);
-    eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx4, 0xBF);
+    eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx1, 0xbf);
+    eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx2, 0xf3);
+    eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx3, 0xc1);
+    eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx4, 0xbf);
   }
 
   // Function to get a sample using the cycle counter on the channel
@@ -178,11 +221,9 @@ export class Channel1 {
   }
 
   static getSample(numberOfCycles: i32): i32 {
-
     // Decrement our channel timer
     Channel1.frequencyTimer -= numberOfCycles;
-    if(Channel1.frequencyTimer <= 0) {
-
+    if (Channel1.frequencyTimer <= 0) {
       // Get the amount that overflowed so we don't drop cycles
       let overflowAmount: i32 = abs(Channel1.frequencyTimer);
 
@@ -207,8 +248,7 @@ export class Channel1 {
     // Finally to set our output volume, the channel must be enabled,
     // Our channel DAC must be enabled, and we must be in an active state
     // Of our duty cycle
-    if(Channel1.isEnabled &&
-    Channel1.isDacEnabled) {
+    if (Channel1.isEnabled && Channel1.isDacEnabled) {
       outputVolume = Channel1.volume;
     } else {
       // Return silence
@@ -218,7 +258,12 @@ export class Channel1 {
 
     // Get the current sampleValue
     let sample: i32 = 1;
-    if (!isDutyCycleClockPositiveOrNegativeForWaveform(Channel1.NRx1Duty, Channel1.waveFormPositionOnDuty)) {
+    if (
+      !isDutyCycleClockPositiveOrNegativeForWaveform(
+        Channel1.NRx1Duty,
+        Channel1.waveFormPositionOnDuty
+      )
+    ) {
       sample = sample * -1;
     }
 
@@ -232,7 +277,7 @@ export class Channel1 {
   //http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Trigger_Event
   static trigger(): void {
     Channel1.isEnabled = true;
-    if(Channel1.lengthCounter === 0) {
+    if (Channel1.lengthCounter === 0) {
       Channel1.lengthCounter = 64;
     }
 
@@ -253,19 +298,19 @@ export class Channel1 {
     Channel1.sweepCounter = Channel1.NRx0SweepPeriod;
 
     // The internal enabled flag is set if either the sweep period or shift are non-zero, cleared otherwise.
-    if(Channel1.NRx0SweepPeriod > 0 && Channel1.NRx0SweepShift > 0) {
+    if (Channel1.NRx0SweepPeriod > 0 && Channel1.NRx0SweepShift > 0) {
       Channel1.isSweepEnabled = true;
     } else {
       Channel1.isSweepEnabled = false;
     }
 
     // If the sweep shift is non-zero, frequency calculation and the overflow check are performed immediately.
-    if(Channel1.NRx0SweepShift > 0) {
-        calculateSweepAndCheckOverflow();
+    if (Channel1.NRx0SweepShift > 0) {
+      calculateSweepAndCheckOverflow();
     }
 
     // Finally if DAC is off, channel is still disabled
-    if(!Channel1.isDacEnabled) {
+    if (!Channel1.isDacEnabled) {
       Channel1.isEnabled = false;
     }
   }
@@ -273,7 +318,6 @@ export class Channel1 {
   // Function to determine if the current channel would update when getting the sample
   // This is used to accumulate samples
   static willChannelUpdate(numberOfCycles: i32): boolean {
-
     //Increment our cycle counter
     Channel1.cycleCounter += numberOfCycles;
 
@@ -292,32 +336,29 @@ export class Channel1 {
     Channel1.sweepCounter -= 1;
 
     if (Channel1.sweepCounter <= 0) {
-
       // Reset back to the sweep period
       Channel1.sweepCounter = Channel1.NRx0SweepPeriod;
 
       // Calculate our sweep
       // When it generates a clock and the sweep's internal enabled flag is set and the sweep period is not zero,
       // a new frequency is calculated and the overflow check is performed.
-      if(Channel1.isSweepEnabled && Channel1.NRx0SweepPeriod > 0) {
+      if (Channel1.isSweepEnabled && Channel1.NRx0SweepPeriod > 0) {
         calculateSweepAndCheckOverflow();
       }
     }
   }
 
   static updateLength(): void {
-
-    if(Channel1.lengthCounter > 0 && Channel1.NRx4LengthEnabled) {
+    if (Channel1.lengthCounter > 0 && Channel1.NRx4LengthEnabled) {
       Channel1.lengthCounter -= 1;
     }
 
-    if(Channel1.lengthCounter === 0) {
+    if (Channel1.lengthCounter === 0) {
       Channel1.isEnabled = false;
     }
   }
 
   static updateEnvelope(): void {
-
     // Obscure behavior
     // TODO: The volume envelope and sweep timers treat a period of 0 as 8.
 
@@ -328,8 +369,8 @@ export class Channel1 {
       // When the timer generates a clock and the envelope period is NOT zero, a new volume is calculated
       // NOTE: There is some weiirrdd obscure behavior where zero can equal 8, so watch out for that
       // If notes are sustained for too long, this is probably why
-      if(Channel1.envelopeCounter !== 0) {
-        if(Channel1.NRx2EnvelopeAddMode && Channel1.volume < 15) {
+      if (Channel1.envelopeCounter !== 0) {
+        if (Channel1.NRx2EnvelopeAddMode && Channel1.volume < 15) {
           Channel1.volume += 1;
         } else if (!Channel1.NRx2EnvelopeAddMode && Channel1.volume > 0) {
           Channel1.volume -= 1;
@@ -340,34 +381,36 @@ export class Channel1 {
 
   static setFrequency(frequency: i32): void {
     // Get the high and low bits
-    let passedFrequencyHighBits: i32 = (frequency >> 8);
-    let passedFrequencyLowBits: i32 = (frequency & 0xFF);
+    let passedFrequencyHighBits: i32 = frequency >> 8;
+    let passedFrequencyLowBits: i32 = frequency & 0xff;
 
     // Get the new register 4
     let register4: i32 = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx4);
     // Knock off lower 3 bits, and Or on our high bits
-    let newRegister4: i32 = (register4 & 0xF8);
+    let newRegister4: i32 = register4 & 0xf8;
     newRegister4 = newRegister4 | passedFrequencyHighBits;
 
     // Set the registers
-    eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx3, passedFrequencyLowBits);
+    eightBitStoreIntoGBMemory(
+      Channel1.memoryLocationNRx3,
+      passedFrequencyLowBits
+    );
     eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx4, newRegister4);
 
     // Save the frequency for ourselves without triggering memory traps
     Channel1.NRx3FrequencyLSB = passedFrequencyLowBits;
     Channel1.NRx4FrequencyMSB = passedFrequencyHighBits;
-    Channel1.frequency = ((Channel1.NRx4FrequencyMSB << 8) | Channel1.NRx3FrequencyLSB);
+    Channel1.frequency =
+      (Channel1.NRx4FrequencyMSB << 8) | Channel1.NRx3FrequencyLSB;
   }
   // Done!
 }
 
-
 // Sweep Specific functions
 function calculateSweepAndCheckOverflow(): void {
-
   let newFrequency: i32 = getNewFrequencyFromSweep();
   // 7FF is the highest value of the frequency: 111 1111 1111
-  if (newFrequency <= 0x7FF && Channel1.NRx0SweepShift > 0) {
+  if (newFrequency <= 0x7ff && Channel1.NRx0SweepShift > 0) {
     // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
     // If the new frequency is 2047 or less and the sweep shift is not zero,
     // this new frequency is written back to the shadow frequency and square 1's frequency in NR13 and NR14,
@@ -382,17 +425,16 @@ function calculateSweepAndCheckOverflow(): void {
 
   // Next check if the new Frequency is above 0x7FF
   // if So, disable our sweep
-  if (newFrequency > 0x7FF) {
+  if (newFrequency > 0x7ff) {
     Channel1.isEnabled = false;
   }
 }
 
 // Function to determing a new sweep in the current context
 function getNewFrequencyFromSweep(): i32 {
-
   // Start our new frequency, by making it equal to the "shadow frequency"
   let newFrequency: i32 = Channel1.sweepShadowFrequency;
-  newFrequency = (newFrequency >> Channel1.NRx0SweepShift);
+  newFrequency = newFrequency >> Channel1.NRx0SweepShift;
 
   // Check for sweep negation
   if (Channel1.NRx0Negate) {

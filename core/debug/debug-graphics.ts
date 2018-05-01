@@ -1,35 +1,20 @@
 // Functions to debug graphical output
-import {
-  backgroundMapLocation,
-  tileDataMap
-} from '../constants/constants';
-import {
-  Graphics,
-  Lcd
-} from '../graphics/index';
-import {
-  Cpu
-} from '../cpu/cpu';
-import {
-  getTileDataAddress
-} from '../graphics/renderUtils';
+import { backgroundMapLocation, tileDataMap } from "../constants/constants";
+import { Graphics, Lcd } from "../graphics/index";
+import { Cpu } from "../cpu/cpu";
+import { getTileDataAddress } from "../graphics/renderUtils";
 import {
   getMonochromeColorFromPalette,
   getRgbColorFromPalette,
   getColorComponentFromRgb
-} from '../graphics/palette';
-import {
-  drawPixelsFromLineOfTile
-} from '../graphics/tiles';
+} from "../graphics/palette";
+import { drawPixelsFromLineOfTile } from "../graphics/tiles";
 import {
   eightBitLoadFromGBMemory,
   Memory,
   loadFromVramBank
-} from '../memory/index';
-import {
-  checkBitOnByte,
-  hexLog
-} from '../helpers/index';
+} from "../memory/index";
+import { checkBitOnByte, hexLog } from "../helpers/index";
 
 export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
   // http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html
@@ -44,7 +29,7 @@ export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
 
   // Get our seleted tile data memory location
   let tileDataMemoryLocation = Graphics.memoryLocationTileDataSelectZeroStart;
-  if(Lcd.bgWindowTileDataSelect) {
+  if (Lcd.bgWindowTileDataSelect) {
     tileDataMemoryLocation = Graphics.memoryLocationTileDataSelectOneStart;
   }
 
@@ -53,9 +38,8 @@ export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
     tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectOneStart;
   }
 
-  for(let y: i32 = 0; y < 256; y++) {
+  for (let y: i32 = 0; y < 256; y++) {
     for (let x: i32 = 0; x < 256; x++) {
-
       // Get our current Y
       let pixelYPositionInMap: i32 = y;
 
@@ -79,7 +63,8 @@ export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
       // And we have x pixel 160. 160 / 8 = 20.
       // * 32, because remember, this is NOT only for the camera, the actual map is 32x32. Therefore, the next tile line of the map, is 32 byte offset.
       // Think like indexing a 2d array, as a 1d array and it make sense :)
-      let tileMapAddress: i32 = tileMapMemoryLocation + (tileYPositionInMap * 32) + tileXPositionInMap;
+      let tileMapAddress: i32 =
+        tileMapMemoryLocation + tileYPositionInMap * 32 + tileXPositionInMap;
 
       // Get the tile Id on the Tile Map
       let tileIdFromTileMap: i32 = loadFromVramBank(tileMapAddress, 0);
@@ -88,7 +73,10 @@ export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
       // Read the comments in _getTileDataAddress() to see what's going on.
       // tl;dr if we had the tile map of "a b c d", and wanted tileId 2.
       // This funcitons returns the start of memory locaiton for the tile 'c'.
-      let tileDataAddress: i32 = getTileDataAddress(tileDataMemoryLocation, tileIdFromTileMap);
+      let tileDataAddress: i32 = getTileDataAddress(
+        tileDataMemoryLocation,
+        tileIdFromTileMap
+      );
 
       // Now we can process the the individual bytes that represent the pixel on a tile
 
@@ -120,7 +108,7 @@ export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
       // Bit 6    Vertical Flip              (0=Normal, 1=Mirror vertically)
       // Bit 7    BG-to-OAM Priority         (0=Use OAM priority bit, 1=BG Priority)
       let bgMapAttributes: i32 = 0;
-      if(Cpu.GBCEnabled && showColor > 0) {
+      if (Cpu.GBCEnabled && showColor > 0) {
         bgMapAttributes = loadFromVramBank(tileMapAddress, 1);
       }
 
@@ -128,7 +116,7 @@ export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
         // We are mirroring the tile, therefore, we need to opposite byte
         // So if our pizel was 0 our of 8, it wild become 7 :)
         // TODO: This may be wrong :p
-        pixelYInTile = 7 - (pixelYInTile);
+        pixelYInTile = 7 - pixelYInTile;
       }
 
       // Remember to represent a single line of 8 pixels on a tile, we need two bytes.
@@ -142,8 +130,14 @@ export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
       // Remember to represent a single line of 8 pixels on a tile, we need two bytes.
       // Therefore, we need to times our modulo by 2, to get the correct line of pixels on the tile.
       // Again, think like you had to map a 2d array as a 1d.
-      let byteOneForLineOfTilePixels: i32 = loadFromVramBank(tileDataAddress + (pixelYInTile * 2), vramBankId)
-      let byteTwoForLineOfTilePixels: i32 = loadFromVramBank(tileDataAddress + (pixelYInTile * 2) + 1, vramBankId);
+      let byteOneForLineOfTilePixels: i32 = loadFromVramBank(
+        tileDataAddress + pixelYInTile * 2,
+        vramBankId
+      );
+      let byteTwoForLineOfTilePixels: i32 = loadFromVramBank(
+        tileDataAddress + pixelYInTile * 2 + 1,
+        vramBankId
+      );
 
       // Now we can get the color for that pixel
       // Colors are represented by getting X position of ByteTwo, and X positon of Byte One
@@ -154,22 +148,26 @@ export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
       if (checkBitOnByte(pixelXInTile, byteTwoForLineOfTilePixels)) {
         // Byte one represents the second bit in our color id, so bit shift
         paletteColorId += 1;
-        paletteColorId = (paletteColorId << 1);
+        paletteColorId = paletteColorId << 1;
       }
       if (checkBitOnByte(pixelXInTile, byteOneForLineOfTilePixels)) {
         paletteColorId += 1;
       }
 
       // FINALLY, RENDER THAT PIXEL!
-      let pixelStart: i32 = ((y * 256) + x) * 3;
+      let pixelStart: i32 = (y * 256 + x) * 3;
 
-      if(Cpu.GBCEnabled && showColor > 0) {
+      if (Cpu.GBCEnabled && showColor > 0) {
         // Finally lets add some, C O L O R
         // Want the botom 3 bits
-        let bgPalette: i32 = (bgMapAttributes & 0x07);
+        let bgPalette: i32 = bgMapAttributes & 0x07;
 
         // Call the helper function to grab the correct color from the palette
-        let rgbColorPalette: i32 = getRgbColorFromPalette(bgPalette, paletteColorId, false);
+        let rgbColorPalette: i32 = getRgbColorFromPalette(
+          bgPalette,
+          paletteColorId,
+          false
+        );
 
         // Split off into red green and blue
         let red: i32 = getColorComponentFromRgb(0, rgbColorPalette);
@@ -181,12 +179,14 @@ export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
         store<u8>(offset + 1, <u8>green);
         store<u8>(offset + 2, <u8>blue);
       } else {
-
         // Only rendering camera for now, so coordinates are for the camera.
         // Get the rgb value for the color Id, will be repeated into R, G, B
-        let monochromeColor: i32 = getMonochromeColorFromPalette(paletteColorId, Graphics.memoryLocationBackgroundPalette);
+        let monochromeColor: i32 = getMonochromeColorFromPalette(
+          paletteColorId,
+          Graphics.memoryLocationBackgroundPalette
+        );
 
-        for(let i: i32 = 0; i < 3; i++) {
+        for (let i: i32 = 0; i < 3; i++) {
           let offset: i32 = backgroundMapLocation + pixelStart + i;
           store<u8>(offset, <u8>monochromeColor);
         }
@@ -196,36 +196,56 @@ export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
 }
 
 export function drawTileDataToWasmMemory(): void {
-  for(let tileDataMapGridY: i32 = 0; tileDataMapGridY < 0x17; tileDataMapGridY++) {
-    for(let tileDataMapGridX: i32 = 0; tileDataMapGridX < 0x1F; tileDataMapGridX++) {
-
+  for (
+    let tileDataMapGridY: i32 = 0;
+    tileDataMapGridY < 0x17;
+    tileDataMapGridY++
+  ) {
+    for (
+      let tileDataMapGridX: i32 = 0;
+      tileDataMapGridX < 0x1f;
+      tileDataMapGridX++
+    ) {
       // Get Our VramBankID
       let vramBankId: i32 = 0;
-      if(tileDataMapGridX > 0x0F) {
+      if (tileDataMapGridX > 0x0f) {
         vramBankId = 1;
       }
 
       // Get our tile ID
       let tileId: i32 = tileDataMapGridY;
-      if(tileDataMapGridY > 0x0F) {
-        tileId -= 0x0F;
+      if (tileDataMapGridY > 0x0f) {
+        tileId -= 0x0f;
       }
       tileId = tileId << 4;
-      if(tileDataMapGridX > 0x0F) {
-        tileId = tileId + (tileDataMapGridX - 0x0F);
+      if (tileDataMapGridX > 0x0f) {
+        tileId = tileId + (tileDataMapGridX - 0x0f);
       } else {
         tileId = tileId + tileDataMapGridX;
       }
 
       // Finally get our tile Data location
-      let tileDataMemoryLocation: i32 = Graphics.memoryLocationTileDataSelectOneStart;
-      if(tileDataMapGridY > 0x0F) {
+      let tileDataMemoryLocation: i32 =
+        Graphics.memoryLocationTileDataSelectOneStart;
+      if (tileDataMapGridY > 0x0f) {
         tileDataMemoryLocation = Graphics.memoryLocationTileDataSelectZeroStart;
       }
 
       // Draw each Y line of the tile
-      for(let tileLineY: i32 = 0; tileLineY < 8; tileLineY++) {
-        drawPixelsFromLineOfTile(tileId, tileDataMemoryLocation, vramBankId, 0, 7, tileLineY, (tileDataMapGridX * 8), (tileDataMapGridY * 8) + tileLineY, (0x1F * 8), tileDataMap, true)
+      for (let tileLineY: i32 = 0; tileLineY < 8; tileLineY++) {
+        drawPixelsFromLineOfTile(
+          tileId,
+          tileDataMemoryLocation,
+          vramBankId,
+          0,
+          7,
+          tileLineY,
+          tileDataMapGridX * 8,
+          tileDataMapGridY * 8 + tileLineY,
+          0x1f * 8,
+          tileDataMap,
+          true
+        );
       }
     }
   }

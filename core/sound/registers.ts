@@ -2,37 +2,25 @@
 // Information of bits on every register can be found at: https://gist.github.com/drhelius/3652407
 // Passing channel number to make things simpler than passing around memory addresses, to avoid bugs in choosing the wrong address
 
-import {
-  Sound,
-  SoundAccumulator
-} from './sound';
-import {
-    Channel1
-} from './channel1';
-import {
-    Channel2
-} from './channel2';
-import {
-    Channel3
-} from './channel3';
-import {
-    Channel4
-} from './channel4';
+import { Sound, SoundAccumulator } from "./sound";
+import { Channel1 } from "./channel1";
+import { Channel2 } from "./channel2";
+import { Channel3 } from "./channel3";
+import { Channel4 } from "./channel4";
 import {
   eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemory
-} from '../memory/index';
+} from "../memory/index";
 import {
   checkBitOnByte,
   setBitOnByte,
   resetBitOnByte,
   hexLog
-} from '../helpers/index';
+} from "../helpers/index";
 
 // Function to check and handle writes to sound registers
 export function SoundRegisterWriteTraps(offset: i32, value: i32): boolean {
-
-  if(offset !== Sound.memoryLocationNR52 && !Sound.NR52IsSoundEnabled) {
+  if (offset !== Sound.memoryLocationNR52 && !Sound.NR52IsSoundEnabled) {
     // Block all writes to any sound register EXCEPT NR52!
     // This is under the assumption that the check for
     // offset >= 0xFF10 && offset <= 0xFF26
@@ -41,7 +29,7 @@ export function SoundRegisterWriteTraps(offset: i32, value: i32): boolean {
     return false;
   }
 
-  switch(offset) {
+  switch (offset) {
     // Handle NRx0 on Channels
     case Channel1.memoryLocationNRx0:
       Channel1.updateNRx0(value);
@@ -129,8 +117,8 @@ export function SoundRegisterWriteTraps(offset: i32, value: i32): boolean {
     case Sound.memoryLocationNR52:
       // Reset all registers except NR52
       Sound.updateNR52(value);
-      if(!checkBitOnByte(7, value)) {
-        for (let i: i32 = 0xFF10; i < 0xFF26; i++) {
+      if (!checkBitOnByte(7, value)) {
+        for (let i: i32 = 0xff10; i < 0xff26; i++) {
           eightBitStoreIntoGBMemory(i, 0x00);
         }
       }
@@ -142,8 +130,7 @@ export function SoundRegisterWriteTraps(offset: i32, value: i32): boolean {
 }
 
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
-export function SoundRegisterReadTraps(offset: i32): i32  {
-
+export function SoundRegisterReadTraps(offset: i32): i32 {
   // TODO: OR All Registers
 
   // This will fix bugs in orcale of ages :)
@@ -152,35 +139,35 @@ export function SoundRegisterReadTraps(offset: i32): i32  {
     let registerNR52: i32 = eightBitLoadFromGBMemory(Sound.memoryLocationNR52);
 
     // Knock off lower 7 bits
-    registerNR52 = (registerNR52 & 0x80);
+    registerNR52 = registerNR52 & 0x80;
 
     // Set our lower 4 bits to our channel isEnabled statuses
-    if(Channel1.isEnabled) {
+    if (Channel1.isEnabled) {
       setBitOnByte(0, registerNR52);
     } else {
       resetBitOnByte(0, registerNR52);
     }
 
-    if(Channel2.isEnabled) {
+    if (Channel2.isEnabled) {
       setBitOnByte(1, registerNR52);
     } else {
       resetBitOnByte(1, registerNR52);
     }
 
-    if(Channel3.isEnabled) {
+    if (Channel3.isEnabled) {
       setBitOnByte(2, registerNR52);
     } else {
       resetBitOnByte(2, registerNR52);
     }
 
-    if(Channel4.isEnabled) {
+    if (Channel4.isEnabled) {
       setBitOnByte(3, registerNR52);
     } else {
       resetBitOnByte(3, registerNR52);
     }
 
     // Or from the table
-    registerNR52 = (registerNR52 | 0x70);
+    registerNR52 = registerNR52 | 0x70;
 
     return registerNR52;
   }

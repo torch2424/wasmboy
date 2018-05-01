@@ -9,11 +9,11 @@
 }
 
 .wasmboy__filePicker__services {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .wasmboy__filePicker__services .donut {

@@ -11,8 +11,8 @@ export {
   getProgramCounter,
   getStackPointer,
   getOpcodeAtProgramCounter
-} from './debug-cpu';
+} from "./debug-cpu";
 export {
   drawBackgroundMapToWasmMemory,
   drawTileDataToWasmMemory
-} from './debug-graphics';
+} from "./debug-graphics";

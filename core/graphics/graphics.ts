@@ -1,44 +1,27 @@
 // Main Class and funcitons for rendering the gameboy display
-import {
-  Lcd,
-  setLcdStatus
-} from './lcd';
-import {
-  renderBackground,
-  renderWindow
-} from './backgroundWindow';
-import {
-  renderSprites
-} from './sprites';
-import {
-  clearPriorityMap
-} from './priority';
-import {
-  resetTileCache
-} from './tiles';
-import {
-  Cpu
-} from '../cpu/cpu'
-import {
-  Config
-} from '../config';
+import { Lcd, setLcdStatus } from "./lcd";
+import { renderBackground, renderWindow } from "./backgroundWindow";
+import { renderSprites } from "./sprites";
+import { clearPriorityMap } from "./priority";
+import { resetTileCache } from "./tiles";
+import { Cpu } from "../cpu/cpu";
+import { Config } from "../config";
 import {
   eightBitLoadFromGBMemory,
   eightBitStoreIntoGBMemory,
   getSaveStateMemoryOffset,
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
-} from '../memory/index';
+} from "../memory/index";
 import {
   checkBitOnByte,
   setBitOnByte,
   resetBitOnByte,
   performanceTimestamp,
   hexLog
-} from '../helpers/index';
+} from "../helpers/index";
 
 export class Graphics {
-
   // Current cycles
   // This will be used for batch processing
   static currentCycles: i32 = 0;
@@ -48,7 +31,7 @@ export class Graphics {
   // and does not exceed the minimum number of cyles for either scanlines, or
   // How often we change the frame, or a channel's update process
   static batchProcessCycles(): i32 {
-      return Graphics.MAX_CYCLES_PER_SCANLINE();
+    return Graphics.MAX_CYCLES_PER_SCANLINE();
   }
 
   // Count the number of cycles to keep synced with cpu cycles
@@ -84,33 +67,33 @@ export class Graphics {
   // LCD
   // scanlineRegister also known as LY
   // See: http://bgb.bircd.org/pandocs.txt , and search " LY "
-  static readonly memoryLocationScanlineRegister: i32 = 0xFF44;
+  static readonly memoryLocationScanlineRegister: i32 = 0xff44;
   static scanlineRegister: i32 = 0;
-  static readonly memoryLocationDmaTransfer: i32 = 0xFF46;
+  static readonly memoryLocationDmaTransfer: i32 = 0xff46;
 
   // Scroll and Window
-  static readonly memoryLocationScrollX: i32 = 0xFF43;
+  static readonly memoryLocationScrollX: i32 = 0xff43;
   static scrollX: i32 = 0;
-  static readonly memoryLocationScrollY: i32 = 0xFF42;
+  static readonly memoryLocationScrollY: i32 = 0xff42;
   static scrollY: i32 = 0;
-  static readonly memoryLocationWindowX: i32 = 0xFF4B;
+  static readonly memoryLocationWindowX: i32 = 0xff4b;
   static windowX: i32 = 0;
-  static readonly memoryLocationWindowY: i32 = 0xFF4A;
+  static readonly memoryLocationWindowY: i32 = 0xff4a;
   static windowY: i32 = 0;
 
   // Tile Maps And Data
   static readonly memoryLocationTileMapSelectZeroStart: i32 = 0x9800;
-  static readonly memoryLocationTileMapSelectOneStart: i32 = 0x9C00;
+  static readonly memoryLocationTileMapSelectOneStart: i32 = 0x9c00;
   static readonly memoryLocationTileDataSelectZeroStart: i32 = 0x8800;
   static readonly memoryLocationTileDataSelectOneStart: i32 = 0x8000;
 
   // Sprites
-  static readonly memoryLocationSpriteAttributesTable: i32 = 0xFE00;
+  static readonly memoryLocationSpriteAttributesTable: i32 = 0xfe00;
 
   // Palettes
-  static readonly memoryLocationBackgroundPalette: i32 = 0xFF47;
-  static readonly memoryLocationSpritePaletteOne: i32 = 0xFF48;
-  static readonly memoryLocationSpritePaletteTwo: i32 = 0xFF49;
+  static readonly memoryLocationBackgroundPalette: i32 = 0xff47;
+  static readonly memoryLocationSpritePaletteOne: i32 = 0xff48;
+  static readonly memoryLocationSpritePaletteTwo: i32 = 0xff49;
 
   // Screen data needs to be stored in wasm memory
 
@@ -120,19 +103,36 @@ export class Graphics {
 
   // Function to save the state of the class
   static saveState(): void {
-    store<i32>(getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot), Graphics.scanlineCycleCounter);
-    store<u8>(getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot), <u8>Lcd.currentLcdMode);
+    store<i32>(
+      getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot),
+      Graphics.scanlineCycleCounter
+    );
+    store<u8>(
+      getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot),
+      <u8>Lcd.currentLcdMode
+    );
 
-    eightBitStoreIntoGBMemory(Graphics.memoryLocationScanlineRegister, Graphics.scanlineRegister);
+    eightBitStoreIntoGBMemory(
+      Graphics.memoryLocationScanlineRegister,
+      Graphics.scanlineRegister
+    );
   }
 
   // Function to load the save state from memory
   static loadState(): void {
-    Graphics.scanlineCycleCounter = load<i32>(getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot));
-    Lcd.currentLcdMode = load<u8>(getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot));
+    Graphics.scanlineCycleCounter = load<i32>(
+      getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot)
+    );
+    Lcd.currentLcdMode = load<u8>(
+      getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot)
+    );
 
-    Graphics.scanlineRegister = eightBitLoadFromGBMemory(Graphics.memoryLocationScanlineRegister);
-    Lcd.updateLcdControl(eightBitLoadFromGBMemory(Lcd.memoryLocationLcdControl));
+    Graphics.scanlineRegister = eightBitLoadFromGBMemory(
+      Graphics.memoryLocationScanlineRegister
+    );
+    Lcd.updateLcdControl(
+      eightBitLoadFromGBMemory(Lcd.memoryLocationLcdControl)
+    );
   }
 }
 
@@ -141,48 +141,45 @@ export class Graphics {
 // Function to batch process our graphics after we skipped so many cycles
 // This is not currently checked in memory read/write
 export function batchProcessGraphics(): void {
-
   if (Graphics.currentCycles < Graphics.batchProcessCycles()) {
     return;
   }
 
   while (Graphics.currentCycles >= Graphics.batchProcessCycles()) {
     updateGraphics(Graphics.batchProcessCycles());
-    Graphics.currentCycles = Graphics.currentCycles - Graphics.batchProcessCycles();
+    Graphics.currentCycles =
+      Graphics.currentCycles - Graphics.batchProcessCycles();
   }
 }
 
 export function initializeGraphics(): void {
   if (Cpu.GBCEnabled) {
     Graphics.scanlineRegister = 0x91;
-    eightBitStoreIntoGBMemory(0xFF40, 0x91);
-    eightBitStoreIntoGBMemory(0xFF41, 0x81);
+    eightBitStoreIntoGBMemory(0xff40, 0x91);
+    eightBitStoreIntoGBMemory(0xff41, 0x81);
     // 0xFF42 -> 0xFF43 = 0x00
-    eightBitStoreIntoGBMemory(0xFF44, 0x90);
+    eightBitStoreIntoGBMemory(0xff44, 0x90);
     // 0xFF45 -> 0xFF46 = 0x00
-    eightBitStoreIntoGBMemory(0xFF47, 0xFC);
+    eightBitStoreIntoGBMemory(0xff47, 0xfc);
     // 0xFF48 -> 0xFF4B = 0x00
   } else {
     Graphics.scanlineRegister = 0x91;
-    eightBitStoreIntoGBMemory(0xFF40, 0x91);
-    eightBitStoreIntoGBMemory(0xFF41, 0x85);
+    eightBitStoreIntoGBMemory(0xff40, 0x91);
+    eightBitStoreIntoGBMemory(0xff41, 0x85);
     // 0xFF42 -> 0xFF45 = 0x00
-    eightBitStoreIntoGBMemory(0xFF46, 0xFF);
-    eightBitStoreIntoGBMemory(0xFF47, 0xFC);
-    eightBitStoreIntoGBMemory(0xFF48, 0xFF);
-    eightBitStoreIntoGBMemory(0xFF49, 0xFF);
+    eightBitStoreIntoGBMemory(0xff46, 0xff);
+    eightBitStoreIntoGBMemory(0xff47, 0xfc);
+    eightBitStoreIntoGBMemory(0xff48, 0xff);
+    eightBitStoreIntoGBMemory(0xff49, 0xff);
     // 0xFF4A -> 0xFF4B = 0x00
   }
 }
 
 export function updateGraphics(numberOfCycles: i32): void {
-
-  if(Lcd.enabled) {
-
+  if (Lcd.enabled) {
     Graphics.scanlineCycleCounter += numberOfCycles;
 
     if (Graphics.scanlineCycleCounter >= Graphics.MAX_CYCLES_PER_SCANLINE()) {
-
       // Reset the scanlineCycleCounter
       // Don't set to zero to catch extra cycles
       Graphics.scanlineCycleCounter -= Graphics.MAX_CYCLES_PER_SCANLINE();
@@ -192,7 +189,7 @@ export function updateGraphics(numberOfCycles: i32): void {
       let scanlineRegister: i32 = Graphics.scanlineRegister;
 
       // Check if we've reached the last scanline
-      if(scanlineRegister === 144) {
+      if (scanlineRegister === 144) {
         // Draw the scanline
         if (!Config.graphicsDisableScanlineRendering) {
           _drawScanline(scanlineRegister);
@@ -235,13 +232,12 @@ export function updateGraphics(numberOfCycles: i32): void {
 
 // TODO: Make this a _drawPixelOnScanline, as values can be updated while drawing a scanline
 function _drawScanline(scanlineRegister: i32): void {
-
   // Get our seleted tile data memory location
-  let tileDataMemoryLocation: i32 = Graphics.memoryLocationTileDataSelectZeroStart;
-  if(Lcd.bgWindowTileDataSelect) {
+  let tileDataMemoryLocation: i32 =
+    Graphics.memoryLocationTileDataSelectZeroStart;
+  if (Lcd.bgWindowTileDataSelect) {
     tileDataMemoryLocation = Graphics.memoryLocationTileDataSelectOneStart;
   }
-
 
   // Check if the background is enabled
   // NOTE: On Gameboy color, Pandocs says this does something completely different
@@ -251,29 +247,37 @@ function _drawScanline(scanlineRegister: i32): void {
   // independently of the priority flags in OAM and BG Map attributes.
   // TODO: Enable this different feature for GBC
   if (Cpu.GBCEnabled || Lcd.bgDisplayEnabled) {
-
     // Get our map memory location
-    let tileMapMemoryLocation: i32 = Graphics.memoryLocationTileMapSelectZeroStart;
+    let tileMapMemoryLocation: i32 =
+      Graphics.memoryLocationTileMapSelectZeroStart;
     if (Lcd.bgTileMapDisplaySelect) {
       tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectOneStart;
     }
 
     // Finally, pass everything to draw the background
-    renderBackground(scanlineRegister, tileDataMemoryLocation, tileMapMemoryLocation);
+    renderBackground(
+      scanlineRegister,
+      tileDataMemoryLocation,
+      tileMapMemoryLocation
+    );
   }
 
   // Check if the window is enabled, and we are currently
   // Drawing lines on the window
-  if(Lcd.windowDisplayEnabled) {
-
+  if (Lcd.windowDisplayEnabled) {
     // Get our map memory location
-    let tileMapMemoryLocation: i32 = Graphics.memoryLocationTileMapSelectZeroStart;
+    let tileMapMemoryLocation: i32 =
+      Graphics.memoryLocationTileMapSelectZeroStart;
     if (Lcd.windowTileMapDisplaySelect) {
       tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectOneStart;
     }
 
     // Finally, pass everything to draw the background
-    renderWindow(scanlineRegister, tileDataMemoryLocation, tileMapMemoryLocation);
+    renderWindow(
+      scanlineRegister,
+      tileDataMemoryLocation,
+      tileMapMemoryLocation
+    );
   }
 
   if (Lcd.spriteDisplayEnable) {
@@ -287,7 +291,7 @@ function _drawScanline(scanlineRegister: i32): void {
 // See above for comments on how things are donw
 function _renderEntireFrame(): void {
   // Scanline needs to be in sync while we draw, thus, we can't shortcut anymore than here
-  for(let i: u8 = 0; i <= 144; i++) {
+  for (let i: u8 = 0; i <= 144; i++) {
     _drawScanline(i);
   }
 }

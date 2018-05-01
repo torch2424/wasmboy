@@ -3,13 +3,8 @@ export {
   batchProcessGraphics,
   initializeGraphics,
   updateGraphics
-} from './graphics';
+} from "./graphics";
 
-export {
-  Lcd
-} from './lcd';
+export { Lcd } from "./lcd";
 
-export {
-  Palette,
-  writeColorPaletteToMemory
-} from './palette';
+export { Palette, writeColorPaletteToMemory } from "./palette";

@@ -1,30 +1,21 @@
 // Funcitons for setting and checking the LCD
-import {
-  Graphics
-} from './graphics';
+import { Graphics } from "./graphics";
 // Assembly script really not feeling the reexport
-import {
-  eightBitLoadFromGBMemory
-} from '../memory/load';
-import {
-  eightBitStoreIntoGBMemory
-} from '../memory/store';
-import {
-  updateHblankHdma
-} from '../memory/index';
+import { eightBitLoadFromGBMemory } from "../memory/load";
+import { eightBitStoreIntoGBMemory } from "../memory/store";
+import { updateHblankHdma } from "../memory/index";
 import {
   requestLcdInterrupt,
   requestVBlankInterrupt
-} from '../interrupts/index';
+} from "../interrupts/index";
 import {
   checkBitOnByte,
   setBitOnByte,
   resetBitOnByte,
   hexLog
-} from '../helpers/index';
+} from "../helpers/index";
 
 export class Lcd {
-
   // Memory Locations
   // Also known at STAT
   // LCD Status (0xFF41) bits Explanation
@@ -35,12 +26,11 @@ export class Lcd {
   // 1 or 01: V-Blank
   // 2 or 10: Searching Sprites Atts
   // 3 or 11: Transfering Data to LCD Driver
-  static readonly memoryLocationLcdStatus: i32 = 0xFF41;
+  static readonly memoryLocationLcdStatus: i32 = 0xff41;
   static currentLcdMode: i32 = 0;
 
-  static readonly memoryLocationCoincidenceCompare: i32 = 0xFF45;
+  static readonly memoryLocationCoincidenceCompare: i32 = 0xff45;
   static coincidenceCompare: i32 = 0;
-
 
   // Also known as LCDC
   // http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html
@@ -52,7 +42,7 @@ export class Lcd {
   // Bit 2 - OBJ (Sprite) Size (0=8x8, 1=8x16)
   // Bit 1 - OBJ (Sprite) Display Enable (0=Off, 1=On)
   // Bit 0 - BG Display (for CGB see below) (0=Off, 1=On
-  static readonly memoryLocationLcdControl: i32 = 0xFF40;
+  static readonly memoryLocationLcdControl: i32 = 0xff40;
   // Decoupled LCDC for caching
   static enabled: boolean = true;
   static windowTileMapDisplaySelect: boolean = false;
@@ -66,22 +56,20 @@ export class Lcd {
   // Functions called in write traps to update our hardware registers
   static updateLcdControl(value: i32): void {
     Lcd.enabled = checkBitOnByte(7, value);
-    Lcd.windowTileMapDisplaySelect = checkBitOnByte(6, value)
-    Lcd.windowDisplayEnabled = checkBitOnByte(5, value)
-    Lcd.bgWindowTileDataSelect = checkBitOnByte(4, value)
-    Lcd.bgTileMapDisplaySelect = checkBitOnByte(3, value)
-    Lcd.tallSpriteSize = checkBitOnByte(2, value)
-    Lcd.spriteDisplayEnable = checkBitOnByte(1, value)
-    Lcd.bgDisplayEnabled = checkBitOnByte(0, value)
+    Lcd.windowTileMapDisplaySelect = checkBitOnByte(6, value);
+    Lcd.windowDisplayEnabled = checkBitOnByte(5, value);
+    Lcd.bgWindowTileDataSelect = checkBitOnByte(4, value);
+    Lcd.bgTileMapDisplaySelect = checkBitOnByte(3, value);
+    Lcd.tallSpriteSize = checkBitOnByte(2, value);
+    Lcd.spriteDisplayEnable = checkBitOnByte(1, value);
+    Lcd.bgDisplayEnabled = checkBitOnByte(0, value);
   }
 }
 
-
 // Pass in the lcd status for performance
 export function setLcdStatus(): void {
-
   // Check if the Lcd was disabled
-  if(!Lcd.enabled) {
+  if (!Lcd.enabled) {
     // Reset scanline cycle counter
     Graphics.scanlineCycleCounter = 0;
     Graphics.scanlineRegister = 0;
@@ -107,21 +95,25 @@ export function setLcdStatus(): void {
   let newLcdMode: i32 = 0;
 
   // Find our newLcd mode
-  if(scanlineRegister >= 144) {
+  if (scanlineRegister >= 144) {
     // VBlank mode
     newLcdMode = 1;
   } else {
-    if (Graphics.scanlineCycleCounter >= Graphics.MIN_CYCLES_SPRITES_LCD_MODE()) {
+    if (
+      Graphics.scanlineCycleCounter >= Graphics.MIN_CYCLES_SPRITES_LCD_MODE()
+    ) {
       // Searching Sprites Atts
       newLcdMode = 2;
-    } else if (Graphics.scanlineCycleCounter >= Graphics.MIN_CYCLES_TRANSFER_DATA_LCD_MODE()) {
+    } else if (
+      Graphics.scanlineCycleCounter >=
+      Graphics.MIN_CYCLES_TRANSFER_DATA_LCD_MODE()
+    ) {
       // Transferring data to lcd
       newLcdMode = 3;
     }
   }
 
   if (lcdMode !== newLcdMode) {
-
     // Get our lcd status
     let lcdStatus: i32 = eightBitLoadFromGBMemory(Lcd.memoryLocationLcdStatus);
 
@@ -131,7 +123,7 @@ export function setLcdStatus(): void {
     let shouldRequestInterrupt: boolean = false;
 
     // Set our LCD Statuc accordingly
-    switch(newLcdMode) {
+    switch (newLcdMode) {
       case 0x00:
         lcdStatus = resetBitOnByte(0, lcdStatus);
         lcdStatus = resetBitOnByte(1, lcdStatus);
@@ -154,28 +146,30 @@ export function setLcdStatus(): void {
     }
 
     // Check if we want to request an interrupt, and we JUST changed modes
-    if(shouldRequestInterrupt) {
+    if (shouldRequestInterrupt) {
       requestLcdInterrupt();
     }
 
     // Check for updating the Hblank HDMA
-    if(newLcdMode === 0) {
+    if (newLcdMode === 0) {
       // Update the Hblank DMA, will simply return if not active
       updateHblankHdma();
     }
 
     // Check for requesting a VBLANK interrupt
-    if(newLcdMode === 1) {
+    if (newLcdMode === 1) {
       requestVBlankInterrupt();
     }
 
     // Check for the coincidence flag
     // Need to check on every mode, and not just HBLANK, as checking on hblank breaks shantae, which checks on vblank
     let coincidenceCompare: i32 = Lcd.coincidenceCompare;
-    if((newLcdMode === 0 || newLcdMode === 1) &&
-      scanlineRegister === coincidenceCompare) {
+    if (
+      (newLcdMode === 0 || newLcdMode === 1) &&
+      scanlineRegister === coincidenceCompare
+    ) {
       lcdStatus = setBitOnByte(2, lcdStatus);
-      if(checkBitOnByte(6, lcdStatus)) {
+      if (checkBitOnByte(6, lcdStatus)) {
         requestLcdInterrupt();
       }
     } else {

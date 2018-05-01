@@ -5,22 +5,11 @@ export {
   getAudioQueueIndex,
   resetAudioQueue,
   Sound
-} from './sound';
+} from "./sound";
 
-export {
-  SoundRegisterWriteTraps,
-  SoundRegisterReadTraps
-} from './registers';
+export { SoundRegisterWriteTraps, SoundRegisterReadTraps } from "./registers";
 
-export {
-  Channel1
-} from './channel1';
-export {
-  Channel2
-} from './channel2';
-export {
-  Channel3
-} from './channel3';
-export {
-  Channel4
-} from './channel4';
+export { Channel1 } from "./channel1";
+export { Channel2 } from "./channel2";
+export { Channel3 } from "./channel3";
+export { Channel4 } from "./channel4";
