@@ -143,11 +143,13 @@ export function renderSprites(scanlineRegister: i32, useLargerSprites: boolean):
               // Lets get the priority byte we put in memory
               let bgPriorityByte: i32 = getPriorityforPixel(spriteXPixelLocationInCameraView, scanlineRegister);
 
+              let bgColorFromPriorityByte: i32 = bgPriorityByte & 0x03;
+
               // Doing an else if, since either will automatically stop drawing the pixel
-              if (isSpritePriorityBehindWindowAndBackground && (bgPriorityByte & 0x03) > 0) {
+              if (isSpritePriorityBehindWindowAndBackground && bgColorFromPriorityByte > 0) {
                 // OAM Priority
                 shouldHideFromOamPriority = true;
-              } else if (Cpu.GBCEnabled && checkBitOnByte(2, bgPriorityByte)) {
+              } else if (Cpu.GBCEnabled && checkBitOnByte(2, bgPriorityByte) && bgColorFromPriorityByte > 0) {
                 // Bg priority
                 shouldHideFromBgPriority = true;
               }
