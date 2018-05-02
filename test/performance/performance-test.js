@@ -41,14 +41,16 @@ WasmBoyDebug.WasmBoy.config(WASMBOY_INITIALIZE_OPTIONS);
 // optional performance keys we will be testing
 // "Dummy" option will do nothing
 const WASMBOY_PERFORMANCE_TESTS = [
-  "noPerformanceOptions",
-  "tileRendering",
-  "tileCaching",
-  "audioBatchProcessing",
-  "timersBatchProcessing",
-  "audioAccumulateSamples",
-  "graphicsBatchProcessing",
-  "graphicsDisableScanlineRendering"
+  ["noPerformanceOptions"],
+  ["tileRendering"],
+  ["tileCaching"],
+  ["tileRendering", "tileCaching"],
+  ["audioBatchProcessing"],
+  ["audioAccumulateSamples"],
+  ["audioBatchProcessing", "audioAccumulateSamples"],
+  ["timersBatchProcessing"],
+  ["graphicsBatchProcessing"],
+  ["graphicsDisableScanlineRendering"]
 ];
 
 const PERFORMANCE_TABLE_HEADER = `
@@ -124,8 +126,8 @@ directories.forEach((directory, directoryIndex) => {
         });
 
          // Finally create a describe for each performance option
-         WASMBOY_PERFORMANCE_TESTS.forEach((performanceOptionKey, performanceOptionIndex) => {
-           describe(performanceOptionKey, () => {
+         WASMBOY_PERFORMANCE_TESTS.forEach((performanceOptionKeys, performanceOptionIndex) => {
+           describe(performanceOptionKeys.join(', '), () => {
 
              // Re initilize for each option
              beforeEach(function (done) {
@@ -135,7 +137,9 @@ directories.forEach((directory, directoryIndex) => {
 
                // Get a copy our our initialize options
                const clonedInitializeOptions = Object.assign({}, WASMBOY_INITIALIZE_OPTIONS);
-               clonedInitializeOptions[performanceOptionKey] = true;
+               performanceOptionKeys.forEach((optionKey) => {
+                 clonedInitializeOptions[optionKey] = true;
+               });
 
                WasmBoyDebug.WasmBoy.reset(clonedInitializeOptions).then(() => {
                  done();
@@ -176,17 +180,17 @@ directories.forEach((directory, directoryIndex) => {
 
                // Some Spacing
                console.log(' ');
-               console.log(`WasmBoy with the option: ${performanceOptionKey} enabled, took ${timeElapsed} milliseconds to run`);
+               console.log(`WasmBoy with the option(s): ${performanceOptionKeys.join(', ')} enabled, took ${timeElapsed} milliseconds to run`);
                console.log(' ');
 
                // Store into our tableObject
-               testRomTableObject[performanceOptionKey] = timeElapsed;
+               testRomTableObject[performanceOptionKeys.join(', ')] = timeElapsed;
 
                // Draw a screenshot of the frame reached
                const imageDataArray = commonTest.getImageDataFromFrame();
 
                // Output a gitignored image of the current tests
-               let testImagePath = testRom + `.${performanceOptionKey}.png`;
+               let testImagePath = testRom + `.${performanceOptionKeys.join('.')}.png`;
                commonTest.createImageFromFrame(imageDataArray, `${directory}/${testImagePath}`).then(() => {
 
                  console.log(`Screenshot created at: ${testImagePath}`);
@@ -195,7 +199,7 @@ directories.forEach((directory, directoryIndex) => {
                  if(performanceOptionIndex >= WASMBOY_PERFORMANCE_TESTS.length - 1) {
                    // Finally convert our test rom table object into a markdown table object
                    const markdownTableArray = [
-                     ['Performance Option', 'Time (milliseconds)']
+                     ['Performance Option(s)', 'Time (milliseconds)']
                    ];
                    Object.keys(testRomTableObject).forEach((tableKey) => {
                      markdownTableArray.push([tableKey, testRomTableObject[tableKey]])
