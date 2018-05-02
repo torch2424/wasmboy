@@ -2,7 +2,7 @@
 const commonTest = require('../common-test');
 
 // Wasm Boy library
-const WasmBoy = require('../../dist/wasmboy.cjs.js').WasmBoy;
+const WasmBoyDebug = require('../../dist/wasmboy.debug.cjs.js').WasmBoyDebug;
 
 // File management
 const fs = require('fs');
@@ -36,7 +36,7 @@ const WASMBOY_INITIALIZE_OPTIONS = {
 };
 
 // Doing an initialize intialization here, that way we can load roms
-WasmBoy.initialize(false, WASMBOY_INITIALIZE_OPTIONS);
+WasmBoyDebug.WasmBoy.config(WASMBOY_INITIALIZE_OPTIONS);
 
 // optional performance keys we will be testing
 // "Dummy" option will do nothing
@@ -116,22 +116,30 @@ directories.forEach((directory, directoryIndex) => {
           // Read the test rom a a Uint8Array and pass to wasmBoy
           const testRomArray = new Uint8Array(fs.readFileSync(`${directory}/${testRom}`));
 
-          WasmBoy.loadGame(testRomArray).then(() => {
-            done();
+          commonTest.instantiateWasm().then(() => {
+            WasmBoyDebug.WasmBoy.loadROM(testRomArray).then(() => {
+              done();
+            });
           });
         });
 
-         // FInally create a describe for each performance option
+         // Finally create a describe for each performance option
          WASMBOY_PERFORMANCE_TESTS.forEach((performanceOptionKey, performanceOptionIndex) => {
            describe(performanceOptionKey, () => {
 
              // Re initilize for each option
-             beforeEach(() => {
-               // Get a copy our our initializa options
+             beforeEach(function (done) {
+
+               // Set a timeout of 2000, takes a while for wasm module to parse
+               this.timeout(2000);
+
+               // Get a copy our our initialize options
                const clonedInitializeOptions = Object.assign({}, WASMBOY_INITIALIZE_OPTIONS);
                clonedInitializeOptions[performanceOptionKey] = true;
 
-               WasmBoy.reset(clonedInitializeOptions);
+               WasmBoyDebug.WasmBoy.reset(clonedInitializeOptions).then(() => {
+                 done();
+               });
              });
 
              // Descibe what the tesrt should do for the option
@@ -146,7 +154,7 @@ directories.forEach((directory, directoryIndex) => {
                  const start = now();
 
                  for(let i = 0; i < NUMBER_OF_FRAMES; i++) {
-                   WasmBoy.wasmInstance.exports.update();
+                   WasmBoyDebug.getWasmInstance().exports.update();
                  }
 
                  const end = now();

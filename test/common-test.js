@@ -1,5 +1,5 @@
 // Wasm Boy library
-const WasmBoy = require("../dist/wasmboy.cjs.js").WasmBoy;
+const WasmBoyDebug = require("../dist/wasmboy.debug.cjs.js").WasmBoyDebug;
 
 // Image Creation
 const PNGImage = require("pngjs-image");
@@ -11,6 +11,29 @@ const path = require("path");
 // Define some constants
 const GAMEBOY_CAMERA_WIDTH = 160;
 const GAMEBOY_CAMERA_HEIGHT = 144;
+
+// Instantiate our wasm module
+const instantiateWasm = () => {
+
+  if (WasmBoyDebug.getWasmInstance() && WasmBoyDebug.getWasmByteMemory()) {
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve) => {
+    const wasmBuffer = new Uint8Array(fs.readFileSync('./dist/core/index.untouched.wasm'));
+    const instance = WebAssembly.instantiate(wasmBuffer, {
+      env: {
+        log: () => {},
+        hexLog: () => {},
+        performanceTimestamp: () => {}
+      }
+    }).then((wasm) => {
+      WasmBoyDebug.setWasmInstance(wasm.instance);
+      WasmBoyDebug.setWasmByteMemory(new Uint8Array(wasm.instance.exports.memory.buffer));
+      resolve();
+    });
+  });
+}
 
 // Function to get our RGB image data array from our frame
 const getImageDataFromFrame = () => {
@@ -25,8 +48,8 @@ const getImageDataFromFrame = () => {
 
       for (let color = 0; color < 3; color++) {
         rgbColor[color] =
-          WasmBoy.wasmByteMemory[
-            WasmBoy.wasmInstance.exports.frameInProgressVideoOutputLocation +
+          WasmBoyDebug.getWasmByteMemory()[
+            WasmBoyDebug.getWasmInstance().exports.frameInProgressVideoOutputLocation +
               pixelStart +
               color
           ];
@@ -105,6 +128,7 @@ const getAllRomsInDirectory = directory => {
 };
 
 module.exports = {
+  instantiateWasm: instantiateWasm,
   getImageDataFromFrame: getImageDataFromFrame,
   createImageFromFrame: createImageFromFrame,
   isDirectory: isDirectory,

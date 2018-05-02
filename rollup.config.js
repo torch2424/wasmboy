@@ -4,6 +4,18 @@ import babel from 'rollup-plugin-babel';
 import url from "rollup-plugin-url"
 import pkg from './package.json';
 
+const plugins = [
+	resolve(), // so Rollup can find node modules
+	url({
+		limit: 100 * 1024, // 100Kb
+		include: ["**/*.wasm"],
+	}),
+	commonjs(), // so Rollup can convert node module to an ES module
+	babel({ // so Rollup can convert unsupported es6 code to es5
+		exclude: ['node_modules/**']
+	})
+];
+
 export default [
 	// browser-friendly UMD build
 	{
@@ -13,17 +25,7 @@ export default [
 			file: pkg.browser,
 			format: 'umd'
 		},
-		plugins: [
-			resolve(), // so Rollup can find node modules
-			url({
-				limit: 100 * 1024, // 100Kb
-  			include: ["**/*.wasm"],
-			}),
-			commonjs(), // so Rollup can convert node module to an ES module
-      babel({ // so Rollup can convert unsupported es6 code to es5
-				exclude: ['node_modules/**']
-			})
-		]
+		plugins: plugins
 	},
 
 	// CommonJS (for Node) and ES module (for bundlers) build.
@@ -38,15 +40,15 @@ export default [
 			{ file: pkg.main, format: 'cjs' },
 			{ file: pkg.module, format: 'es' }
 		],
-    plugins: [
-      resolve(), // so Rollup can find node modules
-			url({
-				limit: 100 * 1024, // 100Kb
-  			include: ["**/*.wasm"],
-			}),
-			babel({
-				exclude: ['node_modules/**']
-			})
-		]
+    plugins: plugins
+	},
+
+	// Debug Builds for headless testing
+	{
+		input: 'lib/debug/debug.js',
+		output: [
+			{ file: 'dist/wasmboy.debug.cjs.js', format: 'cjs' }
+		],
+    plugins: plugins
 	}
 ];

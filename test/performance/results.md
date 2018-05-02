@@ -24,24 +24,24 @@ The Options passed into the emulator on each run are:
 
  | Performance Option               | Time (milliseconds) |
 | -------------------------------- | ------------------- |
-| noPerformanceOptions             | 5458.0195           |
-| tileRendering                    | 4897.6865           |
-| tileCaching                      | 4795.406            |
-| audioBatchProcessing             | 2698.0910000000003  |
-| timersBatchProcessing            | 4804.1044999999995  |
-| audioAccumulateSamples           | 4528.1245           |
-| graphicsBatchProcessing          | 4444.3835           |
-| graphicsDisableScanlineRendering | 4853.2985           | 
+| noPerformanceOptions             | 5814.246999999999   |
+| tileRendering                    | 3808.9565000000002  |
+| tileCaching                      | 5161.335499999999   |
+| audioBatchProcessing             | 3881.295            |
+| timersBatchProcessing            | 3427.3734999999997  |
+| audioAccumulateSamples           | 3716.7855           |
+| graphicsBatchProcessing          | 5372.4965           |
+| graphicsDisableScanlineRendering | 3688.5005           | 
 
  ## tobutobugirl.gb 
 
  | Performance Option               | Time (milliseconds) |
 | -------------------------------- | ------------------- |
-| noPerformanceOptions             | 2840.8675           |
-| tileRendering                    | 2845.0335           |
-| tileCaching                      | 2776.5635           |
-| audioBatchProcessing             | 1986.751            |
-| timersBatchProcessing            | 2734.7195           |
-| audioAccumulateSamples           | 2613.41             |
-| graphicsBatchProcessing          | 2638.9984999999997  |
-| graphicsDisableScanlineRendering | 2766.915            | 
+| noPerformanceOptions             | 6147.995            |
+| tileRendering                    | 6138.721            |
+| tileCaching                      | 5141.4685           |
+| audioBatchProcessing             | 6393.4775           |
+| timersBatchProcessing            | 4045.6400000000003  |
+| audioAccumulateSamples           | 6087.7195           |
+| graphicsBatchProcessing          | 5759.7065           |
+| graphicsDisableScanlineRendering | 5721.539000000001   | 
