@@ -2,10 +2,17 @@ import './style';
 import 'bulma/css/bulma.css';
 import { Component } from 'preact';
 // The following line can be changed to './dist/wasmboy.esm.js', to test the built lib
-import { WasmBoy, WasmBoyGraphics, WasmBoyAudio, WasmBoyController, WasmBoyMemory } from './lib/wasmboy.js';
+import { WasmBoy } from './lib/index.js';
 import { WasmBoyDebugger, WasmBoySystemControls, WasmBoyFilePicker, WasmBoyOptions, WasmBoyGamepad } from './debugger/index';
 
-const wasmBoyDefaultOptions = {
+// Our canvas element
+let canvasElement = undefined;
+
+// Our notification timeout
+let notificationTimeout = undefined;
+
+// WasmBoy Options
+const WasmBoyDefaultOptions = {
   isGbcEnabled: true,
   isAudioEnabled: true,
   frameSkip: 1,
@@ -20,16 +27,10 @@ const wasmBoyDefaultOptions = {
   saveStateCallback: saveStateObject => {
     // Function called everytime a savestate occurs
     // Used by the WasmBoySystemControls to show screenshots on save states
-    saveStateObject.screenshotCanvasDataURL = WasmBoyGraphics.canvasElement.toDataURL();
+    saveStateObject.screenshotCanvasDataURL = canvasElement.toDataURL();
     return saveStateObject;
   }
 };
-
-// Our canvas element
-let canvasElement = undefined;
-
-// Our notification timeout
-let notificationTimeout = undefined;
 
 export default class App extends Component {
   constructor() {
@@ -47,25 +48,14 @@ export default class App extends Component {
     // Get our canvas element
     canvasElement = document.querySelector('.wasmboy__canvas-container__canvas');
 
-    // Load our game
-    WasmBoy.initialize(canvasElement, wasmBoyDefaultOptions);
-
-    // Add our touch inputs
-    // Add our touch inputs
-    const dpadElement = document.getElementById('gamepadDpad');
-    const startElement = document.getElementById('gamepadStart');
-    const selectElement = document.getElementById('gamepadSelect');
-    const aElement = document.getElementById('gamepadA');
-    const bElement = document.getElementById('gamepadB');
-
-    WasmBoyController.addTouchInput('UP', dpadElement, 'DPAD', 'UP');
-    WasmBoyController.addTouchInput('RIGHT', dpadElement, 'DPAD', 'RIGHT');
-    WasmBoyController.addTouchInput('DOWN', dpadElement, 'DPAD', 'DOWN');
-    WasmBoyController.addTouchInput('LEFT', dpadElement, 'DPAD', 'LEFT');
-    WasmBoyController.addTouchInput('A', aElement, 'BUTTON');
-    WasmBoyController.addTouchInput('B', bElement, 'BUTTON');
-    WasmBoyController.addTouchInput('START', startElement, 'BUTTON');
-    WasmBoyController.addTouchInput('SELECT', selectElement, 'BUTTON');
+    // Config our WasmBoy instance
+    WasmBoy.config(WasmBoyDefaultOptions, canvasElement)
+      .then(() => {
+        // Wait for input
+      })
+      .catch(error => {
+        console.error(error);
+      });
   }
 
   // Function to show notifications to the user
@@ -107,8 +97,7 @@ export default class App extends Component {
       optionsComponent = (
         <section>
           <WasmBoyOptions
-            wasmBoy={WasmBoy}
-            availableOptions={wasmBoyDefaultOptions}
+            availableOptions={WasmBoyDefaultOptions}
             showNotification={text => {
               this.showNotification(text);
             }}
@@ -122,7 +111,7 @@ export default class App extends Component {
     if (this.state.showDebugger) {
       debuggerComponent = (
         <section>
-          <WasmBoyDebugger wasmboy={WasmBoy} wasmboyGraphics={WasmBoyGraphics} wasmboyAudio={WasmBoyAudio} />
+          <WasmBoyDebugger />
         </section>
       );
     }
@@ -166,7 +155,6 @@ export default class App extends Component {
         {debuggerComponent}
 
         <WasmBoyFilePicker
-          wasmboy={WasmBoy}
           showNotification={text => {
             this.showNotification(text);
           }}
@@ -174,8 +162,6 @@ export default class App extends Component {
 
         <div>
           <WasmBoySystemControls
-            wasmboy={WasmBoy}
-            wasmboyMemory={WasmBoyMemory}
             showNotification={text => {
               this.showNotification(text);
             }}

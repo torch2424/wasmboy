@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 import fetch from 'unfetch';
 import GooglePicker from './googlePicker/googlePicker';
+import { WasmBoy } from '../../lib/index';
 import './wasmboyFilePicker.css';
 
 // Public Keys for Google Drive API
@@ -23,8 +24,7 @@ export class WasmBoyFilePicker extends Component {
   // https://gist.github.com/AshikNesin/e44b1950f6a24cfcd85330ffc1713513
   loadLocalFile(event) {
     this.setFileLoadingStatus(true);
-    this.props.wasmboy
-      .loadGame(event.target.files[0])
+    WasmBoy.loadROM(event.target.files[0])
       .then(() => {
         console.log('Wasmboy Ready!');
         this.props.showNotification('Game Loaded! 🎉');
@@ -63,48 +63,24 @@ export class WasmBoyFilePicker extends Component {
           return response.json();
         })
         .then(responseJson => {
-          // Finally fetch the file
-          fetch(responseJson.downloadUrl, {
+          // Finally load the file using the oAuthHeaders
+          WasmBoy.loadROM(responseJson.downloadUrl, {
             headers: oAuthHeaders
           })
-            .then(blob => {
-              if (!blob.ok) {
-                return Promise.reject(blob);
-              }
+            .then(() => {
+              console.log('Wasmboy Ready!');
+              this.props.showNotification('Game Loaded! 🎉');
+              this.setFileLoadingStatus(false);
 
-              return blob.arrayBuffer();
-            })
-            .then(bytes => {
-              // Use Wasm Boy to possibly Unzip, and then pass the bytes to be loaded
-              this.props.wasmboy
-                ._getGameFromArrayBuffer(googlePickerFileObject.name, bytes)
-                .then(byteArray => {
-                  this.props.wasmboy
-                    .loadGame(byteArray)
-                    .then(() => {
-                      console.log('Wasmboy Ready!');
-                      this.props.showNotification('Game Loaded! 🎉');
-                      this.setFileLoadingStatus(false);
-
-                      // Set our file name
-                      const newState = Object.assign({}, this.state);
-                      newState.currentFileName = googlePickerFileObject.name;
-                      this.setState(newState);
-                    })
-                    .catch(error => {
-                      console.log('Load Game Error:', error);
-                      this.props.showNotification('Game Load Error! 😞');
-                      this.setFileLoadingStatus(false);
-                    });
-                })
-                .catch(error => {
-                  this.props.showNotification('Error getting file from google drive 💔');
-                  this.setFileLoadingStatus(true);
-                });
+              // Set our file name
+              const newState = Object.assign({}, this.state);
+              newState.currentFileName = googlePickerFileObject.name;
+              this.setState(newState);
             })
             .catch(error => {
-              this.props.showNotification('Error getting file from google drive 💔');
-              this.setFileLoadingStatus(true);
+              console.log('Load Game Error:', error);
+              this.props.showNotification('Game Load Error! 😞');
+              this.setFileLoadingStatus(false);
             });
         })
         .catch(error => {

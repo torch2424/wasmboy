@@ -1,14 +1,15 @@
 import { Component } from 'preact';
 import Promise from 'promise-polyfill';
+import { WasmBoyDebug } from '../../../lib/debug/debug';
 import './wasmboyTileData.css';
 
 const canvasId = 'WasmBoyTileData';
-const tileDataXPixels = 0x1F * 8;
+const tileDataXPixels = 0x1f * 8;
 const tileDataYPixels = 0x17 * 8;
 
 export class WasmBoyTileData extends Component {
   constructor(props) {
-		super(props);
+    super(props);
   }
 
   componentDidMount() {
@@ -40,44 +41,42 @@ export class WasmBoyTileData extends Component {
           updateCanvas();
         }, 500);
       });
-    }
+    };
     updateCanvas();
   }
 
   updateCanvas(canvasElement, canvasContext, canvasImageData) {
-    return new Promise((resolve) => {
-
+    return new Promise(resolve => {
       // Dont update for the following
-      if(!this.props.wasmboy.wasmByteMemory ||
-        !this.props.wasmboy.wasmInstance ||
-        !this.props.wasmboy.ready ||
-        this.props.wasmboy.paused ||
-        !this.props.shouldUpdate) {
+      if (
+        !WasmBoyDebug.getWasmByteMemory() ||
+        !WasmBoyDebug.getWasmInstance() ||
+        !WasmBoyDebug.WasmBoy.isReady() ||
+        WasmBoyDebug.WasmBoy.isPaused() ||
+        !this.props.shouldUpdate
+      ) {
         resolve();
         return;
       }
 
-      this.props.wasmboy.wasmInstance.exports.drawTileDataToWasmMemory();
+      WasmBoyDebug.getWasmInstance().exports.drawTileDataToWasmMemory();
 
       const imageDataArray = new Uint8ClampedArray(tileDataYPixels * tileDataXPixels * 4);
       const rgbColor = new Uint8ClampedArray(3);
 
-      for(let y = 0; y < tileDataYPixels; y++) {
+      for (let y = 0; y < tileDataYPixels; y++) {
         for (let x = 0; x < tileDataXPixels; x++) {
-
           // Each color has an R G B component
-          let pixelStart = ((y * tileDataXPixels) + x) * 3;
+          let pixelStart = (y * tileDataXPixels + x) * 3;
 
           for (let color = 0; color < 3; color++) {
-            rgbColor[color] = this.props.wasmboy.wasmByteMemory[
-              this.props.wasmboy.wasmInstance.exports.tileDataMap + pixelStart + color
-            ];
+            rgbColor[color] = WasmBoyDebug.getWasmByteMemory()[WasmBoyDebug.getWasmInstance().exports.tileDataMap + pixelStart + color];
           }
 
           // Doing graphics using second answer on:
           // https://stackoverflow.com/questions/4899799/whats-the-best-way-to-set-a-single-pixel-in-an-html5-canvas
           // Image Data mapping
-          const imageDataIndex = (x + (y * tileDataXPixels)) * 4;
+          const imageDataIndex = (x + y * tileDataXPixels) * 4;
 
           imageDataArray[imageDataIndex] = rgbColor[0];
           imageDataArray[imageDataIndex + 1] = rgbColor[1];
@@ -88,7 +87,7 @@ export class WasmBoyTileData extends Component {
       }
 
       // Add our new imageData
-      for(let i = 0; i < imageDataArray.length; i++) {
+      for (let i = 0; i < imageDataArray.length; i++) {
         canvasImageData.data[i] = imageDataArray[i];
       }
 
@@ -105,10 +104,9 @@ export class WasmBoyTileData extends Component {
       <div>
         <h1>Tile Data</h1>
         <div class="wasmboy__tileData">
-          <canvas id={canvasId} width={tileDataXPixels} height={tileDataYPixels}>
-          </canvas>
+          <canvas id={canvasId} width={tileDataXPixels} height={tileDataYPixels} />
         </div>
       </div>
-    )
+    );
   }
 }

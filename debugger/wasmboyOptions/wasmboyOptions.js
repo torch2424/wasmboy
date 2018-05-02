@@ -1,4 +1,5 @@
 import { Component } from 'preact';
+import { WasmBoy } from '../../lib/index';
 import './wasmboyOptions.css';
 
 export class WasmBoyOptions extends Component {
@@ -11,8 +12,9 @@ export class WasmBoyOptions extends Component {
   componentDidMount() {
     // Add all of our default options from the props to our component state
     const newState = Object.assign({}, this.state);
+    const wasmboyConfig = WasmBoy.getConfig();
     Object.keys(this.props.availableOptions).forEach(optionKey => {
-      newState[optionKey] = this.props.wasmBoy[optionKey];
+      newState[optionKey] = wasmboyConfig[optionKey];
     });
     this.setState(newState);
   }
@@ -25,8 +27,13 @@ export class WasmBoyOptions extends Component {
 
   // Simply resets wasmboy with the current options
   applyOptions() {
-    this.props.wasmBoy.reset(this.state);
-    this.props.showNotification('Applied Options! 🛠️');
+    WasmBoy.reset(this.state)
+      .then(() => {
+        this.props.showNotification('Applied Options! 🛠️');
+      })
+      .catch(error => {
+        this.props.showNotification('Options Error! 😞');
+      });
   }
 
   render() {

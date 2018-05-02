@@ -1,10 +1,29 @@
 import { Component } from 'preact';
+import { WasmBoy } from '../../lib/index';
 import './wasmboyGamepad.css';
 
 // Simple mobile contreols for the wasmboy debugger
 export class WasmBoyGamepad extends Component {
   constructor() {
     super();
+  }
+
+  componentDidMount() {
+    // Add our touch inputs
+    const dpadElement = document.getElementById('gamepadDpad');
+    const startElement = document.getElementById('gamepadStart');
+    const selectElement = document.getElementById('gamepadSelect');
+    const aElement = document.getElementById('gamepadA');
+    const bElement = document.getElementById('gamepadB');
+
+    WasmBoy.addTouchInput('UP', dpadElement, 'DPAD', 'UP');
+    WasmBoy.addTouchInput('RIGHT', dpadElement, 'DPAD', 'RIGHT');
+    WasmBoy.addTouchInput('DOWN', dpadElement, 'DPAD', 'DOWN');
+    WasmBoy.addTouchInput('LEFT', dpadElement, 'DPAD', 'LEFT');
+    WasmBoy.addTouchInput('A', aElement, 'BUTTON');
+    WasmBoy.addTouchInput('B', bElement, 'BUTTON');
+    WasmBoy.addTouchInput('START', startElement, 'BUTTON');
+    WasmBoy.addTouchInput('SELECT', selectElement, 'BUTTON');
   }
 
   render() {
