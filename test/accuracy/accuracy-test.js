@@ -2,7 +2,7 @@
 const commonTest = require('../common-test');
 
 // Wasm Boy library
-const WasmBoyDebug = require('../../dist/wasmboy.debug.cjs.js').WasmBoyDebug;
+const WasmBoy = require('../../dist/wasmboy.cjs.js').WasmBoy;
 
 // File management
 const fs = require('fs');
@@ -19,7 +19,7 @@ const TEST_ROM_TIMEOUT = {
 };
 
 // Initialize wasmBoy headless, with a speed option
-WasmBoyDebug.WasmBoy.config({
+WasmBoy.config({
     headless: true,
     gameboySpeed: 100.0,
     isGbcEnabled: true
@@ -59,7 +59,7 @@ commonTest.getDirectories(testRomsPath).forEach((directory) => {
           const testRomArray = new Uint8Array(fs.readFileSync(`${directory}/${testRom}`));
 
           commonTest.instantiateWasm().then(() => {
-            WasmBoyDebug.WasmBoy.loadROM(testRomArray).then(() => {
+            WasmBoy.loadROM(testRomArray).then(() => {
               done();
             });
           });
@@ -70,13 +70,13 @@ commonTest.getDirectories(testRomsPath).forEach((directory) => {
           // Set our timeout
           this.timeout(timeToWaitForTestRom + 2000);
 
-          WasmBoyDebug.WasmBoy.play();
+          WasmBoy.play();
 
           console.log(`Running the following test rom: ${directory}/${testRom}`)
 
           setTimeout(() => {
 
-            WasmBoyDebug.WasmBoy.pause().then(() => {
+            WasmBoy.pause().then(() => {
               console.log(`Checking results for the following test rom: ${directory}/${testRom}`);
 
               const imageDataArray = commonTest.getImageDataFromFrame();

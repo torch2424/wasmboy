@@ -2,7 +2,7 @@
 const commonTest = require('../common-test');
 
 // Wasm Boy library
-const WasmBoyDebug = require('../../dist/wasmboy.debug.cjs.js').WasmBoyDebug;
+const WasmBoy = require('../../dist/wasmboy.cjs.js').WasmBoy;
 
 // File management
 const fs = require('fs');
@@ -36,7 +36,7 @@ const WASMBOY_INITIALIZE_OPTIONS = {
 };
 
 // Doing an initialize intialization here, that way we can load roms
-WasmBoyDebug.WasmBoy.config(WASMBOY_INITIALIZE_OPTIONS);
+WasmBoy.config(WASMBOY_INITIALIZE_OPTIONS);
 
 // optional performance keys we will be testing
 // "Dummy" option will do nothing
@@ -119,7 +119,7 @@ directories.forEach((directory, directoryIndex) => {
           const testRomArray = new Uint8Array(fs.readFileSync(`${directory}/${testRom}`));
 
           commonTest.instantiateWasm().then(() => {
-            WasmBoyDebug.WasmBoy.loadROM(testRomArray).then(() => {
+            WasmBoy.loadROM(testRomArray).then(() => {
               done();
             });
           });
@@ -141,7 +141,7 @@ directories.forEach((directory, directoryIndex) => {
                  clonedInitializeOptions[optionKey] = true;
                });
 
-               WasmBoyDebug.WasmBoy.reset(clonedInitializeOptions).then(() => {
+               WasmBoy.reset(clonedInitializeOptions).then(() => {
                  done();
                });
              });
@@ -158,7 +158,7 @@ directories.forEach((directory, directoryIndex) => {
                  const start = now();
 
                  for(let i = 0; i < NUMBER_OF_FRAMES; i++) {
-                   WasmBoyDebug.getWasmInstance().exports.update();
+                   WasmBoy._getWasmInstance().exports.update();
                  }
 
                  const end = now();

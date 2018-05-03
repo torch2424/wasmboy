@@ -42,13 +42,4 @@ export default [
 		],
     plugins: plugins
 	},
-
-	// Debug Builds for headless testing
-	{
-		input: 'lib/debug/debug.js',
-		output: [
-			{ file: 'dist/wasmboy.debug.cjs.js', format: 'cjs' }
-		],
-    plugins: plugins
-	}
 ];

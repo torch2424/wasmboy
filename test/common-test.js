@@ -1,5 +1,5 @@
 // Wasm Boy library
-const WasmBoyDebug = require("../dist/wasmboy.debug.cjs.js").WasmBoyDebug;
+const WasmBoy = require("../dist/wasmboy.cjs.js").WasmBoy;
 
 // Image Creation
 const PNGImage = require("pngjs-image");
@@ -15,7 +15,7 @@ const GAMEBOY_CAMERA_HEIGHT = 144;
 // Instantiate our wasm module
 const instantiateWasm = () => {
 
-  if (WasmBoyDebug.getWasmInstance() && WasmBoyDebug.getWasmByteMemory()) {
+  if (WasmBoy._getWasmInstance() && WasmBoy._getWasmInstance()) {
     return Promise.resolve();
   }
 
@@ -28,8 +28,8 @@ const instantiateWasm = () => {
         performanceTimestamp: () => {}
       }
     }).then((wasm) => {
-      WasmBoyDebug.setWasmInstance(wasm.instance);
-      WasmBoyDebug.setWasmByteMemory(new Uint8Array(wasm.instance.exports.memory.buffer));
+      WasmBoy._setWasmInstance(wasm.instance);
+      WasmBoy._setWasmByteMemory(new Uint8Array(wasm.instance.exports.memory.buffer));
       resolve();
     });
   });
@@ -48,8 +48,8 @@ const getImageDataFromFrame = () => {
 
       for (let color = 0; color < 3; color++) {
         rgbColor[color] =
-          WasmBoyDebug.getWasmByteMemory()[
-            WasmBoyDebug.getWasmInstance().exports.frameInProgressVideoOutputLocation +
+          WasmBoy._getWasmByteMemory()[
+            WasmBoy._getWasmInstance().exports.frameInProgressVideoOutputLocation +
               pixelStart +
               color
           ];
