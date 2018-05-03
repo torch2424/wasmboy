@@ -1,5 +1,5 @@
 import { Component } from 'preact';
-import { WasmBoyDebug } from '../../lib/debug/debug';
+import { WasmBoy } from '../../lib/index';
 import { NumberBaseTable } from './numberBaseTable/numberBaseTable';
 import { WasmBoyBackgroundMap } from './wasmboyBackgroundMap/wasmboyBackgroundMap';
 import { WasmBoyTileData } from './wasmboyTileData/wasmboyTileData';
@@ -7,7 +7,7 @@ import './wasmboyDebugger.css';
 
 // Function to get a value in gameboy memory, to wasmboy memory
 const getWasmBoyOffsetFromGameBoyOffset = gameboyOffset => {
-  return WasmBoyDebug.getWasmInstance().exports.getWasmBoyOffsetFromGameBoyOffset(gameboyOffset);
+  return WasmBoy._getWasmInstance().exports.getWasmBoyOffsetFromGameBoyOffset(gameboyOffset);
 };
 
 let autoUpdateValueTableId = false;
@@ -67,7 +67,7 @@ export class WasmBoyDebugger extends Component {
   // Function to runa  single opcode
   stepOpcode(skipDebugOutput) {
     return new Promise(resolve => {
-      const numberOfCycles = WasmBoyDebug.getWasmInstance().exports.emulationStep();
+      const numberOfCycles = WasmBoy._getWasmInstance().exports.emulationStep();
 
       if (numberOfCycles <= 0) {
         console.error('Opcode not recognized! Check wasm logs.');
@@ -98,7 +98,7 @@ export class WasmBoyDebugger extends Component {
 
       const runOpcode = () => {
         this.stepOpcode(true).then(() => {
-          if (breakPoint && breakPoint === WasmBoyDebug.getWasmInstance().exports.getProgramCounter()) {
+          if (breakPoint && breakPoint === WasmBoy._getWasmInstance().exports.getProgramCounter()) {
             resolve();
             return;
           }
@@ -134,7 +134,7 @@ export class WasmBoyDebugger extends Component {
     }
 
     initialStepPromise.then(() => {
-      if (WasmBoyDebug.getWasmInstance().exports.getProgramCounter() !== breakPoint) {
+      if (WasmBoy._getWasmInstance().exports.getProgramCounter() !== breakPoint) {
         requestAnimationFrame(() => {
           this.runNumberOfOpcodes(2000 + Math.floor(Math.random() * 10), breakPoint, true).then(() => {
             this.updateValueTable();
@@ -149,12 +149,12 @@ export class WasmBoyDebugger extends Component {
   }
 
   logWasmBoyMemory() {
-    console.log(`[WasmBoy Debugger] Memory:`, WasmBoyDebug.getWasmByteMemory());
+    console.log(`[WasmBoy Debugger] Memory:`, WasmBoy._getWasmByteMemory());
   }
 
   updateValueTable() {
     // Check that we have our instance and byte memory
-    if (!WasmBoyDebug.getWasmInstance() || !WasmBoyDebug.getWasmByteMemory()) {
+    if (!WasmBoy._getWasmInstance() || !WasmBoy._getWasmByteMemory()) {
       return;
     }
 
@@ -168,43 +168,43 @@ export class WasmBoyDebugger extends Component {
     };
 
     // Update CPU valueTable
-    valueTable.cpu['Program Counter (PC)'] = WasmBoyDebug.getWasmInstance().exports.getProgramCounter();
-    valueTable.cpu['Opcode at PC'] = WasmBoyDebug.getWasmInstance().exports.getOpcodeAtProgramCounter();
-    valueTable.cpu['Stack Pointer'] = WasmBoyDebug.getWasmInstance().exports.getStackPointer();
-    valueTable.cpu['Register A'] = WasmBoyDebug.getWasmInstance().exports.getRegisterA();
-    valueTable.cpu['Register F'] = WasmBoyDebug.getWasmInstance().exports.getRegisterF();
-    valueTable.cpu['Register B'] = WasmBoyDebug.getWasmInstance().exports.getRegisterB();
-    valueTable.cpu['Register C'] = WasmBoyDebug.getWasmInstance().exports.getRegisterC();
-    valueTable.cpu['Register D'] = WasmBoyDebug.getWasmInstance().exports.getRegisterD();
-    valueTable.cpu['Register E'] = WasmBoyDebug.getWasmInstance().exports.getRegisterE();
-    valueTable.cpu['Register H'] = WasmBoyDebug.getWasmInstance().exports.getRegisterH();
-    valueTable.cpu['Register L'] = WasmBoyDebug.getWasmInstance().exports.getRegisterL();
+    valueTable.cpu['Program Counter (PC)'] = WasmBoy._getWasmInstance().exports.getProgramCounter();
+    valueTable.cpu['Opcode at PC'] = WasmBoy._getWasmInstance().exports.getOpcodeAtProgramCounter();
+    valueTable.cpu['Stack Pointer'] = WasmBoy._getWasmInstance().exports.getStackPointer();
+    valueTable.cpu['Register A'] = WasmBoy._getWasmInstance().exports.getRegisterA();
+    valueTable.cpu['Register F'] = WasmBoy._getWasmInstance().exports.getRegisterF();
+    valueTable.cpu['Register B'] = WasmBoy._getWasmInstance().exports.getRegisterB();
+    valueTable.cpu['Register C'] = WasmBoy._getWasmInstance().exports.getRegisterC();
+    valueTable.cpu['Register D'] = WasmBoy._getWasmInstance().exports.getRegisterD();
+    valueTable.cpu['Register E'] = WasmBoy._getWasmInstance().exports.getRegisterE();
+    valueTable.cpu['Register H'] = WasmBoy._getWasmInstance().exports.getRegisterH();
+    valueTable.cpu['Register L'] = WasmBoy._getWasmInstance().exports.getRegisterL();
     valueTable.cpu = Object.assign({}, valueTable.cpu);
 
     // Update PPU valueTable
-    valueTable.ppu['Scanline Register (LY) - 0xFF44'] = WasmBoyDebug.getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff44)];
-    valueTable.ppu['LCD Status (STAT) - 0xFF41'] = WasmBoyDebug.getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff41)];
-    valueTable.ppu['LCD Control (LCDC) - 0xFF40'] = WasmBoyDebug.getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff40)];
-    valueTable.ppu['Scroll X - 0xFF43'] = WasmBoyDebug.getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff43)];
-    valueTable.ppu['Scroll Y - 0xFF42'] = WasmBoyDebug.getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff42)];
-    valueTable.ppu['Window X - 0xFF4B'] = WasmBoyDebug.getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff4b)];
-    valueTable.ppu['Window Y - 0xFF4A'] = WasmBoyDebug.getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff4a)];
+    valueTable.ppu['Scanline Register (LY) - 0xFF44'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff44)];
+    valueTable.ppu['LCD Status (STAT) - 0xFF41'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff41)];
+    valueTable.ppu['LCD Control (LCDC) - 0xFF40'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff40)];
+    valueTable.ppu['Scroll X - 0xFF43'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff43)];
+    valueTable.ppu['Scroll Y - 0xFF42'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff42)];
+    valueTable.ppu['Window X - 0xFF4B'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff4b)];
+    valueTable.ppu['Window Y - 0xFF4A'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff4a)];
 
     // Update Timers valueTable
-    valueTable.timers['TIMA - 0xFF05'] = WasmBoyDebug.getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff05)];
-    valueTable.timers['TMA - 0xFF06'] = WasmBoyDebug.getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff06)];
-    valueTable.timers['TIMC/TAC - 0xFF07'] = WasmBoyDebug.getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff07)];
-    valueTable.timers['DIV/Divider Register - 0xFF04'] = WasmBoyDebug.getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff04)];
+    valueTable.timers['TIMA - 0xFF05'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff05)];
+    valueTable.timers['TMA - 0xFF06'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff06)];
+    valueTable.timers['TIMC/TAC - 0xFF07'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff07)];
+    valueTable.timers['DIV/Divider Register - 0xFF04'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff04)];
 
     // Update interrupts valueTable
     // TODO: Interrupot master switch
-    // if(WasmBoyDebug.getWasmInstance().exports.areInterruptsEnabled()) {
+    // if(WasmBoy._getWasmInstance().exports.areInterruptsEnabled()) {
     //   valueTable.interrupts['Interrupt Master Switch'] = 0x01;
     // } else {
     //   valueTable.interrupts['Interrupt Master Switch'] = 0x00;
     // }
-    valueTable.interrupts['IE/Interrupt Enabled - 0xFFFF'] = WasmBoyDebug.getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xffff)];
-    valueTable.interrupts['IF/Interrupt Request - 0xFF0F'] = WasmBoyDebug.getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff0f)];
+    valueTable.interrupts['IE/Interrupt Enabled - 0xFFFF'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xffff)];
+    valueTable.interrupts['IF/Interrupt Request - 0xFF0F'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff0f)];
 
     // Update APU valueTable
     // Add the register valueTable for our 4 channels
@@ -213,12 +213,12 @@ export class WasmBoyDebugger extends Component {
         let registerAddress = 0xff10 + 5 * (channelNum - 1) + registerNum;
         valueTable.apu[
           `Channel ${channelNum} - NR${channelNum}${registerNum} - 0x${registerAddress.toString(16).toUpperCase()}`
-        ] = WasmBoyDebug.getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(registerAddress)];
+        ] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(registerAddress)];
       }
     }
-    valueTable.interrupts['IE/Interrupt Enabled - 0xFFFF'] = WasmBoyDebug.getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xffff)];
-    valueTable.interrupts['IE/Interrupt Enabled - 0xFFFF'] = WasmBoyDebug.getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xffff)];
-    valueTable.interrupts['IE/Interrupt Enabled - 0xFFFF'] = WasmBoyDebug.getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xffff)];
+    valueTable.interrupts['IE/Interrupt Enabled - 0xFFFF'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xffff)];
+    valueTable.interrupts['IE/Interrupt Enabled - 0xFFFF'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xffff)];
+    valueTable.interrupts['IE/Interrupt Enabled - 0xFFFF'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xffff)];
 
     // Clone our valueTable, that it is immutable and will cause change detection
     const newState = Object.assign({}, this.state);
@@ -300,7 +300,7 @@ export class WasmBoyDebugger extends Component {
           <button
             class="button"
             onclick={() => {
-              WasmBoyDebug.saveCurrentAudioBufferToWav();
+              WasmBoy._saveCurrentAudioBufferToWav();
             }}
           >
             Save Current Audio buffer to wav

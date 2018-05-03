@@ -1,6 +1,6 @@
 import { Component } from 'preact';
 import Promise from 'promise-polyfill';
-import { WasmBoyDebug } from '../../../lib/debug/debug';
+import { WasmBoy } from '../../../lib/index';
 import './wasmboyTileData.css';
 
 const canvasId = 'WasmBoyTileData';
@@ -49,17 +49,17 @@ export class WasmBoyTileData extends Component {
     return new Promise(resolve => {
       // Dont update for the following
       if (
-        !WasmBoyDebug.getWasmByteMemory() ||
-        !WasmBoyDebug.getWasmInstance() ||
-        !WasmBoyDebug.WasmBoy.isReady() ||
-        WasmBoyDebug.WasmBoy.isPaused() ||
+        !WasmBoy._getWasmByteMemory() ||
+        !WasmBoy._getWasmInstance() ||
+        !WasmBoy.isReady() ||
+        WasmBoy.isPaused() ||
         !this.props.shouldUpdate
       ) {
         resolve();
         return;
       }
 
-      WasmBoyDebug.getWasmInstance().exports.drawTileDataToWasmMemory();
+      WasmBoy._getWasmInstance().exports.drawTileDataToWasmMemory();
 
       const imageDataArray = new Uint8ClampedArray(tileDataYPixels * tileDataXPixels * 4);
       const rgbColor = new Uint8ClampedArray(3);
@@ -70,7 +70,7 @@ export class WasmBoyTileData extends Component {
           let pixelStart = (y * tileDataXPixels + x) * 3;
 
           for (let color = 0; color < 3; color++) {
-            rgbColor[color] = WasmBoyDebug.getWasmByteMemory()[WasmBoyDebug.getWasmInstance().exports.tileDataMap + pixelStart + color];
+            rgbColor[color] = WasmBoy._getWasmByteMemory()[WasmBoy._getWasmInstance().exports.tileDataMap + pixelStart + color];
           }
 
           // Doing graphics using second answer on:

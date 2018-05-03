@@ -1,6 +1,6 @@
 import { Component } from 'preact';
 import Promise from 'promise-polyfill';
-import { WasmBoyDebug } from '../../../lib/debug/debug';
+import { WasmBoy } from '../../../lib/index';
 import './wasmboyBackgroundMap.css';
 
 export class WasmBoyBackgroundMap extends Component {
@@ -45,17 +45,17 @@ export class WasmBoyBackgroundMap extends Component {
     return new Promise(resolve => {
       // Dont update for the following
       if (
-        !WasmBoyDebug.getWasmByteMemory() ||
-        !WasmBoyDebug.getWasmInstance() ||
-        !WasmBoyDebug.WasmBoy.isReady() ||
-        WasmBoyDebug.WasmBoy.isPaused() ||
+        !WasmBoy._getWasmByteMemory() ||
+        !WasmBoy._getWasmInstance() ||
+        !WasmBoy.isReady() ||
+        WasmBoy.isPaused() ||
         !this.props.shouldUpdate
       ) {
         resolve();
         return;
       }
 
-      WasmBoyDebug.getWasmInstance().exports.drawBackgroundMapToWasmMemory(1);
+      WasmBoy._getWasmInstance().exports.drawBackgroundMapToWasmMemory(1);
 
       const imageDataArray = new Uint8ClampedArray(256 * 256 * 4);
       const rgbColor = new Uint8ClampedArray(3);
@@ -66,8 +66,8 @@ export class WasmBoyBackgroundMap extends Component {
           let pixelStart = (y * 256 + x) * 3;
 
           for (let color = 0; color < 3; color++) {
-            rgbColor[color] = WasmBoyDebug.getWasmByteMemory()[
-              WasmBoyDebug.getWasmInstance().exports.backgroundMapLocation + pixelStart + color
+            rgbColor[color] = WasmBoy._getWasmByteMemory()[
+              WasmBoy._getWasmInstance().exports.backgroundMapLocation + pixelStart + color
             ];
           }
 
@@ -96,8 +96,8 @@ export class WasmBoyBackgroundMap extends Component {
       // Draw a semi Transparent camera thing over the imagedata
       // https://www.html5canvastutorials.com/tutorials/html5-canvas-rectangles/
       // Get the scroll X and Y
-      const scrollX = WasmBoyDebug.getWasmByteMemory()[this.props.getWasmBoyOffsetFromGameBoyOffset(0xff43)];
-      const scrollY = WasmBoyDebug.getWasmByteMemory()[this.props.getWasmBoyOffsetFromGameBoyOffset(0xff42)];
+      const scrollX = WasmBoy._getWasmByteMemory()[this.props.getWasmBoyOffsetFromGameBoyOffset(0xff43)];
+      const scrollY = WasmBoy._getWasmByteMemory()[this.props.getWasmBoyOffsetFromGameBoyOffset(0xff42)];
 
       const lineWidth = 2;
       const strokeStyle = 'rgba(173, 140, 255, 200)';
