@@ -4211,11 +4211,9 @@ src_Promise._unhandledRejectionFn = function _unhandledRejectionFn(err) {
 };
 
 /* harmony default export */ var src = (src_Promise);
-// EXTERNAL MODULE: ./dist/wasm/index.untouched.wasm
-var index_untouched = __webpack_require__("toTQ");
-var index_untouched_default = /*#__PURE__*/__webpack_require__.n(index_untouched);
-
 // CONCATENATED MODULE: ./lib/graphics/graphics.js
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new src(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return src.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 
@@ -4234,7 +4232,7 @@ var WASMBOY_MAX_FRAMES_IN_QUEUE = 6;
 // Cached Current Frame output location, since call to wasm is expensive
 var WASMBOY_CURRENT_FRAME_OUTPUT_LOCATION = 0;
 
-var graphics_WasmBoyGraphicsService = function () {
+var WasmBoyGraphicsService = function () {
   function WasmBoyGraphicsService() {
     _classCallCheck(this, WasmBoyGraphicsService);
 
@@ -4261,8 +4259,8 @@ var graphics_WasmBoyGraphicsService = function () {
     // Reset our frame queue and render promises
     this.frameQueue = [];
 
-    return new src(function (resolve, reject) {
-      try {
+    var initializeTask = function () {
+      var _ref = _asyncToGenerator(function* () {
         // Prepare our canvas
         _this.canvasElement = canvasElement;
         _this.canvasContext = _this.canvasElement.getContext('2d');
@@ -4273,19 +4271,21 @@ var graphics_WasmBoyGraphicsService = function () {
         // Add some css for smooth 8-bit canvas scaling
         // https://stackoverflow.com/questions/7615009/disable-interpolation-when-scaling-a-canvas
         // https://caniuse.com/#feat=css-crisp-edges
-        _this.canvasElement.style = '\n          image-rendering: optimizeSpeed;\n          image-rendering: -moz-crisp-edges;\n          image-rendering: -webkit-optimize-contrast;\n          image-rendering: -o-crisp-edges;\n          image-rendering: pixelated;\n          -ms-interpolation-mode: nearest-neighbor;\n        ';
+        _this.canvasElement.style = '\n        image-rendering: optimizeSpeed;\n        image-rendering: -moz-crisp-edges;\n        image-rendering: -webkit-optimize-contrast;\n        image-rendering: -o-crisp-edges;\n        image-rendering: pixelated;\n        -ms-interpolation-mode: nearest-neighbor;\n      ';
 
         // Fill the canvas with a blank screen
         // using client width since we are not requiring a width and height oin the canvas
         // https://developer.mozilla.org/en-US/docs/Web/API/Element/clientWidth
         // TODO: Mention respopnsive canvas scaling in the docs
         _this.canvasContext.clearRect(0, 0, _this.canvasElement.width, _this.canvasElement.height);
+      });
 
-        resolve();
-      } catch (error) {
-        reject(error);
-      }
-    });
+      return function initializeTask() {
+        return _ref.apply(this, arguments);
+      };
+    }();
+
+    return initializeTask();
   };
 
   // Function to render a frame
@@ -4297,58 +4297,65 @@ var graphics_WasmBoyGraphicsService = function () {
   WasmBoyGraphicsService.prototype.renderFrame = function renderFrame() {
     var _this2 = this;
 
-    return new src(function (resolve) {
-      // Draw the pixels
-      // 160x144
-      // Split off our image Data
-      var imageDataArray = new Uint8ClampedArray(GAMEBOY_CAMERA_HEIGHT * GAMEBOY_CAMERA_WIDTH * 4);
-      var rgbColor = new Uint8ClampedArray(3);
+    var renderFrameTask = function () {
+      var _ref2 = _asyncToGenerator(function* () {
+        // Draw the pixels
+        // 160x144
+        // Split off our image Data
+        var imageDataArray = new Uint8ClampedArray(GAMEBOY_CAMERA_HEIGHT * GAMEBOY_CAMERA_WIDTH * 4);
+        var rgbColor = new Uint8ClampedArray(3);
 
-      for (var y = 0; y < GAMEBOY_CAMERA_HEIGHT; y++) {
-        for (var x = 0; x < GAMEBOY_CAMERA_WIDTH; x++) {
+        for (var y = 0; y < GAMEBOY_CAMERA_HEIGHT; y++) {
+          for (var x = 0; x < GAMEBOY_CAMERA_WIDTH; x++) {
+            // Each color has an R G B component
+            var pixelStart = (y * 160 + x) * 3;
 
-          // Each color has an R G B component
-          var pixelStart = (y * 160 + x) * 3;
+            for (var color = 0; color < 3; color++) {
+              rgbColor[color] = _this2.wasmByteMemory[WASMBOY_CURRENT_FRAME_OUTPUT_LOCATION + pixelStart + color];
+            }
 
-          for (var color = 0; color < 3; color++) {
-            rgbColor[color] = _this2.wasmByteMemory[WASMBOY_CURRENT_FRAME_OUTPUT_LOCATION + pixelStart + color];
+            // Doing graphics using second answer on:
+            // https://stackoverflow.com/questions/4899799/whats-the-best-way-to-set-a-single-pixel-in-an-html5-canvas
+            // Image Data mapping
+            var imageDataIndex = (x + y * GAMEBOY_CAMERA_WIDTH) * 4;
+
+            imageDataArray[imageDataIndex] = rgbColor[0];
+            imageDataArray[imageDataIndex + 1] = rgbColor[1];
+            imageDataArray[imageDataIndex + 2] = rgbColor[2];
+            // Alpha, no transparency
+            imageDataArray[imageDataIndex + 3] = 255;
           }
-
-          // Doing graphics using second answer on:
-          // https://stackoverflow.com/questions/4899799/whats-the-best-way-to-set-a-single-pixel-in-an-html5-canvas
-          // Image Data mapping
-          var imageDataIndex = (x + y * GAMEBOY_CAMERA_WIDTH) * 4;
-
-          imageDataArray[imageDataIndex] = rgbColor[0];
-          imageDataArray[imageDataIndex + 1] = rgbColor[1];
-          imageDataArray[imageDataIndex + 2] = rgbColor[2];
-          // Alpha, no transparency
-          imageDataArray[imageDataIndex + 3] = 255;
         }
-      }
 
-      // Add our new imageData
-      for (var i = 0; i < imageDataArray.length; i++) {
-        _this2.canvasImageData.data[i] = imageDataArray[i];
-      }
+        // Add our new imageData
+        for (var i = 0; i < imageDataArray.length; i++) {
+          _this2.canvasImageData.data[i] = imageDataArray[i];
+        }
 
-      // TODO: Allow changing gameboy background color
-      // https://designpieces.com/palette/game-boy-original-color-palette-hex-and-rgb/
-      //this.canvasContext.fillStyle = "#9bbc0f";
-      //this.canvasContext.fillRect(0, 0, this.canvasElement.clientWidth, this.canvasElement.clientHeight);
+        // TODO: Allow changing gameboy background color
+        // https://designpieces.com/palette/game-boy-original-color-palette-hex-and-rgb/
+        //this.canvasContext.fillStyle = "#9bbc0f";
+        //this.canvasContext.fillRect(0, 0, this.canvasElement.clientWidth, this.canvasElement.clientHeight);
 
-      _this2.canvasContext.clearRect(0, 0, GAMEBOY_CAMERA_WIDTH, GAMEBOY_CAMERA_HEIGHT);
-      _this2.canvasContext.putImageData(_this2.canvasImageData, 0, 0);
+        _this2.canvasContext.clearRect(0, 0, GAMEBOY_CAMERA_WIDTH, GAMEBOY_CAMERA_HEIGHT);
+        _this2.canvasContext.putImageData(_this2.canvasImageData, 0, 0);
+      });
 
-      resolve();
-    });
+      return function renderFrameTask() {
+        return _ref2.apply(this, arguments);
+      };
+    }();
+
+    return renderFrameTask();
   };
 
   return WasmBoyGraphicsService;
 }();
 
-var WasmBoyGraphics = new graphics_WasmBoyGraphicsService();
+var WasmBoyGraphics = new WasmBoyGraphicsService();
 // CONCATENATED MODULE: ./lib/audio/audio.js
+function audio__asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new src(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return src.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
 function audio__classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 // Tons of help from:
@@ -4394,7 +4401,7 @@ var getUnsignedAudioSampleAsFloat = function getUnsignedAudioSampleAsFloat(audio
   return audioSample / 2.5;
 };
 
-var audio_WasmBoyAudioService = function () {
+var WasmBoyAudioService = function () {
   function WasmBoyAudioService() {
     audio__classCallCheck(this, WasmBoyAudioService);
 
@@ -4413,20 +4420,30 @@ var audio_WasmBoyAudioService = function () {
   }
 
   WasmBoyAudioService.prototype.initialize = function initialize(wasmInstance, wasmByteMemory) {
-    this.wasmInstance = wasmInstance;
-    this.wasmByteMemory = wasmByteMemory;
+    var _this = this;
 
-    // Initialiuze our cached wasm constants
-    WASMBOY_SOUND_OUTPUT_LOCATION = this.wasmInstance.exports.soundOutputLocation;
+    var initializeTask = function () {
+      var _ref = audio__asyncToGenerator(function* () {
+        _this.wasmInstance = wasmInstance;
+        _this.wasmByteMemory = wasmByteMemory;
 
-    this.audioSources = [];
-    this.averageTimeStretchFps = [];
+        // Initialiuze our cached wasm constants
+        WASMBOY_SOUND_OUTPUT_LOCATION = _this.wasmInstance.exports.soundOutputLocation;
 
-    // Get our Audio context
-    if (!this.audioContext) {
-      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    return src.resolve();
+        _this.audioSources = [];
+        _this.averageTimeStretchFps = [];
+
+        // Get our Audio context
+        if (!_this.audioContext) {
+          _this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+      });
+
+      return function initializeTask() {
+        return _ref.apply(this, arguments);
+      };
+    }();
+    return initializeTask();
   };
 
   // Function to queue up and audio buyffer to be played
@@ -4435,148 +4452,150 @@ var audio_WasmBoyAudioService = function () {
 
 
   WasmBoyAudioService.prototype.playAudio = function playAudio(currentFps, allowFastSpeedStretching) {
-    var _this = this;
+    var _this2 = this;
 
-    return new src(function (resolve) {
+    var playAudioTask = function () {
+      var _ref2 = audio__asyncToGenerator(function* () {
+        // Find our averageFps
+        var fps = currentFps || 60;
+        // TODO Make this a constant
+        var fpsCap = 59;
 
-      // Find our averageFps
-      var fps = currentFps || 60;
-      // TODO Make this a constant
-      var fpsCap = 59;
-
-      // Find our average fps for time stretching
-      _this.averageTimeStretchFps.push(currentFps);
-      // TODO Make the multiplier Const the timeshift speed
-      if (_this.averageTimeStretchFps.length > Math.floor(fpsCap * 3)) {
-        _this.averageTimeStretchFps.shift();
-      }
-
-      // Make sure we have a minimum number of time stretch fps timestamps to judge the average time
-      if (_this.averageTimeStretchFps.length >= fpsCap) {
-        fps = _this.averageTimeStretchFps.reduce(function (accumulator, currentValue) {
-          return accumulator + currentValue;
-        });
-        fps = Math.floor(fps / _this.averageTimeStretchFps.length);
-      }
-
-      // Find if we should time stretch this sample or not from our current fps
-      var playbackRate = 1.0;
-      if (fps < fpsCap || allowFastSpeedStretching) {
-        // Has to be 60 to get accurent playback regarless of fps cap
-        playbackRate = playbackRate * (fps / 60);
-        if (playbackRate <= 0) {
-          playbackRate = 0.01;
+        // Find our average fps for time stretching
+        _this2.averageTimeStretchFps.push(currentFps);
+        // TODO Make the multiplier Const the timeshift speed
+        if (_this2.averageTimeStretchFps.length > Math.floor(fpsCap * 3)) {
+          _this2.averageTimeStretchFps.shift();
         }
-      }
 
-      // Check if we need more samples yet
-      var timeUntilNextSample = void 0;
-      if (_this.audioPlaytime) {
-        timeUntilNextSample = _this.audioPlaytime - _this.audioContext.currentTime;
-        if (timeUntilNextSample > WASMBOY_MIN_TIME_REMAINING_IN_SECONDS && _this.audioContext.currentTime > 0) {
-          resolve();
+        // Make sure we have a minimum number of time stretch fps timestamps to judge the average time
+        if (_this2.averageTimeStretchFps.length >= fpsCap) {
+          fps = _this2.averageTimeStretchFps.reduce(function (accumulator, currentValue) {
+            return accumulator + currentValue;
+          });
+          fps = Math.floor(fps / _this2.averageTimeStretchFps.length);
+        }
+
+        // Find if we should time stretch this sample or not from our current fps
+        var playbackRate = 1.0;
+        if (fps < fpsCap || allowFastSpeedStretching) {
+          // Has to be 60 to get accurent playback regarless of fps cap
+          playbackRate = playbackRate * (fps / 60);
+          if (playbackRate <= 0) {
+            playbackRate = 0.01;
+          }
+        }
+
+        // Check if we need more samples yet
+        var timeUntilNextSample = void 0;
+        if (_this2.audioPlaytime) {
+          timeUntilNextSample = _this2.audioPlaytime - _this2.audioContext.currentTime;
+          if (timeUntilNextSample > WASMBOY_MIN_TIME_REMAINING_IN_SECONDS && _this2.audioContext.currentTime > 0) {
+            return;
+          }
+        }
+
+        // Check if we made it in time
+        // Idea from: https://github.com/binji/binjgb/blob/master/demo/demo.js
+        var audioContextCurrentTime = _this2.audioContext.currentTime;
+        var audioContextCurrentTimeWithLatency = audioContextCurrentTime + DEFAULT_AUDIO_LATENCY_IN_SECONDS;
+        _this2.audioPlaytime = _this2.audioPlaytime || audioContextCurrentTimeWithLatency;
+
+        if (_this2.audioPlaytime < audioContextCurrentTime) {
+          // We took too long, or something happen and hiccup'd the emulator, reset audio playback times
+          //console.log(`[Wasmboy] Reseting Audio Playback time: ${this.audioPlaytime.toFixed(2)} < ${audioContextCurrentTimeWithLatency.toFixed(2)}, Audio Queue Index: ${this.wasmInstance.exports.getAudioQueueIndex()}`);
+          _this2.cancelAllAudio();
+          _this2.wasmInstance.exports.resetAudioQueue();
+          _this2.audioPlaytime = audioContextCurrentTimeWithLatency;
           return;
         }
-      }
 
-      // Check if we made it in time
-      // Idea from: https://github.com/binji/binjgb/blob/master/demo/demo.js
-      var audioContextCurrentTime = _this.audioContext.currentTime;
-      var audioContextCurrentTimeWithLatency = audioContextCurrentTime + DEFAULT_AUDIO_LATENCY_IN_SECONDS;
-      _this.audioPlaytime = _this.audioPlaytime || audioContextCurrentTimeWithLatency;
+        // Cache the audio queue indec here, jumping to wasm is expensive
+        var wasmAudioQueueIndex = _this2.wasmInstance.exports.getAudioQueueIndex();
 
-      if (_this.audioPlaytime < audioContextCurrentTime) {
-        // We took too long, or something happen and hiccup'd the emulator, reset audio playback times
-        //console.log(`[Wasmboy] Reseting Audio Playback time: ${this.audioPlaytime.toFixed(2)} < ${audioContextCurrentTimeWithLatency.toFixed(2)}, Audio Queue Index: ${this.wasmInstance.exports.getAudioQueueIndex()}`);
-        _this.cancelAllAudio();
-        _this.wasmInstance.exports.resetAudioQueue();
-        _this.audioPlaytime = audioContextCurrentTimeWithLatency;
-        resolve();
-        return;
-      }
+        // Lastly, check if we even have any samples we can play
+        if (wasmAudioQueueIndex < 4) {
+          return;
+        }
 
-      // Cache the audio queue indec here, jumping to wasm is expensive
-      var wasmAudioQueueIndex = _this.wasmInstance.exports.getAudioQueueIndex();
+        // We made it! Go ahead and grab and play the pcm samples
+        var wasmBoyNumberOfSamples = wasmAudioQueueIndex;
 
-      // Lastly, check if we even have any samples we can play
-      if (wasmAudioQueueIndex < 4) {
-        resolve();
-        return true;
-      }
+        _this2.audioBuffer = _this2.audioContext.createBuffer(2, wasmBoyNumberOfSamples, WASMBOY_SAMPLE_RATE);
+        var leftChannelBuffer = _this2.audioBuffer.getChannelData(0);
+        var rightChannelBuffer = _this2.audioBuffer.getChannelData(1);
 
-      // We made it! Go ahead and grab and play the pcm samples
-      var wasmBoyNumberOfSamples = wasmAudioQueueIndex;
+        // Our index on our left/right buffers
+        var bufferIndex = 0;
 
-      _this.audioBuffer = _this.audioContext.createBuffer(2, wasmBoyNumberOfSamples, WASMBOY_SAMPLE_RATE);
-      var leftChannelBuffer = _this.audioBuffer.getChannelData(0);
-      var rightChannelBuffer = _this.audioBuffer.getChannelData(1);
+        // Our total number of stereo samples
+        var wasmBoyNumberOfSamplesForStereo = wasmBoyNumberOfSamples * 2;
 
-      // Our index on our left/right buffers
-      var bufferIndex = 0;
+        // Left Channel
+        for (var i = 0; i < wasmBoyNumberOfSamplesForStereo; i = i + 2) {
+          leftChannelBuffer[bufferIndex] = getUnsignedAudioSampleAsFloat(_this2.wasmByteMemory[i + WASMBOY_SOUND_OUTPUT_LOCATION]);
+          bufferIndex++;
+        }
 
-      // Our total number of stereo samples
-      var wasmBoyNumberOfSamplesForStereo = wasmBoyNumberOfSamples * 2;
+        // Reset the buffer index
+        bufferIndex = 0;
 
-      // Left Channel
-      for (var i = 0; i < wasmBoyNumberOfSamplesForStereo; i = i + 2) {
-        leftChannelBuffer[bufferIndex] = getUnsignedAudioSampleAsFloat(_this.wasmByteMemory[i + WASMBOY_SOUND_OUTPUT_LOCATION]);
-        bufferIndex++;
-      }
+        // Right Channel
+        for (var _i = 1; _i < wasmBoyNumberOfSamplesForStereo; _i = _i + 2) {
+          rightChannelBuffer[bufferIndex] = getUnsignedAudioSampleAsFloat(_this2.wasmByteMemory[_i + WASMBOY_SOUND_OUTPUT_LOCATION]);
+          bufferIndex++;
+        }
 
-      // Reset the buffer index
-      bufferIndex = 0;
+        // Reset the Audio Queue
+        _this2.wasmInstance.exports.resetAudioQueue();
 
-      // Right Channel
-      for (var _i = 1; _i < wasmBoyNumberOfSamplesForStereo; _i = _i + 2) {
-        rightChannelBuffer[bufferIndex] = getUnsignedAudioSampleAsFloat(_this.wasmByteMemory[_i + WASMBOY_SOUND_OUTPUT_LOCATION]);
-        bufferIndex++;
-      }
+        // Get an AudioBufferSourceNode.
+        // This is the AudioNode to use when we want to play an AudioBuffer
+        var source = _this2.audioContext.createBufferSource();
 
-      // Reset the Audio Queue
-      _this.wasmInstance.exports.resetAudioQueue();
+        // set the buffer in the AudioBufferSourceNode
+        source.buffer = _this2.audioBuffer;
 
-      // Get an AudioBufferSourceNode.
-      // This is the AudioNode to use when we want to play an AudioBuffer
-      var source = _this.audioContext.createBufferSource();
+        // Set our playback rate for time resetretching
+        source.playbackRate.setValueAtTime(playbackRate, _this2.audioContext.currentTime);
 
-      // set the buffer in the AudioBufferSourceNode
-      source.buffer = _this.audioBuffer;
+        // connect the AudioBufferSourceNode to the
+        // destination so we can hear the sound
+        source.connect(_this2.audioContext.destination);
 
-      // Set our playback rate for time resetretching
-      source.playbackRate.setValueAtTime(playbackRate, _this.audioContext.currentTime);
+        // start the source playing
+        source.start(_this2.audioPlaytime);
 
-      // connect the AudioBufferSourceNode to the
-      // destination so we can hear the sound
-      source.connect(_this.audioContext.destination);
+        // Set our new audio playtime goal
+        var sourcePlaybackLength = wasmBoyNumberOfSamples / (WASMBOY_SAMPLE_RATE * playbackRate);
+        _this2.audioPlaytime = _this2.audioPlaytime + sourcePlaybackLength;
 
-      // start the source playing
-      source.start(_this.audioPlaytime);
+        // Cancel all audio sources on the tail that play before us
+        while (_this2.audioSources[_this2.audioSources.length - 1] && _this2.audioSources[_this2.audioSources.length - 1].playtime <= _this2.audioPlaytime) {
+          _this2.audioSources[_this2.audioSources.length - 1].source.stop();
+          _this2.audioSources.pop();
+        }
 
-      // Set our new audio playtime goal
-      var sourcePlaybackLength = wasmBoyNumberOfSamples / (WASMBOY_SAMPLE_RATE * playbackRate);
-      _this.audioPlaytime = _this.audioPlaytime + sourcePlaybackLength;
+        // Add the source so we can stop this if needed
+        _this2.audioSources.push({
+          source: source,
+          playTime: _this2.audioPlaytime,
+          fps: fps
+        });
 
-      // Cancel all audio sources on the tail that play before us
-      while (_this.audioSources[_this.audioSources.length - 1] && _this.audioSources[_this.audioSources.length - 1].playtime <= _this.audioPlaytime) {
-        _this.audioSources[_this.audioSources.length - 1].source.stop();
-        _this.audioSources.pop();
-      }
-
-      // Add the source so we can stop this if needed
-      _this.audioSources.push({
-        source: source,
-        playTime: _this.audioPlaytime,
-        fps: fps
+        // Shift ourselves out when finished
+        var timeUntilSourceEnds = _this2.audioPlaytime - _this2.audioContext.currentTime + 500;
+        setTimeout(function () {
+          _this2.audioSources.shift();
+        }, timeUntilSourceEnds);
       });
 
-      // Shift ourselves out when finished
-      var timeUntilSourceEnds = _this.audioPlaytime - _this.audioContext.currentTime + 500;
-      setTimeout(function () {
-        _this.audioSources.shift();
-      }, timeUntilSourceEnds);
+      return function playAudioTask() {
+        return _ref2.apply(this, arguments);
+      };
+    }();
 
-      resolve();
-    });
+    return playAudioTask();
   };
 
   WasmBoyAudioService.prototype.cancelAllAudio = function cancelAllAudio() {
@@ -4591,35 +4610,10 @@ var audio_WasmBoyAudioService = function () {
     this.audioPlaytime = this.audioContext.currentTime + DEFAULT_AUDIO_LATENCY_IN_SECONDS;
   };
 
-  WasmBoyAudioService.prototype.debugSaveCurrentAudioBufferToWav = function debugSaveCurrentAudioBufferToWav() {
-
-    if (!this.audioBuffer) {
-      return;
-    }
-
-    // https://www.npmjs.com/package/audiobuffer-to-wav
-    var toWav = __webpack_require__("H4yk");
-    // https://github.com/Jam3/audiobuffer-to-wav/blob/master/demo/index.js
-
-    var wav = toWav(this.audioBuffer);
-    var blob = new window.Blob([new DataView(wav)], {
-      type: 'audio/wav'
-    });
-
-    var url = window.URL.createObjectURL(blob);
-    var anchor = document.createElement('a');
-    document.body.appendChild(anchor);
-    anchor.style = 'display: none';
-    anchor.href = url;
-    anchor.download = 'audio.wav';
-    anchor.click();
-    window.URL.revokeObjectURL(url);
-  };
-
   return WasmBoyAudioService;
 }();
 
-var WasmBoyAudio = new audio_WasmBoyAudioService();
+var WasmBoyAudio = new WasmBoyAudioService();
 // CONCATENATED MODULE: ./node_modules/responsive-gamepad/dist/responsive-gamepad.esm.js
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -5238,21 +5232,20 @@ var controller_WasmBoyControllerService = function () {
 
     // Our wasm instance
     this.wasmInstance = undefined;
+    this.isEnabled = true;
   }
 
   WasmBoyControllerService.prototype.initialize = function initialize(wasmInstance) {
     this.wasmInstance = wasmInstance;
-
     ResponsiveGamepad.initialize();
 
     return src.resolve();
   };
 
-  WasmBoyControllerService.prototype.addTouchInput = function addTouchInput(keyMapKey, element, type, direction) {
-    ResponsiveGamepad.addTouchInput(keyMapKey, element, type, direction);
-  };
-
   WasmBoyControllerService.prototype.updateController = function updateController() {
+    if (!this.isEnabled) {
+      return {};
+    }
 
     // Create an abstracted controller state
     var controllerState = ResponsiveGamepad.getState();
@@ -5262,6 +5255,32 @@ var controller_WasmBoyControllerService = function () {
 
     // Return the controller state in case we need something from it
     return controllerState;
+  };
+
+  WasmBoyControllerService.prototype.enableDefaultJoypad = function enableDefaultJoypad() {
+    this.isEnabled = true;
+
+    return src.resolve();
+  };
+
+  WasmBoyControllerService.prototype.disableDefaultJoypad = function disableDefaultJoypad() {
+    this.isEnabled = false;
+
+    return src.resolve();
+  };
+
+  WasmBoyControllerService.prototype.setJoypadState = function setJoypadState(controllerState) {
+    if (!this.wasmInstance) {
+      return;
+    }
+
+    // Set the new controller state on the instance
+    this.wasmInstance.exports.setJoypadState(controllerState.UP ? 1 : 0, controllerState.RIGHT ? 1 : 0, controllerState.DOWN ? 1 : 0, controllerState.LEFT ? 1 : 0, controllerState.A ? 1 : 0, controllerState.B ? 1 : 0, controllerState.SELECT ? 1 : 0, controllerState.START ? 1 : 0);
+  };
+
+  WasmBoyControllerService.prototype.addTouchInput = function addTouchInput(keyMapKey, element, type, direction) {
+    ResponsiveGamepad.addTouchInput(keyMapKey, element, type, direction);
+    return src.resolve();
   };
 
   return WasmBoyControllerService;
@@ -5334,67 +5353,28 @@ if (typeof window !== 'undefined') {
 }
 
 var idbKeyval = keyval;
-// CONCATENATED MODULE: ./lib/memory/memory.js
-var memory__extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-function memory__classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-
-
-
-// Going to set the key for idbKeyval as the cartridge header.
-// Then, for each cartridge, it will return an object.
-// there will be a cartridgeRam Key, settings Key, and a saveState key
-// Not going to make one giant object, as we want to keep idb transactions light and fast
-
-var WASMBOY_UNLOAD_STORAGE = 'WASMBOY_UNLOAD_STORAGE';
-
-//  Will save the state in parts, to easy memory map changes:
-// https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
-var WASMBOY_SAVE_STATE_SCHEMA = {
-  wasmBoyMemory: {
-    wasmBoyInternalState: [],
-    wasmBoyPaletteMemory: [],
-    gameBoyMemory: [],
-    cartridgeRam: []
-  },
-  date: undefined,
-  name: undefined,
-  isAuto: undefined
-
-  // Define some constants since calls to wasm are expensive
-};var WASMBOY_GAME_BYTES_LOCATION = 0;
-var WASMBOY_GAME_RAM_BANKS_LOCATION = 0;
-var WASMBOY_INTERNAL_STATE_SIZE = 0;
-var WASMBOY_INTERNAL_STATE_LOCATION = 0;
-var WASMBOY_INTERNAL_MEMORY_SIZE = 0;
-var WASMBOY_INTERNAL_MEMORY_LOCATION = 0;
-var WASMBOY_PALETTE_MEMORY_SIZE = 0;
-var WASMBOY_PALETTE_MEMORY_LOCATION = 0;
-
-// Private function to get the cartridge header
-var getCartridgeHeader = function getCartridgeHeader(wasmInstance, wasmByteMemory) {
-
-  if (!wasmByteMemory) {
+// CONCATENATED MODULE: ./lib/memory/header.js
+// Function to get the cartridge header
+var getCartridgeHeader = function getCartridgeHeader(wasmboyMemory) {
+  if (!wasmboyMemory || !wasmboyMemory.wasmByteMemory) {
     return false;
   }
 
   // Header is at 0x0134 - 0x014F
   // http://gbdev.gg8.se/wiki/articles/The_Cartridge_Header
-  var headerLength = 0x014F - 0x0134;
+  var headerLength = 0x014f - 0x0134;
   var headerArray = new Uint8Array(headerLength);
   for (var i = 0; i <= headerLength; i++) {
     // Get the CARTRIDGE_ROM + the offset to point us at the header, plus the current byte
-    headerArray[i] = wasmByteMemory[WASMBOY_GAME_BYTES_LOCATION + 0x0134 + i];
+    headerArray[i] = wasmboyMemory.wasmByteMemory[wasmboyMemory.WASMBOY_GAME_BYTES_LOCATION + 0x0134 + i];
   }
 
   return headerArray;
 };
-
+// CONCATENATED MODULE: ./lib/memory/ram.js
 // Private function to get the caretridge ram
-var getCartridgeRam = function getCartridgeRam(wasmInstance, wasmByteMemory) {
-
-  if (!wasmByteMemory) {
+var getCartridgeRam = function getCartridgeRam(wasmboyMemory) {
+  if (!wasmboyMemory || !wasmboyMemory.wasmByteMemory) {
     return false;
   }
 
@@ -5407,7 +5387,7 @@ var getCartridgeRam = function getCartridgeRam(wasmInstance, wasmByteMemory) {
   // We will determine our cartridge type
   // Get our game MBC type from the cartridge header
   // http://gbdev.gg8.se/wiki/articles/The_Cartridge_Header
-  var cartridgeType = wasmByteMemory[WASMBOY_GAME_BYTES_LOCATION + 0x0147];
+  var cartridgeType = wasmboyMemory.wasmByteMemory[wasmboyMemory.WASMBOY_GAME_BYTES_LOCATION + 0x0147];
 
   var ramSize = undefined;
   if (cartridgeType === 0x00) {
@@ -5419,10 +5399,10 @@ var getCartridgeRam = function getCartridgeRam(wasmInstance, wasmByteMemory) {
   } else if (cartridgeType >= 0x05 && cartridgeType <= 0x06) {
     // MBC2 512X4 Bytes, 2KB
     ramSize = 0x800;
-  } else if (cartridgeType >= 0x0F && cartridgeType <= 0x13) {
+  } else if (cartridgeType >= 0x0f && cartridgeType <= 0x13) {
     // MBC3 32KB of Ram
     ramSize = 0x8000;
-  } else if (cartridgeType >= 0x19 && cartridgeType <= 0x1E) {
+  } else if (cartridgeType >= 0x19 && cartridgeType <= 0x1e) {
     // MBC5 128KB of Ram
     ramSize = 0x20000;
   }
@@ -5435,70 +5415,200 @@ var getCartridgeRam = function getCartridgeRam(wasmInstance, wasmByteMemory) {
   var cartridgeRam = new Uint8Array(ramSize);
 
   for (var i = 0; i < ramSize; i++) {
-    cartridgeRam[i] = wasmByteMemory[WASMBOY_GAME_RAM_BANKS_LOCATION + i];
+    cartridgeRam[i] = wasmboyMemory.wasmByteMemory[wasmboyMemory.WASMBOY_GAME_RAM_BANKS_LOCATION + i];
   }
 
   return cartridgeRam;
 };
+// CONCATENATED MODULE: ./lib/memory/state.js
+var state__extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+
+
+//  Will save the state in parts, to easy memory map changes:
+// https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
+var WASMBOY_SAVE_STATE_SCHEMA = {
+  wasmboyMemory: {
+    wasmBoyInternalState: [],
+    wasmBoyPaletteMemory: [],
+    gameBoyMemory: [],
+    cartridgeRam: []
+  },
+  date: undefined,
+  isAuto: undefined
+};
 
 // Function to return a save state of the current memory
-var getSaveState = function getSaveState(wasmInstance, wasmByteMemory, saveStateCallback, saveStateName) {
+var state_getSaveState = function getSaveState(wasmboyMemory) {
+  // Save our internal wasmboy state to memory
+  wasmboyMemory.wasmInstance.exports.saveState();
 
-  var cartridgeRam = getCartridgeRam(wasmInstance, wasmByteMemory);
+  var cartridgeRam = getCartridgeRam(wasmboyMemory.wasmInstance, wasmboyMemory.wasmByteMemory);
 
-  var wasmBoyInternalState = new Uint8Array(WASMBOY_INTERNAL_STATE_SIZE);
-  var wasmBoyPaletteMemory = new Uint8Array(WASMBOY_PALETTE_MEMORY_SIZE);
-  var gameBoyMemory = new Uint8Array(WASMBOY_INTERNAL_MEMORY_SIZE);
+  var wasmBoyInternalState = new Uint8Array(wasmboyMemory.WASMBOY_INTERNAL_STATE_SIZE);
+  var wasmBoyPaletteMemory = new Uint8Array(wasmboyMemory.WASMBOY_PALETTE_MEMORY_SIZE);
+  var gameBoyMemory = new Uint8Array(wasmboyMemory.WASMBOY_INTERNAL_MEMORY_SIZE);
 
-  for (var i = 0; i < WASMBOY_INTERNAL_STATE_SIZE; i++) {
-    wasmBoyInternalState[i] = wasmByteMemory[i + WASMBOY_INTERNAL_STATE_LOCATION];
+  for (var i = 0; i < wasmboyMemory.WASMBOY_INTERNAL_STATE_SIZE; i++) {
+    wasmBoyInternalState[i] = wasmboyMemory.wasmByteMemory[i + wasmboyMemory.WASMBOY_INTERNAL_STATE_LOCATION];
   }
 
-  for (var _i = 0; _i < WASMBOY_PALETTE_MEMORY_SIZE; _i++) {
-    wasmBoyPaletteMemory[_i] = wasmByteMemory[_i + WASMBOY_PALETTE_MEMORY_LOCATION];
+  for (var _i = 0; _i < wasmboyMemory.WASMBOY_PALETTE_MEMORY_SIZE; _i++) {
+    wasmBoyPaletteMemory[_i] = wasmboyMemory.wasmByteMemory[_i + wasmboyMemory.WASMBOY_PALETTE_MEMORY_LOCATION];
   }
 
-  for (var _i2 = 0; _i2 < WASMBOY_INTERNAL_MEMORY_SIZE; _i2++) {
-    gameBoyMemory[_i2] = wasmByteMemory[_i2 + WASMBOY_INTERNAL_MEMORY_LOCATION];
+  for (var _i2 = 0; _i2 < wasmboyMemory.WASMBOY_INTERNAL_MEMORY_SIZE; _i2++) {
+    gameBoyMemory[_i2] = wasmboyMemory.wasmByteMemory[_i2 + wasmboyMemory.WASMBOY_INTERNAL_MEMORY_LOCATION];
   }
 
-  var saveState = memory__extends({}, WASMBOY_SAVE_STATE_SCHEMA);
+  var saveState = state__extends({}, WASMBOY_SAVE_STATE_SCHEMA);
 
-  saveState.wasmBoyMemory.wasmBoyInternalState = wasmBoyInternalState;
-  saveState.wasmBoyMemory.wasmBoyPaletteMemory = wasmBoyPaletteMemory;
-  saveState.wasmBoyMemory.gameBoyMemory = gameBoyMemory;
-  saveState.wasmBoyMemory.cartridgeRam = cartridgeRam;
+  saveState.wasmboyMemory.wasmBoyInternalState = wasmBoyInternalState;
+  saveState.wasmboyMemory.wasmBoyPaletteMemory = wasmBoyPaletteMemory;
+  saveState.wasmboyMemory.gameBoyMemory = gameBoyMemory;
+  saveState.wasmboyMemory.cartridgeRam = cartridgeRam;
   saveState.date = Date.now();
   saveState.isAuto = false;
-  saveState.name = saveStateName;
 
-  if (saveStateCallback) {
-    saveState = saveStateCallback(saveState);
+  if (wasmboyMemory.saveStateCallback) {
+    saveState = wasmboyMemory.saveStateCallback(saveState);
   }
 
   return saveState;
 };
 
-var loadSaveState = function loadSaveState(wasmInstance, wasmByteMemory, saveState) {
-
-  for (var i = 0; i < WASMBOY_INTERNAL_STATE_SIZE; i++) {
-    wasmByteMemory[i + WASMBOY_INTERNAL_STATE_LOCATION] = saveState.wasmBoyMemory.wasmBoyInternalState[i];
+var loadSaveState = function loadSaveState(wasmboyMemory, saveState) {
+  for (var i = 0; i < wasmboyMemory.WASMBOY_INTERNAL_STATE_SIZE; i++) {
+    wasmboyMemory.wasmByteMemory[i + wasmboyMemory.WASMBOY_INTERNAL_STATE_LOCATION] = saveState.wasmboyMemory.wasmBoyInternalState[i];
   }
 
-  for (var _i3 = 0; _i3 < WASMBOY_PALETTE_MEMORY_SIZE; _i3++) {
-    wasmByteMemory[_i3 + WASMBOY_PALETTE_MEMORY_LOCATION] = saveState.wasmBoyMemory.wasmBoyPaletteMemory[_i3];
+  for (var _i3 = 0; _i3 < wasmboyMemory.WASMBOY_PALETTE_MEMORY_SIZE; _i3++) {
+    wasmboyMemory.wasmByteMemory[_i3 + wasmboyMemory.WASMBOY_PALETTE_MEMORY_LOCATION] = saveState.wasmboyMemory.wasmBoyPaletteMemory[_i3];
   }
 
-  for (var _i4 = 0; _i4 < WASMBOY_INTERNAL_MEMORY_SIZE; _i4++) {
-    wasmByteMemory[_i4 + WASMBOY_INTERNAL_MEMORY_LOCATION] = saveState.wasmBoyMemory.gameBoyMemory[_i4];
+  for (var _i4 = 0; _i4 < wasmboyMemory.WASMBOY_INTERNAL_MEMORY_SIZE; _i4++) {
+    wasmboyMemory.wasmByteMemory[_i4 + wasmboyMemory.WASMBOY_INTERNAL_MEMORY_LOCATION] = saveState.wasmboyMemory.gameBoyMemory[_i4];
   }
 
-  for (var _i5 = 0; _i5 < saveState.wasmBoyMemory.cartridgeRam.length; _i5++) {
-    wasmByteMemory[_i5 + WASMBOY_GAME_RAM_BANKS_LOCATION] = saveState.wasmBoyMemory.cartridgeRam[_i5];
+  for (var _i5 = 0; _i5 < saveState.wasmboyMemory.cartridgeRam.length; _i5++) {
+    wasmboyMemory.wasmByteMemory[_i5 + wasmboyMemory.WASMBOY_GAME_RAM_BANKS_LOCATION] = saveState.wasmboyMemory.cartridgeRam[_i5];
   }
 
   return true;
 };
+// CONCATENATED MODULE: ./lib/memory/autosave.js
+function autosave__asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
+// Need to add a return value, and force all code in the block to be sync
+// https://stackoverflow.com/questions/7255649/window-onbeforeunload-not-working
+// http://vaughnroyko.com/idbonbeforeunload/
+// https://bugzilla.mozilla.org/show_bug.cgi?id=870645
+
+// Solution:
+// ~~Try to force sync: https://www.npmjs.com/package/deasync~~ Didn't work, requires fs
+// Save to local storage, and pick it back up in init: https://bugs.chromium.org/p/chromium/issues/detail?id=144862
+
+// import Functions involving GB and WasmBoy memory
+
+
+
+
+// Function to create a save state, and store it as a localstorage token
+var autosave__prepareAndStoreAutoSave = function _prepareAndStoreAutoSave(wasmboyMemory) {
+  // Check if the game is currently playing
+  if (!wasmboyMemory || !wasmboyMemory.wasmInstance || wasmboyMemory.wasmInstance.exports.hasCoreStarted() <= 0) {
+    return null;
+  }
+
+  // Get our cartridge ram and header
+  var header = getCartridgeHeader(wasmboyMemory);
+  var cartridgeRam = getCartridgeRam(wasmboyMemory);
+
+  // Get our save state, and un type our arrays
+  var saveState = state_getSaveState(wasmboyMemory);
+  var saveStateMemoryKeys = Object.keys(saveState.wasmboyMemory);
+  for (var i = 0; i < saveStateMemoryKeys.length; i++) {
+    saveState.wasmboyMemory[saveStateMemoryKeys[i]] = Array.prototype.slice.call(saveState.wasmboyMemory[saveStateMemoryKeys[i]]);
+  }
+
+  // Set isAuto
+  saveState.isAuto = true;
+
+  // Need to conert types arrays, and back, or selse wll get indexed JSON
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays
+  localStorage.setItem(wasmboyMemory.WASMBOY_UNLOAD_STORAGE, JSON.stringify({
+    header: Array.prototype.slice.call(header),
+    cartridgeRam: Array.prototype.slice.call(cartridgeRam),
+    saveState: saveState
+  }));
+
+  return null;
+};
+
+// Function to find any autosaves in localstorage, and commit them to our idb
+var _findAndCommitAutoSave = function _findAndCommitAutoSave(wasmboyMemory) {
+  var findAndCommitAutoSaveTask = function () {
+    var _ref = autosave__asyncToGenerator(function* () {
+      // Load any unloaded storage in our localStorage
+      var unloadStorage = localStorage.getItem(wasmboyMemory.WASMBOY_UNLOAD_STORAGE);
+      if (unloadStorage) {
+        var unloadStorageObject = JSON.parse(unloadStorage);
+        localStorage.removeItem(wasmboyMemory.WASMBOY_UNLOAD_STORAGE);
+
+        var header = new Uint8Array(unloadStorageObject.header);
+        var cartridgeRam = new Uint8Array(unloadStorageObject.cartridgeRam);
+
+        // Get our save state, and re-type our array
+        var saveState = unloadStorageObject.saveState;
+        if (saveState) {
+          var saveStateMemoryKeys = Object.keys(saveState.wasmboyMemory);
+          for (var i = 0; i < saveStateMemoryKeys.length; i++) {
+            saveState.wasmboyMemory[saveStateMemoryKeys[i]] = new Uint8Array(saveState.wasmboyMemory[saveStateMemoryKeys[i]]);
+          }
+        }
+
+        yield wasmboyMemory.saveCartridgeRam(header, cartridgeRam);
+        yield wasmboyMemory.saveState(header, saveState);
+      }
+    });
+
+    return function findAndCommitAutoSaveTask() {
+      return _ref.apply(this, arguments);
+    };
+  }();
+
+  return findAndCommitAutoSaveTask();
+};
+
+// Function to set event listeners to run our unload handler
+var initializeAutoSave = function initializeAutoSave(wasmboyMemory) {
+  // Set listeners to ensure we save our cartridge ram before closing
+  window.addEventListener('beforeunload', function () {
+    autosave__prepareAndStoreAutoSave(wasmboyMemory);
+  }, false);
+  window.addEventListener('unload', function () {
+    autosave__prepareAndStoreAutoSave(wasmboyMemory);
+  }, false);
+  window.addEventListener('pagehide', function () {
+    autosave__prepareAndStoreAutoSave(wasmboyMemory);
+  }, false);
+
+  // Restore any autosave lingering to be committed
+  return _findAndCommitAutoSave(wasmboyMemory);
+};
+// CONCATENATED MODULE: ./lib/memory/memory.js
+function memory__asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new src(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return src.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
+function memory__classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+
+
+
+// import Functions involving GB and WasmBoy memory
+
+
+
+
 
 var memory_WasmBoyMemoryService = function () {
   function WasmBoyMemoryService() {
@@ -5511,121 +5621,55 @@ var memory_WasmBoyMemoryService = function () {
       ROM: false,
       RAM: false
     };
+
+    // Going to set the key for idbKeyval as the cartridge header.
+    // Then, for each cartridge, it will return an object.
+    // there will be a cartridgeRam Key, settings Key, and a saveState key
+    // Not going to make one giant object, as we want to keep idb transactions light and fast
+    this.WASMBOY_UNLOAD_STORAGE = 'WASMBOY_UNLOAD_STORAGE';
+
+    // Define some constants since calls to wasm are expensive
+    this.WASMBOY_GAME_BYTES_LOCATION = 0;
+    this.WASMBOY_GAME_RAM_BANKS_LOCATION = 0;
+    this.WASMBOY_INTERNAL_STATE_SIZE = 0;
+    this.WASMBOY_INTERNAL_STATE_LOCATION = 0;
+    this.WASMBOY_INTERNAL_MEMORY_SIZE = 0;
+    this.WASMBOY_INTERNAL_MEMORY_LOCATION = 0;
+    this.WASMBOY_PALETTE_MEMORY_SIZE = 0;
+    this.WASMBOY_PALETTE_MEMORY_LOCATION = 0;
   }
 
-  WasmBoyMemoryService.prototype.initialize = function initialize(wasmInstance, wasmByteMemory, saveStateCallback) {
-    var _this = this;
+  WasmBoyMemoryService.prototype.initialize = function initialize(headless, wasmInstance, wasmByteMemory, saveStateCallback) {
+    if (headless) {
+      this.wasmInstance = wasmInstance;
+      this.wasmByteMemory = wasmByteMemory;
+      this.saveStateCallback = saveStateCallback;
 
-    this.wasmInstance = wasmInstance;
-    this.wasmByteMemory = wasmByteMemory;
-    this.saveStateCallback = saveStateCallback;
+      this._initializeConstants();
 
-    this._initializeConstants();
+      return src.resolve();
+    } else {
+      this.wasmInstance = wasmInstance;
+      this.wasmByteMemory = wasmByteMemory;
+      this.saveStateCallback = saveStateCallback;
 
-    var unloadHandler = function unloadHandler() {
-      // Need to add a retrun value, and force all code in the block to be sync
-      // https://stackoverflow.com/questions/7255649/window-onbeforeunload-not-working
-      // http://vaughnroyko.com/idbonbeforeunload/
-      // https://bugzilla.mozilla.org/show_bug.cgi?id=870645
+      this._initializeConstants();
 
-      // Solution:
-      // ~~Try to force sync: https://www.npmjs.com/package/deasync~~ Didn't work, requires fs
-      // Save to local storage, and pick it back up in init: https://bugs.chromium.org/p/chromium/issues/detail?id=144862
-
-      // Check if the game is currently playing
-      if (_this.wasmInstance.exports.hasCoreStarted() <= 0) {
-        return null;
-      }
-
-      // Get our cartridge ram and header
-      var header = getCartridgeHeader(_this.wasmInstance, _this.wasmByteMemory);
-      var cartridgeRam = getCartridgeRam(_this.wasmInstance, _this.wasmByteMemory);
-
-      // Get our save state, and un type our arrays
-      var saveState = getSaveState(_this.wasmInstance, _this.wasmByteMemory, _this.saveStateCallback);
-      var saveStateMemoryKeys = Object.keys(saveState.wasmBoyMemory);
-      for (var i = 0; i < saveStateMemoryKeys.length; i++) {
-        saveState.wasmBoyMemory[saveStateMemoryKeys[i]] = Array.prototype.slice.call(saveState.wasmBoyMemory[saveStateMemoryKeys[i]]);
-      }
-
-      // Set isAuto
-      saveState.isAuto = true;
-
-      // Need to vonert types arrays, and back, or selse wll get indexed JSON
-      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays
-      localStorage.setItem(WASMBOY_UNLOAD_STORAGE, JSON.stringify({
-        header: Array.prototype.slice.call(header),
-        cartridgeRam: Array.prototype.slice.call(cartridgeRam),
-        saveState: saveState
-      }));
-
-      return null;
-    };
-
-    // Set listeners to ensure we save our cartridge ram before closing
-    window.addEventListener("beforeunload", function () {
-      unloadHandler();
-    }, false);
-    window.addEventListener("unload", function () {
-      unloadHandler();
-    }, false);
-    window.addEventListener("pagehide", function () {
-      unloadHandler();
-    }, false);
-
-    return new src(function (resolve, reject) {
-      // Load any unloaded storage in our localStorage
-      var unloadStorage = localStorage.getItem(WASMBOY_UNLOAD_STORAGE);
-      if (unloadStorage) {
-
-        var unloadStorageObject = JSON.parse(unloadStorage);
-        localStorage.removeItem(WASMBOY_UNLOAD_STORAGE);
-
-        var header = new Uint8Array(unloadStorageObject.header);
-        var cartridgeRam = new Uint8Array(unloadStorageObject.cartridgeRam);
-
-        // Get our save state, and re-type our array
-        var saveState = unloadStorageObject.saveState;
-        if (saveState) {
-          var saveStateMemoryKeys = Object.keys(saveState.wasmBoyMemory);
-          for (var i = 0; i < saveStateMemoryKeys.length; i++) {
-            saveState.wasmBoyMemory[saveStateMemoryKeys[i]] = new Uint8Array(saveState.wasmBoyMemory[saveStateMemoryKeys[i]]);
-          }
-        }
-
-        _this.saveCartridgeRam(header, cartridgeRam).then(function () {
-          _this.saveState(header, saveState).then(function () {
-            return resolve();
-          }).catch(function (error) {
-            return reject(error);
-          });
-        }).catch(function (error) {
-          return reject(error);
-        });
-      } else {
-        return resolve();
-      }
-    });
-  };
-
-  WasmBoyMemoryService.prototype.initializeHeadless = function initializeHeadless(wasmInstance, wasmByteMemory, saveStateCallback) {
-    this.wasmInstance = wasmInstance;
-    this.wasmByteMemory = wasmByteMemory;
-    this.saveStateCallback = saveStateCallback;
-
-    this._initializeConstants();
+      // initialize the autosave feature
+      return initializeAutoSave(this);
+    }
   };
 
   WasmBoyMemoryService.prototype._initializeConstants = function _initializeConstants() {
     // Initialiuze our cached wasm constants
-    WASMBOY_GAME_BYTES_LOCATION = this.wasmInstance.exports.gameBytesLocation;
-    WASMBOY_GAME_RAM_BANKS_LOCATION = this.wasmInstance.exports.gameRamBanksLocation;
-    WASMBOY_INTERNAL_STATE_SIZE = this.wasmInstance.exports.wasmBoyInternalStateSize;
-    WASMBOY_INTERNAL_STATE_LOCATION = this.wasmInstance.exports.wasmBoyInternalStateLocation;
-    WASMBOY_INTERNAL_MEMORY_SIZE = this.wasmInstance.exports.gameBoyInternalMemorySize;
-    WASMBOY_INTERNAL_MEMORY_LOCATION = this.wasmInstance.exports.gameBoyInternalMemoryLocation;
-    WASMBOY_PALETTE_MEMORY_SIZE = this.wasmInstance.exports.gameboyColorPaletteSize;
-    WASMBOY_PALETTE_MEMORY_LOCATION = this.wasmInstance.exports.gameboyColorPaletteLocation;
+    this.WASMBOY_GAME_BYTES_LOCATION = this.wasmInstance.exports.gameBytesLocation;
+    this.WASMBOY_GAME_RAM_BANKS_LOCATION = this.wasmInstance.exports.gameRamBanksLocation;
+    this.WASMBOY_INTERNAL_STATE_SIZE = this.wasmInstance.exports.wasmBoyInternalStateSize;
+    this.WASMBOY_INTERNAL_STATE_LOCATION = this.wasmInstance.exports.wasmBoyInternalStateLocation;
+    this.WASMBOY_INTERNAL_MEMORY_SIZE = this.wasmInstance.exports.gameBoyInternalMemorySize;
+    this.WASMBOY_INTERNAL_MEMORY_LOCATION = this.wasmInstance.exports.gameBoyInternalMemoryLocation;
+    this.WASMBOY_PALETTE_MEMORY_SIZE = this.wasmInstance.exports.gameboyColorPaletteSize;
+    this.WASMBOY_PALETTE_MEMORY_LOCATION = this.wasmInstance.exports.gameboyColorPaletteLocation;
   };
 
   WasmBoyMemoryService.prototype.getLoadedCartridgeMemoryState = function getLoadedCartridgeMemoryState() {
@@ -5646,8 +5690,8 @@ var memory_WasmBoyMemoryService = function () {
   // Function to reset stateful sections of memory
 
 
-  WasmBoyMemoryService.prototype.resetMemory = function resetMemory() {
-    for (var i = 0; i <= WASMBOY_GAME_BYTES_LOCATION; i++) {
+  WasmBoyMemoryService.prototype.resetState = function resetState() {
+    for (var i = 0; i <= this.WASMBOY_GAME_BYTES_LOCATION; i++) {
       this.wasmByteMemory[i] = 0;
     }
 
@@ -5655,16 +5699,12 @@ var memory_WasmBoyMemoryService = function () {
   };
 
   WasmBoyMemoryService.prototype.loadCartridgeRom = function loadCartridgeRom(gameBytes, isGbcEnabled, bootRom) {
-
     // Load the game data into actual memory
     for (var i = 0; i < gameBytes.length; i++) {
       if (gameBytes[i]) {
-        this.wasmByteMemory[WASMBOY_GAME_BYTES_LOCATION + i] = gameBytes[i];
+        this.wasmByteMemory[this.WASMBOY_GAME_BYTES_LOCATION + i] = gameBytes[i];
       }
     }
-
-    // TODO: Handle getting a boot rom
-    this.wasmInstance.exports.initialize(isGbcEnabled ? 1 : 0, 0);
 
     this.loadedCartridgeMemoryState.ROM = true;
   };
@@ -5676,31 +5716,30 @@ var memory_WasmBoyMemoryService = function () {
 
 
   WasmBoyMemoryService.prototype.saveCartridgeRam = function saveCartridgeRam(passedHeader, passedCartridgeRam) {
-    var _this2 = this;
+    var _this = this;
 
-    return new src(function (resolve, reject) {
-      // Get the entire header in byte memory
-      // Each version of a rom can have similar title and checksums
-      // Therefore comparing all of it should help with this :)
-      // https://drive.google.com/file/d/0B7y-o-Uytiv9OThXWXFCM1FPbGs/view
-      var header = void 0;
-      var cartridgeRam = void 0;
-      if (passedHeader && passedCartridgeRam) {
-        header = passedHeader;
-        cartridgeRam = passedCartridgeRam;
-      } else {
-        header = getCartridgeHeader(_this2.wasmInstance, _this2.wasmByteMemory);
-        cartridgeRam = getCartridgeRam(_this2.wasmInstance, _this2.wasmByteMemory);
-      }
+    var saveCartridgeRamTask = function () {
+      var _ref = memory__asyncToGenerator(function* () {
+        // Get the entire header in byte memory
+        // Each version of a rom can have similar title and checksums
+        // Therefore comparing all of it should help with this :)
+        // https://drive.google.com/file/d/0B7y-o-Uytiv9OThXWXFCM1FPbGs/view
+        var header = void 0;
+        var cartridgeRam = void 0;
+        if (passedHeader && passedCartridgeRam) {
+          header = passedHeader;
+          cartridgeRam = passedCartridgeRam;
+        } else {
+          header = getCartridgeHeader(_this);
+          cartridgeRam = getCartridgeRam(_this);
+        }
 
-      if (!header || !cartridgeRam) {
-        console.error('Error parsing the cartridgeRam or cartridge header', header, cartridgeRam);
-        reject('Error parsing the cartridgeRam or cartridge header');
-      }
+        if (!header || !cartridgeRam) {
+          throw new Error('Error parsing the cartridgeRam or cartridge header');
+        }
 
-      // Get our cartridge object
-      idbKeyval.get(header).then(function (cartridgeObject) {
-
+        // Get our cartridge object
+        var cartridgeObject = yield idbKeyval.get(header);
         if (!cartridgeObject) {
           cartridgeObject = {};
         }
@@ -5708,15 +5747,15 @@ var memory_WasmBoyMemoryService = function () {
         // Set the cartridgeRam to our cartridgeObject
         cartridgeObject.cartridgeRam = cartridgeRam;
 
-        idbKeyval.set(header, cartridgeObject).then(function () {
-          resolve();
-        }).catch(function (error) {
-          reject(error);
-        });
-      }).catch(function (error) {
-        reject(error);
+        yield idbKeyval.set(header, cartridgeObject);
       });
-    });
+
+      return function saveCartridgeRamTask() {
+        return _ref.apply(this, arguments);
+      };
+    }();
+
+    return saveCartridgeRamTask();
   };
 
   // function to load the cartridge ram
@@ -5724,142 +5763,132 @@ var memory_WasmBoyMemoryService = function () {
 
 
   WasmBoyMemoryService.prototype.loadCartridgeRam = function loadCartridgeRam() {
-    var _this3 = this;
+    var _this2 = this;
 
-    return new src(function (resolve, reject) {
-      // Get the entire header in byte memory
-      // Each version of a rom can have similar title and checksums
-      // Therefore comparing all of it should help with this :)
-      // https://drive.google.com/file/d/0B7y-o-Uytiv9OThXWXFCM1FPbGs/view
-      var header = getCartridgeHeader(_this3.wasmInstance, _this3.wasmByteMemory);
+    var loadCartridgeRamTask = function () {
+      var _ref2 = memory__asyncToGenerator(function* () {
+        // Get the entire header in byte memory
+        // Each version of a rom can have similar title and checksums
+        // Therefore comparing all of it should help with this :)
+        // https://drive.google.com/file/d/0B7y-o-Uytiv9OThXWXFCM1FPbGs/view
+        var header = getCartridgeHeader(_this2);
 
-      if (!header) {
-        reject('Error parsing the cartridge header');
-      }
+        if (!header) {
+          throw new Error('Error parsing the cartridge header');
+        }
 
-      idbKeyval.get(header).then(function (cartridgeObject) {
+        var cartridgeObject = yield idbKeyval.get(header);
 
         if (!cartridgeObject || !cartridgeObject.cartridgeRam) {
-          resolve();
           return;
         }
 
         // Set the cartridgeRam
         for (var i = 0; i < cartridgeObject.cartridgeRam.length; i++) {
-          _this3.wasmByteMemory[WASMBOY_GAME_RAM_BANKS_LOCATION + i] = cartridgeObject.cartridgeRam[i];
+          _this2.wasmByteMemory[_this2.WASMBOY_GAME_RAM_BANKS_LOCATION + i] = cartridgeObject.cartridgeRam[i];
         }
-        _this3.loadedCartridgeMemoryState.RAM = true;
-        resolve();
-      }).catch(function (error) {
-        reject(error);
+        _this2.loadedCartridgeMemoryState.RAM = true;
       });
-    });
+
+      return function loadCartridgeRamTask() {
+        return _ref2.apply(this, arguments);
+      };
+    }();
+
+    return loadCartridgeRamTask();
   };
 
   // Function to save the state to the indexeddb
 
 
   WasmBoyMemoryService.prototype.saveState = function saveState(passedHeader, passedSaveState) {
-    var _this4 = this;
+    var _this3 = this;
 
-    return new src(function (resolve, reject) {
+    var saveStateTask = function () {
+      var _ref3 = memory__asyncToGenerator(function* () {
+        // Get our save state
+        var saveState = void 0;
+        var header = void 0;
+        if (passedHeader && passedSaveState) {
+          saveState = passedSaveState;
+          header = passedHeader;
+        } else {
+          saveState = state_getSaveState(_this3);
+          header = getCartridgeHeader(_this3);
+        }
 
-      // Save our internal wasmboy state to memory
-      _this4.wasmInstance.exports.saveState();
+        if (!header) {
+          throw new Error('Error parsing the cartridge header');
+        }
 
-      // Get our save state
-      var saveState = void 0;
-      var header = void 0;
-      if (passedHeader && passedSaveState) {
-        saveState = passedSaveState;
-        header = passedHeader;
-      } else {
-        saveState = getSaveState(_this4.wasmInstance, _this4.wasmByteMemory, _this4.saveStateCallback);
-        header = getCartridgeHeader(_this4.wasmInstance, _this4.wasmByteMemory);
-      }
-
-      if (!header) {
-        reject('Error parsing the cartridge header');
-      }
-
-      idbKeyval.get(header).then(function (cartridgeObject) {
+        var cartridgeObject = yield idbKeyval.get(header);
 
         if (!cartridgeObject) {
           cartridgeObject = {};
         }
-
         if (!cartridgeObject.saveStates) {
           cartridgeObject.saveStates = [];
         }
 
         cartridgeObject.saveStates.push(saveState);
 
-        idbKeyval.set(header, cartridgeObject).then(function () {
-          resolve();
-        }).catch(function (error) {
-          reject(error);
-        });
-      }).catch(function (error) {
-        reject(error);
+        yield idbKeyval.set(header, cartridgeObject);
       });
-    });
+
+      return function saveStateTask() {
+        return _ref3.apply(this, arguments);
+      };
+    }();
+
+    return saveStateTask();
   };
 
   WasmBoyMemoryService.prototype.loadState = function loadState(saveState) {
-    var _this5 = this;
+    var _this4 = this;
 
-    return new src(function (resolve, reject) {
+    var loadStateTask = function () {
+      var _ref4 = memory__asyncToGenerator(function* () {
+        var header = getCartridgeHeader(_this4);
 
-      var header = getCartridgeHeader(_this5.wasmInstance, _this5.wasmByteMemory);
+        if (!header) {
+          throw new Error('Error parsing the cartridge header');
+        }
 
-      if (!header) {
-        reject('Error parsing the cartridge header');
-      }
-
-      if (saveState) {
-        loadSaveState(_this5.wasmInstance, _this5.wasmByteMemory, saveState);
-
-        // Load back out internal wasmboy state from memory
-        _this5.wasmInstance.exports.loadState();
-
-        resolve();
-      } else {
-        idbKeyval.get(header).then(function (cartridgeObject) {
-
-          if (!cartridgeObject || !cartridgeObject.saveStates) {
-            reject('No Save State passed, and no cartridge object found');
-            return;
-          }
-
-          // Load the last save state
-          loadSaveState(_this5.wasmInstance, _this5.wasmByteMemory, cartridgeObject.saveStates[0]);
+        if (saveState) {
+          loadSaveState(_this4, saveState);
 
           // Load back out internal wasmboy state from memory
-          _this5.wasmInstance.exports.loadState();
+          _this4.wasmInstance.exports.loadState();
 
-          resolve();
-        }).catch(function (error) {
-          reject(error);
-        });
-      }
-    });
-  };
+          return;
+        }
 
-  // Function to reset the state of the wasm core
+        var cartridgeObject = yield idbKeyval.get(header);
+        if (!cartridgeObject || !cartridgeObject.saveStates) {
+          throw new Error('No Save State passed, and no cartridge object found');
+          return;
+        }
 
+        // Load the last save state
+        loadSaveState(_this4, cartridgeObject.saveStates[0]);
 
-  WasmBoyMemoryService.prototype.resetState = function resetState(isGbcEnabled, bootRom) {
-    this.resetMemory();
+        // Load back out internal wasmboy state from memory
+        _this4.wasmInstance.exports.loadState();
+      });
 
-    // TODO: Handle getting a boot rom
-    this.wasmInstance.exports.initialize(isGbcEnabled ? 1 : 0, 0);
+      return function loadStateTask() {
+        return _ref4.apply(this, arguments);
+      };
+    }();
+
+    return loadStateTask();
   };
 
   // Function to return the current cartridge object
 
 
   WasmBoyMemoryService.prototype.getCartridgeObject = function getCartridgeObject() {
-    var header = getCartridgeHeader(this.wasmInstance, this.wasmByteMemory);
+    var header = getCartridgeHeader(this);
     return idbKeyval.get(header);
   };
 
@@ -5870,19 +5899,12 @@ var memory_WasmBoyMemoryService = function () {
 
 
 var WasmBoyMemory = new memory_WasmBoyMemoryService();
-// CONCATENATED MODULE: ./lib/wasmboy.js
-function wasmboy__classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+// EXTERNAL MODULE: ./dist/core/index.untouched.wasm
+var index_untouched = __webpack_require__("lxCI");
+var index_untouched_default = /*#__PURE__*/__webpack_require__.n(index_untouched);
 
-
-
-
-
-
-
-
-
-// requestAnimationFrame() for headless mode
-var raf = __webpack_require__("ommR");
+// CONCATENATED MODULE: ./lib/common/common.js
+// Common Static functions
 
 // Function to get performance timestamp
 // This is to support node vs. Browser
@@ -5892,12 +5914,351 @@ var getPerformanceTimestamp = function getPerformanceTimestamp() {
   }
   return Date.now();
 };
+// CONCATENATED MODULE: ./lib/wasm/instantiate.js
+// Modules
 
-var wasmboy_WasmBoyLib = function () {
 
+
+
+
+// Perofrmance timestamps for logging
+var performanceTimestamps = {};
+
+// Log throttling for our core
+var logRequest = undefined;
+
+// Our wasm instance and memory after instantiation
+var instantiate_wasmInstance = undefined;
+var instantiate_wasmByteMemory = undefined;
+
+// Function to instantiate our wasm Module, wrapped in a promise
+var instantiate_instantiateWasm = function instantiateWasm() {
+  return new src(function (resolve, reject) {
+    // Get our wasm instance from our wasmModule
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/instantiateStreaming
+    var memoryBase = WebAssembly.instantiateStreaming(unfetch_es(index_untouched_default.a), {
+      env: {
+        log: function log(message, arg0, arg1, arg2, arg3, arg4, arg5) {
+          // Grab our string
+          var len = new Uint32Array(instantiate_wasmInstance.exports.memory.buffer, message, 1)[0];
+          var str = String.fromCharCode.apply(null, new Uint16Array(instantiate_wasmInstance.exports.memory.buffer, message + 4, len));
+          if (arg0 !== -9999) str = str.replace('$0', arg0);
+          if (arg1 !== -9999) str = str.replace('$1', arg1);
+          if (arg2 !== -9999) str = str.replace('$2', arg2);
+          if (arg3 !== -9999) str = str.replace('$3', arg3);
+          if (arg4 !== -9999) str = str.replace('$4', arg4);
+          if (arg5 !== -9999) str = str.replace('$5', arg5);
+
+          console.log('[WasmBoy] ' + str);
+        },
+        hexLog: function hexLog(arg0, arg1, arg2, arg3, arg4, arg5) {
+          if (!logRequest) {
+            // Grab our arguments, and log as hex
+            var logString = '[WasmBoy]';
+            if (arg0 !== -9999) logString += ' 0x' + arg0.toString(16) + ' ';
+            if (arg1 !== -9999) logString += ' 0x' + arg1.toString(16) + ' ';
+            if (arg2 !== -9999) logString += ' 0x' + arg2.toString(16) + ' ';
+            if (arg3 !== -9999) logString += ' 0x' + arg3.toString(16) + ' ';
+            if (arg4 !== -9999) logString += ' 0x' + arg4.toString(16) + ' ';
+            if (arg5 !== -9999) logString += ' 0x' + arg5.toString(16) + ' ';
+
+            // Uncomment to unthrottle
+            //console.log(logString);
+
+            // Comment the lines below to disable throttle
+            logRequest = true;
+            setTimeout(function () {
+              console.log(logString);
+              logRequest = false;
+            }, Math.floor(Math.random() * 500));
+          }
+        },
+        performanceTimestamp: function performanceTimestamp(id, value) {
+          if (id === -9999) {
+            id = 0;
+          }
+
+          if (value === -9999) {
+            value = 0;
+          }
+
+          if (!performanceTimestamps[id]) {
+            performanceTimestamps[id] = {};
+            performanceTimestamps[id].throttle = false;
+            performanceTimestamps[id].totalTime = 0;
+            performanceTimestamps[id].value = 0;
+          }
+          if (!performanceTimestamps[id].throttle) {
+            if (performanceTimestamps[id].timestamp) {
+              // sleep a millisecond for hopefully more accurate times
+              var endTime = getPerformanceTimestamp();
+              var timeDifference = endTime - performanceTimestamps[id].timestamp;
+              performanceTimestamps[id].throttle = true;
+              performanceTimestamps[id].totalTime += timeDifference;
+              console.log('[WasmBoy] Performance Timestamp. ID: ' + id + ', Time: ' + timeDifference + ', value difference: ' + (value - performanceTimestamps[id].value) + ', total time: ' + performanceTimestamps[id].totalTime);
+              performanceTimestamps[id].timestamp = false;
+              setTimeout(function () {
+                performanceTimestamps[id].throttle = false;
+              }, 100);
+            } else {
+              performanceTimestamps[id].timestamp = getPerformanceTimestamp();
+              performanceTimestamps[id].value = value;
+            }
+          }
+        }
+      }
+    }).then(function (instantiatedWasm) {
+      // NOTE: Memory growing is now done in the wasm itself
+
+      // Cache our wasmInstance and byte memory
+      instantiate_wasmInstance = instantiatedWasm.instance;
+      instantiate_wasmByteMemory = new Uint8Array(instantiate_wasmInstance.exports.memory.buffer);
+
+      // Resolve our instance and byte memory
+      resolve({
+        instance: instantiate_wasmInstance,
+        byteMemory: instantiate_wasmByteMemory
+      });
+    }).catch(function (error) {
+      reject(error);
+    });
+  });
+};
+// CONCATENATED MODULE: ./lib/wasmboy/rom.js
+function rom__asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new src(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return src.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
+// Modules
+
+
+
+// Collection of functions to parse roms
+// Private function to fetch a game
+var rom_fetchROMAsByteArray = function fetchROMAsByteArray(ROM, fetchHeaders) {
+  var fetchROMAsByteArrayTask = function () {
+    var _ref = rom__asyncToGenerator(function* () {
+      if (ArrayBuffer.isView(ROM) && ROM.constructor === Uint8Array) {
+        return ROM;
+      } else if (typeof ROM === 'object' && ROM.size) {
+        var fileReaderByteArray = yield new src(function (resolve, reject) {
+          // Read the file object
+          // https://www.javascripture.com/FileReader#readAsArrayBuffer_Blob
+          var fileReader = new FileReader();
+          fileReader.onload = function () {
+            rom_getGameFromArrayBuffer(ROM.name, fileReader.result).then(function (byteArray) {
+              resolve(byteArray);
+            }).catch(function (error) {
+              reject(error);
+            });
+          };
+          fileReader.readAsArrayBuffer(ROM);
+        });
+        return fileReaderByteArray;
+      } else {
+        // Fetch the file
+        // First check if we have headers
+        if (!fetchHeaders) {
+          fetchHeaders = {};
+        }
+
+        var bytes = yield unfetch_es(ROM, fetchHeaders).then(function (blob) {
+          if (!blob.ok) {
+            return src.reject(blob);
+          }
+          return blob.arrayBuffer();
+        });
+
+        return yield rom_getGameFromArrayBuffer(ROM, bytes);
+      }
+    });
+
+    return function fetchROMAsByteArrayTask() {
+      return _ref.apply(this, arguments);
+    };
+  }();
+
+  return fetchROMAsByteArrayTask();
+};
+
+// Private function to convert an ArrayBuffer from our file input, into our final Uint8Array
+// Useful for wrapping around .zip files, and using JSZip
+var rom_getGameFromArrayBuffer = function getGameFromArrayBuffer(fileName, ROMBuffer) {
+  var getGameFromArrayBufferTask = function () {
+    var _ref2 = rom__asyncToGenerator(function* () {
+      if (fileName.endsWith('.zip')) {
+        // Use JSZip to get our Rom buffer
+        var JSZip = __webpack_require__("WgY6");
+        var response = yield new src(function (resolve, reject) {
+          // May be an implemented proto non-promise returning function
+          JSZip.loadAsync(ROMBuffer).then(function (zip) {
+            // Zip is not an array, but it's proto implements a custom forEach()
+            var foundGame = false;
+            zip.forEach(function (relativePath, zipEntry) {
+              if (!foundGame) {
+                if (relativePath.endsWith('.gb') || relativePath.endsWith('.gbc')) {
+                  // Another function implemented on the proto
+                  foundGame = true;
+                  zip.file(relativePath).async('uint8array').then(function (ROMInZipBuffer) {
+                    resolve(ROMInZipBuffer);
+                  });
+                }
+              }
+            });
+            if (!foundGame) {
+              reject(new Error('The ".zip" did not contain a ".gb" or ".gbc" file!'));
+            }
+          }, function (error) {
+            reject(error);
+          });
+        });
+
+        return response;
+      }
+
+      // Simply return the ROM Buffer
+      return new Uint8Array(ROMBuffer);
+    });
+
+    return function getGameFromArrayBufferTask() {
+      return _ref2.apply(this, arguments);
+    };
+  }();
+
+  return getGameFromArrayBufferTask();
+};
+// CONCATENATED MODULE: ./lib/wasmboy/render.js
+// Imports
+// requestAnimationFrame() for headless mode
+var raf = __webpack_require__("ommR");
+
+// WasmBoy Modules
+
+
+
+
+// Function to render our emulator output
+var render_render = function render(wasmboy) {
+  // Don't run if paused
+  if (wasmboy.paused) {
+    return true;
+  }
+
+  // Check if we have frameskip
+  var shouldSkipRenderingFrame = false;
+  if (wasmboy.frameSkip && wasmboy.frameSkip > 0) {
+    wasmboy.frameSkipCounter++;
+
+    if (wasmboy.frameSkipCounter < wasmboy.frameSkip) {
+      shouldSkipRenderingFrame = true;
+    } else {
+      wasmboy.frameSkipCounter = 0;
+    }
+  }
+
+  // Render the display
+  if (!shouldSkipRenderingFrame) {
+    WasmBoyGraphics.renderFrame();
+  }
+
+  // Play the audio
+  if (wasmboy.options.isAudioEnabled) {
+    WasmBoyAudio.playAudio(wasmboy.getFPS(), wasmboy.options.gameboyFrameRate > 60);
+  }
+
+  // Update our controller
+  WasmBoyController.updateController();
+
+  wasmboy.renderId = raf(function () {
+    render(wasmboy);
+  });
+};
+// CONCATENATED MODULE: ./lib/wasmboy/update.js
+// Imports
+
+
+// Function to run an update on the emulator itself
+var update_update = function update(wasmboy) {
+  // Don't run if paused
+  if (wasmboy.paused) {
+    return true;
+  }
+
+  // Track our Fps
+  // http://www.growingwiththeweb.com/2017/12/fast-simple-js-fps-counter.html
+  var currentHighResTime = getPerformanceTimestamp();
+  while (wasmboy.fpsTimeStamps[0] < currentHighResTime - 1000) {
+    wasmboy.fpsTimeStamps.shift();
+  }
+
+  // Framecap at 60fps
+  var currentFps = wasmboy.getFPS();
+  if (currentFps > wasmboy.options.gameboyFrameRate) {
+    return true;
+  } else {
+    wasmboy.fpsTimeStamps.push(currentHighResTime);
+  }
+
+  // If audio is enabled, sync by audio
+  // Check how many samples we have, and if we are getting too ahead, need to skip the update
+  // Magic number is from experimenting and wasmboy seems to go good
+  // TODO: Make wasmboy a preference, or calculate from performance.now()
+  // TODO Make audio queue constant in wasmboy audio, and make it a function to be called in wasmboy audio
+  if (!wasmboy.options.headless && !wasmboy.pauseFpsThrottle && wasmboy.options.isAudioEnabled && wasmboy.wasmInstance.exports.getAudioQueueIndex() > 7000 * (wasmboy.options.gameboyFrameRate / 120) && wasmboy.options.gameboyFrameRate <= 60) {
+    // TODO: Waiting for time stretching to resolve may be causing wasmboy
+    console.log('Waiting for audio...');
+    return true;
+  }
+
+  // Update (Execute a frame)
+  var response = wasmboy.wasmInstance.exports.update();
+
+  // Handle our update() response
+  if (response >= 0) {
+    // See: wasm/cpu/opcodes update() function
+    // 0 = render a frame
+    switch (response) {
+      case 0:
+        break;
+    }
+
+    return true;
+  } else {
+    console.log('Wasmboy Crashed!');
+    console.log('Program Counter: 0x' + wasmboy.wasmInstance.exports.getProgramCounter().toString(16));
+    console.log('Opcode: 0x' + wasmboy.wasmByteMemory[wasmboy.wasmInstance.exports.getProgramCounter()].toString(16));
+    wasmboy.pause();
+    return false;
+  }
+};
+// CONCATENATED MODULE: ./lib/wasmboy/wasmboy.js
+function wasmboy__asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new src(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return src.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
+function wasmboy__classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+// Modules
+
+
+
+// WasmBoy Modules
+
+
+
+
+
+// Other lib helpers
+
+
+
+
+
+// requestAnimationFrame() for headless mode
+var wasmboy_raf = __webpack_require__("ommR");
+
+// Our Main Orchestrator of the WasmBoy lib
+
+var wasmboy_WasmBoyLibService = function () {
   // Start the request to our wasm module
-  function WasmBoyLib() {
-    wasmboy__classCallCheck(this, WasmBoyLib);
+  function WasmBoyLibService() {
+    wasmboy__classCallCheck(this, WasmBoyLibService);
 
     this.wasmInstance = undefined;
     this.wasmByteMemory = undefined;
@@ -5907,220 +6268,208 @@ var wasmboy_WasmBoyLib = function () {
     this.ready = false;
     this.renderId = false;
     this.updateId = false;
-    this.loadedGame = false;
+    this.loadedROM = false;
 
-    // Options, can't be undefined
-    this.headless = false;
-    this.isGbcEnabled = true;
-    this.isAudioEnabled = true;
-    this.gameboyFrameRate = 60;
-    this.fpsTimeStamps = [];
-    this.frameSkip = 0;
-    this.frameSkipCounter = 0;
-    this.saveStateCallback = false;
-
-    // Options for wasm
-    this.audioBatchProcessing = false;
-    this.graphicsBatchProcessing = false;
-    this.timersBatchProcessing = false;
-    this.graphicsDisableScanlineRendering = false;
-    this.audioAccumulateSamples = false;
-    this.tileRendering = false;
-    this.tileCaching = false;
+    // Reset our config and stateful elements that depend on it
+    this._resetConfig();
 
     // Debug code
     this.logRequest = false;
     this.performanceTimestamps = {};
   }
 
-  // Function to initialize our Wasmboy
+  // Function to initialize/configure Wasmboy
 
 
-  WasmBoyLib.prototype.initialize = function initialize(canvasElement, wasmBoyOptions) {
+  WasmBoyLibService.prototype.config = function config(wasmBoyOptions, canvasElement) {
     var _this = this;
 
-    // Get our canvas elements
-    this.canvasElement = canvasElement;
+    var configTask = function () {
+      var _ref = wasmboy__asyncToGenerator(function* () {
+        // Get our canvas elements
+        _this.canvasElement = canvasElement;
 
-    // Set our defaults
-    this.headless = false;
-    this.isAudioEnabled = true;
-    this.gameboyFrameRate = 60;
-    this.fpsTimeStamps = [];
-    this.frameSkip = 0;
-    this.frameSkipCounter = 0;
+        // Reset our config and stateful elements that depend on it
+        _this._resetConfig();
 
-    // Defaults for wasm
-    this.audioBatchProcessing = false;
-    this.graphicsBatchProcessing = false;
-    this.timersBatchProcessing = false;
-    this.graphicsDisableScanlineRendering = false;
-    this.audioAccumulateSamples = false;
+        // set our options
+        if (wasmBoyOptions) {
+          // Set all options
+          Object.keys(wasmBoyOptions).forEach(function (key) {
+            if (_this.options[key] !== undefined) {
+              _this.options[key] = wasmBoyOptions[key];
+            }
+          });
 
-    // Defaults for action callbacks
-    this.saveStateCallback = false;
-
-    // set our options
-    if (wasmBoyOptions) {
-
-      // Set all options
-      Object.keys(wasmBoyOptions).forEach(function (key) {
-        if (_this[key] !== undefined) {
-          _this[key] = wasmBoyOptions[key];
+          // Aliases
+          // Gameboy Speed / Framerate
+          if (wasmBoyOptions.gameboySpeed) {
+            var gameboyFrameRate = Math.floor(wasmBoyOptions.gameboySpeed * 60);
+            if (gameboyFrameRate <= 0) {
+              gameboyFrameRate = 1;
+            }
+            _this.options.gameboyFrameRate = gameboyFrameRate;
+          }
         }
       });
 
-      // Aliases
-      // Gameboy Speed / Framerate
-      if (wasmBoyOptions.gameboySpeed) {
-        var gameboyFrameRate = Math.floor(wasmBoyOptions.gameboySpeed * 60);
-        if (gameboyFrameRate <= 0) {
-          gameboyFrameRate = 1;
-        }
-        this.gameboyFrameRate = gameboyFrameRate;
-      }
-    }
+      return function configTask() {
+        return _ref.apply(this, arguments);
+      };
+    }();
+
+    return configTask();
+  };
+
+  // Function to return our current configuration as an object
+
+
+  WasmBoyLibService.prototype.getConfig = function getConfig() {
+    return this.options;
   };
 
   // Finish request for wasm module, and fetch game
 
 
-  WasmBoyLib.prototype.loadGame = function loadGame(game) {
+  WasmBoyLibService.prototype.loadROM = function loadROM(ROM, fetchHeaders) {
     var _this2 = this;
 
     // Getting started with wasm
     // http://webassembly.org/getting-started/js-api/
     this.ready = false;
-    return new src(function (resolve, reject) {
 
-      // Pause the game in case it was running
-      _this2.pauseGame().then(function () {
+    var initializeTask = function () {
+      var _ref2 = wasmboy__asyncToGenerator(function* () {
         // Get our promises
-        var initPromises = [_this2._fetchGameAsByteArray(game), _this2._getWasmInstance()];
+        var initPromises = [rom_fetchROMAsByteArray(ROM, fetchHeaders), _this2._instantiateWasm()];
 
-        if (!_this2.headless && WasmBoyMemory.getLoadedCartridgeMemoryState().RAM) {
+        if (!_this2.options.headless && WasmBoyMemory.getLoadedCartridgeMemoryState().RAM) {
           initPromises.push(WasmBoyMemory.saveCartridgeRam());
         }
 
-        src.all(initPromises).then(function (responses) {
-
-          // Save the game that we loaded if we need to reload the game
-          _this2.loadedGame = game;
-
-          // Check if we are running headless
-          if (_this2.headless) {
-
-            WasmBoyMemory.initializeHeadless(_this2.wasmInstance, _this2.wasmByteMemory, _this2.saveStateCallback);
-
-            // Clear what is currently in memory, then load the cartridge memory
-            WasmBoyMemory.clearMemory();
-            WasmBoyMemory.resetState();
-
-            // TODO: Handle passing a boot rom
-            WasmBoyMemory.loadCartridgeRom(responses[0], false, false);
-            _this2.ready = true;
-
-            resolve();
-          } else {
-            // Finally intialize all of our services
-            // Initialize our services
-            src.all([WasmBoyGraphics.initialize(_this2.canvasElement, _this2.wasmInstance, _this2.wasmByteMemory), WasmBoyAudio.initialize(_this2.wasmInstance, _this2.wasmByteMemory), WasmBoyController.initialize(_this2.wasmInstance), WasmBoyMemory.initialize(_this2.wasmInstance, _this2.wasmByteMemory, _this2.saveStateCallback)]).then(function () {
-
-              // Clear what is currently in memory, then load the carttridge memory
-              WasmBoyMemory.clearMemory();
-              WasmBoyMemory.resetState();
-
-              // TODO: Handle passing a boot rom
-              WasmBoyMemory.loadCartridgeRom(responses[0], _this2.isGbcEnabled, false);
-
-              // Load the game's cartridge ram
-              WasmBoyMemory.loadCartridgeRam().then(function () {
-                _this2.ready = true;
-                resolve();
-              }).catch(function (error) {
-                reject(error);
-              });
-            }).catch(function (error) {
-              reject(error);
-            });
-          }
-        }).catch(function (error) {
-          reject(error);
-        });
+        return yield src.all(initPromises);
       });
-    });
+
+      return function initializeTask() {
+        return _ref2.apply(this, arguments);
+      };
+    }();
+
+    var loadROMAndConfigTask = function () {
+      var _ref3 = wasmboy__asyncToGenerator(function* (responses) {
+        // Clear what is currently in memory, then load the cartridge memory
+        WasmBoyMemory.clearMemory();
+        WasmBoyMemory.resetState();
+
+        // TODO: Handle passing a boot rom
+        WasmBoyMemory.loadCartridgeRom(responses[0]);
+
+        // Run our initialization on the core
+        _this2.wasmInstance.exports.config(0, // TODO: Include Boot Rom
+        _this2.options.isGbcEnabled ? 1 : 0, _this2.options.audioBatchProcessing ? 1 : 0, _this2.options.graphicsBatchProcessing ? 1 : 0, _this2.options.timersBatchProcessing ? 1 : 0, _this2.options.graphicsDisableScanlineRendering ? 1 : 0, _this2.options.audioAccumulateSamples ? 1 : 0, _this2.options.tileRendering ? 1 : 0, _this2.options.tileCaching ? 1 : 0);
+      });
+
+      return function loadROMAndConfigTask(_x) {
+        return _ref3.apply(this, arguments);
+      };
+    }();
+
+    var loadROMTask = function () {
+      var _ref4 = wasmboy__asyncToGenerator(function* () {
+        yield _this2.pause();
+
+        // Initialize any needed parts of wasmboy
+        var responses = yield initializeTask();
+
+        // Save the game that we loaded if we need to reload the game
+        _this2.loadedROM = ROM;
+
+        // Check if we are running headless
+        if (_this2.options.headless) {
+          yield WasmBoyMemory.initialize(_this2.options.headless, _this2.wasmInstance, _this2.wasmByteMemory, _this2.options.saveStateCallback);
+
+          yield loadROMAndConfigTask(responses);
+
+          _this2.ready = true;
+        } else {
+          // Finally intialize all of our services
+          // Initialize our services
+          yield src.all([WasmBoyGraphics.initialize(_this2.canvasElement, _this2.wasmInstance, _this2.wasmByteMemory), WasmBoyAudio.initialize(_this2.wasmInstance, _this2.wasmByteMemory), WasmBoyController.initialize(_this2.wasmInstance), WasmBoyMemory.initialize(_this2.options.headless, _this2.wasmInstance, _this2.wasmByteMemory, _this2.options.saveStateCallback)]);
+
+          yield loadROMAndConfigTask(responses);
+
+          // Load the game's cartridge ram
+          yield WasmBoyMemory.loadCartridgeRam();
+
+          _this2.ready = true;
+        }
+      });
+
+      return function loadROMTask() {
+        return _ref4.apply(this, arguments);
+      };
+    }();
+
+    return loadROMTask();
   };
 
-  // Function to reset wasmBoy, with an optional set of options
+  // function to start/resume
 
 
-  WasmBoyLib.prototype.reset = function reset(wasmBoyOptions) {
-
-    this.initialize(this.canvasElement, wasmBoyOptions);
-    WasmBoyMemory.resetState();
-    if (this.wasmInstance) {
-      // Run our initialization on the core
-      this.wasmInstance.exports.config(this.audioBatchProcessing ? 1 : 0, this.graphicsBatchProcessing ? 1 : 0, this.timersBatchProcessing ? 1 : 0, this.graphicsDisableScanlineRendering ? 1 : 0, this.audioAccumulateSamples ? 1 : 0, this.tileRendering ? 1 : 0, this.tileCaching ? 1 : 0);
-    }
-
-    // Reload the game if one was already loaded
-    if (this.loadedGame && !this.headless) {
-      this.loadGame(this.loadedGame);
-    }
-  };
-
-  // Function to start the game
-
-
-  WasmBoyLib.prototype.startGame = function startGame() {
-    return this.resumeGame();
-  };
-
-  WasmBoyLib.prototype.resumeGame = function resumeGame() {
+  WasmBoyLibService.prototype.play = function play() {
     var _this3 = this;
 
-    if (!this.ready) {
-      return false;
-    }
+    var playTask = function () {
+      var _ref5 = wasmboy__asyncToGenerator(function* () {
+        if (!_this3.ready) {
+          return;
+        }
 
-    // Reset the audio queue index to stop weird pauses when trying to load a game
-    this.wasmInstance.exports.resetAudioQueue();
+        // Reset the audio queue index to stop weird pauses when trying to load a game
+        _this3.wasmInstance.exports.resetAudioQueue();
 
-    // Start our update and render process
-    // Can't time by raf, as raf is not garunteed to be 60fps
-    // Need to run like a web game, where updates to the state of the core are done a 60 fps
-    // but we can render whenever the user would actually see the changes browser side in a raf
-    // https://developer.mozilla.org/en-US/docs/Games/Anatomy
-    this._emulatorUpdate();
+        // Start our update and render process
+        // Can't time by raf, as raf is not garunteed to be 60fps
+        // Need to run like a web game, where updates to the state of the core are done a 60 fps
+        // but we can render whenever the user would actually see the changes browser side in a raf
+        // https://developer.mozilla.org/en-US/docs/Games/Anatomy
+        update_update(_this3);
 
-    // Undo any pause
-    this.paused = false;
+        // Undo any pause
+        _this3.paused = false;
 
-    if (!this.updateId) {
+        if (!_this3.updateId) {
+          var intervalRate = 1000 / _this3.options.gameboyFrameRate;
 
-      var intervalRate = 1000 / this.gameboyFrameRate;
+          // Reset the frameTimeStamps
+          _this3.fpsTimeStamps = [];
 
-      // Reset the frameTimeStamps
-      this.fpsTimeStamps = [];
+          // 1000 / 60 = 60fps
+          _this3.updateId = setInterval(function () {
+            update_update(_this3);
+          }, intervalRate);
+        }
 
-      // 1000 / 60 = 60fps
-      this.updateId = setInterval(function () {
-        _this3._emulatorUpdate();
-      }, intervalRate);
-    }
+        if (!_this3.renderId && !_this3.options.headless) {
+          _this3.renderId = wasmboy_raf(function () {
+            render_render(_this3);
+          });
+        }
 
-    if (!this.renderId && !this.headless) {
-      this.renderId = raf(function () {
-        _this3._emulatorRender();
+        // Finally set up out pause fps throttle
+        // This will allow us to know if we just un paused
+        _this3.pauseFpsThrottle = true;
+        setTimeout(function () {
+          _this3.pauseFpsThrottle = false;
+        }, 1000);
       });
-    }
 
-    // Finally set up out pause fps throttle
-    // This will allow us to know if we just un paused
-    this.pauseFpsThrottle = true;
-    setTimeout(function () {
-      _this3.pauseFpsThrottle = false;
-    }, 1000);
+      return function playTask() {
+        return _ref5.apply(this, arguments);
+      };
+    }();
+
+    return playTask();
   };
 
   // Function to pause the game, returns a promise
@@ -6128,372 +6477,257 @@ var wasmboy_WasmBoyLib = function () {
   // Allow any actions
 
 
-  WasmBoyLib.prototype.pauseGame = function pauseGame() {
-    this.paused = true;
+  WasmBoyLibService.prototype.pause = function pause() {
+    var _this4 = this;
 
-    // Cancel our update and render loop
-    raf.cancel(this.renderId);
-    this.renderId = false;
-    clearInterval(this.updateId);
-    this.updateId = false;
+    var pauseTask = function () {
+      var _ref6 = wasmboy__asyncToGenerator(function* () {
+        _this4.paused = true;
 
-    // Wait a raf to ensure everything is done
-    return new src(function (resolve) {
-      raf(function () {
-        resolve();
+        // Cancel our update and render loop
+        wasmboy_raf.cancel(_this4.renderId);
+        _this4.renderId = false;
+        clearInterval(_this4.updateId);
+        _this4.updateId = false;
+
+        // Wait a raf to ensure everything is done
+        yield new src(function (resolve) {
+          wasmboy_raf(function () {
+            resolve();
+          });
+        });
       });
-    });
+
+      return function pauseTask() {
+        return _ref6.apply(this, arguments);
+      };
+    }();
+
+    return pauseTask();
   };
 
+  // Function to reset wasmBoy, with an optional set of options
+
+
+  WasmBoyLibService.prototype.reset = function reset(wasmBoyOptions) {
+    var _this5 = this;
+
+    var resetTask = function () {
+      var _ref7 = wasmboy__asyncToGenerator(function* () {
+        _this5.config(wasmBoyOptions, _this5.canvasElement);
+        WasmBoyMemory.resetState();
+        // Reload the game if one was already loaded
+        if (_this5.loadedROM && !_this5.options.headless) {
+          return _this5.loadROM(_this5.loadedROM);
+        }
+      });
+
+      return function resetTask() {
+        return _ref7.apply(this, arguments);
+      };
+    }();
+
+    return resetTask();
+  };
+
+  WasmBoyLibService.prototype.saveState = function saveState() {
+    var _this6 = this;
+
+    var saveStateTask = function () {
+      var _ref8 = wasmboy__asyncToGenerator(function* () {
+        yield _this6.pause();
+        yield WasmBoyMemory.saveState();
+      });
+
+      return function saveStateTask() {
+        return _ref8.apply(this, arguments);
+      };
+    }();
+
+    return saveStateTask();
+  };
+
+  // Function to return the save states for the game
+
+
+  WasmBoyLibService.prototype.getSaveStates = function getSaveStates() {
+    var getSaveStatesTask = function () {
+      var _ref9 = wasmboy__asyncToGenerator(function* () {
+        var cartridgeObject = yield WasmBoyMemory.getCartridgeObject();
+        return cartridgeObject.saveStates;
+      });
+
+      return function getSaveStatesTask() {
+        return _ref9.apply(this, arguments);
+      };
+    }();
+
+    return getSaveStatesTask();
+  };
+
+  WasmBoyLibService.prototype.loadState = function loadState(saveState) {
+    var _this7 = this;
+
+    var loadStateTask = function () {
+      var _ref10 = wasmboy__asyncToGenerator(function* () {
+        yield _this7.pause();
+        yield WasmBoyMemory.loadState(saveState);
+      });
+
+      return function loadStateTask() {
+        return _ref10.apply(this, arguments);
+      };
+    }();
+
+    return loadStateTask();
+  };
+
+  // Function to return the current FPS
   // http://www.growingwiththeweb.com/2017/12/fast-simple-js-fps-counter.html
 
 
-  WasmBoyLib.prototype.getFps = function getFps() {
+  WasmBoyLibService.prototype.getFPS = function getFPS() {
     if (this.pauseFpsThrottle) {
-      return this.gameboyFrameRate;
+      return this.options.gameboyFrameRate;
+    } else if (this.fpsTimeStamps) {
+      return this.fpsTimeStamps.length;
     }
-    return this.fpsTimeStamps.length;
+
+    return 0;
   };
 
-  // Function to return the current game object in memory
+  // Private Function to reset options to default
 
 
-  WasmBoyLib.prototype.getWasmBoyMemoryForLoadedGame = function getWasmBoyMemoryForLoadedGame() {
-    return WasmBoyMemory.getCartridgeObject();
+  WasmBoyLibService.prototype._resetConfig = function _resetConfig() {
+    // Reset Fps Metering
+    this.fpsTimeStamps = [];
+    this.frameSkipCounter = 0;
+
+    // Configurable Options
+    this.options = {
+      headless: false,
+      isAudioEnabled: true,
+      gameboyFrameRate: 60,
+      frameSkip: 0,
+      includeBootROM: false,
+      isGbcEnabled: true,
+      audioBatchProcessing: false,
+      graphicsBatchProcessing: false,
+      timersBatchProcessing: false,
+      graphicsDisableScanlineRendering: false,
+      audioAccumulateSamples: false,
+      tileRendering: false,
+      tileCaching: false,
+      saveStateCallback: false
+    };
   };
 
-  WasmBoyLib.prototype.saveState = function saveState() {
-    var _this4 = this;
-
-    var wasPaused = this.paused;
-    // Pause the game in case it was running
-    this.pauseGame().then(function () {
-      // Save our state to wasmMemory
-      WasmBoyMemory.saveState().then(function () {
-        if (!wasPaused) {
-          _this4.resumeGame();
-        }
-      });
-    });
-  };
-
-  WasmBoyLib.prototype.loadState = function loadState(saveState) {
-    var _this5 = this;
-
-    var wasPaused = this.paused;
-    // Pause the game in case it was running, and set to not ready
-    this.pauseGame().then(function () {
-      WasmBoyMemory.loadState(saveState).then(function () {
-        if (!wasPaused) {
-          _this5.resumeGame();
-        }
-      });
-    });
-  };
-
-  // Function to run an update on the emulator itself
+  // Wrapper around instantiateWasm() to ensure we don't already have the instance
 
 
-  WasmBoyLib.prototype._emulatorUpdate = function _emulatorUpdate() {
-
-    // Don't run if paused
-    if (this.paused) {
-      return true;
-    }
-
-    // Track our Fps
-    // http://www.growingwiththeweb.com/2017/12/fast-simple-js-fps-counter.html
-    var currentHighResTime = getPerformanceTimestamp();
-    while (this.fpsTimeStamps[0] < currentHighResTime - 1000) {
-      this.fpsTimeStamps.shift();
-    }
-
-    // Framecap at 60fps
-    var currentFps = this.getFps();
-    if (currentFps > this.gameboyFrameRate) {
-      return true;
-    } else {
-      this.fpsTimeStamps.push(currentHighResTime);
-    }
-
-    // If audio is enabled, sync by audio
-    // Check how many samples we have, and if we are getting too ahead, need to skip the update
-    // Magic number is from experimenting and this seems to go good
-    // TODO: Make this a preference, or calculate from perfrmance.now()
-    // TODO Make audio que ocnstant in wasmboy audio, and make itr a function to be callsed in wasmboy audiio
-    if (!this.headless && !this.pauseFpsThrottle && this.isAudioEnabled && this.wasmInstance.exports.getAudioQueueIndex() > 6000 * (this.gameboyFrameRate / 120) && this.gameboyFrameRate <= 60) {
-      // TODO: Waiting for time stretching to resolve may be causing this
-      console.log('Waiting for audio...');
-      return true;
-    }
-
-    // Update (Execute a frame)
-    var response = this.wasmInstance.exports.update();
-
-    // Handle our update() response
-    if (response > 0) {
-      // See: wasm/cpu/opcodes update() function
-      // 1 = render a frame
-      // 2 = replace boot rom
-      // TODO: Find what should go here
-      switch (response) {
-        case 1:
-        case 2:
-          break;
-      }
-
-      return true;
-    } else {
-      console.log('Wasmboy Crashed!');
-      console.log('Program Counter: 0x' + this.wasmInstance.exports.getProgramCounter().toString(16));
-      console.log('Opcode: 0x' + this.wasmByteMemory[this.wasmInstance.exports.getProgramCounter()].toString(16));
-      this.pauseGame();
-      return false;
-    }
-  };
-
-  // Function to render our emulator output
-
-
-  WasmBoyLib.prototype._emulatorRender = function _emulatorRender() {
-    var _this6 = this;
-
-    // Don't run if paused
-    if (this.paused) {
-      return true;
-    }
-
-    // Check if we have frameskip
-    var shouldSkipRenderingFrame = false;
-    if (this.frameSkip && this.frameSkip > 0) {
-      this.frameSkipCounter++;
-
-      if (this.frameSkipCounter < this.frameSkip) {
-        shouldSkipRenderingFrame = true;
-      } else {
-        this.frameSkipCounter = 0;
-      }
-    }
-
-    // Render the display
-    if (!shouldSkipRenderingFrame) {
-      WasmBoyGraphics.renderFrame();
-    }
-
-    // Play the audio
-    if (this.isAudioEnabled) {
-      WasmBoyAudio.playAudio(this.getFps(), this.gameboyFrameRate > 60);
-    }
-
-    // Update our controller
-    WasmBoyController.updateController();
-
-    this.renderId = raf(function () {
-      _this6._emulatorRender();
-    });
-  };
-
-  // Private funciton to returna promise to our wasmModule
-  // This allow will re-load the wasm module, that way we can obtain a new wasm instance
-  // For each time we load a game
-
-
-  WasmBoyLib.prototype._getWasmInstance = function _getWasmInstance() {
-    var _this7 = this;
-
-    return new src(function (resolve, reject) {
-
-      // Get our wasm instance from our wasmModule
-      var memoryBase = index_untouched_default()({
-        env: {
-          log: function log(message, arg0, arg1, arg2, arg3, arg4, arg5) {
-            // Grab our string
-            var len = new Uint32Array(_this7.wasmInstance.exports.memory.buffer, message, 1)[0];
-            var str = String.fromCharCode.apply(null, new Uint16Array(_this7.wasmInstance.exports.memory.buffer, message + 4, len));
-            if (arg0 !== -9999) str = str.replace("$0", arg0);
-            if (arg1 !== -9999) str = str.replace("$1", arg1);
-            if (arg2 !== -9999) str = str.replace("$2", arg2);
-            if (arg3 !== -9999) str = str.replace("$3", arg3);
-            if (arg4 !== -9999) str = str.replace("$4", arg4);
-            if (arg5 !== -9999) str = str.replace("$5", arg5);
-
-            console.log("[WasmBoy] " + str);
-          },
-          hexLog: function hexLog(arg0, arg1, arg2, arg3, arg4, arg5) {
-
-            if (!_this7.logRequest) {
-
-              // Grab our arguments, and log as hex
-              var logString = '[WasmBoy]';
-              if (arg0 !== -9999) logString += ' 0x' + arg0.toString(16) + ' ';
-              if (arg1 !== -9999) logString += ' 0x' + arg1.toString(16) + ' ';
-              if (arg2 !== -9999) logString += ' 0x' + arg2.toString(16) + ' ';
-              if (arg3 !== -9999) logString += ' 0x' + arg3.toString(16) + ' ';
-              if (arg4 !== -9999) logString += ' 0x' + arg4.toString(16) + ' ';
-              if (arg5 !== -9999) logString += ' 0x' + arg5.toString(16) + ' ';
-
-              // Uncomment to unthrottle
-              //console.log(logString);
-
-              // Comment the lines below to disable throttle
-              _this7.logRequest = true;
-              setTimeout(function () {
-                console.log(logString);
-                _this7.logRequest = false;
-              }, Math.floor(Math.random() * 500));
-            }
-          },
-          performanceTimestamp: function performanceTimestamp(id, value) {
-
-            if (id === -9999) {
-              id = 0;
-            }
-
-            if (value === -9999) {
-              value = 0;
-            }
-
-            if (!_this7.performanceTimestamps[id]) {
-              _this7.performanceTimestamps[id] = {};
-              _this7.performanceTimestamps[id].throttle = false;
-              _this7.performanceTimestamps[id].totalTime = 0;
-              _this7.performanceTimestamps[id].value = 0;
-            }
-            if (!_this7.performanceTimestamps[id].throttle) {
-              if (_this7.performanceTimestamps[id].timestamp) {
-                // sleep a millisecond for hopefully more accurate times
-                var endTime = getPerformanceTimestamp();
-                var timeDifference = endTime - _this7.performanceTimestamps[id].timestamp;
-                _this7.performanceTimestamps[id].throttle = true;
-                _this7.performanceTimestamps[id].totalTime += timeDifference;
-                console.log('[WasmBoy] Performance Timestamp. ID: ' + id + ', Time: ' + timeDifference + ', value difference: ' + (value - _this7.performanceTimestamps[id].value) + ', total time: ' + _this7.performanceTimestamps[id].totalTime);
-                _this7.performanceTimestamps[id].timestamp = false;
-                setTimeout(function () {
-                  _this7.performanceTimestamps[id].throttle = false;
-                }, 100);
-              } else {
-                _this7.performanceTimestamps[id].timestamp = getPerformanceTimestamp();
-                _this7.performanceTimestamps[id].value = value;
-              }
-            }
-          }
-        }
-      }).then(function (instantiatedWasm) {
-        // Using || since rollup and webpack wasm loaders will return differently
-        var instance = _this7.wasmInstance = instantiatedWasm.instance || instantiatedWasm;
-        var module = instantiatedWasm.module;
-
-        // Get our memory from our wasm instance
-        var memory = instance.exports.memory;
-
-        // NOTE: Memory growing is now done in the wasm itself
-        // Grow memory to wasmboy memory map
-        // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
-        // if (memory.buffer.byteLength < this.wasmInstance.exports.wasmMemorySize) {
-        //   // Scale to the maximum needed pages
-        //   memory.grow(Math.ceil(this.wasmInstance.exports.wasmMemorySize / 1024 / 64));
-        // }
-
-        // Will stay in sync
-        _this7.wasmByteMemory = new Uint8Array(_this7.wasmInstance.exports.memory.buffer);
-
-        // Run our initialization on the core
-        _this7.wasmInstance.exports.config(_this7.audioBatchProcessing ? 1 : 0, _this7.graphicsBatchProcessing ? 1 : 0, _this7.timersBatchProcessing ? 1 : 0, _this7.graphicsDisableScanlineRendering ? 1 : 0, _this7.audioAccumulateSamples ? 1 : 0, _this7.tileRendering ? 1 : 0, _this7.tileCaching ? 1 : 0);
-        resolve(_this7.wasmInstance);
-      }).catch(function (error) {
-        reject(error);
-      });
-    });
-  };
-
-  // Private function to fetch a game
-
-
-  WasmBoyLib.prototype._fetchGameAsByteArray = function _fetchGameAsByteArray(game) {
+  WasmBoyLibService.prototype._instantiateWasm = function _instantiateWasm() {
     var _this8 = this;
 
-    return new src(function (resolve, reject) {
-      if (ArrayBuffer.isView(game) && game.constructor === Uint8Array) {
-        // Simply resolve with the input
-        resolve(game);
-        return;
-      } else if (typeof game === 'object' && game.size) {
-        // Read the file object
-        // https://www.javascripture.com/FileReader#readAsArrayBuffer_Blob
-        var fileReader = new FileReader();
-        fileReader.onload = function () {
-          _this8._getGameFromArrayBuffer(game.name, fileReader.result).then(function (byteArray) {
-            resolve(byteArray);
-          }).catch(function (error) {
-            reject(error);
-          });
-        };
-        fileReader.readAsArrayBuffer(game);
-      } else {
-        // Fetch the file
-        unfetch_es(game).then(function (blob) {
-          if (!blob.ok) {
-            return src.reject(blob);
-          }
+    var instantiateWasmTask = function () {
+      var _ref11 = wasmboy__asyncToGenerator(function* () {
+        if (_this8.wasmInstance) {
+          return;
+        } else {
+          var response = yield instantiate_instantiateWasm();
+          _this8.wasmInstance = response.instance;
+          _this8.wasmByteMemory = response.byteMemory;
+        }
+      });
 
-          return blob.arrayBuffer();
-        }).then(function (bytes) {
-          _this8._getGameFromArrayBuffer(game, bytes).then(function (byteArray) {
-            resolve(byteArray);
-          }).catch(function (error) {
-            reject(error);
-          });
-        }).catch(function (error) {
-          reject(error);
-        });
-      }
-    });
+      return function instantiateWasmTask() {
+        return _ref11.apply(this, arguments);
+      };
+    }();
+
+    return instantiateWasmTask();
   };
 
-  // Private function to convert an ArrayBuffer from our file input, into our final Uint8Array
-  // Useful for wrapping around .zip files, and using JSZip
-
-
-  WasmBoyLib.prototype._getGameFromArrayBuffer = function _getGameFromArrayBuffer(fileName, gameBuffer) {
-    return new src(function (resolve, reject) {
-      if (fileName.endsWith('.zip')) {
-        var JSZip = __webpack_require__("WgY6");
-        JSZip.loadAsync(gameBuffer).then(function (zip) {
-          // Zip is not an array, but it's proto implements a custom forEach()
-          var foundGame = false;
-          zip.forEach(function (relativePath, zipEntry) {
-            if (!foundGame) {
-              if (relativePath.endsWith('.gb') || relativePath.endsWith('.gbc')) {
-                // Another function implemented on the proto
-                foundGame = true;
-                zip.file(relativePath).async('uint8array').then(function (gameBuffer) {
-                  resolve(gameBuffer);
-                });
-              }
-            }
-          });
-          if (!foundGame) {
-            reject(new Error('The ".zip" did not contain a ".gb" or ".gbc" file!'));
-          }
-        }, function (error) {
-          reject(error);
-        });
-      } else {
-        var byteArray = new Uint8Array(gameBuffer);
-        resolve(byteArray);
-      }
-    });
-  };
-
-  return WasmBoyLib;
+  return WasmBoyLibService;
 }();
 
-var WasmBoy = new wasmboy_WasmBoyLib();
+var WasmBoyLib = new wasmboy_WasmBoyLibService();
+// CONCATENATED MODULE: ./lib/debug/debug.js
+// Extend the index.js
+
+
+var debug_saveCurrentAudioBufferToWav = function saveCurrentAudioBufferToWav() {
+  if (!WasmBoyAudio.audioBuffer) {
+    return;
+  }
+
+  // https://www.npmjs.com/package/audiobuffer-to-wav
+  var toWav = __webpack_require__("H4yk");
+  // https://github.com/Jam3/audiobuffer-to-wav/blob/master/demo/index.js
+
+  var wav = toWav(WasmBoyAudio.audioBuffer);
+  var blob = new window.Blob([new DataView(wav)], {
+    type: 'audio/wav'
+  });
+
+  var url = window.URL.createObjectURL(blob);
+  var anchor = document.createElement('a');
+  document.body.appendChild(anchor);
+  anchor.style = 'display: none';
+  anchor.href = url;
+  anchor.download = 'audio.wav';
+  anchor.click();
+  window.URL.revokeObjectURL(url);
+};
+// CONCATENATED MODULE: ./lib/index.js
+// Build our public lib api
 
 
 
-// TODO: Remove this, and consolidate public api in Wasmboy
 
+// Debugging properties prepended with _
+
+// export an object that public exposes parts of the singleton
+// Need to bind to preserve this
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_objects/Function/bind
+var WasmBoy = {
+  config: WasmBoyLib.config.bind(WasmBoyLib),
+  getConfig: WasmBoyLib.getConfig.bind(WasmBoyLib),
+  loadROM: WasmBoyLib.loadROM.bind(WasmBoyLib),
+  play: WasmBoyLib.play.bind(WasmBoyLib),
+  pause: WasmBoyLib.pause.bind(WasmBoyLib),
+  reset: WasmBoyLib.reset.bind(WasmBoyLib),
+  isPlaying: function isPlaying() {
+    return !WasmBoyLib.paused;
+  },
+  isPaused: function isPaused() {
+    return WasmBoyLib.paused;
+  },
+  isReady: function isReady() {
+    return WasmBoyLib.ready;
+  },
+  saveState: WasmBoyLib.saveState.bind(WasmBoyLib),
+  getSaveStates: WasmBoyLib.getSaveStates.bind(WasmBoyLib),
+  loadState: WasmBoyLib.loadState.bind(WasmBoyLib),
+  getFPS: WasmBoyLib.getFPS.bind(WasmBoyLib),
+  enableDefaultJoypad: WasmBoyController.enableDefaultJoypad.bind(WasmBoyController),
+  disableDefaultJoypad: WasmBoyController.disableDefaultJoypad.bind(WasmBoyController),
+  setJoypadState: WasmBoyController.setJoypadState.bind(WasmBoyController),
+  addTouchInput: WasmBoyController.addTouchInput.bind(WasmBoyController),
+  _getWasmInstance: function _getWasmInstance() {
+    return WasmBoyLib.wasmInstance;
+  },
+  _setWasmInstance: function _setWasmInstance(instance) {
+    WasmBoyLib.wasmInstance = instance;
+  },
+  _getWasmByteMemory: function _getWasmByteMemory() {
+    return WasmBoyLib.wasmByteMemory;
+  },
+  _setWasmByteMemory: function _setWasmByteMemory(wasmByteMemory) {
+    WasmBoyLib.wasmByteMemory = wasmByteMemory;
+  },
+  _saveCurrentAudioBufferToWav: debug_saveCurrentAudioBufferToWav
+};
 // EXTERNAL MODULE: ./node_modules/load-script/index.js
 var load_script = __webpack_require__("PirY");
 var load_script_default = /*#__PURE__*/__webpack_require__.n(load_script);
@@ -6520,7 +6754,7 @@ var GOOGLE_SDK_URL = 'https://apis.google.com/js/api.js';
 
 var scriptLoadingStarted = false;
 
-var _ref2 = Object(preact_min["h"])(
+var googlePicker__ref2 = Object(preact_min["h"])(
   'button',
   null,
   'Open google chooser'
@@ -6638,7 +6872,7 @@ var googlePicker_GooglePicker = (_temp = _class = function (_Component) {
     return Object(preact_min["h"])(
       'div',
       { onClick: this.onChoose },
-      this.props.children ? this.props.children : _ref2
+      this.props.children ? this.props.children : googlePicker__ref2
     );
   };
 
@@ -6674,13 +6908,14 @@ function wasmboyFilePicker__inherits(subClass, superClass) { if (typeof superCla
 
 
 
+
 // Public Keys for Google Drive API
 var WASMBOY_DEBUGGER_GOOGLE_PICKER_CLIENT_ID = '427833658710-bntpbmf6pimh8trt0n4c36gteomseg61.apps.googleusercontent.com';
 
 // OAuth Key for Google Drive
 var googlePickerOAuthToken = '';
 
-var _ref = Object(preact_min["h"])(
+var wasmboyFilePicker__ref = Object(preact_min["h"])(
   'div',
   { 'class': 'wasmboy__filePicker__services' },
   Object(preact_min["h"])('div', { 'class': 'donut' })
@@ -6693,32 +6928,32 @@ var wasmboyFilePicker__ref2 = Object(preact_min["h"])(
   Object(preact_min["h"])('path', { d: 'M0 0h24v24H0z', fill: 'none' })
 );
 
-var _ref3 = Object(preact_min["h"])(
+var wasmboyFilePicker__ref3 = Object(preact_min["h"])(
   'span',
   { 'class': 'file-label' },
   'Upload from Device'
 );
 
-var _ref4 = Object(preact_min["h"])(
+var wasmboyFilePicker__ref4 = Object(preact_min["h"])(
   'svg',
   { fill: '#020202', height: '24', viewBox: '0 0 24 24', width: '24', xmlns: 'http://www.w3.org/2000/svg' },
   Object(preact_min["h"])('path', { d: 'M0 0h24v24H0z', fill: 'none' }),
   Object(preact_min["h"])('path', { d: 'M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z' })
 );
 
-var _ref5 = Object(preact_min["h"])(
+var wasmboyFilePicker__ref5 = Object(preact_min["h"])(
   'span',
   { 'class': 'file-label' },
   'Get from Google Drive'
 );
 
-var _ref6 = Object(preact_min["h"])(
+var wasmboyFilePicker__ref6 = Object(preact_min["h"])(
   'h1',
   null,
   'Load Game'
 );
 
-var _ref7 = Object(preact_min["h"])(
+var wasmboyFilePicker__ref7 = Object(preact_min["h"])(
   'h2',
   null,
   'Supported file types: ".gb", ".gbc", ".zip"'
@@ -6748,7 +6983,7 @@ var wasmboyFilePicker_WasmBoyFilePicker = function (_Component) {
     var _this2 = this;
 
     this.setFileLoadingStatus(true);
-    this.props.wasmboy.loadGame(event.target.files[0]).then(function () {
+    WasmBoy.loadROM(event.target.files[0]).then(function () {
       console.log('Wasmboy Ready!');
       _this2.props.showNotification('Game Loaded! 🎉');
       _this2.setFileLoadingStatus(false);
@@ -6774,7 +7009,7 @@ var wasmboyFilePicker_WasmBoyFilePicker = function (_Component) {
 
       var googlePickerFileObject = data.docs[0];
       var oAuthHeaders = new Headers({
-        'Authorization': 'Bearer ' + googlePickerOAuthToken
+        Authorization: 'Bearer ' + googlePickerOAuthToken
       });
 
       this.setFileLoadingStatus(true);
@@ -6785,41 +7020,22 @@ var wasmboyFilePicker_WasmBoyFilePicker = function (_Component) {
       }).then(function (response) {
         return response.json();
       }).then(function (responseJson) {
-
-        // Finally fetch the file
-        unfetch_es(responseJson.downloadUrl, {
+        // Finally load the file using the oAuthHeaders
+        WasmBoy.loadROM(responseJson.downloadUrl, {
           headers: oAuthHeaders
-        }).then(function (blob) {
-          if (!blob.ok) {
-            return Promise.reject(blob);
-          }
+        }).then(function () {
+          console.log('Wasmboy Ready!');
+          _this3.props.showNotification('Game Loaded! 🎉');
+          _this3.setFileLoadingStatus(false);
 
-          return blob.arrayBuffer();
-        }).then(function (bytes) {
-
-          // Use Wasm Boy to possibly Unzip, and then pass the bytes to be loaded
-          _this3.props.wasmboy._getGameFromArrayBuffer(googlePickerFileObject.name, bytes).then(function (byteArray) {
-            _this3.props.wasmboy.loadGame(byteArray).then(function () {
-              console.log('Wasmboy Ready!');
-              _this3.props.showNotification('Game Loaded! 🎉');
-              _this3.setFileLoadingStatus(false);
-
-              // Set our file name
-              var newState = wasmboyFilePicker__extends({}, _this3.state);
-              newState.currentFileName = googlePickerFileObject.name;
-              _this3.setState(newState);
-            }).catch(function (error) {
-              console.log('Load Game Error:', error);
-              _this3.props.showNotification('Game Load Error! 😞');
-              _this3.setFileLoadingStatus(false);
-            });
-          }).catch(function (error) {
-            _this3.props.showNotification('Error getting file from google drive 💔');
-            _this3.setFileLoadingStatus(true);
-          });
+          // Set our file name
+          var newState = wasmboyFilePicker__extends({}, _this3.state);
+          newState.currentFileName = googlePickerFileObject.name;
+          _this3.setState(newState);
         }).catch(function (error) {
-          _this3.props.showNotification('Error getting file from google drive 💔');
-          _this3.setFileLoadingStatus(true);
+          console.log('Load Game Error:', error);
+          _this3.props.showNotification('Game Load Error! 😞');
+          _this3.setFileLoadingStatus(false);
         });
       }).catch(function (error) {
         _this3.props.showNotification('Error getting file from google drive 💔');
@@ -6837,7 +7053,7 @@ var wasmboyFilePicker_WasmBoyFilePicker = function (_Component) {
   WasmBoyFilePicker.prototype.render = function render() {
     var _this4 = this;
 
-    var fileInput = _ref;
+    var fileInput = wasmboyFilePicker__ref;
     if (!this.state.isFileLoading) {
       fileInput = Object(preact_min["h"])(
         'div',
@@ -6848,9 +7064,15 @@ var wasmboyFilePicker_WasmBoyFilePicker = function (_Component) {
           Object(preact_min["h"])(
             'label',
             { 'class': 'file-label' },
-            Object(preact_min["h"])('input', { 'class': 'file-input', type: 'file', accept: '.gb, .gbc, .zip', name: 'resume', onChange: function onChange(event) {
+            Object(preact_min["h"])('input', {
+              'class': 'file-input',
+              type: 'file',
+              accept: '.gb, .gbc, .zip',
+              name: 'resume',
+              onChange: function onChange(event) {
                 _this4.loadLocalFile(event);
-              } }),
+              }
+            }),
             Object(preact_min["h"])(
               'span',
               { 'class': 'file-cta' },
@@ -6859,13 +7081,14 @@ var wasmboyFilePicker_WasmBoyFilePicker = function (_Component) {
                 { 'class': 'file-icon' },
                 wasmboyFilePicker__ref2
               ),
-              _ref3
+              wasmboyFilePicker__ref3
             )
           )
         ),
         Object(preact_min["h"])(
           googlePicker_GooglePicker,
-          { clientId: WASMBOY_DEBUGGER_GOOGLE_PICKER_CLIENT_ID,
+          {
+            clientId: WASMBOY_DEBUGGER_GOOGLE_PICKER_CLIENT_ID,
             scope: ['https://www.googleapis.com/auth/drive.readonly'],
             onChange: function onChange(data) {
               _this4.loadGoogleDriveFile(data);
@@ -6876,7 +7099,8 @@ var wasmboyFilePicker_WasmBoyFilePicker = function (_Component) {
             multiselect: false,
             navHidden: true,
             authImmediate: false,
-            viewId: 'DOCS' },
+            viewId: 'DOCS'
+          },
           Object(preact_min["h"])(
             'div',
             { 'class': 'file' },
@@ -6889,9 +7113,9 @@ var wasmboyFilePicker_WasmBoyFilePicker = function (_Component) {
                 Object(preact_min["h"])(
                   'span',
                   { 'class': 'file-icon' },
-                  _ref4
+                  wasmboyFilePicker__ref4
                 ),
-                _ref5
+                wasmboyFilePicker__ref5
               )
             )
           )
@@ -6902,8 +7126,8 @@ var wasmboyFilePicker_WasmBoyFilePicker = function (_Component) {
     return Object(preact_min["h"])(
       'div',
       { 'class': 'wasmboy__filePicker' },
-      _ref6,
-      _ref7,
+      wasmboyFilePicker__ref6,
+      wasmboyFilePicker__ref7,
       Object(preact_min["h"])(
         'h2',
         null,
@@ -6933,6 +7157,7 @@ function wasmboySystemControls__classCallCheck(instance, Constructor) { if (!(in
 function wasmboySystemControls__possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function wasmboySystemControls__inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 
 
 
@@ -6983,11 +7208,11 @@ var wasmboySystemControls_WasmBoySystemControls = function (_Component) {
     var _fpsCounter = void 0;
     _fpsCounter = function fpsCounter() {
       _this.setState({
-        fps: props.wasmboy.getFps()
+        fps: WasmBoy.getFPS()
       });
       setTimeout(function () {
         _fpsCounter();
-      }, 500);
+      }, 1000);
     };
     _fpsCounter();
     return _this;
@@ -7008,8 +7233,8 @@ var wasmboySystemControls_WasmBoySystemControls = function (_Component) {
     this.setState(newState);
 
     // Get our save states
-    this.props.wasmboyMemory.getCartridgeObject().then(function (cartridgeObject) {
-      newState.saveStates = cartridgeObject.saveStates;
+    WasmBoy.getSaveStates().then(function (saveStates) {
+      newState.saveStates = saveStates;
       _this2.setState(newState);
     }).catch(function () {
       newState.saveStateError = true;
@@ -7026,34 +7251,52 @@ var wasmboySystemControls_WasmBoySystemControls = function (_Component) {
   };
 
   WasmBoySystemControls.prototype.startGame = function startGame() {
-    if (!this.props.wasmboy.ready) {
+    if (!WasmBoy.isReady()) {
       this.props.showNotification('Please load a game. ⏏️');
     } else {
-      this.props.wasmboy.startGame();
+      WasmBoy.play();
     }
   };
 
   WasmBoySystemControls.prototype.saveState = function saveState() {
-    this.props.wasmboy.saveState();
-    this.props.showNotification('State Saved! 💾');
+    var _this3 = this;
+
+    WasmBoy.saveState().then(function () {
+      WasmBoy.play().then(function () {
+        _this3.props.showNotification('State Saved! 💾');
+      }).catch(function () {
+        _this3.props.showNotification('Error Saving State... 😞');
+      });
+    }).catch(function () {
+      _this3.props.showNotification('Error Saving State... 😞');
+    });
   };
 
   WasmBoySystemControls.prototype.loadState = function loadState(saveState) {
+    var _this4 = this;
+
     this.closeSaveStates();
-    this.props.wasmboy.loadState(saveState);
-    this.props.showNotification('State Loaded! 😀');
+    WasmBoy.loadState(saveState).then(function () {
+      WasmBoy.play().then(function () {
+        _this4.props.showNotification('State Loaded! 😀');
+      }).catch(function () {
+        _this4.props.showNotification('Error Loading State... 😞');
+      });
+    }).catch(function () {
+      _this4.props.showNotification('Error Loading State... 😞');
+    });
   };
 
   WasmBoySystemControls.prototype.getStartButtonClass = function getStartButtonClass() {
-    if (this.props.wasmboy && this.props.wasmboy.ready) {
-      return "is-success";
+    if (WasmBoy.isReady()) {
+      return 'is-success';
     }
 
-    return "is-danger";
+    return 'is-danger';
   };
 
   WasmBoySystemControls.prototype.render = function render(props) {
-    var _this3 = this;
+    var _this5 = this;
 
     var saveStateElements = wasmboySystemControls__ref;
     if (this.state.showSaveStates) {
@@ -7065,14 +7308,17 @@ var wasmboySystemControls_WasmBoySystemControls = function (_Component) {
           saveStateDateString = saveStateDateString.toLocaleString();
           saveStateElements.unshift(Object(preact_min["h"])(
             'div',
-            { 'class': 'saveState', onClick: function onClick() {
-                _this3.loadState(saveState);
-              } },
+            {
+              'class': 'saveState',
+              onClick: function onClick() {
+                _this5.loadState(saveState);
+              }
+            },
             Object(preact_min["h"])('img', { src: saveState.screenshotCanvasDataURL }),
             wasmboySystemControls__ref2,
             saveStateDateString,
             wasmboySystemControls__ref3,
-            saveState.isAuto ? "true" : "false"
+            saveState.isAuto ? 'true' : 'false'
           ));
         });
       }
@@ -7087,37 +7333,42 @@ var wasmboySystemControls_WasmBoySystemControls = function (_Component) {
       { className: 'wasmboy__systemControls system-controls' },
       Object(preact_min["h"])(
         'button',
-        { className: this.getStartButtonClass() + " button", onclick: function onclick() {
-            _this3.startGame();
-          } },
-        'Start Game'
+        {
+          className: this.getStartButtonClass() + ' button',
+          onclick: function onclick() {
+            _this5.startGame();
+          }
+        },
+        'Play'
       ),
       Object(preact_min["h"])(
         'button',
-        { 'class': 'button', onclick: function onclick() {
-            props.wasmboy.pauseGame();
-          } },
-        'Pause Game'
+        {
+          'class': 'button',
+          onclick: function onclick() {
+            WasmBoy.pause();
+          }
+        },
+        'Pause'
       ),
       Object(preact_min["h"])(
         'button',
-        { 'class': 'button', onclick: function onclick() {
-            props.wasmboy.resumeGame();
-          } },
-        'Resume Game'
-      ),
-      Object(preact_min["h"])(
-        'button',
-        { 'class': 'button', onclick: function onclick() {
-            _this3.saveState();
-          } },
+        {
+          'class': 'button',
+          onclick: function onclick() {
+            _this5.saveState();
+          }
+        },
         'Save State'
       ),
       Object(preact_min["h"])(
         'button',
-        { 'class': 'button', onclick: function onclick() {
-            _this3.openSaveStates();
-          } },
+        {
+          'class': 'button',
+          onclick: function onclick() {
+            _this5.openSaveStates();
+          }
+        },
         'Load State'
       ),
       Object(preact_min["h"])(
@@ -7134,9 +7385,12 @@ var wasmboySystemControls_WasmBoySystemControls = function (_Component) {
           { 'class': 'modal is-active' },
           Object(preact_min["h"])(
             'div',
-            { 'class': 'modal-background', onClick: function onClick() {
-                _this3.closeSaveStates();
-              } },
+            {
+              'class': 'modal-background',
+              onClick: function onClick() {
+                _this5.closeSaveStates();
+              }
+            },
             Object(preact_min["h"])(
               'div',
               { 'class': 'modal-content' },
@@ -7147,9 +7401,13 @@ var wasmboySystemControls_WasmBoySystemControls = function (_Component) {
                 saveStateElements
               )
             ),
-            Object(preact_min["h"])('button', { 'class': 'modal-close is-large', 'aria-label': 'close', onClick: function onClick() {
-                _this3.closeSaveStates();
-              } })
+            Object(preact_min["h"])('button', {
+              'class': 'modal-close is-large',
+              'aria-label': 'close',
+              onClick: function onClick() {
+                _this5.closeSaveStates();
+              }
+            })
           )
         )
       ) : null
@@ -7364,6 +7622,7 @@ function wasmboyBackgroundMap__inherits(subClass, superClass) { if (typeof super
 
 
 
+
 var wasmboyBackgroundMap__ref = Object(preact_min["h"])(
   'div',
   null,
@@ -7420,26 +7679,24 @@ var wasmboyBackgroundMap_WasmBoyBackgroundMap = function (_Component) {
     var _this3 = this;
 
     return new src(function (resolve) {
-
       // Dont update for the following
-      if (!_this3.props.wasmboy.wasmByteMemory || !_this3.props.wasmboy.wasmInstance || !_this3.props.wasmboy.ready || _this3.props.wasmboy.paused || !_this3.props.shouldUpdate) {
+      if (!WasmBoy._getWasmByteMemory() || !WasmBoy._getWasmInstance() || !WasmBoy.isReady() || WasmBoy.isPaused() || !_this3.props.shouldUpdate) {
         resolve();
         return;
       }
 
-      _this3.props.wasmboy.wasmInstance.exports.drawBackgroundMapToWasmMemory(1);
+      WasmBoy._getWasmInstance().exports.drawBackgroundMapToWasmMemory(1);
 
       var imageDataArray = new Uint8ClampedArray(256 * 256 * 4);
       var rgbColor = new Uint8ClampedArray(3);
 
       for (var y = 0; y < 256; y++) {
         for (var x = 0; x < 256; x++) {
-
           // Each color has an R G B component
           var pixelStart = (y * 256 + x) * 3;
 
           for (var color = 0; color < 3; color++) {
-            rgbColor[color] = _this3.props.wasmboy.wasmByteMemory[_this3.props.wasmboy.wasmInstance.exports.backgroundMapLocation + pixelStart + color];
+            rgbColor[color] = WasmBoy._getWasmByteMemory()[WasmBoy._getWasmInstance().exports.backgroundMapLocation + pixelStart + color];
           }
 
           // Doing graphics using second answer on:
@@ -7467,8 +7724,8 @@ var wasmboyBackgroundMap_WasmBoyBackgroundMap = function (_Component) {
       // Draw a semi Transparent camera thing over the imagedata
       // https://www.html5canvastutorials.com/tutorials/html5-canvas-rectangles/
       // Get the scroll X and Y
-      var scrollX = _this3.props.wasmboy.wasmByteMemory[_this3.props.getWasmBoyOffsetFromGameBoyOffset(0xFF43, _this3.props.wasmboy)];
-      var scrollY = _this3.props.wasmboy.wasmByteMemory[_this3.props.getWasmBoyOffsetFromGameBoyOffset(0xFF42, _this3.props.wasmboy)];
+      var scrollX = WasmBoy._getWasmByteMemory()[_this3.props.getWasmBoyOffsetFromGameBoyOffset(0xff43)];
+      var scrollY = WasmBoy._getWasmByteMemory()[_this3.props.getWasmBoyOffsetFromGameBoyOffset(0xff42)];
 
       var lineWidth = 2;
       var strokeStyle = 'rgba(173, 140, 255, 200)';
@@ -7532,8 +7789,9 @@ function wasmboyTileData__inherits(subClass, superClass) { if (typeof superClass
 
 
 
+
 var canvasId = 'WasmBoyTileData';
-var tileDataXPixels = 0x1F * 8;
+var tileDataXPixels = 0x1f * 8;
 var tileDataYPixels = 0x17 * 8;
 
 var wasmboyTileData__ref = Object(preact_min["h"])(
@@ -7592,26 +7850,24 @@ var wasmboyTileData_WasmBoyTileData = function (_Component) {
     var _this3 = this;
 
     return new src(function (resolve) {
-
       // Dont update for the following
-      if (!_this3.props.wasmboy.wasmByteMemory || !_this3.props.wasmboy.wasmInstance || !_this3.props.wasmboy.ready || _this3.props.wasmboy.paused || !_this3.props.shouldUpdate) {
+      if (!WasmBoy._getWasmByteMemory() || !WasmBoy._getWasmInstance() || !WasmBoy.isReady() || WasmBoy.isPaused() || !_this3.props.shouldUpdate) {
         resolve();
         return;
       }
 
-      _this3.props.wasmboy.wasmInstance.exports.drawTileDataToWasmMemory();
+      WasmBoy._getWasmInstance().exports.drawTileDataToWasmMemory();
 
       var imageDataArray = new Uint8ClampedArray(tileDataYPixels * tileDataXPixels * 4);
       var rgbColor = new Uint8ClampedArray(3);
 
       for (var y = 0; y < tileDataYPixels; y++) {
         for (var x = 0; x < tileDataXPixels; x++) {
-
           // Each color has an R G B component
           var pixelStart = (y * tileDataXPixels + x) * 3;
 
           for (var color = 0; color < 3; color++) {
-            rgbColor[color] = _this3.props.wasmboy.wasmByteMemory[_this3.props.wasmboy.wasmInstance.exports.tileDataMap + pixelStart + color];
+            rgbColor[color] = WasmBoy._getWasmByteMemory()[WasmBoy._getWasmInstance().exports.tileDataMap + pixelStart + color];
           }
 
           // Doing graphics using second answer on:
@@ -7667,9 +7923,10 @@ function wasmboyDebugger__inherits(subClass, superClass) { if (typeof superClass
 
 
 
+
 // Function to get a value in gameboy memory, to wasmboy memory
-var getWasmBoyOffsetFromGameBoyOffset = function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset, wasmboy) {
-  return wasmboy.wasmInstance.exports.getWasmBoyOffsetFromGameBoyOffset(gameboyOffset);
+var wasmboyDebugger_getWasmBoyOffsetFromGameBoyOffset = function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset) {
+  return WasmBoy._getWasmInstance().exports.getWasmBoyOffsetFromGameBoyOffset(gameboyOffset);
 };
 
 var autoUpdateValueTableId = false;
@@ -7720,13 +7977,13 @@ var wasmboyDebugger__ref7 = Object(preact_min["h"])(
   )
 );
 
-var _ref8 = Object(preact_min["h"])(
+var wasmboyDebugger__ref8 = Object(preact_min["h"])(
   'h3',
   null,
   'PPU Info:'
 );
 
-var _ref9 = Object(preact_min["h"])(
+var wasmboyDebugger__ref9 = Object(preact_min["h"])(
   'a',
   { href: 'http://gbdev.gg8.se/wiki/articles/Video_Display', target: 'blank' },
   Object(preact_min["h"])(
@@ -7736,13 +7993,13 @@ var _ref9 = Object(preact_min["h"])(
   )
 );
 
-var _ref10 = Object(preact_min["h"])(
+var wasmboyDebugger__ref10 = Object(preact_min["h"])(
   'h3',
   null,
   'APU Info:'
 );
 
-var _ref11 = Object(preact_min["h"])(
+var wasmboyDebugger__ref11 = Object(preact_min["h"])(
   'a',
   { href: 'http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware', target: 'blank' },
   Object(preact_min["h"])(
@@ -7798,7 +8055,7 @@ var wasmboyDebugger_WasmBoyDebugger = function (_Component) {
       autoUpdateValueTable: false,
       showBackgroundMap: false,
       showTileData: false,
-      breakPoint: "40",
+      breakPoint: '40',
       opcodesToRun: 2000,
       valueTable: {
         cpu: {},
@@ -7814,7 +8071,7 @@ var wasmboyDebugger_WasmBoyDebugger = function (_Component) {
   // Function to simply flip a boolean on the state
 
 
-  WasmBoyDebugger.prototype.flipShowStatus = function flipShowStatus(stateKey, wasmboy) {
+  WasmBoyDebugger.prototype.flipShowStatus = function flipShowStatus(stateKey) {
     var _this2 = this;
 
     var newState = wasmboyDebugger__extends({}, this.state);
@@ -7825,7 +8082,7 @@ var wasmboyDebugger_WasmBoyDebugger = function (_Component) {
     if (stateKey === 'autoUpdateValueTable') {
       if (this.state.autoUpdateValueTable) {
         var _autoUpdateValueTable = function _autoUpdateValueTable() {
-          _this2.updateValueTable(wasmboy);
+          _this2.updateValueTable();
           if (autoUpdateValueTableId) {
             autoUpdateValueTableId = requestAnimationFrame(function () {
               _autoUpdateValueTable();
@@ -7851,15 +8108,15 @@ var wasmboyDebugger_WasmBoyDebugger = function (_Component) {
   // Function to runa  single opcode
 
 
-  WasmBoyDebugger.prototype.stepOpcode = function stepOpcode(wasmboy, wasmboyGraphics, skipDebugOutput) {
+  WasmBoyDebugger.prototype.stepOpcode = function stepOpcode(skipDebugOutput) {
     var _this3 = this;
 
     return new Promise(function (resolve) {
-      var numberOfCycles = wasmboy.wasmInstance.exports.emulationStep();
+      var numberOfCycles = WasmBoy._getWasmInstance().exports.emulationStep();
 
       if (numberOfCycles <= 0) {
         console.error('Opcode not recognized! Check wasm logs.');
-        _this3.updateDebugInfo(wasmboy);
+        _this3.updateDebugInfo();
         throw new Error();
       }
 
@@ -7867,8 +8124,7 @@ var wasmboyDebugger_WasmBoyDebugger = function (_Component) {
         resolve();
         return;
       }
-      wasmboyGraphics.renderFrame();
-      _this3.updateValueTable(wasmboy);
+      _this3.updateValueTable();
 
       resolve();
     });
@@ -7877,7 +8133,7 @@ var wasmboyDebugger_WasmBoyDebugger = function (_Component) {
   // Function to run a specifed number of opcodes for faster stepping
 
 
-  WasmBoyDebugger.prototype.runNumberOfOpcodes = function runNumberOfOpcodes(wasmboy, wasmboyGraphics, numberOfOpcodes, breakPoint, skipDebugOutput) {
+  WasmBoyDebugger.prototype.runNumberOfOpcodes = function runNumberOfOpcodes(numberOfOpcodes, breakPoint, skipDebugOutput) {
     var _this4 = this;
 
     // Keep stepping until highest opcode increases
@@ -7887,12 +8143,11 @@ var wasmboyDebugger_WasmBoyDebugger = function (_Component) {
     }
 
     return new Promise(function (resolve) {
-
       var opcodesRan = 0;
 
       var runOpcode = function runOpcode() {
-        _this4.stepOpcode(wasmboy, wasmboyGraphics, true).then(function () {
-          if (breakPoint && breakPoint === wasmboy.wasmInstance.exports.getProgramCounter()) {
+        _this4.stepOpcode(true).then(function () {
+          if (breakPoint && breakPoint === WasmBoy._getWasmInstance().exports.getProgramCounter()) {
             resolve();
             return;
           }
@@ -7908,8 +8163,7 @@ var wasmboyDebugger_WasmBoyDebugger = function (_Component) {
             return;
           }
 
-          wasmboyGraphics.renderFrame();
-          _this4.updateValueTable(wasmboy);
+          _this4.updateValueTable();
 
           resolve();
         });
@@ -7921,7 +8175,7 @@ var wasmboyDebugger_WasmBoyDebugger = function (_Component) {
   // Function to keep running opcodes until a breakpoint is reached
 
 
-  WasmBoyDebugger.prototype.breakPoint = function breakPoint(wasmboy, wasmboyGraphics, skipInitialStep) {
+  WasmBoyDebugger.prototype.breakPoint = function breakPoint(skipInitialStep) {
     var _this5 = this;
 
     // Set our opcode breakpoint
@@ -7929,31 +8183,33 @@ var wasmboyDebugger_WasmBoyDebugger = function (_Component) {
 
     var initialStepPromise = Promise.resolve();
     if (!skipInitialStep) {
-      initialStepPromise = this.runNumberOfOpcodes(wasmboy, wasmboyGraphics, 1, breakPoint);
+      initialStepPromise = this.runNumberOfOpcodes(1, breakPoint);
     }
 
     initialStepPromise.then(function () {
-      if (wasmboy.wasmInstance.exports.getProgramCounter() !== breakPoint) {
+      if (WasmBoy._getWasmInstance().exports.getProgramCounter() !== breakPoint) {
         requestAnimationFrame(function () {
-          _this5.runNumberOfOpcodes(wasmboy, wasmboyGraphics, 2000 + Math.floor(Math.random() * 10), breakPoint, true).then(function () {
-            wasmboyGraphics.renderFrame();
-            _this5.updateValueTable(wasmboy);
-            _this5.breakPoint(wasmboy, wasmboyGraphics, true);
+          _this5.runNumberOfOpcodes(2000 + Math.floor(Math.random() * 10), breakPoint, true).then(function () {
+            _this5.updateValueTable();
+            _this5.breakPoint(true);
           });
         });
       } else {
         console.log('Reached Breakpoint, that satisfies test inside runNumberOfOpcodes');
-        wasmboyGraphics.renderFrame();
-        _this5.updateValueTable(wasmboy);
+        _this5.updateValueTable();
       }
     });
   };
 
-  WasmBoyDebugger.prototype.logWasmBoyMemory = function logWasmBoyMemory(wasmBoy) {
-    console.log('[WasmBoy Debugger] Memory:', wasmBoy.wasmByteMemory);
+  WasmBoyDebugger.prototype.logWasmBoyMemory = function logWasmBoyMemory() {
+    console.log('[WasmBoy Debugger] Memory:', WasmBoy._getWasmByteMemory());
   };
 
-  WasmBoyDebugger.prototype.updateValueTable = function updateValueTable(wasmboy) {
+  WasmBoyDebugger.prototype.updateValueTable = function updateValueTable() {
+    // Check that we have our instance and byte memory
+    if (!WasmBoy._getWasmInstance() || !WasmBoy._getWasmByteMemory()) {
+      return;
+    }
 
     // Create our new valueTable object
     var valueTable = {
@@ -7965,55 +8221,55 @@ var wasmboyDebugger_WasmBoyDebugger = function (_Component) {
     };
 
     // Update CPU valueTable
-    valueTable.cpu['Program Counter (PC)'] = wasmboy.wasmInstance.exports.getProgramCounter();
-    valueTable.cpu['Opcode at PC'] = wasmboy.wasmInstance.exports.getOpcodeAtProgramCounter();
-    valueTable.cpu['Stack Pointer'] = wasmboy.wasmInstance.exports.getStackPointer();
-    valueTable.cpu['Register A'] = wasmboy.wasmInstance.exports.getRegisterA();
-    valueTable.cpu['Register F'] = wasmboy.wasmInstance.exports.getRegisterF();
-    valueTable.cpu['Register B'] = wasmboy.wasmInstance.exports.getRegisterB();
-    valueTable.cpu['Register C'] = wasmboy.wasmInstance.exports.getRegisterC();
-    valueTable.cpu['Register D'] = wasmboy.wasmInstance.exports.getRegisterD();
-    valueTable.cpu['Register E'] = wasmboy.wasmInstance.exports.getRegisterE();
-    valueTable.cpu['Register H'] = wasmboy.wasmInstance.exports.getRegisterH();
-    valueTable.cpu['Register L'] = wasmboy.wasmInstance.exports.getRegisterL();
+    valueTable.cpu['Program Counter (PC)'] = WasmBoy._getWasmInstance().exports.getProgramCounter();
+    valueTable.cpu['Opcode at PC'] = WasmBoy._getWasmInstance().exports.getOpcodeAtProgramCounter();
+    valueTable.cpu['Stack Pointer'] = WasmBoy._getWasmInstance().exports.getStackPointer();
+    valueTable.cpu['Register A'] = WasmBoy._getWasmInstance().exports.getRegisterA();
+    valueTable.cpu['Register F'] = WasmBoy._getWasmInstance().exports.getRegisterF();
+    valueTable.cpu['Register B'] = WasmBoy._getWasmInstance().exports.getRegisterB();
+    valueTable.cpu['Register C'] = WasmBoy._getWasmInstance().exports.getRegisterC();
+    valueTable.cpu['Register D'] = WasmBoy._getWasmInstance().exports.getRegisterD();
+    valueTable.cpu['Register E'] = WasmBoy._getWasmInstance().exports.getRegisterE();
+    valueTable.cpu['Register H'] = WasmBoy._getWasmInstance().exports.getRegisterH();
+    valueTable.cpu['Register L'] = WasmBoy._getWasmInstance().exports.getRegisterL();
     valueTable.cpu = wasmboyDebugger__extends({}, valueTable.cpu);
 
     // Update PPU valueTable
-    valueTable.ppu['Scanline Register (LY) - 0xFF44'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFF44, wasmboy)];
-    valueTable.ppu['LCD Status (STAT) - 0xFF41'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFF41, wasmboy)];
-    valueTable.ppu['LCD Control (LCDC) - 0xFF40'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFF40, wasmboy)];
-    valueTable.ppu['Scroll X - 0xFF43'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFF43, wasmboy)];
-    valueTable.ppu['Scroll Y - 0xFF42'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFF42, wasmboy)];
-    valueTable.ppu['Window X - 0xFF4B'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFF4B, wasmboy)];
-    valueTable.ppu['Window Y - 0xFF4A'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFF4A, wasmboy)];
+    valueTable.ppu['Scanline Register (LY) - 0xFF44'] = WasmBoy._getWasmByteMemory()[wasmboyDebugger_getWasmBoyOffsetFromGameBoyOffset(0xff44)];
+    valueTable.ppu['LCD Status (STAT) - 0xFF41'] = WasmBoy._getWasmByteMemory()[wasmboyDebugger_getWasmBoyOffsetFromGameBoyOffset(0xff41)];
+    valueTable.ppu['LCD Control (LCDC) - 0xFF40'] = WasmBoy._getWasmByteMemory()[wasmboyDebugger_getWasmBoyOffsetFromGameBoyOffset(0xff40)];
+    valueTable.ppu['Scroll X - 0xFF43'] = WasmBoy._getWasmByteMemory()[wasmboyDebugger_getWasmBoyOffsetFromGameBoyOffset(0xff43)];
+    valueTable.ppu['Scroll Y - 0xFF42'] = WasmBoy._getWasmByteMemory()[wasmboyDebugger_getWasmBoyOffsetFromGameBoyOffset(0xff42)];
+    valueTable.ppu['Window X - 0xFF4B'] = WasmBoy._getWasmByteMemory()[wasmboyDebugger_getWasmBoyOffsetFromGameBoyOffset(0xff4b)];
+    valueTable.ppu['Window Y - 0xFF4A'] = WasmBoy._getWasmByteMemory()[wasmboyDebugger_getWasmBoyOffsetFromGameBoyOffset(0xff4a)];
 
     // Update Timers valueTable
-    valueTable.timers['TIMA - 0xFF05'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFF05, wasmboy)];
-    valueTable.timers['TMA - 0xFF06'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFF06, wasmboy)];
-    valueTable.timers['TIMC/TAC - 0xFF07'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFF07, wasmboy)];
-    valueTable.timers['DIV/Divider Register - 0xFF04'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFF04, wasmboy)];
+    valueTable.timers['TIMA - 0xFF05'] = WasmBoy._getWasmByteMemory()[wasmboyDebugger_getWasmBoyOffsetFromGameBoyOffset(0xff05)];
+    valueTable.timers['TMA - 0xFF06'] = WasmBoy._getWasmByteMemory()[wasmboyDebugger_getWasmBoyOffsetFromGameBoyOffset(0xff06)];
+    valueTable.timers['TIMC/TAC - 0xFF07'] = WasmBoy._getWasmByteMemory()[wasmboyDebugger_getWasmBoyOffsetFromGameBoyOffset(0xff07)];
+    valueTable.timers['DIV/Divider Register - 0xFF04'] = WasmBoy._getWasmByteMemory()[wasmboyDebugger_getWasmBoyOffsetFromGameBoyOffset(0xff04)];
 
     // Update interrupts valueTable
     // TODO: Interrupot master switch
-    // if(wasmboy.wasmInstance.exports.areInterruptsEnabled()) {
+    // if(WasmBoy._getWasmInstance().exports.areInterruptsEnabled()) {
     //   valueTable.interrupts['Interrupt Master Switch'] = 0x01;
     // } else {
     //   valueTable.interrupts['Interrupt Master Switch'] = 0x00;
     // }
-    valueTable.interrupts['IE/Interrupt Enabled - 0xFFFF'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFFFF, wasmboy)];
-    valueTable.interrupts['IF/Interrupt Request - 0xFF0F'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFF0F, wasmboy)];
+    valueTable.interrupts['IE/Interrupt Enabled - 0xFFFF'] = WasmBoy._getWasmByteMemory()[wasmboyDebugger_getWasmBoyOffsetFromGameBoyOffset(0xffff)];
+    valueTable.interrupts['IF/Interrupt Request - 0xFF0F'] = WasmBoy._getWasmByteMemory()[wasmboyDebugger_getWasmBoyOffsetFromGameBoyOffset(0xff0f)];
 
     // Update APU valueTable
     // Add the register valueTable for our 4 channels
     for (var channelNum = 1; channelNum <= 4; channelNum++) {
       for (var registerNum = 0; registerNum < 5; registerNum++) {
-        var registerAddress = 0xFF10 + 5 * (channelNum - 1) + registerNum;
-        valueTable.apu['Channel ' + channelNum + ' - NR' + channelNum + registerNum + ' - 0x' + registerAddress.toString(16).toUpperCase()] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(registerAddress, wasmboy)];
+        var registerAddress = 0xff10 + 5 * (channelNum - 1) + registerNum;
+        valueTable.apu['Channel ' + channelNum + ' - NR' + channelNum + registerNum + ' - 0x' + registerAddress.toString(16).toUpperCase()] = WasmBoy._getWasmByteMemory()[wasmboyDebugger_getWasmBoyOffsetFromGameBoyOffset(registerAddress)];
       }
     }
-    valueTable.interrupts['IE/Interrupt Enabled - 0xFFFF'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFFFF, wasmboy)];
-    valueTable.interrupts['IE/Interrupt Enabled - 0xFFFF'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFFFF, wasmboy)];
-    valueTable.interrupts['IE/Interrupt Enabled - 0xFFFF'] = wasmboy.wasmByteMemory[getWasmBoyOffsetFromGameBoyOffset(0xFFFF, wasmboy)];
+    valueTable.interrupts['IE/Interrupt Enabled - 0xFFFF'] = WasmBoy._getWasmByteMemory()[wasmboyDebugger_getWasmBoyOffsetFromGameBoyOffset(0xffff)];
+    valueTable.interrupts['IE/Interrupt Enabled - 0xFFFF'] = WasmBoy._getWasmByteMemory()[wasmboyDebugger_getWasmBoyOffsetFromGameBoyOffset(0xffff)];
+    valueTable.interrupts['IE/Interrupt Enabled - 0xFFFF'] = WasmBoy._getWasmByteMemory()[wasmboyDebugger_getWasmBoyOffsetFromGameBoyOffset(0xffff)];
 
     // Clone our valueTable, that it is immutable and will cause change detection
     var newState = wasmboyDebugger__extends({}, this.state);
@@ -8034,9 +8290,12 @@ var wasmboyDebugger_WasmBoyDebugger = function (_Component) {
         { 'class': 'debuggerAction' },
         Object(preact_min["h"])(
           'button',
-          { 'class': 'button', onclick: function onclick() {
-              _this6.stepOpcode(props.wasmboy, props.wasmboyGraphics).then(function () {});
-            } },
+          {
+            'class': 'button',
+            onclick: function onclick() {
+              _this6.stepOpcode().then(function () {});
+            }
+          },
           'Step Opcode'
         )
       ),
@@ -8044,17 +8303,22 @@ var wasmboyDebugger_WasmBoyDebugger = function (_Component) {
         'div',
         { 'class': 'debuggerAction' },
         'Run Specified Number of Opcodes:',
-        Object(preact_min["h"])('input', { type: 'number',
+        Object(preact_min["h"])('input', {
+          type: 'number',
           'class': 'input',
           value: this.state.opcodesToRun,
           onChange: function onChange(evt) {
             _this6.state.opcodesToRun = evt.target.value;
-          } }),
+          }
+        }),
         Object(preact_min["h"])(
           'button',
-          { 'class': 'button', onclick: function onclick() {
-              _this6.runNumberOfOpcodes(props.wasmboy, props.wasmboyGraphics).then(function () {});
-            } },
+          {
+            'class': 'button',
+            onclick: function onclick() {
+              _this6.runNumberOfOpcodes().then(function () {});
+            }
+          },
           'Run number of opcodes'
         )
       ),
@@ -8068,12 +8332,16 @@ var wasmboyDebugger_WasmBoyDebugger = function (_Component) {
           value: this.state.breakPoint,
           onChange: function onChange(evt) {
             _this6.state.breakPoint = evt.target.value;
-          } }),
+          }
+        }),
         Object(preact_min["h"])(
           'button',
-          { 'class': 'button', onclick: function onclick() {
-              _this6.breakPoint(props.wasmboy, props.wasmboyGraphics);
-            } },
+          {
+            'class': 'button',
+            onclick: function onclick() {
+              _this6.breakPoint();
+            }
+          },
           'Run To Breakpoint'
         )
       ),
@@ -8083,9 +8351,12 @@ var wasmboyDebugger_WasmBoyDebugger = function (_Component) {
         { 'class': 'debuggerAction' },
         Object(preact_min["h"])(
           'button',
-          { 'class': 'button', onclick: function onclick() {
-              _this6.logWasmBoyMemory(props.wasmboy);
-            } },
+          {
+            'class': 'button',
+            onclick: function onclick() {
+              _this6.logWasmBoyMemory();
+            }
+          },
           'Log Memory to console'
         )
       ),
@@ -8094,9 +8365,12 @@ var wasmboyDebugger_WasmBoyDebugger = function (_Component) {
         { 'class': 'debuggerAction' },
         Object(preact_min["h"])(
           'button',
-          { 'class': 'button', onclick: function onclick() {
-              props.wasmboyAudio.debugSaveCurrentAudioBufferToWav();
-            } },
+          {
+            'class': 'button',
+            onclick: function onclick() {
+              WasmBoy._saveCurrentAudioBufferToWav();
+            }
+          },
           'Save Current Audio buffer to wav'
         )
       ),
@@ -8105,9 +8379,13 @@ var wasmboyDebugger_WasmBoyDebugger = function (_Component) {
         { 'class': 'debuggerAction' },
         Object(preact_min["h"])(
           'button',
-          { 'class': 'button', onclick: function onclick() {
-              _this6.state.showValueTable = true;_this6.updateValueTable(props.wasmboy);
-            } },
+          {
+            'class': 'button',
+            onclick: function onclick() {
+              _this6.state.showValueTable = true;
+              _this6.updateValueTable();
+            }
+          },
           'Update Value Table'
         )
       ),
@@ -8124,8 +8402,10 @@ var wasmboyDebugger_WasmBoyDebugger = function (_Component) {
             type: 'checkbox',
             checked: this.state.showValueTable,
             onChange: function onChange() {
-              _this6.flipShowStatus('showValueTable');_this6.updateValueTable(props.wasmboy);
-            } })
+              _this6.flipShowStatus('showValueTable');
+              _this6.updateValueTable();
+            }
+          })
         )
       ),
       Object(preact_min["h"])(
@@ -8140,8 +8420,10 @@ var wasmboyDebugger_WasmBoyDebugger = function (_Component) {
             type: 'checkbox',
             checked: this.state.autoUpdateValueTable,
             onChange: function onChange() {
-              _this6.state.showValueTable = true;_this6.flipShowStatus('autoUpdateValueTable', props.wasmboy);
-            } })
+              _this6.state.showValueTable = true;
+              _this6.flipShowStatus('autoUpdateValueTable');
+            }
+          })
         )
       ),
       Object(preact_min["h"])(
@@ -8157,7 +8439,8 @@ var wasmboyDebugger_WasmBoyDebugger = function (_Component) {
             checked: this.state.showBackgroundMap,
             onChange: function onChange() {
               _this6.flipShowStatus('showBackgroundMap');
-            } })
+            }
+          })
         )
       ),
       Object(preact_min["h"])(
@@ -8173,21 +8456,22 @@ var wasmboyDebugger_WasmBoyDebugger = function (_Component) {
             checked: this.state.showTileData,
             onChange: function onChange() {
               _this6.flipShowStatus('showTileData');
-            } })
+            }
+          })
         )
       ),
       Object(preact_min["h"])(
         'div',
-        { className: this.getStateClass('showValueTable') + " animated fadeIn" },
+        { className: this.getStateClass('showValueTable') + ' animated fadeIn' },
         wasmboyDebugger__ref5,
         wasmboyDebugger__ref6,
         wasmboyDebugger__ref7,
         Object(preact_min["h"])(numberBaseTable_NumberBaseTable, { object: this.state.valueTable.cpu }),
-        _ref8,
-        _ref9,
+        wasmboyDebugger__ref8,
+        wasmboyDebugger__ref9,
         Object(preact_min["h"])(numberBaseTable_NumberBaseTable, { object: this.state.valueTable.ppu }),
-        _ref10,
-        _ref11,
+        wasmboyDebugger__ref10,
+        wasmboyDebugger__ref11,
         Object(preact_min["h"])(numberBaseTable_NumberBaseTable, { object: this.state.valueTable.apu }),
         _ref12,
         _ref13,
@@ -8198,19 +8482,16 @@ var wasmboyDebugger_WasmBoyDebugger = function (_Component) {
       ),
       Object(preact_min["h"])(
         'div',
-        { className: this.getStateClass('showBackgroundMap') + " animated fadeIn" },
+        { className: this.getStateClass('showBackgroundMap') + ' animated fadeIn' },
         Object(preact_min["h"])(wasmboyBackgroundMap_WasmBoyBackgroundMap, {
-          wasmboy: props.wasmboy,
           shouldUpdate: this.state.showBackgroundMap,
-          getWasmBoyOffsetFromGameBoyOffset: getWasmBoyOffsetFromGameBoyOffset })
+          getWasmBoyOffsetFromGameBoyOffset: wasmboyDebugger_getWasmBoyOffsetFromGameBoyOffset
+        })
       ),
       Object(preact_min["h"])(
         'div',
-        { className: this.getStateClass('showTileData') + " animated fadeIn" },
-        Object(preact_min["h"])(wasmboyTileData_WasmBoyTileData, {
-          wasmboy: props.wasmboy,
-          shouldUpdate: this.state.showTileData,
-          getWasmBoyOffsetFromGameBoyOffset: getWasmBoyOffsetFromGameBoyOffset })
+        { className: this.getStateClass('showTileData') + ' animated fadeIn' },
+        Object(preact_min["h"])(wasmboyTileData_WasmBoyTileData, { shouldUpdate: this.state.showTileData, getWasmBoyOffsetFromGameBoyOffset: wasmboyDebugger_getWasmBoyOffsetFromGameBoyOffset })
       )
     );
   };
@@ -8235,6 +8516,7 @@ function wasmboyOptions__inherits(subClass, superClass) { if (typeof superClass 
 
 
 
+
 var wasmboyOptions__ref = Object(preact_min["h"])(
   'h1',
   null,
@@ -8247,7 +8529,8 @@ var wasmboyOptions__ref2 = Object(preact_min["h"])(
   Object(preact_min["h"])(
     'i',
     null,
-    'Applying options will reset any currently running game without saving. It is reccomended you apply your options before loading your game. Information on the ',
+    'Applying options will reset any currently running game without saving. It is reccomended you apply your options before loading your game. Information on the',
+    ' ',
     Object(preact_min["h"])(
       'a',
       { href: 'https://github.com/torch2424/wasmBoy/blob/master/test/performance/results.md', target: '_blank' },
@@ -8269,12 +8552,11 @@ var wasmboyOptions_WasmBoyOptions = function (_Component) {
   }
 
   WasmBoyOptions.prototype.componentDidMount = function componentDidMount() {
-    var _this2 = this;
-
     // Add all of our default options from the props to our component state
     var newState = wasmboyOptions__extends({}, this.state);
+    var wasmboyConfig = WasmBoy.getConfig();
     Object.keys(this.props.availableOptions).forEach(function (optionKey) {
-      newState[optionKey] = _this2.props.wasmBoy[optionKey];
+      newState[optionKey] = wasmboyConfig[optionKey];
     });
     this.setState(newState);
   };
@@ -8289,8 +8571,13 @@ var wasmboyOptions_WasmBoyOptions = function (_Component) {
 
 
   WasmBoyOptions.prototype.applyOptions = function applyOptions() {
-    this.props.wasmBoy.reset(this.state);
-    this.props.showNotification('Applied Options! 🛠️');
+    var _this2 = this;
+
+    WasmBoy.reset(this.state).then(function () {
+      _this2.props.showNotification('Applied Options! 🛠️');
+    }).catch(function (error) {
+      _this2.props.showNotification('Options Error! 😞');
+    });
   };
 
   WasmBoyOptions.prototype.render = function render() {
@@ -8299,7 +8586,6 @@ var wasmboyOptions_WasmBoyOptions = function (_Component) {
     // Create an array of all of our configurable options
     var options = [];
     Object.keys(this.state).forEach(function (stateOptionKey) {
-
       // Boolean Checkboxes
       if (typeof _this3.state[stateOptionKey] === typeof true) {
         options.push(Object(preact_min["h"])(
@@ -8315,13 +8601,14 @@ var wasmboyOptions_WasmBoyOptions = function (_Component) {
               checked: _this3.state[stateOptionKey],
               onChange: function onChange() {
                 _this3.setStateKey(stateOptionKey, !_this3.state[stateOptionKey]);
-              } })
+              }
+            })
           )
         ));
       }
 
       // Number Input Fields
-      if (typeof _this3.state[stateOptionKey] === "number") {
+      if (typeof _this3.state[stateOptionKey] === 'number') {
         options.push(Object(preact_min["h"])(
           'div',
           null,
@@ -8329,13 +8616,15 @@ var wasmboyOptions_WasmBoyOptions = function (_Component) {
             'label',
             { 'class': 'checkbox' },
             stateOptionKey,
-            Object(preact_min["h"])('input', { type: 'number',
+            Object(preact_min["h"])('input', {
+              type: 'number',
               'class': 'input',
               name: stateOptionKey,
               value: _this3.state[stateOptionKey],
               onChange: function onChange(event) {
                 _this3.setStateKey(stateOptionKey, parseFloat(event.target.value));
-              } })
+              }
+            })
           )
         ));
       }
@@ -8353,9 +8642,12 @@ var wasmboyOptions_WasmBoyOptions = function (_Component) {
       ),
       Object(preact_min["h"])(
         'button',
-        { 'class': 'wasmboy__options__apply button', onClick: function onClick() {
+        {
+          'class': 'wasmboy__options__apply button',
+          onClick: function onClick() {
             _this3.applyOptions();
-          } },
+          }
+        },
         'Apply Options'
       )
     );
@@ -8379,85 +8671,104 @@ function wasmboyGamepad__inherits(subClass, superClass) { if (typeof superClass 
 
 
 
+
 // Simple mobile contreols for the wasmboy debugger
 
 var wasmboyGamepad__ref = Object(preact_min["h"])(
-    'svg',
-    { id: 'gamepadDpad', height: '24', viewBox: '0 0 24 24', width: '24', xmlns: 'http://www.w3.org/2000/svg' },
-    Object(preact_min["h"])('path', { d: 'M0 0h24v24H0z', fill: 'none' }),
-    Object(preact_min["h"])('path', { d: 'M15 7.5V2H9v5.5l3 3 3-3zM7.5 9H2v6h5.5l3-3-3-3zM9 16.5V22h6v-5.5l-3-3-3 3zM16.5 9l-3 3 3 3H22V9h-5.5z' })
+  'svg',
+  { id: 'gamepadDpad', height: '24', viewBox: '0 0 24 24', width: '24', xmlns: 'http://www.w3.org/2000/svg' },
+  Object(preact_min["h"])('path', { d: 'M0 0h24v24H0z', fill: 'none' }),
+  Object(preact_min["h"])('path', { d: 'M15 7.5V2H9v5.5l3 3 3-3zM7.5 9H2v6h5.5l3-3-3-3zM9 16.5V22h6v-5.5l-3-3-3 3zM16.5 9l-3 3 3 3H22V9h-5.5z' })
 );
 
 var wasmboyGamepad__ref2 = Object(preact_min["h"])(
-    'svg',
-    { id: 'gamepadStart', height: '24', viewBox: '6 6 12 12', width: '24', xmlns: 'http://www.w3.org/2000/svg' },
-    Object(preact_min["h"])('path', { d: 'M19 13H5v-2h14v2z' }),
-    Object(preact_min["h"])('path', { d: 'M0 0h24v24H0z', fill: 'none' }),
-    Object(preact_min["h"])(
-        'text',
-        { x: '21', y: '55', transform: 'scale(0.325)' },
-        'Start'
-    )
+  'svg',
+  { id: 'gamepadStart', height: '24', viewBox: '6 6 12 12', width: '24', xmlns: 'http://www.w3.org/2000/svg' },
+  Object(preact_min["h"])('path', { d: 'M19 13H5v-2h14v2z' }),
+  Object(preact_min["h"])('path', { d: 'M0 0h24v24H0z', fill: 'none' }),
+  Object(preact_min["h"])(
+    'text',
+    { x: '21', y: '55', transform: 'scale(0.325)' },
+    'Start'
+  )
 );
 
 var wasmboyGamepad__ref3 = Object(preact_min["h"])(
-    'svg',
-    { id: 'gamepadSelect', height: '24', viewBox: '6 6 12 12', width: '24', xmlns: 'http://www.w3.org/2000/svg' },
-    Object(preact_min["h"])('path', { d: 'M19 13H5v-2h14v2z' }),
-    Object(preact_min["h"])('path', { d: 'M0 0h24v24H0z', fill: 'none' }),
-    Object(preact_min["h"])(
-        'text',
-        { x: '16', y: '55', transform: 'scale(0.325)' },
-        'Select'
-    )
+  'svg',
+  { id: 'gamepadSelect', height: '24', viewBox: '6 6 12 12', width: '24', xmlns: 'http://www.w3.org/2000/svg' },
+  Object(preact_min["h"])('path', { d: 'M19 13H5v-2h14v2z' }),
+  Object(preact_min["h"])('path', { d: 'M0 0h24v24H0z', fill: 'none' }),
+  Object(preact_min["h"])(
+    'text',
+    { x: '16', y: '55', transform: 'scale(0.325)' },
+    'Select'
+  )
 );
 
 var wasmboyGamepad__ref4 = Object(preact_min["h"])(
-    'svg',
-    { id: 'gamepadA', height: '24', viewBox: '0 0 24 24', width: '24', xmlns: 'http://www.w3.org/2000/svg' },
-    Object(preact_min["h"])('path', { d: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z' }),
-    Object(preact_min["h"])('path', { d: 'M0 0h24v24H0z', fill: 'none' }),
-    Object(preact_min["h"])(
-        'text',
-        { x: '7.5', y: '16.25' },
-        'A'
-    )
+  'svg',
+  { id: 'gamepadA', height: '24', viewBox: '0 0 24 24', width: '24', xmlns: 'http://www.w3.org/2000/svg' },
+  Object(preact_min["h"])('path', { d: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z' }),
+  Object(preact_min["h"])('path', { d: 'M0 0h24v24H0z', fill: 'none' }),
+  Object(preact_min["h"])(
+    'text',
+    { x: '7.5', y: '16.25' },
+    'A'
+  )
 );
 
 var wasmboyGamepad__ref5 = Object(preact_min["h"])(
-    'svg',
-    { id: 'gamepadB', height: '24', viewBox: '0 0 24 24', width: '24', xmlns: 'http://www.w3.org/2000/svg' },
-    Object(preact_min["h"])('path', { d: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z' }),
-    Object(preact_min["h"])('path', { d: 'M0 0h24v24H0z', fill: 'none' }),
-    Object(preact_min["h"])(
-        'text',
-        { x: '7.5', y: '17.25' },
-        'B'
-    )
+  'svg',
+  { id: 'gamepadB', height: '24', viewBox: '0 0 24 24', width: '24', xmlns: 'http://www.w3.org/2000/svg' },
+  Object(preact_min["h"])('path', { d: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z' }),
+  Object(preact_min["h"])('path', { d: 'M0 0h24v24H0z', fill: 'none' }),
+  Object(preact_min["h"])(
+    'text',
+    { x: '7.5', y: '17.25' },
+    'B'
+  )
 );
 
 var wasmboyGamepad_WasmBoyGamepad = function (_Component) {
-    wasmboyGamepad__inherits(WasmBoyGamepad, _Component);
+  wasmboyGamepad__inherits(WasmBoyGamepad, _Component);
 
-    function WasmBoyGamepad() {
-        wasmboyGamepad__classCallCheck(this, WasmBoyGamepad);
+  function WasmBoyGamepad() {
+    wasmboyGamepad__classCallCheck(this, WasmBoyGamepad);
 
-        return wasmboyGamepad__possibleConstructorReturn(this, _Component.call(this));
-    }
+    return wasmboyGamepad__possibleConstructorReturn(this, _Component.call(this));
+  }
 
-    WasmBoyGamepad.prototype.render = function render() {
-        return Object(preact_min["h"])(
-            'div',
-            { 'class': 'wasmboy__gamepad' },
-            wasmboyGamepad__ref,
-            wasmboyGamepad__ref2,
-            wasmboyGamepad__ref3,
-            wasmboyGamepad__ref4,
-            wasmboyGamepad__ref5
-        );
-    };
+  WasmBoyGamepad.prototype.componentDidMount = function componentDidMount() {
+    // Add our touch inputs
+    var dpadElement = document.getElementById('gamepadDpad');
+    var startElement = document.getElementById('gamepadStart');
+    var selectElement = document.getElementById('gamepadSelect');
+    var aElement = document.getElementById('gamepadA');
+    var bElement = document.getElementById('gamepadB');
 
-    return WasmBoyGamepad;
+    WasmBoy.addTouchInput('UP', dpadElement, 'DPAD', 'UP');
+    WasmBoy.addTouchInput('RIGHT', dpadElement, 'DPAD', 'RIGHT');
+    WasmBoy.addTouchInput('DOWN', dpadElement, 'DPAD', 'DOWN');
+    WasmBoy.addTouchInput('LEFT', dpadElement, 'DPAD', 'LEFT');
+    WasmBoy.addTouchInput('A', aElement, 'BUTTON');
+    WasmBoy.addTouchInput('B', bElement, 'BUTTON');
+    WasmBoy.addTouchInput('START', startElement, 'BUTTON');
+    WasmBoy.addTouchInput('SELECT', selectElement, 'BUTTON');
+  };
+
+  WasmBoyGamepad.prototype.render = function render() {
+    return Object(preact_min["h"])(
+      'div',
+      { 'class': 'wasmboy__gamepad' },
+      wasmboyGamepad__ref,
+      wasmboyGamepad__ref2,
+      wasmboyGamepad__ref3,
+      wasmboyGamepad__ref4,
+      wasmboyGamepad__ref5
+    );
+  };
+
+  return WasmBoyGamepad;
 }(preact_min["Component"]);
 // CONCATENATED MODULE: ./debugger/index.js
 
@@ -8480,34 +8791,36 @@ function index__inherits(subClass, superClass) { if (typeof superClass !== "func
 
 
 
+// The following line can be changed to './dist/wasmboy.esm.js', to test the built lib
 
 
-
-var wasmBoyDefaultOptions = {
-	isGbcEnabled: true,
-	isAudioEnabled: true,
-	frameSkip: 1,
-	audioBatchProcessing: true,
-	timersBatchProcessing: false,
-	audioAccumulateSamples: true,
-	graphicsBatchProcessing: false,
-	graphicsDisableScanlineRendering: false,
-	tileRendering: true,
-	tileCaching: true,
-	gameboyFrameRate: 60,
-	saveStateCallback: function saveStateCallback(saveStateObject) {
-		// Function called everytime a savestate occurs
-		// Used by the WasmBoySystemControls to show screenshots on save states
-		saveStateObject.screenshotCanvasDataURL = WasmBoyGraphics.canvasElement.toDataURL();
-		return saveStateObject;
-	}
-};
 
 // Our canvas element
 var index_canvasElement = undefined;
 
 // Our notification timeout
 var notificationTimeout = undefined;
+
+// WasmBoy Options
+var WasmBoyDefaultOptions = {
+  isGbcEnabled: true,
+  isAudioEnabled: true,
+  frameSkip: 1,
+  audioBatchProcessing: true,
+  timersBatchProcessing: false,
+  audioAccumulateSamples: true,
+  graphicsBatchProcessing: false,
+  graphicsDisableScanlineRendering: false,
+  tileRendering: true,
+  tileCaching: true,
+  gameboyFrameRate: 60,
+  saveStateCallback: function saveStateCallback(saveStateObject) {
+    // Function called everytime a savestate occurs
+    // Used by the WasmBoySystemControls to show screenshots on save states
+    saveStateObject.screenshotCanvasDataURL = index_canvasElement.toDataURL();
+    return saveStateObject;
+  }
+};
 
 var index__ref = Object(preact_min["h"])('div', null);
 
@@ -8518,183 +8831,180 @@ var index__ref3 = Object(preact_min["h"])('div', null);
 var index__ref4 = Object(preact_min["h"])('div', null);
 
 var index__ref5 = Object(preact_min["h"])(
-	'section',
-	null,
-	Object(preact_min["h"])(wasmboyDebugger_WasmBoyDebugger, { wasmboy: WasmBoy, wasmboyGraphics: WasmBoyGraphics, wasmboyAudio: WasmBoyAudio })
+  'section',
+  null,
+  Object(preact_min["h"])(wasmboyDebugger_WasmBoyDebugger, null)
 );
 
 var index__ref6 = Object(preact_min["h"])(
-	'h1',
-	{ 'class': 'wasmboy__title' },
-	'WasmBoy (Debugger / Demo)'
+  'h1',
+  { 'class': 'wasmboy__title' },
+  'WasmBoy (Debugger / Demo)'
 );
 
 var index__ref7 = Object(preact_min["h"])(
-	'main',
-	{ className: 'wasmboy__canvas-container' },
-	Object(preact_min["h"])('canvas', { className: 'wasmboy__canvas-container__canvas' })
+  'main',
+  { className: 'wasmboy__canvas-container' },
+  Object(preact_min["h"])('canvas', { className: 'wasmboy__canvas-container__canvas' })
 );
 
 var index__ref8 = Object(preact_min["h"])(wasmboyGamepad_WasmBoyGamepad, null);
 
 var index_App = function (_Component) {
-	index__inherits(App, _Component);
+  index__inherits(App, _Component);
 
-	function App() {
-		index__classCallCheck(this, App);
+  function App() {
+    index__classCallCheck(this, App);
 
-		var _this = index__possibleConstructorReturn(this, _Component.call(this));
+    var _this = index__possibleConstructorReturn(this, _Component.call(this));
 
-		_this.state = {
-			showDebugger: false,
-			showOptions: false,
-			notification: index__ref
-		};
-		return _this;
-	}
+    _this.state = {
+      showDebugger: false,
+      showOptions: false,
+      notification: index__ref
+    };
+    return _this;
+  }
 
-	// Using componentDidMount to wait for the canvas element to be inserted in DOM
-
-
-	App.prototype.componentDidMount = function componentDidMount() {
-
-		// Get our canvas element
-		index_canvasElement = document.querySelector(".wasmboy__canvas-container__canvas");
-
-		// Load our game
-		WasmBoy.initialize(index_canvasElement, wasmBoyDefaultOptions);
-
-		// Add our touch inputs
-		// Add our touch inputs
-		var dpadElement = document.getElementById('gamepadDpad');
-		var startElement = document.getElementById('gamepadStart');
-		var selectElement = document.getElementById('gamepadSelect');
-		var aElement = document.getElementById('gamepadA');
-		var bElement = document.getElementById('gamepadB');
-
-		WasmBoyController.addTouchInput('UP', dpadElement, 'DPAD', 'UP');
-		WasmBoyController.addTouchInput('RIGHT', dpadElement, 'DPAD', 'RIGHT');
-		WasmBoyController.addTouchInput('DOWN', dpadElement, 'DPAD', 'DOWN');
-		WasmBoyController.addTouchInput('LEFT', dpadElement, 'DPAD', 'LEFT');
-		WasmBoyController.addTouchInput('A', aElement, 'BUTTON');
-		WasmBoyController.addTouchInput('B', bElement, 'BUTTON');
-		WasmBoyController.addTouchInput('START', startElement, 'BUTTON');
-		WasmBoyController.addTouchInput('SELECT', selectElement, 'BUTTON');
-	};
-
-	// Function to show notifications to the user
+  // Using componentDidMount to wait for the canvas element to be inserted in DOM
 
 
-	App.prototype.showNotification = function showNotification(notificationText) {
-		var _this2 = this;
+  App.prototype.componentDidMount = function componentDidMount() {
+    // Get our canvas element
+    index_canvasElement = document.querySelector('.wasmboy__canvas-container__canvas');
 
-		if (notificationTimeout) {
-			clearTimeout(notificationTimeout);
-			notificationTimeout = undefined;
-		}
+    // Config our WasmBoy instance
+    WasmBoy.config(WasmBoyDefaultOptions, index_canvasElement).then(function () {
+      // Wait for input
+    }).catch(function (error) {
+      console.error(error);
+    });
+  };
 
-		var closeNotification = function closeNotification() {
-			var newState = index__extends({}, _this2.state);
-			newState.notification = index__ref2;
-			_this2.setState(newState);
-		};
+  // Function to show notifications to the user
 
-		var newState = index__extends({}, this.state);
-		newState.notification = Object(preact_min["h"])(
-			'div',
-			{ 'class': 'notification animated fadeIn' },
-			Object(preact_min["h"])('button', { 'class': 'delete', onClick: function onClick() {
-					closeNotification();
-				} }),
-			notificationText
-		);
-		this.setState(newState);
 
-		notificationTimeout = setTimeout(function () {
-			closeNotification();
-		}, 3000);
-	};
+  App.prototype.showNotification = function showNotification(notificationText) {
+    var _this2 = this;
 
-	App.prototype.render = function render() {
-		var _this3 = this;
+    if (notificationTimeout) {
+      clearTimeout(notificationTimeout);
+      notificationTimeout = undefined;
+    }
 
-		// Optionally render the options
-		var optionsComponent = index__ref3;
-		if (this.state.showOptions) {
-			optionsComponent = Object(preact_min["h"])(
-				'section',
-				null,
-				Object(preact_min["h"])(wasmboyOptions_WasmBoyOptions, { wasmBoy: WasmBoy, availableOptions: wasmBoyDefaultOptions, showNotification: function showNotification(text) {
-						_this3.showNotification(text);
-					} })
-			);
-		}
+    var closeNotification = function closeNotification() {
+      var newState = index__extends({}, _this2.state);
+      newState.notification = index__ref2;
+      _this2.setState(newState);
+    };
 
-		// optionally render the debugger
-		var debuggerComponent = index__ref4;
-		if (this.state.showDebugger) {
-			debuggerComponent = index__ref5;
-		}
+    var newState = index__extends({}, this.state);
+    newState.notification = Object(preact_min["h"])(
+      'div',
+      { 'class': 'notification animated fadeIn' },
+      Object(preact_min["h"])('button', {
+        'class': 'delete',
+        onClick: function onClick() {
+          closeNotification();
+        }
+      }),
+      notificationText
+    );
+    this.setState(newState);
 
-		return Object(preact_min["h"])(
-			'div',
-			{ 'class': 'wasmboy' },
-			index__ref6,
-			Object(preact_min["h"])(
-				'div',
-				{ style: 'text-align: center' },
-				Object(preact_min["h"])(
-					'label',
-					{ 'class': 'checkbox' },
-					'Show Options',
-					Object(preact_min["h"])('input', {
-						id: 'showOptions',
-						type: 'checkbox',
-						checked: this.state.showOptions,
-						onChange: function onChange() {
-							var newState = index__extends({}, _this3.state);
-							newState.showOptions = !newState.showOptions;
-							_this3.setState(newState);
-						} })
-				)
-			),
-			optionsComponent,
-			Object(preact_min["h"])(
-				'div',
-				{ style: 'text-align: center' },
-				Object(preact_min["h"])(
-					'label',
-					{ 'class': 'checkbox' },
-					'Show Debugger',
-					Object(preact_min["h"])('input', {
-						type: 'checkbox',
-						checked: this.state.showDebugger,
-						onChange: function onChange() {
-							var newState = index__extends({}, _this3.state);
-							newState.showDebugger = !newState.showDebugger;
-							_this3.setState(newState);
-						} })
-				)
-			),
-			debuggerComponent,
-			Object(preact_min["h"])(wasmboyFilePicker_WasmBoyFilePicker, { wasmboy: WasmBoy,
-				showNotification: function showNotification(text) {
-					_this3.showNotification(text);
-				} }),
-			Object(preact_min["h"])(
-				'div',
-				null,
-				Object(preact_min["h"])(wasmboySystemControls_WasmBoySystemControls, { wasmboy: WasmBoy, wasmboyMemory: WasmBoyMemory, showNotification: function showNotification(text) {
-						_this3.showNotification(text);
-					} })
-			),
-			index__ref7,
-			index__ref8,
-			this.state.notification
-		);
-	};
+    notificationTimeout = setTimeout(function () {
+      closeNotification();
+    }, 3000);
+  };
 
-	return App;
+  App.prototype.render = function render() {
+    var _this3 = this;
+
+    // Optionally render the options
+    var optionsComponent = index__ref3;
+    if (this.state.showOptions) {
+      optionsComponent = Object(preact_min["h"])(
+        'section',
+        null,
+        Object(preact_min["h"])(wasmboyOptions_WasmBoyOptions, {
+          availableOptions: WasmBoyDefaultOptions,
+          showNotification: function showNotification(text) {
+            _this3.showNotification(text);
+          }
+        })
+      );
+    }
+
+    // optionally render the debugger
+    var debuggerComponent = index__ref4;
+    if (this.state.showDebugger) {
+      debuggerComponent = index__ref5;
+    }
+
+    return Object(preact_min["h"])(
+      'div',
+      { 'class': 'wasmboy' },
+      index__ref6,
+      Object(preact_min["h"])(
+        'div',
+        { style: 'text-align: center' },
+        Object(preact_min["h"])(
+          'label',
+          { 'class': 'checkbox' },
+          'Show Options',
+          Object(preact_min["h"])('input', {
+            id: 'showOptions',
+            type: 'checkbox',
+            checked: this.state.showOptions,
+            onChange: function onChange() {
+              var newState = index__extends({}, _this3.state);
+              newState.showOptions = !newState.showOptions;
+              _this3.setState(newState);
+            }
+          })
+        )
+      ),
+      optionsComponent,
+      Object(preact_min["h"])(
+        'div',
+        { style: 'text-align: center' },
+        Object(preact_min["h"])(
+          'label',
+          { 'class': 'checkbox' },
+          'Show Debugger',
+          Object(preact_min["h"])('input', {
+            type: 'checkbox',
+            checked: this.state.showDebugger,
+            onChange: function onChange() {
+              var newState = index__extends({}, _this3.state);
+              newState.showDebugger = !newState.showDebugger;
+              _this3.setState(newState);
+            }
+          })
+        )
+      ),
+      debuggerComponent,
+      Object(preact_min["h"])(wasmboyFilePicker_WasmBoyFilePicker, {
+        showNotification: function showNotification(text) {
+          _this3.showNotification(text);
+        }
+      }),
+      Object(preact_min["h"])(
+        'div',
+        null,
+        Object(preact_min["h"])(wasmboySystemControls_WasmBoySystemControls, {
+          showNotification: function showNotification(text) {
+            _this3.showNotification(text);
+          }
+        })
+      ),
+      index__ref7,
+      index__ref8,
+      this.state.notification
+    );
+  };
+
+  return App;
 }(preact_min["Component"]);
 
 
@@ -18452,6 +18762,13 @@ module.exports = function (fn, args, that) {
 
 /***/ }),
 
+/***/ "lxCI":
+/***/ (function(module, exports) {
+
+module.exports = "data:application/wasm;base64,AGFzbQEAAAABfhBgAAF/YAd/f39/f39/AGABfwF/YAAAYAJ/fwBgAn9/AX9gAX8AYAl/f39/f39/f38AYAR/f39/AX9gA39/fwBgA39/fwF/YAR/f39/AGAHf39/f39/fwF/YA1/f39/f39/f39/f39/AX9gBn9/f39/fwBgCH9/f39/f39/AAILAQNlbnYDbG9nAAEDkgKQAgECAgICAwMEAwMDAwMDAwMFAAYDAwcAAAAFAAICBAAAAwMDAwAGAwMDAwMCAgICAgIDBQIAAwIAAwIAAAIAAAAFCAkGBgYDBgYGBgYGBgYGBgYGBgYGAwYDBgMGAwYGBgUGBgUAAAUCAAICCQYJBAQABgYDBgMGBgYGBgYFBAUGBAYGBgIECQICAAIGAgIAAAACAgICAgIEBgYCBgYCBgYCBgYCAgICAgICAgICBQoCAgYCAgICAAQGAAAABQULBQULDAUFCgUKCg0MAQ4OCQkEBgMDAwAAAwMDAwYDAAAFBAMDAwMDAwMDAwMDAwIDAwMDAwMDAwMDAwMDAAIEAwYGDwAAAAAAAAAAAAAABgMDBQMBAAEG5Ar9AX8AQQALfwBBgICsBAt/AEGLAQt/AEEAC38AQYAIC38AQYAIC38AQYAIC38AQYAQC38AQf//Awt/AEGAEAt/AEGAgAELfwBBgJABC38AQYCAAgt/AEGAkAMLfwBBgIABC38AQYCQBAt/AEGA6B8LfwBBgJAEC38AQYAEC38AQYCgBAt/AEGAuAELfwBBgNgFC38AQYDYBQt/AEGAmA4LfwBBgIAMC38AQYCYGgt/AEGAgAkLfwBBgJgjC38AQYDgAAt/AEGA+CMLfwBBgIAIC38AQYD4Kwt/AEGAgAgLfwBBgPgzC38AQYCI+AMLfwFBAAt/AUEAC38BQQELfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUHP/gMLfwFBAAt/AUHw/gMLfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEBC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUGAAgt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAQt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBDwt/AUEAC38BQQALfwFBDwt/AUEAC38BQQALfwFBAAt/AUEPC38BQQALfwFBAAt/AUEAC38BQQ8LfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBgPcCC38BQQELfwFBAQt/AUEBC38BQQELfwFBAQt/AUEBC38BQQELfwFBAQt/AUEAC38BQQALfwFB/wALfwFB/wALfwFBAAt/AUGAgAgLfwFBAQt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQELfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUHV/gMLfwFBAAt/AUHR/gMLfwFB0v4DC38BQdP+Awt/AUHU/gMLfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFB6P4DC38BQev+Awt/AUHp/gMLfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUEAC38BQQALfwFBAAt/AUF/C38BQX8LfwFBAAt/AUEAC38BQQALfwBBgICsBAt/AEGACAt/AEGACAt/AEGAEAt/AEH//wMLfwBBgJAEC38AQYCQBAt/AEGABAt/AEGA2AULfwBBgJgOC38AQYCYGgt/AEGA+CMLfwBBgPgrC38AQYD4MwsHug1NBmNvbmZpZwAWDGV4ZWN1dGVGcmFtZQDfAQtleGVjdXRlU3RlcADeAQlzYXZlU3RhdGUA7QEJbG9hZFN0YXRlAPsBDmhhc0NvcmVTdGFydGVkAPwBDnNldEpveXBhZFN0YXRlAIICH2dldE51bWJlck9mU2FtcGxlc0luQXVkaW9CdWZmZXIAgwIQY2xlYXJBdWRpb0J1ZmZlcgD1ARdXQVNNQk9ZX01FTU9SWV9MT0NBVElPTgMAE1dBU01CT1lfTUVNT1JZX1NJWkUDARJXQVNNQk9ZX1dBU01fUEFHRVMDAh5BU1NFTUJMWVNDUklQVF9NRU1PUllfTE9DQVRJT04DAxpBU1NFTUJMWVNDUklQVF9NRU1PUllfU0laRQMEFldBU01CT1lfU1RBVEVfTE9DQVRJT04DBRJXQVNNQk9ZX1NUQVRFX1NJWkUDBiBHQU1FQk9ZX0lOVEVSTkFMX01FTU9SWV9MT0NBVElPTgMHHEdBTUVCT1lfSU5URVJOQUxfTUVNT1JZX1NJWkUDCBJWSURFT19SQU1fTE9DQVRJT04DCQ5WSURFT19SQU1fU0laRQMKEVdPUktfUkFNX0xPQ0FUSU9OAwsNV09SS19SQU1fU0laRQMMJk9USEVSX0dBTUVCT1lfSU5URVJOQUxfTUVNT1JZX0xPQ0FUSU9OAw0iT1RIRVJfR0FNRUJPWV9JTlRFUk5BTF9NRU1PUllfU0laRQMOGEdSQVBISUNTX09VVFBVVF9MT0NBVElPTgMPFEdSQVBISUNTX09VVFBVVF9TSVpFAxAUR0JDX1BBTEVUVEVfTE9DQVRJT04DERBHQkNfUEFMRVRURV9TSVpFAxIYQkdfUFJJT1JJVFlfTUFQX0xPQ0FUSU9OAxMUQkdfUFJJT1JJVFlfTUFQX1NJWkUDFA5GUkFNRV9MT0NBVElPTgMVCkZSQU1FX1NJWkUDFhdCQUNLR1JPVU5EX01BUF9MT0NBVElPTgMXE0JBQ0tHUk9VTkRfTUFQX1NJWkUDGBJUSUxFX0RBVEFfTE9DQVRJT04DGQ5USUxFX0RBVEFfU0laRQMaEk9BTV9USUxFU19MT0NBVElPTgMbDk9BTV9USUxFU19TSVpFAxwVQVVESU9fQlVGRkVSX0xPQ0FUSU9OAx0RQVVESU9fQlVGRkVSX1NJWkUDHhZDQVJUUklER0VfUkFNX0xPQ0FUSU9OAx8SQ0FSVFJJREdFX1JBTV9TSVpFAyAWQ0FSVFJJREdFX1JPTV9MT0NBVElPTgMhEkNBUlRSSURHRV9ST01fU0laRQMiIWdldFdhc21Cb3lPZmZzZXRGcm9tR2FtZUJveU9mZnNldAAEDGdldFJlZ2lzdGVyQQCEAgxnZXRSZWdpc3RlckIAhQIMZ2V0UmVnaXN0ZXJDAIYCDGdldFJlZ2lzdGVyRACHAgxnZXRSZWdpc3RlckUAiAIMZ2V0UmVnaXN0ZXJIAIkCDGdldFJlZ2lzdGVyTACKAgxnZXRSZWdpc3RlckYAiwIRZ2V0UHJvZ3JhbUNvdW50ZXIAjAIPZ2V0U3RhY2tQb2ludGVyAI0CGWdldE9wY29kZUF0UHJvZ3JhbUNvdW50ZXIAGR1kcmF3QmFja2dyb3VuZE1hcFRvV2FzbU1lbW9yeQCOAhhkcmF3VGlsZURhdGFUb1dhc21NZW1vcnkAjwIGdXBkYXRlAN8BDWVtdWxhdGlvblN0ZXAA3gESZ2V0QXVkaW9RdWV1ZUluZGV4AIMCD3Jlc2V0QXVkaW9RdWV1ZQD1AQ53YXNtTWVtb3J5U2l6ZQPvARx3YXNtQm95SW50ZXJuYWxTdGF0ZUxvY2F0aW9uA/ABGHdhc21Cb3lJbnRlcm5hbFN0YXRlU2l6ZQPxAR1nYW1lQm95SW50ZXJuYWxNZW1vcnlMb2NhdGlvbgPyARlnYW1lQm95SW50ZXJuYWxNZW1vcnlTaXplA/MBE3ZpZGVvT3V0cHV0TG9jYXRpb24D9AEiZnJhbWVJblByb2dyZXNzVmlkZW9PdXRwdXRMb2NhdGlvbgP3ARtnYW1lYm95Q29sb3JQYWxldHRlTG9jYXRpb24D9QEXZ2FtZWJveUNvbG9yUGFsZXR0ZVNpemUD9gEVYmFja2dyb3VuZE1hcExvY2F0aW9uA/gBC3RpbGVEYXRhTWFwA/kBE3NvdW5kT3V0cHV0TG9jYXRpb24D+gERZ2FtZUJ5dGVzTG9jYXRpb24D/AEUZ2FtZVJhbUJhbmtzTG9jYXRpb24D+wEGbWVtb3J5AgAIApACCpPFAZACEgAgACABIAIgAyAEIAUgBhAACy8BAn8jLSEBIy5FIgIEfyABRQUgAgtBAXEEQEEBIQEL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dABpAGEAbABpAHoAaQBuAGcAIAAoAGkAbgBjAGwAdQBkAGUAQgBvAG8AdABSAG8AbQA9ACQAMAApAOBYBG5hbWUB2FiRAgAaY29yZS9oZWxwZXJzL2luZGV4L2Vudi5sb2cBFmNvcmUvaGVscGVycy9pbmRleC9sb2cCJWNvcmUvbWVtb3J5L2JhbmtpbmcvZ2V0Um9tQmFua0FkZHJlc3MDJWNvcmUvbWVtb3J5L2JhbmtpbmcvZ2V0UmFtQmFua0FkZHJlc3MEN2NvcmUvbWVtb3J5L21lbW9yeU1hcC9nZXRXYXNtQm95T2Zmc2V0RnJvbUdhbWVCb3lPZmZzZXQFKWNvcmUvbWVtb3J5L2xvYWQvZWlnaHRCaXRMb2FkRnJvbUdCTWVtb3J5Bhpjb3JlL2NwdS9jcHUvaW5pdGlhbGl6ZUNwdQcmY29yZS9tZW1vcnkvbWVtb3J5L2luaXRpYWxpemVDYXJ0cmlkZ2UIK2NvcmUvbWVtb3J5L3N0b3JlL2VpZ2h0Qml0U3RvcmVJbnRvR0JNZW1vcnkJHWNvcmUvbWVtb3J5L2RtYS9pbml0aWFsaXplRG1hCiljb3JlL2dyYXBoaWNzL2dyYXBoaWNzL2luaXRpYWxpemVHcmFwaGljcwsnY29yZS9ncmFwaGljcy9wYWxldHRlL2luaXRpYWxpemVQYWxldHRlDCdjb3JlL3NvdW5kL2NoYW5uZWwxL0NoYW5uZWwxLmluaXRpYWxpemUNJ2NvcmUvc291bmQvY2hhbm5lbDIvQ2hhbm5lbDIuaW5pdGlhbGl6ZQ4nY29yZS9zb3VuZC9jaGFubmVsMy9DaGFubmVsMy5pbml0aWFsaXplDydjb3JlL3NvdW5kL2NoYW5uZWw0L0NoYW5uZWw0LmluaXRpYWxpemUQIGNvcmUvc291bmQvc291bmQvaW5pdGlhbGl6ZVNvdW5kESFjb3JlL2hlbHBlcnMvaW5kZXgvY2hlY2tCaXRPbkJ5dGUSM2NvcmUvdGltZXJzL3RpbWVycy9nZXRGcmVxdWVuY3lGcm9tSW5wdXRDbG9ja1NlbGVjdBMsY29yZS90aW1lcnMvdGltZXJzL1RpbWVycy51cGRhdGVUaW1lckNvbnRyb2wUI2NvcmUvdGltZXJzL3RpbWVycy9pbml0aWFsaXplVGltZXJzFRRjb3JlL2NvcmUvaW5pdGlhbGl6ZRYQY29yZS9jb3JlL2NvbmZpZxclY29yZS9jcHUvY3B1L0NwdS5NQVhfQ1lDTEVTX1BFUl9GUkFNRRgfY29yZS9jcHUvb3Bjb2Rlcy9nZXREYXRhQnl0ZVR3bxkfY29yZS9jcHUvb3Bjb2Rlcy9nZXREYXRhQnl0ZU9uZRojY29yZS9oZWxwZXJzL2luZGV4L2NvbmNhdGVuYXRlQnl0ZXMbKGNvcmUvY3B1L29wY29kZXMvZ2V0Q29uY2F0ZW5hdGVkRGF0YUJ5dGUcIGNvcmUvaGVscGVycy9pbmRleC9zcGxpdEhpZ2hCeXRlHR9jb3JlL2hlbHBlcnMvaW5kZXgvc3BsaXRMb3dCeXRlHiFjb3JlL21lbW9yeS9iYW5raW5nL2hhbmRsZUJhbmtpbmcfKWNvcmUvc291bmQvc291bmQvU291bmQuYmF0Y2hQcm9jZXNzQ3ljbGVzIC1jb3JlL3NvdW5kL3NvdW5kL1NvdW5kLm1heEZyYW1lU2VxdWVuY2VDeWNsZXMhKWNvcmUvc291bmQvY2hhbm5lbDEvQ2hhbm5lbDEudXBkYXRlTGVuZ3RoIiljb3JlL3NvdW5kL2NoYW5uZWwyL0NoYW5uZWwyLnVwZGF0ZUxlbmd0aCMpY29yZS9zb3VuZC9jaGFubmVsMy9DaGFubmVsMy51cGRhdGVMZW5ndGgkKWNvcmUvc291bmQvY2hhbm5lbDQvQ2hhbm5lbDQudXBkYXRlTGVuZ3RoJSxjb3JlL3NvdW5kL2NoYW5uZWwxL2dldE5ld0ZyZXF1ZW5jeUZyb21Td2VlcCYpY29yZS9zb3VuZC9jaGFubmVsMS9DaGFubmVsMS5zZXRGcmVxdWVuY3knMmNvcmUvc291bmQvY2hhbm5lbDEvY2FsY3VsYXRlU3dlZXBBbmRDaGVja092ZXJmbG93KChjb3JlL3NvdW5kL2NoYW5uZWwxL0NoYW5uZWwxLnVwZGF0ZVN3ZWVwKStjb3JlL3NvdW5kL2NoYW5uZWwxL0NoYW5uZWwxLnVwZGF0ZUVudmVsb3BlKitjb3JlL3NvdW5kL2NoYW5uZWwyL0NoYW5uZWwyLnVwZGF0ZUVudmVsb3BlKytjb3JlL3NvdW5kL2NoYW5uZWw0L0NoYW5uZWw0LnVwZGF0ZUVudmVsb3BlLCVjb3JlL3NvdW5kL3NvdW5kL3VwZGF0ZUZyYW1lU2VxdWVuY2VyLS5jb3JlL3NvdW5kL2NoYW5uZWwxL0NoYW5uZWwxLndpbGxDaGFubmVsVXBkYXRlLipjb3JlL3NvdW5kL2FjY3VtdWxhdG9yL2RpZENoYW5uZWxEYWNDaGFuZ2UvLmNvcmUvc291bmQvY2hhbm5lbDIvQ2hhbm5lbDIud2lsbENoYW5uZWxVcGRhdGUwLmNvcmUvc291bmQvY2hhbm5lbDMvQ2hhbm5lbDMud2lsbENoYW5uZWxVcGRhdGUxLmNvcmUvc291bmQvY2hhbm5lbDQvQ2hhbm5lbDQud2lsbENoYW5uZWxVcGRhdGUyJ2NvcmUvc291bmQvY2hhbm5lbDEvQ2hhbm5lbDEucmVzZXRUaW1lcjM9Y29yZS9zb3VuZC9kdXR5L2lzRHV0eUN5Y2xlQ2xvY2tQb3NpdGl2ZU9yTmVnYXRpdmVGb3JXYXZlZm9ybTQmY29yZS9zb3VuZC9jaGFubmVsMS9DaGFubmVsMS5nZXRTYW1wbGU1NmNvcmUvc291bmQvY2hhbm5lbDEvQ2hhbm5lbDEuZ2V0U2FtcGxlRnJvbUN5Y2xlQ291bnRlcjYnY29yZS9zb3VuZC9jaGFubmVsMi9DaGFubmVsMi5yZXNldFRpbWVyNyZjb3JlL3NvdW5kL2NoYW5uZWwyL0NoYW5uZWwyLmdldFNhbXBsZTg2Y29yZS9zb3VuZC9jaGFubmVsMi9DaGFubmVsMi5nZXRTYW1wbGVGcm9tQ3ljbGVDb3VudGVyOSdjb3JlL3NvdW5kL2NoYW5uZWwzL0NoYW5uZWwzLnJlc2V0VGltZXI6JmNvcmUvc291bmQvY2hhbm5lbDMvQ2hhbm5lbDMuZ2V0U2FtcGxlOzZjb3JlL3NvdW5kL2NoYW5uZWwzL0NoYW5uZWwzLmdldFNhbXBsZUZyb21DeWNsZUNvdW50ZXI8O2NvcmUvc291bmQvY2hhbm5lbDQvQ2hhbm5lbDQuZ2V0Tm9pc2VDaGFubmVsRnJlcXVlbmN5UGVyaW9kPSZjb3JlL3NvdW5kL2NoYW5uZWw0L0NoYW5uZWw0LmdldFNhbXBsZT42Y29yZS9zb3VuZC9jaGFubmVsNC9DaGFubmVsNC5nZXRTYW1wbGVGcm9tQ3ljbGVDb3VudGVyPxxjb3JlL2NwdS9jcHUvQ3B1LkNMT0NLX1NQRUVEQCpjb3JlL3NvdW5kL3NvdW5kL1NvdW5kLm1heERvd25TYW1wbGVDeWNsZXNBKGNvcmUvc291bmQvc291bmQvZ2V0U2FtcGxlQXNVbnNpZ25lZEJ5dGVCImNvcmUvc291bmQvc291bmQvbWl4Q2hhbm5lbFNhbXBsZXNDM2NvcmUvc291bmQvc291bmQvc2V0TGVmdEFuZFJpZ2h0T3V0cHV0Rm9yQXVkaW9RdWV1ZUQmY29yZS9zb3VuZC9hY2N1bXVsYXRvci9hY2N1bXVsYXRlU291bmRFH2NvcmUvc291bmQvc291bmQvY2FsY3VsYXRlU291bmRGHGNvcmUvc291bmQvc291bmQvdXBkYXRlU291bmRHImNvcmUvc291bmQvc291bmQvYmF0Y2hQcm9jZXNzQXVkaW9IJ2NvcmUvc291bmQvY2hhbm5lbDEvQ2hhbm5lbDEudXBkYXRlTlJ4MEknY29yZS9zb3VuZC9jaGFubmVsMy9DaGFubmVsMy51cGRhdGVOUngwSidjb3JlL3NvdW5kL2NoYW5uZWwxL0NoYW5uZWwxLnVwZGF0ZU5SeDFLJ2NvcmUvc291bmQvY2hhbm5lbDIvQ2hhbm5lbDIudXBkYXRlTlJ4MUwnY29yZS9zb3VuZC9jaGFubmVsMy9DaGFubmVsMy51cGRhdGVOUngxTSdjb3JlL3NvdW5kL2NoYW5uZWw0L0NoYW5uZWw0LnVwZGF0ZU5SeDFOJ2NvcmUvc291bmQvY2hhbm5lbDEvQ2hhbm5lbDEudXBkYXRlTlJ4Mk8nY29yZS9zb3VuZC9jaGFubmVsMi9DaGFubmVsMi51cGRhdGVOUngyUCdjb3JlL3NvdW5kL2NoYW5uZWwzL0NoYW5uZWwzLnVwZGF0ZU5SeDJRJ2NvcmUvc291bmQvY2hhbm5lbDQvQ2hhbm5lbDQudXBkYXRlTlJ4MlInY29yZS9zb3VuZC9jaGFubmVsMS9DaGFubmVsMS51cGRhdGVOUngzUydjb3JlL3NvdW5kL2NoYW5uZWwyL0NoYW5uZWwyLnVwZGF0ZU5SeDNUJ2NvcmUvc291bmQvY2hhbm5lbDMvQ2hhbm5lbDMudXBkYXRlTlJ4M1UnY29yZS9zb3VuZC9jaGFubmVsNC9DaGFubmVsNC51cGRhdGVOUngzVidjb3JlL3NvdW5kL2NoYW5uZWwxL0NoYW5uZWwxLnVwZGF0ZU5SeDRXJGNvcmUvc291bmQvY2hhbm5lbDEvQ2hhbm5lbDEudHJpZ2dlclgnY29yZS9zb3VuZC9jaGFubmVsMi9DaGFubmVsMi51cGRhdGVOUng0WSRjb3JlL3NvdW5kL2NoYW5uZWwyL0NoYW5uZWwyLnRyaWdnZXJaJ2NvcmUvc291bmQvY2hhbm5lbDMvQ2hhbm5lbDMudXBkYXRlTlJ4NFskY29yZS9zb3VuZC9jaGFubmVsMy9DaGFubmVsMy50cmlnZ2VyXCdjb3JlL3NvdW5kL2NoYW5uZWw0L0NoYW5uZWw0LnVwZGF0ZU5SeDRdJGNvcmUvc291bmQvY2hhbm5lbDQvQ2hhbm5lbDQudHJpZ2dlcl4hY29yZS9zb3VuZC9zb3VuZC9Tb3VuZC51cGRhdGVOUjUwXyFjb3JlL3NvdW5kL3NvdW5kL1NvdW5kLnVwZGF0ZU5SNTFgIWNvcmUvc291bmQvc291bmQvU291bmQudXBkYXRlTlI1MmEsY29yZS9zb3VuZC9yZWdpc3RlcnMvU291bmRSZWdpc3RlcldyaXRlVHJhcHNiJmNvcmUvZ3JhcGhpY3MvbGNkL0xjZC51cGRhdGVMY2RDb250cm9sYyBjb3JlL21lbW9yeS9kbWEvc3RhcnREbWFUcmFuc2ZlcmQfY29yZS9oZWxwZXJzL2luZGV4L3NldEJpdE9uQnl0ZWUnY29yZS9tZW1vcnkvZG1hL2dldEhkbWFTb3VyY2VGcm9tTWVtb3J5Zixjb3JlL21lbW9yeS9kbWEvZ2V0SGRtYURlc3RpbmF0aW9uRnJvbU1lbW9yeWchY29yZS9oZWxwZXJzL2luZGV4L3Jlc2V0Qml0T25CeXRlaCtjb3JlL3NvdW5kL3JlZ2lzdGVycy9Tb3VuZFJlZ2lzdGVyUmVhZFRyYXBzaSFjb3JlL2pveXBhZC9qb3lwYWQvZ2V0Sm95cGFkU3RhdGVqJGNvcmUvbWVtb3J5L3JlYWRUcmFwcy9jaGVja1JlYWRUcmFwc2syY29yZS9tZW1vcnkvbG9hZC9laWdodEJpdExvYWRGcm9tR0JNZW1vcnlXaXRoVHJhcHNsHGNvcmUvbWVtb3J5L2RtYS9oZG1hVHJhbnNmZXJtIWNvcmUvbWVtb3J5L2RtYS9zdGFydEhkbWFUcmFuc2Zlcm4yY29yZS9ncmFwaGljcy9wYWxldHRlL3N0b3JlUGFsZXR0ZUJ5dGVJbldhc21NZW1vcnlvMGNvcmUvZ3JhcGhpY3MvcGFsZXR0ZS9pbmNyZW1lbnRQYWxldHRlSW5kZXhJZlNldHAvY29yZS9ncmFwaGljcy9wYWxldHRlL3dyaXRlQ29sb3JQYWxldHRlVG9NZW1vcnlxLGNvcmUvdGltZXJzL3RpbWVycy9UaW1lcnMuYmF0Y2hQcm9jZXNzQ3ljbGVzcihjb3JlL3RpbWVycy90aW1lcnMvX2NoZWNrRGl2aWRlclJlZ2lzdGVycyxjb3JlL2ludGVycnVwdHMvaW50ZXJydXB0cy9fcmVxdWVzdEludGVycnVwdHQwY29yZS9pbnRlcnJ1cHRzL2ludGVycnVwdHMvcmVxdWVzdFRpbWVySW50ZXJydXB0dR9jb3JlL3RpbWVycy90aW1lcnMvdXBkYXRlVGltZXJzdiVjb3JlL3RpbWVycy90aW1lcnMvYmF0Y2hQcm9jZXNzVGltZXJzdy9jb3JlL3RpbWVycy90aW1lcnMvVGltZXJzLnVwZGF0ZURpdmlkZXJSZWdpc3RlcngsY29yZS90aW1lcnMvdGltZXJzL1RpbWVycy51cGRhdGVUaW1lckNvdW50ZXJ5K2NvcmUvdGltZXJzL3RpbWVycy9UaW1lcnMudXBkYXRlVGltZXJNb2R1bG96JmNvcmUvam95cGFkL2pveXBhZC9Kb3lwYWQudXBkYXRlSm95cGFkez5jb3JlL2ludGVycnVwdHMvaW50ZXJydXB0cy9JbnRlcnJ1cHRzLnVwZGF0ZUludGVycnVwdFJlcXVlc3RlZHw8Y29yZS9pbnRlcnJ1cHRzL2ludGVycnVwdHMvSW50ZXJydXB0cy51cGRhdGVJbnRlcnJ1cHRFbmFibGVkfSZjb3JlL21lbW9yeS93cml0ZVRyYXBzL2NoZWNrV3JpdGVUcmFwc340Y29yZS9tZW1vcnkvc3RvcmUvZWlnaHRCaXRTdG9yZUludG9HQk1lbW9yeVdpdGhUcmFwc38ZY29yZS9jcHUvZmxhZ3Mvc2V0RmxhZ0JpdIABH2NvcmUvY3B1L2ZsYWdzL3NldEhhbGZDYXJyeUZsYWeBAS9jb3JlL2NwdS9mbGFncy9jaGVja0FuZFNldEVpZ2h0Qml0SGFsZkNhcnJ5RmxhZ4IBGmNvcmUvY3B1L2ZsYWdzL3NldFplcm9GbGFngwEeY29yZS9jcHUvZmxhZ3Mvc2V0U3VidHJhY3RGbGFnhAEbY29yZS9jcHUvZmxhZ3Mvc2V0Q2FycnlGbGFnhQEhY29yZS9oZWxwZXJzL2luZGV4L3JvdGF0ZUJ5dGVMZWZ0hgE2Y29yZS9tZW1vcnkvc3RvcmUvc2l4dGVlbkJpdFN0b3JlSW50b0dCTWVtb3J5V2l0aFRyYXBzhwE0Y29yZS9jcHUvZmxhZ3MvY2hlY2tBbmRTZXRTaXh0ZWVuQml0RmxhZ3NBZGRPdmVyZmxvd4gBImNvcmUvaGVscGVycy9pbmRleC9yb3RhdGVCeXRlUmlnaHSJAR9jb3JlL2NwdS9vcGNvZGVzL2hhbmRsZU9wY29kZTB4igEbY29yZS9jcHUvZmxhZ3MvZ2V0Q2FycnlGbGFniwEtY29yZS9oZWxwZXJzL2luZGV4L3JvdGF0ZUJ5dGVMZWZ0VGhyb3VnaENhcnJ5jAEiY29yZS9jcHUvaW5zdHJ1Y3Rpb25zL3JlbGF0aXZlSnVtcI0BLmNvcmUvaGVscGVycy9pbmRleC9yb3RhdGVCeXRlUmlnaHRUaHJvdWdoQ2FycnmOAR9jb3JlL2NwdS9vcGNvZGVzL2hhbmRsZU9wY29kZTF4jwEaY29yZS9jcHUvZmxhZ3MvZ2V0WmVyb0ZsYWeQAR9jb3JlL2NwdS9mbGFncy9nZXRIYWxmQ2FycnlGbGFnkQEeY29yZS9jcHUvZmxhZ3MvZ2V0U3VidHJhY3RGbGFnkgEfY29yZS9jcHUvb3Bjb2Rlcy9oYW5kbGVPcGNvZGUyeJMBH2NvcmUvY3B1L29wY29kZXMvaGFuZGxlT3Bjb2RlM3iUAR9jb3JlL2NwdS9vcGNvZGVzL2hhbmRsZU9wY29kZTR4lQEfY29yZS9jcHUvb3Bjb2Rlcy9oYW5kbGVPcGNvZGU1eJYBH2NvcmUvY3B1L29wY29kZXMvaGFuZGxlT3Bjb2RlNniXAR9jb3JlL2NwdS9vcGNvZGVzL2hhbmRsZU9wY29kZTd4mAErY29yZS9jcHUvZmxhZ3MvY2hlY2tBbmRTZXRFaWdodEJpdENhcnJ5RmxhZ5kBImNvcmUvY3B1L2luc3RydWN0aW9ucy9hZGRBUmVnaXN0ZXKaAS5jb3JlL2NwdS9pbnN0cnVjdGlvbnMvYWRkQVRocm91Z2hDYXJyeVJlZ2lzdGVymwEfY29yZS9jcHUvb3Bjb2Rlcy9oYW5kbGVPcGNvZGU4eJwBImNvcmUvY3B1L2luc3RydWN0aW9ucy9zdWJBUmVnaXN0ZXKdAS5jb3JlL2NwdS9pbnN0cnVjdGlvbnMvc3ViQVRocm91Z2hDYXJyeVJlZ2lzdGVyngEfY29yZS9jcHUvb3Bjb2Rlcy9oYW5kbGVPcGNvZGU5eJ8BImNvcmUvY3B1L2luc3RydWN0aW9ucy9hbmRBUmVnaXN0ZXKgASJjb3JlL2NwdS9pbnN0cnVjdGlvbnMveG9yQVJlZ2lzdGVyoQEfY29yZS9jcHUvb3Bjb2Rlcy9oYW5kbGVPcGNvZGVBeKIBIWNvcmUvY3B1L2luc3RydWN0aW9ucy9vckFSZWdpc3RlcqMBIWNvcmUvY3B1L2luc3RydWN0aW9ucy9jcEFSZWdpc3RlcqQBH2NvcmUvY3B1L29wY29kZXMvaGFuZGxlT3Bjb2RlQnilAStjb3JlL21lbW9yeS9sb2FkL3NpeHRlZW5CaXRMb2FkRnJvbUdCTWVtb3J5pgEoY29yZS9jcHUvaW5zdHJ1Y3Rpb25zL3JvdGF0ZVJlZ2lzdGVyTGVmdKcBKWNvcmUvY3B1L2luc3RydWN0aW9ucy9yb3RhdGVSZWdpc3RlclJpZ2h0qAE0Y29yZS9jcHUvaW5zdHJ1Y3Rpb25zL3JvdGF0ZVJlZ2lzdGVyTGVmdFRocm91Z2hDYXJyeakBNWNvcmUvY3B1L2luc3RydWN0aW9ucy9yb3RhdGVSZWdpc3RlclJpZ2h0VGhyb3VnaENhcnJ5qgEnY29yZS9jcHUvaW5zdHJ1Y3Rpb25zL3NoaWZ0TGVmdFJlZ2lzdGVyqwEyY29yZS9jcHUvaW5zdHJ1Y3Rpb25zL3NoaWZ0UmlnaHRBcml0aG1ldGljUmVnaXN0ZXKsAStjb3JlL2NwdS9pbnN0cnVjdGlvbnMvc3dhcE5pYmJsZXNPblJlZ2lzdGVyrQEvY29yZS9jcHUvaW5zdHJ1Y3Rpb25zL3NoaWZ0UmlnaHRMb2dpY2FsUmVnaXN0ZXKuASdjb3JlL2NwdS9pbnN0cnVjdGlvbnMvdGVzdEJpdE9uUmVnaXN0ZXKvASZjb3JlL2NwdS9pbnN0cnVjdGlvbnMvc2V0Qml0T25SZWdpc3RlcrABIWNvcmUvY3B1L2NiT3Bjb2Rlcy9oYW5kbGVDYk9wY29kZbEBH2NvcmUvY3B1L29wY29kZXMvaGFuZGxlT3Bjb2RlQ3iyAShjb3JlL2ludGVycnVwdHMvaW50ZXJydXB0cy9zZXRJbnRlcnJ1cHRzswEfY29yZS9jcHUvb3Bjb2Rlcy9oYW5kbGVPcGNvZGVEeLQBH2NvcmUvY3B1L29wY29kZXMvaGFuZGxlT3Bjb2RlRXi1AR9jb3JlL2NwdS9vcGNvZGVzL2hhbmRsZU9wY29kZUZ4tgEeY29yZS9jcHUvb3Bjb2Rlcy9leGVjdXRlT3Bjb2RltwE6Y29yZS9pbnRlcnJ1cHRzL2ludGVycnVwdHMvSW50ZXJydXB0cy5hcmVJbnRlcnJ1cHRzUGVuZGluZ7gBLWNvcmUvbWVtb3J5L3N0b3JlL3NpeHRlZW5CaXRTdG9yZUludG9HQk1lbW9yebkBK2NvcmUvaW50ZXJydXB0cy9pbnRlcnJ1cHRzL19oYW5kbGVJbnRlcnJ1cHS6ASpjb3JlL2ludGVycnVwdHMvaW50ZXJydXB0cy9jaGVja0ludGVycnVwdHO7ATdjb3JlL2dyYXBoaWNzL2dyYXBoaWNzL0dyYXBoaWNzLk1BWF9DWUNMRVNfUEVSX1NDQU5MSU5FvAEyY29yZS9ncmFwaGljcy9ncmFwaGljcy9HcmFwaGljcy5iYXRjaFByb2Nlc3NDeWNsZXO9ASdjb3JlL2dyYXBoaWNzL2dyYXBoaWNzL2xvYWRGcm9tVnJhbUJhbmu+ASdjb3JlL2dyYXBoaWNzL2dyYXBoaWNzL2dldFJnYlBpeGVsU3RhcnS/ASZjb3JlL2dyYXBoaWNzL2dyYXBoaWNzL3NldFBpeGVsT25GcmFtZcABJGNvcmUvZ3JhcGhpY3MvcHJpb3JpdHkvZ2V0UGl4ZWxTdGFydMEBKmNvcmUvZ3JhcGhpY3MvcHJpb3JpdHkvZ2V0UHJpb3JpdHlmb3JQaXhlbMIBKmNvcmUvZ3JhcGhpY3MvcHJpb3JpdHkvYWRkUHJpb3JpdHlmb3JQaXhlbMMBOmNvcmUvZ3JhcGhpY3MvYmFja2dyb3VuZFdpbmRvdy9kcmF3TGluZU9mVGlsZUZyb21UaWxlQ2FjaGXEASZjb3JlL2dyYXBoaWNzL3RpbGVzL2dldFRpbGVEYXRhQWRkcmVzc8UBM2NvcmUvZ3JhcGhpY3MvcGFsZXR0ZS9sb2FkUGFsZXR0ZUJ5dGVGcm9tV2FzbU1lbW9yecYBLGNvcmUvZ3JhcGhpY3MvcGFsZXR0ZS9nZXRSZ2JDb2xvckZyb21QYWxldHRlxwEuY29yZS9ncmFwaGljcy9wYWxldHRlL2dldENvbG9yQ29tcG9uZW50RnJvbVJnYsgBM2NvcmUvZ3JhcGhpY3MvcGFsZXR0ZS9nZXRNb25vY2hyb21lQ29sb3JGcm9tUGFsZXR0ZckBJWNvcmUvZ3JhcGhpY3MvdGlsZXMvZ2V0VGlsZVBpeGVsU3RhcnTKASxjb3JlL2dyYXBoaWNzL3RpbGVzL2RyYXdQaXhlbHNGcm9tTGluZU9mVGlsZcsBN2NvcmUvZ3JhcGhpY3MvYmFja2dyb3VuZFdpbmRvdy9kcmF3TGluZU9mVGlsZUZyb21UaWxlSWTMATdjb3JlL2dyYXBoaWNzL2JhY2tncm91bmRXaW5kb3cvZHJhd0NvbG9yUGl4ZWxGcm9tVGlsZUlkzQE8Y29yZS9ncmFwaGljcy9iYWNrZ3JvdW5kV2luZG93L2RyYXdNb25vY2hyb21lUGl4ZWxGcm9tVGlsZUlkzgE7Y29yZS9ncmFwaGljcy9iYWNrZ3JvdW5kV2luZG93L2RyYXdCYWNrZ3JvdW5kV2luZG93U2NhbmxpbmXPAS9jb3JlL2dyYXBoaWNzL2JhY2tncm91bmRXaW5kb3cvcmVuZGVyQmFja2dyb3VuZNABK2NvcmUvZ3JhcGhpY3MvYmFja2dyb3VuZFdpbmRvdy9yZW5kZXJXaW5kb3fRASNjb3JlL2dyYXBoaWNzL3Nwcml0ZXMvcmVuZGVyU3ByaXRlc9IBJGNvcmUvZ3JhcGhpY3MvZ3JhcGhpY3MvX2RyYXdTY2FubGluZdMBKWNvcmUvZ3JhcGhpY3MvZ3JhcGhpY3MvX3JlbmRlckVudGlyZUZyYW1l1AEnY29yZS9ncmFwaGljcy9wcmlvcml0eS9jbGVhclByaW9yaXR5TWFw1QEiY29yZS9ncmFwaGljcy90aWxlcy9yZXNldFRpbGVDYWNoZdYBO2NvcmUvZ3JhcGhpY3MvZ3JhcGhpY3MvR3JhcGhpY3MuTUlOX0NZQ0xFU19TUFJJVEVTX0xDRF9NT0RF1wFBY29yZS9ncmFwaGljcy9ncmFwaGljcy9HcmFwaGljcy5NSU5fQ1lDTEVTX1RSQU5TRkVSX0RBVEFfTENEX01PREXYAS5jb3JlL2ludGVycnVwdHMvaW50ZXJydXB0cy9yZXF1ZXN0TGNkSW50ZXJydXB02QEgY29yZS9tZW1vcnkvZG1hL3VwZGF0ZUhibGFua0hkbWHaATFjb3JlL2ludGVycnVwdHMvaW50ZXJydXB0cy9yZXF1ZXN0VkJsYW5rSW50ZXJydXB02wEeY29yZS9ncmFwaGljcy9sY2Qvc2V0TGNkU3RhdHVz3AElY29yZS9ncmFwaGljcy9ncmFwaGljcy91cGRhdGVHcmFwaGljc90BK2NvcmUvZ3JhcGhpY3MvZ3JhcGhpY3MvYmF0Y2hQcm9jZXNzR3JhcGhpY3PeARVjb3JlL2NvcmUvZXhlY3V0ZVN0ZXDfARZjb3JlL2NvcmUvZXhlY3V0ZUZyYW1l4AEiY29yZS9jb3JlL2dldFNhdmVTdGF0ZU1lbW9yeU9mZnNldOEBMmNvcmUvbWVtb3J5L3N0b3JlL3N0b3JlQm9vbGVhbkRpcmVjdGx5VG9XYXNtTWVtb3J54gEaY29yZS9jcHUvY3B1L0NwdS5zYXZlU3RhdGXjASljb3JlL2dyYXBoaWNzL2dyYXBoaWNzL0dyYXBoaWNzLnNhdmVTdGF0ZeQBL2NvcmUvaW50ZXJydXB0cy9pbnRlcnJ1cHRzL0ludGVycnVwdHMuc2F2ZVN0YXRl5QEjY29yZS9qb3lwYWQvam95cGFkL0pveXBhZC5zYXZlU3RhdGXmASNjb3JlL21lbW9yeS9tZW1vcnkvTWVtb3J5LnNhdmVTdGF0ZecBI2NvcmUvdGltZXJzL3RpbWVycy9UaW1lcnMuc2F2ZVN0YXRl6AEgY29yZS9zb3VuZC9zb3VuZC9Tb3VuZC5zYXZlU3RhdGXpASZjb3JlL3NvdW5kL2NoYW5uZWwxL0NoYW5uZWwxLnNhdmVTdGF0ZeoBJmNvcmUvc291bmQvY2hhbm5lbDIvQ2hhbm5lbDIuc2F2ZVN0YXRl6wEmY29yZS9zb3VuZC9jaGFubmVsMy9DaGFubmVsMy5zYXZlU3RhdGXsASZjb3JlL3NvdW5kL2NoYW5uZWw0L0NoYW5uZWw0LnNhdmVTdGF0Ze0BE2NvcmUvY29yZS9zYXZlU3RhdGXuATJjb3JlL21lbW9yeS9sb2FkL2xvYWRCb29sZWFuRGlyZWN0bHlGcm9tV2FzbU1lbW9yee8BGmNvcmUvY3B1L2NwdS9DcHUubG9hZFN0YXRl8AEpY29yZS9ncmFwaGljcy9ncmFwaGljcy9HcmFwaGljcy5sb2FkU3RhdGXxAS9jb3JlL2ludGVycnVwdHMvaW50ZXJydXB0cy9JbnRlcnJ1cHRzLmxvYWRTdGF0ZfIBI2NvcmUvam95cGFkL2pveXBhZC9Kb3lwYWQubG9hZFN0YXRl8wEjY29yZS9tZW1vcnkvbWVtb3J5L01lbW9yeS5sb2FkU3RhdGX0ASNjb3JlL3RpbWVycy90aW1lcnMvVGltZXJzLmxvYWRTdGF0ZfUBIWNvcmUvc291bmQvc291bmQvY2xlYXJBdWRpb0J1ZmZlcvYBIGNvcmUvc291bmQvc291bmQvU291bmQubG9hZFN0YXRl9wEmY29yZS9zb3VuZC9jaGFubmVsMS9DaGFubmVsMS5sb2FkU3RhdGX4ASZjb3JlL3NvdW5kL2NoYW5uZWwyL0NoYW5uZWwyLmxvYWRTdGF0ZfkBJmNvcmUvc291bmQvY2hhbm5lbDMvQ2hhbm5lbDMubG9hZFN0YXRl+gEmY29yZS9zb3VuZC9jaGFubmVsNC9DaGFubmVsNC5sb2FkU3RhdGX7ARNjb3JlL2NvcmUvbG9hZFN0YXRl/AEYY29yZS9jb3JlL2hhc0NvcmVTdGFydGVk/QE0Y29yZS9qb3lwYWQvam95cGFkL19nZXRKb3lwYWRCdXR0b25TdGF0ZUZyb21CdXR0b25JZP4BNGNvcmUvam95cGFkL2pveXBhZC9fc2V0Sm95cGFkQnV0dG9uU3RhdGVGcm9tQnV0dG9uSWT/ATFjb3JlL2ludGVycnVwdHMvaW50ZXJydXB0cy9yZXF1ZXN0Sm95cGFkSW50ZXJydXB0gAIlY29yZS9qb3lwYWQvam95cGFkL19wcmVzc0pveXBhZEJ1dHRvboECJ2NvcmUvam95cGFkL2pveXBhZC9fcmVsZWFzZUpveXBhZEJ1dHRvboICIWNvcmUvam95cGFkL2pveXBhZC9zZXRKb3lwYWRTdGF0ZYMCMGNvcmUvc291bmQvc291bmQvZ2V0TnVtYmVyT2ZTYW1wbGVzSW5BdWRpb0J1ZmZlcoQCIWNvcmUvZGVidWcvZGVidWctY3B1L2dldFJlZ2lzdGVyQYUCIWNvcmUvZGVidWcvZGVidWctY3B1L2dldFJlZ2lzdGVyQoYCIWNvcmUvZGVidWcvZGVidWctY3B1L2dldFJlZ2lzdGVyQ4cCIWNvcmUvZGVidWcvZGVidWctY3B1L2dldFJlZ2lzdGVyRIgCIWNvcmUvZGVidWcvZGVidWctY3B1L2dldFJlZ2lzdGVyRYkCIWNvcmUvZGVidWcvZGVidWctY3B1L2dldFJlZ2lzdGVySIoCIWNvcmUvZGVidWcvZGVidWctY3B1L2dldFJlZ2lzdGVyTIsCIWNvcmUvZGVidWcvZGVidWctY3B1L2dldFJlZ2lzdGVyRowCJmNvcmUvZGVidWcvZGVidWctY3B1L2dldFByb2dyYW1Db3VudGVyjQIkY29yZS9kZWJ1Zy9kZWJ1Zy1jcHUvZ2V0U3RhY2tQb2ludGVyjgI3Y29yZS9kZWJ1Zy9kZWJ1Zy1ncmFwaGljcy9kcmF3QmFja2dyb3VuZE1hcFRvV2FzbU1lbW9yeY8CMmNvcmUvZGVidWcvZGVidWctZ3JhcGhpY3MvZHJhd1RpbGVEYXRhVG9XYXNtTWVtb3J5kAIFc3RhcnQAMRBzb3VyY2VNYXBwaW5nVVJMH2Fzc2V0cy9pbmRleC51bnRvdWNoZWQud2FzbS5tYXA="
+
+/***/ }),
+
 /***/ "njQ8":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19086,33 +19403,6 @@ exports.Deflate = Deflate;
 exports.deflate = deflate;
 exports.deflateRaw = deflateRaw;
 exports.gzip = gzip;
-
-/***/ }),
-
-/***/ "toTQ":
-/***/ (function(module, exports) {
-
-var buffer = new ArrayBuffer(38818);var uint8 = new Uint8Array(buffer);uint8.set([0,97,115,109,1,0,0,0,1,114,15,96,0,1,127,96,7,127,127,127,127,127,127,127,0,96,1,127,1,127,96,2,127,127,0,96,2,127,127,1,127,96,1,127,0,96,0,0,96,8,127,127,127,127,127,127,127,127,0,96,3,127,127,127,1,127,96,4,127,127,127,127,0,96,13,127,127,127,127,127,127,127,127,127,127,127,127,127,1,127,96,4,127,127,127,127,1,127,96,3,127,127,127,0,96,7,127,127,127,127,127,127,127,1,127,96,6,127,127,127,127,127,127,0,2,11,1,3,101,110,118,3,108,111,103,0,1,3,144,2,142,2,1,2,3,2,2,2,2,4,3,5,6,5,5,7,0,6,0,0,0,0,0,0,0,0,0,0,0,4,4,4,4,4,8,4,8,5,8,4,9,10,6,0,1,6,6,6,6,6,6,6,0,5,6,3,3,0,0,0,2,2,3,0,0,6,6,6,6,0,5,6,6,6,6,6,2,2,2,2,2,2,6,4,2,0,6,2,0,6,2,0,0,2,0,0,0,4,11,12,5,5,5,6,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,6,5,6,5,6,5,6,5,5,5,4,5,5,0,0,4,2,0,2,2,12,5,12,3,3,0,5,6,5,6,5,5,5,5,5,5,4,3,4,5,3,5,5,5,2,3,12,2,2,0,2,5,2,2,0,0,0,2,2,2,2,2,2,3,5,5,2,5,5,2,5,5,2,5,5,2,2,2,2,2,2,2,2,2,2,4,8,2,2,5,2,2,2,2,0,3,5,0,0,0,4,9,4,13,13,1,14,14,12,12,3,5,6,6,6,0,0,6,6,6,6,5,6,0,0,4,3,6,6,6,6,6,6,6,6,6,6,6,6,2,6,6,6,6,6,6,6,6,6,6,6,6,6,5,3,1,0,1,6,238,8,216,1,127,0,65,128,128,172,4,11,127,0,65,128,8,11,127,0,65,128,8,11,127,0,65,128,16,11,127,0,65,255,255,3,11,127,0,65,128,144,4,11,127,0,65,128,144,4,11,127,0,65,128,4,11,127,0,65,128,216,5,11,127,0,65,128,152,14,11,127,0,65,128,152,26,11,127,0,65,128,248,35,11,127,0,65,128,248,43,11,127,0,65,128,248,51,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,207,254,3,11,127,1,65,0,11,127,1,65,240,254,3,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,1,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,128,2,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,1,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,15,11,127,1,65,0,11,127,1,65,0,11,127,1,65,15,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,15,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,15,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,128,247,2,11,127,1,65,1,11,127,1,65,1,11,127,1,65,1,11,127,1,65,1,11,127,1,65,1,11,127,1,65,1,11,127,1,65,1,11,127,1,65,1,11,127,1,65,0,11,127,1,65,0,11,127,1,65,255,0,11,127,1,65,255,0,11,127,1,65,128,128,8,11,127,1,65,1,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,1,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,213,254,3,11,127,1,65,0,11,127,1,65,209,254,3,11,127,1,65,210,254,3,11,127,1,65,211,254,3,11,127,1,65,212,254,3,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,232,254,3,11,127,1,65,235,254,3,11,127,1,65,233,254,3,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,127,1,65,127,11,127,1,65,127,11,127,1,65,0,11,127,1,65,0,11,127,1,65,0,11,7,152,6,39,6,99,111,110,102,105,103,0,1,14,115,101,116,74,111,121,112,97,100,83,116,97,116,101,0,14,18,103,101,116,65,117,100,105,111,81,117,101,117,101,73,110,100,101,120,0,15,15,114,101,115,101,116,65,117,100,105,111,81,117,101,117,101,0,16,14,119,97,115,109,77,101,109,111,114,121,83,105,122,101,3,0,28,119,97,115,109,66,111,121,73,110,116,101,114,110,97,108,83,116,97,116,101,76,111,99,97,116,105,111,110,3,1,24,119,97,115,109,66,111,121,73,110,116,101,114,110,97,108,83,116,97,116,101,83,105,122,101,3,2,29,103,97,109,101,66,111,121,73,110,116,101,114,110,97,108,77,101,109,111,114,121,76,111,99,97,116,105,111,110,3,3,25,103,97,109,101,66,111,121,73,110,116,101,114,110,97,108,77,101,109,111,114,121,83,105,122,101,3,4,19,118,105,100,101,111,79,117,116,112,117,116,76,111,99,97,116,105,111,110,3,5,34,102,114,97,109,101,73,110,80,114,111,103,114,101,115,115,86,105,100,101,111,79,117,116,112,117,116,76,111,99,97,116,105,111,110,3,8,27,103,97,109,101,98,111,121,67,111,108,111,114,80,97,108,101,116,116,101,76,111,99,97,116,105,111,110,3,6,23,103,97,109,101,98,111,121,67,111,108,111,114,80,97,108,101,116,116,101,83,105,122,101,3,7,21,98,97,99,107,103,114,111,117,110,100,77,97,112,76,111,99,97,116,105,111,110,3,9,11,116,105,108,101,68,97,116,97,77,97,112,3,10,19,115,111,117,110,100,79,117,116,112,117,116,76,111,99,97,116,105,111,110,3,11,17,103,97,109,101,66,121,116,101,115,76,111,99,97,116,105,111,110,3,13,20,103,97,109,101,82,97,109,66,97,110,107,115,76,111,99,97,116,105,111,110,3,12,33,103,101,116,87,97,115,109,66,111,121,79,102,102,115,101,116,70,114,111,109,71,97,109,101,66,111,121,79,102,102,115,101,116,0,6,12,103,101,116,82,101,103,105,115,116,101,114,65,0,17,12,103,101,116,82,101,103,105,115,116,101,114,66,0,18,12,103,101,116,82,101,103,105,115,116,101,114,67,0,19,12,103,101,116,82,101,103,105,115,116,101,114,68,0,20,12,103,101,116,82,101,103,105,115,116,101,114,69,0,21,12,103,101,116,82,101,103,105,115,116,101,114,72,0,22,12,103,101,116,82,101,103,105,115,116,101,114,76,0,23,12,103,101,116,82,101,103,105,115,116,101,114,70,0,24,17,103,101,116,80,114,111,103,114,97,109,67,111,117,110,116,101,114,0,25,15,103,101,116,83,116,97,99,107,80,111,105,110,116,101,114,0,26,25,103,101,116,79,112,99,111,100,101,65,116,80,114,111,103,114,97,109,67,111,117,110,116,101,114,0,27,29,100,114,97,119,66,97,99,107,103,114,111,117,110,100,77,97,112,84,111,87,97,115,109,77,101,109,111,114,121,0,36,24,100,114,97,119,84,105,108,101,68,97,116,97,84,111,87,97,115,109,77,101,109,111,114,121,0,41,14,104,97,115,67,111,114,101,83,116,97,114,116,101,100,0,42,10,105,110,105,116,105,97,108,105,122,101,0,55,13,101,109,117,108,97,116,105,111,110,83,116,101,112,0,241,1,6,117,112,100,97,116,101,0,242,1,9,115,97,118,101,83,116,97,116,101,0,128,2,9,108,111,97,100,83,116,97,116,101,0,141,2,6,109,101,109,111,114,121,2,0,8,2,142,2,10,180,196,1,142,2,121,0,32,0,65,0,74,4,64,65,1,36,14,5,65,0,36,14,11,32,1,65,0,74,4,64,65,1,36,15,5,65,0,36,15,11,32,2,65,0,74,4,64,65,1,36,16,5,65,0,36,16,11,32,3,65,0,74,4,64,65,1,36,17,5,65,0,36,17,11,32,4,65,0,74,4,64,65,1,36,18,5,65,0,36,18,11,32,5,65,0,74,4,64,65,1,36,19,5,65,0,36,19,11,32,6,65,0,74,4,64,65,1,36,20,5,65,0,36,20,11,11,73,0,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,32,0,14,8,1,2,3,4,5,6,7,8,0,11,12,8,11,35,22,15,11,35,23,15,11,35,24,15,11,35,25,15,11,35,26,15,11,35,27,15,11,35,28,15,11,35,29,15,11,65,0,11,93,0,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,32,0,14,8,1,2,3,4,5,6,7,8,0,11,12,8,11,32,1,36,22,12,7,11,32,1,36,23,12,6,11,32,1,36,24,12,5,11,32,1,36,25,12,4,11,32,1,36,26,12,3,11,32,1,36,27,12,2,11,32,1,36,28,12,1,11,32,1,36,29,11,11,47,1,2,127,35,34,33,1,35,35,69,34,2,4,127,32,1,69,5,32,2,11,65,1,113,4,64,65,1,33,1,11,32,1,65,128,128,1,108,32,0,65,128,128,1,107,106,11,17,0,35,38,65,128,192,0,108,32,0,65,128,192,2,107,106,11,165,1,1,1,127,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,32,0,65,12,117,14,14,1,1,1,1,2,2,2,2,3,3,4,4,5,6,0,11,12,6,11,32,0,65,128,248,51,106,15,11,32,0,16,4,65,128,248,51,106,15,11,35,36,4,64,35,37,16,7,65,1,113,33,1,11,32,0,65,128,144,126,106,32,1,65,128,192,0,108,106,15,11,32,0,16,5,65,128,248,43,106,15,11,32,0,65,128,144,126,106,15,11,35,36,4,64,35,39,16,7,65,7,113,33,1,11,32,1,65,1,72,4,64,65,1,33,1,11,32,0,32,1,65,128,32,108,106,65,128,240,125,106,15,11,32,0,65,128,80,106,11,9,0,32,0,16,6,45,0,0,11,10,0,32,1,65,1,32,0,116,114,11,11,0,32,0,16,6,32,1,58,0,0,11,26,1,1,127,32,0,65,143,254,3,16,7,16,8,34,1,36,40,65,143,254,3,32,1,16,9,11,10,0,65,1,36,33,65,4,16,10,11,99,1,1,127,65,0,36,21,32,0,16,2,69,4,64,65,1,33,1,11,32,0,65,1,16,3,32,1,4,64,65,0,33,1,32,0,65,3,76,4,64,65,1,33,1,11,65,0,33,0,35,31,4,127,32,1,5,35,31,11,65,1,113,4,64,65,1,33,0,11,35,32,4,127,32,1,69,5,35,32,11,65,1,113,4,64,65,1,33,0,11,32,0,4,64,16,11,11,11,11,8,0,32,0,65,0,16,3,11,138,1,0,32,0,65,0,74,4,64,65,0,16,12,5,65,0,16,13,11,32,1,65,0,74,4,64,65,1,16,12,5,65,1,16,13,11,32,2,65,0,74,4,64,65,2,16,12,5,65,2,16,13,11,32,3,65,0,74,4,64,65,3,16,12,5,65,3,16,13,11,32,4,65,0,74,4,64,65,4,16,12,5,65,4,16,13,11,32,5,65,0,74,4,64,65,5,16,12,5,65,5,16,13,11,32,6,65,0,74,4,64,65,6,16,12,5,65,6,16,13,11,32,7,65,0,74,4,64,65,7,16,12,5,65,7,16,13,11,11,4,0,35,41,11,6,0,65,0,36,41,11,4,0,35,42,11,4,0,35,43,11,4,0,35,44,11,4,0,35,45,11,4,0,35,46,11,4,0,35,47,11,4,0,35,48,11,4,0,35,49,11,4,0,35,50,11,4,0,35,51,11,10,0,35,50,16,7,65,255,1,113,11,23,0,32,0,65,128,144,126,106,32,1,65,1,113,65,128,192,0,108,106,45,0,0,11,13,0,32,1,65,1,32,0,116,113,65,0,71,11,56,1,1,127,32,0,65,128,144,2,70,4,64,32,1,65,128,1,106,33,2,65,7,32,1,16,29,4,64,32,1,65,128,1,107,33,2,11,32,0,32,2,65,16,108,106,15,11,32,0,32,1,65,16,108,106,11,34,1,1,127,32,0,65,63,113,33,2,32,1,4,64,32,2,65,192,0,106,33,2,11,32,2,65,128,144,4,106,45,0,0,11,18,0,32,0,65,255,1,113,65,8,116,32,1,65,255,1,113,114,11,32,1,1,127,32,0,65,8,108,32,1,65,2,108,106,34,3,65,1,106,32,2,16,31,32,3,32,2,16,31,16,32,11,22,0,32,1,65,31,32,0,65,5,108,116,113,32,0,65,5,108,117,65,8,108,11,74,0,32,2,69,4,64,32,1,16,7,32,0,65,2,108,117,65,3,113,33,0,11,65,242,1,33,1,2,64,2,64,2,64,2,64,2,64,32,0,14,4,4,1,2,3,0,11,12,3,11,65,160,1,33,1,12,2,11,65,216,0,33,1,12,1,11,65,8,33,1,11,32,1,11,152,3,1,11,127,65,128,144,2,33,8,35,52,4,64,65,128,128,2,33,8,11,65,128,176,2,33,9,35,53,4,64,65,128,184,2,33,9,11,3,64,32,3,65,128,2,72,4,64,65,0,33,4,3,64,32,4,65,128,2,72,4,64,32,8,32,9,32,3,65,3,117,65,32,108,106,32,4,65,3,117,106,34,1,65,0,16,28,16,30,33,10,32,3,65,8,111,33,2,65,7,32,4,65,8,111,107,33,6,65,0,33,5,35,36,4,127,32,0,65,0,74,5,35,36,11,65,1,113,4,64,32,1,65,1,16,28,33,5,11,65,6,32,5,16,29,4,64,65,7,32,2,107,33,2,11,65,0,33,7,65,3,32,5,16,29,4,64,65,1,33,7,11,32,10,32,2,65,2,108,106,32,7,16,28,33,11,65,0,33,1,32,6,32,10,32,2,65,2,108,106,65,1,106,32,7,16,28,16,29,4,64,65,2,33,1,11,32,6,32,11,16,29,4,64,32,1,65,1,106,33,1,11,32,3,65,128,2,108,32,4,106,65,3,108,33,6,35,36,4,127,32,0,65,0,74,5,35,36,11,65,1,113,4,64,65,0,32,5,65,7,113,32,1,65,0,16,33,34,1,16,34,33,5,65,1,32,1,16,34,33,7,65,2,32,1,16,34,33,2,32,6,65,128,152,14,106,34,1,32,5,58,0,0,32,1,65,1,106,32,7,58,0,0,32,1,65,2,106,32,2,58,0,0,5,32,1,65,199,254,3,65,0,16,35,33,1,65,0,33,2,3,64,32,2,65,3,72,4,64,32,6,65,128,152,14,106,32,2,106,32,1,58,0,0,32,2,65,1,106,33,2,12,1,11,11,11,32,4,65,1,106,33,4,12,1,11,11,32,3,65,1,106,33,3,12,1,11,11,11,13,0,32,1,32,2,108,32,0,106,65,3,108,11,11,0,32,1,65,160,1,108,32,0,106,11,40,1,1,127,32,2,65,3,113,33,4,32,3,4,64,65,2,32,4,16,8,33,4,11,32,0,32,1,16,38,65,128,160,4,106,32,4,58,0,0,11,180,2,1,6,127,32,1,32,0,16,30,34,0,32,5,65,2,108,106,32,2,16,28,33,17,32,0,32,5,65,2,108,106,65,1,106,32,2,16,28,33,18,32,3,33,0,3,64,32,0,32,4,76,4,64,32,6,32,0,32,3,107,106,34,15,32,8,72,4,64,32,0,33,1,32,12,65,0,72,34,13,4,127,32,13,5,65,5,32,12,16,29,69,11,65,1,113,4,64,65,7,32,1,107,33,1,11,65,0,33,13,32,1,32,18,16,29,4,64,65,2,33,13,11,32,1,32,17,16,29,4,64,32,13,65,1,106,33,13,11,32,12,65,0,78,4,127,65,0,32,12,65,7,113,32,13,65,0,16,33,34,2,16,34,33,16,65,1,32,2,16,34,33,1,65,2,32,2,16,34,5,32,11,65,0,76,4,64,65,199,254,3,33,11,11,32,13,32,11,32,10,16,35,34,2,33,16,32,2,34,1,11,33,5,32,9,32,15,32,7,32,8,16,37,34,2,106,32,16,58,0,0,32,9,32,2,106,65,1,106,32,1,58,0,0,32,9,32,2,106,65,2,106,32,5,58,0,0,65,0,33,1,32,12,65,0,78,4,64,65,7,32,12,16,29,33,1,11,32,15,32,7,32,13,32,1,16,39,32,14,65,1,106,33,14,11,32,0,65,1,106,33,0,12,1,11,11,32,14,11,199,1,1,6,127,3,64,32,2,65,23,72,4,64,65,0,33,0,3,64,32,0,65,31,72,4,64,65,0,33,4,32,0,65,15,74,4,64,65,1,33,4,11,32,2,33,1,32,2,65,15,74,4,64,32,1,65,15,107,33,1,11,32,1,65,4,116,33,1,32,0,65,15,74,4,127,32,1,32,0,65,15,107,106,5,32,1,32,0,106,11,33,1,65,128,128,2,33,5,32,2,65,15,74,4,64,65,128,144,2,33,5,11,65,0,33,3,3,64,32,3,65,8,72,4,64,32,1,32,5,32,4,65,0,65,7,32,3,32,0,65,8,108,32,2,65,8,108,32,3,106,65,248,1,65,128,152,26,65,1,65,0,65,127,16,40,26,32,3,65,1,106,33,3,12,1,11,11,32,0,65,1,106,33,0,12,1,11,11,32,2,65,1,106,33,2,12,1,11,11,11,12,0,35,54,4,64,65,1,15,11,65,0,11,18,0,32,0,32,1,32,2,32,3,32,4,32,5,32,6,16,0,11,164,1,1,2,127,65,199,2,16,7,33,0,65,0,36,55,65,0,36,56,65,0,36,57,65,0,36,58,65,0,36,35,32,0,4,64,32,0,65,1,78,34,1,4,127,32,0,65,3,76,5,32,1,11,65,1,113,4,64,65,1,36,56,5,32,0,65,5,78,34,1,4,127,32,0,65,6,76,5,32,1,11,65,1,113,4,64,65,1,36,57,5,32,0,65,15,78,34,1,4,127,32,0,65,19,76,5,32,1,11,65,1,113,4,64,65,1,36,58,5,32,0,65,25,78,34,1,4,127,32,0,65,30,76,5,32,1,11,65,1,113,4,64,65,1,36,35,11,11,11,11,5,65,1,36,55,11,65,1,36,34,65,0,36,38,11,108,0,35,36,4,64,65,145,1,36,59,65,192,254,3,65,145,1,16,9,65,193,254,3,65,129,1,16,9,65,196,254,3,65,144,1,16,9,65,199,254,3,65,252,1,16,9,5,65,145,1,36,59,65,192,254,3,65,145,1,16,9,65,193,254,3,65,133,1,16,9,65,198,254,3,65,255,1,16,9,65,199,254,3,65,252,1,16,9,65,200,254,3,65,255,1,16,9,65,201,254,3,65,255,1,16,9,11,11,47,0,65,144,254,3,65,128,1,16,9,65,145,254,3,65,191,1,16,9,65,146,254,3,65,243,1,16,9,65,147,254,3,65,193,1,16,9,65,148,254,3,65,191,1,16,9,11,44,0,65,149,254,3,65,255,1,16,9,65,150,254,3,65,63,16,9,65,151,254,3,65,0,16,9,65,152,254,3,65,0,16,9,65,153,254,3,65,184,1,16,9,11,50,0,65,154,254,3,65,255,0,16,9,65,155,254,3,65,255,1,16,9,65,156,254,3,65,159,1,16,9,65,157,254,3,65,0,16,9,65,158,254,3,65,184,1,16,9,65,1,36,60,11,45,0,65,159,254,3,65,255,1,16,9,65,160,254,3,65,255,1,16,9,65,161,254,3,65,0,16,9,65,162,254,3,65,0,16,9,65,163,254,3,65,191,1,16,9,11,45,0,16,46,16,47,16,48,16,49,65,164,254,3,65,247,0,16,9,65,165,254,3,65,243,1,16,9,65,166,254,3,65,241,1,16,9,65,1,36,61,65,1,36,62,11,98,1,1,127,65,128,2,33,0,35,68,4,64,65,128,4,33,0,11,2,64,2,64,2,64,2,64,2,64,35,65,14,3,1,2,3,0,11,12,3,11,65,128,8,33,0,35,68,4,64,65,128,16,33,0,11,32,0,15,11,65,16,33,0,35,68,4,64,65,32,33,0,11,32,0,15,11,65,192,0,33,0,35,68,4,64,65,254,0,33,0,11,32,0,15,11,32,0,11,32,0,65,2,32,0,16,29,36,64,35,64,69,4,64,15,11,32,0,65,3,113,36,65,65,0,36,66,16,51,36,67,11,62,0,35,36,4,64,65,132,254,3,65,47,16,9,65,47,36,63,65,135,254,3,65,248,1,16,9,65,248,1,16,52,5,65,132,254,3,65,171,1,16,9,65,171,1,36,63,65,135,254,3,65,248,1,16,9,65,248,1,16,52,11,11,128,4,1,2,127,65,195,2,16,7,34,3,65,192,1,70,34,2,4,127,32,2,5,32,0,65,0,74,34,2,4,127,32,3,65,128,1,70,5,32,2,11,65,1,113,11,65,1,113,4,64,65,1,36,36,11,65,4,65,1,32,1,65,241,177,127,65,241,177,127,65,241,177,127,65,241,177,127,16,43,32,1,65,0,76,4,64,35,36,4,64,65,17,36,42,65,128,1,36,49,65,0,36,43,65,0,36,44,65,255,1,36,45,65,214,0,36,46,65,0,36,47,65,13,36,48,65,128,2,36,50,65,254,255,3,36,51,65,240,254,3,65,248,1,16,9,65,207,254,3,65,254,1,16,9,65,205,254,3,65,254,0,16,9,65,128,254,3,65,207,1,16,9,65,130,254,3,65,252,0,16,9,65,143,254,3,65,225,1,16,9,65,232,254,3,65,192,1,16,9,65,233,254,3,65,255,1,16,9,65,234,254,3,65,193,1,16,9,65,235,254,3,65,13,16,9,65,207,254,3,65,0,16,9,65,240,254,3,65,1,16,9,65,209,254,3,65,255,1,16,9,65,210,254,3,65,255,1,16,9,65,211,254,3,65,255,1,16,9,65,212,254,3,65,255,1,16,9,65,213,254,3,65,255,1,16,9,65,236,254,3,65,254,1,16,9,65,245,254,3,65,143,1,16,9,5,65,1,36,42,65,176,1,36,49,65,0,36,43,65,19,36,44,65,0,36,45,65,216,1,36,46,65,1,36,47,65,205,0,36,48,65,128,2,36,50,65,254,255,3,36,51,65,240,254,3,65,255,1,16,9,65,207,254,3,65,255,1,16,9,65,205,254,3,65,255,1,16,9,65,128,254,3,65,207,1,16,9,65,130,254,3,65,254,0,16,9,65,143,254,3,65,225,1,16,9,65,232,254,3,65,255,1,16,9,65,233,254,3,65,255,1,16,9,65,234,254,3,65,255,1,16,9,65,235,254,3,65,255,1,16,9,65,207,254,3,65,0,16,9,65,240,254,3,65,1,16,9,65,209,254,3,65,255,1,16,9,65,210,254,3,65,255,1,16,9,65,211,254,3,65,255,1,16,9,65,212,254,3,65,255,1,16,9,65,213,254,3,65,255,1,16,9,11,16,44,16,45,16,50,16,53,11,11,12,0,32,0,32,1,16,54,65,0,36,54,11,16,0,35,68,4,64,65,160,201,8,15,11,65,208,164,4,11,18,0,35,50,65,1,106,65,255,255,3,113,16,7,65,255,1,113,11,13,0,16,57,16,27,16,32,65,255,255,3,113,11,12,0,32,0,65,128,254,3,113,65,8,117,11,8,0,32,0,65,255,1,113,11,248,2,1,2,127,35,55,4,64,15,11,32,0,65,255,63,76,4,64,35,57,4,127,65,4,32,1,65,255,1,113,16,29,69,5,35,57,11,65,1,113,69,4,64,32,1,65,15,113,34,2,4,64,32,2,65,10,70,4,64,65,1,36,71,11,5,65,0,36,71,11,11,5,32,0,65,255,255,0,76,4,64,35,35,69,34,2,4,127,32,2,5,32,0,65,255,223,0,76,11,65,1,113,4,64,35,57,4,64,32,1,65,15,113,36,34,11,32,1,33,2,35,56,4,64,32,2,65,31,113,33,2,35,34,65,224,1,113,36,34,5,35,58,4,64,32,2,65,255,0,113,33,2,35,34,65,128,1,113,36,34,5,35,35,4,64,35,34,65,0,113,36,34,11,11,11,35,34,32,2,114,36,34,5,65,0,33,2,35,34,16,60,33,3,32,1,65,0,74,4,64,65,1,33,2,11,32,2,32,3,16,32,36,34,11,5,35,57,69,34,3,4,127,32,0,65,255,191,1,76,5,32,3,11,65,1,113,4,64,35,56,4,127,35,72,5,35,56,11,65,1,113,4,64,35,34,65,31,113,36,34,35,34,32,1,65,224,1,113,114,36,34,15,11,35,58,4,64,32,1,65,8,78,34,3,4,127,32,1,65,12,76,5,32,3,11,26,11,32,1,33,3,35,35,4,127,32,3,65,15,113,5,32,3,65,3,113,11,34,3,36,38,5,35,57,69,34,3,4,127,32,0,65,255,255,1,76,5,32,3,11,65,1,113,4,64,35,56,4,64,65,0,32,1,65,255,1,113,16,29,4,64,65,1,36,72,5,65,0,36,72,11,11,11,11,11,11,11,14,0,35,68,4,64,65,174,1,15,11,65,215,0,11,16,0,35,68,4,64,65,128,128,1,15,11,65,128,192,0,11,42,1,1,127,35,77,65,0,74,34,0,4,127,35,78,5,32,0,11,65,1,113,4,64,35,77,65,1,107,36,77,11,35,77,69,4,64,65,0,36,79,11,11,42,1,1,127,35,80,65,0,74,34,0,4,127,35,81,5,32,0,11,65,1,113,4,64,35,80,65,1,107,36,80,11,35,80,69,4,64,65,0,36,82,11,11,42,1,1,127,35,83,65,0,74,34,0,4,127,35,84,5,32,0,11,65,1,113,4,64,35,83,65,1,107,36,83,11,35,83,69,4,64,65,0,36,85,11,11,42,1,1,127,35,86,65,0,74,34,0,4,127,35,87,5,32,0,11,65,1,113,4,64,35,86,65,1,107,36,86,11,35,86,69,4,64,65,0,36,88,11,11,29,1,1,127,35,92,35,93,117,33,0,35,94,4,127,35,92,32,0,107,5,35,92,32,0,106,11,34,0,11,64,1,2,127,65,148,254,3,16,7,65,248,1,113,32,0,65,8,117,34,1,114,33,2,65,147,254,3,32,0,65,255,1,113,34,0,16,9,65,148,254,3,32,2,16,9,32,0,36,95,32,1,36,96,35,96,65,8,116,35,95,114,36,97,11,56,1,2,127,16,68,34,0,65,255,15,76,34,1,4,127,35,93,65,0,74,5,32,1,11,65,1,113,4,64,32,0,36,92,32,0,16,69,16,68,33,0,11,32,0,65,255,15,74,4,64,65,0,36,79,11,11,42,0,35,89,65,1,107,36,89,35,89,65,0,76,4,64,35,90,36,89,35,91,4,127,35,90,65,0,74,5,35,91,11,65,1,113,4,64,16,70,11,11,11,84,1,1,127,35,98,65,1,107,36,98,35,98,65,0,76,4,64,35,99,36,98,35,98,4,64,35,100,4,127,35,101,65,15,72,5,35,100,11,65,1,113,4,64,35,101,65,1,106,36,101,5,35,100,69,34,0,4,127,35,101,65,0,74,5,32,0,11,65,1,113,4,64,35,101,65,1,107,36,101,11,11,11,11,11,84,1,1,127,35,102,65,1,107,36,102,35,102,65,0,76,4,64,35,103,36,102,35,102,4,64,35,104,4,127,35,105,65,15,72,5,35,104,11,65,1,113,4,64,35,105,65,1,106,36,105,5,35,104,69,34,0,4,127,35,105,65,0,74,5,32,0,11,65,1,113,4,64,35,105,65,1,107,36,105,11,11,11,11,11,84,1,1,127,35,106,65,1,107,36,106,35,106,65,0,76,4,64,35,107,36,106,35,106,4,64,35,108,4,127,35,109,65,15,72,5,35,108,11,65,1,113,4,64,35,109,65,1,106,36,109,5,35,108,69,34,0,4,127,35,109,65,0,74,5,32,0,11,65,1,113,4,64,35,109,65,1,107,36,109,11,11,11,11,11,134,1,0,35,75,32,0,106,36,75,35,75,16,63,78,4,64,35,75,16,63,107,36,75,2,64,2,64,2,64,2,64,2,64,2,64,2,64,35,76,14,8,1,0,2,0,3,0,4,5,0,11,12,5,11,16,64,16,65,16,66,16,67,12,4,11,16,64,16,65,16,66,16,67,16,71,12,3,11,16,64,16,65,16,66,16,67,12,2,11,16,64,16,65,16,66,16,67,16,71,12,1,11,16,72,16,73,16,74,11,35,76,65,1,106,36,76,35,76,65,8,78,4,64,65,0,36,76,11,65,1,15,11,65,0,11,25,0,35,110,32,0,106,36,110,35,111,35,110,107,65,0,74,4,64,65,0,15,11,65,1,11,108,0,2,64,2,64,2,64,2,64,2,64,2,64,32,0,65,1,107,14,4,1,2,3,4,0,11,12,4,11,35,112,35,113,71,4,64,35,113,36,112,65,1,15,11,65,0,15,11,35,114,35,115,71,4,64,35,115,36,114,65,1,15,11,65,0,15,11,35,116,35,117,71,4,64,35,117,36,116,65,1,15,11,65,0,15,11,35,118,35,119,71,4,64,35,119,36,118,65,1,15,11,65,0,15,11,65,0,11,25,0,35,120,32,0,106,36,120,35,121,35,120,107,65,0,74,4,64,65,0,15,11,65,1,11,41,1,1,127,35,122,32,0,106,36,122,35,123,35,122,107,65,0,74,34,1,4,127,35,60,69,5,32,1,11,65,1,113,4,64,65,0,15,11,65,1,11,25,0,35,124,32,0,106,36,124,35,125,35,124,107,65,0,74,4,64,65,0,15,11,65,1,11,25,0,65,128,16,35,97,107,65,4,108,36,111,35,68,4,64,35,111,65,2,108,36,111,11,11,60,0,2,64,2,64,2,64,2,64,2,64,32,0,65,1,107,14,3,1,2,3,0,11,12,3,11,32,1,65,129,1,16,29,15,11,32,1,65,135,1,16,29,15,11,32,1,65,254,0,16,29,15,11,32,1,65,1,16,29,11,115,1,1,127,35,111,32,0,107,36,111,35,111,65,0,76,4,64,35,111,34,0,65,0,32,0,107,32,0,65,0,74,27,33,0,16,81,35,111,32,0,107,36,111,35,127,65,1,106,36,127,35,127,65,8,78,4,64,65,0,36,127,11,11,35,79,4,127,35,113,5,35,79,11,65,1,113,4,64,35,101,33,0,5,65,15,15,11,65,1,33,1,35,128,1,35,127,16,82,69,4,64,65,127,33,1,11,32,1,32,0,108,65,15,106,11,16,1,1,127,35,110,33,0,65,0,36,110,32,0,16,83,11,26,0,65,128,16,35,130,1,107,65,4,108,36,121,35,68,4,64,35,121,65,2,108,36,121,11,11,120,1,1,127,35,121,32,0,107,36,121,35,121,65,0,76,4,64,35,121,34,0,65,0,32,0,107,32,0,65,0,74,27,33,0,16,85,35,121,32,0,107,36,121,35,131,1,65,1,106,36,131,1,35,131,1,65,8,78,4,64,65,0,36,131,1,11,11,35,82,4,127,35,115,5,35,82,11,65,1,113,4,64,35,105,33,0,5,65,15,15,11,65,1,33,1,35,132,1,35,131,1,16,82,69,4,64,65,127,33,1,11,32,1,32,0,108,65,15,106,11,16,1,1,127,35,120,33,0,65,0,36,120,32,0,16,86,11,26,0,65,128,16,35,134,1,107,65,2,108,36,123,35,68,4,64,35,123,65,2,108,36,123,11,11,251,1,1,2,127,35,123,32,0,107,36,123,35,123,65,0,76,4,64,35,123,34,1,65,0,32,1,107,32,1,65,0,74,27,33,1,16,88,35,123,32,1,107,36,123,35,135,1,65,1,106,36,135,1,35,135,1,65,32,78,4,64,65,0,36,135,1,11,11,65,0,33,1,35,136,1,33,2,35,85,4,127,35,117,5,35,85,11,65,1,113,4,64,35,60,4,64,65,156,254,3,16,7,65,5,117,65,15,113,34,2,36,136,1,65,0,36,60,11,5,65,15,15,11,35,135,1,65,2,109,65,176,254,3,106,16,7,33,0,35,135,1,65,2,111,4,127,32,0,65,15,113,5,32,0,65,4,117,65,15,113,11,33,0,2,64,2,64,2,64,2,64,2,64,2,64,32,2,14,3,1,2,3,0,11,12,3,11,32,0,65,4,117,33,0,12,3,11,65,1,33,1,12,2,11,32,0,65,1,117,33,0,65,2,33,1,12,1,11,32,0,65,2,117,33,0,65,4,33,1,11,32,1,65,0,74,4,127,32,0,32,1,109,5,65,0,11,34,0,65,15,106,11,16,1,1,127,35,122,33,0,65,0,36,122,32,0,16,89,11,27,1,1,127,35,138,1,35,139,1,116,33,0,35,68,4,64,32,0,65,2,108,33,0,11,32,0,11,161,1,1,1,127,35,125,32,0,107,36,125,35,125,65,0,76,4,64,35,125,34,0,65,0,32,0,107,32,0,65,0,74,27,33,0,16,91,36,125,35,125,32,0,107,36,125,35,140,1,65,1,113,35,140,1,65,1,117,65,1,113,115,33,1,35,140,1,65,1,117,36,140,1,35,140,1,32,1,65,14,116,114,36,140,1,35,141,1,4,64,35,140,1,65,191,127,113,36,140,1,35,140,1,32,1,65,6,116,114,36,140,1,11,11,35,88,4,127,35,119,5,35,88,11,65,1,113,4,64,35,109,33,1,5,65,15,15,11,65,0,35,140,1,16,29,4,127,65,127,5,65,1,11,34,0,32,1,108,65,15,106,11,16,1,1,127,35,124,33,0,65,0,36,124,32,0,16,92,11,18,0,35,68,4,64,65,128,128,128,4,15,11,65,128,128,128,2,11,4,0,16,94,11,52,1,1,127,32,0,65,60,70,4,64,65,255,0,15,11,32,0,65,60,107,65,160,141,6,34,2,108,32,1,108,65,8,109,65,160,141,6,109,65,60,106,65,160,141,6,108,65,140,241,2,109,11,203,1,1,2,127,65,0,36,61,35,145,1,4,127,65,0,32,0,106,5,65,15,11,33,4,35,146,1,4,127,32,4,32,1,106,5,32,4,65,15,106,11,33,4,35,147,1,4,127,32,4,32,2,106,5,32,4,65,15,106,11,33,4,35,148,1,4,127,32,4,32,3,106,5,32,4,65,15,106,11,33,4,35,149,1,4,127,65,0,32,0,106,5,65,15,11,33,5,35,150,1,4,127,32,5,32,1,106,5,32,5,65,15,106,11,33,5,35,151,1,4,127,32,5,32,2,106,5,32,5,65,15,106,11,33,5,35,152,1,4,127,32,5,32,3,106,5,32,5,65,15,106,11,33,5,65,0,36,62,65,0,36,142,1,32,4,35,153,1,65,1,106,16,96,33,0,32,5,35,154,1,65,1,106,16,96,33,1,32,0,36,155,1,32,1,36,156,1,32,0,32,1,16,32,11,37,1,1,127,32,2,65,2,108,65,128,248,35,106,34,3,32,0,65,1,106,58,0,0,32,3,65,1,106,32,1,65,1,106,58,0,0,11,167,2,1,4,127,32,0,16,76,34,1,4,127,32,1,5,65,1,16,77,11,65,1,113,33,1,32,0,16,78,34,2,4,127,32,2,5,65,2,16,77,11,65,1,113,33,2,32,0,16,79,34,3,4,127,32,3,5,65,3,16,77,11,65,1,113,33,3,32,0,16,80,34,4,4,127,32,4,5,65,4,16,77,11,65,1,113,33,4,32,1,4,64,16,84,36,126,11,32,2,4,64,16,87,36,129,1,11,32,3,4,64,16,90,36,133,1,11,32,4,4,64,16,93,36,137,1,11,32,1,4,127,32,1,5,32,2,11,65,1,113,34,1,4,127,32,1,5,32,3,11,65,1,113,34,1,4,127,32,1,5,32,4,11,65,1,113,4,64,65,1,36,142,1,11,35,143,1,32,0,35,144,1,108,106,36,143,1,35,143,1,16,95,78,4,64,35,143,1,16,95,107,36,143,1,35,142,1,4,127,35,142,1,5,35,61,11,65,1,113,34,1,4,127,32,1,5,35,62,11,65,1,113,4,64,35,126,35,129,1,35,133,1,35,137,1,16,97,26,11,35,155,1,65,1,106,35,156,1,65,1,106,35,41,16,98,35,41,65,1,106,36,41,35,41,35,157,1,65,2,109,65,1,107,78,4,64,35,41,65,1,107,36,41,11,11,11,135,1,1,4,127,32,0,16,83,33,1,32,0,16,86,33,2,32,0,16,89,33,3,32,0,16,92,33,4,32,1,36,126,32,2,36,129,1,32,3,36,133,1,32,4,36,137,1,35,143,1,32,0,35,144,1,108,106,36,143,1,35,143,1,16,95,78,4,64,35,143,1,16,95,107,36,143,1,32,1,32,2,32,3,32,4,16,97,34,0,16,59,65,1,106,32,0,16,60,65,1,106,35,41,16,98,35,41,65,1,106,36,41,35,41,35,157,1,65,2,109,65,1,107,78,4,64,35,41,65,1,107,36,41,11,11,11,36,1,1,127,32,0,16,75,33,1,35,18,4,127,32,1,69,5,35,18,11,65,1,113,4,64,32,0,16,99,5,32,0,16,100,11,11,35,0,35,74,16,62,72,4,64,15,11,3,64,35,74,16,62,78,4,64,16,62,16,101,35,74,16,62,107,36,74,12,1,11,11,11,28,0,32,0,65,240,0,113,65,4,117,36,90,65,3,32,0,16,29,36,94,32,0,65,7,113,36,93,11,10,0,65,7,32,0,16,29,36,117,11,30,0,32,0,65,6,117,65,3,113,36,128,1,32,0,65,63,113,36,159,1,65,192,0,35,159,1,107,36,77,11,30,0,32,0,65,6,117,65,3,113,36,132,1,32,0,65,63,113,36,160,1,65,192,0,35,160,1,107,36,80,11,16,0,32,0,36,161,1,65,128,2,35,161,1,107,36,83,11,19,0,32,0,65,63,113,36,162,1,65,192,0,35,162,1,107,36,86,11,39,0,32,0,65,4,117,65,15,113,36,163,1,65,3,32,0,16,29,36,100,32,0,65,7,113,36,99,32,0,65,248,1,113,65,0,74,36,113,11,39,0,32,0,65,4,117,65,15,113,36,164,1,65,3,32,0,16,29,36,104,32,0,65,7,113,36,103,32,0,65,248,1,113,65,0,74,36,115,11,13,0,32,0,65,5,117,65,15,113,36,165,1,11,39,0,32,0,65,4,117,65,15,113,36,166,1,65,3,32,0,16,29,36,108,32,0,65,7,113,36,107,32,0,65,248,1,113,65,0,74,36,119,11,16,0,32,0,36,95,35,96,65,8,116,35,95,114,36,97,11,20,0,32,0,36,167,1,35,168,1,65,8,116,35,167,1,114,36,130,1,11,20,0,32,0,36,169,1,35,170,1,65,8,116,35,169,1,114,36,134,1,11,124,0,32,0,65,4,117,36,139,1,65,3,32,0,16,29,36,141,1,32,0,65,7,113,36,171,1,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,35,171,1,14,8,1,2,3,4,5,6,7,8,0,11,12,8,11,65,8,36,138,1,15,11,65,16,36,138,1,15,11,65,32,36,138,1,15,11,65,48,36,138,1,15,11,65,192,0,36,138,1,15,11,65,208,0,36,138,1,15,11,65,224,0,36,138,1,15,11,65,240,0,36,138,1,11,11,27,0,65,6,32,0,16,29,36,78,32,0,65,7,113,36,96,35,96,65,8,116,35,95,114,36,97,11,91,1,1,127,65,1,36,79,35,77,69,4,64,65,192,0,36,77,11,16,81,35,99,36,98,35,163,1,36,101,35,97,36,92,35,90,36,89,35,90,65,0,74,34,0,4,127,35,93,65,0,74,5,32,0,11,65,1,113,4,64,65,1,36,91,5,65,0,36,91,11,35,93,65,0,74,4,64,16,70,11,35,113,69,4,64,65,0,36,79,11,11,31,0,65,6,32,0,16,29,36,81,32,0,65,7,113,36,168,1,35,168,1,65,8,116,35,167,1,114,36,130,1,11,38,0,65,1,36,82,35,80,69,4,64,65,192,0,36,80,11,16,85,35,103,36,102,35,164,1,36,105,35,115,69,4,64,65,0,36,82,11,11,31,0,65,6,32,0,16,29,36,84,32,0,65,7,113,36,170,1,35,170,1,65,8,116,35,169,1,114,36,134,1,11,34,0,65,1,36,85,35,83,69,4,64,65,128,2,36,83,11,16,88,65,0,36,135,1,35,117,69,4,64,65,0,36,85,11,11,10,0,65,6,32,0,16,29,36,87,11,47,0,65,1,36,88,35,86,69,4,64,65,192,0,36,86,11,16,91,36,125,35,107,36,106,35,166,1,36,109,65,255,255,1,36,140,1,35,119,69,4,64,65,0,36,88,11,11,21,0,32,0,65,4,117,65,7,113,36,153,1,32,0,65,7,113,36,154,1,11,74,0,65,7,32,0,16,29,36,148,1,65,6,32,0,16,29,36,147,1,65,5,32,0,16,29,36,146,1,65,4,32,0,16,29,36,145,1,65,3,32,0,16,29,36,152,1,65,2,32,0,16,29,36,151,1,65,1,32,0,16,29,36,150,1,65,0,32,0,16,29,36,149,1,11,11,0,65,7,32,0,16,29,36,158,1,11,129,3,1,1,127,32,0,65,166,254,3,71,34,2,4,127,35,158,1,69,5,32,2,11,65,1,113,4,64,65,0,15,11,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,32,0,65,144,254,3,107,14,23,1,3,7,11,15,0,4,8,12,16,2,5,9,13,17,0,6,10,14,18,19,20,21,0,11,12,21,11,32,1,16,103,65,1,15,11,32,1,16,104,65,1,15,11,32,1,16,105,65,1,15,11,32,1,16,106,65,1,15,11,32,1,16,107,65,1,15,11,32,1,16,108,65,1,15,11,32,1,16,109,65,1,15,11,32,1,16,110,65,1,15,11,65,1,36,60,32,1,16,111,65,1,15,11,32,1,16,112,65,1,15,11,32,1,16,113,65,1,15,11,32,1,16,114,65,1,15,11,32,1,16,115,65,1,15,11,32,1,16,116,65,1,15,11,65,7,32,1,16,29,4,64,32,1,16,117,16,118,11,65,1,15,11,65,7,32,1,16,29,4,64,32,1,16,119,16,120,11,65,1,15,11,65,7,32,1,16,29,4,64,32,1,16,121,16,122,11,65,1,15,11,65,7,32,1,16,29,4,64,32,1,16,123,16,124,11,65,1,15,11,32,1,16,125,65,1,36,61,65,1,15,11,32,1,16,126,65,1,36,62,65,1,15,11,32,1,16,127,65,7,32,1,16,29,69,4,64,65,144,254,3,33,0,3,64,32,0,65,166,254,3,72,4,64,32,0,65,0,16,9,32,0,65,1,106,33,0,12,1,11,11,11,65,1,15,11,65,1,11,72,0,65,7,32,0,16,29,36,172,1,65,6,32,0,16,29,36,173,1,65,5,32,0,16,29,36,174,1,65,4,32,0,16,29,36,52,65,3,32,0,16,29,36,53,65,2,32,0,16,29,36,175,1,65,1,32,0,16,29,36,176,1,65,0,32,0,16,29,36,177,1,11,54,1,1,127,32,0,65,8,116,33,0,3,64,32,1,65,159,1,76,4,64,32,1,65,128,252,3,106,32,0,32,1,106,16,7,16,9,32,1,65,1,106,33,1,12,1,11,11,65,132,5,36,179,1,11,19,0,35,186,1,16,7,35,187,1,16,7,16,32,65,240,255,3,113,11,23,0,35,188,1,16,7,35,189,1,16,7,16,32,65,240,63,113,65,128,128,2,106,11,13,0,32,1,65,1,32,0,116,65,127,115,113,11,115,1,1,127,32,0,65,166,254,3,70,4,64,65,166,254,3,16,7,65,128,1,113,33,1,35,79,4,127,65,0,32,1,16,8,5,65,0,32,1,16,133,1,11,26,35,82,4,127,65,1,32,1,16,8,5,65,1,32,1,16,133,1,11,26,35,85,4,127,65,2,32,1,16,8,5,65,2,32,1,16,133,1,11,26,35,88,4,127,65,3,32,1,16,8,5,65,3,32,1,16,133,1,11,26,32,1,65,240,0,114,15,11,65,127,11,193,1,1,1,127,35,30,33,0,35,31,4,64,35,22,4,127,65,2,32,0,16,133,1,5,65,2,32,0,16,8,11,33,0,35,23,4,127,65,0,32,0,16,133,1,5,65,0,32,0,16,8,11,33,0,35,24,4,127,65,3,32,0,16,133,1,5,65,3,32,0,16,8,11,33,0,35,25,4,127,65,1,32,0,16,133,1,5,65,1,32,0,16,8,11,33,0,5,35,32,4,64,35,26,4,127,65,0,32,0,16,133,1,5,65,0,32,0,16,8,11,33,0,35,27,4,127,65,1,32,0,16,133,1,5,65,1,32,0,16,8,11,33,0,35,28,4,127,65,2,32,0,16,133,1,5,65,2,32,0,16,8,11,33,0,35,29,4,127,65,3,32,0,16,133,1,5,65,3,32,0,16,8,11,33,0,11,11,32,0,65,240,1,114,11,147,2,1,1,127,32,0,65,128,128,2,34,1,72,4,64,65,127,15,11,32,0,65,128,128,2,78,34,1,4,127,32,0,65,128,192,2,72,5,32,1,11,65,1,113,4,64,65,127,15,11,32,0,65,128,192,3,78,34,1,4,127,32,0,65,128,252,3,72,5,32,1,11,65,1,113,4,64,32,0,65,128,192,0,107,16,7,15,11,32,0,65,128,252,3,78,34,1,4,127,32,0,65,159,253,3,76,5,32,1,11,65,1,113,4,64,35,73,65,2,72,4,64,65,255,1,15,11,65,127,15,11,32,0,65,196,254,3,70,4,64,32,0,35,59,16,9,35,59,15,11,32,0,65,144,254,3,78,34,1,4,127,32,0,65,166,254,3,76,5,32,1,11,65,1,113,4,64,16,102,32,0,16,134,1,15,11,32,0,65,176,254,3,78,34,1,4,127,32,0,65,191,254,3,76,5,32,1,11,65,1,113,4,64,16,102,65,127,15,11,32,0,65,132,254,3,70,4,64,32,0,35,63,16,9,35,63,15,11,32,0,65,133,254,3,70,4,64,32,0,35,193,1,16,9,35,193,1,15,11,32,0,65,128,254,3,70,4,64,16,135,1,15,11,65,127,11,28,1,1,127,32,0,16,136,1,34,1,65,127,70,4,64,32,0,16,7,15,11,32,1,65,255,1,113,11,101,1,3,127,3,64,32,4,32,2,72,4,64,32,0,32,4,106,16,137,1,33,5,32,1,32,4,106,33,3,3,64,32,3,65,255,191,2,74,4,64,32,3,65,128,192,0,107,33,3,12,1,11,11,32,3,32,5,16,155,1,32,4,65,1,106,33,4,12,1,11,11,65,32,33,3,35,68,4,64,65,192,0,33,3,11,35,179,1,32,3,32,2,65,16,109,108,106,36,179,1,11,142,1,1,3,127,35,36,69,4,64,15,11,35,185,1,4,127,65,7,32,0,16,29,69,5,35,185,1,11,65,1,113,4,64,65,0,36,185,1,35,184,1,16,7,33,1,35,184,1,65,7,32,1,16,8,16,9,15,11,16,131,1,33,1,16,132,1,33,2,65,7,32,0,16,133,1,65,1,106,65,16,108,33,3,65,7,32,0,16,29,4,64,65,1,36,185,1,32,3,36,190,1,32,1,36,191,1,32,2,36,192,1,35,184,1,65,7,32,0,16,133,1,16,9,5,32,1,32,2,32,3,16,138,1,35,184,1,65,255,1,16,9,11,11,36,1,1,127,32,0,65,63,113,33,3,32,2,4,64,32,3,65,192,0,106,33,3,11,32,3,65,128,144,4,106,32,1,58,0,0,11,24,0,65,7,32,0,16,29,4,64,32,1,65,7,32,0,65,1,106,16,8,16,9,11,11,76,1,2,127,32,0,35,196,1,70,34,2,4,127,32,2,5,32,0,35,195,1,70,11,65,1,113,4,64,65,6,32,0,65,1,107,16,7,16,133,1,33,2,32,0,35,195,1,70,4,64,65,1,33,3,11,32,2,32,1,32,3,16,140,1,32,2,32,0,65,1,107,16,141,1,11,11,5,0,65,128,2,11,51,0,35,198,1,32,0,106,36,198,1,35,198,1,16,143,1,78,4,64,35,198,1,16,143,1,107,36,198,1,35,63,65,1,106,36,63,35,63,65,255,1,74,4,64,65,0,36,63,11,11,11,11,0,65,1,36,200,1,65,2,16,10,11,70,0,32,0,16,144,1,35,64,69,4,64,15,11,35,66,32,0,106,36,66,3,64,35,66,35,67,78,4,64,35,66,35,67,107,36,66,35,193,1,65,255,1,78,4,64,35,199,1,36,193,1,16,145,1,5,35,193,1,65,1,106,36,193,1,11,12,1,11,11,11,70,1,1,127,16,143,1,33,0,35,64,4,127,35,67,32,0,72,5,35,64,11,65,1,113,4,64,35,67,33,0,11,35,197,1,32,0,72,4,64,15,11,3,64,35,197,1,32,0,78,4,64,32,0,16,146,1,35,197,1,32,0,107,36,197,1,12,1,11,11,11,24,0,65,0,36,63,65,132,254,3,65,0,16,9,65,0,36,66,35,199,1,36,193,1,11,7,0,32,0,36,193,1,11,7,0,32,0,36,199,1,11,26,0,32,0,65,255,1,115,36,30,65,4,35,30,16,29,36,31,65,5,35,30,16,29,36,32,11,41,0,65,0,32,0,16,29,36,201,1,65,1,32,0,16,29,36,202,1,65,2,32,0,16,29,36,200,1,65,4,32,0,16,29,36,33,32,0,36,40,11,43,0,65,0,32,0,16,29,36,203,1,65,1,32,0,16,29,36,204,1,65,2,32,0,16,29,36,205,1,65,4,32,0,16,29,36,206,1,32,0,36,207,1,11,219,5,1,2,127,32,0,65,128,128,2,34,2,72,4,64,32,0,32,1,16,61,65,0,15,11,32,0,65,128,128,2,78,34,2,4,127,32,0,65,128,192,2,72,5,32,2,11,65,1,113,4,64,65,1,15,11,65,128,252,3,33,3,32,0,65,128,192,3,78,34,2,4,127,32,0,65,128,252,3,72,5,32,2,11,65,1,113,4,64,32,0,65,128,192,0,107,32,1,16,9,65,1,15,11,32,0,65,128,252,3,78,34,2,4,127,32,0,65,159,253,3,76,5,32,2,11,65,1,113,4,64,35,73,65,2,72,4,64,65,0,15,11,65,1,15,11,32,0,65,160,253,3,78,34,2,4,127,32,0,65,255,253,3,76,5,32,2,11,65,1,113,4,64,65,0,15,11,32,0,65,144,254,3,78,34,2,4,127,32,0,65,166,254,3,76,5,32,2,11,65,1,113,4,64,16,102,32,0,32,1,16,128,1,15,11,32,0,65,176,254,3,78,34,2,4,127,32,0,65,191,254,3,76,5,32,2,11,65,1,113,4,64,16,102,11,32,0,65,192,254,3,78,34,2,4,127,32,0,65,203,254,3,76,5,32,2,11,65,1,113,4,64,32,0,65,192,254,3,70,4,64,32,1,16,129,1,65,1,15,11,32,0,65,196,254,3,70,4,64,65,0,36,59,32,0,65,0,16,9,65,0,15,11,32,0,65,197,254,3,70,4,64,32,1,36,178,1,65,1,15,11,32,0,65,198,254,3,70,4,64,32,1,16,130,1,65,1,15,11,2,64,2,64,2,64,2,64,2,64,2,64,32,0,65,194,254,3,107,14,10,2,1,0,0,0,0,0,0,4,3,0,11,12,4,11,32,1,36,180,1,65,1,15,11,32,1,36,181,1,65,1,15,11,32,1,36,182,1,65,1,15,11,32,1,36,183,1,65,1,15,11,65,1,15,11,32,0,35,184,1,70,4,64,32,1,16,139,1,65,0,15,11,32,0,35,39,70,34,2,4,127,32,2,5,32,0,35,37,70,11,65,1,113,4,64,35,185,1,4,64,35,191,1,65,128,128,1,78,34,2,4,127,35,191,1,65,255,255,1,76,5,32,2,11,65,1,113,34,2,4,127,32,2,5,35,191,1,65,128,160,3,78,34,2,4,127,35,191,1,65,255,191,3,76,5,32,2,11,65,1,113,11,65,1,113,4,64,65,0,15,11,11,11,32,0,35,194,1,78,34,2,4,127,32,0,35,195,1,76,5,32,2,11,65,1,113,4,64,32,0,32,1,16,142,1,65,1,15,11,32,0,65,132,254,3,78,34,2,4,127,32,0,65,135,254,3,76,5,32,2,11,65,1,113,4,64,16,147,1,2,64,2,64,2,64,2,64,2,64,2,64,32,0,65,132,254,3,107,14,4,1,2,3,4,0,11,12,4,11,32,1,16,148,1,65,0,15,11,32,1,16,149,1,65,1,15,11,32,1,16,150,1,65,1,15,11,32,1,16,52,65,1,15,11,65,1,15,11,32,0,65,128,254,3,70,4,64,32,1,16,151,1,11,32,0,65,143,254,3,70,4,64,32,1,16,152,1,65,1,15,11,32,0,65,255,255,3,70,4,64,32,1,16,153,1,65,1,15,11,65,1,11,18,0,32,0,32,1,16,154,1,4,64,32,0,32,1,16,9,11,11,48,1,1,127,65,1,32,0,116,65,255,1,113,33,2,32,1,65,0,74,4,64,35,49,32,2,114,65,255,1,113,36,49,5,35,49,32,2,65,255,1,115,113,36,49,11,35,49,11,10,0,65,5,32,0,16,156,1,26,11,79,1,1,127,32,1,65,0,78,4,64,32,0,65,15,113,32,1,65,15,113,106,65,16,113,4,64,65,1,16,157,1,5,65,0,16,157,1,11,5,32,1,34,2,65,0,32,2,107,32,2,65,0,74,27,65,15,113,32,0,65,15,113,75,4,64,65,1,16,157,1,5,65,0,16,157,1,11,11,11,10,0,65,7,32,0,16,156,1,26,11,10,0,65,6,32,0,16,156,1,26,11,10,0,65,4,32,0,16,156,1,26,11,21,0,32,0,65,1,116,65,255,1,113,32,0,65,7,118,114,65,255,1,113,11,51,1,1,127,32,1,16,59,33,2,32,0,32,1,16,60,34,1,16,154,1,4,64,32,0,32,1,16,9,11,32,0,65,1,106,34,0,32,2,16,154,1,4,64,32,0,32,2,16,9,11,11,123,0,32,2,4,64,32,0,32,1,115,32,0,32,1,106,115,34,2,65,16,113,4,64,65,1,16,157,1,5,65,0,16,157,1,11,32,2,65,128,2,113,4,64,65,1,16,161,1,5,65,0,16,161,1,11,5,32,0,32,1,65,255,255,3,113,106,65,255,255,3,113,34,2,32,0,73,4,64,65,1,16,161,1,5,65,0,16,161,1,11,32,0,32,1,65,255,255,3,113,115,32,2,115,65,128,32,113,4,64,65,1,16,157,1,5,65,0,16,157,1,11,11,11,21,0,32,0,65,1,118,32,0,65,7,116,65,255,1,113,114,65,255,1,113,11,246,4,1,1,127,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,32,0,14,16,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,0,11,12,16,11,65,4,15,11,16,58,16,59,65,255,1,113,36,43,16,58,16,60,65,255,1,113,36,44,35,50,65,2,106,65,255,255,3,113,36,50,65,12,15,11,35,43,35,44,16,32,35,42,16,155,1,65,8,15,11,35,43,35,44,16,32,65,255,255,3,113,65,1,106,65,255,255,3,113,34,0,16,59,65,255,1,113,36,43,32,0,16,60,65,255,1,113,36,44,65,8,15,11,35,43,65,1,16,158,1,35,43,65,1,106,65,255,1,113,36,43,35,43,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,0,16,160,1,65,4,15,11,35,43,65,127,16,158,1,35,43,65,1,107,65,255,1,113,36,43,35,43,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,1,16,160,1,65,4,15,11,16,27,36,43,35,50,65,1,106,65,255,255,3,113,36,50,65,8,15,11,35,42,65,128,1,113,65,128,1,70,4,64,65,1,16,161,1,5,65,0,16,161,1,11,35,42,16,162,1,36,42,65,0,16,159,1,65,0,16,160,1,65,0,16,157,1,65,4,15,11,16,58,35,51,16,163,1,35,50,65,2,106,65,255,255,3,113,36,50,65,20,15,11,35,47,35,48,16,32,65,255,255,3,113,34,0,35,43,35,44,16,32,65,255,255,3,113,34,1,65,0,16,164,1,32,0,32,1,106,65,255,255,3,113,34,0,16,59,65,255,1,113,36,47,32,0,16,60,65,255,1,113,36,48,65,0,16,160,1,65,8,15,11,35,43,35,44,16,32,16,137,1,65,255,1,113,36,42,65,8,15,11,35,43,35,44,16,32,65,255,255,3,113,65,1,107,65,255,255,3,113,34,0,16,59,65,255,1,113,36,43,32,0,16,60,65,255,1,113,36,44,65,8,15,11,35,44,65,1,16,158,1,35,44,65,1,106,65,255,1,113,36,44,35,44,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,0,16,160,1,65,4,15,11,35,44,65,127,16,158,1,35,44,65,1,107,65,255,1,113,36,44,35,44,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,1,16,160,1,65,4,15,11,16,27,36,44,35,50,65,1,106,65,255,255,3,113,36,50,65,8,15,11,35,42,65,1,113,65,0,75,4,64,65,1,16,161,1,5,65,0,16,161,1,11,35,42,16,165,1,36,42,65,0,16,159,1,65,0,16,160,1,65,0,16,157,1,65,4,15,11,65,127,11,10,0,35,49,65,4,118,65,1,113,11,19,0,32,0,65,1,116,65,255,1,113,16,167,1,114,65,255,1,113,11,32,0,35,50,32,0,65,24,116,65,24,117,106,65,255,255,3,113,36,50,35,50,65,1,106,65,255,255,3,113,36,50,11,22,0,32,0,65,1,118,16,167,1,65,7,116,65,255,1,113,114,65,255,1,113,11,222,5,1,1,127,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,32,0,65,16,107,14,16,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,0,11,12,16,11,35,36,4,64,65,0,65,205,254,3,16,137,1,34,0,16,29,4,64,65,205,254,3,65,7,65,0,32,0,16,133,1,34,0,16,29,4,127,65,0,36,68,65,7,32,0,16,133,1,5,65,1,36,68,65,7,32,0,16,8,11,34,0,16,155,1,65,204,0,15,11,11,35,50,65,1,106,65,255,255,3,113,36,50,65,4,15,11,16,58,16,59,65,255,1,113,36,45,16,58,16,60,65,255,1,113,36,46,35,50,65,2,106,65,255,255,3,113,36,50,65,12,15,11,35,45,35,46,16,32,35,42,16,155,1,65,8,15,11,35,45,35,46,16,32,65,255,255,3,113,65,1,106,65,255,255,3,113,34,0,16,59,65,255,1,113,36,45,32,0,16,60,65,255,1,113,36,46,65,8,15,11,35,45,65,1,16,158,1,35,45,65,1,106,65,255,1,113,36,45,35,45,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,0,16,160,1,65,4,15,11,35,45,65,127,16,158,1,35,45,65,1,107,65,255,1,113,36,45,35,45,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,1,16,160,1,65,4,15,11,16,27,36,45,35,50,65,1,106,65,255,255,3,113,36,50,65,8,15,11,65,0,33,0,35,42,65,128,1,113,65,128,1,70,4,64,65,1,33,0,11,35,42,16,168,1,36,42,32,0,4,64,65,1,16,161,1,5,65,0,16,161,1,11,65,0,16,159,1,65,0,16,160,1,65,0,16,157,1,65,4,15,11,16,27,16,169,1,65,12,15,11,35,47,35,48,16,32,65,255,255,3,113,34,0,35,45,35,46,16,32,65,255,255,3,113,34,1,65,0,16,164,1,32,0,32,1,106,65,255,255,3,113,34,0,16,59,65,255,1,113,36,47,32,0,16,60,65,255,1,113,36,48,65,0,16,160,1,65,8,15,11,35,45,35,46,16,32,65,255,255,3,113,16,137,1,65,255,1,113,36,42,65,8,15,11,35,45,35,46,16,32,65,255,255,3,113,65,1,107,65,255,255,3,113,34,0,16,59,65,255,1,113,36,45,32,0,16,60,65,255,1,113,36,46,65,8,15,11,35,46,65,1,16,158,1,35,46,65,1,106,65,255,1,113,36,46,35,46,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,0,16,160,1,65,4,15,11,35,46,65,127,16,158,1,35,46,65,1,107,65,255,1,113,36,46,35,46,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,1,16,160,1,65,4,15,11,16,27,36,46,35,50,65,1,106,65,255,255,3,113,36,50,65,8,15,11,65,0,33,0,35,42,65,1,113,65,1,70,4,64,65,1,33,0,11,35,42,16,170,1,36,42,32,0,4,64,65,1,16,161,1,5,65,0,16,161,1,11,65,0,16,159,1,65,0,16,160,1,65,0,16,157,1,65,4,15,11,65,127,11,10,0,35,49,65,7,118,65,1,113,11,10,0,35,49,65,5,118,65,1,113,11,10,0,35,49,65,6,118,65,1,113,11,179,6,1,1,127,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,32,0,65,32,107,14,16,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,0,11,12,16,11,16,172,1,4,64,35,50,65,1,106,65,255,255,3,113,36,50,65,8,15,5,16,27,16,169,1,65,12,15,11,0,11,16,58,34,0,16,59,65,255,1,113,36,47,32,0,16,60,65,255,1,113,36,48,35,50,65,2,106,65,255,255,3,113,36,50,65,12,15,11,35,47,35,48,16,32,65,255,255,3,113,34,0,35,42,16,155,1,32,0,65,1,106,65,255,255,3,113,34,0,16,59,65,255,1,113,36,47,32,0,16,60,65,255,1,113,36,48,65,8,15,11,35,47,35,48,16,32,65,255,255,3,113,65,1,106,65,255,255,3,113,34,0,16,59,65,255,1,113,36,47,32,0,16,60,65,255,1,113,36,48,65,8,15,11,35,47,65,1,16,158,1,35,47,65,1,106,65,255,1,113,36,47,35,47,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,0,16,160,1,65,4,15,11,35,47,65,127,16,158,1,35,47,65,1,107,65,255,1,113,36,47,35,47,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,1,16,160,1,65,4,15,11,16,27,36,47,35,50,65,1,106,65,255,255,3,113,36,50,65,8,15,11,16,173,1,65,0,75,4,64,65,6,33,1,11,16,167,1,65,0,75,4,64,32,1,65,224,0,114,65,255,1,113,33,1,11,16,174,1,65,0,75,4,127,35,42,32,1,107,65,255,1,113,5,35,42,65,15,113,65,9,75,4,64,32,1,65,6,114,65,255,1,113,33,1,11,35,42,65,153,1,75,4,64,32,1,65,224,0,114,65,255,1,113,33,1,11,35,42,32,1,106,65,255,1,113,11,34,0,4,64,65,0,16,159,1,5,65,1,16,159,1,11,32,1,65,224,0,113,4,64,65,1,16,161,1,5,65,0,16,161,1,11,65,0,16,157,1,32,0,36,42,65,4,15,11,16,172,1,65,0,75,4,64,16,27,16,169,1,65,12,15,5,35,50,65,1,106,65,255,255,3,113,36,50,65,8,15,11,0,11,35,47,35,48,16,32,65,255,255,3,113,34,1,32,1,65,0,16,164,1,32,1,65,2,108,65,255,255,3,113,34,1,16,59,65,255,1,113,36,47,32,1,16,60,65,255,1,113,36,48,65,0,16,160,1,65,8,15,11,35,47,35,48,16,32,65,255,255,3,113,34,1,16,137,1,65,255,1,113,36,42,32,1,65,1,106,65,255,255,3,113,34,1,16,59,65,255,1,113,36,47,32,1,16,60,65,255,1,113,36,48,65,8,15,11,35,47,35,48,16,32,65,255,255,3,113,65,1,107,65,255,255,3,113,34,1,16,59,65,255,1,113,36,47,32,1,16,60,65,255,1,113,36,48,65,8,15,11,35,48,65,1,16,158,1,35,48,65,1,106,65,255,1,113,36,48,35,48,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,0,16,160,1,65,4,15,11,35,48,65,127,16,158,1,35,48,65,1,107,65,255,1,113,36,48,35,48,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,1,16,160,1,65,4,15,11,16,27,36,48,35,50,65,1,106,65,255,255,3,113,36,50,65,8,15,11,35,42,65,127,115,65,255,1,113,36,42,65,1,16,160,1,65,1,16,157,1,65,4,15,11,65,127,11,173,5,1,2,127,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,32,0,65,48,107,14,16,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,0,11,12,16,11,16,167,1,4,64,35,50,65,1,106,65,255,255,3,113,36,50,65,8,15,5,16,27,16,169,1,65,12,15,11,0,11,16,58,36,51,35,50,65,2,106,65,255,255,3,113,36,50,65,12,15,11,35,47,35,48,16,32,65,255,255,3,113,34,0,35,42,16,155,1,32,0,65,1,107,65,255,255,3,113,34,0,16,59,65,255,1,113,36,47,32,0,16,60,65,255,1,113,36,48,65,8,15,11,35,51,65,1,106,65,255,255,3,113,36,51,65,8,15,11,35,47,35,48,16,32,65,255,255,3,113,34,0,16,137,1,65,255,1,113,34,1,65,1,34,2,16,158,1,32,1,65,1,106,65,255,1,113,34,1,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,0,16,160,1,32,0,32,1,16,155,1,65,12,15,11,35,47,35,48,16,32,65,255,255,3,113,34,2,16,137,1,65,255,1,113,34,1,65,127,16,158,1,32,1,65,1,107,65,255,1,113,34,1,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,1,16,160,1,32,2,32,1,16,155,1,65,12,15,11,35,47,35,48,16,32,65,255,255,3,113,16,27,16,155,1,35,50,65,1,106,65,255,255,3,113,36,50,65,12,15,11,65,0,16,160,1,65,0,16,157,1,65,1,16,161,1,65,4,15,11,16,167,1,65,1,70,4,64,16,27,16,169,1,65,12,15,5,35,50,65,1,106,65,255,255,3,113,36,50,65,8,15,11,0,11,35,47,35,48,16,32,65,255,255,3,113,34,1,35,51,65,0,16,164,1,32,1,35,51,106,65,255,255,3,113,34,2,16,59,65,255,1,113,36,47,32,2,16,60,65,255,1,113,36,48,65,0,16,160,1,65,8,15,11,35,47,35,48,16,32,65,255,255,3,113,34,2,16,137,1,65,255,1,113,36,42,32,2,65,1,107,65,255,255,3,113,34,2,16,59,65,255,1,113,36,47,32,2,16,60,65,255,1,113,36,48,65,8,15,11,35,51,65,1,107,65,255,255,3,113,36,51,65,8,15,11,35,42,65,1,16,158,1,35,42,65,1,106,65,255,1,113,36,42,35,42,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,0,16,160,1,65,4,15,11,35,42,65,127,16,158,1,35,42,65,1,107,65,255,1,113,36,42,35,42,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,1,16,160,1,65,4,15,11,16,27,36,42,35,50,65,1,106,65,255,255,3,113,36,50,65,8,15,11,65,0,16,160,1,65,0,16,157,1,16,167,1,65,0,75,4,64,65,0,16,161,1,5,65,1,16,161,1,11,65,4,15,11,65,127,11,211,1,0,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,32,0,65,192,0,107,14,16,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,0,11,12,16,11,65,4,15,11,35,44,36,43,65,4,15,11,35,45,36,43,65,4,15,11,35,46,36,43,65,4,15,11,35,47,36,43,65,4,15,11,35,48,36,43,65,4,15,11,35,47,35,48,16,32,16,137,1,65,255,1,113,36,43,65,8,15,11,35,42,36,43,65,4,15,11,35,43,36,44,65,4,15,11,65,4,15,11,35,45,36,44,65,4,15,11,35,46,36,44,65,4,15,11,35,47,36,44,65,4,15,11,35,48,36,44,65,4,15,11,35,47,35,48,16,32,16,137,1,65,255,1,113,36,44,65,8,15,11,35,42,36,44,65,4,15,11,65,127,11,211,1,0,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,32,0,65,208,0,107,14,16,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,0,11,12,16,11,35,43,36,45,65,4,15,11,35,44,36,45,65,4,15,11,65,4,15,11,35,46,36,45,65,4,15,11,35,47,36,45,65,4,15,11,35,48,36,45,65,4,15,11,35,47,35,48,16,32,16,137,1,65,255,1,113,36,45,65,8,15,11,35,42,36,45,65,4,15,11,35,43,36,46,65,4,15,11,35,44,36,46,65,4,15,11,35,45,36,46,65,4,15,11,65,4,15,11,35,47,36,46,65,4,15,11,35,48,36,46,65,4,15,11,35,47,35,48,16,32,16,137,1,65,255,1,113,36,46,65,4,15,11,35,42,36,46,65,4,15,11,65,127,11,211,1,0,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,32,0,65,224,0,107,14,16,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,0,11,12,16,11,35,43,36,47,65,8,15,11,35,44,36,47,65,4,15,11,35,45,36,47,65,4,15,11,35,46,36,47,65,4,15,11,65,4,15,11,35,48,36,47,65,4,15,11,35,47,35,48,16,32,16,137,1,65,255,1,113,36,47,65,8,15,11,35,42,36,47,65,4,15,11,35,43,36,48,65,4,15,11,35,44,36,48,65,4,15,11,35,45,36,48,65,4,15,11,35,46,36,48,65,4,15,11,35,47,36,48,65,4,15,11,65,4,15,11,35,47,35,48,16,32,16,137,1,65,255,1,113,36,48,65,8,15,11,35,42,36,48,65,4,15,11,65,127,11,132,2,0,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,32,0,65,240,0,107,14,16,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,0,11,12,16,11,35,47,35,48,16,32,35,43,16,155,1,65,8,15,11,35,47,35,48,16,32,35,44,16,155,1,65,8,15,11,35,47,35,48,16,32,35,45,16,155,1,65,8,15,11,35,47,35,48,16,32,35,46,16,155,1,65,8,15,11,35,47,35,48,16,32,35,47,16,155,1,65,8,15,11,35,47,35,48,16,32,35,48,16,155,1,65,8,15,11,35,185,1,69,4,64,65,1,36,70,11,65,4,15,11,35,47,35,48,16,32,35,42,16,155,1,65,8,15,11,35,43,36,42,65,4,15,11,35,44,36,42,65,4,15,11,35,45,36,42,65,4,15,11,35,46,36,42,65,4,15,11,35,47,36,42,65,4,15,11,35,48,36,42,65,4,15,11,35,47,35,48,16,32,16,137,1,65,255,1,113,36,42,65,8,15,11,65,4,15,11,65,127,11,75,1,1,127,32,1,65,0,78,4,64,32,0,32,0,32,1,65,255,1,113,106,65,255,1,113,75,4,64,65,1,16,161,1,5,65,0,16,161,1,11,5,32,1,34,2,65,0,32,2,107,32,2,65,0,74,27,32,0,74,4,64,65,1,16,161,1,5,65,0,16,161,1,11,11,11,48,0,35,42,32,0,16,158,1,35,42,32,0,16,181,1,35,42,32,0,106,65,255,1,113,36,42,35,42,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,0,16,160,1,11,99,1,1,127,35,42,32,0,106,16,167,1,106,65,255,1,113,33,1,35,42,32,0,115,32,1,115,65,16,113,4,64,65,1,16,157,1,5,65,0,16,157,1,11,35,42,32,0,106,16,167,1,106,65,128,2,113,65,0,75,4,64,65,1,16,161,1,5,65,0,16,161,1,11,32,1,36,42,35,42,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,0,16,160,1,11,235,1,0,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,32,0,65,128,1,107,14,16,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,0,11,12,16,11,35,43,16,182,1,65,4,15,11,35,44,16,182,1,65,4,15,11,35,45,16,182,1,65,4,15,11,35,46,16,182,1,65,4,15,11,35,47,16,182,1,65,4,15,11,35,48,16,182,1,65,4,15,11,35,47,35,48,16,32,16,137,1,65,255,1,113,16,182,1,65,8,15,11,35,42,16,182,1,65,4,15,11,35,43,16,183,1,65,4,15,11,35,44,16,183,1,65,4,15,11,35,45,16,183,1,65,4,15,11,35,46,16,183,1,65,4,15,11,35,47,16,183,1,65,4,15,11,35,48,16,183,1,65,4,15,11,35,47,35,48,16,32,16,137,1,65,255,1,113,16,183,1,65,8,15,11,35,42,16,183,1,65,4,15,11,65,127,11,55,1,1,127,35,42,32,0,65,127,108,34,1,16,158,1,35,42,32,1,16,181,1,35,42,32,0,107,65,255,1,113,36,42,35,42,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,1,16,160,1,11,99,1,1,127,35,42,32,0,107,16,167,1,107,65,255,1,113,33,1,35,42,32,0,115,32,1,115,65,16,113,4,64,65,1,16,157,1,5,65,0,16,157,1,11,35,42,32,0,107,16,167,1,107,65,128,2,113,65,0,75,4,64,65,1,16,161,1,5,65,0,16,161,1,11,32,1,36,42,35,42,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,1,16,160,1,11,235,1,0,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,32,0,65,144,1,107,14,16,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,0,11,12,16,11,35,43,16,185,1,65,4,15,11,35,44,16,185,1,65,4,15,11,35,45,16,185,1,65,4,15,11,35,46,16,185,1,65,4,15,11,35,47,16,185,1,65,4,15,11,35,48,16,185,1,65,4,15,11,35,47,35,48,16,32,16,137,1,65,255,1,113,16,185,1,65,8,15,11,35,42,16,185,1,65,4,15,11,35,43,16,186,1,65,4,15,11,35,44,16,186,1,65,4,15,11,35,45,16,186,1,65,4,15,11,35,46,16,186,1,65,4,15,11,35,47,16,186,1,65,4,15,11,35,48,16,186,1,65,4,15,11,35,47,35,48,16,32,16,137,1,65,255,1,113,16,186,1,65,8,15,11,35,42,16,186,1,65,4,15,11,65,127,11,44,0,35,42,32,0,113,65,255,1,113,36,42,35,42,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,0,16,160,1,65,1,16,157,1,65,0,16,161,1,11,44,0,35,42,32,0,115,65,255,1,113,36,42,35,42,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,0,16,160,1,65,0,16,157,1,65,0,16,161,1,11,235,1,0,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,32,0,65,160,1,107,14,16,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,0,11,12,16,11,35,43,16,188,1,65,4,15,11,35,44,16,188,1,65,4,15,11,35,45,16,188,1,65,4,15,11,35,46,16,188,1,65,4,15,11,35,47,16,188,1,65,4,15,11,35,48,16,188,1,65,4,15,11,35,47,35,48,16,32,16,137,1,65,255,1,113,16,188,1,65,8,15,11,35,42,16,188,1,65,4,15,11,35,43,16,189,1,65,4,15,11,35,44,16,189,1,65,4,15,11,35,45,16,189,1,65,4,15,11,35,46,16,189,1,65,4,15,11,35,47,16,189,1,65,4,15,11,35,48,16,189,1,65,4,15,11,35,47,35,48,16,32,16,137,1,65,255,1,113,16,189,1,65,8,15,11,35,42,16,189,1,65,4,15,11,65,127,11,44,0,35,42,32,0,114,65,255,1,113,36,42,35,42,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,0,16,160,1,65,0,16,157,1,65,0,16,161,1,11,47,1,1,127,35,42,32,0,65,127,108,34,1,16,158,1,35,42,32,1,16,181,1,35,42,32,1,106,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,1,16,160,1,11,235,1,0,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,32,0,65,176,1,107,14,16,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,0,11,12,16,11,35,43,16,191,1,65,4,15,11,35,44,16,191,1,65,4,15,11,35,45,16,191,1,65,4,15,11,35,46,16,191,1,65,4,15,11,35,47,16,191,1,65,4,15,11,35,48,16,191,1,65,4,15,11,35,47,35,48,16,32,16,137,1,65,255,1,113,16,191,1,65,8,15,11,35,42,16,191,1,65,4,15,11,35,43,16,192,1,65,4,15,11,35,44,16,192,1,65,4,15,11,35,45,16,192,1,65,4,15,11,35,46,16,192,1,65,4,15,11,35,47,16,192,1,65,4,15,11,35,48,16,192,1,65,4,15,11,35,47,35,48,16,32,16,137,1,65,255,1,113,16,192,1,65,8,15,11,35,42,16,192,1,65,4,15,11,65,127,11,63,1,2,127,2,64,2,64,32,0,16,136,1,34,1,65,127,71,13,1,32,0,16,7,33,1,11,11,2,64,2,64,32,0,65,1,106,34,2,16,136,1,34,0,65,127,71,13,1,32,2,16,7,33,0,11,11,32,0,32,1,16,32,11,59,0,32,0,65,128,1,113,65,128,1,70,4,64,65,1,16,161,1,5,65,0,16,161,1,11,32,0,16,162,1,34,0,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,0,16,160,1,65,0,16,157,1,32,0,11,57,0,32,0,65,1,113,65,0,75,4,64,65,1,16,161,1,5,65,0,16,161,1,11,32,0,16,165,1,34,0,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,0,16,160,1,65,0,16,157,1,32,0,11,72,1,1,127,32,0,65,128,1,113,65,128,1,70,4,64,65,1,33,1,11,32,0,16,168,1,33,0,32,1,4,64,65,1,16,161,1,5,65,0,16,161,1,11,32,0,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,0,16,160,1,65,0,16,157,1,32,0,11,70,1,1,127,32,0,65,1,113,65,1,70,4,64,65,1,33,1,11,32,0,16,170,1,33,0,32,1,4,64,65,1,16,161,1,5,65,0,16,161,1,11,32,0,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,0,16,160,1,65,0,16,157,1,32,0,11,76,1,1,127,32,0,65,128,1,113,65,128,1,70,4,64,65,1,33,1,11,32,0,65,1,116,65,255,1,113,33,0,32,1,4,64,65,1,16,161,1,5,65,0,16,161,1,11,32,0,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,0,16,160,1,65,0,16,157,1,32,0,11,104,1,2,127,32,0,65,128,1,113,65,128,1,70,4,64,65,1,33,1,11,32,0,65,1,113,65,1,70,4,64,65,1,33,2,11,32,0,65,1,118,33,0,32,1,4,64,32,0,65,128,1,114,65,255,1,113,33,0,11,32,0,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,0,16,160,1,65,0,16,157,1,32,2,4,64,65,1,16,161,1,5,65,0,16,161,1,11,32,0,11,53,0,32,0,65,15,113,65,4,116,32,0,65,240,1,113,65,4,118,114,34,0,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,0,16,160,1,65,0,16,157,1,65,0,16,161,1,32,0,11,68,1,1,127,32,0,65,1,113,65,1,70,4,64,65,1,33,1,11,32,0,65,1,118,34,0,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,0,16,160,1,65,0,16,157,1,32,1,4,64,65,1,16,161,1,5,65,0,16,161,1,11,32,0,11,40,0,32,1,65,1,32,0,116,65,255,1,113,113,4,64,65,0,16,159,1,5,65,1,16,159,1,11,65,0,16,160,1,65,1,16,157,1,32,1,11,48,0,32,1,65,0,74,4,127,32,2,65,1,32,0,116,65,255,1,113,114,65,255,1,113,5,32,2,65,1,32,0,116,65,255,1,113,65,127,115,65,255,1,113,113,11,34,2,11,194,8,1,5,127,65,127,33,4,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,32,0,65,8,111,34,5,14,8,1,2,3,4,5,6,7,8,0,11,12,8,11,35,43,33,1,12,7,11,35,44,33,1,12,6,11,35,45,33,1,12,5,11,35,46,33,1,12,4,11,35,47,33,1,12,3,11,35,48,33,1,12,2,11,35,47,35,48,16,32,16,137,1,65,255,1,113,33,1,12,1,11,35,42,33,1,11,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,32,0,65,240,1,113,65,4,117,14,16,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,0,11,12,16,11,32,0,65,7,76,4,64,32,1,16,195,1,33,2,65,1,33,3,5,32,0,65,15,76,4,64,32,1,16,196,1,33,2,65,1,33,3,11,11,12,15,11,32,0,65,23,76,4,64,32,1,16,197,1,33,2,65,1,33,3,5,32,0,65,31,76,4,64,32,1,16,198,1,33,2,65,1,33,3,11,11,12,14,11,32,0,65,39,76,4,64,32,1,16,199,1,33,2,65,1,33,3,5,32,0,65,47,76,4,64,32,1,16,200,1,33,2,65,1,33,3,11,11,12,13,11,32,0,65,55,76,4,64,32,1,16,201,1,33,2,65,1,33,3,5,32,0,65,63,76,4,64,32,1,16,202,1,33,2,65,1,33,3,11,11,12,12,11,32,0,65,199,0,76,4,64,65,0,32,1,16,203,1,33,2,65,1,33,3,5,32,0,65,207,0,76,4,64,65,1,32,1,16,203,1,33,2,65,1,33,3,11,11,12,11,11,32,0,65,215,0,76,4,64,65,2,32,1,16,203,1,33,2,65,1,33,3,5,32,0,65,223,0,76,4,64,65,3,32,1,16,203,1,33,2,65,1,33,3,11,11,12,10,11,32,0,65,231,0,76,4,64,65,4,32,1,16,203,1,33,2,65,1,33,3,5,32,0,65,239,0,76,4,64,65,5,32,1,16,203,1,33,2,65,1,33,3,11,11,12,9,11,32,0,65,247,0,76,4,64,65,6,32,1,16,203,1,33,2,65,1,33,3,5,32,0,65,255,0,76,4,64,65,7,32,1,16,203,1,33,2,65,1,33,3,11,11,12,8,11,32,0,65,135,1,76,4,64,65,0,65,0,32,1,16,204,1,33,2,65,1,33,3,5,32,0,65,143,1,76,4,64,65,1,65,0,32,1,16,204,1,33,2,65,1,33,3,11,11,12,7,11,32,0,65,151,1,76,4,64,65,2,65,0,32,1,16,204,1,33,2,65,1,33,3,5,32,0,65,159,1,76,4,64,65,3,65,0,32,1,16,204,1,33,2,65,1,33,3,11,11,12,6,11,32,0,65,167,1,76,4,64,65,4,65,0,32,1,16,204,1,33,2,65,1,33,3,5,32,0,65,175,1,76,4,64,65,5,65,0,32,1,16,204,1,33,2,65,1,33,3,11,11,12,5,11,32,0,65,183,1,76,4,64,65,6,65,0,32,1,16,204,1,33,2,65,1,33,3,5,32,0,65,191,1,76,4,64,65,7,65,0,32,1,16,204,1,33,2,65,1,33,3,11,11,12,4,11,32,0,65,199,1,76,4,64,65,0,65,1,32,1,16,204,1,33,2,65,1,33,3,5,32,0,65,207,1,76,4,64,65,1,65,1,32,1,16,204,1,33,2,65,1,33,3,11,11,12,3,11,32,0,65,215,1,76,4,64,65,2,65,1,32,1,16,204,1,33,2,65,1,33,3,5,32,0,65,223,1,76,4,64,65,3,65,1,32,1,16,204,1,33,2,65,1,33,3,11,11,12,2,11,32,0,65,231,1,76,4,64,65,4,65,1,32,1,16,204,1,33,2,65,1,33,3,5,32,0,65,239,1,76,4,64,65,5,65,1,32,1,16,204,1,33,2,65,1,33,3,11,11,12,1,11,32,0,65,247,1,76,4,64,65,6,65,1,32,1,16,204,1,33,2,65,1,33,3,5,32,0,65,255,1,76,4,64,65,7,65,1,32,1,16,204,1,33,2,65,1,33,3,11,11,11,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,32,5,14,8,1,2,3,4,5,6,7,8,0,11,12,8,11,32,2,36,43,12,7,11,32,2,36,44,12,6,11,32,2,36,45,12,5,11,32,2,36,46,12,4,11,32,2,36,47,12,3,11,32,2,36,48,12,2,11,35,47,35,48,16,32,32,2,16,155,1,12,1,11,32,2,36,42,11,35,50,65,1,106,65,255,255,3,113,36,50,32,3,4,64,65,8,33,4,32,5,65,6,70,4,64,65,16,33,4,11,11,32,4,11,213,4,1,1,127,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,32,0,65,192,1,107,14,16,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,0,11,12,16,11,16,172,1,4,64,65,8,15,5,35,51,16,194,1,65,255,255,3,113,36,50,35,51,65,2,106,65,255,255,3,113,36,51,65,20,15,11,0,11,35,51,16,194,1,33,1,35,51,65,2,106,65,255,255,3,113,36,51,32,1,16,59,65,255,1,113,36,43,32,1,16,60,65,255,1,113,36,44,65,12,15,11,16,172,1,4,64,35,50,65,2,106,65,255,255,3,113,36,50,65,12,15,5,16,58,36,50,65,16,15,11,0,11,16,58,36,50,65,16,15,11,16,172,1,4,64,35,50,65,2,106,65,255,255,3,113,36,50,65,12,15,5,35,51,65,2,107,65,255,255,3,113,36,51,35,51,35,50,65,2,106,65,255,255,3,113,16,163,1,16,58,36,50,65,24,15,11,0,11,35,51,65,2,107,65,255,255,3,113,36,51,35,51,35,43,35,44,16,32,16,163,1,65,16,15,11,16,27,16,182,1,35,50,65,1,106,65,255,255,3,113,36,50,65,8,15,11,35,51,65,2,107,65,255,255,3,113,36,51,35,51,35,50,16,163,1,65,0,36,50,65,16,15,11,16,172,1,65,1,70,4,64,35,51,16,194,1,65,255,255,3,113,36,50,35,51,65,2,106,65,255,255,3,113,36,51,65,20,15,5,65,8,15,11,0,11,35,51,16,194,1,65,255,255,3,113,36,50,35,51,65,2,106,65,255,255,3,113,36,51,65,16,15,11,16,172,1,65,1,70,4,64,16,58,36,50,65,16,15,5,35,50,65,2,106,65,255,255,3,113,36,50,65,12,15,11,0,11,16,27,16,205,1,34,1,65,0,74,4,64,32,1,65,4,106,33,1,11,32,1,15,11,16,172,1,65,1,70,4,64,35,51,65,2,107,65,255,255,3,113,36,51,35,51,35,50,65,2,106,65,255,255,3,113,16,163,1,16,58,36,50,65,24,15,5,35,50,65,2,106,65,255,255,3,113,36,50,65,12,15,11,0,11,35,51,65,2,107,65,255,255,3,113,36,51,35,51,35,50,65,2,106,65,255,255,3,113,16,163,1,16,58,36,50,65,24,15,11,16,27,16,183,1,35,50,65,1,106,65,255,255,3,113,36,50,65,8,15,11,35,51,65,2,107,65,255,255,3,113,36,51,35,51,35,50,16,163,1,65,8,36,50,65,16,15,11,65,127,11,7,0,32,0,36,208,1,11,145,4,1,1,127,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,32,0,65,208,1,107,14,16,1,2,3,0,4,5,6,7,8,9,10,0,11,0,12,13,0,11,12,13,11,16,167,1,4,64,65,8,15,5,35,51,16,194,1,65,255,255,3,113,36,50,35,51,65,2,106,65,255,255,3,113,36,51,65,20,15,11,0,11,35,51,16,194,1,33,1,35,51,65,2,106,65,255,255,3,113,36,51,32,1,16,59,65,255,1,113,36,45,32,1,16,60,65,255,1,113,36,46,65,12,15,11,16,167,1,4,64,35,50,65,2,106,65,255,255,3,113,36,50,65,12,15,5,16,58,36,50,65,16,15,11,0,11,16,167,1,4,64,35,50,65,2,106,65,255,255,3,113,36,50,65,12,15,5,35,51,65,2,107,65,255,255,3,113,36,51,35,51,35,50,65,2,106,65,255,255,3,113,16,163,1,16,58,36,50,65,24,15,11,0,11,35,51,65,2,107,65,255,255,3,113,36,51,35,51,35,45,35,46,16,32,16,163,1,65,16,15,11,16,27,16,185,1,35,50,65,1,106,65,255,255,3,113,36,50,65,8,15,11,35,51,65,2,107,65,255,255,3,113,36,51,35,51,35,50,16,163,1,65,16,36,50,65,16,15,11,16,167,1,65,1,70,4,64,35,51,16,194,1,65,255,255,3,113,36,50,35,51,65,2,106,65,255,255,3,113,36,51,65,20,15,5,65,8,15,11,0,11,35,51,16,194,1,65,255,255,3,113,36,50,65,1,16,207,1,35,51,65,2,106,65,255,255,3,113,36,51,65,16,15,11,16,167,1,65,1,70,4,64,16,58,36,50,65,16,15,5,35,50,65,2,106,65,255,255,3,113,36,50,65,12,15,11,0,11,16,167,1,65,1,70,4,64,35,51,65,2,107,65,255,255,3,113,36,51,35,51,35,50,65,2,106,65,255,255,3,113,16,163,1,16,58,36,50,65,24,15,5,35,50,65,2,106,65,255,255,3,113,36,50,65,12,15,11,0,11,16,27,16,186,1,35,50,65,1,106,65,255,255,3,113,36,50,65,8,15,11,35,51,65,2,107,65,255,255,3,113,36,51,35,51,35,50,16,163,1,65,24,36,50,65,16,15,11,65,127,11,240,2,1,1,127,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,32,0,65,224,1,107,14,16,1,2,3,0,0,4,5,6,7,8,9,0,0,0,10,11,0,11,12,11,11,16,27,65,128,254,3,106,35,42,16,155,1,35,50,65,1,106,65,255,255,3,113,36,50,65,12,15,11,35,51,16,194,1,33,1,35,51,65,2,106,65,255,255,3,113,36,51,32,1,16,59,65,255,1,113,36,47,32,1,16,60,65,255,1,113,36,48,65,12,15,11,35,44,65,128,254,3,106,35,42,16,155,1,65,8,15,11,35,51,65,2,107,65,255,255,3,113,36,51,35,51,35,47,35,48,16,32,16,163,1,65,16,15,11,16,27,16,188,1,35,50,65,1,106,65,255,255,3,113,36,50,65,8,15,11,35,51,65,2,107,65,255,255,3,113,36,51,35,51,35,50,16,163,1,65,32,36,50,65,16,15,11,16,27,65,24,116,65,24,117,33,1,35,51,32,1,65,1,16,164,1,35,51,32,1,106,65,255,255,3,113,36,51,65,0,16,159,1,65,0,16,160,1,35,50,65,1,106,65,255,255,3,113,36,50,65,16,15,11,35,47,35,48,16,32,65,255,255,3,113,36,50,65,4,15,11,16,58,35,42,16,155,1,35,50,65,2,106,65,255,255,3,113,36,50,65,16,15,11,16,27,16,189,1,35,50,65,1,106,65,255,255,3,113,36,50,65,8,15,11,35,51,65,2,107,65,255,255,3,113,36,51,35,51,35,50,16,163,1,65,40,36,50,65,16,15,11,65,127,11,167,3,0,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,32,0,65,240,1,107,14,16,1,2,3,4,0,5,6,7,8,9,10,11,0,0,12,13,0,11,12,13,11,16,27,65,128,254,3,106,16,137,1,65,255,1,113,36,42,35,50,65,1,106,65,255,255,3,113,36,50,65,12,15,11,35,51,16,194,1,65,255,255,3,113,33,0,35,51,65,2,106,65,255,255,3,113,36,51,32,0,16,59,65,255,1,113,36,42,32,0,16,60,65,255,1,113,36,49,65,12,15,11,35,44,65,128,254,3,106,16,137,1,65,255,1,113,36,42,65,8,15,11,65,0,16,207,1,65,4,15,11,35,51,65,2,107,65,255,255,3,113,36,51,35,51,35,42,35,49,16,32,16,163,1,65,16,15,11,16,27,16,191,1,35,50,65,1,106,65,255,255,3,113,36,50,65,8,15,11,35,51,65,2,107,65,255,255,3,113,36,51,35,51,35,50,16,163,1,65,48,36,50,65,16,15,11,16,27,65,24,116,65,24,117,33,0,65,0,16,159,1,65,0,16,160,1,35,51,32,0,65,1,16,164,1,35,51,32,0,106,65,255,255,3,113,34,0,16,59,65,255,1,113,36,47,32,0,16,60,65,255,1,113,36,48,35,50,65,1,106,65,255,255,3,113,36,50,65,12,15,11,35,47,35,48,16,32,65,255,255,3,113,36,51,65,8,15,11,16,58,16,137,1,65,255,1,113,36,42,35,50,65,2,106,65,255,255,3,113,36,50,65,16,15,11,65,1,16,207,1,65,4,15,11,16,27,16,192,1,35,50,65,1,106,65,255,255,3,113,36,50,65,8,15,11,35,51,65,2,107,65,255,255,3,113,36,51,35,51,35,50,16,163,1,65,56,36,50,65,16,15,11,65,127,11,189,1,0,35,50,65,1,106,65,255,255,3,113,36,50,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,2,64,32,0,65,240,1,113,65,4,117,14,15,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0,11,12,15,11,32,0,16,166,1,15,11,32,0,16,171,1,15,11,32,0,16,175,1,15,11,32,0,16,176,1,15,11,32,0,16,177,1,15,11,32,0,16,178,1,15,11,32,0,16,179,1,15,11,32,0,16,180,1,15,11,32,0,16,184,1,15,11,32,0,16,187,1,15,11,32,0,16,190,1,15,11,32,0,16,193,1,15,11,32,0,16,206,1,15,11,32,0,16,208,1,15,11,32,0,16,209,1,15,11,32,0,16,210,1,11,11,0,35,40,35,207,1,113,65,0,74,11,27,1,1,127,32,1,16,59,33,2,32,0,32,1,16,60,16,9,32,0,65,1,106,32,2,16,9,11,126,1,1,127,65,0,16,207,1,32,0,65,143,254,3,16,7,16,133,1,34,1,36,40,65,143,254,3,32,1,16,9,35,51,65,2,107,65,255,255,3,113,36,51,35,51,35,50,16,213,1,2,64,2,64,2,64,2,64,2,64,2,64,32,0,14,5,1,2,3,0,4,0,11,12,4,11,65,0,36,201,1,65,192,0,36,50,12,3,11,65,0,36,202,1,65,200,0,36,50,12,2,11,65,0,36,200,1,65,208,0,36,50,12,1,11,65,0,36,33,65,224,0,36,50,11,11,187,1,1,1,127,35,208,1,4,127,35,207,1,65,0,74,5,35,208,1,11,65,1,113,34,0,4,127,35,40,65,0,74,5,32,0,11,65,1,113,4,64,65,0,33,0,35,203,1,4,127,35,201,1,5,35,203,1,11,65,1,113,4,64,65,0,16,214,1,65,1,33,0,5,35,204,1,4,127,35,202,1,5,35,204,1,11,65,1,113,4,64,65,1,16,214,1,65,1,33,0,5,35,205,1,4,127,35,200,1,5,35,205,1,11,65,1,113,4,64,65,2,16,214,1,65,1,33,0,5,35,206,1,4,127,35,33,5,35,206,1,11,65,1,113,4,64,65,4,16,214,1,65,1,33,0,11,11,11,11,32,0,4,64,65,20,33,0,35,70,4,64,65,0,36,70,65,24,33,0,11,32,0,15,11,11,65,0,11,14,0,35,68,4,64,65,144,7,15,11,65,200,3,11,5,0,16,216,1,11,14,0,32,1,65,160,1,108,32,0,106,65,3,108,11,22,0,32,0,32,1,16,218,1,65,128,216,5,106,32,2,106,32,3,58,0,0,11,16,0,32,0,32,1,16,38,65,128,160,4,106,45,0,0,11,180,2,1,3,127,32,1,65,0,74,34,5,4,127,32,0,65,8,74,5,32,5,11,65,1,113,34,5,4,127,32,6,35,211,1,70,5,32,5,11,65,1,113,34,5,4,127,32,0,35,212,1,70,5,32,5,11,65,1,113,4,64,65,0,33,5,65,0,33,6,65,5,32,4,65,1,107,16,7,16,29,4,64,65,1,33,5,11,65,5,32,4,16,7,16,29,4,64,65,1,33,6,11,65,0,33,3,3,64,32,3,65,8,72,4,64,32,5,32,6,71,4,64,65,7,32,3,107,33,3,11,32,0,32,3,106,65,160,1,76,4,64,32,0,65,8,32,3,107,107,33,8,32,0,32,3,106,32,1,16,218,1,65,128,216,5,106,33,9,65,0,33,4,3,64,32,4,65,3,72,4,64,32,0,32,3,106,32,1,32,4,32,9,32,4,106,45,0,0,16,219,1,32,4,65,1,106,33,4,12,1,11,11,32,0,32,3,106,32,1,65,2,32,8,32,1,16,220,1,34,4,16,133,1,65,2,32,4,16,29,16,39,32,7,65,1,106,33,7,11,32,3,65,1,106,33,3,12,1,11,11,5,32,6,36,211,1,11,32,0,35,212,1,78,4,64,32,0,65,8,106,36,212,1,32,0,32,2,65,8,111,34,6,72,4,64,35,212,1,32,6,106,36,212,1,11,11,32,7,11,133,1,1,3,127,32,3,65,8,111,33,3,32,0,69,4,64,32,2,32,2,65,8,109,65,8,108,107,33,7,11,65,7,33,8,32,0,65,8,106,65,160,1,74,4,64,65,160,1,32,0,107,33,8,11,65,127,33,2,35,36,4,64,65,3,32,4,65,1,16,28,34,2,65,255,1,113,16,29,4,64,65,1,33,9,11,65,6,32,2,16,29,4,64,65,7,32,3,107,33,3,11,11,32,6,32,5,32,9,32,7,32,8,32,3,32,0,32,1,65,160,1,65,128,216,5,65,0,65,0,32,2,16,40,11,230,1,1,1,127,32,5,32,6,16,30,33,6,32,4,65,1,16,28,33,4,32,3,65,8,111,33,3,65,6,32,4,16,29,4,64,65,7,32,3,107,33,3,11,65,0,33,5,65,3,32,4,16,29,4,64,65,1,33,5,11,32,6,32,3,65,2,108,106,32,5,16,28,33,7,32,6,32,3,65,2,108,106,65,1,106,32,5,16,28,33,5,32,2,65,8,111,33,3,65,5,32,4,16,29,69,4,64,65,7,32,3,107,33,3,11,65,0,33,2,32,3,32,5,16,29,4,64,65,2,33,2,11,32,3,32,7,16,29,4,64,32,2,65,1,106,33,2,11,65,0,32,4,65,7,113,32,2,65,0,16,33,34,3,16,34,33,5,65,1,32,3,16,34,33,6,65,2,32,3,16,34,33,3,32,0,32,1,65,0,32,5,16,219,1,32,0,32,1,65,1,32,6,16,219,1,32,0,32,1,65,2,32,3,16,219,1,32,0,32,1,32,2,65,7,32,4,16,29,16,39,11,142,1,0,32,4,32,5,16,30,34,4,32,3,65,8,111,34,3,65,2,108,106,65,0,16,28,33,5,32,4,32,3,65,2,108,106,65,1,106,65,0,16,28,33,4,65,0,33,3,65,7,32,2,65,8,111,107,34,2,32,4,16,29,4,64,65,2,33,3,11,32,2,32,5,16,29,4,64,32,3,65,1,106,65,255,1,113,33,3,11,32,0,32,1,65,0,32,3,65,199,254,3,65,0,16,35,34,2,16,219,1,32,0,32,1,65,1,32,2,16,219,1,32,0,32,1,65,2,32,2,16,219,1,32,0,32,1,32,3,65,0,16,39,11,221,1,1,6,127,32,3,65,3,117,33,11,3,64,32,4,65,160,1,72,4,64,32,4,32,5,106,34,6,65,128,2,78,4,64,32,6,65,128,2,107,33,6,11,32,2,32,11,65,32,108,106,32,6,65,3,117,106,34,8,65,0,16,28,33,7,65,0,33,9,35,20,4,64,32,4,32,0,32,6,32,3,32,8,32,1,32,7,16,221,1,34,10,65,0,74,4,64,32,4,32,10,65,1,107,106,33,4,65,1,33,9,11,11,35,19,4,127,32,9,69,5,35,19,11,65,1,113,4,64,32,4,32,0,32,6,32,3,32,8,32,1,32,7,16,222,1,34,10,65,0,74,4,64,32,4,32,10,65,1,107,106,33,4,11,5,32,9,69,4,64,35,36,4,64,32,4,32,0,32,6,32,3,32,8,32,1,32,7,16,223,1,5,32,4,32,0,32,6,32,3,32,1,32,7,16,224,1,11,11,11,32,4,65,1,106,33,4,12,1,11,11,11,43,1,1,127,32,0,35,181,1,106,34,3,65,128,2,78,4,64,32,3,65,128,2,107,33,3,11,32,0,32,1,32,2,32,3,65,0,35,180,1,16,225,1,11,47,1,2,127,35,182,1,33,3,32,0,35,183,1,34,4,72,4,64,15,11,32,0,32,1,32,2,32,0,32,4,107,32,3,65,7,107,34,3,32,3,65,127,108,16,225,1,11,128,5,1,14,127,65,39,33,8,3,64,32,8,65,0,78,4,64,32,8,65,4,108,34,4,65,128,252,3,106,16,7,33,3,32,4,65,129,252,3,106,16,7,33,9,32,4,65,130,252,3,106,16,7,33,2,32,3,65,16,107,33,3,32,9,65,8,107,33,9,65,8,33,5,32,1,4,64,65,16,33,5,32,2,65,2,111,65,1,70,4,64,32,2,65,1,107,33,2,11,11,32,0,32,3,78,34,7,4,127,32,0,32,3,32,5,106,72,5,32,7,11,65,1,113,4,64,65,7,32,4,65,131,252,3,106,16,7,34,7,16,29,33,10,65,6,32,7,16,29,33,4,65,5,32,7,16,29,33,13,32,0,32,3,107,33,3,32,4,4,64,32,3,32,5,107,65,127,108,65,1,107,33,3,11,65,128,128,2,32,2,16,30,32,3,65,2,108,106,33,3,65,0,33,2,35,36,4,127,65,3,32,7,16,29,5,35,36,11,65,1,113,4,64,65,1,33,2,11,32,3,32,2,16,28,33,14,32,3,65,1,106,32,2,16,28,33,15,65,7,33,3,3,64,32,3,65,0,78,4,64,32,3,33,2,32,13,4,64,32,2,65,7,107,65,127,108,33,2,11,65,0,33,4,32,2,32,15,16,29,4,64,65,2,33,4,11,32,2,32,14,16,29,4,64,32,4,65,1,106,33,4,11,32,4,4,64,32,9,65,7,32,3,107,106,34,5,65,0,78,34,6,4,127,32,5,65,160,1,76,5,32,6,11,65,1,113,4,64,65,0,33,6,65,0,33,11,65,0,33,12,35,36,4,127,35,177,1,69,5,35,36,11,65,1,113,4,64,65,1,33,6,11,32,6,69,4,64,32,5,32,0,16,220,1,33,2,32,10,4,127,32,2,65,3,113,65,0,74,5,32,10,11,65,1,113,4,64,65,1,33,11,5,35,36,4,127,65,2,32,2,16,29,5,35,36,11,65,1,113,4,64,65,1,33,12,11,11,11,32,6,4,127,32,6,5,32,11,69,34,2,4,127,32,12,69,5,32,2,11,65,1,113,11,65,1,113,4,64,35,36,4,64,65,0,32,7,65,7,113,32,4,65,1,16,33,34,2,16,34,33,4,65,1,32,2,16,34,33,6,65,2,32,2,16,34,33,2,32,5,32,0,65,0,32,4,16,219,1,32,5,32,0,65,1,32,6,16,219,1,32,5,32,0,65,2,32,2,16,219,1,5,65,200,254,3,33,2,65,4,32,7,16,29,4,64,65,201,254,3,33,2,11,32,5,32,0,65,0,32,4,32,2,65,0,16,35,34,2,16,219,1,32,5,32,0,65,1,32,2,16,219,1,32,5,32,0,65,2,32,2,16,219,1,11,11,11,11,32,3,65,1,107,33,3,12,1,11,11,11,32,8,65,1,107,33,8,12,1,11,11,11,111,1,2,127,65,128,144,2,33,2,35,52,4,64,65,128,128,2,33,2,11,35,36,4,127,35,36,5,35,177,1,11,65,1,113,4,64,65,128,176,2,33,1,35,53,4,64,65,128,184,2,33,1,11,32,0,32,2,32,1,16,226,1,11,35,174,1,4,64,65,128,176,2,33,1,35,173,1,4,64,65,128,184,2,33,1,11,32,0,32,2,32,1,16,227,1,11,35,176,1,4,64,32,0,35,175,1,16,228,1,11,11,34,1,1,127,3,64,32,0,65,144,1,77,4,64,32,0,16,229,1,32,0,65,1,106,65,255,1,113,33,0,12,1,11,11,11,66,1,2,127,3,64,32,0,65,144,1,72,4,64,65,0,33,1,3,64,32,1,65,160,1,72,4,64,32,1,32,0,16,38,65,128,160,4,106,65,0,58,0,0,32,1,65,1,106,33,1,12,1,11,11,32,0,65,1,106,33,0,12,1,11,11,11,12,0,65,127,36,211,1,65,127,36,212,1,11,14,0,35,68,4,64,65,240,5,15,11,65,248,2,11,14,0,35,68,4,64,65,242,3,15,11,65,249,1,11,11,0,65,1,36,202,1,65,1,16,10,11,108,1,1,127,35,185,1,69,4,64,15,11,35,190,1,65,16,34,0,72,4,64,35,190,1,33,0,11,35,191,1,35,192,1,32,0,16,138,1,35,191,1,32,0,106,36,191,1,35,192,1,32,0,106,36,192,1,35,190,1,32,0,107,36,190,1,35,190,1,65,0,76,4,64,65,0,36,185,1,35,184,1,65,255,1,16,9,5,35,184,1,65,7,35,190,1,65,16,109,65,1,107,16,133,1,16,9,11,11,11,0,65,1,36,201,1,65,0,16,10,11,216,2,1,5,127,35,172,1,69,4,64,65,0,36,210,1,65,0,36,59,65,196,254,3,65,0,16,9,65,0,65,1,65,193,254,3,16,7,16,133,1,16,133,1,33,3,65,0,36,73,65,193,254,3,32,3,16,9,15,11,35,73,33,2,35,59,34,3,65,144,1,78,4,64,65,1,33,1,5,35,210,1,16,233,1,78,4,64,65,2,33,1,5,35,210,1,16,234,1,78,4,64,65,3,33,1,11,11,11,32,2,32,1,71,4,64,65,193,254,3,16,7,33,0,32,1,36,73,65,0,33,2,2,64,2,64,2,64,2,64,2,64,2,64,32,1,14,4,1,2,3,4,0,11,12,4,11,65,3,65,1,65,0,32,0,16,133,1,16,133,1,34,0,16,29,33,2,12,3,11,65,4,65,0,65,1,32,0,16,133,1,16,8,34,0,16,29,33,2,12,2,11,65,5,65,1,65,0,32,0,16,133,1,16,8,34,0,16,29,33,2,12,1,11,65,1,65,0,32,0,16,8,16,8,33,0,11,32,2,4,64,16,235,1,11,32,1,69,4,64,16,236,1,11,32,1,65,1,70,4,64,16,237,1,11,35,178,1,33,2,32,1,69,34,4,4,127,32,4,5,32,1,65,1,70,11,65,1,113,34,4,4,127,32,3,32,2,70,5,32,4,11,65,1,113,4,64,65,6,65,2,32,0,16,8,34,0,16,29,4,64,16,235,1,11,5,65,2,32,0,16,133,1,33,0,11,65,193,254,3,32,0,16,9,11,11,115,1,1,127,35,172,1,4,64,35,210,1,32,0,106,36,210,1,35,210,1,16,216,1,78,4,64,35,210,1,16,216,1,107,36,210,1,35,59,34,1,65,144,1,70,4,64,35,17,4,64,16,230,1,5,32,1,16,229,1,11,16,231,1,16,232,1,5,32,1,65,144,1,72,4,64,35,17,69,4,64,32,1,16,229,1,11,11,11,32,1,65,153,1,74,4,127,65,0,5,32,1,65,1,106,11,34,1,36,59,11,11,16,238,1,11,44,0,35,209,1,16,217,1,72,4,64,15,11,3,64,35,209,1,16,217,1,78,4,64,16,217,1,16,239,1,35,209,1,16,217,1,107,36,209,1,12,1,11,11,11,238,1,1,2,127,65,1,36,54,65,4,33,0,35,70,69,34,1,4,127,35,21,69,5,32,1,11,65,1,113,4,64,35,50,16,7,65,255,1,113,16,211,1,33,0,5,35,70,4,127,35,208,1,69,5,35,70,11,65,1,113,34,1,4,127,16,212,1,5,32,1,11,65,1,113,4,64,65,0,36,70,65,0,36,21,35,50,16,7,65,255,1,113,16,211,1,33,0,35,50,65,1,107,65,255,255,3,113,36,50,11,11,35,49,65,240,1,113,36,49,32,0,65,0,76,4,64,32,0,15,11,35,179,1,65,0,74,4,64,32,0,35,179,1,106,33,0,65,0,36,179,1,11,32,0,16,215,1,106,33,0,35,69,32,0,106,36,69,35,21,69,4,64,35,15,4,64,35,209,1,32,0,106,36,209,1,16,240,1,5,32,0,16,239,1,11,35,14,4,64,35,74,32,0,106,36,74,5,32,0,16,101,11,11,35,16,4,64,35,197,1,32,0,106,36,197,1,16,147,1,5,32,0,16,146,1,11,32,0,11,76,1,2,127,3,64,32,0,69,34,1,4,127,35,69,16,56,72,5,32,1,11,65,1,113,4,64,16,241,1,65,0,72,4,64,65,1,33,0,11,12,1,11,11,35,69,16,56,78,4,64,35,69,16,56,107,36,69,65,1,15,11,35,50,65,1,107,65,255,255,3,113,36,50,65,127,11,14,0,32,0,65,128,8,106,32,1,65,50,108,106,11,22,0,32,1,4,64,32,0,65,1,58,0,0,5,32,0,65,0,58,0,0,11,11,158,1,0,65,0,65,0,16,243,1,35,42,58,0,0,65,1,65,0,16,243,1,35,43,58,0,0,65,2,65,0,16,243,1,35,44,58,0,0,65,3,65,0,16,243,1,35,45,58,0,0,65,4,65,0,16,243,1,35,46,58,0,0,65,5,65,0,16,243,1,35,47,58,0,0,65,6,65,0,16,243,1,35,48,58,0,0,65,7,65,0,16,243,1,35,49,58,0,0,65,8,65,0,16,243,1,35,51,59,1,0,65,10,65,0,16,243,1,35,50,59,1,0,65,12,65,0,16,243,1,35,69,54,2,0,65,17,65,0,16,243,1,35,70,16,244,1,65,18,65,0,16,243,1,35,21,16,244,1,11,35,0,65,0,65,1,16,243,1,35,210,1,54,2,0,65,4,65,1,16,243,1,35,73,58,0,0,65,196,254,3,35,59,16,9,11,28,0,65,0,65,2,16,243,1,35,208,1,16,244,1,65,1,65,2,16,243,1,35,213,1,16,244,1,11,3,0,1,11,110,0,65,0,65,4,16,243,1,35,34,59,1,0,65,2,65,4,16,243,1,35,38,59,1,0,65,4,65,4,16,243,1,35,71,16,244,1,65,5,65,4,16,243,1,35,72,16,244,1,65,6,65,4,16,243,1,35,55,16,244,1,65,7,65,4,16,243,1,35,56,16,244,1,65,8,65,4,16,243,1,35,57,16,244,1,65,9,65,4,16,243,1,35,58,16,244,1,65,10,65,4,16,243,1,35,35,16,244,1,11,56,0,65,0,65,5,16,243,1,35,66,54,2,0,65,4,65,5,16,243,1,35,67,54,2,0,65,8,65,5,16,243,1,35,198,1,54,2,0,65,132,254,3,35,63,16,9,65,133,254,3,35,193,1,16,9,11,39,0,65,0,65,6,16,243,1,35,75,54,2,0,65,4,65,6,16,243,1,35,143,1,58,0,0,65,5,65,6,16,243,1,35,76,58,0,0,11,123,0,65,0,65,7,16,243,1,35,79,16,244,1,65,1,65,7,16,243,1,35,111,54,2,0,65,5,65,7,16,243,1,35,98,54,2,0,65,9,65,7,16,243,1,35,77,54,2,0,65,14,65,7,16,243,1,35,101,54,2,0,65,19,65,7,16,243,1,35,214,1,58,0,0,65,20,65,7,16,243,1,35,127,58,0,0,65,25,65,7,16,243,1,35,91,16,244,1,65,26,65,7,16,243,1,35,89,54,2,0,65,31,65,7,16,243,1,35,92,59,1,0,11,88,0,65,0,65,8,16,243,1,35,82,16,244,1,65,1,65,8,16,243,1,35,121,54,2,0,65,5,65,8,16,243,1,35,102,54,2,0,65,9,65,8,16,243,1,35,80,54,2,0,65,14,65,8,16,243,1,35,105,54,2,0,65,19,65,8,16,243,1,35,215,1,58,0,0,65,20,65,8,16,243,1,35,131,1,58,0,0,11,51,0,65,0,65,9,16,243,1,35,85,16,244,1,65,1,65,9,16,243,1,35,123,54,2,0,65,5,65,9,16,243,1,35,83,54,2,0,65,9,65,9,16,243,1,35,135,1,59,1,0,11,75,0,65,0,65,10,16,243,1,35,88,16,244,1,65,1,65,10,16,243,1,35,125,54,2,0,65,5,65,10,16,243,1,35,106,54,2,0,65,9,65,10,16,243,1,35,86,54,2,0,65,14,65,10,16,243,1,35,109,54,2,0,65,19,65,10,16,243,1,35,140,1,59,1,0,11,35,0,16,245,1,16,246,1,16,247,1,16,248,1,16,249,1,16,250,1,16,251,1,16,252,1,16,253,1,16,254,1,16,255,1,11,18,0,32,0,45,0,0,65,0,74,4,64,65,1,15,11,65,0,11,158,1,0,65,0,65,0,16,243,1,45,0,0,36,42,65,1,65,0,16,243,1,45,0,0,36,43,65,2,65,0,16,243,1,45,0,0,36,44,65,3,65,0,16,243,1,45,0,0,36,45,65,4,65,0,16,243,1,45,0,0,36,46,65,5,65,0,16,243,1,45,0,0,36,47,65,6,65,0,16,243,1,45,0,0,36,48,65,7,65,0,16,243,1,45,0,0,36,49,65,8,65,0,16,243,1,47,1,0,36,51,65,10,65,0,16,243,1,47,1,0,36,50,65,12,65,0,16,243,1,40,2,0,36,69,65,17,65,0,16,243,1,16,129,2,36,70,65,18,65,0,16,243,1,16,129,2,36,21,11,44,0,65,0,65,1,16,243,1,40,2,0,36,210,1,65,4,65,1,16,243,1,45,0,0,36,73,65,196,254,3,16,7,36,59,65,192,254,3,16,7,16,129,1,11,46,0,65,0,65,2,16,243,1,16,129,2,36,208,1,65,1,65,2,16,243,1,16,129,2,36,213,1,65,255,255,3,16,7,16,153,1,65,143,254,3,16,7,16,152,1,11,11,0,65,128,254,3,16,7,16,151,1,11,110,0,65,0,65,4,16,243,1,47,1,0,36,34,65,2,65,4,16,243,1,47,1,0,36,38,65,4,65,4,16,243,1,16,129,2,36,71,65,5,65,4,16,243,1,16,129,2,36,72,65,6,65,4,16,243,1,16,129,2,36,55,65,7,65,4,16,243,1,16,129,2,36,56,65,8,65,4,16,243,1,16,129,2,36,57,65,9,65,4,16,243,1,16,129,2,36,58,65,10,65,4,16,243,1,16,129,2,36,35,11,73,0,65,0,65,5,16,243,1,40,2,0,36,66,65,4,65,5,16,243,1,40,2,0,36,67,65,8,65,5,16,243,1,40,2,0,36,198,1,65,132,254,3,16,7,36,63,65,133,254,3,16,7,16,149,1,65,134,254,3,16,7,16,150,1,65,135,254,3,16,7,16,52,11,41,0,65,0,65,6,16,243,1,40,2,0,36,75,65,4,65,6,16,243,1,45,0,0,36,143,1,65,5,65,6,16,243,1,45,0,0,36,76,16,16,11,123,0,65,0,65,7,16,243,1,16,129,2,36,79,65,1,65,7,16,243,1,40,2,0,36,111,65,5,65,7,16,243,1,40,2,0,36,98,65,9,65,7,16,243,1,40,2,0,36,77,65,14,65,7,16,243,1,40,2,0,36,101,65,19,65,7,16,243,1,45,0,0,36,214,1,65,20,65,7,16,243,1,45,0,0,36,127,65,25,65,7,16,243,1,16,129,2,36,91,65,26,65,7,16,243,1,40,2,0,36,89,65,31,65,7,16,243,1,47,1,0,36,92,11,88,0,65,0,65,8,16,243,1,16,129,2,36,82,65,1,65,8,16,243,1,40,2,0,36,121,65,5,65,8,16,243,1,40,2,0,36,102,65,9,65,8,16,243,1,40,2,0,36,80,65,14,65,8,16,243,1,40,2,0,36,105,65,19,65,8,16,243,1,45,0,0,36,215,1,65,20,65,8,16,243,1,45,0,0,36,131,1,11,51,0,65,0,65,9,16,243,1,16,129,2,36,85,65,1,65,9,16,243,1,40,2,0,36,123,65,5,65,9,16,243,1,40,2,0,36,83,65,9,65,9,16,243,1,47,1,0,36,135,1,11,75,0,65,0,65,10,16,243,1,16,129,2,36,88,65,1,65,10,16,243,1,40,2,0,36,125,65,5,65,10,16,243,1,40,2,0,36,106,65,9,65,10,16,243,1,40,2,0,36,86,65,14,65,10,16,243,1,40,2,0,36,109,65,19,65,10,16,243,1,47,1,0,36,140,1,11,39,0,16,130,2,16,131,2,16,132,2,16,133,2,16,134,2,16,135,2,16,136,2,16,137,2,16,138,2,16,139,2,16,140,2,65,0,36,54,11,20,0,63,0,65,139,1,72,4,64,65,139,1,63,0,107,64,0,26,11,11,11,73,1,0,65,4,11,67,32,0,0,0,105,0,110,0,105,0,116,0,105,0,97,0,108,0,105,0,122,0,105,0,110,0,103,0,32,0,40,0,105,0,110,0,99,0,108,0,117,0,100,0,101,0,66,0,111,0,111,0,116,0,82,0,111,0,109,0,61,0,36,0,48,0,41,0,184,87,4,110,97,109,101,1,176,87,143,2,0,26,119,97,115,109,47,104,101,108,112,101,114,115,47,105,110,100,101,120,47,101,110,118,46,108,111,103,1,18,119,97,115,109,47,99,111,110,102,105,103,47,99,111,110,102,105,103,2,51,119,97,115,109,47,106,111,121,112,97,100,47,105,110,100,101,120,47,95,103,101,116,74,111,121,112,97,100,66,117,116,116,111,110,83,116,97,116,101,70,114,111,109,66,117,116,116,111,110,73,100,3,51,119,97,115,109,47,106,111,121,112,97,100,47,105,110,100,101,120,47,95,115,101,116,74,111,121,112,97,100,66,117,116,116,111,110,83,116,97,116,101,70,114,111,109,66,117,116,116,111,110,73,100,4,37,119,97,115,109,47,109,101,109,111,114,121,47,98,97,110,107,105,110,103,47,103,101,116,82,111,109,66,97,110,107,65,100,100,114,101,115,115,5,37,119,97,115,109,47,109,101,109,111,114,121,47,98,97,110,107,105,110,103,47,103,101,116,82,97,109,66,97,110,107,65,100,100,114,101,115,115,6,55,119,97,115,109,47,109,101,109,111,114,121,47,109,101,109,111,114,121,77,97,112,47,103,101,116,87,97,115,109,66,111,121,79,102,102,115,101,116,70,114,111,109,71,97,109,101,66,111,121,79,102,102,115,101,116,7,41,119,97,115,109,47,109,101,109,111,114,121,47,108,111,97,100,47,101,105,103,104,116,66,105,116,76,111,97,100,70,114,111,109,71,66,77,101,109,111,114,121,8,31,119,97,115,109,47,104,101,108,112,101,114,115,47,105,110,100,101,120,47,115,101,116,66,105,116,79,110,66,121,116,101,9,43,119,97,115,109,47,109,101,109,111,114,121,47,115,116,111,114,101,47,101,105,103,104,116,66,105,116,83,116,111,114,101,73,110,116,111,71,66,77,101,109,111,114,121,10,39,119,97,115,109,47,105,110,116,101,114,114,117,112,116,115,47,105,110,100,101,120,47,95,114,101,113,117,101,115,116,73,110,116,101,114,114,117,112,116,11,44,119,97,115,109,47,105,110,116,101,114,114,117,112,116,115,47,105,110,100,101,120,47,114,101,113,117,101,115,116,74,111,121,112,97,100,73,110,116,101,114,114,117,112,116,12,36,119,97,115,109,47,106,111,121,112,97,100,47,105,110,100,101,120,47,95,112,114,101,115,115,74,111,121,112,97,100,66,117,116,116,111,110,13,38,119,97,115,109,47,106,111,121,112,97,100,47,105,110,100,101,120,47,95,114,101,108,101,97,115,101,74,111,121,112,97,100,66,117,116,116,111,110,14,32,119,97,115,109,47,106,111,121,112,97,100,47,105,110,100,101,120,47,115,101,116,74,111,121,112,97,100,83,116,97,116,101,15,35,119,97,115,109,47,115,111,117,110,100,47,115,111,117,110,100,47,103,101,116,65,117,100,105,111,81,117,101,117,101,73,110,100,101,120,16,32,119,97,115,109,47,115,111,117,110,100,47,115,111,117,110,100,47,114,101,115,101,116,65,117,100,105,111,81,117,101,117,101,17,33,119,97,115,109,47,100,101,98,117,103,47,100,101,98,117,103,45,99,112,117,47,103,101,116,82,101,103,105,115,116,101,114,65,18,33,119,97,115,109,47,100,101,98,117,103,47,100,101,98,117,103,45,99,112,117,47,103,101,116,82,101,103,105,115,116,101,114,66,19,33,119,97,115,109,47,100,101,98,117,103,47,100,101,98,117,103,45,99,112,117,47,103,101,116,82,101,103,105,115,116,101,114,67,20,33,119,97,115,109,47,100,101,98,117,103,47,100,101,98,117,103,45,99,112,117,47,103,101,116,82,101,103,105,115,116,101,114,68,21,33,119,97,115,109,47,100,101,98,117,103,47,100,101,98,117,103,45,99,112,117,47,103,101,116,82,101,103,105,115,116,101,114,69,22,33,119,97,115,109,47,100,101,98,117,103,47,100,101,98,117,103,45,99,112,117,47,103,101,116,82,101,103,105,115,116,101,114,72,23,33,119,97,115,109,47,100,101,98,117,103,47,100,101,98,117,103,45,99,112,117,47,103,101,116,82,101,103,105,115,116,101,114,76,24,33,119,97,115,109,47,100,101,98,117,103,47,100,101,98,117,103,45,99,112,117,47,103,101,116,82,101,103,105,115,116,101,114,70,25,38,119,97,115,109,47,100,101,98,117,103,47,100,101,98,117,103,45,99,112,117,47,103,101,116,80,114,111,103,114,97,109,67,111,117,110,116,101,114,26,36,119,97,115,109,47,100,101,98,117,103,47,100,101,98,117,103,45,99,112,117,47,103,101,116,83,116,97,99,107,80,111,105,110,116,101,114,27,46,119,97,115,109,47,100,101,98,117,103,47,100,101,98,117,103,45,99,112,117,47,103,101,116,79,112,99,111,100,101,65,116,80,114,111,103,114,97,109,67,111,117,110,116,101,114,28,35,119,97,115,109,47,109,101,109,111,114,121,47,109,101,109,111,114,121,47,108,111,97,100,70,114,111,109,86,114,97,109,66,97,110,107,29,33,119,97,115,109,47,104,101,108,112,101,114,115,47,105,110,100,101,120,47,99,104,101,99,107,66,105,116,79,110,66,121,116,101,30,44,119,97,115,109,47,103,114,97,112,104,105,99,115,47,114,101,110,100,101,114,85,116,105,108,115,47,103,101,116,84,105,108,101,68,97,116,97,65,100,100,114,101,115,115,31,48,119,97,115,109,47,109,101,109,111,114,121,47,109,101,109,111,114,121,47,108,111,97,100,80,97,108,101,116,116,101,66,121,116,101,70,114,111,109,87,97,115,109,77,101,109,111,114,121,32,35,119,97,115,109,47,104,101,108,112,101,114,115,47,105,110,100,101,120,47,99,111,110,99,97,116,101,110,97,116,101,66,121,116,101,115,33,44,119,97,115,109,47,103,114,97,112,104,105,99,115,47,112,97,108,101,116,116,101,47,103,101,116,82,103,98,67,111,108,111,114,70,114,111,109,80,97,108,101,116,116,101,34,46,119,97,115,109,47,103,114,97,112,104,105,99,115,47,112,97,108,101,116,116,101,47,103,101,116,67,111,108,111,114,67,111,109,112,111,110,101,110,116,70,114,111,109,82,103,98,35,51,119,97,115,109,47,103,114,97,112,104,105,99,115,47,112,97,108,101,116,116,101,47,103,101,116,77,111,110,111,99,104,114,111,109,101,67,111,108,111,114,70,114,111,109,80,97,108,101,116,116,101,36,55,119,97,115,109,47,100,101,98,117,103,47,100,101,98,117,103,45,103,114,97,112,104,105,99,115,47,100,114,97,119,66,97,99,107,103,114,111,117,110,100,77,97,112,84,111,87,97,115,109,77,101,109,111,114,121,37,37,119,97,115,109,47,103,114,97,112,104,105,99,115,47,116,105,108,101,115,47,103,101,116,84,105,108,101,80,105,120,101,108,83,116,97,114,116,38,36,119,97,115,109,47,103,114,97,112,104,105,99,115,47,112,114,105,111,114,105,116,121,47,103,101,116,80,105,120,101,108,83,116,97,114,116,39,42,119,97,115,109,47,103,114,97,112,104,105,99,115,47,112,114,105,111,114,105,116,121,47,97,100,100,80,114,105,111,114,105,116,121,102,111,114,80,105,120,101,108,40,44,119,97,115,109,47,103,114,97,112,104,105,99,115,47,116,105,108,101,115,47,100,114,97,119,80,105,120,101,108,115,70,114,111,109,76,105,110,101,79,102,84,105,108,101,41,50,119,97,115,109,47,100,101,98,117,103,47,100,101,98,117,103,45,103,114,97,112,104,105,99,115,47,100,114,97,119,84,105,108,101,68,97,116,97,84,111,87,97,115,109,77,101,109,111,114,121,42,25,119,97,115,109,47,105,110,100,101,120,47,104,97,115,67,111,114,101,83,116,97,114,116,101,100,43,22,119,97,115,109,47,104,101,108,112,101,114,115,47,105,110,100,101,120,47,108,111,103,44,38,119,97,115,109,47,109,101,109,111,114,121,47,109,101,109,111,114,121,47,105,110,105,116,105,97,108,105,122,101,67,97,114,116,114,105,100,103,101,45,41,119,97,115,109,47,103,114,97,112,104,105,99,115,47,103,114,97,112,104,105,99,115,47,105,110,105,116,105,97,108,105,122,101,71,114,97,112,104,105,99,115,46,39,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,49,47,67,104,97,110,110,101,108,49,46,105,110,105,116,105,97,108,105,122,101,47,39,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,50,47,67,104,97,110,110,101,108,50,46,105,110,105,116,105,97,108,105,122,101,48,39,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,51,47,67,104,97,110,110,101,108,51,46,105,110,105,116,105,97,108,105,122,101,49,39,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,52,47,67,104,97,110,110,101,108,52,46,105,110,105,116,105,97,108,105,122,101,50,32,119,97,115,109,47,115,111,117,110,100,47,115,111,117,110,100,47,105,110,105,116,105,97,108,105,122,101,83,111,117,110,100,51,50,119,97,115,109,47,116,105,109,101,114,115,47,105,110,100,101,120,47,103,101,116,70,114,101,113,117,101,110,99,121,70,114,111,109,73,110,112,117,116,67,108,111,99,107,83,101,108,101,99,116,52,43,119,97,115,109,47,116,105,109,101,114,115,47,105,110,100,101,120,47,84,105,109,101,114,115,46,117,112,100,97,116,101,84,105,109,101,114,67,111,110,116,114,111,108,53,34,119,97,115,109,47,116,105,109,101,114,115,47,105,110,100,101,120,47,105,110,105,116,105,97,108,105,122,101,84,105,109,101,114,115,54,26,119,97,115,109,47,99,112,117,47,99,112,117,47,105,110,105,116,105,97,108,105,122,101,67,112,117,55,21,119,97,115,109,47,105,110,100,101,120,47,105,110,105,116,105,97,108,105,122,101,56,37,119,97,115,109,47,99,112,117,47,99,112,117,47,67,112,117,46,77,65,88,95,67,89,67,76,69,83,95,80,69,82,95,70,82,65,77,69,57,31,119,97,115,109,47,99,112,117,47,111,112,99,111,100,101,115,47,103,101,116,68,97,116,97,66,121,116,101,84,119,111,58,40,119,97,115,109,47,99,112,117,47,111,112,99,111,100,101,115,47,103,101,116,67,111,110,99,97,116,101,110,97,116,101,100,68,97,116,97,66,121,116,101,59,32,119,97,115,109,47,104,101,108,112,101,114,115,47,105,110,100,101,120,47,115,112,108,105,116,72,105,103,104,66,121,116,101,60,31,119,97,115,109,47,104,101,108,112,101,114,115,47,105,110,100,101,120,47,115,112,108,105,116,76,111,119,66,121,116,101,61,33,119,97,115,109,47,109,101,109,111,114,121,47,98,97,110,107,105,110,103,47,104,97,110,100,108,101,66,97,110,107,105,110,103,62,41,119,97,115,109,47,115,111,117,110,100,47,115,111,117,110,100,47,83,111,117,110,100,46,98,97,116,99,104,80,114,111,99,101,115,115,67,121,99,108,101,115,63,45,119,97,115,109,47,115,111,117,110,100,47,115,111,117,110,100,47,83,111,117,110,100,46,109,97,120,70,114,97,109,101,83,101,113,117,101,110,99,101,67,121,99,108,101,115,64,41,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,49,47,67,104,97,110,110,101,108,49,46,117,112,100,97,116,101,76,101,110,103,116,104,65,41,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,50,47,67,104,97,110,110,101,108,50,46,117,112,100,97,116,101,76,101,110,103,116,104,66,41,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,51,47,67,104,97,110,110,101,108,51,46,117,112,100,97,116,101,76,101,110,103,116,104,67,41,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,52,47,67,104,97,110,110,101,108,52,46,117,112,100,97,116,101,76,101,110,103,116,104,68,44,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,49,47,103,101,116,78,101,119,70,114,101,113,117,101,110,99,121,70,114,111,109,83,119,101,101,112,69,41,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,49,47,67,104,97,110,110,101,108,49,46,115,101,116,70,114,101,113,117,101,110,99,121,70,50,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,49,47,99,97,108,99,117,108,97,116,101,83,119,101,101,112,65,110,100,67,104,101,99,107,79,118,101,114,102,108,111,119,71,40,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,49,47,67,104,97,110,110,101,108,49,46,117,112,100,97,116,101,83,119,101,101,112,72,43,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,49,47,67,104,97,110,110,101,108,49,46,117,112,100,97,116,101,69,110,118,101,108,111,112,101,73,43,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,50,47,67,104,97,110,110,101,108,50,46,117,112,100,97,116,101,69,110,118,101,108,111,112,101,74,43,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,52,47,67,104,97,110,110,101,108,52,46,117,112,100,97,116,101,69,110,118,101,108,111,112,101,75,37,119,97,115,109,47,115,111,117,110,100,47,115,111,117,110,100,47,117,112,100,97,116,101,70,114,97,109,101,83,101,113,117,101,110,99,101,114,76,46,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,49,47,67,104,97,110,110,101,108,49,46,119,105,108,108,67,104,97,110,110,101,108,85,112,100,97,116,101,77,36,119,97,115,109,47,115,111,117,110,100,47,115,111,117,110,100,47,100,105,100,67,104,97,110,110,101,108,68,97,99,67,104,97,110,103,101,78,46,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,50,47,67,104,97,110,110,101,108,50,46,119,105,108,108,67,104,97,110,110,101,108,85,112,100,97,116,101,79,46,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,51,47,67,104,97,110,110,101,108,51,46,119,105,108,108,67,104,97,110,110,101,108,85,112,100,97,116,101,80,46,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,52,47,67,104,97,110,110,101,108,52,46,119,105,108,108,67,104,97,110,110,101,108,85,112,100,97,116,101,81,39,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,49,47,67,104,97,110,110,101,108,49,46,114,101,115,101,116,84,105,109,101,114,82,61,119,97,115,109,47,115,111,117,110,100,47,100,117,116,121,47,105,115,68,117,116,121,67,121,99,108,101,67,108,111,99,107,80,111,115,105,116,105,118,101,79,114,78,101,103,97,116,105,118,101,70,111,114,87,97,118,101,102,111,114,109,83,38,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,49,47,67,104,97,110,110,101,108,49,46,103,101,116,83,97,109,112,108,101,84,54,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,49,47,67,104,97,110,110,101,108,49,46,103,101,116,83,97,109,112,108,101,70,114,111,109,67,121,99,108,101,67,111,117,110,116,101,114,85,39,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,50,47,67,104,97,110,110,101,108,50,46,114,101,115,101,116,84,105,109,101,114,86,38,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,50,47,67,104,97,110,110,101,108,50,46,103,101,116,83,97,109,112,108,101,87,54,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,50,47,67,104,97,110,110,101,108,50,46,103,101,116,83,97,109,112,108,101,70,114,111,109,67,121,99,108,101,67,111,117,110,116,101,114,88,39,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,51,47,67,104,97,110,110,101,108,51,46,114,101,115,101,116,84,105,109,101,114,89,38,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,51,47,67,104,97,110,110,101,108,51,46,103,101,116,83,97,109,112,108,101,90,54,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,51,47,67,104,97,110,110,101,108,51,46,103,101,116,83,97,109,112,108,101,70,114,111,109,67,121,99,108,101,67,111,117,110,116,101,114,91,59,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,52,47,67,104,97,110,110,101,108,52,46,103,101,116,78,111,105,115,101,67,104,97,110,110,101,108,70,114,101,113,117,101,110,99,121,80,101,114,105,111,100,92,38,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,52,47,67,104,97,110,110,101,108,52,46,103,101,116,83,97,109,112,108,101,93,54,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,52,47,67,104,97,110,110,101,108,52,46,103,101,116,83,97,109,112,108,101,70,114,111,109,67,121,99,108,101,67,111,117,110,116,101,114,94,28,119,97,115,109,47,99,112,117,47,99,112,117,47,67,112,117,46,67,76,79,67,75,95,83,80,69,69,68,95,42,119,97,115,109,47,115,111,117,110,100,47,115,111,117,110,100,47,83,111,117,110,100,46,109,97,120,68,111,119,110,83,97,109,112,108,101,67,121,99,108,101,115,96,40,119,97,115,109,47,115,111,117,110,100,47,115,111,117,110,100,47,103,101,116,83,97,109,112,108,101,65,115,85,110,115,105,103,110,101,100,66,121,116,101,97,34,119,97,115,109,47,115,111,117,110,100,47,115,111,117,110,100,47,109,105,120,67,104,97,110,110,101,108,83,97,109,112,108,101,115,98,53,119,97,115,109,47,109,101,109,111,114,121,47,109,101,109,111,114,121,47,115,101,116,76,101,102,116,65,110,100,82,105,103,104,116,79,117,116,112,117,116,70,111,114,65,117,100,105,111,81,117,101,117,101,99,32,119,97,115,109,47,115,111,117,110,100,47,115,111,117,110,100,47,97,99,99,117,109,117,108,97,116,101,83,111,117,110,100,100,31,119,97,115,109,47,115,111,117,110,100,47,115,111,117,110,100,47,99,97,108,99,117,108,97,116,101,83,111,117,110,100,101,28,119,97,115,109,47,115,111,117,110,100,47,115,111,117,110,100,47,117,112,100,97,116,101,83,111,117,110,100,102,34,119,97,115,109,47,115,111,117,110,100,47,115,111,117,110,100,47,98,97,116,99,104,80,114,111,99,101,115,115,65,117,100,105,111,103,39,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,49,47,67,104,97,110,110,101,108,49,46,117,112,100,97,116,101,78,82,120,48,104,39,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,51,47,67,104,97,110,110,101,108,51,46,117,112,100,97,116,101,78,82,120,48,105,39,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,49,47,67,104,97,110,110,101,108,49,46,117,112,100,97,116,101,78,82,120,49,106,39,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,50,47,67,104,97,110,110,101,108,50,46,117,112,100,97,116,101,78,82,120,49,107,39,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,51,47,67,104,97,110,110,101,108,51,46,117,112,100,97,116,101,78,82,120,49,108,39,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,52,47,67,104,97,110,110,101,108,52,46,117,112,100,97,116,101,78,82,120,49,109,39,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,49,47,67,104,97,110,110,101,108,49,46,117,112,100,97,116,101,78,82,120,50,110,39,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,50,47,67,104,97,110,110,101,108,50,46,117,112,100,97,116,101,78,82,120,50,111,39,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,51,47,67,104,97,110,110,101,108,51,46,117,112,100,97,116,101,78,82,120,50,112,39,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,52,47,67,104,97,110,110,101,108,52,46,117,112,100,97,116,101,78,82,120,50,113,39,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,49,47,67,104,97,110,110,101,108,49,46,117,112,100,97,116,101,78,82,120,51,114,39,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,50,47,67,104,97,110,110,101,108,50,46,117,112,100,97,116,101,78,82,120,51,115,39,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,51,47,67,104,97,110,110,101,108,51,46,117,112,100,97,116,101,78,82,120,51,116,39,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,52,47,67,104,97,110,110,101,108,52,46,117,112,100,97,116,101,78,82,120,51,117,39,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,49,47,67,104,97,110,110,101,108,49,46,117,112,100,97,116,101,78,82,120,52,118,36,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,49,47,67,104,97,110,110,101,108,49,46,116,114,105,103,103,101,114,119,39,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,50,47,67,104,97,110,110,101,108,50,46,117,112,100,97,116,101,78,82,120,52,120,36,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,50,47,67,104,97,110,110,101,108,50,46,116,114,105,103,103,101,114,121,39,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,51,47,67,104,97,110,110,101,108,51,46,117,112,100,97,116,101,78,82,120,52,122,36,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,51,47,67,104,97,110,110,101,108,51,46,116,114,105,103,103,101,114,123,39,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,52,47,67,104,97,110,110,101,108,52,46,117,112,100,97,116,101,78,82,120,52,124,36,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,52,47,67,104,97,110,110,101,108,52,46,116,114,105,103,103,101,114,125,33,119,97,115,109,47,115,111,117,110,100,47,115,111,117,110,100,47,83,111,117,110,100,46,117,112,100,97,116,101,78,82,53,48,126,33,119,97,115,109,47,115,111,117,110,100,47,115,111,117,110,100,47,83,111,117,110,100,46,117,112,100,97,116,101,78,82,53,49,127,33,119,97,115,109,47,115,111,117,110,100,47,115,111,117,110,100,47,83,111,117,110,100,46,117,112,100,97,116,101,78,82,53,50,128,1,44,119,97,115,109,47,115,111,117,110,100,47,114,101,103,105,115,116,101,114,115,47,83,111,117,110,100,82,101,103,105,115,116,101,114,87,114,105,116,101,84,114,97,112,115,129,1,38,119,97,115,109,47,103,114,97,112,104,105,99,115,47,108,99,100,47,76,99,100,46,117,112,100,97,116,101,76,99,100,67,111,110,116,114,111,108,130,1,32,119,97,115,109,47,109,101,109,111,114,121,47,100,109,97,47,115,116,97,114,116,68,109,97,84,114,97,110,115,102,101,114,131,1,39,119,97,115,109,47,109,101,109,111,114,121,47,100,109,97,47,103,101,116,72,100,109,97,83,111,117,114,99,101,70,114,111,109,77,101,109,111,114,121,132,1,44,119,97,115,109,47,109,101,109,111,114,121,47,100,109,97,47,103,101,116,72,100,109,97,68,101,115,116,105,110,97,116,105,111,110,70,114,111,109,77,101,109,111,114,121,133,1,33,119,97,115,109,47,104,101,108,112,101,114,115,47,105,110,100,101,120,47,114,101,115,101,116,66,105,116,79,110,66,121,116,101,134,1,43,119,97,115,109,47,115,111,117,110,100,47,114,101,103,105,115,116,101,114,115,47,83,111,117,110,100,82,101,103,105,115,116,101,114,82,101,97,100,84,114,97,112,115,135,1,32,119,97,115,109,47,106,111,121,112,97,100,47,105,110,100,101,120,47,103,101,116,74,111,121,112,97,100,83,116,97,116,101,136,1,36,119,97,115,109,47,109,101,109,111,114,121,47,114,101,97,100,84,114,97,112,115,47,99,104,101,99,107,82,101,97,100,84,114,97,112,115,137,1,50,119,97,115,109,47,109,101,109,111,114,121,47,108,111,97,100,47,101,105,103,104,116,66,105,116,76,111,97,100,70,114,111,109,71,66,77,101,109,111,114,121,87,105,116,104,84,114,97,112,115,138,1,28,119,97,115,109,47,109,101,109,111,114,121,47,100,109,97,47,104,100,109,97,84,114,97,110,115,102,101,114,139,1,33,119,97,115,109,47,109,101,109,111,114,121,47,100,109,97,47,115,116,97,114,116,72,100,109,97,84,114,97,110,115,102,101,114,140,1,47,119,97,115,109,47,109,101,109,111,114,121,47,109,101,109,111,114,121,47,115,116,111,114,101,80,97,108,101,116,116,101,66,121,116,101,73,110,87,97,115,109,77,101,109,111,114,121,141,1,48,119,97,115,109,47,103,114,97,112,104,105,99,115,47,112,97,108,101,116,116,101,47,105,110,99,114,101,109,101,110,116,80,97,108,101,116,116,101,73,110,100,101,120,73,102,83,101,116,142,1,47,119,97,115,109,47,103,114,97,112,104,105,99,115,47,112,97,108,101,116,116,101,47,119,114,105,116,101,67,111,108,111,114,80,97,108,101,116,116,101,84,111,77,101,109,111,114,121,143,1,43,119,97,115,109,47,116,105,109,101,114,115,47,105,110,100,101,120,47,84,105,109,101,114,115,46,98,97,116,99,104,80,114,111,99,101,115,115,67,121,99,108,101,115,144,1,39,119,97,115,109,47,116,105,109,101,114,115,47,105,110,100,101,120,47,95,99,104,101,99,107,68,105,118,105,100,101,114,82,101,103,105,115,116,101,114,145,1,43,119,97,115,109,47,105,110,116,101,114,114,117,112,116,115,47,105,110,100,101,120,47,114,101,113,117,101,115,116,84,105,109,101,114,73,110,116,101,114,114,117,112,116,146,1,30,119,97,115,109,47,116,105,109,101,114,115,47,105,110,100,101,120,47,117,112,100,97,116,101,84,105,109,101,114,115,147,1,36,119,97,115,109,47,116,105,109,101,114,115,47,105,110,100,101,120,47,98,97,116,99,104,80,114,111,99,101,115,115,84,105,109,101,114,115,148,1,46,119,97,115,109,47,116,105,109,101,114,115,47,105,110,100,101,120,47,84,105,109,101,114,115,46,117,112,100,97,116,101,68,105,118,105,100,101,114,82,101,103,105,115,116,101,114,149,1,43,119,97,115,109,47,116,105,109,101,114,115,47,105,110,100,101,120,47,84,105,109,101,114,115,46,117,112,100,97,116,101,84,105,109,101,114,67,111,117,110,116,101,114,150,1,42,119,97,115,109,47,116,105,109,101,114,115,47,105,110,100,101,120,47,84,105,109,101,114,115,46,117,112,100,97,116,101,84,105,109,101,114,77,111,100,117,108,111,151,1,37,119,97,115,109,47,106,111,121,112,97,100,47,105,110,100,101,120,47,74,111,121,112,97,100,46,117,112,100,97,116,101,74,111,121,112,97,100,152,1,57,119,97,115,109,47,105,110,116,101,114,114,117,112,116,115,47,105,110,100,101,120,47,73,110,116,101,114,114,117,112,116,115,46,117,112,100,97,116,101,73,110,116,101,114,114,117,112,116,82,101,113,117,101,115,116,101,100,153,1,55,119,97,115,109,47,105,110,116,101,114,114,117,112,116,115,47,105,110,100,101,120,47,73,110,116,101,114,114,117,112,116,115,46,117,112,100,97,116,101,73,110,116,101,114,114,117,112,116,69,110,97,98,108,101,100,154,1,38,119,97,115,109,47,109,101,109,111,114,121,47,119,114,105,116,101,84,114,97,112,115,47,99,104,101,99,107,87,114,105,116,101,84,114,97,112,115,155,1,52,119,97,115,109,47,109,101,109,111,114,121,47,115,116,111,114,101,47,101,105,103,104,116,66,105,116,83,116,111,114,101,73,110,116,111,71,66,77,101,109,111,114,121,87,105,116,104,84,114,97,112,115,156,1,25,119,97,115,109,47,99,112,117,47,102,108,97,103,115,47,115,101,116,70,108,97,103,66,105,116,157,1,31,119,97,115,109,47,99,112,117,47,102,108,97,103,115,47,115,101,116,72,97,108,102,67,97,114,114,121,70,108,97,103,158,1,47,119,97,115,109,47,99,112,117,47,102,108,97,103,115,47,99,104,101,99,107,65,110,100,83,101,116,69,105,103,104,116,66,105,116,72,97,108,102,67,97,114,114,121,70,108,97,103,159,1,26,119,97,115,109,47,99,112,117,47,102,108,97,103,115,47,115,101,116,90,101,114,111,70,108,97,103,160,1,30,119,97,115,109,47,99,112,117,47,102,108,97,103,115,47,115,101,116,83,117,98,116,114,97,99,116,70,108,97,103,161,1,27,119,97,115,109,47,99,112,117,47,102,108,97,103,115,47,115,101,116,67,97,114,114,121,70,108,97,103,162,1,33,119,97,115,109,47,104,101,108,112,101,114,115,47,105,110,100,101,120,47,114,111,116,97,116,101,66,121,116,101,76,101,102,116,163,1,54,119,97,115,109,47,109,101,109,111,114,121,47,115,116,111,114,101,47,115,105,120,116,101,101,110,66,105,116,83,116,111,114,101,73,110,116,111,71,66,77,101,109,111,114,121,87,105,116,104,84,114,97,112,115,164,1,52,119,97,115,109,47,99,112,117,47,102,108,97,103,115,47,99,104,101,99,107,65,110,100,83,101,116,83,105,120,116,101,101,110,66,105,116,70,108,97,103,115,65,100,100,79,118,101,114,102,108,111,119,165,1,34,119,97,115,109,47,104,101,108,112,101,114,115,47,105,110,100,101,120,47,114,111,116,97,116,101,66,121,116,101,82,105,103,104,116,166,1,31,119,97,115,109,47,99,112,117,47,111,112,99,111,100,101,115,47,104,97,110,100,108,101,79,112,99,111,100,101,48,120,167,1,27,119,97,115,109,47,99,112,117,47,102,108,97,103,115,47,103,101,116,67,97,114,114,121,70,108,97,103,168,1,45,119,97,115,109,47,104,101,108,112,101,114,115,47,105,110,100,101,120,47,114,111,116,97,116,101,66,121,116,101,76,101,102,116,84,104,114,111,117,103,104,67,97,114,114,121,169,1,34,119,97,115,109,47,99,112,117,47,105,110,115,116,114,117,99,116,105,111,110,115,47,114,101,108,97,116,105,118,101,74,117,109,112,170,1,46,119,97,115,109,47,104,101,108,112,101,114,115,47,105,110,100,101,120,47,114,111,116,97,116,101,66,121,116,101,82,105,103,104,116,84,104,114,111,117,103,104,67,97,114,114,121,171,1,31,119,97,115,109,47,99,112,117,47,111,112,99,111,100,101,115,47,104,97,110,100,108,101,79,112,99,111,100,101,49,120,172,1,26,119,97,115,109,47,99,112,117,47,102,108,97,103,115,47,103,101,116,90,101,114,111,70,108,97,103,173,1,31,119,97,115,109,47,99,112,117,47,102,108,97,103,115,47,103,101,116,72,97,108,102,67,97,114,114,121,70,108,97,103,174,1,30,119,97,115,109,47,99,112,117,47,102,108,97,103,115,47,103,101,116,83,117,98,116,114,97,99,116,70,108,97,103,175,1,31,119,97,115,109,47,99,112,117,47,111,112,99,111,100,101,115,47,104,97,110,100,108,101,79,112,99,111,100,101,50,120,176,1,31,119,97,115,109,47,99,112,117,47,111,112,99,111,100,101,115,47,104,97,110,100,108,101,79,112,99,111,100,101,51,120,177,1,31,119,97,115,109,47,99,112,117,47,111,112,99,111,100,101,115,47,104,97,110,100,108,101,79,112,99,111,100,101,52,120,178,1,31,119,97,115,109,47,99,112,117,47,111,112,99,111,100,101,115,47,104,97,110,100,108,101,79,112,99,111,100,101,53,120,179,1,31,119,97,115,109,47,99,112,117,47,111,112,99,111,100,101,115,47,104,97,110,100,108,101,79,112,99,111,100,101,54,120,180,1,31,119,97,115,109,47,99,112,117,47,111,112,99,111,100,101,115,47,104,97,110,100,108,101,79,112,99,111,100,101,55,120,181,1,43,119,97,115,109,47,99,112,117,47,102,108,97,103,115,47,99,104,101,99,107,65,110,100,83,101,116,69,105,103,104,116,66,105,116,67,97,114,114,121,70,108,97,103,182,1,34,119,97,115,109,47,99,112,117,47,105,110,115,116,114,117,99,116,105,111,110,115,47,97,100,100,65,82,101,103,105,115,116,101,114,183,1,46,119,97,115,109,47,99,112,117,47,105,110,115,116,114,117,99,116,105,111,110,115,47,97,100,100,65,84,104,114,111,117,103,104,67,97,114,114,121,82,101,103,105,115,116,101,114,184,1,31,119,97,115,109,47,99,112,117,47,111,112,99,111,100,101,115,47,104,97,110,100,108,101,79,112,99,111,100,101,56,120,185,1,34,119,97,115,109,47,99,112,117,47,105,110,115,116,114,117,99,116,105,111,110,115,47,115,117,98,65,82,101,103,105,115,116,101,114,186,1,46,119,97,115,109,47,99,112,117,47,105,110,115,116,114,117,99,116,105,111,110,115,47,115,117,98,65,84,104,114,111,117,103,104,67,97,114,114,121,82,101,103,105,115,116,101,114,187,1,31,119,97,115,109,47,99,112,117,47,111,112,99,111,100,101,115,47,104,97,110,100,108,101,79,112,99,111,100,101,57,120,188,1,34,119,97,115,109,47,99,112,117,47,105,110,115,116,114,117,99,116,105,111,110,115,47,97,110,100,65,82,101,103,105,115,116,101,114,189,1,34,119,97,115,109,47,99,112,117,47,105,110,115,116,114,117,99,116,105,111,110,115,47,120,111,114,65,82,101,103,105,115,116,101,114,190,1,31,119,97,115,109,47,99,112,117,47,111,112,99,111,100,101,115,47,104,97,110,100,108,101,79,112,99,111,100,101,65,120,191,1,33,119,97,115,109,47,99,112,117,47,105,110,115,116,114,117,99,116,105,111,110,115,47,111,114,65,82,101,103,105,115,116,101,114,192,1,33,119,97,115,109,47,99,112,117,47,105,110,115,116,114,117,99,116,105,111,110,115,47,99,112,65,82,101,103,105,115,116,101,114,193,1,31,119,97,115,109,47,99,112,117,47,111,112,99,111,100,101,115,47,104,97,110,100,108,101,79,112,99,111,100,101,66,120,194,1,43,119,97,115,109,47,109,101,109,111,114,121,47,108,111,97,100,47,115,105,120,116,101,101,110,66,105,116,76,111,97,100,70,114,111,109,71,66,77,101,109,111,114,121,195,1,40,119,97,115,109,47,99,112,117,47,105,110,115,116,114,117,99,116,105,111,110,115,47,114,111,116,97,116,101,82,101,103,105,115,116,101,114,76,101,102,116,196,1,41,119,97,115,109,47,99,112,117,47,105,110,115,116,114,117,99,116,105,111,110,115,47,114,111,116,97,116,101,82,101,103,105,115,116,101,114,82,105,103,104,116,197,1,52,119,97,115,109,47,99,112,117,47,105,110,115,116,114,117,99,116,105,111,110,115,47,114,111,116,97,116,101,82,101,103,105,115,116,101,114,76,101,102,116,84,104,114,111,117,103,104,67,97,114,114,121,198,1,53,119,97,115,109,47,99,112,117,47,105,110,115,116,114,117,99,116,105,111,110,115,47,114,111,116,97,116,101,82,101,103,105,115,116,101,114,82,105,103,104,116,84,104,114,111,117,103,104,67,97,114,114,121,199,1,39,119,97,115,109,47,99,112,117,47,105,110,115,116,114,117,99,116,105,111,110,115,47,115,104,105,102,116,76,101,102,116,82,101,103,105,115,116,101,114,200,1,50,119,97,115,109,47,99,112,117,47,105,110,115,116,114,117,99,116,105,111,110,115,47,115,104,105,102,116,82,105,103,104,116,65,114,105,116,104,109,101,116,105,99,82,101,103,105,115,116,101,114,201,1,43,119,97,115,109,47,99,112,117,47,105,110,115,116,114,117,99,116,105,111,110,115,47,115,119,97,112,78,105,98,98,108,101,115,79,110,82,101,103,105,115,116,101,114,202,1,47,119,97,115,109,47,99,112,117,47,105,110,115,116,114,117,99,116,105,111,110,115,47,115,104,105,102,116,82,105,103,104,116,76,111,103,105,99,97,108,82,101,103,105,115,116,101,114,203,1,39,119,97,115,109,47,99,112,117,47,105,110,115,116,114,117,99,116,105,111,110,115,47,116,101,115,116,66,105,116,79,110,82,101,103,105,115,116,101,114,204,1,38,119,97,115,109,47,99,112,117,47,105,110,115,116,114,117,99,116,105,111,110,115,47,115,101,116,66,105,116,79,110,82,101,103,105,115,116,101,114,205,1,33,119,97,115,109,47,99,112,117,47,99,98,79,112,99,111,100,101,115,47,104,97,110,100,108,101,67,98,79,112,99,111,100,101,206,1,31,119,97,115,109,47,99,112,117,47,111,112,99,111,100,101,115,47,104,97,110,100,108,101,79,112,99,111,100,101,67,120,207,1,35,119,97,115,109,47,105,110,116,101,114,114,117,112,116,115,47,105,110,100,101,120,47,115,101,116,73,110,116,101,114,114,117,112,116,115,208,1,31,119,97,115,109,47,99,112,117,47,111,112,99,111,100,101,115,47,104,97,110,100,108,101,79,112,99,111,100,101,68,120,209,1,31,119,97,115,109,47,99,112,117,47,111,112,99,111,100,101,115,47,104,97,110,100,108,101,79,112,99,111,100,101,69,120,210,1,31,119,97,115,109,47,99,112,117,47,111,112,99,111,100,101,115,47,104,97,110,100,108,101,79,112,99,111,100,101,70,120,211,1,30,119,97,115,109,47,99,112,117,47,111,112,99,111,100,101,115,47,101,120,101,99,117,116,101,79,112,99,111,100,101,212,1,53,119,97,115,109,47,105,110,116,101,114,114,117,112,116,115,47,105,110,100,101,120,47,73,110,116,101,114,114,117,112,116,115,46,97,114,101,73,110,116,101,114,114,117,112,116,115,80,101,110,100,105,110,103,213,1,45,119,97,115,109,47,109,101,109,111,114,121,47,115,116,111,114,101,47,115,105,120,116,101,101,110,66,105,116,83,116,111,114,101,73,110,116,111,71,66,77,101,109,111,114,121,214,1,38,119,97,115,109,47,105,110,116,101,114,114,117,112,116,115,47,105,110,100,101,120,47,95,104,97,110,100,108,101,73,110,116,101,114,114,117,112,116,215,1,37,119,97,115,109,47,105,110,116,101,114,114,117,112,116,115,47,105,110,100,101,120,47,99,104,101,99,107,73,110,116,101,114,114,117,112,116,115,216,1,55,119,97,115,109,47,103,114,97,112,104,105,99,115,47,103,114,97,112,104,105,99,115,47,71,114,97,112,104,105,99,115,46,77,65,88,95,67,89,67,76,69,83,95,80,69,82,95,83,67,65,78,76,73,78,69,217,1,50,119,97,115,109,47,103,114,97,112,104,105,99,115,47,103,114,97,112,104,105,99,115,47,71,114,97,112,104,105,99,115,46,98,97,116,99,104,80,114,111,99,101,115,115,67,121,99,108,101,115,218,1,35,119,97,115,109,47,109,101,109,111,114,121,47,109,101,109,111,114,121,47,103,101,116,82,103,98,80,105,120,101,108,83,116,97,114,116,219,1,34,119,97,115,109,47,109,101,109,111,114,121,47,109,101,109,111,114,121,47,115,101,116,80,105,120,101,108,79,110,70,114,97,109,101,220,1,42,119,97,115,109,47,103,114,97,112,104,105,99,115,47,112,114,105,111,114,105,116,121,47,103,101,116,80,114,105,111,114,105,116,121,102,111,114,80,105,120,101,108,221,1,58,119,97,115,109,47,103,114,97,112,104,105,99,115,47,98,97,99,107,103,114,111,117,110,100,87,105,110,100,111,119,47,100,114,97,119,76,105,110,101,79,102,84,105,108,101,70,114,111,109,84,105,108,101,67,97,99,104,101,222,1,55,119,97,115,109,47,103,114,97,112,104,105,99,115,47,98,97,99,107,103,114,111,117,110,100,87,105,110,100,111,119,47,100,114,97,119,76,105,110,101,79,102,84,105,108,101,70,114,111,109,84,105,108,101,73,100,223,1,55,119,97,115,109,47,103,114,97,112,104,105,99,115,47,98,97,99,107,103,114,111,117,110,100,87,105,110,100,111,119,47,100,114,97,119,67,111,108,111,114,80,105,120,101,108,70,114,111,109,84,105,108,101,73,100,224,1,60,119,97,115,109,47,103,114,97,112,104,105,99,115,47,98,97,99,107,103,114,111,117,110,100,87,105,110,100,111,119,47,100,114,97,119,77,111,110,111,99,104,114,111,109,101,80,105,120,101,108,70,114,111,109,84,105,108,101,73,100,225,1,59,119,97,115,109,47,103,114,97,112,104,105,99,115,47,98,97,99,107,103,114,111,117,110,100,87,105,110,100,111,119,47,100,114,97,119,66,97,99,107,103,114,111,117,110,100,87,105,110,100,111,119,83,99,97,110,108,105,110,101,226,1,47,119,97,115,109,47,103,114,97,112,104,105,99,115,47,98,97,99,107,103,114,111,117,110,100,87,105,110,100,111,119,47,114,101,110,100,101,114,66,97,99,107,103,114,111,117,110,100,227,1,43,119,97,115,109,47,103,114,97,112,104,105,99,115,47,98,97,99,107,103,114,111,117,110,100,87,105,110,100,111,119,47,114,101,110,100,101,114,87,105,110,100,111,119,228,1,35,119,97,115,109,47,103,114,97,112,104,105,99,115,47,115,112,114,105,116,101,115,47,114,101,110,100,101,114,83,112,114,105,116,101,115,229,1,36,119,97,115,109,47,103,114,97,112,104,105,99,115,47,103,114,97,112,104,105,99,115,47,95,100,114,97,119,83,99,97,110,108,105,110,101,230,1,41,119,97,115,109,47,103,114,97,112,104,105,99,115,47,103,114,97,112,104,105,99,115,47,95,114,101,110,100,101,114,69,110,116,105,114,101,70,114,97,109,101,231,1,39,119,97,115,109,47,103,114,97,112,104,105,99,115,47,112,114,105,111,114,105,116,121,47,99,108,101,97,114,80,114,105,111,114,105,116,121,77,97,112,232,1,34,119,97,115,109,47,103,114,97,112,104,105,99,115,47,116,105,108,101,115,47,114,101,115,101,116,84,105,108,101,67,97,99,104,101,233,1,59,119,97,115,109,47,103,114,97,112,104,105,99,115,47,103,114,97,112,104,105,99,115,47,71,114,97,112,104,105,99,115,46,77,73,78,95,67,89,67,76,69,83,95,83,80,82,73,84,69,83,95,76,67,68,95,77,79,68,69,234,1,65,119,97,115,109,47,103,114,97,112,104,105,99,115,47,103,114,97,112,104,105,99,115,47,71,114,97,112,104,105,99,115,46,77,73,78,95,67,89,67,76,69,83,95,84,82,65,78,83,70,69,82,95,68,65,84,65,95,76,67,68,95,77,79,68,69,235,1,41,119,97,115,109,47,105,110,116,101,114,114,117,112,116,115,47,105,110,100,101,120,47,114,101,113,117,101,115,116,76,99,100,73,110,116,101,114,114,117,112,116,236,1,32,119,97,115,109,47,109,101,109,111,114,121,47,100,109,97,47,117,112,100,97,116,101,72,98,108,97,110,107,72,100,109,97,237,1,44,119,97,115,109,47,105,110,116,101,114,114,117,112,116,115,47,105,110,100,101,120,47,114,101,113,117,101,115,116,86,66,108,97,110,107,73,110,116,101,114,114,117,112,116,238,1,30,119,97,115,109,47,103,114,97,112,104,105,99,115,47,108,99,100,47,115,101,116,76,99,100,83,116,97,116,117,115,239,1,37,119,97,115,109,47,103,114,97,112,104,105,99,115,47,103,114,97,112,104,105,99,115,47,117,112,100,97,116,101,71,114,97,112,104,105,99,115,240,1,43,119,97,115,109,47,103,114,97,112,104,105,99,115,47,103,114,97,112,104,105,99,115,47,98,97,116,99,104,80,114,111,99,101,115,115,71,114,97,112,104,105,99,115,241,1,24,119,97,115,109,47,105,110,100,101,120,47,101,109,117,108,97,116,105,111,110,83,116,101,112,242,1,17,119,97,115,109,47,105,110,100,101,120,47,117,112,100,97,116,101,243,1,43,119,97,115,109,47,109,101,109,111,114,121,47,109,101,109,111,114,121,47,103,101,116,83,97,118,101,83,116,97,116,101,77,101,109,111,114,121,79,102,102,115,101,116,244,1,50,119,97,115,109,47,109,101,109,111,114,121,47,115,116,111,114,101,47,115,116,111,114,101,66,111,111,108,101,97,110,68,105,114,101,99,116,108,121,84,111,87,97,115,109,77,101,109,111,114,121,245,1,26,119,97,115,109,47,99,112,117,47,99,112,117,47,67,112,117,46,115,97,118,101,83,116,97,116,101,246,1,41,119,97,115,109,47,103,114,97,112,104,105,99,115,47,103,114,97,112,104,105,99,115,47,71,114,97,112,104,105,99,115,46,115,97,118,101,83,116,97,116,101,247,1,42,119,97,115,109,47,105,110,116,101,114,114,117,112,116,115,47,105,110,100,101,120,47,73,110,116,101,114,114,117,112,116,115,46,115,97,118,101,83,116,97,116,101,248,1,34,119,97,115,109,47,106,111,121,112,97,100,47,105,110,100,101,120,47,74,111,121,112,97,100,46,115,97,118,101,83,116,97,116,101,249,1,35,119,97,115,109,47,109,101,109,111,114,121,47,109,101,109,111,114,121,47,77,101,109,111,114,121,46,115,97,118,101,83,116,97,116,101,250,1,34,119,97,115,109,47,116,105,109,101,114,115,47,105,110,100,101,120,47,84,105,109,101,114,115,46,115,97,118,101,83,116,97,116,101,251,1,32,119,97,115,109,47,115,111,117,110,100,47,115,111,117,110,100,47,83,111,117,110,100,46,115,97,118,101,83,116,97,116,101,252,1,38,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,49,47,67,104,97,110,110,101,108,49,46,115,97,118,101,83,116,97,116,101,253,1,38,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,50,47,67,104,97,110,110,101,108,50,46,115,97,118,101,83,116,97,116,101,254,1,38,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,51,47,67,104,97,110,110,101,108,51,46,115,97,118,101,83,116,97,116,101,255,1,38,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,52,47,67,104,97,110,110,101,108,52,46,115,97,118,101,83,116,97,116,101,128,2,20,119,97,115,109,47,105,110,100,101,120,47,115,97,118,101,83,116,97,116,101,129,2,50,119,97,115,109,47,109,101,109,111,114,121,47,108,111,97,100,47,108,111,97,100,66,111,111,108,101,97,110,68,105,114,101,99,116,108,121,70,114,111,109,87,97,115,109,77,101,109,111,114,121,130,2,26,119,97,115,109,47,99,112,117,47,99,112,117,47,67,112,117,46,108,111,97,100,83,116,97,116,101,131,2,41,119,97,115,109,47,103,114,97,112,104,105,99,115,47,103,114,97,112,104,105,99,115,47,71,114,97,112,104,105,99,115,46,108,111,97,100,83,116,97,116,101,132,2,42,119,97,115,109,47,105,110,116,101,114,114,117,112,116,115,47,105,110,100,101,120,47,73,110,116,101,114,114,117,112,116,115,46,108,111,97,100,83,116,97,116,101,133,2,34,119,97,115,109,47,106,111,121,112,97,100,47,105,110,100,101,120,47,74,111,121,112,97,100,46,108,111,97,100,83,116,97,116,101,134,2,35,119,97,115,109,47,109,101,109,111,114,121,47,109,101,109,111,114,121,47,77,101,109,111,114,121,46,108,111,97,100,83,116,97,116,101,135,2,34,119,97,115,109,47,116,105,109,101,114,115,47,105,110,100,101,120,47,84,105,109,101,114,115,46,108,111,97,100,83,116,97,116,101,136,2,32,119,97,115,109,47,115,111,117,110,100,47,115,111,117,110,100,47,83,111,117,110,100,46,108,111,97,100,83,116,97,116,101,137,2,38,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,49,47,67,104,97,110,110,101,108,49,46,108,111,97,100,83,116,97,116,101,138,2,38,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,50,47,67,104,97,110,110,101,108,50,46,108,111,97,100,83,116,97,116,101,139,2,38,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,51,47,67,104,97,110,110,101,108,51,46,108,111,97,100,83,116,97,116,101,140,2,38,119,97,115,109,47,115,111,117,110,100,47,99,104,97,110,110,101,108,52,47,67,104,97,110,110,101,108,52,46,108,111,97,100,83,116,97,116,101,141,2,20,119,97,115,109,47,105,110,100,101,120,47,108,111,97,100,83,116,97,116,101,142,2,5,115,116,97,114,116,0,49,16,115,111,117,114,99,101,77,97,112,112,105,110,103,85,82,76,31,97,115,115,101,116,115,47,105,110,100,101,120,46,117,110,116,111,117,99,104,101,100,46,119,97,115,109,46,109,97,112,]);// This file will not run on it's own
-
-const {
-  Module,
-  instantiate,
-  Memory,
-  Table
-} = WebAssembly;
-
-const WebAssemblyModule = function(deps = {
-  'global': {},
-  'env': {
-    'memory': new Memory({initial: 10, limit: 100}),
-    'table': new Table({initial: 0, element: 'anyfunc'})
-  }
-}) {
-  return instantiate(buffer, deps);
-}
-
-module.exports = WebAssemblyModule;
-
 
 /***/ }),
 
