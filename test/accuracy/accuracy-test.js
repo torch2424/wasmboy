@@ -19,7 +19,7 @@ const TEST_ROM_TIMEOUT = {
 };
 
 // Initialize wasmBoy headless, with a speed option
-WasmBoy.initialize(false, {
+WasmBoy.config({
     headless: true,
     gameboySpeed: 100.0,
     isGbcEnabled: true
@@ -47,8 +47,8 @@ commonTest.getDirectories(testRomsPath).forEach((directory) => {
         // Not using arrow functions, as arrow function timeouts were acting up
         beforeEach(function(done) {
 
-          // Set a timeout of 5000, takes a while for wasm module to parse
-          this.timeout(5000);
+          // Set a timeout of 7500, takes a while for wasm module to parse
+          this.timeout(7500);
 
           // Get our current test rom timeout
           if (TEST_ROM_TIMEOUT[testRom.replace('.gb', '')]) {
@@ -58,8 +58,10 @@ commonTest.getDirectories(testRomsPath).forEach((directory) => {
           // Read the test rom a a Uint8Array and pass to wasmBoy
           const testRomArray = new Uint8Array(fs.readFileSync(`${directory}/${testRom}`));
 
-          WasmBoy.loadGame(testRomArray).then(() => {
-            done();
+          commonTest.instantiateWasm().then(() => {
+            WasmBoy.loadROM(testRomArray).then(() => {
+              done();
+            });
           });
         });
 
@@ -68,13 +70,13 @@ commonTest.getDirectories(testRomsPath).forEach((directory) => {
           // Set our timeout
           this.timeout(timeToWaitForTestRom + 2000);
 
-          WasmBoy.startGame();
+          WasmBoy.play();
 
           console.log(`Running the following test rom: ${directory}/${testRom}`)
 
           setTimeout(() => {
 
-            WasmBoy.pauseGame().then(() => {
+            WasmBoy.pause().then(() => {
               console.log(`Checking results for the following test rom: ${directory}/${testRom}`);
 
               const imageDataArray = commonTest.getImageDataFromFrame();

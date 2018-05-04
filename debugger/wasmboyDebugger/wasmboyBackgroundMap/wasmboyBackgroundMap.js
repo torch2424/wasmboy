@@ -1,10 +1,11 @@
 import { Component } from 'preact';
 import Promise from 'promise-polyfill';
+import { WasmBoy } from '../../../lib/index';
 import './wasmboyBackgroundMap.css';
 
 export class WasmBoyBackgroundMap extends Component {
   constructor(props) {
-		super(props);
+    super(props);
   }
 
   componentDidMount() {
@@ -36,44 +37,44 @@ export class WasmBoyBackgroundMap extends Component {
           updateBackgroundMap();
         }, 500);
       });
-    }
+    };
     updateBackgroundMap();
   }
 
   updateBackgroundMap(canvasElement, canvasContext, canvasImageData) {
-    return new Promise((resolve) => {
-
+    return new Promise(resolve => {
       // Dont update for the following
-      if(!this.props.wasmboy.wasmByteMemory ||
-        !this.props.wasmboy.wasmInstance ||
-        !this.props.wasmboy.ready ||
-        this.props.wasmboy.paused ||
-        !this.props.shouldUpdate) {
+      if (
+        !WasmBoy._getWasmByteMemory() ||
+        !WasmBoy._getWasmInstance() ||
+        !WasmBoy.isReady() ||
+        WasmBoy.isPaused() ||
+        !this.props.shouldUpdate
+      ) {
         resolve();
         return;
       }
 
-      this.props.wasmboy.wasmInstance.exports.drawBackgroundMapToWasmMemory(1);
+      WasmBoy._getWasmInstance().exports.drawBackgroundMapToWasmMemory(1);
 
       const imageDataArray = new Uint8ClampedArray(256 * 256 * 4);
       const rgbColor = new Uint8ClampedArray(3);
 
-      for(let y = 0; y < 256; y++) {
+      for (let y = 0; y < 256; y++) {
         for (let x = 0; x < 256; x++) {
-
           // Each color has an R G B component
-          let pixelStart = ((y * 256) + x) * 3;
+          let pixelStart = (y * 256 + x) * 3;
 
           for (let color = 0; color < 3; color++) {
-            rgbColor[color] = this.props.wasmboy.wasmByteMemory[
-              this.props.wasmboy.wasmInstance.exports.backgroundMapLocation + pixelStart + color
+            rgbColor[color] = WasmBoy._getWasmByteMemory()[
+              WasmBoy._getWasmInstance().exports.backgroundMapLocation + pixelStart + color
             ];
           }
 
           // Doing graphics using second answer on:
           // https://stackoverflow.com/questions/4899799/whats-the-best-way-to-set-a-single-pixel-in-an-html5-canvas
           // Image Data mapping
-          const imageDataIndex = (x + (y * 256)) * 4;
+          const imageDataIndex = (x + y * 256) * 4;
 
           imageDataArray[imageDataIndex] = rgbColor[0];
           imageDataArray[imageDataIndex + 1] = rgbColor[1];
@@ -84,7 +85,7 @@ export class WasmBoyBackgroundMap extends Component {
       }
 
       // Add our new imageData
-      for(let i = 0; i < imageDataArray.length; i++) {
+      for (let i = 0; i < imageDataArray.length; i++) {
         canvasImageData.data[i] = imageDataArray[i];
       }
 
@@ -95,8 +96,8 @@ export class WasmBoyBackgroundMap extends Component {
       // Draw a semi Transparent camera thing over the imagedata
       // https://www.html5canvastutorials.com/tutorials/html5-canvas-rectangles/
       // Get the scroll X and Y
-      const scrollX = this.props.wasmboy.wasmByteMemory[this.props.getWasmBoyOffsetFromGameBoyOffset(0xFF43, this.props.wasmboy)];
-      const scrollY = this.props.wasmboy.wasmByteMemory[this.props.getWasmBoyOffsetFromGameBoyOffset(0xFF42, this.props.wasmboy)];
+      const scrollX = WasmBoy._getWasmByteMemory()[this.props.getWasmBoyOffsetFromGameBoyOffset(0xff43)];
+      const scrollY = WasmBoy._getWasmByteMemory()[this.props.getWasmBoyOffsetFromGameBoyOffset(0xff42)];
 
       const lineWidth = 2;
       const strokeStyle = 'rgba(173, 140, 255, 200)';
@@ -111,7 +112,7 @@ export class WasmBoyBackgroundMap extends Component {
 
       // Upper right corner
       if (scrollX + 160 > 256) {
-        canvasContext.rect(0, scrollY, (scrollX + 160 - 256), 144);
+        canvasContext.rect(0, scrollY, scrollX + 160 - 256, 144);
         canvasContext.lineWidth = lineWidth;
         canvasContext.strokeStyle = strokeStyle;
         canvasContext.stroke();
@@ -119,7 +120,7 @@ export class WasmBoyBackgroundMap extends Component {
 
       // Bottom left corner
       if (scrollY + 144 > 256) {
-        canvasContext.rect(scrollX, 0, 160, (scrollY + 144 - 256));
+        canvasContext.rect(scrollX, 0, 160, scrollY + 144 - 256);
         canvasContext.lineWidth = lineWidth;
         canvasContext.strokeStyle = strokeStyle;
         canvasContext.stroke();
@@ -127,7 +128,7 @@ export class WasmBoyBackgroundMap extends Component {
 
       // Bottom right corner
       if (scrollX + 160 > 256 && scrollY + 144 > 256) {
-        canvasContext.rect(0, 0, (scrollX + 160 - 256), (scrollY + 144 - 256));
+        canvasContext.rect(0, 0, scrollX + 160 - 256, scrollY + 144 - 256);
         canvasContext.lineWidth = lineWidth;
         canvasContext.strokeStyle = strokeStyle;
         canvasContext.stroke();
@@ -142,10 +143,9 @@ export class WasmBoyBackgroundMap extends Component {
       <div>
         <h1>Background Map</h1>
         <div class="wasmboy__backgroundMap">
-          <canvas id="WasmBoyBackgroundMap" width="256" height="256">
-          </canvas>
+          <canvas id="WasmBoyBackgroundMap" width="256" height="256" />
         </div>
       </div>
-    )
+    );
   }
 }

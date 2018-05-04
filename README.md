@@ -86,7 +86,7 @@ Just your standard node app. Install Node with [nvm](https://github.com/creation
 The project contains three different elements.
 
 * The `debugger` is the container for the wasmBoy library, which is simply a [preact](https://github.com/developit/preact) application, generated with [preact-cli](https://github.com/developit/preact-cli).
-* The `wasm` or `core` which is the web assembly module for wasmBoy written in [AssemblyScript](https://github.com/AssemblyScript/assemblyscript).
+* The `core` or `wasm`  which is the web assembly module for wasmBoy written in [AssemblyScript](https://github.com/AssemblyScript/assemblyscript).
 * The `lib` which is the importable library of wasmBoy that can be used in other projects, that adds a top level API to the `core`.
 
 Each of these uses a different build process. The debugger uses [webpack](https://webpack.js.org/), the wasm uses the [AssemblyScript](https://github.com/AssemblyScript/assemblyscript) compiler CLI tool, and the lib uses [Rollup.js](https://rollupjs.org/guide/en).
@@ -126,10 +126,10 @@ npm run debugger:serve
 npm run debugger:build
 
 # Watch the wasm (AssemblyScript) *.ts files and build on changes
-npm run wasm:watch
+npm run core:watch
 
 # Build the wasm (AssemblyScript) *.ts files, with the correct CLI flags
-npm run wasm:build
+npm run core:build
 
 # Watch the Wasmboy ES6 Module for changes, and build
 npm run lib:watch

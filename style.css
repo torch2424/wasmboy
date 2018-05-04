@@ -1,76 +1,76 @@
 /* General styles for the debugger, and the index component */
 
-html, body {
-	font: 14px/1.21 'Helvetica Neue', arial, sans-serif;
-	font-weight: 400;
-	/* For mobile phones to be able to scroll the view into place */
-	min-height: 600px;
+html,
+body {
+  font: 14px/1.21 'Helvetica Neue', arial, sans-serif;
+  font-weight: 400;
+  /* For mobile phones to be able to scroll the view into place */
+  min-height: 600px;
 }
 
 h1 {
-	text-align: center;
-	font-weight: bold !important;
+  text-align: center;
+  font-weight: bold !important;
 }
 
 p {
-	text-align: center;
-	max-width: 640px;
-	margin-left: auto;
-	margin-right: auto;
+  text-align: center;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 button {
-	margin-left: 5px;
-	margin-right: 5px;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
-input[type="checkbox"] {
-	margin-left: 5px;
+input[type='checkbox'] {
+  margin-left: 5px;
 }
 
 .hide {
-	display: none;
+  display: none;
 }
 
 .notification {
-	width: 50vw;
-	max-width: 400px;
-	color: #FAFAFA;
-	background-color: rgba(0, 0, 0, 0.65) !important;
-	position: fixed !important;
-	bottom: 10px;
-	right: 20px;
-	text-overflow: wrap !important;
-	z-index: 100000;
+  width: 50vw;
+  max-width: 400px;
+  color: #fafafa;
+  background-color: rgba(0, 0, 0, 0.65) !important;
+  position: fixed !important;
+  bottom: 10px;
+  right: 20px;
+  text-overflow: wrap !important;
+  z-index: 100000;
 }
 
 .wasmboy {
-	max-width: 700px;
-	margin-left: auto;
-	margin-right: auto;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .wasmboy__title {
-	margin-top: 10px;
-	margin-bottom: 10px;
-	font-size: 1rem;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-size: 1rem;
 }
 
 .wasmboy__canvas-container {
-	text-align: center;
+  text-align: center;
 }
 
 .wasmboy__canvas-container__canvas {
+  border: 1px solid black;
 
-	border: 1px solid black;
-
-	/* Width and height are 160x144 pixel aspect ratio in vw */
-	width: 50vw;
-	height: 45vw;
-	min-width: 160px;
-	min-height: 144px;
-	max-width: 640px;
-	max-height: 576px;
+  /* Width and height are 160x144 pixel aspect ratio in vw */
+  width: 50vw;
+  height: 45vw;
+  min-width: 160px;
+  min-height: 144px;
+  max-width: 640px;
+  max-height: 576px;
 }
 
 /* https://atomiks.github.io/30-seconds-of-css/ */
