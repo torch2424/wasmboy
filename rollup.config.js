@@ -1,7 +1,8 @@
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
-import url from "rollup-plugin-url"
+import url from "rollup-plugin-url";
+import regenerator from 'rollup-plugin-regenerator';
 import pkg from './package.json';
 
 const plugins = [
@@ -13,7 +14,8 @@ const plugins = [
 	commonjs(), // so Rollup can convert node module to an ES module
 	babel({ // so Rollup can convert unsupported es6 code to es5
 		exclude: ['node_modules/**']
-	})
+	}),
+	regenerator(),
 ];
 
 export default [
@@ -25,6 +27,7 @@ export default [
 			file: pkg.browser,
 			format: 'umd'
 		},
+		context: 'window',
 		plugins: plugins
 	},
 
@@ -37,9 +40,17 @@ export default [
 	{
 		input: 'lib/index.js',
 		output: [
-			{ file: pkg.main, format: 'cjs' },
 			{ file: pkg.module, format: 'es' }
 		],
+		context: 'window',
     plugins: plugins
 	},
+	{
+		input: 'lib/index.js',
+		output: [
+			{ file: pkg.main, format: 'cjs' }
+		],
+		context: 'global',
+    plugins: plugins
+	}
 ];
