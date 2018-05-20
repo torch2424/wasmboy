@@ -4,13 +4,13 @@
   "author": "Aaron Turner",
   "version": "0.0.1",
   "license": "Apache 2.0",
-  "homepage": "https://torch2424.github.io/wasmboy",
+  "homepage": "https://torch2424.github.io/wasmBoy",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/torch2424/wasmboy.git"
+    "url": "git+https://github.com/torch2424/wasmBoy.git"
   },
   "bugs": {
-    "url": "https://github.com/torch2424/wasmboy/issues"
+    "url": "https://github.com/torch2424/wasmBoy/issues"
   },
   "main": "dist/wasmboy.cjs.js",
   "module": "dist/wasmboy.esm.js",
