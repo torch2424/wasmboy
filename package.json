@@ -1,7 +1,17 @@
 {
-  "name": "wasmBoy",
-  "version": "0.0.0",
+  "name": "wasmboy",
+  "description": "Gameboy / Gameboy Color Emulator written for Web Assembly using AssemblyScript. Shell/Debugger in Preact",
+  "author": "Aaron Turner",
+  "version": "0.0.1",
   "license": "Apache 2.0",
+  "homepage": "https://torch2424.github.io/wasmboy",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/torch2424/wasmboy.git"
+  },
+  "bugs": {
+    "url": "https://github.com/torch2424/wasmboy/issues"
+  },
   "main": "dist/wasmboy.cjs.js",
   "module": "dist/wasmboy.esm.js",
   "browser": "dist/wasmboy.umd.js",
@@ -22,6 +32,7 @@
     "core:build": "npx asc core/index.ts -b dist/core/index.untouched.wasm -t dist/core/index.untouched.wast -O3 --validate --sourceMap assets/index.untouched.wasm.map --memoryBase 0 && cp dist/core/index.untouched.wasm.map assets/index.untouched.wasm.map && echo \"Built Wasm!\"",
     "lib:watch": "npx rollup -c -w",
     "lib:build": "npx rollup -c",
+    "lib:deploy": "npm run core:build && npm run lib:build && npm publish",
     "prettier": "npm run prettier:fix",
     "prettier:lint": " echo \"Listing unlinted files, will show nothing if everything is fine.\" && npx prettier --list-different index.js preact.config.js style.css debugger/**/*.js debugger/**/*.css lib/**/*.js core/**/*.ts",
     "prettier:fix": "npx prettier --write index.js preact.config.js style.css debugger/**/*.js debugger/**/*.css lib/**/*.js core/**/*.ts",
