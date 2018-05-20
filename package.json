@@ -2,7 +2,7 @@
   "name": "wasmboy",
   "description": "Gameboy / Gameboy Color Emulator written for Web Assembly using AssemblyScript. Shell/Debugger in Preact",
   "author": "Aaron Turner",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "Apache 2.0",
   "homepage": "https://torch2424.github.io/wasmBoy",
   "repository": {
@@ -68,11 +68,11 @@
     "promise-polyfill": "7.0.0",
     "raf": "^3.4.0",
     "responsive-gamepad": "0.0.3",
-    "unfetch": "^3.0.0"
+    "unfetch": "^3.0.0",
+    "audiobuffer-to-wav": "^1.0.0"
   },
   "devDependencies": {
     "assemblyscript": "github:AssemblyScript/assemblyscript#31633899f9b54b5f7819ffb4ff365b5a94acdb40",
-    "audiobuffer-to-wav": "^1.0.0",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-env": "^1.6.1",
     "bulma": "^0.7.1",
