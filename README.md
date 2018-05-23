@@ -1,4 +1,4 @@
-# wasmBoy
+# wasmboy
 
 <!--- Badges -->
 [![Build Status](https://travis-ci.org/torch2424/wasmBoy.svg?branch=master)](https://travis-ci.org/torch2424/wasmBoy)
@@ -85,9 +85,9 @@ Just your standard node app. Install Node with [nvm](https://github.com/creation
 
 The project contains three different elements.
 
-* The `debugger` is the container for the wasmBoy library, which is simply a [preact](https://github.com/developit/preact) application, generated with [preact-cli](https://github.com/developit/preact-cli).
-* The `core` or `wasm`  which is the web assembly module for wasmBoy written in [AssemblyScript](https://github.com/AssemblyScript/assemblyscript).
-* The `lib` which is the importable library of wasmBoy that can be used in other projects, that adds a top level API to the `core`.
+* The `debugger` is the container for the wasmboy library, which is simply a [preact](https://github.com/developit/preact) application, generated with [preact-cli](https://github.com/developit/preact-cli).
+* The `core` or `wasm`  which is the web assembly module for wasmboy written in [AssemblyScript](https://github.com/AssemblyScript/assemblyscript).
+* The `lib` which is the importable library of wasmboy that can be used in other projects, that adds a top level API to the `core`.
 
 Each of these uses a different build process. The debugger uses [webpack](https://webpack.js.org/), the wasm uses the [AssemblyScript](https://github.com/AssemblyScript/assemblyscript) compiler CLI tool, and the lib uses [Rollup.js](https://rollupjs.org/guide/en).
 
@@ -138,7 +138,7 @@ npm run lib:watch
 npm run lib:build
 ```
 
-The debugger application/container for wasmBoy utilizes the [preact-cli](https://github.com/developit/preact-cli/blob/master/README.md). Additional workflow commands and tips can be found there.
+The debugger application/container for wasmboy utilizes the [preact-cli](https://github.com/developit/preact-cli/blob/master/README.md). Additional workflow commands and tips can be found there.
 
 Using the [gh-pages](https://www.npmjs.com/package/gh-pages) for debugger/demo deployment onto gh-pages.
 
