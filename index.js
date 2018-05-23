@@ -56,6 +56,14 @@ export default class App extends Component {
       .catch(error => {
         console.error(error);
       });
+
+
+    setTimeout(() => {
+      let canvasElementTwo = document.querySelector('.wasmboy__canvas-container__canvas-2');
+      WasmBoy.setCanvas(canvasElementTwo).then(() => {
+        console.log('aye');
+      })
+    }, 30000)
   }
 
   // Function to show notifications to the user
@@ -170,6 +178,7 @@ export default class App extends Component {
 
         <main className="wasmboy__canvas-container">
           <canvas className="wasmboy__canvas-container__canvas" />
+          <canvas className="wasmboy__canvas-container__canvas-2" />
         </main>
 
         <WasmBoyGamepad />
