@@ -16,7 +16,7 @@
   "module": "dist/wasmboy.esm.js",
   "browser": "dist/wasmboy.umd.js",
   "scripts": {
-    "start": "npx concurrently --kill-others --names \"DEBUGGER,CORE,LIB\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"npm run debugger:watch\" \"npm run core:watch\" \"npm run lib:watch\"",
+    "start": "npm run core:build && npx concurrently --kill-others --names \"DEBUGGER,CORE,LIB\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"npm run debugger:watch\" \"npm run core:watch\" \"npm run lib:watch\"",
     "dev": "npm run start",
     "watch": "npm run start",
     "build": "npm run core:build && npm run lib:build",
