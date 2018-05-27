@@ -300,8 +300,8 @@ export class WasmBoyDebugger extends Component {
           <button
             class="button"
             onclick={() => {
-              console.log('Retrieving Cartridge Info...')
-              WasmBoy._getCartridgeInfo().then((cartridgeInfo) => {
+              console.log('Retrieving Cartridge Info...');
+              WasmBoy._getCartridgeInfo().then(cartridgeInfo => {
                 console.log('Cartridge Info:', cartridgeInfo);
               });
             }}
