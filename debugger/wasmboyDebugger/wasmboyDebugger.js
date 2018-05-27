@@ -300,6 +300,20 @@ export class WasmBoyDebugger extends Component {
           <button
             class="button"
             onclick={() => {
+              console.log('Retrieving Cartridge Info...')
+              WasmBoy._getCartridgeInfo().then((cartridgeInfo) => {
+                console.log('Cartridge Info:', cartridgeInfo);
+              });
+            }}
+          >
+            Log Cartridge Info to Console
+          </button>
+        </div>
+
+        <div class="debuggerAction">
+          <button
+            class="button"
+            onclick={() => {
               WasmBoy._saveCurrentAudioBufferToWav();
             }}
           >
