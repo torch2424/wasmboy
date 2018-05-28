@@ -63,29 +63,35 @@ export class WasmBoyFilePicker extends Component {
           return response.json();
         })
         .then(responseJson => {
-          // Finally load the file using the oAuthHeaders
-          WasmBoy.loadROM(responseJson.downloadUrl, {
-            headers: oAuthHeaders
-          })
-            .then(() => {
-              console.log('Wasmboy Ready!');
-              this.props.showNotification('Game Loaded! 🎉');
-              this.setFileLoadingStatus(false);
-
-              // Set our file name
-              const newState = Object.assign({}, this.state);
-              newState.currentFileName = googlePickerFileObject.name;
-              this.setState(newState);
+          if (responseJson.title.endsWith('.zip') || responseJson.title.endsWith('.gb') || responseJson.title.endsWith('.gbc')) {
+            // Finally load the file using the oAuthHeaders
+            WasmBoy.loadROM(responseJson.downloadUrl, {
+              headers: oAuthHeaders,
+              fileName: responseJson.title
             })
-            .catch(error => {
-              console.log('Load Game Error:', error);
-              this.props.showNotification('Game Load Error! 😞');
-              this.setFileLoadingStatus(false);
-            });
+              .then(() => {
+                console.log('Wasmboy Ready!');
+                this.props.showNotification('Game Loaded! 🎉');
+                this.setFileLoadingStatus(false);
+
+                // Set our file name
+                const newState = Object.assign({}, this.state);
+                newState.currentFileName = responseJson.title;
+                this.setState(newState);
+              })
+              .catch(error => {
+                console.log('Load Game Error:', error);
+                this.props.showNotification('Game Load Error! 😞');
+                this.setFileLoadingStatus(false);
+              });
+          } else {
+            this.props.showNotification('Invalid file type. 😞');
+            this.setFileLoadingStatus(false);
+          }
         })
         .catch(error => {
           this.props.showNotification('Error getting file from google drive 💔');
-          this.setFileLoadingStatus(true);
+          this.setFileLoadingStatus(false);
         });
     }
   }
