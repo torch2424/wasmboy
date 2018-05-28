@@ -27,7 +27,7 @@
     "debugger:watch": "preact watch",
     "debugger:serve": "preact build && preact serve",
     "debugger:build": "preact build",
-    "debugger:deploy": "npm run debugger:build && npx gh-pages -d build",
+    "debugger:deploy": "npm run debugger:build && echo 'wasmboy.app' > build/CNAME && npx gh-pages -d build",
     "core:watch": "npx watch \"npm run core:build\" core",
     "core:build": "npx asc core/index.ts -b dist/core/index.untouched.wasm -t dist/core/index.untouched.wast -O3 --validate --sourceMap assets/index.untouched.wasm.map --memoryBase 0 && cp dist/core/index.untouched.wasm.map assets/index.untouched.wasm.map && echo \"Built Wasm!\"",
     "lib:watch": "npx rollup -c -w",
