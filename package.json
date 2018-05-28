@@ -16,8 +16,7 @@
   "module": "dist/wasmboy.esm.js",
   "browser": "dist/wasmboy.umd.js",
   "scripts": {
-    "start":
-      "npm run core:build && npx concurrently --kill-others --names \"DEBUGGER,CORE,LIB\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"npm run debugger:watch\" \"npm run core:watch\" \"npm run lib:watch\"",
+    "start": "npm run core:build && npx concurrently --kill-others --names \"DEBUGGER,CORE,LIB\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"npm run debugger:watch\" \"npm run core:watch\" \"npm run lib:watch\"",
     "dev": "npm run start",
     "watch": "npm run start",
     "build": "npm run core:build && npm run lib:build",
@@ -30,18 +29,20 @@
     "debugger:build": "preact build",
     "debugger:deploy": "npm run debugger:build && npx gh-pages -d build",
     "core:watch": "npx watch \"npm run core:build\" core",
-    "core:build":
-      "npx asc core/index.ts -b dist/core/index.untouched.wasm -t dist/core/index.untouched.wast -O3 --validate --sourceMap assets/index.untouched.wasm.map --memoryBase 0 && cp dist/core/index.untouched.wasm.map assets/index.untouched.wasm.map && echo \"Built Wasm!\"",
+    "core:build": "npx asc core/index.ts -b dist/core/index.untouched.wasm -t dist/core/index.untouched.wast -O3 --validate --sourceMap assets/index.untouched.wasm.map --memoryBase 0 && cp dist/core/index.untouched.wasm.map assets/index.untouched.wasm.map && echo \"Built Wasm!\"",
     "lib:watch": "npx rollup -c -w",
     "lib:build": "npx rollup -c",
     "lib:deploy": "npm run core:build && npm run lib:build && npx np",
     "prettier": "npm run prettier:fix",
-    "prettier:lint":
-      " echo \"Listing unlinted files, will show nothing if everything is fine.\" && npx prettier --list-different index.js preact.config.js style.css debugger/**/*.js debugger/**/*.css lib/**/*.js core/**/*.ts",
-    "prettier:fix": "npx prettier --write index.js preact.config.js style.css debugger/**/*.js debugger/**/*.css lib/**/*.js core/**/*.ts",
+    "prettier:lint": " echo \"Listing unlinted files, will show nothing if everything is fine.\" && npx prettier --config .prettierrc --list-different index.js preact.config.js style.css debugger/**/*.js debugger/**/*.css lib/**/*.js core/**/*.ts",
+    "prettier:fix": "npx prettier --config .prettierrc --write index.js preact.config.js style.css debugger/**/*.js debugger/**/*.css lib/**/*.js core/**/*.ts",
     "precommit": "npx pretty-quick --staged"
   },
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "babel": {
     "presets": [
       [
@@ -51,12 +52,16 @@
         }
       ]
     ],
-    "plugins": ["external-helpers"]
+    "plugins": [
+      "external-helpers"
+    ]
   },
   "eslintConfig": {
     "extends": "eslint-config-synacor"
   },
-  "eslintIgnore": ["build/*"],
+  "eslintIgnore": [
+    "build/*"
+  ],
   "dependencies": {
     "idb": "^2.1.0",
     "jszip": "^3.1.5",
