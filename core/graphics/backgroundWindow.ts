@@ -426,7 +426,7 @@ function drawLineOfTileFromTileId(
   // Or i is 157, and our camera is only 160 pixels wide
   let tileXStart: i32 = 0;
   if (xPixel == 0) {
-    tileXStart = pixelXPositionInMap - pixelXPositionInMap / 8 * 8;
+    tileXStart = pixelXPositionInMap - (pixelXPositionInMap / 8) * 8;
   }
   let tileXEnd: i32 = 7;
   if (xPixel + 8 > 160) {

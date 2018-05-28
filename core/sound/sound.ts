@@ -411,7 +411,7 @@ function getSampleAsUnsignedByte(sample: i32, mixerVolume: i32): i32 {
   convertedSample = convertedSample * precision;
 
   // Multiply by the mixer volume fraction (to find the actual volume)
-  convertedSample = convertedSample * mixerVolume / 8;
+  convertedSample = (convertedSample * mixerVolume) / 8;
 
   // Convert back to scale of 0 to 120
   convertedSample = convertedSample / precision;
@@ -424,8 +424,8 @@ function getSampleAsUnsignedByte(sample: i32, mixerVolume: i32): i32 {
   // For example, 120 / 254 = 0.47244094488188976
   // Multiply by 1000 to increase the float into an int
   // so, 120 * 1000 / (0.47244094488188976 * 1000) should give approximate answer for max mixer volume
-  let maxDivider: i32 = 120 * precision / 254;
-  convertedSample = convertedSample * precision / maxDivider;
+  let maxDivider: i32 = (120 * precision) / 254;
+  convertedSample = (convertedSample * precision) / maxDivider;
 
   return convertedSample;
 }
