@@ -6163,6 +6163,14 @@ var initializeAutoSave = function initializeAutoSave(wasmboyMemory) {
   window.addEventListener('pagehide', function () {
     autosave__prepareAndStoreAutoSave(wasmboyMemory);
   }, false);
+  // Mobile Page visibility, for pressing home, closing tabs, task switcher, etc...
+  // https://www.igvita.com/2015/11/20/dont-lose-user-and-app-state-use-page-visibility/
+  document.addEventListener('visibilitychange', function () {
+    // fires when user switches tabs, apps, goes to homescreen, etc.
+    if (document.visibilityState === 'hidden') {
+      autosave__prepareAndStoreAutoSave(wasmboyMemory);
+    }
+  });
 
   // Restore any autosave lingering to be committed
   return _findAndCommitAutoSave(wasmboyMemory);
