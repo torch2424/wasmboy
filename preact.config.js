@@ -30,7 +30,7 @@ export default function(config, env, helpers) {
     // serving on github pages, so: wasmBoy/
     // https://github.com/developit/preact-cli/issues/218
     // https://github.com/developit/preact-cli/pull/323
-    config.output.publicPath = '/wasmBoy/';
+    config.output.publicPath = '/';
   }
 
   // Add a wasm loader

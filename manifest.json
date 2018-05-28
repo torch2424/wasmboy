@@ -1,7 +1,7 @@
 {
   "name": "wasmBoy",
   "short_name": "wasmBoy",
-  "start_url": "/wasmBoy/",
+  "start_url": "/",
   "display": "fullscreen",
   "orientation": "landscape",
   "background_color": "#fff",
