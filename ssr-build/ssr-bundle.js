@@ -6263,8 +6263,10 @@ var memory_WasmBoyMemoryService = function () {
 
 
   WasmBoyMemoryService.prototype.resetState = function resetState() {
-    for (var i = 0; i <= this.WASMBOY_GAME_BYTES_LOCATION; i++) {
-      this.wasmByteMemory[i] = 0;
+    if (this.wasmByteMemory) {
+      for (var i = 0; i <= this.WASMBOY_GAME_BYTES_LOCATION; i++) {
+        this.wasmByteMemory[i] = 0;
+      }
     }
 
     this.loadedCartridgeMemoryState.RAM = false;
@@ -6660,7 +6662,7 @@ function rom__asyncToGenerator(fn) { return function () { var gen = fn.apply(thi
 
 // Collection of functions to parse roms
 // Private function to fetch a game
-var rom_fetchROMAsByteArray = function fetchROMAsByteArray(ROM, fetchHeaders) {
+var rom_fetchROMAsByteArray = function fetchROMAsByteArray(ROM, loadOptions) {
   var fetchROMAsByteArrayTask = function () {
     var _ref = rom__asyncToGenerator(function* () {
       if (ArrayBuffer.isView(ROM) && ROM.constructor === Uint8Array) {
@@ -6683,8 +6685,9 @@ var rom_fetchROMAsByteArray = function fetchROMAsByteArray(ROM, fetchHeaders) {
       } else {
         // Fetch the file
         // First check if we have headers
-        if (!fetchHeaders) {
-          fetchHeaders = {};
+        var fetchHeaders = {};
+        if (loadOptions && loadOptions.headers) {
+          fetchHeaders.headers = loadOptions.headers;
         }
 
         var bytes = yield unfetch_es(ROM, fetchHeaders).then(function (blob) {
@@ -6694,7 +6697,12 @@ var rom_fetchROMAsByteArray = function fetchROMAsByteArray(ROM, fetchHeaders) {
           return blob.arrayBuffer();
         });
 
-        return yield rom_getGameFromArrayBuffer(ROM, bytes);
+        var fileName = ROM;
+        if (loadOptions.fileName) {
+          fileName = loadOptions.fileName;
+        }
+
+        return yield rom_getGameFromArrayBuffer(fileName, bytes);
       }
     });
 
@@ -6913,6 +6921,9 @@ var wasmboy_WasmBoyLibService = function () {
 
     var configTask = function () {
       var _ref = wasmboy__asyncToGenerator(function* () {
+        // Pause any currently running game
+        yield _this.pause();
+
         // Get our canvas elements
         yield _this.setCanvas(canvasElement);
 
@@ -7026,6 +7037,9 @@ var wasmboy_WasmBoyLibService = function () {
         // TODO: Handle passing a boot rom
         WasmBoyMemory.loadCartridgeRom(responses[0]);
 
+        // Save the game that we loaded if we need to reload the game
+        _this3.loadedROM = responses[0];
+
         // Run our initialization on the core
         _this3.wasmInstance.exports.config(0, // TODO: Include Boot Rom
         _this3.options.isGbcEnabled ? 1 : 0, _this3.options.audioBatchProcessing ? 1 : 0, _this3.options.graphicsBatchProcessing ? 1 : 0, _this3.options.timersBatchProcessing ? 1 : 0, _this3.options.graphicsDisableScanlineRendering ? 1 : 0, _this3.options.audioAccumulateSamples ? 1 : 0, _this3.options.tileRendering ? 1 : 0, _this3.options.tileCaching ? 1 : 0);
@@ -7038,13 +7052,11 @@ var wasmboy_WasmBoyLibService = function () {
 
     var loadROMTask = function () {
       var _ref5 = wasmboy__asyncToGenerator(function* () {
+        // Pause wasmBoy
         yield _this3.pause();
 
         // Initialize any needed parts of wasmboy
         var responses = yield initializeTask();
-
-        // Save the game that we loaded if we need to reload the game
-        _this3.loadedROM = ROM;
 
         // Check if we are running headless
         if (_this3.options.headless) {
@@ -7686,26 +7698,32 @@ var wasmboyFilePicker_WasmBoyFilePicker = function (_Component) {
       }).then(function (response) {
         return response.json();
       }).then(function (responseJson) {
-        // Finally load the file using the oAuthHeaders
-        WasmBoy.loadROM(responseJson.downloadUrl, {
-          headers: oAuthHeaders
-        }).then(function () {
-          console.log('Wasmboy Ready!');
-          _this3.props.showNotification('Game Loaded! 🎉');
-          _this3.setFileLoadingStatus(false);
+        if (responseJson.title.endsWith('.zip') || responseJson.title.endsWith('.gb') || responseJson.title.endsWith('.gbc')) {
+          // Finally load the file using the oAuthHeaders
+          WasmBoy.loadROM(responseJson.downloadUrl, {
+            headers: oAuthHeaders,
+            fileName: responseJson.title
+          }).then(function () {
+            console.log('Wasmboy Ready!');
+            _this3.props.showNotification('Game Loaded! 🎉');
+            _this3.setFileLoadingStatus(false);
 
-          // Set our file name
-          var newState = wasmboyFilePicker__extends({}, _this3.state);
-          newState.currentFileName = googlePickerFileObject.name;
-          _this3.setState(newState);
-        }).catch(function (error) {
-          console.log('Load Game Error:', error);
-          _this3.props.showNotification('Game Load Error! 😞');
+            // Set our file name
+            var newState = wasmboyFilePicker__extends({}, _this3.state);
+            newState.currentFileName = responseJson.title;
+            _this3.setState(newState);
+          }).catch(function (error) {
+            console.log('Load Game Error:', error);
+            _this3.props.showNotification('Game Load Error! 😞');
+            _this3.setFileLoadingStatus(false);
+          });
+        } else {
+          _this3.props.showNotification('Invalid file type. 😞');
           _this3.setFileLoadingStatus(false);
-        });
+        }
       }).catch(function (error) {
         _this3.props.showNotification('Error getting file from google drive 💔');
-        _this3.setFileLoadingStatus(true);
+        _this3.setFileLoadingStatus(false);
       });
     }
   };
