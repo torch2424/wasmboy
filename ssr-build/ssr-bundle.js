@@ -6706,7 +6706,7 @@ var rom_fetchROMAsByteArray = function fetchROMAsByteArray(ROM, loadOptions) {
         });
 
         var fileName = ROM;
-        if (loadOptions.fileName) {
+        if (loadOptions && loadOptions.fileName) {
           fileName = loadOptions.fileName;
         }
 
