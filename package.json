@@ -34,8 +34,8 @@
     "lib:build": "npx rollup -c",
     "lib:deploy": "npm run core:build && npm run lib:build && npx np",
     "prettier": "npm run prettier:fix",
-    "prettier:lint": " echo \"Listing unlinted files, will show nothing if everything is fine.\" && npx prettier --list-different index.js preact.config.js style.css debugger/**/*.js debugger/**/*.css lib/**/*.js core/**/*.ts",
-    "prettier:fix": "npx prettier --write index.js preact.config.js style.css debugger/**/*.js debugger/**/*.css lib/**/*.js core/**/*.ts",
+    "prettier:lint": " echo \"Listing unlinted files, will show nothing if everything is fine.\" && npx prettier --config .prettierrc --list-different index.js preact.config.js style.css debugger/**/*.js debugger/**/*.css lib/**/*.js core/**/*.ts",
+    "prettier:fix": "npx prettier --config .prettierrc --write index.js preact.config.js style.css debugger/**/*.js debugger/**/*.css lib/**/*.js core/**/*.ts",
     "precommit": "npx pretty-quick --staged"
   },
   "files": [
