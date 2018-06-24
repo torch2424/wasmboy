@@ -4751,6 +4751,7 @@ var WasmBoyGraphicsService = function () {
 
     this.wasmInstance = undefined;
     this.wasmByteMemory = undefined;
+    this.updateGraphicsCallback = undefined;
 
     this.frameQueue = undefined;
     this.frameQueueRenderPromise = undefined;
@@ -4760,11 +4761,12 @@ var WasmBoyGraphicsService = function () {
     this.canvasImageData = undefined;
   }
 
-  WasmBoyGraphicsService.prototype.initialize = function initialize(canvasElement, wasmInstance, wasmByteMemory) {
+  WasmBoyGraphicsService.prototype.initialize = function initialize(canvasElement, wasmInstance, wasmByteMemory, updateGraphicsCallback) {
     var _this = this;
 
     this.wasmInstance = wasmInstance;
     this.wasmByteMemory = wasmByteMemory;
+    this.updateGraphicsCallback = updateGraphicsCallback;
 
     // Initialiuze our cached wasm constants
     WASMBOY_CURRENT_FRAME_OUTPUT_LOCATION = this.wasmInstance.exports.frameInProgressVideoOutputLocation;
@@ -4838,6 +4840,11 @@ var WasmBoyGraphicsService = function () {
             // Alpha, no transparency
             imageDataArray[imageDataIndex + 3] = 255;
           }
+        }
+
+        // Check for a callback for accessing image data
+        if (_this2.updateGraphicsCallback) {
+          _this2.updateGraphicsCallback(imageDataArray);
         }
 
         // Add our new imageData
@@ -4921,6 +4928,7 @@ var WasmBoyAudioService = function () {
     // Wasmboy instance and memory
     this.wasmInstance = undefined;
     this.wasmByteMemory = undefined;
+    this.updateAudioCallback = undefined;
 
     this.audioContext = undefined;
     this.audioBuffer = undefined;
@@ -4932,13 +4940,14 @@ var WasmBoyAudioService = function () {
     this.averageTimeStretchFps = [];
   }
 
-  WasmBoyAudioService.prototype.initialize = function initialize(wasmInstance, wasmByteMemory) {
+  WasmBoyAudioService.prototype.initialize = function initialize(wasmInstance, wasmByteMemory, updateAudioCallback) {
     var _this = this;
 
     var initializeTask = function () {
       var _ref = audio__asyncToGenerator(function* () {
         _this.wasmInstance = wasmInstance;
         _this.wasmByteMemory = wasmByteMemory;
+        _this.updateAudioCallback = updateAudioCallback;
 
         // Initialiuze our cached wasm constants
         WASMBOY_SOUND_OUTPUT_LOCATION = _this.wasmInstance.exports.soundOutputLocation;
@@ -5072,9 +5081,18 @@ var WasmBoyAudioService = function () {
         // Set our playback rate for time resetretching
         source.playbackRate.setValueAtTime(playbackRate, _this2.audioContext.currentTime);
 
+        // Call our callback, if we have one
+        var finalNode = source;
+        if (_this2.updateAudioCallback) {
+          var responseNode = _this2.updateAudioCallback(_this2.audioContext, source);
+          if (responseNode) {
+            finalNode = responseNode;
+          }
+        }
+
         // connect the AudioBufferSourceNode to the
         // destination so we can hear the sound
-        source.connect(_this2.audioContext.destination);
+        finalNode.connect(_this2.audioContext.destination);
 
         // start the source playing
         source.start(_this2.audioPlaytime);
@@ -5132,12 +5150,14 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 // Define a keyboard key schema
 var keyInputSchema = {
+  ID: undefined,
   ACTIVE: false,
   KEY_CODE: undefined
 
   // Define a gamepad button schema
   // https://w3c.github.io/gamepad/#remapping
 };var gamepadInputSchema = {
+  ID: undefined,
   ACTIVE: false,
   BUTTON_ID: undefined,
   JOYSTICK: {
@@ -5147,6 +5167,7 @@ var keyInputSchema = {
 };
 
 var touchInputSchema = {
+  ID: undefined,
   ACTIVE: false,
   ELEMENT: undefined,
   TYPE: undefined,
@@ -5195,17 +5216,29 @@ var touchInputSchema = {
     KEYBOARD: [],
     GAMEPAD: [],
     TOUCHPAD: []
-  }
-};
+
+    // Function to return an ID for our input
+    // https://stackoverflow.com/questions/6860853/generate-random-string-for-div-id
+  } };function getInputId() {
+
+  var idGenerator = function idGenerator() {
+    return Math.random().toString(36).replace(/[^a-z]+/g, '').substr(2, 10);
+  };
+
+  var stringId = "" + idGenerator() + idGenerator();
+  return stringId.slice();
+}
 
 function getKeyInput(keyCode) {
   var input = _extends({}, keyInputSchema);
+  input.ID = getInputId();
   input.KEY_CODE = keyCode;
   return input;
 }
 
 function getGamepadInput(gamepadButtonId, axisId, axisIsPositive) {
   var input = _extends({}, gamepadInputSchema);
+  input.ID = getInputId();
   input.JOYSTICK = _extends({}, gamepadInputSchema.JOYSTICK);
   if (gamepadButtonId || gamepadButtonId === 0) {
     input.BUTTON_ID = gamepadButtonId;
@@ -5218,6 +5251,8 @@ function getGamepadInput(gamepadButtonId, axisId, axisIsPositive) {
 
 function getTouchInput(element, type, direction, eventHandler) {
   var input = _extends({}, touchInputSchema);
+
+  input.ID = getInputId();
 
   // TODO: Check the type for a valid type
 
@@ -5361,7 +5396,9 @@ keymap.SELECT.KEYBOARD.push(getKeyInput(Key.BACK_SLASH));
 keymap.SELECT.KEYBOARD.push(getKeyInput(Key.NUMPAD_1));
 keymap.SELECT.GAMEPAD.push(getGamepadInput(8));
 
-var KEYMAP = keymap;
+var KEYMAP = function KEYMAP() {
+  return JSON.parse(JSON.stringify(keymap));
+};
 
 var classCallCheck = function classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -5408,50 +5445,97 @@ var ResponsiveGamepadService = function () {
     // Our settings
     this.gamepadAnalogStickDeadZone = 0.25;
     this.keyMapKeys = Object.keys(KeyMapSchema());
-    this.keyMap = KEYMAP;
+    this.keyMap = KEYMAP();
+    this.enabled = false;
+    this.addedEventListeners = false;
   }
 
   createClass(ResponsiveGamepadService, [{
-    key: 'initialize',
-    value: function initialize(keyMap) {
-      var _this = this;
+    key: 'enable',
+    value: function enable(keyMap) {
 
-      // Add our key event listeners
-      window.addEventListener('keyup', function (event) {
-        _this.updateKeyboard(event);
-      });
-      window.addEventListener('keydown', function (event) {
-        _this.updateKeyboard(event);
-      });
-
-      // Add a resize listen to update the gamepad rect on resize
-      window.addEventListener("resize", function () {
-        _this.updateTouchpadRect();
-      });
-
+      // TODO: Verify it is a valid keymap passed
       if (keyMap) {
         this.keyMap = keyMap;
       }
+
+      // Add our key event listeners
+      // Wrapping in this for preact prerender
+      if (!this.addedEventListeners && typeof window !== "undefined") {
+        window.addEventListener('keyup', this.updateKeyboard.bind(this));
+        window.addEventListener('keydown', this.updateKeyboard.bind(this));
+        // Add a resize listen to update the gamepad rect on resize
+        window.addEventListener("resize", this.updateTouchpadRect.bind(this));
+
+        this.addedEventListeners = true;
+      }
+
+      this.enabled = true;
+    }
+
+    // Disable responsive gamepad, and remove all the listeners
+
+  }, {
+    key: 'disable',
+    value: function disable() {
+      this.keyMap = undefined;
+
+      this.enabled = false;
+    }
+  }, {
+    key: 'isEnabled',
+    value: function isEnabled() {
+      return this.enabled;
     }
   }, {
     key: 'addTouchInput',
     value: function addTouchInput(keyMapKey, element, type, direction) {
-      var _this2 = this;
+      var _this = this;
 
       // Declare our touch input
       // TODO: May have to add the event handler after getting the input
       var touchInput = void 0;
       touchInput = getTouchInput(element, type, direction, function (event) {
-        _this2.updateTouchpad(keyMapKey, touchInput, event);
+        _this.updateTouchpad(keyMapKey, touchInput, event);
       });
 
       // Add the input to our keymap
       this.keyMap[keyMapKey].TOUCHPAD.push(touchInput);
+
+      // Return the touchInput ID so that is may be removed later
+      return touchInput.ID;
+    }
+  }, {
+    key: 'removeTouchInput',
+    value: function removeTouchInput(keyMapKey, touchInputId) {
+      // Search for the input in our touch pad for every key
+      var touchInputIndex = undefined;
+
+      this.keyMap[keyMapKey].TOUCHPAD.some(function (input, index) {
+        if (input.ID === touchInputId) {
+          touchInputIndex = index;
+          return true;
+        }
+
+        return false;
+      });
+
+      // If we found the key and index, remove the touch input
+      if (touchInputIndex !== undefined) {
+        this.keyMap[keyMapKey].TOUCHPAD.splice(touchInputIndex, 1);
+        return true;
+      }
+
+      return false;
     }
   }, {
     key: 'getState',
     value: function getState() {
-      var _this3 = this;
+      var _this2 = this;
+
+      if (!this.enabled) {
+        return {};
+      }
 
       // Keyboard handled by listeners on window
 
@@ -5467,7 +5551,7 @@ var ResponsiveGamepadService = function () {
       this.keyMapKeys.forEach(function (key) {
 
         // Find if any of the keyboard, gamepad or touchpad buttons are pressed
-        var keyboardState = _this3.keyMap[key].KEYBOARD.some(function (keyInput) {
+        var keyboardState = _this2.keyMap[key].KEYBOARD.some(function (keyInput) {
           return keyInput.ACTIVE;
         });
 
@@ -5477,7 +5561,7 @@ var ResponsiveGamepadService = function () {
         }
 
         // Find if any of the keyboard, gamepad or touchpad buttons are pressed
-        var gamepadState = _this3.keyMap[key].GAMEPAD.some(function (gamepadInput) {
+        var gamepadState = _this2.keyMap[key].GAMEPAD.some(function (gamepadInput) {
           return gamepadInput.ACTIVE;
         });
 
@@ -5487,7 +5571,7 @@ var ResponsiveGamepadService = function () {
         }
 
         // Find if any of the keyboard, gamepad or touchpad buttons are pressed
-        var touchState = _this3.keyMap[key].TOUCHPAD.some(function (touchInput) {
+        var touchState = _this2.keyMap[key].TOUCHPAD.some(function (touchInput) {
           return touchInput.ACTIVE;
         });
 
@@ -5503,12 +5587,40 @@ var ResponsiveGamepadService = function () {
       return controllerState;
     }
 
+    // Function to return if we are ignoring input for key events
+
+  }, {
+    key: 'isIgnoringKeyEvents',
+    value: function isIgnoringKeyEvents() {
+
+      // Checking for window for preact prerender
+      if (typeof window === "undefined") {
+        return true;
+      }
+
+      return INPUT_HTML_TAGS.some(function (htmlTag) {
+        if (document.activeElement && document.activeElement.tagName.toLowerCase() === htmlTag.toLowerCase()) {
+          return true;
+        }
+        return false;
+      });
+    }
+
     // Function to handle keyboard update events
 
   }, {
     key: 'updateKeyboard',
     value: function updateKeyboard(keyEvent) {
-      var _this4 = this;
+      var _this3 = this;
+
+      if (!this.enabled) {
+        return;
+      }
+
+      // Checking for window for preact prerender
+      if (typeof window === "undefined") {
+        return;
+      }
 
       // Ignore the event if focus on a input-table field
       // https://www.w3schools.com/tags/ref_byfunc.asp
@@ -5533,9 +5645,9 @@ var ResponsiveGamepadService = function () {
 
       // Loop through our keys
       this.keyMapKeys.forEach(function (key) {
-        _this4.keyMap[key].KEYBOARD.forEach(function (keyInput, index) {
+        _this3.keyMap[key].KEYBOARD.forEach(function (keyInput, index) {
           if (keyInput.KEY_CODE === keyEvent.keyCode) {
-            _this4.keyMap[key].KEYBOARD[index].ACTIVE = isPressed;
+            _this3.keyMap[key].KEYBOARD[index].ACTIVE = isPressed;
           }
         });
       });
@@ -5549,7 +5661,7 @@ var ResponsiveGamepadService = function () {
   }, {
     key: 'updateGamepad',
     value: function updateGamepad() {
-      var _this5 = this;
+      var _this4 = this;
 
       // Similar to: https://github.com/torch2424/picoDeploy/blob/master/src/assets/3pLibs/pico8gamepad/pico8gamepad.js
       // Gampad Diagram: https://www.html5rocks.com/en/tutorials/doodles/gamepad/#toc-gamepadinfo
@@ -5565,20 +5677,20 @@ var ResponsiveGamepadService = function () {
         }
 
         // Loop through our keys
-        _this5.keyMapKeys.forEach(function (key) {
-          _this5.keyMap[key].GAMEPAD.forEach(function (gamepadInput, index) {
+        _this4.keyMapKeys.forEach(function (key) {
+          _this4.keyMap[key].GAMEPAD.forEach(function (gamepadInput, index) {
 
             // Check if we are a gamepad button
-            if (_this5.keyMap[key].GAMEPAD[index].BUTTON_ID || _this5.keyMap[key].GAMEPAD[index].BUTTON_ID === 0) {
-              _this5.keyMap[key].GAMEPAD[index].ACTIVE = isButtonPressed(gamepad, _this5.keyMap[key].GAMEPAD[index].BUTTON_ID);
+            if (_this4.keyMap[key].GAMEPAD[index].BUTTON_ID || _this4.keyMap[key].GAMEPAD[index].BUTTON_ID === 0) {
+              _this4.keyMap[key].GAMEPAD[index].ACTIVE = isButtonPressed(gamepad, _this4.keyMap[key].GAMEPAD[index].BUTTON_ID);
             }
 
             // Check if we are an axis
-            if (_this5.keyMap[key].GAMEPAD[index].JOYSTICK.AXIS_ID !== undefined && _this5.keyMap[key].GAMEPAD[index].JOYSTICK.IS_POSITIVE !== undefined) {
-              if (_this5.keyMap[key].GAMEPAD[index].JOYSTICK.IS_POSITIVE) {
-                _this5.keyMap[key].GAMEPAD[index].ACTIVE = getAnalogStickAxis(gamepad, _this5.keyMap[key].GAMEPAD[index].JOYSTICK.AXIS_ID) > +_this5.gamepadAnalogStickDeadZone;
+            if (_this4.keyMap[key].GAMEPAD[index].JOYSTICK.AXIS_ID !== undefined && _this4.keyMap[key].GAMEPAD[index].JOYSTICK.IS_POSITIVE !== undefined) {
+              if (_this4.keyMap[key].GAMEPAD[index].JOYSTICK.IS_POSITIVE) {
+                _this4.keyMap[key].GAMEPAD[index].ACTIVE = getAnalogStickAxis(gamepad, _this4.keyMap[key].GAMEPAD[index].JOYSTICK.AXIS_ID) > +_this4.gamepadAnalogStickDeadZone;
               } else {
-                _this5.keyMap[key].GAMEPAD[index].ACTIVE = getAnalogStickAxis(gamepad, _this5.keyMap[key].GAMEPAD[index].JOYSTICK.AXIS_ID) < -_this5.gamepadAnalogStickDeadZone;
+                _this4.keyMap[key].GAMEPAD[index].ACTIVE = getAnalogStickAxis(gamepad, _this4.keyMap[key].GAMEPAD[index].JOYSTICK.AXIS_ID) < -_this4.gamepadAnalogStickDeadZone;
               }
             }
           });
@@ -5597,16 +5709,16 @@ var ResponsiveGamepadService = function () {
   }, {
     key: 'updateTouchpadRect',
     value: function updateTouchpadRect() {
-      var _this6 = this;
+      var _this5 = this;
 
       // Read from the DOM, and get each of our elements position, doing this here, as it is best to read from the dom in sequence
       // use element.getBoundingRect() top, bottom, left, right to get clientX and clientY in touch events :)
       // https://stackoverflow.com/questions/442404/retrieve-the-position-x-y-of-an-html-element
       //console.log("GamepadComponent: Updating Rect()...");
       this.keyMapKeys.forEach(function (key) {
-        _this6.keyMap[key].TOUCHPAD.forEach(function (touchInput, index) {
-          var boundingRect = _this6.keyMap[key].TOUCHPAD[index].ELEMENT.getBoundingClientRect();
-          _this6.keyMap[key].TOUCHPAD[index].BOUNDING_RECT = boundingRect;
+        _this5.keyMap[key].TOUCHPAD.forEach(function (touchInput, index) {
+          var boundingRect = _this5.keyMap[key].TOUCHPAD[index].ELEMENT.getBoundingClientRect();
+          _this5.keyMap[key].TOUCHPAD[index].BOUNDING_RECT = boundingRect;
         });
       });
     }
@@ -5616,12 +5728,12 @@ var ResponsiveGamepadService = function () {
   }, {
     key: 'resetTouchDpad',
     value: function resetTouchDpad() {
-      var _this7 = this;
+      var _this6 = this;
 
       var dpadKeys = ['UP', 'RIGHT', 'DOWN', 'LEFT'];
 
       dpadKeys.forEach(function (dpadKey) {
-        _this7.keyMap[dpadKey].TOUCHPAD.forEach(function (touchInput) {
+        _this6.keyMap[dpadKey].TOUCHPAD.forEach(function (touchInput) {
           touchInput.ACTIVE = false;
         });
       });
@@ -5632,6 +5744,10 @@ var ResponsiveGamepadService = function () {
   }, {
     key: 'updateTouchpad',
     value: function updateTouchpad(keyMapKey, touchInput, event) {
+
+      if (!this.enabled) {
+        return;
+      }
 
       if (!event || event.type.includes('touch') && !event.touches) return;
 
@@ -5750,8 +5866,7 @@ var controller_WasmBoyControllerService = function () {
 
   WasmBoyControllerService.prototype.initialize = function initialize(wasmInstance) {
     this.wasmInstance = wasmInstance;
-    ResponsiveGamepad.initialize();
-
+    this.enableDefaultJoypad();
     return src.resolve();
   };
 
@@ -5770,18 +5885,6 @@ var controller_WasmBoyControllerService = function () {
     return controllerState;
   };
 
-  WasmBoyControllerService.prototype.enableDefaultJoypad = function enableDefaultJoypad() {
-    this.isEnabled = true;
-
-    return src.resolve();
-  };
-
-  WasmBoyControllerService.prototype.disableDefaultJoypad = function disableDefaultJoypad() {
-    this.isEnabled = false;
-
-    return src.resolve();
-  };
-
   WasmBoyControllerService.prototype.setJoypadState = function setJoypadState(controllerState) {
     if (!this.wasmInstance) {
       return;
@@ -5791,8 +5894,29 @@ var controller_WasmBoyControllerService = function () {
     this.wasmInstance.exports.setJoypadState(controllerState.UP ? 1 : 0, controllerState.RIGHT ? 1 : 0, controllerState.DOWN ? 1 : 0, controllerState.LEFT ? 1 : 0, controllerState.A ? 1 : 0, controllerState.B ? 1 : 0, controllerState.SELECT ? 1 : 0, controllerState.START ? 1 : 0);
   };
 
+  WasmBoyControllerService.prototype.enableDefaultJoypad = function enableDefaultJoypad() {
+    this.isEnabled = true;
+
+    ResponsiveGamepad.enable(KEYMAP());
+
+    return src.resolve();
+  };
+
+  WasmBoyControllerService.prototype.disableDefaultJoypad = function disableDefaultJoypad() {
+    this.isEnabled = false;
+
+    ResponsiveGamepad.disable(KEYMAP());
+
+    return src.resolve();
+  };
+
   WasmBoyControllerService.prototype.addTouchInput = function addTouchInput(keyMapKey, element, type, direction) {
-    ResponsiveGamepad.addTouchInput(keyMapKey, element, type, direction);
+    var touchInputId = ResponsiveGamepad.addTouchInput(keyMapKey, element, type, direction);
+    return src.resolve(touchInputId);
+  };
+
+  WasmBoyControllerService.prototype.removeTouchInput = function removeTouchInput(keyMapKey, touchInputId) {
+    ResponsiveGamepad.removeTouchInput(keyMapKey, touchInputId);
     return src.resolve();
   };
 
@@ -6042,7 +6166,7 @@ var state_getSaveState = function getSaveState(wasmboyMemory) {
   saveState.isAuto = false;
 
   if (wasmboyMemory.saveStateCallback) {
-    saveState = wasmboyMemory.saveStateCallback(saveState);
+    wasmboyMemory.saveStateCallback(saveState);
   }
 
   return saveState;
@@ -6914,6 +7038,7 @@ var wasmboy_WasmBoyLibService = function () {
     this.loadedROM = false;
 
     // Reset our config and stateful elements that depend on it
+    // this.options is set here
     this._resetConfig();
 
     // Debug code
@@ -7076,7 +7201,7 @@ var wasmboy_WasmBoyLibService = function () {
         } else {
           // Finally intialize all of our services
           // Initialize our services
-          yield src.all([WasmBoyGraphics.initialize(_this3.canvasElement, _this3.wasmInstance, _this3.wasmByteMemory), WasmBoyAudio.initialize(_this3.wasmInstance, _this3.wasmByteMemory), WasmBoyController.initialize(_this3.wasmInstance), WasmBoyMemory.initialize(_this3.options.headless, _this3.wasmInstance, _this3.wasmByteMemory, _this3.options.saveStateCallback)]);
+          yield src.all([WasmBoyGraphics.initialize(_this3.canvasElement, _this3.wasmInstance, _this3.wasmByteMemory, _this3.options.updateGraphicsCallback), WasmBoyAudio.initialize(_this3.wasmInstance, _this3.wasmByteMemory, _this3.options.updateAudioCallback), WasmBoyController.initialize(_this3.wasmInstance), WasmBoyMemory.initialize(_this3.options.headless, _this3.wasmInstance, _this3.wasmByteMemory, _this3.options.saveStateCallback)]);
 
           yield loadROMAndConfigTask(responses);
 
@@ -7301,6 +7426,8 @@ var wasmboy_WasmBoyLibService = function () {
       audioAccumulateSamples: false,
       tileRendering: false,
       tileCaching: false,
+      updateGraphicsCallback: false,
+      updateAudioCallback: false,
       saveStateCallback: false
     };
   };
@@ -7399,6 +7526,7 @@ var WasmBoy = {
   disableDefaultJoypad: WasmBoyController.disableDefaultJoypad.bind(WasmBoyController),
   setJoypadState: WasmBoyController.setJoypadState.bind(WasmBoyController),
   addTouchInput: WasmBoyController.addTouchInput.bind(WasmBoyController),
+  removeTouchInput: WasmBoyController.removeTouchInput.bind(WasmBoyController),
   _getWasmInstance: function _getWasmInstance() {
     return WasmBoyLib.wasmInstance;
   },
@@ -9510,6 +9638,11 @@ var index_canvasElement = undefined;
 // Our notification timeout
 var notificationTimeout = undefined;
 
+// Variables to tell if our callbacks were ever run
+var saveStateCallbackCalled = false;
+var graphicsCallbackCalled = false;
+var audioCallbackCalled = false;
+
 // WasmBoy Options
 var WasmBoyDefaultOptions = {
   isGbcEnabled: true,
@@ -9523,11 +9656,27 @@ var WasmBoyDefaultOptions = {
   tileRendering: true,
   tileCaching: true,
   gameboyFrameRate: 60,
+  updateGraphicsCallback: function updateGraphicsCallback(imageDataArray) {
+    if (!graphicsCallbackCalled) {
+      console.log('Graphics Callback Called! Only Logging this once... imageDataArray:', imageDataArray);
+      graphicsCallbackCalled = true;
+    }
+  },
+  updateAudioCallback: function updateAudioCallback(audioContext, audioBufferSourceNode) {
+    if (!audioCallbackCalled) {
+      console.log('Audio Callback Called! Only Logging this once... audioContext, audioBufferSourceNode:', audioContext, audioBufferSourceNode);
+      audioCallbackCalled = true;
+    }
+  },
   saveStateCallback: function saveStateCallback(saveStateObject) {
+    if (!saveStateCallbackCalled) {
+      console.log('Save State Callback Called! Only Logging this once... saveStateObject:', saveStateObject);
+      saveStateCallbackCalled = true;
+    }
+
     // Function called everytime a savestate occurs
     // Used by the WasmBoySystemControls to show screenshots on save states
     saveStateObject.screenshotCanvasDataURL = index_canvasElement.toDataURL();
-    return saveStateObject;
   }
 };
 
@@ -9552,12 +9701,22 @@ var index__ref6 = Object(preact_min["h"])(
 );
 
 var index__ref7 = Object(preact_min["h"])(
+  'div',
+  { style: 'text-align: center' },
+  Object(preact_min["h"])(
+    'a',
+    { href: 'https://github.com/torch2424/wasmBoy', target: '_blank' },
+    'Fork me on Github'
+  )
+);
+
+var index__ref8 = Object(preact_min["h"])(
   'main',
   { className: 'wasmboy__canvas-container' },
   Object(preact_min["h"])('canvas', { className: 'wasmboy__canvas-container__canvas' })
 );
 
-var index__ref8 = Object(preact_min["h"])(wasmboyGamepad_WasmBoyGamepad, null);
+var index__ref9 = Object(preact_min["h"])(wasmboyGamepad_WasmBoyGamepad, null);
 
 var index_App = function (_Component) {
   index__inherits(App, _Component);
@@ -9654,6 +9813,7 @@ var index_App = function (_Component) {
       'div',
       { 'class': 'wasmboy' },
       index__ref6,
+      index__ref7,
       Object(preact_min["h"])(
         'div',
         { style: 'text-align: center' },
@@ -9707,8 +9867,8 @@ var index_App = function (_Component) {
           }
         })
       ),
-      index__ref7,
       index__ref8,
+      index__ref9,
       this.state.notification
     );
   };
@@ -16159,11 +16319,13 @@ exports._tr_align = _tr_align;
       var p = promisifyRequestCall(indexedDB, 'open', [name, version]);
       var request = p.request;
 
-      request.onupgradeneeded = function (event) {
-        if (upgradeCallback) {
-          upgradeCallback(new UpgradeDB(request.result, event.oldVersion, request.transaction));
-        }
-      };
+      if (request) {
+        request.onupgradeneeded = function (event) {
+          if (upgradeCallback) {
+            upgradeCallback(new UpgradeDB(request.result, event.oldVersion, request.transaction));
+          }
+        };
+      }
 
       return p.then(function (db) {
         return new DB(db);
