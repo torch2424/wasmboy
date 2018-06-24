@@ -120,6 +120,11 @@ export default class App extends Component {
       <div class="wasmboy">
         <h1 class="wasmboy__title">WasmBoy (Debugger / Demo)</h1>
         <div style="text-align: center">
+          <a href="https://github.com/torch2424/wasmBoy" target="_blank">
+            Fork me on Github
+          </a>
+        </div>
+        <div style="text-align: center">
           <label class="checkbox">
             Show Options
             <input
