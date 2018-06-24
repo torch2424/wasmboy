@@ -11,6 +11,11 @@ let canvasElement = undefined;
 // Our notification timeout
 let notificationTimeout = undefined;
 
+// Variables to tell if our callbacks were ever run
+let saveStateCallbackCalled = false;
+let graphicsCallbackCalled = false;
+let audioCallbackCalled = false;
+
 // WasmBoy Options
 const WasmBoyDefaultOptions = {
   isGbcEnabled: true,
@@ -24,11 +29,31 @@ const WasmBoyDefaultOptions = {
   tileRendering: true,
   tileCaching: true,
   gameboyFrameRate: 60,
+  updateGraphicsCallback: imageDataArray => {
+    if (!graphicsCallbackCalled) {
+      console.log('Graphics Callback Called! Only Logging this once... imageDataArray:', imageDataArray);
+      graphicsCallbackCalled = true;
+    }
+  },
+  updateAudioCallback: (audioContext, audioBufferSourceNode) => {
+    if (!audioCallbackCalled) {
+      console.log(
+        'Audio Callback Called! Only Logging this once... audioContext, audioBufferSourceNode:',
+        audioContext,
+        audioBufferSourceNode
+      );
+      audioCallbackCalled = true;
+    }
+  },
   saveStateCallback: saveStateObject => {
+    if (!saveStateCallbackCalled) {
+      console.log('Save State Callback Called! Only Logging this once... saveStateObject:', saveStateObject);
+      saveStateCallbackCalled = true;
+    }
+
     // Function called everytime a savestate occurs
     // Used by the WasmBoySystemControls to show screenshots on save states
     saveStateObject.screenshotCanvasDataURL = canvasElement.toDataURL();
-    return saveStateObject;
   }
 };
 
