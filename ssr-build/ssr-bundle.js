@@ -5861,12 +5861,12 @@ var controller_WasmBoyControllerService = function () {
 
     // Our wasm instance
     this.wasmInstance = undefined;
-    this.isEnabled = true;
+    this.isEnabled = false;
+    this.enableDefaultJoypad();
   }
 
   WasmBoyControllerService.prototype.initialize = function initialize(wasmInstance) {
     this.wasmInstance = wasmInstance;
-    this.enableDefaultJoypad();
     return src.resolve();
   };
 
@@ -5898,26 +5898,20 @@ var controller_WasmBoyControllerService = function () {
     this.isEnabled = true;
 
     ResponsiveGamepad.enable(KEYMAP());
-
-    return src.resolve();
   };
 
   WasmBoyControllerService.prototype.disableDefaultJoypad = function disableDefaultJoypad() {
     this.isEnabled = false;
 
     ResponsiveGamepad.disable(KEYMAP());
-
-    return src.resolve();
   };
 
   WasmBoyControllerService.prototype.addTouchInput = function addTouchInput(keyMapKey, element, type, direction) {
-    var touchInputId = ResponsiveGamepad.addTouchInput(keyMapKey, element, type, direction);
-    return src.resolve(touchInputId);
+    return ResponsiveGamepad.addTouchInput(keyMapKey, element, type, direction);
   };
 
   WasmBoyControllerService.prototype.removeTouchInput = function removeTouchInput(keyMapKey, touchInputId) {
-    ResponsiveGamepad.removeTouchInput(keyMapKey, touchInputId);
-    return src.resolve();
+    return ResponsiveGamepad.removeTouchInput(keyMapKey, touchInputId);
   };
 
   return WasmBoyControllerService;
