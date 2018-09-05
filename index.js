@@ -57,6 +57,19 @@ const WasmBoyDefaultOptions = {
   }
 };
 
+// Setup Google Analytics
+const loadScript = require('load-script');
+loadScript('https://www.googletagmanager.com/gtag/js?id=UA-125276735-1', function(err, script) {
+  if (!err) {
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      window.dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+    gtag('config', 'UA-125276735-1');
+  }
+});
+
 export default class App extends Component {
   constructor() {
     super();
