@@ -54,6 +54,18 @@ const WasmBoyDefaultOptions = {
     // Function called everytime a savestate occurs
     // Used by the WasmBoySystemControls to show screenshots on save states
     saveStateObject.screenshotCanvasDataURL = canvasElement.toDataURL();
+  },
+  onReady: () => {
+    console.log('onReady Callback Called!');
+  },
+  onPlay: () => {
+    console.log('onPlay Callback Called!');
+  },
+  onPause: () => {
+    console.log('onPause Callback Called!');
+  },
+  onLoadedAndStarted: () => {
+    console.log('onLoadedAndStarted Callback Called!');
   }
 };
 
