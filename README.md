@@ -3,6 +3,9 @@
 <!--- Badges -->
 
 [![Build Status](https://travis-ci.org/torch2424/wasmBoy.svg?branch=master)](https://travis-ci.org/torch2424/wasmBoy)
+![npm bundle size (minified)](https://img.shields.io/bundlephobia/min/wasmboy.svg)
+![npm](https://img.shields.io/npm/dt/wasmboy.svg)
+![GitHub](https://img.shields.io/github/license/torch2424/wasmboy.svg)
 [![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/torch2424)
 
 <!--- Short Description-->
