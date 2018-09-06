@@ -24,6 +24,22 @@ export class SoundAccumulator {
   static needToRemixSamples: boolean = false;
 }
 
+export function initializeSoundAccumulator(): void {
+  SoundAccumulator.channel1Sample = 15;
+  SoundAccumulator.channel2Sample = 15;
+  SoundAccumulator.channel3Sample = 15;
+  SoundAccumulator.channel4Sample = 15;
+  SoundAccumulator.channel1DacEnabled = false;
+  SoundAccumulator.channel2DacEnabled = false;
+  SoundAccumulator.channel3DacEnabled = false;
+  SoundAccumulator.channel4DacEnabled = false;
+  SoundAccumulator.leftChannelSampleUnsignedByte = 127;
+  SoundAccumulator.rightChannelSampleUnsignedByte = 127;
+  SoundAccumulator.mixerVolumeChanged = true;
+  SoundAccumulator.mixerEnabledChanged = true;
+  SoundAccumulator.needToRemixSamples = false;
+}
+
 export function accumulateSound(numberOfCycles: i32): void {
   // Check if any of the individual channels will update
   let channel1WillUpdate: boolean = Channel1.willChannelUpdate(numberOfCycles) || didChannelDacChange(Channel1.channelNumber);

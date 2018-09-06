@@ -131,6 +131,15 @@ export function batchProcessGraphics(): void {
 }
 
 export function initializeGraphics(): void {
+  // Reset Stateful Variables
+  Graphics.currentCycles = 0;
+  Graphics.scanlineCycleCounter = 0x00;
+  Graphics.scanlineRegister = 0;
+  Graphics.scrollX = 0;
+  Graphics.scrollY = 0;
+  Graphics.windowX = 0;
+  Graphics.windowY = 0;
+
   if (Cpu.GBCEnabled) {
     Graphics.scanlineRegister = 0x91;
     eightBitStoreIntoGBMemory(0xff40, 0x91);

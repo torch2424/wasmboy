@@ -10,7 +10,7 @@
 // byte from 0 (-1.0) to 254 (1.0)
 import { AUDIO_BUFFER_LOCATION } from '../constants';
 import { getSaveStateMemoryOffset } from '../core';
-import { SoundAccumulator, accumulateSound } from './accumulator';
+import { SoundAccumulator, initializeSoundAccumulator, accumulateSound } from './accumulator';
 import { Channel1 } from './channel1';
 import { Channel2 } from './channel2';
 import { Channel3 } from './channel3';
@@ -140,6 +140,24 @@ export class Sound {
 // Initialize sound registers
 // From: https://emu-docs.org/Game%20Boy/gb_sound.txt
 export function initializeSound(): void {
+  // Reset Stateful variables
+  Sound.currentCycles = 0;
+  Sound.NR50LeftMixerVolume = 0;
+  Sound.NR50RightMixerVolume = 0;
+  Sound.NR51IsChannel1EnabledOnLeftOutput = true;
+  Sound.NR51IsChannel2EnabledOnLeftOutput = true;
+  Sound.NR51IsChannel3EnabledOnLeftOutput = true;
+  Sound.NR51IsChannel4EnabledOnLeftOutput = true;
+  Sound.NR51IsChannel1EnabledOnRightOutput = true;
+  Sound.NR51IsChannel2EnabledOnRightOutput = true;
+  Sound.NR51IsChannel3EnabledOnRightOutput = true;
+  Sound.NR51IsChannel4EnabledOnRightOutput = true;
+  Sound.NR52IsSoundEnabled = true;
+  Sound.frameSequenceCycleCounter = 0x0000;
+  Sound.downSampleCycleCounter = 0x00;
+  Sound.frameSequencer = 0x00;
+  Sound.audioQueueIndex = 0x0000;
+
   // intiialize our channels
   Channel1.initialize();
   Channel2.initialize();
@@ -151,8 +169,7 @@ export function initializeSound(): void {
   eightBitStoreIntoGBMemory(Sound.memoryLocationNR51, 0xf3);
   eightBitStoreIntoGBMemory(Sound.memoryLocationNR52, 0xf1);
 
-  SoundAccumulator.mixerVolumeChanged = true;
-  SoundAccumulator.mixerEnabledChanged = true;
+  initializeSoundAccumulator();
 }
 
 // Function to batch process our audio after we skipped so many cycles

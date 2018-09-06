@@ -112,6 +112,23 @@ export class Cpu {
 }
 
 export function initializeCpu(): void {
+  // Reset all stateful Cpu variables
+  // Cpu.GBCEnabled is done by core/initialize
+  Cpu.GBCDoubleSpeed = false;
+  Cpu.registerA = 0;
+  Cpu.registerB = 0;
+  Cpu.registerC = 0;
+  Cpu.registerD = 0;
+  Cpu.registerE = 0;
+  Cpu.registerH = 0;
+  Cpu.registerL = 0;
+  Cpu.registerF = 0;
+  Cpu.stackPointer = 0;
+  Cpu.programCounter = 0x00;
+  Cpu.currentCycles = 0;
+  Cpu.isHalted = false;
+  Cpu.isStopped = false;
+
   if (Cpu.GBCEnabled) {
     // CPU Registers
     Cpu.registerA = 0x11;

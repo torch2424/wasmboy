@@ -131,6 +131,10 @@ export class Memory {
 }
 
 export function initializeCartridge(): void {
+  // Reset stateful variables
+  Memory.isRamBankingEnabled = false;
+  Memory.isMBC1RomModeEnabled = true;
+
   // Get our game MBC type from the cartridge header
   // http://gbdev.gg8.se/wiki/articles/The_Cartridge_Header
   let cartridgeType: i32 = eightBitLoadFromGBMemory(0x0147);

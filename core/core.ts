@@ -112,6 +112,8 @@ function initialize(): void {
   // Detecting GBC http://bgb.bircd.org/pandocs.htm#cgbregisters
   if (gbcType === 0xc0 || (Config.useGbcWhenAvailable && gbcType === 0x80)) {
     Cpu.GBCEnabled = true;
+  } else {
+    Cpu.GBCEnabled = false;
   }
 
   // Call our respective classes intialization

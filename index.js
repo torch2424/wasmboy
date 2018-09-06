@@ -54,8 +54,33 @@ const WasmBoyDefaultOptions = {
     // Function called everytime a savestate occurs
     // Used by the WasmBoySystemControls to show screenshots on save states
     saveStateObject.screenshotCanvasDataURL = canvasElement.toDataURL();
+  },
+  onReady: () => {
+    console.log('onReady Callback Called!');
+  },
+  onPlay: () => {
+    console.log('onPlay Callback Called!');
+  },
+  onPause: () => {
+    console.log('onPause Callback Called!');
+  },
+  onLoadedAndStarted: () => {
+    console.log('onLoadedAndStarted Callback Called!');
   }
 };
+
+// Setup Google Analytics
+const loadScript = require('load-script');
+loadScript('https://www.googletagmanager.com/gtag/js?id=UA-125276735-1', function(err, script) {
+  if (!err) {
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      window.dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+    gtag('config', 'UA-125276735-1');
+  }
+});
 
 export default class App extends Component {
   constructor() {

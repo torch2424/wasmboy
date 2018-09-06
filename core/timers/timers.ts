@@ -108,6 +108,16 @@ export class Timers {
 }
 
 export function initializeTimers(): void {
+  // Reset stateful Variables
+  Timers.currentCycles = 0;
+  Timers.dividerRegister = 0;
+  Timers.timerCounter = 0;
+  Timers.timerModulo = 0;
+  Timers.timerEnabled = false;
+  Timers.timerInputClock = 0;
+  Timers.cycleCounter = 0;
+  Timers.dividerRegisterCycleCounter = 0;
+
   if (Cpu.GBCEnabled) {
     eightBitStoreIntoGBMemory(0xff04, 0x2f);
     Timers.dividerRegister = 0x2f;
