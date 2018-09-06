@@ -265,7 +265,8 @@ export class WasmBoyDebugger extends Component {
         </div>
 
         <div class="debuggerAction">
-          Breakpoint Line Number: 0x<input
+          Breakpoint Line Number: 0x
+          <input
             type="string"
             class="input"
             value={this.state.breakPoint}
