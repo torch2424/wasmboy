@@ -12,8 +12,8 @@ import { Config } from './config';
 import { hexLog, log } from './helpers/index';
 
 // Grow our memory to the specified size
-if (current_memory() < WASMBOY_WASM_PAGES) {
-  grow_memory(WASMBOY_WASM_PAGES - current_memory());
+if (memory.size() < WASMBOY_WASM_PAGES) {
+  memory.grow(WASMBOY_WASM_PAGES - memory.size());
 }
 
 // Function to track if the core has started

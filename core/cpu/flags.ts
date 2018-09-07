@@ -79,7 +79,7 @@ export function checkAndSetEightBitCarryFlag(value: u8, amountToAdd: i32): void 
       setCarryFlag(0);
     }
   } else {
-    if (abs(amountToAdd) > value) {
+    if (abs(amountToAdd) > <i32>value) {
       setCarryFlag(1);
     } else {
       setCarryFlag(0);
