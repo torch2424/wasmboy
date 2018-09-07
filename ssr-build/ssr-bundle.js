@@ -4767,7 +4767,7 @@ var WasmBoyGraphicsService = function () {
     this.updateGraphicsCallback = updateGraphicsCallback;
 
     // Initialiuze our cached wasm constants
-    WASMBOY_CURRENT_FRAME_OUTPUT_LOCATION = this.wasmInstance.exports.frameInProgressVideoOutputLocation;
+    WASMBOY_CURRENT_FRAME_OUTPUT_LOCATION = this.wasmInstance.exports.frameInProgressVideoOutputLocation.valueOf();
 
     // Reset our frame queue and render promises
     this.frameQueue = [];
@@ -4948,7 +4948,7 @@ var WasmBoyAudioService = function () {
         _this.updateAudioCallback = updateAudioCallback;
 
         // Initialiuze our cached wasm constants
-        WASMBOY_SOUND_OUTPUT_LOCATION = _this.wasmInstance.exports.soundOutputLocation;
+        WASMBOY_SOUND_OUTPUT_LOCATION = _this.wasmInstance.exports.soundOutputLocation.valueOf();
 
         _this.audioSources = [];
         _this.averageTimeStretchFps = [];
@@ -6358,14 +6358,14 @@ var memory_WasmBoyMemoryService = function () {
 
   WasmBoyMemoryService.prototype._initializeConstants = function _initializeConstants() {
     // Initialiuze our cached wasm constants
-    this.WASMBOY_GAME_BYTES_LOCATION = this.wasmInstance.exports.gameBytesLocation;
-    this.WASMBOY_GAME_RAM_BANKS_LOCATION = this.wasmInstance.exports.gameRamBanksLocation;
-    this.WASMBOY_INTERNAL_STATE_SIZE = this.wasmInstance.exports.wasmBoyInternalStateSize;
-    this.WASMBOY_INTERNAL_STATE_LOCATION = this.wasmInstance.exports.wasmBoyInternalStateLocation;
-    this.WASMBOY_INTERNAL_MEMORY_SIZE = this.wasmInstance.exports.gameBoyInternalMemorySize;
-    this.WASMBOY_INTERNAL_MEMORY_LOCATION = this.wasmInstance.exports.gameBoyInternalMemoryLocation;
-    this.WASMBOY_PALETTE_MEMORY_SIZE = this.wasmInstance.exports.gameboyColorPaletteSize;
-    this.WASMBOY_PALETTE_MEMORY_LOCATION = this.wasmInstance.exports.gameboyColorPaletteLocation;
+    this.WASMBOY_GAME_BYTES_LOCATION = this.wasmInstance.exports.gameBytesLocation.valueOf();
+    this.WASMBOY_GAME_RAM_BANKS_LOCATION = this.wasmInstance.exports.gameRamBanksLocation.valueOf();
+    this.WASMBOY_INTERNAL_STATE_SIZE = this.wasmInstance.exports.wasmBoyInternalStateSize.valueOf();
+    this.WASMBOY_INTERNAL_STATE_LOCATION = this.wasmInstance.exports.wasmBoyInternalStateLocation.valueOf();
+    this.WASMBOY_INTERNAL_MEMORY_SIZE = this.wasmInstance.exports.gameBoyInternalMemorySize.valueOf();
+    this.WASMBOY_INTERNAL_MEMORY_LOCATION = this.wasmInstance.exports.gameBoyInternalMemoryLocation.valueOf();
+    this.WASMBOY_PALETTE_MEMORY_SIZE = this.wasmInstance.exports.gameboyColorPaletteSize.valueOf();
+    this.WASMBOY_PALETTE_MEMORY_LOCATION = this.wasmInstance.exports.gameboyColorPaletteLocation.valueOf();
   };
 
   WasmBoyMemoryService.prototype.getLoadedCartridgeMemoryState = function getLoadedCartridgeMemoryState() {
