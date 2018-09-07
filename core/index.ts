@@ -1,7 +1,7 @@
 // Public Exports
 export { config, executeFrame, executeStep, saveState, loadState, hasCoreStarted } from './core';
-export { setJoypadState } from './joypad/index';
-export { getNumberOfSamplesInAudioBuffer, clearAudioBuffer } from './sound/index';
+export { setJoypadState } from './joypad/joypad';
+export { getNumberOfSamplesInAudioBuffer, clearAudioBuffer } from './sound/sound';
 export {
   WASMBOY_MEMORY_LOCATION,
   WASMBOY_MEMORY_SIZE,
@@ -51,10 +51,9 @@ export {
   getRegisterF,
   getProgramCounter,
   getStackPointer,
-  getOpcodeAtProgramCounter,
-  drawBackgroundMapToWasmMemory,
-  drawTileDataToWasmMemory
-} from './debug/index';
+  getOpcodeAtProgramCounter
+} from './debug/debug-cpu';
+export { drawBackgroundMapToWasmMemory, drawTileDataToWasmMemory } from './debug/debug-graphics';
 export {
   update,
   emulationStep,

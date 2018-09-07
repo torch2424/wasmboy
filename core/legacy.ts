@@ -8,7 +8,7 @@
 
 export { executeFrame as update, executeStep as emulationStep } from './core';
 
-export { getNumberOfSamplesInAudioBuffer as getAudioQueueIndex, clearAudioBuffer as resetAudioQueue } from './sound/index';
+export { getNumberOfSamplesInAudioBuffer as getAudioQueueIndex, clearAudioBuffer as resetAudioQueue } from './sound/sound';
 
 /******************
 

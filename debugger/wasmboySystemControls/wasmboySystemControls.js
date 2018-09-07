@@ -66,7 +66,8 @@ export class WasmBoySystemControls extends Component {
 
   saveState() {
     WasmBoy.saveState()
-      .then(() => {
+      .then(saveState => {
+        console.log('Save State:', saveState);
         WasmBoy.play()
           .then(() => {
             this.props.showNotification('State Saved! 💾');
