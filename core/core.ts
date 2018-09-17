@@ -28,20 +28,20 @@ export function hasCoreStarted(): i32 {
 
 // Function to configure & initialize wasmboy
 export function config(
-  enableBootRom: i32 = 0,
-  useGbcWhenAvailable: i32 = 1,
-  audioBatchProcessing: i32 = 0,
-  graphicsBatchProcessing: i32 = 0,
-  timersBatchProcessing: i32 = 0,
-  graphicsDisableScanlineRendering: i32 = 0,
-  audioAccumulateSamples: i32 = 0,
-  tileRendering: i32 = 0,
-  tileCaching: i32 = 0
+  enableBootRom: i32,
+  useGbcWhenAvailable: i32,
+  audioBatchProcessing: i32,
+  graphicsBatchProcessing: i32,
+  timersBatchProcessing: i32,
+  graphicsDisableScanlineRendering: i32,
+  audioAccumulateSamples: i32,
+  tileRendering: i32,
+  tileCaching: i32
 ): void {
   // TODO: depending on the boot rom, initialization may be different
   // From: http://www.codeslinger.co.uk/pages/projects/gameboy/hardware.html
   // All values default to zero in memory, so not setting them yet
-  log('initializing (includeBootRom=$0)', 1, enableBootRom);
+  // log('initializing (includeBootRom=$0)', 1, enableBootRom);
 
   if (enableBootRom > 0) {
     Config.enableBootRom = true;
