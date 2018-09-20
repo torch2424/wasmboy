@@ -3,6 +3,7 @@
 <!--- Badges -->
 
 [![Build Status](https://travis-ci.org/torch2424/wasmBoy.svg?branch=master)](https://travis-ci.org/torch2424/wasmBoy)
+![npm version](https://img.shields.io/npm/v/wasmboy.svg)
 ![npm bundle size (minified)](https://img.shields.io/bundlephobia/min/wasmboy.svg)
 ![npm](https://img.shields.io/npm/dt/wasmboy.svg)
 ![GitHub](https://img.shields.io/github/license/torch2424/wasmboy.svg)
@@ -13,6 +14,7 @@
 🎮👾🕹️ Gameboy Emulator Library written in Web Assembly using [AssemblyScript](https://github.com/AssemblyScript/assemblyscript), Debugger/Shell in Preact 🎮👾🕹️
 
 [Debugger / Demo with support for mobile controls](https://torch2424.github.io/wasmBoy/)
+[Documentation](https://github.com/torch2424/wasmBoy/wiki)
 
 <!-- Header gif -->
 
@@ -23,10 +25,10 @@
 # Table of Contents
 
 - [Features](#features)
+- [Usage](#usage)
 - [Example Gifs &amp; Screenshots](#example-gifs--screenshots)
 - [Tests](#tests)
   - [Blarrg](#blarrg)
-- [Roadmap](#roadmap)
 - [Contributing](#contributing)
   - [Installation](#installation)
   - [CLI Commands / Npm Scripts](#cli-commands--npm-scripts)
@@ -46,7 +48,13 @@
 - Keyboard and gamepad input support using [responsive gamepad](https://www.npmjs.com/package/responsive-gamepad) ⌨️ 🎮
 - Debugger with a value table (I/O map), Tile Data visualizer, and Background Map with Scroll Indicators 🐛
 
-[Please see the Roadmap for upcoming features](#roadmap)
+# Usage
+
+Simply install through npm:
+
+`npm install --save wasmboy`
+
+Documentation for the project can be found on the [WasmBoy Wiki](https://github.com/torch2424/wasmBoy/wiki).
 
 # Example Gifs & Screenshots
 
@@ -73,12 +81,6 @@
 **cpu_instrs**
 
 ![Cpu Instructions all tests passing](./test/accuracy/testroms/blargg/cpu_instrs.golden.png)
-
-# Roadmap
-
-The project doe quality and performance also depends on the [AssemblyScript Roadmap](https://github.com/AssemblyScript/assemblyscript/wiki/Status-and-Roadmap).
-
-The Wasmboy library is being recorded at [Issue #3](https://github.com/torch2424/wasmBoy/issues/3)
 
 # Contributing
 
@@ -164,12 +166,6 @@ Using the [gh-pages](https://www.npmjs.com/package/gh-pages) for debugger/demo d
 - [dcodeIO for building and fixing bugs with AssemblyScript](https://github.com/AssemblyScript/assemblyscript). And for being awesome!
 
 - [r/emudev](https://www.reddit.com/r/EmuDev/), especially to [binjimint](https://www.reddit.com/r/EmuDev/comments/7y2bux/gameboy_gb_graphical_bugs_game_writes_zeroes_into/dudlj3w/) for helping me sooooo much!
-
-# Random Tips for new Gameboy EmuDevs
-
-- It's better to code an emulator by abstracting assembly commands into functions, rather than by Opcode operation
-
-- Gameboy Opcodes are difficult till about 0x40
 
 # Resources
 
