@@ -3,7 +3,7 @@
   "description": "Gameboy / Gameboy Color Emulator written for Web Assembly using AssemblyScript. Shell/Debugger in Preact",
   "author": "Aaron Turner",
   "version": "0.1.6",
-  "license": "Apache 2.0",
+  "license": "Apache-2.0",
   "homepage": "https://torch2424.github.io/wasmBoy",
   "repository": {
     "type": "git",
@@ -26,8 +26,8 @@
     "test:perf": "npm run test:performance",
     "test:performance": "npm run build && npx mocha test/performance/performance-test.js --exit",
     "debugger:watch": "preact watch",
-    "debugger:serve": "preact build && preact serve",
-    "debugger:build": "preact build",
+    "debugger:serve": "npm run debugger:build && preact serve",
+    "debugger:build": "preact build --no-prerender",
     "debugger:deploy": "npm run debugger:build && echo 'wasmboy.app' > build/CNAME && npx gh-pages -d build",
     "core:watch": "npx watch \"npm run core:build\" core",
     "core:build": "npx asc core/index.ts -b dist/core/index.untouched.wasm -t dist/core/index.untouched.wast -O3 --validate --sourceMap assets/index.untouched.wasm.map --memoryBase 0 && cp dist/core/index.untouched.wasm.map assets/index.untouched.wasm.map && echo \"Built Wasm!\"",
@@ -64,6 +64,7 @@
     "build/*"
   ],
   "dependencies": {
+    "@babel/polyfill": "^7.0.0",
     "audiobuffer-to-wav": "^1.0.0",
     "idb": "^2.1.0",
     "promise-polyfill": "7.0.0",
