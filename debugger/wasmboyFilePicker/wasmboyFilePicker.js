@@ -29,11 +29,21 @@ export class WasmBoyFilePicker extends Component {
         console.log('Wasmboy Ready!');
         this.props.showNotification('Game Loaded! 🎉');
         this.setFileLoadingStatus(false);
+
+        // Fire off Analytics
+        if (window !== undefined && window.gtag) {
+          gtag('event', 'load_rom_success');
+        }
       })
       .catch(error => {
         console.log('Load Game Error:', error);
         this.props.showNotification('Game Load Error! 😞');
         this.setFileLoadingStatus(false);
+
+        // Fire off Analytics
+        if (window !== undefined && window.gtag) {
+          gtag('event', 'load_rom_fail');
+        }
       });
 
     // Set our file name
@@ -79,11 +89,21 @@ export class WasmBoyFilePicker extends Component {
                 const newState = Object.assign({}, this.state);
                 newState.currentFileName = responseJson.title;
                 this.setState(newState);
+
+                // Fire off Analytics
+                if (window !== undefined && window.gtag) {
+                  gtag('event', 'load_rom_success');
+                }
               })
               .catch(error => {
                 console.log('Load Game Error:', error);
                 this.props.showNotification('Game Load Error! 😞');
                 this.setFileLoadingStatus(false);
+
+                // Fire off Analytics
+                if (window !== undefined && window.gtag) {
+                  gtag('event', 'load_rom_fail');
+                }
               });
           } else {
             this.props.showNotification('Invalid file type. 😞');

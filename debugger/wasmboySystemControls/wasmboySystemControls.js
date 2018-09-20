@@ -63,6 +63,11 @@ export class WasmBoySystemControls extends Component {
       this.props.showNotification('Please load a game. ⏏️');
     } else {
       WasmBoy.play();
+
+      // Fire off Analytics
+      if (window !== undefined && window.gtag) {
+        gtag('event', 'rom_played');
+      }
     }
   }
 
