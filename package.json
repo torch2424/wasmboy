@@ -97,6 +97,7 @@
     "pretty-quick": "^1.6.0",
     "rollup": "^0.56.2",
     "rollup-plugin-babel": "^3.0.3",
+    "rollup-plugin-bundle-size": "^1.0.2",
     "rollup-plugin-commonjs": "^8.3.0",
     "rollup-plugin-node-resolve": "^3.0.3",
     "rollup-plugin-regenerator": "^0.5.4",
