@@ -39,7 +39,9 @@ export class WasmBoySystemControls extends Component {
     // Get our save states
     WasmBoy.getSaveStates()
       .then(saveStates => {
-        newState.saveStates = saveStates;
+        if (saveStates) {
+          newState.saveStates = saveStates;
+        }
         this.setState(newState);
       })
       .catch(() => {
@@ -61,6 +63,11 @@ export class WasmBoySystemControls extends Component {
       this.props.showNotification('Please load a game. ⏏️');
     } else {
       WasmBoy.play();
+
+      // Fire off Analytics
+      if (window !== undefined && window.gtag) {
+        gtag('event', 'rom_played');
+      }
     }
   }
 
@@ -132,7 +139,7 @@ export class WasmBoySystemControls extends Component {
         });
       }
 
-      if (this.state.saveStateError) {
+      if (this.state.saveStateError || this.state.saveStates.length <= 0) {
         saveStateElements = <h1>No Save States Found 😞</h1>;
       }
     }

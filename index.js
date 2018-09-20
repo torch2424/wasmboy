@@ -5,6 +5,9 @@ import { Component } from 'preact';
 import { WasmBoy } from './lib/index.js';
 import { WasmBoyDebugger, WasmBoySystemControls, WasmBoyFilePicker, WasmBoyOptions, WasmBoyGamepad } from './debugger/index';
 
+// Get our package.json
+const packageJson = require('./package.json');
+
 // Our canvas element
 let canvasElement = undefined;
 
@@ -80,6 +83,8 @@ if (typeof window !== 'undefined') {
       }
       gtag('js', new Date());
       gtag('config', 'UA-125276735-1');
+      // Attach Analytics to window
+      window.gtag = gtag;
     }
   });
 }
@@ -172,6 +177,9 @@ export default class App extends Component {
       <div class="wasmboy">
         <h1 class="wasmboy__title">WasmBoy (Debugger / Demo)</h1>
         <div style="text-align: center">
+          <b>Version: {packageJson.version}</b>
+        </div>
+        <div style="text-align: center">
           <a href="https://github.com/torch2424/wasmBoy" target="_blank">
             Fork me on Github
           </a>
@@ -204,6 +212,11 @@ export default class App extends Component {
                 const newState = Object.assign({}, this.state);
                 newState.showDebugger = !newState.showDebugger;
                 this.setState(newState);
+
+                // Fire off Analytics
+                if (window !== undefined && window.gtag) {
+                  gtag('event', 'opened_debugger');
+                }
               }}
             />
           </label>

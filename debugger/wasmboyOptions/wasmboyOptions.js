@@ -30,6 +30,11 @@ export class WasmBoyOptions extends Component {
     WasmBoy.reset(this.state)
       .then(() => {
         this.props.showNotification('Applied Options! 🛠️');
+
+        // Fire off Analytics
+        if (window !== undefined && window.gtag) {
+          gtag('event', 'applied_options');
+        }
       })
       .catch(error => {
         this.props.showNotification('Options Error! 😞');

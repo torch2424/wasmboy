@@ -29,11 +29,21 @@ export class WasmBoyFilePicker extends Component {
         console.log('Wasmboy Ready!');
         this.props.showNotification('Game Loaded! 🎉');
         this.setFileLoadingStatus(false);
+
+        // Fire off Analytics
+        if (window !== undefined && window.gtag) {
+          gtag('event', 'load_rom_success');
+        }
       })
       .catch(error => {
         console.log('Load Game Error:', error);
         this.props.showNotification('Game Load Error! 😞');
         this.setFileLoadingStatus(false);
+
+        // Fire off Analytics
+        if (window !== undefined && window.gtag) {
+          gtag('event', 'load_rom_fail');
+        }
       });
 
     // Set our file name
@@ -63,7 +73,8 @@ export class WasmBoyFilePicker extends Component {
           return response.json();
         })
         .then(responseJson => {
-          if (responseJson.title.endsWith('.zip') || responseJson.title.endsWith('.gb') || responseJson.title.endsWith('.gbc')) {
+          const lowercaseTitle = responseJson.title.toLowerCase();
+          if (lowercaseTitle.includes('.zip') || lowercaseTitle.includes('.gb') || lowercaseTitle.includes('.gbc')) {
             // Finally load the file using the oAuthHeaders
             WasmBoy.loadROM(responseJson.downloadUrl, {
               headers: oAuthHeaders,
@@ -78,11 +89,21 @@ export class WasmBoyFilePicker extends Component {
                 const newState = Object.assign({}, this.state);
                 newState.currentFileName = responseJson.title;
                 this.setState(newState);
+
+                // Fire off Analytics
+                if (window !== undefined && window.gtag) {
+                  gtag('event', 'load_rom_success');
+                }
               })
               .catch(error => {
                 console.log('Load Game Error:', error);
                 this.props.showNotification('Game Load Error! 😞');
                 this.setFileLoadingStatus(false);
+
+                // Fire off Analytics
+                if (window !== undefined && window.gtag) {
+                  gtag('event', 'load_rom_fail');
+                }
               });
           } else {
             this.props.showNotification('Invalid file type. 😞');
