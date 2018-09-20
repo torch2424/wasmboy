@@ -63,7 +63,8 @@ export class WasmBoyFilePicker extends Component {
           return response.json();
         })
         .then(responseJson => {
-          if (responseJson.title.endsWith('.zip') || responseJson.title.endsWith('.gb') || responseJson.title.endsWith('.gbc')) {
+          const lowercaseTitle = responseJson.title.toLowerCase();
+          if (lowercaseTitle.includes('.zip') || lowercaseTitle.includes('.gb') || lowercaseTitle.includes('.gbc')) {
             // Finally load the file using the oAuthHeaders
             WasmBoy.loadROM(responseJson.downloadUrl, {
               headers: oAuthHeaders,
