@@ -3,7 +3,6 @@ import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
 import url from 'rollup-plugin-url';
 import regenerator from 'rollup-plugin-regenerator';
-import compiler from '@ampproject/rollup-plugin-closure-compiler';
 import bundleSize from 'rollup-plugin-bundle-size';
 import pkg from './package.json';
 
@@ -19,7 +18,6 @@ const plugins = [
     exclude: ['node_modules/**']
   }),
   regenerator(),
-  compiler(),
   bundleSize()
 ];
 
