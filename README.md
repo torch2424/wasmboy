@@ -13,6 +13,8 @@
 
 🎮👾🕹️ Gameboy Emulator Library written in Web Assembly using [AssemblyScript](https://github.com/AssemblyScript/assemblyscript), Debugger/Shell in Preact 🎮👾🕹️
 
+**Project is still < 1.0.0. Most games are playable, but the emulator is still not very accurate. Expect bugs.**
+
 [Debugger / Demo with support for mobile controls](https://torch2424.github.io/wasmBoy/)
 
 [Documentation](https://github.com/torch2424/wasmBoy/wiki)
@@ -44,7 +46,7 @@
 - Outputs graphics to a scalable / responsive HTML5 canvas 🖼️, and audio through the Web Audio API 🔊
 - Support for In-game saves, and save states 💾
 - Configurable options to increase performance for low(er) end devices 🔥
-- _WIP:_ Importable into other projects as a dependency ♻️
+- Importable into other projects as a dependency ♻️
 - Built with Web Assembly 🕸️
 - Keyboard and gamepad input support using [responsive gamepad](https://www.npmjs.com/package/responsive-gamepad) ⌨️ 🎮
 - Debugger with a value table (I/O map), Tile Data visualizer, and Background Map with Scroll Indicators 🐛
@@ -56,6 +58,8 @@ Simply install through npm:
 `npm install --save wasmboy`
 
 Documentation for the project can be found on the [WasmBoy Wiki](https://github.com/torch2424/wasmBoy/wiki).
+
+**Project is still < 1.0.0. Most games are playable, but the emulator is still not very accurate. Expect bugs.**
 
 # Example Gifs & Screenshots
 
