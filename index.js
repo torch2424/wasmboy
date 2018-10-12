@@ -178,7 +178,7 @@ export default class App extends Component {
       <div class="wasmboy">
         <h1 class="wasmboy__title">WasmBoy (Debugger / Demo)</h1>
         <div style="text-align: center">
-          <b>Version: {packageJson.version}</b>
+          <b>WasmBoy Lib Version: {packageJson.version}</b>
         </div>
         <div style="text-align: center">
           <a href="https://github.com/torch2424/wasmBoy" target="_blank">

@@ -45,4 +45,25 @@ export default function(config, env, helpers) {
     }
   });
   config.resolve.extensions.push('.wasm');
+
+  // Add a loader for gb files
+  // using url-loader
+  config.module.loaders.push({
+    loader: 'url-loader',
+    test: /\.gb$/,
+    options: {
+      limit: 100 * 1024,
+      mimetype: 'application/octet-stream'
+    }
+  });
+  config.resolve.extensions.push('.gb');
+  config.module.loaders.push({
+    loader: 'url-loader',
+    test: /\.gbc$/,
+    options: {
+      limit: 100 * 1024,
+      mimetype: 'application/octet-stream'
+    }
+  });
+  config.resolve.extensions.push('.gbc');
 }
