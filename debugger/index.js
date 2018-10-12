@@ -3,7 +3,7 @@ import 'bulma/css/bulma.css';
 import '@babel/polyfill';
 import { Component } from 'preact';
 // The following line can be changed to './dist/wasmboy.esm.js', to test the built lib
-import { WasmBoy } from '../dist/wasmboy.esm';
+import { WasmBoy } from '../lib/index.js';
 import { WasmBoyDebugger } from './wasmboyDebugger/wasmboyDebugger';
 import { WasmBoySystemControls } from './wasmboySystemControls/wasmboySystemControls';
 import { WasmBoyFilePicker } from './wasmboyFilePicker/wasmboyFilePicker';
@@ -11,7 +11,7 @@ import { WasmBoyOptions } from './wasmboyOptions/wasmboyOptions';
 import { WasmBoyGamepad } from './wasmboyGamepad/wasmboyGamepad';
 
 // Get our package.json
-const packageJson = require('../package.json');
+import packageJson from '../package.json';
 
 // Our canvas element
 let canvasElement = undefined;
