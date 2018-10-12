@@ -14,7 +14,7 @@ const openSourceROMs = {
   tobutobugirl: {
     title: 'tobu tobu girl',
     url: tobuTobuGirlROM,
-    image: 'https://vaporboy.net/assets/homebrew/tobutobugirl/tobutobugirl.png',
+    image: 'assets/tobutobugirl.png',
     link: 'http://tangramgames.dk/tobutobugirl/',
     infoElement: (
       <div>
@@ -70,15 +70,7 @@ export class WasmBoyFilePicker extends Component {
       const openSourceROM = openSourceROMs[romKey];
       this.openSourceROMElements.push(
         <div class="open-source-rom">
-          <button
-            class="open-source-rom__button"
-            onClick={event => {
-              console.log(event);
-              if (event.target.tagName.toLowerCase() !== 'a') {
-                this.loadOpenSourceROM(openSourceROM);
-              }
-            }}
-          >
+          <button class="open-source-rom__button" onClick={() => this.loadOpenSourceROM(openSourceROM)}>
             <div class="open-source-rom__left">
               <img src={openSourceROM.image} />
             </div>
