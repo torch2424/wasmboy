@@ -4,6 +4,8 @@ import GooglePicker from './googlePicker/googlePicker';
 import { WasmBoy } from '../../lib/index';
 import './wasmboyFilePicker.css';
 
+// Import our demo roms
+
 // Public Keys for Google Drive API
 const WASMBOY_DEBUGGER_GOOGLE_PICKER_CLIENT_ID = '427833658710-bntpbmf6pimh8trt0n4c36gteomseg61.apps.googleusercontent.com';
 
