@@ -183,12 +183,7 @@ export class WasmBoySystemControls extends Component {
         {this.state.showSaveStates ? (
           <Portal into="body">
             <div class="modal is-active">
-              <div
-                class="modal-background"
-                onClick={() => {
-                  this.closeSaveStates();
-                }}
-              >
+              <div class="modal-background">
                 <div class="modal-content">
                   <h1>Load Save State For Current Game</h1>
                   <div class="saveStateContainer">{saveStateElements}</div>
