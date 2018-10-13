@@ -13,6 +13,10 @@ import { WasmBoyGamepad } from './wasmboyGamepad/wasmboyGamepad';
 // Get our package.json
 import packageJson from '../package.json';
 
+// Our current canvas object.
+// Up here for the saveStateCallback
+let canvasElement = undefined;
+
 // Our notification timeout
 let notificationTimeout = undefined;
 
@@ -117,16 +121,18 @@ export default class App extends Component {
   }
 
   componentDidUpdate() {
-    console.log('hi');
     this.setWasmBoyCanvas();
-
-    console.log('ayyee', WasmBoy.getCanvas());
   }
 
   setWasmBoyCanvas() {
-    // Get our canvas element
-    const canvasElement = document.querySelector('.wasmboy__canvas-container__canvas');
-    WasmBoy.setCanvas(canvasElement);
+    const setCanvasTask = async () => {
+      // Get our canvas element
+      canvasElement = document.querySelector('.wasmboy__canvas-container__canvas');
+      await WasmBoy.setCanvas(canvasElement);
+      await WasmBoy.play();
+    };
+
+    return setCanvasTask();
   }
 
   // Function to show notifications to the user

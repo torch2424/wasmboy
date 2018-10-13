@@ -2,7 +2,7 @@ import { Component } from 'preact';
 import Portal from 'preact-portal';
 import fetch from 'unfetch';
 import GooglePicker from './googlePicker/googlePicker';
-import { WasmBoy } from '../../lib/index';
+import { WasmBoy } from '../../dist/wasmboy.esm';
 import './wasmboyFilePicker.css';
 
 // Import our demo roms

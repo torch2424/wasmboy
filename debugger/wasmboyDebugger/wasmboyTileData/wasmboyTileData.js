@@ -1,6 +1,6 @@
 import { Component } from 'preact';
 import Promise from 'promise-polyfill';
-import { WasmBoy } from '../../../lib/index';
+import { WasmBoy } from '../../../dist/wasmboy.esm';
 import './wasmboyTileData.css';
 
 const canvasId = 'WasmBoyTileData';
