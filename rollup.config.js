@@ -13,15 +13,17 @@ const plugins = [
     limit: 100 * 1024, // 100Kb
     include: ['**/*.wasm']
   }),
-  commonjs(), // so Rollup can convert node module to an ES module
   babel({
     // so Rollup can convert unsupported es6 code to es5
     exclude: ['node_modules/**']
   }),
-  regenerator(),
+  commonjs(), // so Rollup can convert node module to an ES module
   compiler(),
   bundleSize()
 ];
+
+// Plugins specific to running in a node runtime
+const nodePlugins = [...plugins, regenerator()];
 
 export default [
   // browser-friendly UMD build
@@ -30,7 +32,8 @@ export default [
     output: {
       name: 'WasmBoy',
       file: pkg.browser,
-      format: 'umd'
+      format: 'umd',
+      sourcemap: true
     },
     context: 'window',
     plugins: plugins
@@ -44,14 +47,26 @@ export default [
   // `file` and `format` for each target)
   {
     input: 'lib/index.js',
-    output: [{ file: pkg.module, format: 'es' }],
+    output: [
+      {
+        file: pkg.module,
+        format: 'es',
+        sourcemap: true
+      }
+    ],
     context: 'window',
     plugins: plugins
   },
   {
     input: 'lib/index.js',
-    output: [{ file: pkg.main, format: 'cjs' }],
+    output: [
+      {
+        file: pkg.main,
+        format: 'cjs',
+        sourcemap: true
+      }
+    ],
     context: 'global',
-    plugins: plugins
+    plugins: nodePlugins
   }
 ];

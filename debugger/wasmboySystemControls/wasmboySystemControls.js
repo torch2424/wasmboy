@@ -1,6 +1,6 @@
 import { Component } from 'preact';
 import Portal from 'preact-portal';
-import { WasmBoy } from '../../lib/index';
+import { WasmBoy } from '../../dist/wasmboy.esm';
 import './wasmBoySystemControls.css';
 
 export class WasmBoySystemControls extends Component {
@@ -79,12 +79,14 @@ export class WasmBoySystemControls extends Component {
           .then(() => {
             this.props.showNotification('State Saved! 💾');
           })
-          .catch(() => {
+          .catch(err => {
             this.props.showNotification('Error Saving State... 😞');
+            console.error(err);
           });
       })
-      .catch(() => {
+      .catch(err => {
         this.props.showNotification('Error Saving State... 😞');
+        console.error(err);
       });
   }
 

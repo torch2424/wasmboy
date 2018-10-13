@@ -1,6 +1,6 @@
 import { Component } from 'preact';
 import Promise from 'promise-polyfill';
-import { WasmBoy } from '../../../lib/index';
+import { WasmBoy } from '../../../dist/wasmboy.esm';
 import './wasmboyBackgroundMap.css';
 
 export class WasmBoyBackgroundMap extends Component {
@@ -66,9 +66,7 @@ export class WasmBoyBackgroundMap extends Component {
           let pixelStart = (y * 256 + x) * 3;
 
           for (let color = 0; color < 3; color++) {
-            rgbColor[color] = WasmBoy._getWasmByteMemory()[
-              WasmBoy._getWasmInstance().exports.backgroundMapLocation + pixelStart + color
-            ];
+            rgbColor[color] = WasmBoy._getWasmByteMemory()[WasmBoy._getWasmInstance().exports.backgroundMapLocation + pixelStart + color];
           }
 
           // Doing graphics using second answer on:

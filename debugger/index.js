@@ -3,7 +3,7 @@ import 'bulma/css/bulma.css';
 import '@babel/polyfill';
 import { Component } from 'preact';
 // The following line can be changed to './dist/wasmboy.esm.js', to test the built lib
-import { WasmBoy } from '../lib/index.js';
+import { WasmBoy } from '../dist/wasmboy.esm';
 import { WasmBoyDebugger } from './wasmboyDebugger/wasmboyDebugger';
 import { WasmBoySystemControls } from './wasmboySystemControls/wasmboySystemControls';
 import { WasmBoyFilePicker } from './wasmboyFilePicker/wasmboyFilePicker';
@@ -13,7 +13,8 @@ import { WasmBoyGamepad } from './wasmboyGamepad/wasmboyGamepad';
 // Get our package.json
 import packageJson from '../package.json';
 
-// Our canvas element
+// Our current canvas object.
+// Up here for the saveStateCallback
 let canvasElement = undefined;
 
 // Our notification timeout
@@ -107,17 +108,31 @@ export default class App extends Component {
 
   // Using componentDidMount to wait for the canvas element to be inserted in DOM
   componentDidMount() {
-    // Get our canvas element
-    canvasElement = document.querySelector('.wasmboy__canvas-container__canvas');
-
     // Config our WasmBoy instance
-    WasmBoy.config(WasmBoyDefaultOptions, canvasElement)
+    WasmBoy.config(WasmBoyDefaultOptions)
       .then(() => {
         // Wait for input
+        this.setWasmBoyCanvas();
       })
       .catch(error => {
         console.error(error);
       });
+    this.setWasmBoyCanvas();
+  }
+
+  componentDidUpdate() {
+    this.setWasmBoyCanvas();
+  }
+
+  setWasmBoyCanvas() {
+    const setCanvasTask = async () => {
+      // Get our canvas element
+      canvasElement = document.querySelector('.wasmboy__canvas-container__canvas');
+      await WasmBoy.setCanvas(canvasElement);
+      await WasmBoy.play();
+    };
+
+    return setCanvasTask();
   }
 
   // Function to show notifications to the user
