@@ -13,6 +13,9 @@ import { WasmBoyGamepad } from './wasmboyGamepad/wasmboyGamepad';
 // Get our package.json
 import packageJson from '../package.json';
 
+// Log the wasmboy lib
+console.log('WasmBoy', WasmBoy);
+
 // Our current canvas object.
 // Up here for the saveStateCallback
 let canvasElement = undefined;
