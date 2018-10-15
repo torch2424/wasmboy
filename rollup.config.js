@@ -2,28 +2,57 @@ import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
 import url from 'rollup-plugin-url';
+import replace from 'rollup-plugin-replace';
 import regenerator from 'rollup-plugin-regenerator';
 import compiler from '@ampproject/rollup-plugin-closure-compiler';
 import bundleSize from 'rollup-plugin-bundle-size';
 import pkg from './package.json';
 
+// Our base plugins needed by every bundle type
 const plugins = [
   resolve(), // so Rollup can find node modules
-  url({
-    limit: 100 * 1024, // 100Kb
-    include: ['**/*.wasm', '**/*.worker.js']
-  }),
   babel({
     // so Rollup can convert unsupported es6 code to es5
     exclude: ['node_modules/**']
   }),
-  commonjs(), // so Rollup can convert node module to an ES module
-  // compiler(),
-  bundleSize()
+  commonjs() // so Rollup can convert node module to an ES module
 ];
 
+// Url inline replacements
+const urlPlugins = [
+  url({
+    limit: 100 * 1024, // 100Kb
+    include: ['**/*.wasm']
+  }),
+  url({
+    limit: 1000000 * 1024, // Always inline
+    include: ['**/*.worker.js'],
+    // Don't emit files, this will replace the worker build output
+    emitFiles: false
+  })
+];
+
+// Our replace Options for node workers
+// https://nodejs.org/api/worker_threads.html
+const replaceNodeOptions = {
+  delimiters: ['', ''],
+  values: {
+    '/*ROLLUP_REPLACE_NODE': '',
+    'ROLLUP_REPLACE_NODE*/': ''
+  }
+};
 // Plugins specific to running in a node runtime
-const nodePlugins = [...plugins, regenerator()];
+const nodePlugins = [replace(replaceNodeOptions), ...urlPlugins, ...plugins, regenerator(), bundleSize()];
+
+const replaceBrowserOptions = {
+  delimiters: ['', ''],
+  values: {
+    '/*ROLLUP_REPLACE_BROWSER': '',
+    'ROLLUP_REPLACE_BROWSER*/': ''
+  }
+};
+// Plugins specific to running in a node runtime
+const browserPlugins = [replace(replaceBrowserOptions), ...urlPlugins, ...plugins, compiler(), bundleSize()];
 
 // Define our worker outputs
 const workerEntryPoints = [
@@ -34,16 +63,19 @@ const workerEntryPoints = [
   'memory/worker/memory.worker.js'
 ];
 
+const workerPlugins = [...plugins, bundleSize()];
+
 const workerBundles = [];
 workerEntryPoints.forEach(workerEntryPoint => {
   workerBundles.push({
     input: `lib/${workerEntryPoint}`,
     output: {
       file: `dist/${workerEntryPoint}`,
-      format: 'esm',
+      format: 'iife',
+      name: 'WasmBoyWorker',
       sourcemap: true
     },
-    plugins: plugins
+    plugins: workerPlugins
   });
 });
 
@@ -59,7 +91,7 @@ const libBundles = [
       sourcemap: true
     },
     context: 'window',
-    plugins: plugins
+    plugins: browserPlugins
   },
 
   // CommonJS (for Node) and ES module (for bundlers) build.
@@ -78,7 +110,7 @@ const libBundles = [
       }
     ],
     context: 'window',
-    plugins: plugins
+    plugins: browserPlugins
   },
   {
     input: 'lib/index.js',
