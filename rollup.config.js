@@ -63,7 +63,7 @@ const workerEntryPoints = [
   'memory/worker/memory.worker.js'
 ];
 
-const workerPlugins = [...plugins, bundleSize()];
+const workerPlugins = [...plugins, regenerator(), bundleSize()];
 
 const workerBundles = [];
 workerEntryPoints.forEach(workerEntryPoint => {
