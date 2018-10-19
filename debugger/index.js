@@ -1,6 +1,5 @@
 import '../style';
 import 'bulma/css/bulma.css';
-import '@babel/polyfill';
 import { Component } from 'preact';
 // The following line can be changed to './dist/wasmboy.esm.js', to test the built lib
 import { WasmBoy } from '../dist/wasmboy.esm';

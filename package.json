@@ -44,27 +44,7 @@
     "README.md",
     "LICENSE"
   ],
-  "babel": {
-    "presets": [
-      [
-        "env",
-        {
-          "modules": false
-        }
-      ]
-    ],
-    "plugins": [
-      "external-helpers"
-    ]
-  },
-  "eslintConfig": {
-    "extends": "eslint-config-synacor"
-  },
-  "eslintIgnore": [
-    "build/*"
-  ],
   "dependencies": {
-    "@babel/polyfill": "^7.0.0",
     "audiobuffer-to-wav": "^1.0.0",
     "idb": "^2.1.0",
     "promise-polyfill": "7.0.0",
@@ -75,13 +55,12 @@
   },
   "devDependencies": {
     "@ampproject/rollup-plugin-closure-compiler": "^0.7.2",
+    "@babel/core": "^7.1.2",
+    "@babel/plugin-proposal-class-properties": "^7.1.0",
     "assemblyscript": "github:AssemblyScript/assemblyscript#c769f65bacd5392e5c9efab112b33244fc0a0c8f",
-    "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-env": "^1.6.1",
     "bulma": "^0.7.1",
     "concurrently": "^3.5.1",
-    "eslint": "^4.5.0",
-    "eslint-config-synacor": "^1.1.0",
     "gh-pages": "^1.1.0",
     "husky": "^1.0.0-rc.8",
     "if-env": "^1.0.0",
@@ -98,11 +77,10 @@
     "preact-portal": "^1.1.3",
     "prettier": "^1.12.1",
     "pretty-quick": "^1.6.0",
-    "rollup-plugin-babel": "^3.0.3",
+    "rollup-plugin-babel": "^4.0.3",
     "rollup-plugin-bundle-size": "^1.0.2",
     "rollup-plugin-commonjs": "^8.3.0",
     "rollup-plugin-node-resolve": "^3.0.3",
-    "rollup-plugin-regenerator": "^0.5.4",
     "rollup-plugin-replace": "^2.1.0",
     "rollup-plugin-url": "^1.4.0",
     "source-map-loader": "^0.2.4",

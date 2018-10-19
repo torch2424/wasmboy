@@ -3,7 +3,6 @@ import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
 import url from 'rollup-plugin-url';
 import replace from 'rollup-plugin-replace';
-import regenerator from 'rollup-plugin-regenerator';
 import compiler from '@ampproject/rollup-plugin-closure-compiler';
 import bundleSize from 'rollup-plugin-bundle-size';
 import pkg from './package.json';
@@ -13,7 +12,8 @@ const plugins = [
   resolve(), // so Rollup can find node modules
   babel({
     // so Rollup can convert unsupported es6 code to es5
-    exclude: ['node_modules/**']
+    exclude: ['node_modules/**'],
+    plugins: ['@babel/plugin-proposal-class-properties']
   }),
   commonjs() // so Rollup can convert node module to an ES module
 ];
@@ -42,7 +42,7 @@ const replaceNodeOptions = {
   }
 };
 // Plugins specific to running in a node runtime
-const nodePlugins = [replace(replaceNodeOptions), ...urlPlugins, ...plugins, regenerator(), bundleSize()];
+const nodePlugins = [replace(replaceNodeOptions), ...urlPlugins, ...plugins, bundleSize()];
 
 const replaceBrowserOptions = {
   delimiters: ['', ''],
@@ -63,7 +63,7 @@ const workerEntryPoints = [
   'memory/worker/memory.worker.js'
 ];
 
-const workerPlugins = [...plugins, regenerator(), bundleSize()];
+const workerPlugins = [...plugins, bundleSize()];
 
 const workerBundles = [];
 workerEntryPoints.forEach(workerEntryPoint => {
@@ -75,6 +75,7 @@ workerEntryPoints.forEach(workerEntryPoint => {
       name: 'WasmBoyWorker',
       sourcemap: true
     },
+    context: 'self',
     plugins: workerPlugins
   });
 });
