@@ -13,7 +13,7 @@ const plugins = [
   babel({
     // so Rollup can convert unsupported es6 code to es5
     exclude: ['node_modules/**'],
-    plugins: ['@babel/plugin-proposal-class-properties']
+    plugins: ['@babel/plugin-proposal-class-properties', '@babel/plugin-proposal-object-rest-spread']
   }),
   commonjs() // so Rollup can convert node module to an ES module
 ];

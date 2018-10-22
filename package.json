@@ -57,6 +57,7 @@
     "@ampproject/rollup-plugin-closure-compiler": "^0.7.2",
     "@babel/core": "^7.1.2",
     "@babel/plugin-proposal-class-properties": "^7.1.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
     "assemblyscript": "github:AssemblyScript/assemblyscript#c769f65bacd5392e5c9efab112b33244fc0a0c8f",
     "babel-preset-env": "^1.6.1",
     "bulma": "^0.7.1",
