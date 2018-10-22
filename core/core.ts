@@ -6,7 +6,16 @@ import { Interrupts, checkInterrupts } from './interrupts/index';
 import { Joypad } from './joypad/index';
 import { Memory, initializeCartridge, initializeDma, eightBitStoreIntoGBMemory, eightBitLoadFromGBMemory } from './memory/index';
 import { Timers, initializeTimers, updateTimers, batchProcessTimers } from './timers/index';
-import { Sound, initializeSound, Channel1, Channel2, Channel3, Channel4, updateSound } from './sound/index';
+import {
+  Sound,
+  initializeSound,
+  Channel1,
+  Channel2,
+  Channel3,
+  Channel4,
+  updateSound,
+  getNumberOfSamplesInAudioBuffer
+} from './sound/index';
 import { WASMBOY_WASM_PAGES } from './constants';
 import { Config } from './config';
 import { hexLog, log } from './helpers/index';
@@ -157,7 +166,8 @@ function initialize(): void {
   hasStarted = false;
 }
 
-// Public funciton to run opcodes until an event occurs.
+// Public funciton to run opcodes until,
+// a frame is ready, or error.
 // Return values:
 // -1 = error
 // 0 = render a frame
@@ -181,6 +191,48 @@ export function executeFrame(): i32 {
 
     return 0;
   }
+  // TODO: Boot ROM handling
+
+  // There was an error, return -1, and push the program counter back to grab the error opcode
+  Cpu.programCounter -= 1;
+  return -1;
+}
+
+// Public Function to run opcodes until,
+// a frame is ready, audio bufer is filled, or error
+// -1 = error
+// 0 = render a frame
+// 1 = output audio
+export function executeFrameAndCheckAudio(maxAudioBuffer: i32): i32 {
+  let error: boolean = false;
+  let numberOfCycles: i32 = -1;
+  let audioBufferSize: i32 = 1024;
+
+  if (maxAudioBuffer && maxAudioBuffer > 0) {
+    audioBufferSize = maxAudioBuffer;
+  }
+
+  while (!error && Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME() && getNumberOfSamplesInAudioBuffer() < audioBufferSize) {
+    numberOfCycles = executeStep();
+    if (numberOfCycles < 0) {
+      error = true;
+    }
+  }
+
+  // Find our exit reason
+  if (Cpu.currentCycles >= Cpu.MAX_CYCLES_PER_FRAME()) {
+    // Render a frame
+
+    // Reset our currentCycles
+    Cpu.currentCycles -= Cpu.MAX_CYCLES_PER_FRAME();
+
+    return 0;
+  }
+  if (getNumberOfSamplesInAudioBuffer() >= audioBufferSize) {
+    // Output Audio
+    return 1;
+  }
+
   // TODO: Boot ROM handling
 
   // There was an error, return -1, and push the program counter back to grab the error opcode

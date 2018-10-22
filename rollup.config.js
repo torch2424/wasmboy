@@ -52,7 +52,11 @@ const replaceBrowserOptions = {
   }
 };
 // Plugins specific to running in a node runtime
-const browserPlugins = [replace(replaceBrowserOptions), ...urlPlugins, ...plugins, compiler(), bundleSize()];
+const browserPlugins = [replace(replaceBrowserOptions), ...urlPlugins, ...plugins];
+if (process.env.PROD) {
+  browserPlugins.push(compiler());
+}
+browserPlugins.push(bundleSize());
 
 // Define our worker outputs
 const workerEntryPoints = [

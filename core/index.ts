@@ -1,5 +1,5 @@
 // Public Exports
-export { config, executeFrame, executeStep, saveState, loadState, hasCoreStarted } from './core';
+export { config, executeFrame, executeFrameAndCheckAudio, executeStep, saveState, loadState, hasCoreStarted } from './core';
 export { setJoypadState } from './joypad/joypad';
 export { getNumberOfSamplesInAudioBuffer, clearAudioBuffer } from './sound/sound';
 export {
