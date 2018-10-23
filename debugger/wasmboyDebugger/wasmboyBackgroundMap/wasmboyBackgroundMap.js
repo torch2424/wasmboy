@@ -42,20 +42,18 @@ export class WasmBoyBackgroundMap extends Component {
   }
 
   updateBackgroundMap(canvasElement, canvasContext, canvasImageData) {
-    return new Promise(resolve => {
+    const updateBackgroundMapTask = async () => {
       // Dont update for the following
-      if (
-        !WasmBoy._getWasmByteMemory() ||
-        !WasmBoy._getWasmInstance() ||
-        !WasmBoy.isReady() ||
-        WasmBoy.isPaused() ||
-        !this.props.shouldUpdate
-      ) {
-        resolve();
+      if (!WasmBoy.isReady() || WasmBoy.isPaused() || !this.props.shouldUpdate) {
         return;
       }
 
-      WasmBoy._getWasmInstance().exports.drawBackgroundMapToWasmMemory(1);
+      // Draw our background map
+      WasmBoy._runWasmExport('drawBackgroundMapToWasmMemory', [1]);
+
+      // Get our background map location constant
+      const backgroundMapLocation = await WasmBoy._getWasmConstant('backgroundMapLocation');
+      const backgroundMapMemory = await WasmBoy._getWasmMemorySection(backgroundMapLocation, backgroundMapLocation + 256 * 256 * 3);
 
       const imageDataArray = new Uint8ClampedArray(256 * 256 * 4);
       const rgbColor = new Uint8ClampedArray(3);
@@ -66,7 +64,7 @@ export class WasmBoyBackgroundMap extends Component {
           let pixelStart = (y * 256 + x) * 3;
 
           for (let color = 0; color < 3; color++) {
-            rgbColor[color] = WasmBoy._getWasmByteMemory()[WasmBoy._getWasmInstance().exports.backgroundMapLocation + pixelStart + color];
+            rgbColor[color] = backgroundMapMemory[pixelStart + color];
           }
 
           // Doing graphics using second answer on:
@@ -94,8 +92,13 @@ export class WasmBoyBackgroundMap extends Component {
       // Draw a semi Transparent camera thing over the imagedata
       // https://www.html5canvastutorials.com/tutorials/html5-canvas-rectangles/
       // Get the scroll X and Y
-      const scrollX = WasmBoy._getWasmByteMemory()[this.props.getWasmBoyOffsetFromGameBoyOffset(0xff43)];
-      const scrollY = WasmBoy._getWasmByteMemory()[this.props.getWasmBoyOffsetFromGameBoyOffset(0xff42)];
+      const scrollMemoryRegistersStart = await this.props.getWasmBoyOffsetFromGameBoyOffset(0xff42);
+      const scrollMemoryRegistersEnd = (await this.props.getWasmBoyOffsetFromGameBoyOffset(0xff43)) + 1;
+
+      const scrollMemoryRegisters = await WasmBoy._getWasmMemorySection(scrollMemoryRegistersStart, scrollMemoryRegistersEnd);
+
+      const scrollX = scrollMemoryRegisters[1];
+      const scrollY = scrollMemoryRegisters[0];
 
       const lineWidth = 2;
       const strokeStyle = 'rgba(173, 140, 255, 200)';
@@ -131,9 +134,8 @@ export class WasmBoyBackgroundMap extends Component {
         canvasContext.strokeStyle = strokeStyle;
         canvasContext.stroke();
       }
-
-      resolve();
-    });
+    };
+    return updateBackgroundMapTask();
   }
 
   render() {
