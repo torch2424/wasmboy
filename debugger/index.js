@@ -31,14 +31,14 @@ let audioCallbackCalled = false;
 const WasmBoyDefaultOptions = {
   isGbcEnabled: true,
   isAudioEnabled: true,
-  frameSkip: 1,
-  audioBatchProcessing: true,
+  frameSkip: 0,
+  audioBatchProcessing: false,
   timersBatchProcessing: false,
-  audioAccumulateSamples: true,
+  audioAccumulateSamples: false,
   graphicsBatchProcessing: false,
   graphicsDisableScanlineRendering: false,
-  tileRendering: true,
-  tileCaching: true,
+  tileRendering: false,
+  tileCaching: false,
   gameboyFrameRate: 60,
   updateGraphicsCallback: imageDataArray => {
     if (!graphicsCallbackCalled) {
@@ -104,6 +104,7 @@ export default class App extends Component {
     this.state = {
       showDebugger: false,
       showOptions: false,
+      showGamepad: false,
       notification: <div />
     };
   }
@@ -122,7 +123,7 @@ export default class App extends Component {
     this.setWasmBoyCanvas();
   }
 
-  componentDidUpdate() {
+  componentDidMount() {
     this.setWasmBoyCanvas();
   }
 
@@ -244,6 +245,26 @@ export default class App extends Component {
           </label>
         </div>
 
+        <div style="text-align: center">
+          <label class="checkbox">
+            Show Touchpad
+            <input
+              type="checkbox"
+              checked={this.state.showGamepad}
+              onChange={() => {
+                const newState = Object.assign({}, this.state);
+                newState.showGamepad = !newState.showGamepad;
+                this.setState(newState);
+
+                // Fire off Analytics
+                if (window !== undefined && window.gtag) {
+                  gtag('event', 'showed_gamepad');
+                }
+              }}
+            />
+          </label>
+        </div>
+
         {debuggerComponent}
 
         <WasmBoyFilePicker
@@ -264,7 +285,7 @@ export default class App extends Component {
           <canvas className="wasmboy__canvas-container__canvas" />
         </main>
 
-        <WasmBoyGamepad />
+        {this.state.showGamepad ? <WasmBoyGamepad /> : ''}
 
         {this.state.notification}
       </div>
