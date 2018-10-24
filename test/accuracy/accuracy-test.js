@@ -18,26 +18,26 @@ const TEST_ROM_TIMEOUT = {
   cpu_instrs: 17500
 };
 
+console.log(`Testing wasmBoy version: ${WasmBoy.getVersion()}`);
+
 // Initialize wasmBoy headless, with a speed option
 WasmBoy.config({
-    headless: true,
-    gameboySpeed: 100.0,
-    isGbcEnabled: true
+  headless: true,
+  gameboySpeed: 100.0,
+  isGbcEnabled: true
 });
 
 const testRomsPath = './test/accuracy/testroms';
 
-commonTest.getDirectories(testRomsPath).forEach((directory) => {
+commonTest.getDirectories(testRomsPath).forEach(directory => {
   // Get all test roms for the directory
   const testRoms = commonTest.getAllRomsInDirectory(directory);
 
   // Create a describe for the directory
   describe(directory, () => {
-
     // Describe for each test rom
-    testRoms.forEach((testRom) => {
+    testRoms.forEach(testRom => {
       describe(testRom, () => {
-
         // Default: Wait 60 seconds for every test
         // Stop watch-ed cpu_instructs and it took about 55
         // So lets see how this goes
@@ -46,7 +46,6 @@ commonTest.getDirectories(testRomsPath).forEach((directory) => {
         // Define our wasmboy instance
         // Not using arrow functions, as arrow function timeouts were acting up
         beforeEach(function(done) {
-
           // Set a timeout of 7500, takes a while for wasm module to parse
           this.timeout(7500);
 
@@ -66,16 +65,14 @@ commonTest.getDirectories(testRomsPath).forEach((directory) => {
         });
 
         it('should match the expected output in the .output file. If it does not exist, create the file.', function(done) {
-
           // Set our timeout
           this.timeout(timeToWaitForTestRom + 2000);
 
           WasmBoy.play();
 
-          console.log(`Running the following test rom: ${directory}/${testRom}`)
+          console.log(`Running the following test rom: ${directory}/${testRom}`);
 
           setTimeout(() => {
-
             WasmBoy.pause().then(() => {
               console.log(`Checking results for the following test rom: ${directory}/${testRom}`);
 
@@ -83,61 +80,64 @@ commonTest.getDirectories(testRomsPath).forEach((directory) => {
 
               // Output a gitignored image of the current tests
               const testImagePath = testRom.replace('.gb', '.current.png');
-              commonTest.createImageFromFrame(imageDataArray, `${directory}/${testImagePath}`).then(() => {
-                // Now compare with the current array if we have it
-                const testDataPath = testRom.replace('.gb', '.golden.output');
-                if (fs.existsSync(`${directory}/${testDataPath}`)) {
-                  // Compare the file
-                  const goldenOuput = fs.readFileSync(`${directory}/${testDataPath}`);
+              commonTest
+                .createImageFromFrame(imageDataArray, `${directory}/${testImagePath}`)
+                .then(() => {
+                  // Now compare with the current array if we have it
+                  const testDataPath = testRom.replace('.gb', '.golden.output');
+                  if (fs.existsSync(`${directory}/${testDataPath}`)) {
+                    // Compare the file
+                    const goldenOuput = fs.readFileSync(`${directory}/${testDataPath}`);
 
-                  const goldenImageDataArray = JSON.parse(goldenOuput);
+                    const goldenImageDataArray = JSON.parse(goldenOuput);
 
-                  if(goldenImageDataArray.length !== imageDataArray.length) {
-                    assert.equal(goldenImageDataArray.length === imageDataArray.length, true);
-                  } else {
-                    // Find the differences between the two arrays
-                    const arrayDiff = [];
+                    if (goldenImageDataArray.length !== imageDataArray.length) {
+                      assert.equal(goldenImageDataArray.length === imageDataArray.length, true);
+                    } else {
+                      // Find the differences between the two arrays
+                      const arrayDiff = [];
 
-                    for (let i = 0; i < goldenImageDataArray.length; i++) {
-                      if(goldenImageDataArray[i] !== imageDataArray[i]) {
-                        arrayDiff.push({
-                          index: i,
-                          goldenElement: goldenImageDataArray[i],
-                          imageDataElement: imageDataArray[i]
-                        });
+                      for (let i = 0; i < goldenImageDataArray.length; i++) {
+                        if (goldenImageDataArray[i] !== imageDataArray[i]) {
+                          arrayDiff.push({
+                            index: i,
+                            goldenElement: goldenImageDataArray[i],
+                            imageDataElement: imageDataArray[i]
+                          });
+                        }
                       }
+
+                      // Check if we found differences
+                      if (arrayDiff.length > 0) {
+                        console.log('Differences found in expected (golden) output:');
+                        console.log(arrayDiff);
+                      }
+
+                      assert.equal(arrayDiff.length, 0);
                     }
 
-                    // Check if we found differences
-                    if(arrayDiff.length > 0) {
-                      console.log('Differences found in expected (golden) output:')
-                      console.log(arrayDiff);
-                    }
-
-                    assert.equal(arrayDiff.length, 0);
-                  }
-
-                  done();
-                } else {
-                  // Either we didn't have it because this is the first time running this test rom,
-                  // or we wanted to update expected output, so we deleted the file
-                  console.warn(`No output found in: ${directory}/${testDataPath}, Creating expected (golden) output...`);
-
-                  // Create the output file
-                  // Stringify our image data
-                  const imageDataStringified = JSON.stringify(imageDataArray);
-                  fs.writeFileSync(`${directory}/${testDataPath}`, imageDataStringified);
-
-                  const testImagePath = testRom.replace('.gb', '.golden.png');
-                  commonTest.createImageFromFrame(imageDataArray, `${directory}/${testImagePath}`).then(() => {
                     done();
-                  });
-                }
-              }).catch(() => {
-                console.log('Error creating images...');
-                assert.equal(true, false);
-                done();
-              });
+                  } else {
+                    // Either we didn't have it because this is the first time running this test rom,
+                    // or we wanted to update expected output, so we deleted the file
+                    console.warn(`No output found in: ${directory}/${testDataPath}, Creating expected (golden) output...`);
+
+                    // Create the output file
+                    // Stringify our image data
+                    const imageDataStringified = JSON.stringify(imageDataArray);
+                    fs.writeFileSync(`${directory}/${testDataPath}`, imageDataStringified);
+
+                    const testImagePath = testRom.replace('.gb', '.golden.png');
+                    commonTest.createImageFromFrame(imageDataArray, `${directory}/${testImagePath}`).then(() => {
+                      done();
+                    });
+                  }
+                })
+                .catch(() => {
+                  console.log('Error creating images...');
+                  assert.equal(true, false);
+                  done();
+                });
             });
           }, timeToWaitForTestRom);
         });
