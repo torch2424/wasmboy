@@ -21,7 +21,7 @@ const plugins = [
 // Url inline replacements
 const urlPlugins = [
   url({
-    limit: 100 * 1024, // 100Kb
+    limit: 1000000 * 1024, // Always inline
     include: ['**/*.wasm']
   }),
   url({
