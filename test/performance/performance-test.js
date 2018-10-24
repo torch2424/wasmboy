@@ -140,51 +140,52 @@ directories.forEach((directory, directoryIndex) => {
 
             // Descibe what the tesrt should do for the option
             it(`should be able to run ${NUMBER_OF_FRAMES} frames in a timely manner`, function(done) {
-              // Add some timeout in case the option takes much longer
-              this.timeout(PERFORMANCE_OPTION_TIMEOUT * PERFORMANCE_OPTION_ITERATIONS);
+              const runFramesTask = async () => {
+                // Add some timeout in case the option takes much longer
+                this.timeout(PERFORMANCE_OPTION_TIMEOUT * PERFORMANCE_OPTION_ITERATIONS);
 
-              const iterationTimes = [];
+                const iterationTimes = [];
 
-              for (let iterations = 0; iterations < PERFORMANCE_OPTION_ITERATIONS; iterations++) {
-                const start = now();
+                for (let iterations = 0; iterations < PERFORMANCE_OPTION_ITERATIONS; iterations++) {
+                  const start = now();
 
-                for (let i = 0; i < NUMBER_OF_FRAMES; i++) {
-                  WasmBoy._getWasmInstance().exports.update();
+                  for (let i = 0; i < NUMBER_OF_FRAMES; i++) {
+                    await WasmBoy._runWasmExport('update');
+                  }
+
+                  const end = now();
+
+                  const iterationTimeElapsed = (end - start).toFixed(3);
+                  iterationTimes.push(iterationTimeElapsed);
+
+                  console.log(`Finished Iteration #${iterations}`);
                 }
 
-                const end = now();
+                let totalTime = 0;
+                iterationTimes.forEach(time => {
+                  totalTime += parseFloat(time);
+                });
+                let timeElapsed = 0;
+                if (iterationTimes.length > 0) {
+                  timeElapsed = totalTime / iterationTimes.length;
+                }
 
-                const iterationTimeElapsed = (end - start).toFixed(3);
-                iterationTimes.push(iterationTimeElapsed);
+                // Some Spacing
+                console.log(' ');
+                console.log(
+                  `WasmBoy with the option(s): ${performanceOptionKeys.join(', ')} enabled, ` + `took ${timeElapsed} milliseconds to run`
+                );
+                console.log(' ');
 
-                console.log(`Finished Iteration #${iterations}`);
-              }
+                // Store into our tableObject
+                testRomTableObject[performanceOptionKeys.join(', ')] = timeElapsed;
 
-              let totalTime = 0;
-              iterationTimes.forEach(time => {
-                totalTime += parseFloat(time);
-              });
-              let timeElapsed = 0;
-              if (iterationTimes.length > 0) {
-                timeElapsed = totalTime / iterationTimes.length;
-              }
+                // Draw a screenshot of the frame reached
+                const imageDataArray = await commonTest.getImageDataFromFrame();
+                // Output a gitignored image of the current tests
+                let testImagePath = testRom + `.${performanceOptionKeys.join('.')}.png`;
 
-              // Some Spacing
-              console.log(' ');
-              console.log(
-                `WasmBoy with the option(s): ${performanceOptionKeys.join(', ')} enabled, took ${timeElapsed} milliseconds to run`
-              );
-              console.log(' ');
-
-              // Store into our tableObject
-              testRomTableObject[performanceOptionKeys.join(', ')] = timeElapsed;
-
-              // Draw a screenshot of the frame reached
-              const imageDataArray = commonTest.getImageDataFromFrame();
-
-              // Output a gitignored image of the current tests
-              let testImagePath = testRom + `.${performanceOptionKeys.join('.')}.png`;
-              commonTest.createImageFromFrame(imageDataArray, `${directory}/${testImagePath}`).then(() => {
+                await commonTest.createImageFromFrame(imageDataArray, `${directory}/${testImagePath}`);
                 console.log(`Screenshot created at: ${testImagePath}`);
 
                 // Check if we should finalize the test rom
@@ -210,7 +211,8 @@ directories.forEach((directory, directoryIndex) => {
                 console.log(' ');
 
                 done();
-              });
+              };
+              runFramesTask();
             });
           });
         });
