@@ -32,13 +32,13 @@ const WasmBoyDefaultOptions = {
   isGbcEnabled: true,
   isAudioEnabled: true,
   frameSkip: 0,
-  audioBatchProcessing: false,
+  audioBatchProcessing: true,
   timersBatchProcessing: false,
-  audioAccumulateSamples: false,
+  audioAccumulateSamples: true,
   graphicsBatchProcessing: false,
   graphicsDisableScanlineRendering: false,
-  tileRendering: false,
-  tileCaching: false,
+  tileRendering: true,
+  tileCaching: true,
   gameboyFrameRate: 60,
   updateGraphicsCallback: imageDataArray => {
     if (!graphicsCallbackCalled) {

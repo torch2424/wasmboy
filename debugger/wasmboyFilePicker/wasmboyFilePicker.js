@@ -1,6 +1,5 @@
 import { Component } from 'preact';
 import Portal from 'preact-portal';
-import fetch from 'unfetch';
 import GooglePicker from './googlePicker/googlePicker';
 import { WasmBoy } from '../../dist/wasmboy.esm';
 import './wasmboyFilePicker.css';
