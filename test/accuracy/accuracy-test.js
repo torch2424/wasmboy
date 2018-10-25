@@ -18,6 +18,9 @@ const TEST_ROM_TIMEOUT = {
   cpu_instrs: 17500
 };
 
+// Print our version
+console.log(`WasmBoy version: ${WasmBoy.getVersion()}`);
+
 // Initialize wasmBoy headless, with a speed option
 WasmBoy.config({
   headless: true,
