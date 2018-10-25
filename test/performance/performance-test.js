@@ -8,7 +8,7 @@ const WasmBoy = require('../../dist/wasmboy.cjs.js').WasmBoy;
 const fs = require('fs');
 
 // Performance.now npm package for ease of use
-const now = require("performance-now");
+const now = require('performance-now');
 
 // Markdown table for some coolness and a referencable table by users for which options are best
 const markdownTable = require('markdown-table');
@@ -30,9 +30,9 @@ const PERFORMANCE_OPTION_ITERATIONS = 2;
 
 // Initialize wasmBoy headless, with a speed option
 const WASMBOY_INITIALIZE_OPTIONS = {
-    headless: true,
-    gameboySpeed: 100.0,
-    isGbcEnabled: true
+  headless: true,
+  gameboySpeed: 100.0,
+  isGbcEnabled: true
 };
 
 // Doing an initialize intialization here, that way we can load roms
@@ -41,16 +41,16 @@ WasmBoy.config(WASMBOY_INITIALIZE_OPTIONS);
 // optional performance keys we will be testing
 // "Dummy" option will do nothing
 const WASMBOY_PERFORMANCE_TESTS = [
-  ["noPerformanceOptions"],
-  ["tileRendering"],
-  ["tileCaching"],
-  ["tileRendering", "tileCaching"],
-  ["audioBatchProcessing"],
-  ["audioAccumulateSamples"],
-  ["audioBatchProcessing", "audioAccumulateSamples"],
-  ["timersBatchProcessing"],
-  ["graphicsBatchProcessing"],
-  ["graphicsDisableScanlineRendering"]
+  ['noPerformanceOptions'],
+  ['tileRendering'],
+  ['tileCaching'],
+  ['tileRendering', 'tileCaching'],
+  ['audioBatchProcessing'],
+  ['audioAccumulateSamples'],
+  ['audioBatchProcessing', 'audioAccumulateSamples'],
+  ['timersBatchProcessing'],
+  ['graphicsBatchProcessing'],
+  ['graphicsDisableScanlineRendering']
 ];
 
 const PERFORMANCE_TABLE_HEADER = `
@@ -82,10 +82,13 @@ let performanceTableString = PERFORMANCE_TABLE_HEADER;
 const writePerformanceTable = () => {
   // Finally write to our markdown table file
   fs.writeFileSync(performanceTablePath, performanceTableString);
-  console.log(' ')
+  console.log(' ');
   console.log(`Created a Markdown table with these results at: ${performanceTablePath}`);
-  console.log(' ')
-}
+  console.log(' ');
+};
+
+// Print our version
+console.log(`WasmBoy version: ${WasmBoy.getVersion()}`);
 
 // Create our callback insanity
 const directories = commonTest.getDirectories(testRomsPath);
@@ -95,135 +98,127 @@ directories.forEach((directory, directoryIndex) => {
 
   // Create a describe for the directory
   describe(directory, () => {
-
     // Check if we should write the performance table
-    if(directoryIndex >= directories.length - 1 && (!testRoms || testRoms.length <= 0)) {
+    if (directoryIndex >= directories.length - 1 && (!testRoms || testRoms.length <= 0)) {
       writePerformanceTable();
     }
 
     // Describe for each test rom
     testRoms.forEach((testRom, testRomIndex) => {
-
       const testRomTableObject = {};
 
       describe(testRom, () => {
-
         // Define our wasmboy instance
         // Not using arrow functions, as arrow function timeouts were acting up
         beforeEach(function(done) {
-
           // Set a timeout of 5000, takes a while for wasm module to parse
           this.timeout(5000);
 
           // Read the test rom a a Uint8Array and pass to wasmBoy
           const testRomArray = new Uint8Array(fs.readFileSync(`${directory}/${testRom}`));
 
-          commonTest.instantiateWasm().then(() => {
-            WasmBoy.loadROM(testRomArray).then(() => {
-              done();
-            });
+          WasmBoy.loadROM(testRomArray).then(() => {
+            done();
           });
         });
 
-         // Finally create a describe for each performance option
-         WASMBOY_PERFORMANCE_TESTS.forEach((performanceOptionKeys, performanceOptionIndex) => {
-           describe(performanceOptionKeys.join(', '), () => {
+        // Finally create a describe for each performance option
+        WASMBOY_PERFORMANCE_TESTS.forEach((performanceOptionKeys, performanceOptionIndex) => {
+          describe(performanceOptionKeys.join(', '), () => {
+            // Re initilize for each option
+            beforeEach(function(done) {
+              // Set a timeout of 2000, takes a while for wasm module to parse
+              this.timeout(2000);
 
-             // Re initilize for each option
-             beforeEach(function (done) {
+              // Get a copy our our initialize options
+              const clonedInitializeOptions = Object.assign({}, WASMBOY_INITIALIZE_OPTIONS);
+              performanceOptionKeys.forEach(optionKey => {
+                clonedInitializeOptions[optionKey] = true;
+              });
 
-               // Set a timeout of 2000, takes a while for wasm module to parse
-               this.timeout(2000);
+              WasmBoy.reset(clonedInitializeOptions).then(() => {
+                done();
+              });
+            });
 
-               // Get a copy our our initialize options
-               const clonedInitializeOptions = Object.assign({}, WASMBOY_INITIALIZE_OPTIONS);
-               performanceOptionKeys.forEach((optionKey) => {
-                 clonedInitializeOptions[optionKey] = true;
-               });
+            // Descibe what the tesrt should do for the option
+            it(`should be able to run ${NUMBER_OF_FRAMES} frames in a timely manner`, function(done) {
+              const runFramesTask = async () => {
+                // Add some timeout in case the option takes much longer
+                this.timeout(PERFORMANCE_OPTION_TIMEOUT * PERFORMANCE_OPTION_ITERATIONS);
 
-               WasmBoy.reset(clonedInitializeOptions).then(() => {
-                 done();
-               });
-             });
+                const iterationTimes = [];
 
-             // Descibe what the tesrt should do for the option
-             it(`should be able to run ${NUMBER_OF_FRAMES} frames in a timely manner`, function(done) {
+                for (let iterations = 0; iterations < PERFORMANCE_OPTION_ITERATIONS; iterations++) {
+                  const start = now();
 
-               // Add some timeout in case the option takes much longer
-               this.timeout(PERFORMANCE_OPTION_TIMEOUT * PERFORMANCE_OPTION_ITERATIONS);
+                  for (let i = 0; i < NUMBER_OF_FRAMES; i++) {
+                    await WasmBoy._runWasmExport('update');
+                  }
 
-               const iterationTimes = [];
+                  const end = now();
 
-               for(let iterations = 0; iterations < PERFORMANCE_OPTION_ITERATIONS; iterations++) {
-                 const start = now();
+                  const iterationTimeElapsed = (end - start).toFixed(3);
+                  iterationTimes.push(iterationTimeElapsed);
 
-                 for(let i = 0; i < NUMBER_OF_FRAMES; i++) {
-                   WasmBoy._getWasmInstance().exports.update();
-                 }
+                  console.log(`Finished Iteration #${iterations}`);
+                }
 
-                 const end = now();
+                let totalTime = 0;
+                iterationTimes.forEach(time => {
+                  totalTime += parseFloat(time);
+                });
+                let timeElapsed = 0;
+                if (iterationTimes.length > 0) {
+                  timeElapsed = totalTime / iterationTimes.length;
+                }
 
-                 const iterationTimeElapsed = (end - start).toFixed(3);
-                 iterationTimes.push(iterationTimeElapsed);
+                // Some Spacing
+                console.log(' ');
+                console.log(
+                  `WasmBoy with the option(s): ${performanceOptionKeys.join(', ')} enabled, ` + `took ${timeElapsed} milliseconds to run`
+                );
+                console.log(' ');
 
-                 console.log(`Finished Iteration #${iterations}`)
-               }
+                // Store into our tableObject
+                testRomTableObject[performanceOptionKeys.join(', ')] = timeElapsed;
 
-               let totalTime = 0;
-               iterationTimes.forEach((time) => {
-                 totalTime += parseFloat(time);
-               });
-               let timeElapsed = 0;
-               if(iterationTimes.length > 0) {
-                 timeElapsed = totalTime / iterationTimes.length;
-               }
+                // Draw a screenshot of the frame reached
+                const imageDataArray = await commonTest.getImageDataFromFrame();
+                // Output a gitignored image of the current tests
+                let testImagePath = testRom + `.${performanceOptionKeys.join('.')}.png`;
 
-               // Some Spacing
-               console.log(' ');
-               console.log(`WasmBoy with the option(s): ${performanceOptionKeys.join(', ')} enabled, took ${timeElapsed} milliseconds to run`);
-               console.log(' ');
+                await commonTest.createImageFromFrame(imageDataArray, `${directory}/${testImagePath}`);
+                console.log(`Screenshot created at: ${testImagePath}`);
 
-               // Store into our tableObject
-               testRomTableObject[performanceOptionKeys.join(', ')] = timeElapsed;
+                // Check if we should finalize the test rom
+                if (performanceOptionIndex >= WASMBOY_PERFORMANCE_TESTS.length - 1) {
+                  // Finally convert our test rom table object into a markdown table object
+                  const markdownTableArray = [['Performance Option(s)', 'Time (milliseconds)']];
+                  Object.keys(testRomTableObject).forEach(tableKey => {
+                    markdownTableArray.push([tableKey, testRomTableObject[tableKey]]);
+                  });
 
-               // Draw a screenshot of the frame reached
-               const imageDataArray = commonTest.getImageDataFromFrame();
+                  performanceTableString += `\n ## ${testRom} \n\n ${markdownTable(markdownTableArray)} \n`;
 
-               // Output a gitignored image of the current tests
-               let testImagePath = testRom + `.${performanceOptionKeys.join('.')}.png`;
-               commonTest.createImageFromFrame(imageDataArray, `${directory}/${testImagePath}`).then(() => {
+                  // Check if this is the last everything
+                  if (testRomIndex >= testRoms.length - 1 && directoryIndex >= directories.length - 1) {
+                    writePerformanceTable();
+                  }
+                }
 
-                 console.log(`Screenshot created at: ${testImagePath}`);
+                // Simple asset to signify the test passed
+                assert.equal(true, true);
 
-                 // Check if we should finalize the test rom
-                 if(performanceOptionIndex >= WASMBOY_PERFORMANCE_TESTS.length - 1) {
-                   // Finally convert our test rom table object into a markdown table object
-                   const markdownTableArray = [
-                     ['Performance Option(s)', 'Time (milliseconds)']
-                   ];
-                   Object.keys(testRomTableObject).forEach((tableKey) => {
-                     markdownTableArray.push([tableKey, testRomTableObject[tableKey]])
-                   });
+                // Some Spacing
+                console.log(' ');
 
-                   performanceTableString += `\n ## ${testRom} \n\n ${markdownTable(markdownTableArray)} \n`;
-
-                   // Check if this is the last everything
-                   if(testRomIndex >= testRoms.length - 1 && directoryIndex >= directories.length - 1) {
-                     writePerformanceTable();
-                   }
-                 }
-
-                 // Simple asset to signify the test passed
-                 assert.equal(true, true);
-
-                 // Some Spacing
-                 console.log(' ');
-
-                 done();
-               });
-             });
-           });
-         });
+                done();
+              };
+              runFramesTask();
+            });
+          });
+        });
       });
     });
   });

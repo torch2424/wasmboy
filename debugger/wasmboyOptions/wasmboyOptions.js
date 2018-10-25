@@ -46,7 +46,7 @@ export class WasmBoyOptions extends Component {
     let options = [];
     Object.keys(this.state).forEach(stateOptionKey => {
       // Boolean Checkboxes
-      if (typeof this.state[stateOptionKey] === typeof true) {
+      if (typeof this.state[stateOptionKey] === 'boolean') {
         options.push(
           <div>
             <label class="checkbox" for={stateOptionKey}>

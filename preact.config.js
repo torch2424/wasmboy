@@ -31,20 +31,14 @@ export default function(config, env, helpers) {
     // https://github.com/developit/preact-cli/issues/218
     // https://github.com/developit/preact-cli/pull/323
     config.output.publicPath = '/';
+  } else {
+    // Add a loader for sourcemaps
+    config.module.loaders.push({
+      loader: 'source-map-loader',
+      test: /\.js$/,
+      enforce: 'pre'
+    });
   }
-
-  // Add a wasm loader
-  // https://github.com/developit/preact-cli/issues/464
-  // https://github.com/webpack-contrib/url-loader
-  config.module.loaders.push({
-    loader: 'url-loader',
-    test: /\.wasm$/,
-    options: {
-      limit: 100 * 1024,
-      mimetype: 'application/wasm'
-    }
-  });
-  config.resolve.extensions.push('.wasm');
 
   // Add a loader for gb files
   // using url-loader

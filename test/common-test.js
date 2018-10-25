@@ -1,42 +1,26 @@
 // Wasm Boy library
-const WasmBoy = require("../dist/wasmboy.cjs.js").WasmBoy;
+const WasmBoy = require('../dist/wasmboy.cjs.js').WasmBoy;
 
 // Image Creation
-const PNGImage = require("pngjs-image");
+const PNGImage = require('pngjs-image');
 
 // File management
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 
 // Define some constants
 const GAMEBOY_CAMERA_WIDTH = 160;
 const GAMEBOY_CAMERA_HEIGHT = 144;
 
-// Instantiate our wasm module
-const instantiateWasm = () => {
-
-  if (WasmBoy._getWasmInstance() && WasmBoy._getWasmInstance()) {
-    return Promise.resolve();
-  }
-
-  return new Promise((resolve) => {
-    const wasmBuffer = new Uint8Array(fs.readFileSync('./dist/core/index.untouched.wasm'));
-    const instance = WebAssembly.instantiate(wasmBuffer, {
-      env: {
-        log: () => {},
-        hexLog: () => {},
-        performanceTimestamp: () => {}
-      }
-    }).then((wasm) => {
-      WasmBoy._setWasmInstance(wasm.instance);
-      WasmBoy._setWasmByteMemory(new Uint8Array(wasm.instance.exports.memory.buffer));
-      resolve();
-    });
-  });
-}
-
 // Function to get our RGB image data array from our frame
-const getImageDataFromFrame = () => {
+const getImageDataFromFrame = async () => {
+  // Get our output frame
+  const frameInProgressVideoOutputLocation = await WasmBoy._getWasmConstant('frameInProgressVideoOutputLocation');
+  const frameInProgressMemory = await WasmBoy._getWasmMemorySection(
+    frameInProgressVideoOutputLocation,
+    frameInProgressVideoOutputLocation + GAMEBOY_CAMERA_HEIGHT * GAMEBOY_CAMERA_WIDTH * 3 + 1
+  );
+
   // Going to compare pixel values from the VRAM to confirm tests
   const imageDataArray = [];
   const rgbColor = [];
@@ -44,15 +28,10 @@ const getImageDataFromFrame = () => {
   for (let y = 0; y < GAMEBOY_CAMERA_HEIGHT; y++) {
     for (let x = 0; x < GAMEBOY_CAMERA_WIDTH; x++) {
       // Each color has an R G B component
-      let pixelStart = (y * 160 + x) * 3;
+      let pixelStart = (y * GAMEBOY_CAMERA_WIDTH + x) * 3;
 
       for (let color = 0; color < 3; color++) {
-        rgbColor[color] =
-          WasmBoy._getWasmByteMemory()[
-            WasmBoy._getWasmInstance().exports.frameInProgressVideoOutputLocation +
-              pixelStart +
-              color
-          ];
+        rgbColor[color] = frameInProgressMemory[pixelStart + color];
       }
 
       // Doing graphics using second answer on:
@@ -75,10 +54,7 @@ const getImageDataFromFrame = () => {
 const createImageFromFrame = (imageDataArray, outputPath) => {
   return new Promise((resolve, reject) => {
     // https://www.npmjs.com/package/pngjs-image
-    const image = PNGImage.createImage(
-      GAMEBOY_CAMERA_WIDTH,
-      GAMEBOY_CAMERA_HEIGHT
-    );
+    const image = PNGImage.createImage(GAMEBOY_CAMERA_WIDTH, GAMEBOY_CAMERA_HEIGHT);
 
     // Write our pixel values
     for (let i = 0; i < imageDataArray.length - 4; i = i + 4) {
@@ -121,14 +97,13 @@ const getAllRomsInDirectory = directory => {
   const files = fs.readdirSync(directory);
   const testRoms = files.filter(function(file) {
     const fileExt = path.extname(file).toLowerCase();
-    return fileExt === ".gb" || fileExt === ".gbc";
+    return fileExt === '.gb' || fileExt === '.gbc';
   });
 
   return testRoms;
 };
 
 module.exports = {
-  instantiateWasm: instantiateWasm,
   getImageDataFromFrame: getImageDataFromFrame,
   createImageFromFrame: createImageFromFrame,
   isDirectory: isDirectory,

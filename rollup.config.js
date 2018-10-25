@@ -2,30 +2,95 @@ import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
 import url from 'rollup-plugin-url';
-import regenerator from 'rollup-plugin-regenerator';
+import replace from 'rollup-plugin-replace';
 import compiler from '@ampproject/rollup-plugin-closure-compiler';
 import bundleSize from 'rollup-plugin-bundle-size';
 import pkg from './package.json';
 
+// Our base plugins needed by every bundle type
 const plugins = [
   resolve(), // so Rollup can find node modules
-  url({
-    limit: 100 * 1024, // 100Kb
-    include: ['**/*.wasm']
-  }),
   babel({
     // so Rollup can convert unsupported es6 code to es5
-    exclude: ['node_modules/**']
+    exclude: ['node_modules/**'],
+    plugins: ['@babel/plugin-proposal-class-properties', '@babel/plugin-proposal-object-rest-spread']
   }),
-  commonjs(), // so Rollup can convert node module to an ES module
-  compiler(),
-  bundleSize()
+  commonjs() // so Rollup can convert node module to an ES module
 ];
 
-// Plugins specific to running in a node runtime
-const nodePlugins = [...plugins, regenerator()];
+// Url inline replacements
+const urlPlugins = [
+  url({
+    limit: 1000000 * 1024, // Always inline
+    include: ['**/*.wasm']
+  }),
+  url({
+    limit: 1000000 * 1024, // Always inline
+    include: ['**/*.worker.js'],
+    // Don't emit files, this will replace the worker build output
+    emitFiles: false
+  })
+];
 
-export default [
+// Our replace Options for node workers
+// https://nodejs.org/api/worker_threads.html
+const replaceNodeOptions = {
+  delimiters: ['', ''],
+  values: {
+    '/*ROLLUP_REPLACE_NODE': '',
+    'ROLLUP_REPLACE_NODE*/': ''
+  }
+};
+// Plugins specific to running in a node runtime
+const nodePlugins = [replace(replaceNodeOptions), ...urlPlugins, ...plugins, bundleSize()];
+
+const replaceBrowserOptions = {
+  delimiters: ['', ''],
+  values: {
+    '/*ROLLUP_REPLACE_BROWSER': '',
+    'ROLLUP_REPLACE_BROWSER*/': ''
+  }
+};
+// Plugins specific to running in a node runtime
+const browserPlugins = [replace(replaceBrowserOptions), ...urlPlugins, ...plugins];
+if (process.env.PROD) {
+  browserPlugins.push(compiler());
+}
+browserPlugins.push(bundleSize());
+
+// Define our worker outputs
+const workerEntryPoints = [
+  'wasmboy/worker/wasmboy.worker.js',
+  'graphics/worker/graphics.worker.js',
+  'audio/worker/audio.worker.js',
+  'controller/worker/controller.worker.js',
+  'memory/worker/memory.worker.js'
+];
+
+const workerPlugins = [...plugins, bundleSize()];
+
+let workerSourceMaps = 'inline';
+if (process.env.PROD) {
+  workerSourceMaps = false;
+}
+
+const workerBundles = [];
+workerEntryPoints.forEach(workerEntryPoint => {
+  workerBundles.push({
+    input: `lib/${workerEntryPoint}`,
+    output: {
+      file: `dist/${workerEntryPoint}`,
+      format: 'iife',
+      name: 'WasmBoyWorker',
+      sourcemap: workerSourceMaps
+    },
+    context: 'self',
+    plugins: workerPlugins
+  });
+});
+
+// Create our lib bundles
+const libBundles = [
   // browser-friendly UMD build
   {
     input: 'lib/index.js',
@@ -36,7 +101,7 @@ export default [
       sourcemap: true
     },
     context: 'window',
-    plugins: plugins
+    plugins: browserPlugins
   },
 
   // CommonJS (for Node) and ES module (for bundlers) build.
@@ -55,7 +120,7 @@ export default [
       }
     ],
     context: 'window',
-    plugins: plugins
+    plugins: browserPlugins
   },
   {
     input: 'lib/index.js',
@@ -70,3 +135,5 @@ export default [
     plugins: nodePlugins
   }
 ];
+
+export default [...workerBundles, ...libBundles];

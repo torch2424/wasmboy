@@ -1,5 +1,4 @@
 import { Component } from 'preact';
-import Promise from 'promise-polyfill';
 import { WasmBoy } from '../../../dist/wasmboy.esm';
 import './wasmboyTileData.css';
 
@@ -46,23 +45,24 @@ export class WasmBoyTileData extends Component {
   }
 
   updateCanvas(canvasElement, canvasContext, canvasImageData) {
-    return new Promise(resolve => {
+    const updateCanvasTask = async () => {
       // Dont update for the following
-      if (
-        !WasmBoy._getWasmByteMemory() ||
-        !WasmBoy._getWasmInstance() ||
-        !WasmBoy.isReady() ||
-        WasmBoy.isPaused() ||
-        !this.props.shouldUpdate
-      ) {
-        resolve();
+      if (!WasmBoy.isReady() || WasmBoy.isPaused() || !this.props.shouldUpdate) {
         return;
       }
 
-      WasmBoy._getWasmInstance().exports.drawTileDataToWasmMemory();
+      // Draw our tile Data
+      WasmBoy._runWasmExport('drawTileDataToWasmMemory');
 
       const imageDataArray = new Uint8ClampedArray(tileDataYPixels * tileDataXPixels * 4);
       const rgbColor = new Uint8ClampedArray(3);
+
+      // Get our background map location constant
+      const tileDataMapLocation = await WasmBoy._getWasmConstant('tileDataMap');
+      const tileDataMapMemory = await WasmBoy._getWasmMemorySection(
+        tileDataMapLocation,
+        tileDataMapLocation + tileDataYPixels * tileDataXPixels * 3
+      );
 
       for (let y = 0; y < tileDataYPixels; y++) {
         for (let x = 0; x < tileDataXPixels; x++) {
@@ -70,7 +70,7 @@ export class WasmBoyTileData extends Component {
           let pixelStart = (y * tileDataXPixels + x) * 3;
 
           for (let color = 0; color < 3; color++) {
-            rgbColor[color] = WasmBoy._getWasmByteMemory()[WasmBoy._getWasmInstance().exports.tileDataMap + pixelStart + color];
+            rgbColor[color] = tileDataMapMemory[pixelStart + color];
           }
 
           // Doing graphics using second answer on:
@@ -94,9 +94,8 @@ export class WasmBoyTileData extends Component {
       canvasContext.beginPath();
       canvasContext.clearRect(0, 0, tileDataXPixels, tileDataYPixels);
       canvasContext.putImageData(canvasImageData, 0, 0);
-
-      resolve();
-    });
+    };
+    return updateCanvasTask();
   }
 
   render() {

@@ -6,8 +6,8 @@ import { WasmBoyTileData } from './wasmboyTileData/wasmboyTileData';
 import './wasmboyDebugger.css';
 
 // Function to get a value in gameboy memory, to wasmboy memory
-const getWasmBoyOffsetFromGameBoyOffset = gameboyOffset => {
-  return WasmBoy._getWasmInstance().exports.getWasmBoyOffsetFromGameBoyOffset(gameboyOffset);
+const getWasmBoyOffsetFromGameBoyOffset = async gameboyOffset => {
+  return await WasmBoy._runWasmExport('getWasmBoyOffsetFromGameBoyOffset', [gameboyOffset]);
 };
 
 let autoUpdateValueTableId = false;
@@ -66,8 +66,8 @@ export class WasmBoyDebugger extends Component {
 
   // Function to runa  single opcode
   stepOpcode(skipDebugOutput) {
-    return new Promise(resolve => {
-      const numberOfCycles = WasmBoy._getWasmInstance().exports.emulationStep();
+    const stepOpcodeTask = async () => {
+      const numberOfCycles = await WasmBoy._runWasmExport('emulationStep');
 
       if (numberOfCycles <= 0) {
         console.error('Opcode not recognized! Check wasm logs.');
@@ -76,13 +76,11 @@ export class WasmBoyDebugger extends Component {
       }
 
       if (skipDebugOutput) {
-        resolve();
         return;
       }
       this.updateValueTable();
-
-      resolve();
-    });
+    };
+    return stepOpcodeTask();
   }
 
   // Function to run a specifed number of opcodes for faster stepping
@@ -93,34 +91,32 @@ export class WasmBoyDebugger extends Component {
       opcodesToRun = numberOfOpcodes;
     }
 
-    return new Promise(resolve => {
+    const runNumberOfOpcodesTask = async () => {
       let opcodesRan = 0;
 
-      const runOpcode = () => {
-        this.stepOpcode(true).then(() => {
-          if (breakPoint && breakPoint === WasmBoy._getWasmInstance().exports.getProgramCounter()) {
-            resolve();
-            return;
-          }
+      const runOpcode = async () => {
+        await this.stepOpcode(true);
 
-          if (opcodesRan < opcodesToRun) {
-            opcodesRan++;
-            runOpcode();
-            return;
-          }
-
-          if (skipDebugOutput) {
-            resolve();
-            return;
-          }
-
+        if (!skipDebugOutput) {
           this.updateValueTable();
+        }
+        const programCounter = await WasmBoy._runWasmExport('getProgramCounter');
+        if (breakPoint && breakPoint === programCounter) {
+          if (skipDebugOutput) {
+            this.updateValueTable();
+          }
+          return;
+        }
 
-          resolve();
-        });
+        if (opcodesRan < opcodesToRun) {
+          opcodesRan++;
+          await runOpcode();
+          return;
+        }
       };
-      runOpcode();
-    });
+      await runOpcode();
+    };
+    return runNumberOfOpcodesTask();
   }
 
   // Function to keep running opcodes until a breakpoint is reached
@@ -128,13 +124,13 @@ export class WasmBoyDebugger extends Component {
     // Set our opcode breakpoint
     const breakPoint = parseInt(this.state.breakPoint, 16);
 
-    let initialStepPromise = Promise.resolve();
-    if (!skipInitialStep) {
-      initialStepPromise = this.runNumberOfOpcodes(1, breakPoint);
-    }
+    const breakPointTask = async () => {
+      if (!skipInitialStep) {
+        await this.runNumberOfOpcodes(1, breakPoint);
+      }
 
-    initialStepPromise.then(() => {
-      if (WasmBoy._getWasmInstance().exports.getProgramCounter() !== breakPoint) {
+      const programCounter = await WasmBoy._runWasmExport('getProgramCounter');
+      if (programCounter !== breakPoint) {
         requestAnimationFrame(() => {
           this.runNumberOfOpcodes(2000 + Math.floor(Math.random() * 10), breakPoint, true).then(() => {
             this.updateValueTable();
@@ -145,16 +141,19 @@ export class WasmBoyDebugger extends Component {
         console.log('Reached Breakpoint, that satisfies test inside runNumberOfOpcodes');
         this.updateValueTable();
       }
-    });
+    };
+    breakPointTask();
   }
 
   logWasmBoyMemory() {
-    console.log(`[WasmBoy Debugger] Memory:`, WasmBoy._getWasmByteMemory());
+    WasmBoy._getWasmMemorySection().then(wasmByteMemory => {
+      console.log(`[WasmBoy Debugger] Memory:`, wasmByteMemory);
+    });
   }
 
   updateValueTable() {
     // Check that we have our instance and byte memory
-    if (!WasmBoy._getWasmInstance() || !WasmBoy._getWasmByteMemory()) {
+    if (!WasmBoy.isReady()) {
       return;
     }
 
@@ -167,63 +166,67 @@ export class WasmBoyDebugger extends Component {
       interrupts: {}
     };
 
-    // Update CPU valueTable
-    valueTable.cpu['Program Counter (PC)'] = WasmBoy._getWasmInstance().exports.getProgramCounter();
-    valueTable.cpu['Opcode at PC'] = WasmBoy._getWasmInstance().exports.getOpcodeAtProgramCounter();
-    valueTable.cpu['Stack Pointer'] = WasmBoy._getWasmInstance().exports.getStackPointer();
-    valueTable.cpu['Register A'] = WasmBoy._getWasmInstance().exports.getRegisterA();
-    valueTable.cpu['Register F'] = WasmBoy._getWasmInstance().exports.getRegisterF();
-    valueTable.cpu['Register B'] = WasmBoy._getWasmInstance().exports.getRegisterB();
-    valueTable.cpu['Register C'] = WasmBoy._getWasmInstance().exports.getRegisterC();
-    valueTable.cpu['Register D'] = WasmBoy._getWasmInstance().exports.getRegisterD();
-    valueTable.cpu['Register E'] = WasmBoy._getWasmInstance().exports.getRegisterE();
-    valueTable.cpu['Register H'] = WasmBoy._getWasmInstance().exports.getRegisterH();
-    valueTable.cpu['Register L'] = WasmBoy._getWasmInstance().exports.getRegisterL();
-    valueTable.cpu = Object.assign({}, valueTable.cpu);
+    const getValueTableTask = async () => {
+      // Update CPU valueTable
+      valueTable.cpu['Program Counter (PC)'] = await WasmBoy._runWasmExport('getProgramCounter');
+      valueTable.cpu['Opcode at PC'] = await WasmBoy._runWasmExport('getOpcodeAtProgramCounter');
+      valueTable.cpu['Stack Pointer'] = await WasmBoy._runWasmExport('getStackPointer');
+      valueTable.cpu['Register A'] = await WasmBoy._runWasmExport('getRegisterA');
+      valueTable.cpu['Register F'] = await WasmBoy._runWasmExport('getRegisterF');
+      valueTable.cpu['Register B'] = await WasmBoy._runWasmExport('getRegisterB');
+      valueTable.cpu['Register C'] = await WasmBoy._runWasmExport('getRegisterC');
+      valueTable.cpu['Register D'] = await WasmBoy._runWasmExport('getRegisterD');
+      valueTable.cpu['Register E'] = await WasmBoy._runWasmExport('getRegisterE');
+      valueTable.cpu['Register H'] = await WasmBoy._runWasmExport('getRegisterH');
+      valueTable.cpu['Register L'] = await WasmBoy._runWasmExport('getRegisterL');
+      valueTable.cpu = Object.assign({}, valueTable.cpu);
 
-    // Update PPU valueTable
-    valueTable.ppu['Scanline Register (LY) - 0xFF44'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff44)];
-    valueTable.ppu['LCD Status (STAT) - 0xFF41'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff41)];
-    valueTable.ppu['LCD Control (LCDC) - 0xFF40'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff40)];
-    valueTable.ppu['Scroll X - 0xFF43'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff43)];
-    valueTable.ppu['Scroll Y - 0xFF42'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff42)];
-    valueTable.ppu['Window X - 0xFF4B'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff4b)];
-    valueTable.ppu['Window Y - 0xFF4A'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff4a)];
+      // Get all of the gameboy 0xffXX memory
+      const debugMemoryStart = await getWasmBoyOffsetFromGameBoyOffset(0xff00);
+      const debugMemoryEnd = await getWasmBoyOffsetFromGameBoyOffset(0xffff);
+      const debugMemory = await WasmBoy._getWasmMemorySection(debugMemoryStart, debugMemoryEnd + 1);
 
-    // Update Timers valueTable
-    valueTable.timers['TIMA - 0xFF05'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff05)];
-    valueTable.timers['TMA - 0xFF06'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff06)];
-    valueTable.timers['TIMC/TAC - 0xFF07'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff07)];
-    valueTable.timers['DIV/Divider Register - 0xFF04'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff04)];
+      // Update PPI
+      valueTable.ppu['Scanline Register (LY) - 0xFF44'] = debugMemory[0x0044];
+      valueTable.ppu['LCD Status (STAT) - 0xFF41'] = debugMemory[0x0041];
+      valueTable.ppu['LCD Control (LCDC) - 0xFF40'] = debugMemory[0x0040];
+      valueTable.ppu['Scroll X - 0xFF43'] = debugMemory[0x0043];
+      valueTable.ppu['Scroll Y - 0xFF42'] = debugMemory[0x0042];
+      valueTable.ppu['Window X - 0xFF4B'] = debugMemory[0x004b];
+      valueTable.ppu['Window Y - 0xFF4A'] = debugMemory[0x004a];
 
-    // Update interrupts valueTable
-    // TODO: Interrupot master switch
-    // if(WasmBoy._getWasmInstance().exports.areInterruptsEnabled()) {
-    //   valueTable.interrupts['Interrupt Master Switch'] = 0x01;
-    // } else {
-    //   valueTable.interrupts['Interrupt Master Switch'] = 0x00;
-    // }
-    valueTable.interrupts['IE/Interrupt Enabled - 0xFFFF'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xffff)];
-    valueTable.interrupts['IF/Interrupt Request - 0xFF0F'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xff0f)];
+      // Update Timers valueTable
+      valueTable.timers['TIMA - 0xFF05'] = debugMemory[0x0005];
+      valueTable.timers['TMA - 0xFF06'] = debugMemory[0x0006];
+      valueTable.timers['TIMC/TAC - 0xFF07'] = debugMemory[0x0007];
+      valueTable.timers['DIV/Divider Register - 0xFF04'] = debugMemory[0x0004];
 
-    // Update APU valueTable
-    // Add the register valueTable for our 4 channels
-    for (let channelNum = 1; channelNum <= 4; channelNum++) {
-      for (let registerNum = 0; registerNum < 5; registerNum++) {
-        let registerAddress = 0xff10 + 5 * (channelNum - 1) + registerNum;
-        valueTable.apu[
-          `Channel ${channelNum} - NR${channelNum}${registerNum} - 0x${registerAddress.toString(16).toUpperCase()}`
-        ] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(registerAddress)];
+      // Update interrupts valueTable
+      // TODO: Interrupot master switch
+      // if(WasmBoy._getWasmInstance().exports.areInterruptsEnabled()) {
+      //   valueTable.interrupts['Interrupt Master Switch'] = 0x01;
+      // } else {
+      //   valueTable.interrupts['Interrupt Master Switch'] = 0x00;
+      // }
+      valueTable.interrupts['IE/Interrupt Enabled - 0xFFFF'] = debugMemory[0x00ff];
+      valueTable.interrupts['IF/Interrupt Request - 0xFF0F'] = debugMemory[0x000f];
+
+      // Update APU valueTable
+      // Add the register valueTable for our 4 channels
+      for (let channelNum = 1; channelNum <= 4; channelNum++) {
+        for (let registerNum = 0; registerNum < 5; registerNum++) {
+          let registerAddress = 0xff10 + 5 * (channelNum - 1) + registerNum;
+          valueTable.apu[`Channel ${channelNum} - NR${channelNum}${registerNum} - 0x${registerAddress.toString(16).toUpperCase()}`] =
+            debugMemory[registerAddress & 0x00ff];
+        }
       }
-    }
-    valueTable.interrupts['IE/Interrupt Enabled - 0xFFFF'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xffff)];
-    valueTable.interrupts['IE/Interrupt Enabled - 0xFFFF'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xffff)];
-    valueTable.interrupts['IE/Interrupt Enabled - 0xFFFF'] = WasmBoy._getWasmByteMemory()[getWasmBoyOffsetFromGameBoyOffset(0xffff)];
 
-    // Clone our valueTable, that it is immutable and will cause change detection
-    const newState = Object.assign({}, this.state);
-    newState.valueTable = valueTable;
-    this.setState(newState);
+      // Clone our valueTable, that it is immutable and will cause change detection
+      const newState = Object.assign({}, this.state);
+      newState.valueTable = valueTable;
+      this.setState(newState);
+    };
+    getValueTableTask();
   }
 
   render(props) {

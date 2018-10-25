@@ -62,6 +62,7 @@ export class WasmBoySystemControls extends Component {
     if (!WasmBoy.isReady()) {
       this.props.showNotification('Please load a game. ⏏️');
     } else {
+      WasmBoy.resumeAudioContext();
       WasmBoy.play();
 
       // Fire off Analytics

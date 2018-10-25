@@ -1,6 +1,5 @@
 import '../style';
 import 'bulma/css/bulma.css';
-import '@babel/polyfill';
 import { Component } from 'preact';
 // The following line can be changed to './dist/wasmboy.esm.js', to test the built lib
 import { WasmBoy } from '../dist/wasmboy.esm';
@@ -10,12 +9,15 @@ import { WasmBoyFilePicker } from './wasmboyFilePicker/wasmboyFilePicker';
 import { WasmBoyOptions } from './wasmboyOptions/wasmboyOptions';
 import { WasmBoyGamepad } from './wasmboyGamepad/wasmboyGamepad';
 
-// Get our package.json
-import packageJson from '../package.json';
+// Log the wasmboy lib
+console.log('WasmBoy', WasmBoy);
 
 // Our current canvas object.
 // Up here for the saveStateCallback
-let canvasElement = undefined;
+const getCanvasElement = () => {
+  const canvasElement = document.querySelector('.wasmboy__canvas-container__canvas');
+  return canvasElement;
+};
 
 // Our notification timeout
 let notificationTimeout = undefined;
@@ -29,7 +31,7 @@ let audioCallbackCalled = false;
 const WasmBoyDefaultOptions = {
   isGbcEnabled: true,
   isAudioEnabled: true,
-  frameSkip: 1,
+  frameSkip: 0,
   audioBatchProcessing: true,
   timersBatchProcessing: false,
   audioAccumulateSamples: true,
@@ -62,7 +64,7 @@ const WasmBoyDefaultOptions = {
 
     // Function called everytime a savestate occurs
     // Used by the WasmBoySystemControls to show screenshots on save states
-    saveStateObject.screenshotCanvasDataURL = canvasElement.toDataURL();
+    saveStateObject.screenshotCanvasDataURL = getCanvasElement().toDataURL();
   },
   onReady: () => {
     console.log('onReady Callback Called!');
@@ -102,6 +104,7 @@ export default class App extends Component {
     this.state = {
       showDebugger: false,
       showOptions: false,
+      showGamepad: false,
       notification: <div />
     };
   }
@@ -117,18 +120,12 @@ export default class App extends Component {
       .catch(error => {
         console.error(error);
       });
-    this.setWasmBoyCanvas();
-  }
-
-  componentDidUpdate() {
-    this.setWasmBoyCanvas();
   }
 
   setWasmBoyCanvas() {
     const setCanvasTask = async () => {
       // Get our canvas element
-      canvasElement = document.querySelector('.wasmboy__canvas-container__canvas');
-      await WasmBoy.setCanvas(canvasElement);
+      await WasmBoy.setCanvas(getCanvasElement());
       await WasmBoy.play();
     };
 
@@ -197,7 +194,7 @@ export default class App extends Component {
       <div class="wasmboy">
         <h1 class="wasmboy__title">WasmBoy (Debugger / Demo)</h1>
         <div style="text-align: center">
-          <b>WasmBoy Lib Version: {packageJson.version}</b>
+          <b>WasmBoy Lib Version: {WasmBoy.getVersion()}</b>
         </div>
         <div style="text-align: center">
           <a href="https://github.com/torch2424/wasmBoy" target="_blank">
@@ -242,6 +239,26 @@ export default class App extends Component {
           </label>
         </div>
 
+        <div style="text-align: center">
+          <label class="checkbox">
+            Show Touchpad
+            <input
+              type="checkbox"
+              checked={this.state.showGamepad}
+              onChange={() => {
+                const newState = Object.assign({}, this.state);
+                newState.showGamepad = !newState.showGamepad;
+                this.setState(newState);
+
+                // Fire off Analytics
+                if (window !== undefined && window.gtag) {
+                  gtag('event', 'showed_gamepad');
+                }
+              }}
+            />
+          </label>
+        </div>
+
         {debuggerComponent}
 
         <WasmBoyFilePicker
@@ -262,7 +279,7 @@ export default class App extends Component {
           <canvas className="wasmboy__canvas-container__canvas" />
         </main>
 
-        <WasmBoyGamepad />
+        {this.state.showGamepad ? <WasmBoyGamepad /> : ''}
 
         {this.state.notification}
       </div>
