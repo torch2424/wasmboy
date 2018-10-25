@@ -1,6 +1,7 @@
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
+import typescript from 'rollup-plugin-typescript';
 import url from 'rollup-plugin-url';
 import replace from 'rollup-plugin-replace';
 import compiler from '@ampproject/rollup-plugin-closure-compiler';
@@ -67,12 +68,71 @@ const workerEntryPoints = [
   'memory/worker/memory.worker.js'
 ];
 
-const workerPlugins = [...plugins, bundleSize()];
+const workerPlugins = [resolve()];
+if (process.env.TS) {
+  workerPlugins.push(
+    babel({
+      // so Rollup can convert unsupported es6 code to es5
+      exclude: ['node_modules/**'],
+      plugins: [
+        ['@babel/plugin-proposal-class-properties'],
+        ['@babel/plugin-proposal-object-rest-spread'],
+        [
+          'babel-plugin-filter-imports',
+          {
+            imports: {
+              './instantiate': ['instantiateWasm']
+            }
+          }
+        ]
+      ]
+    })
+  );
+} else {
+  workerPlugins.push(
+    babel({
+      // so Rollup can convert unsupported es6 code to es5
+      exclude: ['node_modules/**'],
+      plugins: [
+        ['@babel/plugin-proposal-class-properties'],
+        ['@babel/plugin-proposal-object-rest-spread'],
+        [
+          'babel-plugin-filter-imports',
+          {
+            imports: {
+              './instantiate': ['instantiateTs']
+            }
+          }
+        ]
+      ]
+    })
+  );
+}
+workerPlugins.push(commonjs());
+workerPlugins.push(bundleSize());
 
 let workerSourceMaps = 'inline';
 if (process.env.PROD) {
   workerSourceMaps = false;
 }
+
+const coreTsBundles = [
+  {
+    input: './core/index.ts',
+    output: {
+      file: `dist/core.esm.js`,
+      format: 'esm',
+      name: 'WasmBoyCore',
+      sourcemap: 'inline'
+    },
+    plugins: [
+      typescript({
+        tsconfig: './core/tsconfig.json'
+      }),
+      bundleSize()
+    ]
+  }
+];
 
 const workerBundles = [];
 workerEntryPoints.forEach(workerEntryPoint => {
@@ -136,4 +196,11 @@ const libBundles = [
   }
 ];
 
-export default [...workerBundles, ...libBundles];
+let exports;
+if (process.env.TS) {
+  exports = [...coreTsBundles, ...workerBundles, ...libBundles];
+} else {
+  exports = [...workerBundles, ...libBundles];
+}
+
+export default exports;
