@@ -58,9 +58,6 @@
   height: 110px;
 }
 
-/* Only display on phones */
-@media screen and (max-width: 800px) {
-  .wasmboy__gamepad {
-    display: block;
-  }
+.wasmboy__gamepad {
+  display: block;
 }
