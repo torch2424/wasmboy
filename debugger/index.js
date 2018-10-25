@@ -116,15 +116,11 @@ export default class App extends Component {
       .then(() => {
         // Wait for input
         this.setWasmBoyCanvas();
+        console.log('WasmBoy Config:', WasmBoy.getConfig());
       })
       .catch(error => {
         console.error(error);
       });
-    this.setWasmBoyCanvas();
-  }
-
-  componentDidMount() {
-    this.setWasmBoyCanvas();
   }
 
   setWasmBoyCanvas() {

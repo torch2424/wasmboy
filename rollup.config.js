@@ -69,6 +69,11 @@ const workerEntryPoints = [
 
 const workerPlugins = [...plugins, bundleSize()];
 
+let workerSourceMaps = 'inline';
+if (process.env.PROD) {
+  workerSourceMaps = false;
+}
+
 const workerBundles = [];
 workerEntryPoints.forEach(workerEntryPoint => {
   workerBundles.push({
@@ -77,7 +82,7 @@ workerEntryPoints.forEach(workerEntryPoint => {
       file: `dist/${workerEntryPoint}`,
       format: 'iife',
       name: 'WasmBoyWorker',
-      sourcemap: true
+      sourcemap: workerSourceMaps
     },
     context: 'self',
     plugins: workerPlugins
