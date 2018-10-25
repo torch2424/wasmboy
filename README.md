@@ -29,6 +29,7 @@
 
 - [Features](#features)
 - [Usage](#usage)
+  - [Supported Platforms](#supported-platforms)
 - [Example Gifs &amp; Screenshots](#example-gifs--screenshots)
 - [Tests](#tests)
   - [Blarrg](#blarrg)
@@ -48,10 +49,14 @@
 - Configurable options to increase performance for low(er) end devices 🔥
 - Importable into other projects as a dependency ♻️
 - Built with Web Assembly 🕸️
+- Uses Web Workers for Parallelized rendering 🛠️
 - Keyboard and gamepad input support using [responsive gamepad](https://www.npmjs.com/package/responsive-gamepad) ⌨️ 🎮
 - Debugger with a value table (I/O map), Tile Data visualizer, and Background Map with Scroll Indicators 🐛
+- Runs in both Browser and Node 🌐
 
 # Usage
+
+**Project is still < 1.0.0. Most games are playable, but the emulator is still not very accurate. Expect bugs.**
 
 Simply install through npm:
 
@@ -59,7 +64,9 @@ Simply install through npm:
 
 Documentation for the project can be found on the [WasmBoy Wiki](https://github.com/torch2424/wasmBoy/wiki).
 
-**Project is still < 1.0.0. Most games are playable, but the emulator is still not very accurate. Expect bugs.**
+### Supported Platforms
+
+Try to test and aim for support on all major browsers (Chrome, Firefox, and Safari). Also, Node support works with the `headless` option, and using the [Worker Threads](https://nodejs.org/api/worker_threads.html) `--experimental-worker` flag.
 
 # Example Gifs & Screenshots
 
