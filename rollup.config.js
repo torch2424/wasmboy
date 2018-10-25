@@ -116,6 +116,7 @@ if (process.env.PROD) {
   workerSourceMaps = false;
 }
 
+// TODO: Add intro/outro to hack together memory support.
 const coreTsBundles = [
   {
     input: './core/index.ts',
