@@ -87,6 +87,9 @@ const writePerformanceTable = () => {
   console.log(' ');
 };
 
+// Print our version
+console.log(`WasmBoy version: ${WasmBoy.getVersion()}`);
+
 // Create our callback insanity
 const directories = commonTest.getDirectories(testRomsPath);
 directories.forEach((directory, directoryIndex) => {

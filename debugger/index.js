@@ -9,15 +9,15 @@ import { WasmBoyFilePicker } from './wasmboyFilePicker/wasmboyFilePicker';
 import { WasmBoyOptions } from './wasmboyOptions/wasmboyOptions';
 import { WasmBoyGamepad } from './wasmboyGamepad/wasmboyGamepad';
 
-// Get our package.json
-import packageJson from '../package.json';
-
 // Log the wasmboy lib
 console.log('WasmBoy', WasmBoy);
 
 // Our current canvas object.
 // Up here for the saveStateCallback
-let canvasElement = undefined;
+const getCanvasElement = () => {
+  const canvasElement = document.querySelector('.wasmboy__canvas-container__canvas');
+  return canvasElement;
+};
 
 // Our notification timeout
 let notificationTimeout = undefined;
@@ -64,7 +64,7 @@ const WasmBoyDefaultOptions = {
 
     // Function called everytime a savestate occurs
     // Used by the WasmBoySystemControls to show screenshots on save states
-    saveStateObject.screenshotCanvasDataURL = canvasElement.toDataURL();
+    saveStateObject.screenshotCanvasDataURL = getCanvasElement().toDataURL();
   },
   onReady: () => {
     console.log('onReady Callback Called!');
@@ -116,7 +116,6 @@ export default class App extends Component {
       .then(() => {
         // Wait for input
         this.setWasmBoyCanvas();
-        console.log('WasmBoy Config:', WasmBoy.getConfig());
       })
       .catch(error => {
         console.error(error);
@@ -126,8 +125,7 @@ export default class App extends Component {
   setWasmBoyCanvas() {
     const setCanvasTask = async () => {
       // Get our canvas element
-      canvasElement = document.querySelector('.wasmboy__canvas-container__canvas');
-      await WasmBoy.setCanvas(canvasElement);
+      await WasmBoy.setCanvas(getCanvasElement());
       await WasmBoy.play();
     };
 
@@ -196,7 +194,7 @@ export default class App extends Component {
       <div class="wasmboy">
         <h1 class="wasmboy__title">WasmBoy (Debugger / Demo)</h1>
         <div style="text-align: center">
-          <b>WasmBoy Lib Version: {packageJson.version}</b>
+          <b>WasmBoy Lib Version: {WasmBoy.getVersion()}</b>
         </div>
         <div style="text-align: center">
           <a href="https://github.com/torch2424/wasmBoy" target="_blank">
