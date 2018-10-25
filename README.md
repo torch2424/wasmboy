@@ -49,7 +49,7 @@
 - Configurable options to increase performance for low(er) end devices 🔥
 - Importable into other projects as a dependency ♻️
 - Built with Web Assembly 🕸️
-- Uses Web Workers for Parallelized rendering 🛠️
+- Uses Web Workers for parallelized rendering 🛠️
 - Keyboard and gamepad input support using [responsive gamepad](https://www.npmjs.com/package/responsive-gamepad) ⌨️ 🎮
 - Debugger with a value table (I/O map), Tile Data visualizer, and Background Map with Scroll Indicators 🐛
 - Runs in both Browser and Node 🌐
@@ -66,7 +66,7 @@ Documentation for the project can be found on the [WasmBoy Wiki](https://github.
 
 ### Supported Platforms
 
-Try to test and aim for support on all major browsers (Chrome, Firefox, and Safari). Also, Node support works with the `headless` option, and using the [Worker Threads](https://nodejs.org/api/worker_threads.html) `--experimental-worker` flag.
+Try to test and aim for support on all major browsers (Chrome, Firefox, and Safari). Also, Node support works with the [`headless` option in the WasmBoy config](https://github.com/torch2424/wasmBoy/wiki/Lib-API#wasmboyoptions), and using the [Worker Threads](https://nodejs.org/api/worker_threads.html) `--experimental-worker` flag.
 
 # Example Gifs & Screenshots
 
