@@ -200,7 +200,7 @@ function _checkDividerRegister(numberOfCycles: i32): void {
   }
 }
 
-// Function to get a cycle count froma  passed Timer clock
+// Function to get a cycle count from a passed Timer clock
 function getFrequencyFromInputClockSelect(): i32 {
   // Returns value equivalent to
   // Cpu.CLOCK_SPEED / timc frequency
