@@ -8,6 +8,9 @@ import compiler from '@ampproject/rollup-plugin-closure-compiler';
 import bundleSize from 'rollup-plugin-bundle-size';
 import pkg from './package.json';
 
+// Fs for some extra needed files
+const fs = require('fs');
+
 // Our base plugins needed by every bundle type
 const plugins = [
   resolve(), // so Rollup can find node modules
@@ -116,11 +119,13 @@ if (process.env.PROD) {
   workerSourceMaps = false;
 }
 
-// TODO: Add intro/outro to hack together memory support.
 const coreTsBundles = [
   {
     input: './core/index.ts',
     output: {
+      banner: () => {
+        return fs.readFileSync('./core/wasmMock.js', 'utf8');
+      },
       file: `dist/core.esm.js`,
       format: 'esm',
       name: 'WasmBoyCore',

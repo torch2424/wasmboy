@@ -17,8 +17,11 @@
   "browser": "dist/wasmboy.umd.js",
   "scripts": {
     "start": "npm run core:build && npm run lib:build && npx concurrently --kill-others --names \"DEBUGGER,CORE,LIB\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"npm run debugger:watch\" \"npm run core:watch\" \"npm run lib:watch\"",
+    "start:ts": "npm run lib:build:ts && npx concurrently --kill-others --names \"DEBUGGER,LIBANDCORETS\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run debugger:watch\" \"npm run lib:watch:ts\"",
     "dev": "npm run start",
     "watch": "npm run start",
+    "dev:ts": "npm run start:ts",
+    "watch:ts": "npm run start:ts",
     "build": "npm run core:build && npm run lib:build",
     "deploy": "npm run lib:deploy && npm run debugger:deploy",
     "test": "npm run test:accuracy",
