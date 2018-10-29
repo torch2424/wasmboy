@@ -1,8 +1,9 @@
 import { Cpu } from './index';
+import { u8Overflow, u16Overflow } from '../portable/overflow';
 
 // Set flag bit on on register F. For instance set zero flag to zero -> (7, 0)
 function setFlagBit(flagBit: u8, flagValue: i32): u8 {
-  let bitwiseOperand: u8 = 1 << flagBit;
+  let bitwiseOperand: u8 = u8Overflow(1 << flagBit);
   if (flagValue > 0) {
     Cpu.registerF = Cpu.registerF | bitwiseOperand;
   } else {
@@ -53,7 +54,7 @@ export function getCarryFlag(): u8 {
 export function checkAndSetEightBitHalfCarryFlag(value: u8, amountToAdd: i32): void {
   if (amountToAdd >= 0) {
     // https://robdor.com/2016/08/10/gameboy-emulator-half-carry-flag/
-    let result: u8 = (((<u8>value) & 0x0f) + ((<u8>amountToAdd) & 0x0f)) & 0x10;
+    let result: u8 = u8Overflow(((<u8>value) & 0x0f) + ((<u8>amountToAdd) & 0x0f)) & 0x10;
     if (result !== 0x00) {
       setHalfCarryFlag(1);
     } else {
@@ -72,7 +73,7 @@ export function checkAndSetEightBitHalfCarryFlag(value: u8, amountToAdd: i32): v
 
 export function checkAndSetEightBitCarryFlag(value: u8, amountToAdd: i32): void {
   if (amountToAdd >= 0) {
-    let result: u8 = value + <u8>amountToAdd;
+    let result: u8 = u8Overflow(value + <u8>amountToAdd);
     if (value > result) {
       setCarryFlag(1);
     } else {
@@ -116,7 +117,7 @@ export function checkAndSetSixteenBitFlagsAddOverflow(valueOne: u16, valueTwo: i
     // Logic from: https://github.com/djhworld/gomeboycolor/blob/master/src/cpu/index.go
     // CTRL+F addWords
     // Value two is not signed
-    let result: u16 = valueOne + <u16>valueTwo;
+    let result: u16 = u16Overflow(valueOne + <u16>valueTwo);
 
     // Check the carry flag by allowing the overflow
     if (result < valueOne) {
@@ -126,7 +127,8 @@ export function checkAndSetSixteenBitFlagsAddOverflow(valueOne: u16, valueTwo: i
     }
 
     // To check for half carry flag (bit 15), by XOR'ing valyes, and and'ing the bit in question
-    if (((valueOne ^ (<u16>valueTwo) ^ (<u16>result)) & 0x1000) !== 0x00) {
+    let halfCarryCheck: u16 = u16Overflow(valueOne ^ (<u16>valueTwo) ^ ((<u16>result) & 0x1000));
+    if (halfCarryCheck !== 0x00) {
       setHalfCarryFlag(1);
     } else {
       setHalfCarryFlag(0);

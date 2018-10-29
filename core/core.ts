@@ -310,11 +310,13 @@ export function executeStep(): i32 {
       updateGraphics(numberOfCycles);
     }
 
+    /* TODO: torch2424 unskip sound
     if (Config.audioBatchProcessing) {
       Sound.currentCycles += numberOfCycles;
     } else {
       updateSound(numberOfCycles);
     }
+       */
   }
 
   if (Config.timersBatchProcessing) {

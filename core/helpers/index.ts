@@ -1,4 +1,5 @@
 import { getCarryFlag } from '../cpu/index';
+import { u8Overflow } from '../portable/overflow';
 
 // Grouped registers
 // possible overload these later to performace actions
@@ -21,26 +22,26 @@ export function rotateByteLeft(value: u8): u8 {
   // https://stackoverflow.com/questions/19204750/how-do-i-perform-a-circular-rotation-of-a-byte
   // 4-bit example:
   // 1010 -> 0100 | 0001
-  return (value << 1) | (value >> 7);
+  return u8Overflow((value << 1) | (value >> 7));
 }
 
 export function rotateByteLeftThroughCarry(value: u8): u8 {
   // Example: https://github.com/nakardo/node-gameboy/blob/master/lib/cpu/opcodes.js
   // Through carry meaning, instead of raotating the bit that gets dropped off, but the carry there instead
-  return (value << 1) | getCarryFlag();
+  return u8Overflow((value << 1) | getCarryFlag());
 }
 
 export function rotateByteRight(value: u8): u8 {
   // Rotate right
   // 4-bit example:
   // 1010 -> 0101 | 0000
-  return (value >> 1) | (value << 7);
+  return u8Overflow((value >> 1) | (value << 7));
 }
 
 export function rotateByteRightThroughCarry(value: u8): u8 {
   // Example: https://github.com/nakardo/node-gameboy/blob/master/lib/cpu/opcodes.js
   // Through carry meaning, instead of raotating the bit that gets dropped off, put the carry there instead
-  return (value >> 1) | (getCarryFlag() << 7);
+  return u8Overflow((value >> 1) | (getCarryFlag() << 7));
 }
 
 export function setBitOnByte(bitPosition: i32, byte: i32): i32 {

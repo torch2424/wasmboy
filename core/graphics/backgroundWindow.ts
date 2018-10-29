@@ -12,6 +12,7 @@ import { TileCache, drawPixelsFromLineOfTile, getTileDataAddress } from './tiles
 import { eightBitLoadFromGBMemory } from '../memory/load';
 import { Memory } from '../memory/memory';
 import { hexLog, checkBitOnByte, setBitOnByte, resetBitOnByte } from '../helpers/index';
+import { u8Overflow } from '../portable/overflow';
 
 export function renderBackground(scanlineRegister: i32, tileDataMemoryLocation: i32, tileMapMemoryLocation: i32): void {
   // NOTE: Camera is reffering to what you can see inside the 160x144 viewport of the entire rendered 256x256 map.
@@ -227,6 +228,7 @@ function drawMonochromePixelFromTileId(
   if (checkBitOnByte(pixelXInTile, byteOneForLineOfTilePixels)) {
     paletteColorId += 1;
   }
+  // Not checking u8 Portability overflow here, since it can't be greater than i32 over :p
 
   // Now get the colorId from the pallete, to get our final color
   // Developers could change colorIds to represents different colors

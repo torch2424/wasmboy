@@ -124,7 +124,7 @@ const coreTsBundles = [
     input: './core/index.ts',
     output: {
       banner: () => {
-        return fs.readFileSync('./core/wasmMock.js', 'utf8');
+        return fs.readFileSync('./core/portable/wasmMock.js', 'utf8');
       },
       file: `dist/core.esm.js`,
       format: 'esm',
