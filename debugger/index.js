@@ -105,6 +105,7 @@ export default class App extends Component {
       showDebugger: false,
       showOptions: false,
       showGamepad: false,
+      autoPlayROMOnLoad: false,
       notification: <div />
     };
   }
@@ -241,6 +242,21 @@ export default class App extends Component {
 
         <div style="text-align: center">
           <label class="checkbox">
+            Auto Play ROM on Load
+            <input
+              type="checkbox"
+              checked={this.state.autoPlayROMOnLoad}
+              onChange={() => {
+                const newState = Object.assign({}, this.state);
+                newState.autoPlayROMOnLoad = !newState.autoPlayROMOnLoad;
+                this.setState(newState);
+              }}
+            />
+          </label>
+        </div>
+
+        <div style="text-align: center">
+          <label class="checkbox">
             Show Touchpad
             <input
               type="checkbox"
@@ -265,6 +281,7 @@ export default class App extends Component {
           showNotification={text => {
             this.showNotification(text);
           }}
+          autoplay={this.state.autoPlayROMOnLoad}
         />
 
         <div>
