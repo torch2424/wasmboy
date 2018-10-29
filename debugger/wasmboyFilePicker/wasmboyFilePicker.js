@@ -92,27 +92,38 @@ export class WasmBoyFilePicker extends Component {
 
   loadROM(file, fileName) {
     this.setFileLoadingStatus(true);
-    WasmBoy.loadROM(file)
-      .then(() => {
-        console.log('Wasmboy Ready!');
-        this.props.showNotification('Game Loaded! 🎉');
-        this.setFileLoadingStatus(false);
 
-        // Fire off Analytics
-        if (window !== undefined && window.gtag) {
-          gtag('event', 'load_rom_success');
-        }
-      })
-      .catch(error => {
-        console.log('Load Game Error:', error);
-        this.props.showNotification('Game Load Error! 😞');
-        this.setFileLoadingStatus(false);
+    // To test the new autoplay in safari
+    // and in chrome
+    WasmBoy.resumeAudioContext();
 
-        // Fire off Analytics
-        if (window !== undefined && window.gtag) {
-          gtag('event', 'load_rom_fail');
-        }
-      });
+    const loadROMTask = async () => {
+      await WasmBoy.loadROM(file);
+      this.props.showNotification('Game Loaded! 🎉');
+      this.setFileLoadingStatus(false);
+
+      // To test the new autoplay in safari
+      // and in chrome
+      if (this.props.autoplay) {
+        WasmBoy.play();
+      }
+
+      // Fire off Analytics
+      if (window !== undefined && window.gtag) {
+        gtag('event', 'load_rom_success');
+      }
+    };
+
+    loadROMTask().catch(error => {
+      console.log('Load Game Error:', error);
+      this.props.showNotification('Game Load Error! 😞');
+      this.setFileLoadingStatus(false);
+
+      // Fire off Analytics
+      if (window !== undefined && window.gtag) {
+        gtag('event', 'load_rom_fail');
+      }
+    });
 
     // Set our file name
     const newState = Object.assign({}, this.state);
@@ -123,10 +134,17 @@ export class WasmBoyFilePicker extends Component {
   // Allow passing a file
   // https://gist.github.com/AshikNesin/e44b1950f6a24cfcd85330ffc1713513
   loadLocalFile(event) {
+    // WasmBoy.resumeAudioContext();
+    // Handled by the onClick on the input
     this.loadROM(event.target.files[0], event.target.files[0].name);
+
+    if (this.props.autoplay) {
+      WasmBoy.play();
+    }
   }
 
   loadGoogleDriveFile(data) {
+    WasmBoy.resumeAudioContext();
     if (data.action === 'picked') {
       // Fetch from the drive api to download the file
       // https://developers.google.com/drive/v3/web/picker
@@ -158,6 +176,10 @@ export class WasmBoyFilePicker extends Component {
                 console.log('Wasmboy Ready!');
                 this.props.showNotification('Game Loaded! 🎉');
                 this.setFileLoadingStatus(false);
+
+                if (this.props.autoplay) {
+                  WasmBoy.play();
+                }
 
                 // Set our file name
                 const newState = Object.assign({}, this.state);
@@ -221,6 +243,9 @@ export class WasmBoyFilePicker extends Component {
                 name="resume"
                 onChange={event => {
                   this.loadLocalFile(event);
+                }}
+                onClick={() => {
+                  WasmBoy.resumeAudioContext();
                 }}
               />
               <span class="file-cta">
