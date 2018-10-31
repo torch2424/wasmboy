@@ -19,7 +19,7 @@ import {
   eightBitLoadFromGBMemoryWithTraps,
   sixteenBitLoadFromGBMemory
 } from '../memory/index';
-import { u8Overflow, u16Overflow } from '../portable/overflow';
+import { u8Portable, u16Portable } from '../portable/portable';
 
 // Handle CB Opcodes
 // NOTE: Program stpes and cycles are standardized depending on the register type
@@ -313,7 +313,7 @@ export function handleCbOpcode(cbOpcode: i32): i32 {
 
   // Increase program counter, as all CB codes take two bytes
   // Program counter will really increase by two since opcodes handles the other
-  Cpu.programCounter = u16Overflow(Cpu.programCounter + 1);
+  Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
 
   // Finally our number of cycles
   // Set if we handled the opcode

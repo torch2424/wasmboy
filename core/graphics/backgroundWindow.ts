@@ -12,7 +12,7 @@ import { TileCache, drawPixelsFromLineOfTile, getTileDataAddress } from './tiles
 import { eightBitLoadFromGBMemory } from '../memory/load';
 import { Memory } from '../memory/memory';
 import { hexLog, checkBitOnByte, setBitOnByte, resetBitOnByte } from '../helpers/index';
-import { u8Overflow } from '../portable/overflow';
+import { u8Portable } from '../portable/portable';
 
 export function renderBackground(scanlineRegister: i32, tileDataMemoryLocation: i32, tileMapMemoryLocation: i32): void {
   // NOTE: Camera is reffering to what you can see inside the 160x144 viewport of the entire rendered 256x256 map.
