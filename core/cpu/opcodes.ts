@@ -1662,7 +1662,7 @@ function handleOpcodeCx(opcode: i32): i32 {
         Cpu.programCounter = getConcatenatedDataByte();
         return 16;
       } else {
-        Cpu.stackPointer = u16Overflow(Cpu.stackPointer + 2);
+        Cpu.programCounter = u16Overflow(Cpu.programCounter + 2);
         return 12;
       }
     case 0xc3:
@@ -1679,7 +1679,7 @@ function handleOpcodeCx(opcode: i32): i32 {
         Cpu.programCounter = getConcatenatedDataByte();
         return 24;
       } else {
-        Cpu.stackPointer = u16Overflow(Cpu.stackPointer + 2);
+        Cpu.programCounter = u16Overflow(Cpu.programCounter + 2);
         return 12;
       }
     case 0xc5:
@@ -1693,7 +1693,7 @@ function handleOpcodeCx(opcode: i32): i32 {
       // 2 8
       // Z 0 H C
       addARegister(getDataByteOne());
-      Cpu.stackPointer = u16Overflow(Cpu.stackPointer + 1);
+      Cpu.programCounter = u16Overflow(Cpu.programCounter + 1);
       return 8;
     case 0xc7:
       // RST 00H
@@ -1725,7 +1725,7 @@ function handleOpcodeCx(opcode: i32): i32 {
         Cpu.programCounter = getConcatenatedDataByte();
         return 16;
       } else {
-        Cpu.stackPointer = u16Overflow(Cpu.stackPointer + 2);
+        Cpu.programCounter = u16Overflow(Cpu.programCounter + 2);
         return 12;
       }
     case 0xcb:
@@ -1745,7 +1745,7 @@ function handleOpcodeCx(opcode: i32): i32 {
         Cpu.programCounter = getConcatenatedDataByte();
         return 24;
       } else {
-        Cpu.stackPointer = u16Overflow(Cpu.stackPointer + 2);
+        Cpu.programCounter = u16Overflow(Cpu.programCounter + 2);
         return 12;
       }
     case 0xcd:
@@ -1760,7 +1760,7 @@ function handleOpcodeCx(opcode: i32): i32 {
       // 2  8
       // Z 0 H C
       addAThroughCarryRegister(getDataByteOne());
-      Cpu.stackPointer = u16Overflow(Cpu.stackPointer + 1);
+      Cpu.programCounter = u16Overflow(Cpu.programCounter + 1);
       return 8;
     case 0xcf:
       // RST 08H
@@ -1800,7 +1800,7 @@ function handleOpcodeDx(opcode: i32): i32 {
         Cpu.programCounter = getConcatenatedDataByte();
         return 16;
       } else {
-        Cpu.stackPointer = u16Overflow(Cpu.stackPointer + 2);
+        Cpu.programCounter = u16Overflow(Cpu.programCounter + 2);
         return 12;
       }
     /* No Opcode for: 0xD3 */
@@ -1813,7 +1813,7 @@ function handleOpcodeDx(opcode: i32): i32 {
         Cpu.programCounter = getConcatenatedDataByte();
         return 24;
       } else {
-        Cpu.stackPointer = u16Overflow(Cpu.stackPointer + 2);
+        Cpu.programCounter = u16Overflow(Cpu.programCounter + 2);
         return 12;
       }
     case 0xd5:
@@ -1827,7 +1827,7 @@ function handleOpcodeDx(opcode: i32): i32 {
       // 2  8
       // Z 1 H C
       subARegister(getDataByteOne());
-      Cpu.stackPointer = u16Overflow(Cpu.stackPointer + 1);
+      Cpu.programCounter = u16Overflow(Cpu.programCounter + 1);
       return 8;
     case 0xd7:
       // RST 10H
@@ -1861,7 +1861,7 @@ function handleOpcodeDx(opcode: i32): i32 {
         Cpu.programCounter = getConcatenatedDataByte();
         return 16;
       } else {
-        Cpu.stackPointer = u16Overflow(Cpu.stackPointer + 2);
+        Cpu.programCounter = u16Overflow(Cpu.programCounter + 2);
         return 12;
       }
     /* No Opcode for: 0xDB */
@@ -1874,7 +1874,7 @@ function handleOpcodeDx(opcode: i32): i32 {
         Cpu.programCounter = getConcatenatedDataByte();
         return 24;
       } else {
-        Cpu.stackPointer = u16Overflow(Cpu.stackPointer + 2);
+        Cpu.programCounter = u16Overflow(Cpu.programCounter + 2);
         return 12;
       }
     /* No Opcode for: 0xDD */
@@ -1883,7 +1883,7 @@ function handleOpcodeDx(opcode: i32): i32 {
       // 2 8
       // Z 1 H C
       subAThroughCarryRegister(getDataByteOne());
-      Cpu.stackPointer = u16Overflow(Cpu.stackPointer + 1);
+      Cpu.programCounter = u16Overflow(Cpu.programCounter + 1);
       return 8;
     case 0xdf:
       // RST 18H
@@ -1937,7 +1937,7 @@ function handleOpcodeEx(opcode: i32): i32 {
       // 2  8
       // Z 0 1 0
       andARegister(getDataByteOne());
-      Cpu.stackPointer = u16Overflow(Cpu.stackPointer + 1);
+      Cpu.programCounter = u16Overflow(Cpu.programCounter + 1);
       return 8;
     case 0xe7:
       // RST 20H
@@ -1995,7 +1995,7 @@ function handleOpcodeFx(opcode: i32): i32 {
       // LDH A,(a8)
       // 2 12
       let largeDataByteOne: i32 = getDataByteOne();
-      Cpu.registerA = <u8>eightBitLoadFromGBMemoryWithTraps(0xff00 + largeDataByteOne);
+      Cpu.registerA = u8Overflow(<u8>eightBitLoadFromGBMemoryWithTraps(0xff00 + largeDataByteOne));
       Cpu.programCounter = u16Overflow(Cpu.programCounter + 1);
       return 12;
     case 0xf1:
