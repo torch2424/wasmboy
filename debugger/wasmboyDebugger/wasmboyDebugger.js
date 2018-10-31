@@ -23,6 +23,7 @@ export class WasmBoyDebugger extends Component {
       showTileData: false,
       breakPoint: '40',
       opcodesToRun: 2000,
+      opcodesStepped: 0,
       valueTable: {
         cpu: {},
         ppu: {},
@@ -74,6 +75,11 @@ export class WasmBoyDebugger extends Component {
         this.updateDebugInfo();
         throw new Error();
       }
+
+      this.setState({
+        ...this.state,
+        opcodesStepped: this.state.opcodesStepped + 1
+      });
 
       if (skipDebugOutput) {
         return;
@@ -395,6 +401,10 @@ export class WasmBoyDebugger extends Component {
               }}
             />
           </label>
+        </div>
+
+        <div>
+          <h2>Opcodes Stepped: {this.state.opcodesStepped}</h2>
         </div>
 
         <div className={this.getStateClass('showValueTable') + ' animated fadeIn'}>

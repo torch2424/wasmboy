@@ -30,7 +30,7 @@ let audioCallbackCalled = false;
 // WasmBoy Options
 const WasmBoyDefaultOptions = {
   isGbcEnabled: true,
-  isAudioEnabled: false,
+  isAudioEnabled: true,
   frameSkip: 0,
   audioBatchProcessing: true,
   timersBatchProcessing: false,
