@@ -127,8 +127,9 @@ export function checkAndSetSixteenBitFlagsAddOverflow(valueOne: u16, valueTwo: i
     }
 
     // To check for half carry flag (bit 15), by XOR'ing valyes, and and'ing the bit in question
-    let halfCarryCheck: u16 = u16Overflow(valueOne ^ (<u16>valueTwo) ^ ((<u16>result) & 0x1000));
-    if (halfCarryCheck !== 0x00) {
+    let halfCarryXor: u16 = valueOne ^ (<u16>valueTwo) ^ (<u16>result);
+    let halfCarryAnd: u16 = u16Overflow(halfCarryXor & 0x1000);
+    if (halfCarryAnd !== 0x00) {
       setHalfCarryFlag(1);
     } else {
       setHalfCarryFlag(0);

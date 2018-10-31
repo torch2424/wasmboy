@@ -2,11 +2,9 @@
 // https://github.com/AssemblyScript/assemblyscript/wiki/Writing-portable-code
 
 export function u8Overflow(param: u8): u8 {
-  // return param & 0xFF;
-  return param;
+  return param & 0xff;
 }
 
 export function u16Overflow(param: u16): u16 {
-  // return param & 0xFFFF;
-  return param;
+  return param & 0xffff;
 }
