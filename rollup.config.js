@@ -3,6 +3,7 @@ import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
 import typescript from 'rollup-plugin-typescript';
 import url from 'rollup-plugin-url';
+import json from 'rollup-plugin-json';
 import replace from 'rollup-plugin-replace';
 import compiler from '@ampproject/rollup-plugin-closure-compiler';
 import bundleSize from 'rollup-plugin-bundle-size';
@@ -14,12 +15,13 @@ const fs = require('fs');
 // Our base plugins needed by every bundle type
 const plugins = [
   resolve(), // so Rollup can find node modules
+  commonjs(),
+  json(),
   babel({
     // so Rollup can convert unsupported es6 code to es5
     exclude: ['node_modules/**'],
     plugins: ['@babel/plugin-proposal-class-properties', '@babel/plugin-proposal-object-rest-spread']
-  }),
-  commonjs() // so Rollup can convert node module to an ES module
+  })
 ];
 
 // Url inline replacements
@@ -71,7 +73,7 @@ const workerEntryPoints = [
   'memory/worker/memory.worker.js'
 ];
 
-const workerPlugins = [resolve()];
+const workerPlugins = [resolve(), commonjs(), json()];
 if (process.env.TS) {
   workerPlugins.push(
     babel({
@@ -111,7 +113,6 @@ if (process.env.TS) {
     })
   );
 }
-workerPlugins.push(commonjs());
 workerPlugins.push(bundleSize());
 
 let workerSourceMaps = 'inline';
