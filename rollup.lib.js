@@ -88,7 +88,17 @@ const libBundles = [
     context: 'window',
     plugins: browserPlugins
   },
-
+  {
+    input: 'lib/index.js',
+    output: {
+      name: 'WasmBoy',
+      file: pkg.iife,
+      format: 'iife',
+      sourcemap: true
+    },
+    context: 'window',
+    plugins: browserPlugins
+  },
   {
     input: 'lib/index.js',
     output: [

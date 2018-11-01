@@ -15,6 +15,7 @@
   "main": "dist/wasmboy.cjs.js",
   "module": "dist/wasmboy.esm.js",
   "browser": "dist/wasmboy.umd.js",
+  "iife": "dist/wasmboy.iife.js",
   "scripts": {
     "prepare": "npm run core:build && npm run lib:build",
     "start": "npx concurrently --kill-others --names \"DEBUGGER,CORE,LIB\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"npm run debugger:watch\" \"npm run core:watch\" \"npm run lib:watch:wasm\"",
