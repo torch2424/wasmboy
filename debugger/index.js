@@ -196,6 +196,13 @@ export default class App extends Component {
         <div style="text-align: center">
           <b>WasmBoy Lib Version: {WasmBoy.getVersion()}</b>
         </div>
+        {WasmBoy.getCoreType() ? (
+          <div style="text-align: center">
+            <b>WasmBoy Core Type: {WasmBoy.getCoreType()}</b>
+          </div>
+        ) : (
+          ''
+        )}
         <div style="text-align: center">
           <a href="https://github.com/torch2424/wasmBoy" target="_blank">
             Fork me on Github

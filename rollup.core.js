@@ -35,9 +35,9 @@ const coreTsBundles = [
       file: `dist/core/core.esm.js`,
       format: 'esm',
       name: 'WasmBoyCore',
-      sourcemap
+      sourcemap: sourcemap
     },
-    plugins
+    plugins: plugins
   },
   {
     input: './core/index.ts',
@@ -48,9 +48,9 @@ const coreTsBundles = [
       file: `dist/core/core.umd.js`,
       format: 'umd',
       name: 'WasmBoyCore',
-      sourcemap
+      sourcemap: sourcemap
     },
-    plugins
+    plugins: plugins
   },
   {
     input: './core/index.ts',
@@ -61,9 +61,9 @@ const coreTsBundles = [
       file: `dist/core/core.cjs.js`,
       format: 'cjs',
       name: 'WasmBoyCore',
-      sourcemap
+      sourcemap: sourcemap
     },
-    plugins
+    plugins: plugins
   }
 ];
 

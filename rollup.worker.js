@@ -3,33 +3,28 @@
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
-import url from 'rollup-plugin-url';
 import json from 'rollup-plugin-json';
 import replace from 'rollup-plugin-replace';
 import compiler from '@ampproject/rollup-plugin-closure-compiler';
 import bundleSize from 'rollup-plugin-bundle-size';
 
-let sourcemap = 'inline';
+let sourcemap = true;
 if (process.env.PROD) {
   sourcemap = false;
 }
 
 let filterImports;
-if (process.env.TS) {
+if (process.env.TS && !process.env.WASM) {
   filterImports = {
-    './instantiate': ['instantiateWasm']
+    './instantiate': ['instantiateWasmCore']
   };
-} else {
+} else if (process.env.WASM && !process.env.TS) {
   filterImports = {
-    './instantiate': ['instantiateTs']
+    './instantiate': ['instantiateTsCore']
   };
 }
 
 const plugins = [
-  url({
-    limit: 1000000 * 1024, // Always inline
-    include: ['**/*.wasm']
-  }),
   resolve(),
   commonjs(),
   json(),
@@ -78,7 +73,8 @@ if (process.env.TS) {
     input: 'lib/wasmboy/worker/wasmboy.worker.js',
     output: 'dist/worker/wasmboy.ts.worker.js'
   });
-} else {
+}
+if (process.env.WASM) {
   workerFiles.push({
     input: 'lib/wasmboy/worker/wasmboy.worker.js',
     output: 'dist/worker/wasmboy.wasm.worker.js'
@@ -93,7 +89,7 @@ workerFiles.forEach(workerFile => {
       file: workerFile.output,
       format: 'iife',
       name: 'WasmBoyWorker',
-      sourcemap
+      sourcemap: sourcemap
     },
     context: 'self',
     plugins: plugins

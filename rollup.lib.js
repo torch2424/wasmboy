@@ -12,27 +12,27 @@ import bundleSize from 'rollup-plugin-bundle-size';
 import pkg from './package.json';
 
 let filterImports;
-if (process.env.TS) {
+if (process.env.TS && !process.env.WASM) {
   filterImports = {
-    '../../dist/wasmboy/worker/wasmboy.wasm.worker.js': ['default', '*']
+    '../../dist/worker/wasmboy.wasm.worker.js': ['default', '*']
   };
-} else {
+} else if (process.env.WASM && !process.env.TS) {
   filterImports = {
-    '../../dist/wasmboy/worker/wasmboy.ts.worker.js': ['default', '*']
+    '../../dist/worker/wasmboy.ts.worker.js': ['default', '*']
   };
 }
 
 // Our base plugins needed by every bundle type
 const plugins = [
+  resolve(), // so Rollup can find node modules
+  commonjs(),
+  json(),
   url({
     limit: 1000000 * 1024, // Always inline
     include: ['**/*.worker.js', '**/*.wasm'],
     // Don't emit files, this will replace the worker build output
     emitFiles: false
   }),
-  resolve(), // so Rollup can find node modules
-  commonjs(),
-  json(),
   babel({
     // so Rollup can convert unsupported es6 code to es5
     exclude: ['node_modules/**'],
