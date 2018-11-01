@@ -1,5 +1,6 @@
 // Portable Code for JS Wasm Benchmarking
 // https://github.com/AssemblyScript/assemblyscript/wiki/Writing-portable-code
+// https://github.com/AssemblyScript/assemblyscript/blob/master/std/portable/index.js
 
 import { checkBitOnByte, resetBitOnByte, setBitOnByte } from '../helpers/index';
 
@@ -20,4 +21,8 @@ export function i8Portable(param: i8): i8 {
   }
 
   return <i8>response;
+}
+
+export function i32Portable(param: i32): i32 {
+  return param | 0;
 }

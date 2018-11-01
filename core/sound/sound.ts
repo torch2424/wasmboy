@@ -24,6 +24,7 @@ import {
   storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
 import { checkBitOnByte, concatenateBytes, splitLowByte, splitHighByte, hexLog, performanceTimestamp } from '../helpers/index';
+import { i32Portable } from '../portable/portable';
 
 export class Sound {
   // Current cycles
@@ -443,6 +444,9 @@ function getSampleAsUnsignedByte(sample: i32, mixerVolume: i32): i32 {
   // so, 120 * 1000 / (0.47244094488188976 * 1000) should give approximate answer for max mixer volume
   let maxDivider: i32 = (120 * precision) / 254;
   convertedSample = (convertedSample * precision) / maxDivider;
+
+  // Ensure we have an i32 and not a float for JS builds
+  convertedSample = i32Portable(convertedSample);
 
   return convertedSample;
 }
