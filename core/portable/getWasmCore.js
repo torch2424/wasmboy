@@ -37,13 +37,11 @@ const wasmNodeInstantiate = async wasmModuleUrl => {
 const getWasmBoyWasmCore = async () => {
   let response = undefined;
 
-  /*ROLLUP_REPLACE_BROWSER
-  response = await wasmBrowserInstantiate(wasmModuleUrl);
-  ROLLUP_REPLACE_BROWSER*/
-
-  /*ROLLUP_REPLACE_NODE
-  response = await wasmNodeInstantiate(wasmModuleUrl);
-  ROLLUP_REPLACE_NODE*/
+  if (typeof window !== 'undefined') {
+    response = await wasmBrowserInstantiate(wasmModuleUrl);
+  } else {
+    response = await wasmNodeInstantiate(wasmModuleUrl);
+  }
 
   // Set our wasmInstance and byte memory in the main thread
   const instance = response.instance;

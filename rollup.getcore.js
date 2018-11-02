@@ -28,30 +28,9 @@ const plugins = [
     // so Rollup can convert unsupported es6 code to es5
     exclude: ['node_modules/**'],
     plugins: [['@babel/plugin-proposal-class-properties'], ['@babel/plugin-proposal-object-rest-spread']]
-  })
+  }),
+  bundleSize()
 ];
-
-// Our replace Options for node workers
-// https://nodejs.org/api/worker_threads.html
-const replaceNodeOptions = {
-  delimiters: ['', ''],
-  values: {
-    '/*ROLLUP_REPLACE_NODE': '',
-    'ROLLUP_REPLACE_NODE*/': ''
-  }
-};
-// Plugins specific to running in a node runtime
-const nodePlugins = [replace(replaceNodeOptions), ...plugins, bundleSize()];
-
-const replaceBrowserOptions = {
-  delimiters: ['', ''],
-  values: {
-    '/*ROLLUP_REPLACE_BROWSER': '',
-    'ROLLUP_REPLACE_BROWSER*/': ''
-  }
-};
-// Plugins specific to running in a node runtime
-const browserPlugins = [replace(replaceBrowserOptions), ...plugins, bundleSize()];
 
 // Array of bundles to make
 const bundleMap = [];
@@ -84,7 +63,7 @@ bundleMap.forEach(bundleObject => {
       sourcemap: false
     },
     context: 'window',
-    plugins: browserPlugins
+    plugins: plugins
   });
   getCoreBundles.push({
     input: bundleObject.input,
@@ -95,7 +74,7 @@ bundleMap.forEach(bundleObject => {
       sourcemap: false
     },
     context: 'window',
-    plugins: browserPlugins
+    plugins: plugins
   });
   getCoreBundles.push({
     input: bundleObject.input,
@@ -106,7 +85,7 @@ bundleMap.forEach(bundleObject => {
       sourcemap: false
     },
     context: 'window',
-    plugins: browserPlugins
+    plugins: plugins
   });
   getCoreBundles.push({
     input: bundleObject.input,
@@ -117,7 +96,7 @@ bundleMap.forEach(bundleObject => {
       sourcemap: false
     },
     context: 'global',
-    plugins: nodePlugins
+    plugins: plugins
   });
 });
 
