@@ -2,12 +2,11 @@
 import libBundles from './rollup.lib';
 import workerBundles from './rollup.worker';
 import coreTsBundles from './rollup.core';
+import getCoreBundles from './rollup.getcore';
 
-let exports;
+let exports = [...getCoreBundles, ...workerBundles, ...libBundles];
 if (process.env.TS) {
-  exports = [...coreTsBundles, ...workerBundles, ...libBundles];
-} else {
-  exports = [...workerBundles, ...libBundles];
+  exports = [...coreTsBundles, ...exports];
 }
 
 export default exports;

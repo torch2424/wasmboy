@@ -16,11 +16,11 @@ if (process.env.PROD) {
 let filterImports;
 if (process.env.TS && !process.env.WASM) {
   filterImports = {
-    './instantiate': ['instantiateWasmCore']
+    '../../../dist/core/getWasmBoyWasmCore.esm': ['default', '*']
   };
 } else if (process.env.WASM && !process.env.TS) {
   filterImports = {
-    './instantiate': ['instantiateTsCore']
+    '../../../dist/core/getWasmBoyTsCore.esm': ['default', '*']
   };
 }
 

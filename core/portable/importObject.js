@@ -1,7 +1,4 @@
-import { getPerformanceTimestamp } from '../../common/common';
-
-// Perofrmance timestamps for logging
-const performanceTimestamps = {};
+// Import object for our core js wrapper
 
 // Log throttling for our core
 let logRequest = undefined;
@@ -41,42 +38,6 @@ const wasmImportObject = {
           console.log(logString);
           logRequest = false;
         }, Math.floor(Math.random() * 500));
-      }
-    },
-    performanceTimestamp: (id, value) => {
-      if (id === -9999) {
-        id = 0;
-      }
-
-      if (value === -9999) {
-        value = 0;
-      }
-
-      if (!performanceTimestamps[id]) {
-        performanceTimestamps[id] = {};
-        performanceTimestamps[id].throttle = false;
-        performanceTimestamps[id].totalTime = 0;
-        performanceTimestamps[id].value = 0;
-      }
-      if (!performanceTimestamps[id].throttle) {
-        if (performanceTimestamps[id].timestamp) {
-          // sleep a millisecond for hopefully more accurate times
-          let endTime = getPerformanceTimestamp();
-          let timeDifference = endTime - performanceTimestamps[id].timestamp;
-          performanceTimestamps[id].throttle = true;
-          performanceTimestamps[id].totalTime += timeDifference;
-          console.log(
-            `[WasmBoy] Performance Timestamp. ID: ${id}, Time: ${timeDifference}, value difference: ${value -
-              performanceTimestamps[id].value}, total time: ${performanceTimestamps[id].totalTime}`
-          );
-          performanceTimestamps[id].timestamp = false;
-          setTimeout(() => {
-            performanceTimestamps[id].throttle = false;
-          }, 100);
-        } else {
-          performanceTimestamps[id].timestamp = getPerformanceTimestamp();
-          performanceTimestamps[id].value = value;
-        }
       }
     }
   }

@@ -1,4 +1,6 @@
-// Rollup Config for our main JS Lib
+// Rollup Config to bundle our "Get Core" exports
+// Convinient JS Exports to instantiate and import the
+// WasmBoy Core
 
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
@@ -11,17 +13,6 @@ import compiler from '@ampproject/rollup-plugin-closure-compiler';
 import bundleSize from 'rollup-plugin-bundle-size';
 import pkg from './package.json';
 
-let filterImports;
-if (process.env.TS && !process.env.WASM) {
-  filterImports = {
-    '../../dist/worker/wasmboy.wasm.worker.js': ['default', '*']
-  };
-} else if (process.env.WASM && !process.env.TS) {
-  filterImports = {
-    '../../dist/worker/wasmboy.ts.worker.js': ['default', '*']
-  };
-}
-
 // Our base plugins needed by every bundle type
 const plugins = [
   resolve(), // so Rollup can find node modules
@@ -29,23 +20,14 @@ const plugins = [
   json(),
   url({
     limit: 1000000 * 1024, // Always inline
-    include: ['**/*.worker.js'],
+    include: ['**/*.wasm'],
     // Don't emit files, this will replace the worker build output
     emitFiles: false
   }),
   babel({
     // so Rollup can convert unsupported es6 code to es5
     exclude: ['node_modules/**'],
-    plugins: [
-      ['@babel/plugin-proposal-class-properties'],
-      ['@babel/plugin-proposal-object-rest-spread'],
-      [
-        'babel-plugin-filter-imports',
-        {
-          imports: filterImports
-        }
-      ]
-    ]
+    plugins: [['@babel/plugin-proposal-class-properties'], ['@babel/plugin-proposal-object-rest-spread']]
   })
 ];
 
@@ -69,60 +51,74 @@ const replaceBrowserOptions = {
   }
 };
 // Plugins specific to running in a node runtime
-const browserPlugins = [replace(replaceBrowserOptions), ...plugins];
-if (process.env.PROD) {
-  browserPlugins.push(compiler());
-}
-browserPlugins.push(bundleSize());
+const browserPlugins = [replace(replaceBrowserOptions), ...plugins, bundleSize()];
 
-// Create our lib bundles
-const libBundles = [
-  {
-    input: 'lib/index.js',
+// Array of bundles to make
+const bundleMap = [];
+
+if (process.env.WASM) {
+  bundleMap.push({
+    name: 'WasmBoyWasmCore',
+    input: 'core/portable/getWasmCore.js',
+    output: 'dist/core/getWasmBoyWasmCore'
+  });
+}
+
+if (process.env.TS) {
+  bundleMap.push({
+    name: 'WasmBoyTsCore',
+    input: 'core/portable/getTsCore.js',
+    output: 'dist/core/getWasmBoyTsCore'
+  });
+}
+
+const getCoreBundles = [];
+
+bundleMap.forEach(bundleObject => {
+  getCoreBundles.push({
+    input: bundleObject.input,
     output: {
-      name: 'WasmBoy',
-      file: pkg.browser,
+      name: bundleObject.name,
+      file: `${bundleObject.output}.umd.js`,
       format: 'umd',
-      sourcemap: true
+      sourcemap: false
     },
     context: 'window',
     plugins: browserPlugins
-  },
-  {
-    input: 'lib/index.js',
+  });
+  getCoreBundles.push({
+    input: bundleObject.input,
     output: {
-      name: 'WasmBoy',
-      file: pkg.iife,
+      name: bundleObject.name,
+      file: `${bundleObject.output}.iife.js`,
       format: 'iife',
-      sourcemap: true
+      sourcemap: false
     },
     context: 'window',
     plugins: browserPlugins
-  },
-  {
-    input: 'lib/index.js',
-    output: [
-      {
-        file: pkg.module,
-        format: 'es',
-        sourcemap: true
-      }
-    ],
+  });
+  getCoreBundles.push({
+    input: bundleObject.input,
+    output: {
+      name: bundleObject.name,
+      file: `${bundleObject.output}.esm.js`,
+      format: 'es',
+      sourcemap: false
+    },
     context: 'window',
     plugins: browserPlugins
-  },
-  {
-    input: 'lib/index.js',
-    output: [
-      {
-        file: pkg.main,
-        format: 'cjs',
-        sourcemap: true
-      }
-    ],
+  });
+  getCoreBundles.push({
+    input: bundleObject.input,
+    output: {
+      name: bundleObject.name,
+      file: `${bundleObject.output}.cjs.js`,
+      format: 'cjs',
+      sourcemap: false
+    },
     context: 'global',
     plugins: nodePlugins
-  }
-];
+  });
+});
 
-export default libBundles;
+export default getCoreBundles;
