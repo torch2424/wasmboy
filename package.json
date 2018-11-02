@@ -32,7 +32,6 @@
     "test:perf": "npm run test:performance",
     "test:performance": "npm run build && npm run test:performance:nobuild",
     "test:performance:nobuild": "node --experimental-worker node_modules/mocha/bin/_mocha test/performance/performance-test.js --exit",
-    "test:benchmark:build": "npx rollup -c --environment PROD,BENCHMARK",
     "debugger:watch": "preact watch --src debugger",
     "debugger:serve": "npm run debugger:build && preact serve",
     "debugger:build": "preact build --src debugger --no-prerender",
