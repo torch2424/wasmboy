@@ -12,10 +12,10 @@
   "bugs": {
     "url": "https://github.com/torch2424/wasmBoy/issues"
   },
-  "main": "dist/wasmboy.cjs.js",
-  "module": "dist/wasmboy.esm.js",
-  "browser": "dist/wasmboy.umd.js",
-  "iife": "dist/wasmboy.iife.js",
+  "main": "dist/wasmboy.wasm.cjs.js",
+  "module": "dist/wasmboy.wasm.esm.js",
+  "browser": "dist/wasmboy.wasm.umd.js",
+  "iife": "dist/wasmboy.wasm.iife.js",
   "scripts": {
     "prepare": "npm run core:build && npm run lib:build:wasm && npm run lib:build:ts",
     "start": "npx concurrently --kill-others --names \"DEBUGGER,CORE,LIB\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"npm run debugger:watch\" \"npm run core:watch\" \"npm run lib:watch:wasm\"",
@@ -32,6 +32,7 @@
     "test:perf": "npm run test:performance",
     "test:performance": "npm run build && npm run test:performance:nobuild",
     "test:performance:nobuild": "node --experimental-worker node_modules/mocha/bin/_mocha test/performance/performance-test.js --exit",
+    "test:benchmark:build": "npx rollup -c --environment PROD,BENCHMARK",
     "debugger:watch": "preact watch --src debugger",
     "debugger:serve": "npm run debugger:build && preact serve",
     "debugger:build": "preact build --src debugger --no-prerender",

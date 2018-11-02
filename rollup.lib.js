@@ -11,43 +11,54 @@ import compiler from '@ampproject/rollup-plugin-closure-compiler';
 import bundleSize from 'rollup-plugin-bundle-size';
 import pkg from './package.json';
 
-let filterImports;
-if (process.env.TS && !process.env.WASM) {
-  filterImports = {
-    '../../dist/worker/wasmboy.wasm.worker.js': ['default', '*']
-  };
-} else if (process.env.WASM && !process.env.TS) {
-  filterImports = {
-    '../../dist/worker/wasmboy.ts.worker.js': ['default', '*']
-  };
-}
+// Our final bundles we are generating for the lib
+const libBundles = [];
 
-// Our base plugins needed by every bundle type
-const plugins = [
-  resolve(), // so Rollup can find node modules
-  commonjs(),
-  json(),
-  url({
-    limit: 1000000 * 1024, // Always inline
-    include: ['**/*.worker.js'],
-    // Don't emit files, this will replace the worker build output
-    emitFiles: false
-  }),
-  babel({
-    // so Rollup can convert unsupported es6 code to es5
-    exclude: ['node_modules/**'],
-    plugins: [
-      ['@babel/plugin-proposal-class-properties'],
-      ['@babel/plugin-proposal-object-rest-spread'],
-      [
-        'babel-plugin-filter-imports',
-        {
-          imports: filterImports
-        }
-      ]
-    ]
-  })
+const baseLibBundles = [
+  {
+    input: 'lib/index.js',
+    output: {
+      name: 'WasmBoy',
+      format: 'umd',
+      sourcemap: true
+    },
+    context: 'window'
+  },
+  {
+    input: 'lib/index.js',
+    output: {
+      name: 'WasmBoy',
+      format: 'iife',
+      sourcemap: true
+    },
+    context: 'window'
+  },
+  {
+    input: 'lib/index.js',
+    output: {
+      format: 'esm',
+      sourcemap: true
+    },
+    context: 'window'
+  },
+  {
+    input: 'lib/index.js',
+    output: {
+      file: pkg.main,
+      format: 'cjs',
+      sourcemap: true
+    },
+    context: 'global'
+  }
 ];
+
+// Plugin Options
+const filterImportsWasm = {
+  '../../dist/worker/wasmboy.wasm.worker.js': ['default', '*']
+};
+const filterImportsTs = {
+  '../../dist/worker/wasmboy.ts.worker.js': ['default', '*']
+};
 
 // Our replace Options for node workers
 // https://nodejs.org/api/worker_threads.html
@@ -58,8 +69,6 @@ const replaceNodeOptions = {
     'ROLLUP_REPLACE_NODE*/': ''
   }
 };
-// Plugins specific to running in a node runtime
-const nodePlugins = [replace(replaceNodeOptions), ...plugins, bundleSize()];
 
 const replaceBrowserOptions = {
   delimiters: ['', ''],
@@ -68,61 +77,84 @@ const replaceBrowserOptions = {
     'ROLLUP_REPLACE_BROWSER*/': ''
   }
 };
-// Plugins specific to running in a node runtime
-const browserPlugins = [replace(replaceBrowserOptions), ...plugins];
-if (process.env.PROD) {
-  browserPlugins.push(compiler());
-}
-browserPlugins.push(bundleSize());
 
-// Create our lib bundles
-const libBundles = [
-  {
-    input: 'lib/index.js',
-    output: {
-      name: 'WasmBoy',
-      file: pkg.browser,
-      format: 'umd',
-      sourcemap: true
-    },
-    context: 'window',
-    plugins: browserPlugins
-  },
-  {
-    input: 'lib/index.js',
-    output: {
-      name: 'WasmBoy',
-      file: pkg.iife,
-      format: 'iife',
-      sourcemap: true
-    },
-    context: 'window',
-    plugins: browserPlugins
-  },
-  {
-    input: 'lib/index.js',
-    output: [
+const babelPluginConfig = {
+  // so Rollup can convert unsupported es6 code to es5
+  exclude: ['node_modules/**'],
+  plugins: [
+    ['@babel/plugin-proposal-class-properties'],
+    ['@babel/plugin-proposal-object-rest-spread'],
+    [
+      'babel-plugin-filter-imports',
       {
-        file: pkg.module,
-        format: 'es',
-        sourcemap: true
+        imports: {}
       }
-    ],
-    context: 'window',
-    plugins: browserPlugins
-  },
-  {
-    input: 'lib/index.js',
-    output: [
-      {
-        file: pkg.main,
-        format: 'cjs',
-        sourcemap: true
-      }
-    ],
-    context: 'global',
-    plugins: nodePlugins
+    ]
+  ]
+};
+
+baseLibBundles.forEach(baseLibBundle => {
+  // Start with our plugins
+  let plugins = [];
+
+  // Determine our replacements
+  if (baseLibBundle.output.format !== 'cjs') {
+    plugins.push(replace(replaceBrowserOptions));
+  } else {
+    plugins.push(replace(replaceNodeOptions));
   }
-];
+
+  // Add standard plugins
+  plugins = [
+    ...plugins,
+    resolve(), // so Rollup can find node modules
+    commonjs(),
+    json(),
+    url({
+      limit: 1000000 * 1024, // Always inline
+      include: ['**/*.worker.js'],
+      // Don't emit files, this will replace the worker build output
+      emitFiles: false
+    })
+  ];
+
+  // Start pushing bundles onto our lib bundles
+  if (process.env.TS) {
+    const tsBundle = {
+      ...baseLibBundle
+    };
+
+    const tsBabelPluginConfig = {
+      ...babelPluginConfig
+    };
+    tsBabelPluginConfig.plugins[2][1].imports = filterImportsWasm;
+
+    tsBundle.plugins = [...plugins, babel(tsBabelPluginConfig), bundleSize()];
+
+    tsBundle.output.file = `dist/wasmboy.ts.${baseLibBundle.output.format}.js`;
+    libBundles.push(tsBundle);
+  }
+
+  if (process.env.WASM) {
+    const wasmBundle = {
+      ...baseLibBundle
+    };
+
+    const wasmBabelPluginConfig = {
+      ...babelPluginConfig
+    };
+    wasmBabelPluginConfig.plugins[2][1].imports = filterImportsTs;
+
+    wasmBundle.plugins = [...plugins, babel(wasmBabelPluginConfig)];
+
+    if (baseLibBundle.output.format !== 'cjs' && process.env.PROD) {
+      wasmBundle.plugins.push(compiler());
+    }
+    wasmBundle.plugins.push(bundleSize());
+
+    wasmBundle.output.file = `dist/wasmboy.wasm.${baseLibBundle.output.format}.js`;
+    libBundles.push(wasmBundle);
+  }
+});
 
 export default libBundles;

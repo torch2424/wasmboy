@@ -2,7 +2,7 @@ import '../style';
 import 'bulma/css/bulma.css';
 import { Component } from 'preact';
 // The following line can be changed to './dist/wasmboy.esm.js', to test the built lib
-import { WasmBoy } from '../dist/wasmboy.esm';
+import { WasmBoy } from '../dist/wasmboy.wasm.esm';
 import { WasmBoyDebugger } from './wasmboyDebugger/wasmboyDebugger';
 import { WasmBoySystemControls } from './wasmboySystemControls/wasmboySystemControls';
 import { WasmBoyFilePicker } from './wasmboyFilePicker/wasmboyFilePicker';
