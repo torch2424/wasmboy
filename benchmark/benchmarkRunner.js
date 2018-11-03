@@ -103,6 +103,13 @@ export default class BenchmarkRunner extends Component {
       () => {
         document.getElementById('wasm-run-state').innerHTML = `Wasm Frames Run: ${wasmTimes.length}`;
         document.getElementById('ts-run-state').innerHTML = `TS Frames Run: ${tsTimes.length}`;
+
+        document.getElementById('results').innerHTML = `
+      Wasm Mean: ${stats.mean(wasmTimes)}
+      Wasm Sum: ${stats.sum(wasmTimes)}
+      Ts Mean: ${stats.mean(tsTimes)}
+      Ts Sum: ${stats.sum(tsTimes)}
+    `;
       }
     );
   }
@@ -120,6 +127,7 @@ export default class BenchmarkRunner extends Component {
         <div id="wasm-run-state" />
         <div id="ts-run-state" />
         <canvas id="wasmboy-output-canvas" />
+        <div id="results" />
       </div>
     );
   }

@@ -43,7 +43,7 @@
     "lib:watch:ts": "npx rollup -c -w --environment TS",
     "lib:build:ts": "npx rollup -c --environment PROD,TS",
     "lib:deploy": "npm run core:build && npm run lib:build:wasm && npx np",
-    "benchmark:build": "npx rollup -c --environment BENCHMARK",
+    "benchmark:build": "npx rollup -c --environment PROD,BENCHMARK",
     "benchmark:watch": "npx rollup -c -w --environment BENCHMARK",
     "prettier": "npm run prettier:fix",
     "prettier:lint": " echo \"Listing unlinted files, will show nothing if everything is fine.\" && npx prettier --config .prettierrc --list-different index.js preact.config.js style.css debugger/**/*.js debugger/**/*.css lib/**/*.js core/**/*.ts",
