@@ -48,6 +48,7 @@ class WasmBoyBenchmarkApp extends Component {
     const instantiateCoresTask = async () => {
       wasmboyWasmCore = await getWasmBoyWasmCore();
       wasmboyTsCore = await getWasmBoyTsCore();
+
       console.log('WasmBoy Wasm Core:', wasmboyWasmCore);
       console.log('WasmBoy TS Core:', wasmboyTsCore);
 

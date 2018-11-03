@@ -47,8 +47,14 @@ export default class LoadROMSelector extends Component {
       const ROM = await fetchROMAsByteArray(openSourceROM.url);
 
       // Set the ROM in byte memory
-      wasmboyTsCore.byteMemory.set(ROM, wasmboyTsCore.WASMBOY_GAME_BYTES_LOCATION);
-      wasmboyWasmCore.byteMemory.set(ROM, wasmboyTsCore.WASMBOY_GAME_BYTES_LOCATION);
+      wasmboyTsCore.byteMemory.set(ROM, wasmboyTsCore.instance.exports.CARTRIDGE_ROM_LOCATION);
+      wasmboyWasmCore.byteMemory.set(ROM, wasmboyTsCore.instance.exports.CARTRIDGE_ROM_LOCATION);
+
+      // Our config params
+      const configParams = [0, 1, 0, 0, 0, 0, 0, 0, 0];
+
+      wasmboyWasmCore.instance.exports.config.apply(this, configParams);
+      wasmboyTsCore.instance.exports.config.apply(this, configParams);
 
       this.props.ROMLoaded();
 

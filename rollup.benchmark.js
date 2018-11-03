@@ -24,7 +24,9 @@ let plugins = [
   postcss({
     extensions: ['.css']
   }),
-  resolve(), // so Rollup can find node modules
+  resolve({
+    preferBuiltins: false
+  }),
   babel(babelPluginConfig),
   commonjs(),
   json(),
@@ -33,9 +35,7 @@ let plugins = [
     include: ['**/*.gb', '**/*.gbc', '**/*.png'],
     // Don't emit files, this will replace the worker build output
     emitFiles: false
-  }),
-  compiler(),
-  bundleSize()
+  })
 ];
 
 let sourcemap = false;
