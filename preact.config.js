@@ -60,4 +60,13 @@ export default function(config, env, helpers) {
     }
   });
   config.resolve.extensions.push('.gbc');
+  config.module.loaders.push({
+    loader: 'url-loader',
+    test: /\.png$/,
+    options: {
+      limit: 100 * 1024,
+      mimetype: 'image/png'
+    }
+  });
+  config.resolve.extensions.push('.png');
 }

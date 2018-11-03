@@ -2,7 +2,6 @@
 
 import typescript from 'rollup-plugin-typescript';
 import babel from 'rollup-plugin-babel';
-import compiler from '@ampproject/rollup-plugin-closure-compiler';
 import bundleSize from 'rollup-plugin-bundle-size';
 
 // TODO(torch2424), write a file in core/portable/instantiateWasm.js
@@ -17,13 +16,9 @@ const plugins = [
   typescript({
     tsconfig: './core/tsconfig.json'
   }),
-  babel()
+  babel(),
+  bundleSize()
 ];
-
-if (process.env.PROD) {
-  plugins.push(compiler());
-}
-plugins.push(bundleSize());
 
 let sourcemap = 'inline';
 if (process.env.PROD) {
