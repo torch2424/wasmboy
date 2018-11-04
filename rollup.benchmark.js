@@ -56,7 +56,7 @@ if (process.env.ROLLUP_WATCH) {
     copy([
       {
         files: 'demo/debugger/assets/**/*',
-        dest: 'build/benchmark'
+        dest: 'build/benchmark/assets'
       },
       {
         files: 'benchmark/index.html',

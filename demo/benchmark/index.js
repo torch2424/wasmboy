@@ -7,11 +7,11 @@ import './index.css';
 import valoo from 'valoo';
 import browserDetect from 'browser-detect';
 
-import packageJson from '../package.json';
+import packageJson from '../../package.json';
 
 // Import our cores
-import getWasmBoyWasmCore from '../dist/core/getWasmBoyWasmCore.esm';
-import getWasmBoyTsCore from '../dist/core/getWasmBoyTsCore.esm';
+import getWasmBoyWasmCore from '../../dist/core/getWasmBoyWasmCore.esm';
+import getWasmBoyTsCore from '../../dist/core/getWasmBoyTsCore.esm';
 
 import LoadROMSelector from './loadrom';
 import BenchmarkRunner from './benchmarkRunner';

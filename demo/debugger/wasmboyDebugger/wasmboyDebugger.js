@@ -1,5 +1,5 @@
 import { Component } from 'preact';
-import { WasmBoy } from '../../dist/wasmboy.esm';
+import { WasmBoy } from '../../../dist/wasmboy.wasm.esm';
 import { NumberBaseTable } from './numberBaseTable/numberBaseTable';
 import { WasmBoyBackgroundMap } from './wasmboyBackgroundMap/wasmboyBackgroundMap';
 import { WasmBoyTileData } from './wasmboyTileData/wasmboyTileData';

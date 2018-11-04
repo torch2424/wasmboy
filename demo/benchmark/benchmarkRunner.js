@@ -3,8 +3,8 @@ import { h, Component } from 'preact';
 import microseconds from 'microseconds';
 import stats from 'stats-lite';
 
-import { WasmBoyGraphics } from '../lib/graphics/graphics';
-import { getImageDataFromGraphicsFrameBuffer } from '../lib/graphics/worker/imageData';
+import { WasmBoyGraphics } from '../../lib/graphics/graphics';
+import { getImageDataFromGraphicsFrameBuffer } from '../../lib/graphics/worker/imageData';
 
 const toSeconds = microSeconds => {
   return microSeconds / 1000000;

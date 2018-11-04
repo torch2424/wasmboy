@@ -1,7 +1,7 @@
 import { Component } from 'preact';
 import Portal from 'preact-portal';
 import GooglePicker from './googlePicker/googlePicker';
-import { WasmBoy } from '../../dist/wasmboy.esm';
+import { WasmBoy } from '../../../dist/wasmboy.wasm.esm';
 import './wasmboyFilePicker.css';
 
 import { openSourceROMs, getOpenSourceROMElements } from './openSourceROMs';

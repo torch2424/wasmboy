@@ -1,5 +1,5 @@
 import { Component } from 'preact';
-import { WasmBoy } from '../../dist/wasmboy.esm';
+import { WasmBoy } from '../../../dist/wasmboy.wasm.esm';
 import './wasmboyGamepad.css';
 
 // Simple mobile contreols for the wasmboy debugger

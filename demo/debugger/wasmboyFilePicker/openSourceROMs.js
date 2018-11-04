@@ -2,9 +2,9 @@
 import { h } from 'preact';
 
 // Import our demo roms
-import blarggsCpuROM from '../../test/accuracy/testroms/blargg/cpu_instrs.gb';
-import tobuTobuGirlROM from '../../test/performance/testroms/tobutobugirl/tobutobugirl.gb';
-import backToColorDemoROM from '../../test/performance/testroms/back-to-color/back-to-color.gbc';
+import blarggsCpuROM from '../../../test/accuracy/testroms/blargg/cpu_instrs.gb';
+import tobuTobuGirlROM from '../../../test/performance/testroms/tobutobugirl/tobutobugirl.gb';
+import backToColorDemoROM from '../../../test/performance/testroms/back-to-color/back-to-color.gbc';
 
 export const openSourceROMs = {
   tobutobugirl: {
