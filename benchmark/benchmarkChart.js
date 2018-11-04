@@ -30,7 +30,7 @@ export const getChartConfig = (title, xAxisTitle, yAxisTitle, isHigherBetter, th
         text: title
       },
       tooltips: {
-        position: 'average',
+        position: 'nearest',
         mode: 'index',
         intersect: false,
         callbacks: {
@@ -40,26 +40,26 @@ export const getChartConfig = (title, xAxisTitle, yAxisTitle, isHigherBetter, th
 
             // Get the label of the fastest dataset,
             const getBetterObject = () => {
-              let firstIndex = 1;
-              let secondIndex = 0;
+              let tooltipCompare;
               if (isHigherBetter) {
-                firstIndex = 0;
-                secondIndex = 1;
+                tooltipCompare = tooltipItems[0].yLabel > tooltipItems[1].yLabel;
+              } else {
+                tooltipCompare = tooltipItems[0].yLabel < tooltipItems[1].yLabel;
               }
 
-              if (tooltipItems[firstIndex].yLabel > tooltipItems[secondIndex].yLabel) {
-                fastestDifference = tooltipItems[firstIndex].yLabel - tooltipItems[secondIndex].yLabel;
-                return tooltipItems[firstIndex];
+              if (tooltipCompare) {
+                fastestDifference = tooltipItems[0].yLabel - tooltipItems[1].yLabel;
+                return tooltipItems[0];
               } else {
-                fastestDifference = tooltipItems[secondIndex].yLabel - tooltipItems[firstIndex].yLabel;
-                return tooltipItems[secondIndex];
+                fastestDifference = tooltipItems[1].yLabel - tooltipItems[0].yLabel;
+                return tooltipItems[1];
               }
             };
 
             const fastestItem = getBetterObject();
             const fastestDataset = data.datasets[fastestItem.datasetIndex];
 
-            return `Best: ${fastestDataset.label}` + (isHigherBetter ? `(+${fastestDifference})` : `(${fastestDifference})`);
+            return `Best: ${fastestDataset.label} ` + (isHigherBetter ? `(+${fastestDifference})` : `(${fastestDifference})`);
           }
         }
       },
@@ -76,6 +76,7 @@ export const getChartConfig = (title, xAxisTitle, yAxisTitle, isHigherBetter, th
               labelString: xAxisTitle
             },
             ticks: {
+              suggestedMin: 0,
               callback: (dataLabel, index) => {
                 if (index % 10 === 0 || index === wasmData.length) {
                   return dataLabel;
@@ -91,6 +92,9 @@ export const getChartConfig = (title, xAxisTitle, yAxisTitle, isHigherBetter, th
             scaleLabel: {
               display: true,
               labelString: yAxisTitle
+            },
+            ticks: {
+              suggestedMin: 0
             }
           }
         ]

@@ -10,7 +10,7 @@ import BenchmarkResults from './benchmarkResults';
 let wasmTimes = [];
 let tsTimes = [];
 
-const maxCycles = 2000;
+const maxCycles = 200;
 
 const toSeconds = microSeconds => {
   return microSeconds / 1000000;
