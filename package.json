@@ -70,6 +70,7 @@
     "assemblyscript": "github:AssemblyScript/assemblyscript#c769f65bacd5392e5c9efab112b33244fc0a0c8f",
     "babel-plugin-filter-imports": "^2.0.3",
     "babel-preset-env": "^1.6.1",
+    "branchsite": "^4.0.3",
     "browser-detect": "^0.2.28",
     "bulma": "^0.7.1",
     "chart.js": "^2.7.3",
