@@ -5,29 +5,42 @@ import stats from 'stats-lite';
 
 import { WasmBoyGraphics } from '../lib/graphics/graphics';
 import { getImageDataFromGraphicsFrameBuffer } from '../lib/graphics/worker/imageData';
+import BenchmarkResults from './benchmarkResults';
 
 let wasmTimes = [];
 let tsTimes = [];
 
-const coreBenchmark = async (Core, times, loopCallback) => {
-  let currentCycles = 0;
-  const maxCycles = 2000;
+const maxCycles = 2000;
 
-  const coreCycle = () => {
+const toSeconds = microSeconds => {
+  return microSeconds / 1000000;
+};
+
+const averageFpsFromTimes = frameTimes => {
+  if (frameTimes.length <= 0) {
+    return 0;
+  }
+  return Math.floor(1000000 / stats.mean(frameTimes));
+};
+
+const coreBenchmark = async (Core, times, cyclesToRun, asyncLoopCallback) => {
+  let currentCycles = 0;
+
+  const coreCycle = async () => {
     const start = microseconds.now();
     Core.instance.exports.executeFrame();
     times.push(microseconds.since(start));
-    if (loopCallback) {
-      loopCallback(Core, times);
+    if (asyncLoopCallback) {
+      await asyncLoopCallback(Core, times);
     }
   };
 
   await new Promise(resolve => {
-    const cycleLoop = resolve => {
-      coreCycle();
+    const cycleLoop = async resolve => {
+      await coreCycle();
       currentCycles++;
 
-      if (currentCycles >= maxCycles) {
+      if (currentCycles >= cyclesToRun) {
         resolve();
       } else {
         setTimeout(() => {
@@ -57,10 +70,7 @@ export default class BenchmarkRunner extends Component {
     };
   }
 
-  componentDidMount() {
-    // Set up our WasmBoy Graphics
-    WasmBoyGraphics.initialize(document.getElementById('wasmboy-output-canvas'));
-  }
+  componentDidMount() {}
 
   runBenchmark() {
     this.setState(
@@ -69,18 +79,26 @@ export default class BenchmarkRunner extends Component {
         running: true
       },
       () => {
-        wasmTimes = [];
-        tsTimes = [];
+        const asyncLoopCallback = async Core => {
+          outputFrame(Core, this.props.WasmBoyTsCore);
+
+          await new Promise(resolve => {
+            this.setState(
+              {
+                ...this.state
+              },
+              () => resolve()
+            );
+          });
+        };
 
         const benchmarkTask = async () => {
-          await coreBenchmark(this.props.WasmBoyWasmCore, wasmTimes, Core => {
-            outputFrame(Core, this.props.WasmBoyTsCore);
-            document.getElementById('wasm-run-state').innerHTML = `Wasm Frames Run: ${wasmTimes.length}`;
-          });
-          await coreBenchmark(this.props.WasmBoyTsCore, tsTimes, Core => {
-            outputFrame(Core, this.props.WasmBoyTsCore);
-            document.getElementById('ts-run-state').innerHTML = `TS Frames Run: ${tsTimes.length}`;
-          });
+          WasmBoyGraphics.initialize(document.getElementById('wasm-canvas'));
+          await coreBenchmark(this.props.WasmBoyWasmCore, wasmTimes, maxCycles, asyncLoopCallback);
+
+          WasmBoyGraphics.initialize(document.getElementById('ts-canvas'));
+          await coreBenchmark(this.props.WasmBoyTsCore, tsTimes, maxCycles, asyncLoopCallback);
+
           this.benchmarkComplete();
         };
         benchmarkTask();
@@ -95,23 +113,10 @@ export default class BenchmarkRunner extends Component {
     console.log('wasm mean', stats.mean(wasmTimes), 'sum', stats.sum(wasmTimes));
     console.log('ts mean', stats.mean(tsTimes), 'sum', stats.sum(tsTimes));
 
-    this.setState(
-      {
-        ...this.state,
-        running: false
-      },
-      () => {
-        document.getElementById('wasm-run-state').innerHTML = `Wasm Frames Run: ${wasmTimes.length}`;
-        document.getElementById('ts-run-state').innerHTML = `TS Frames Run: ${tsTimes.length}`;
-
-        document.getElementById('results').innerHTML = `
-      Wasm Mean: ${stats.mean(wasmTimes)}
-      Wasm Sum: ${stats.sum(wasmTimes)}
-      Ts Mean: ${stats.mean(tsTimes)}
-      Ts Sum: ${stats.sum(tsTimes)}
-    `;
-      }
-    );
+    this.setState({
+      ...this.state,
+      running: false
+    });
   }
 
   render() {
@@ -120,14 +125,25 @@ export default class BenchmarkRunner extends Component {
     }
 
     return (
-      <div>
+      <div class="runner">
         <div class="button is-success" disabled={!this.props.ready || this.state.running} onClick={() => this.runBenchmark()}>
           Run
         </div>
-        <div id="wasm-run-state" />
-        <div id="ts-run-state" />
-        <canvas id="wasmboy-output-canvas" />
-        <div id="results" />
+
+        <div class="runner__output">
+          <div>
+            <div>Wasm Frames Run: {wasmTimes.length}</div>
+            <div>Current Wasm FPS Average: {wasmTimes.length > 0 ? averageFpsFromTimes(wasmTimes) : 0}</div>
+            <canvas id="wasm-canvas" />
+          </div>
+          <div>
+            <div>Ts Frames Run: {tsTimes.length}</div>
+            <div>Curren Ts FPS Average: {wasmTimes.length > 0 ? averageFpsFromTimes(tsTimes) : 0}</div>
+            <canvas id="ts-canvas" />
+          </div>
+        </div>
+
+        <BenchmarkResults WasmTimes={wasmTimes} TsTimes={tsTimes} isRunning={this.state.running} />
       </div>
     );
   }

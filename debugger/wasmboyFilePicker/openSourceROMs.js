@@ -3,17 +3,14 @@ import { h } from 'preact';
 
 // Import our demo roms
 import blarggsCpuROM from '../../test/accuracy/testroms/blargg/cpu_instrs.gb';
-import blarggsCpuImage from '../assets/cpu_instrs.golden.png';
 import tobuTobuGirlROM from '../../test/performance/testroms/tobutobugirl/tobutobugirl.gb';
-import tobuTobuGirlImage from '../assets/tobutobugirl.png';
 import backToColorDemoROM from '../../test/performance/testroms/back-to-color/back-to-color.gbc';
-import backToColorDemoImage from '../assets/back-to-color.gbc.noPerformanceOptions.png';
 
 export const openSourceROMs = {
   tobutobugirl: {
     title: 'tobu tobu girl',
     url: tobuTobuGirlROM,
-    image: tobuTobuGirlImage,
+    image: 'assets/tobutobugirl.png',
     link: 'http://tangramgames.dk/tobutobugirl/',
     infoElement: (
       <div>
@@ -27,7 +24,7 @@ export const openSourceROMs = {
   blarggsCpu: {
     title: "Blargg's CPU Test",
     url: blarggsCpuROM,
-    image: blarggsCpuImage,
+    image: 'assets/cpu_instrs.golden.png',
     link: 'http://gbdev.gg8.se/wiki/articles/Test_ROMs',
     infoElement: (
       <div>
@@ -38,7 +35,7 @@ export const openSourceROMs = {
   backToColor: {
     title: 'Back to Color',
     url: backToColorDemoROM,
-    image: backToColorDemoImage,
+    image: 'assets/back-to-color.gbc.noPerformanceOptions.png',
     link: 'https://github.com/AntonioND/back-to-color',
     infoElement: (
       <div>

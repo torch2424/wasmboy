@@ -43,7 +43,7 @@ if (process.env.ROLLUP_WATCH) {
   plugins = [
     ...plugins,
     serve({
-      contentBase: ['dist/', 'benchmark/'],
+      contentBase: ['dist/', 'dist/benchmark/', 'benchmark/', 'debugger/'],
       port: 8080
     })
   ];

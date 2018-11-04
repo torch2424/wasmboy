@@ -21,13 +21,23 @@ export default class LoadROMSelector extends Component {
   }
 
   componentDidMount() {
-    this.openSourceROMElements = getOpenSourceROMElements(this.loadROMIntoCores.bind(this));
+    this.openSourceROMElements = getOpenSourceROMElements(this.loadOpenSourceROM.bind(this));
   }
 
-  loadROMIntoCores(openSourceROM) {
+  // Allow passing a file
+  // https://gist.github.com/AshikNesin/e44b1950f6a24cfcd85330ffc1713513
+  loadLocalFile(event) {
+    this.loadROMIntoCores(event.target.files[0], event.target.files[0].name);
+  }
+
+  loadOpenSourceROM(openSourceROM) {
+    this.loadROMIntoCores(openSourceROM.url, openSourceROM.title);
+  }
+
+  loadROMIntoCores(ROMUrl, title) {
     this.setState({
       ...this.state,
-      ROM: openSourceROM.title,
+      ROM: title,
       showROMs: false,
       loading: true
     });
@@ -44,7 +54,7 @@ export default class LoadROMSelector extends Component {
       }
 
       // Fetch the rom
-      const ROM = await fetchROMAsByteArray(openSourceROM.url);
+      const ROM = await fetchROMAsByteArray(ROMUrl);
 
       // Set the ROM in byte memory
       wasmboyTsCore.byteMemory.set(ROM, wasmboyTsCore.instance.exports.CARTRIDGE_ROM_LOCATION);
@@ -76,7 +86,43 @@ export default class LoadROMSelector extends Component {
           <div class="donut" />
         ) : (
           <div>
-            <button onClick={() => this.setState({ ...this.state, showROMs: true })}>Choose ROM</button>
+            {/* Upload ROM from device */}
+            <div class="file">
+              <label class="file-label">
+                <input
+                  class="file-input"
+                  type="file"
+                  accept=".gb, .gbc, .zip"
+                  name="resume"
+                  onChange={event => {
+                    this.loadLocalFile(event);
+                  }}
+                />
+                <span class="file-cta">
+                  <span class="file-icon">
+                    {/* Material file svg https://material.io/icons/#ic_insert_drive_file */}
+                    <svg fill="#020202" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M6 2c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6H6zm7 7V3.5L18.5 9H13z" />
+                      <path d="M0 0h24v24H0z" fill="none" />
+                    </svg>
+                  </span>
+                  <span class="file-label">Upload from Device</span>
+                </span>
+              </label>
+            </div>
+
+            {/* Open Source ROMs Button */}
+            <a class="button is-medium is-light file-button" onClick={() => this.setState({ ...this.state, showROMs: true })}>
+              <span class="icon">
+                {/* Material open lock svg https://material.io/tools/icons/static/icons/baseline-lock_open-24px.svg */}
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                  <path d="M0 0h24v24H0z" fill="none" />
+                  <path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z" />
+                </svg>
+              </span>
+              <span>Open Source ROMs (Play Now)</span>
+            </a>
+
             <div>Current ROM: {this.state.ROM}</div>
           </div>
         )}
