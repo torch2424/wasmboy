@@ -49,7 +49,20 @@ if (process.env.ROLLUP_WATCH) {
   ];
   sourcemap = 'inline';
 } else {
-  plugins = [...plugins, compiler()];
+  plugins = [
+    ...plugins,
+    compiler(),
+    copy([
+      {
+        files: 'debugger/assets/**/*',
+        dest: 'build/benchmark'
+      },
+      {
+        files: 'benchmark/index.html',
+        dest: 'build/benchmark'
+      }
+    ])
+  ];
 }
 
 plugins = [...plugins, bundleSize()];
@@ -59,7 +72,7 @@ const benchmarkBundles = [
     input: 'benchmark/index.js',
     output: {
       name: 'WasmBoyBenchmark',
-      file: 'dist/benchmark/index.iife.js',
+      file: 'build/benchmark/index.iife.js',
       format: 'iife',
       sourcemap: sourcemap
     },

@@ -1,7 +1,8 @@
 import { h, render, Component } from 'preact';
 
-import '../debugger/style.css';
 import 'bulma/css/bulma.css';
+import '../debugger/style.css';
+import './index.css';
 
 import valoo from 'valoo';
 import browserDetect from 'browser-detect';
