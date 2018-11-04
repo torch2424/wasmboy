@@ -9,6 +9,7 @@ import serve from 'rollup-plugin-serve';
 import compiler from '@ampproject/rollup-plugin-closure-compiler';
 import bundleSize from 'rollup-plugin-bundle-size';
 import postcss from 'rollup-plugin-postcss';
+import copy from 'rollup-plugin-copy-glob';
 import pkg from './package.json';
 
 const babelPluginConfig = {
