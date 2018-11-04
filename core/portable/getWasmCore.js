@@ -34,13 +34,18 @@ const wasmNodeInstantiate = async wasmModuleUrl => {
 };
 
 // Function to instantiate our wasm and respond back
-const getWasmBoyWasmCore = async () => {
+const getWasmBoyWasmCore = async isInBrowser => {
   let response = undefined;
 
-  if (typeof window !== 'undefined') {
+  // Allow forcing the browser mode, but also check manually
+  if (isInBrowser) {
     response = await wasmBrowserInstantiate(wasmModuleUrl);
   } else {
-    response = await wasmNodeInstantiate(wasmModuleUrl);
+    if (typeof window !== 'undefined' || typeof self !== 'undefined') {
+      response = await wasmBrowserInstantiate(wasmModuleUrl);
+    } else {
+      response = await wasmNodeInstantiate(wasmModuleUrl);
+    }
   }
 
   // Set our wasmInstance and byte memory in the main thread
