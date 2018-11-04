@@ -16,67 +16,78 @@ export default class BenchmarkRunner extends Component {
 
   componentDidMount() {
     this.renderCharts([], []);
+    this.generateTable([], []);
   }
 
   componentWillReceiveProps(newProps) {
-    if (newProps.WasmTimes && newProps.TsTimes && !newProps.isRunning) {
-      this.generateTable(newProps.WasmTimes, newProps.TsTimes);
-      this.renderCharts(newProps.WasmTimes, newProps.TsTimes);
+    if (newProps.WasmTimes && newProps.TsTimes && !newProps.running()) {
+      this.generateTable(newProps.WasmTimes(), newProps.TsTimes());
+      this.renderCharts(newProps.WasmTimes(), newProps.TsTimes());
     }
   }
 
   generateTable(wasmTimes, tsTimes) {
     if (!wasmTimes || !tsTimes || wasmTimes.length <= 0 || tsTimes.length <= 0) {
-      return;
+      generalStatsTable = <table />;
+      return <table />;
     }
 
     generalStatsTable = (
-      <table class="stats-table">
-        <tr>
-          <th>Statistic</th>
-          <th>Wasm</th>
-          <th>Ts</th>
-        </tr>
-        <tr>
-          <td>Sum</td>
-          <td>{stats.sum(wasmTimes)}</td>
-          <td>{stats.sum(tsTimes)}</td>
-        </tr>
-        <tr>
-          <td>Mean</td>
-          <td>{stats.mean(wasmTimes)}</td>
-          <td>{stats.mean(tsTimes)}</td>
-        </tr>
-        <tr>
-          <td>Median</td>
-          <td>{stats.median(wasmTimes)}</td>
-          <td>{stats.median(tsTimes)}</td>
-        </tr>
-        <tr>
-          <td>Mode</td>
-          <td>{stats.mode(wasmTimes)}</td>
-          <td>{stats.mode(tsTimes)}</td>
-        </tr>
-        <tr>
-          <td>Variance</td>
-          <td>{stats.variance(wasmTimes)}</td>
-          <td>{stats.variance(tsTimes)}</td>
-        </tr>
-        <tr>
-          <td>Standard Deviation</td>
-          <td>{stats.stdev(wasmTimes)}</td>
-          <td>{stats.stdev(tsTimes)}</td>
-        </tr>
-        <tr>
-          <td>Sample Variance</td>
-          <td>{stats.sampleVariance(wasmTimes)}</td>
-          <td>{stats.sampleVariance(tsTimes)}</td>
-        </tr>
-        <tr>
-          <td>Sample Standard Deviation</td>
-          <td>{stats.sampleStdev(wasmTimes)}</td>
-          <td>{stats.sampleStdev(tsTimes)}</td>
-        </tr>
+      <table class="table is-bordered is-striped is-narrow is-fullwidth">
+        <thead>
+          <tr>
+            <th>Statistic</th>
+            <th>Wasm</th>
+            <th>Ts</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Total Frame Times</td>
+            <td>{wasmTimes.length}</td>
+            <td>{tsTimes.length}</td>
+          </tr>
+          <tr>
+            <td>Sum</td>
+            <td>{stats.sum(wasmTimes)}</td>
+            <td>{stats.sum(tsTimes)}</td>
+          </tr>
+          <tr>
+            <td>Mean</td>
+            <td>{stats.mean(wasmTimes)}</td>
+            <td>{stats.mean(tsTimes)}</td>
+          </tr>
+          <tr>
+            <td>Median</td>
+            <td>{stats.median(wasmTimes)}</td>
+            <td>{stats.median(tsTimes)}</td>
+          </tr>
+          <tr>
+            <td>Mode</td>
+            <td>{stats.mode(wasmTimes)}</td>
+            <td>{stats.mode(tsTimes)}</td>
+          </tr>
+          <tr>
+            <td>Variance</td>
+            <td>{stats.variance(wasmTimes)}</td>
+            <td>{stats.variance(tsTimes)}</td>
+          </tr>
+          <tr>
+            <td>Standard Deviation</td>
+            <td>{stats.stdev(wasmTimes)}</td>
+            <td>{stats.stdev(tsTimes)}</td>
+          </tr>
+          <tr>
+            <td>Sample Variance</td>
+            <td>{stats.sampleVariance(wasmTimes)}</td>
+            <td>{stats.sampleVariance(tsTimes)}</td>
+          </tr>
+          <tr>
+            <td>Sample Standard Deviation</td>
+            <td>{stats.sampleStdev(wasmTimes)}</td>
+            <td>{stats.sampleStdev(tsTimes)}</td>
+          </tr>
+        </tbody>
       </table>
     );
 
@@ -199,34 +210,38 @@ export default class BenchmarkRunner extends Component {
 
   render() {
     return (
-      <div>
+      <section class="results">
         <div>
           <button
             class="button"
             onClick={() => {
-              console.log('Wasm Times:', this.props.WasmTimes);
-              console.log('Js Times:', this.props.TsTimes);
+              console.log('Wasm Times:', this.props.WasmTimes());
+              console.log('Js Times:', this.props.TsTimes());
             }}
             disabled={
               !this.props ||
-              !this.props.WasmTimes ||
-              !this.props.TsTimes ||
-              this.props.WasmTimes.length <= 0 ||
-              this.props.TsTimes.length <= 0
+              this.props.running() ||
+              !this.props.WasmTimes() ||
+              !this.props.TsTimes() ||
+              this.props.WasmTimes().length <= 0 ||
+              this.props.TsTimes().length <= 0
             }
           >
-            Log Raw Frame Execution Times (in microseconds) to Console
+            Log Frame Execution Times to Console
           </button>
         </div>
+
         <div>
-          General Statistics of Times (In Microseconds):
+          <h1>General Statistics of Times (In Microseconds)</h1>
           {generalStatsTable}
         </div>
+
         <div>
+          <h1>Frame Times Visualization</h1>
           <canvas id="times-vs-frames-chart" />
           <canvas id="fps-vs-frames-chart" />
         </div>
-      </div>
+      </section>
     );
   }
 }

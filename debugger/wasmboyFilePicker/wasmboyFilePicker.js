@@ -203,7 +203,7 @@ export class WasmBoyFilePicker extends Component {
           </GooglePicker>
 
           {/* Open Source ROMs Button */}
-          <a class="button is-medium is-light file-button" onClick={() => this.setState({ ...this.state, showOpenSourceROMs: true })}>
+          <a class="button is-normal is-light file-button" onClick={() => this.setState({ ...this.state, showOpenSourceROMs: true })}>
             <span class="icon">
               {/* Material open lock svg https://material.io/tools/icons/static/icons/baseline-lock_open-24px.svg */}
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">

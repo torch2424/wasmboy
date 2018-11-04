@@ -3,7 +3,10 @@ import { h, render, Component } from 'preact';
 import '../debugger/style.css';
 import 'bulma/css/bulma.css';
 
+import valoo from 'valoo';
 import browserDetect from 'browser-detect';
+
+import packageJson from '../package.json';
 
 // Import our cores
 import getWasmBoyWasmCore from '../dist/core/getWasmBoyWasmCore.esm';
@@ -11,6 +14,7 @@ import getWasmBoyTsCore from '../dist/core/getWasmBoyTsCore.esm';
 
 import LoadROMSelector from './loadrom';
 import BenchmarkRunner from './benchmarkRunner';
+import BenchmarkResults from './benchmarkResults';
 
 let wasmboyWasmCore = undefined;
 let wasmboyTsCore = undefined;
@@ -21,11 +25,26 @@ class WasmBoyBenchmarkApp extends Component {
 
     const browserInfo = browserDetect();
 
+    // Create ur valoo variables with dummy callbacks so they update
+    const dummyCallback = v => {};
+
+    const running = valoo(false);
+    const wasmTimes = valoo([]);
+    const tsTimes = valoo([]);
+    running.on(() => this.setState({ ...this.state }));
+    wasmTimes.on(dummyCallback);
+    tsTimes.on(dummyCallback);
+
     this.state = {
       ready: false,
       loading: false,
+      running,
       browserInfo: {
         ...browserInfo
+      },
+      results: {
+        wasmTimes,
+        tsTimes
       }
     };
   }
@@ -54,35 +73,69 @@ class WasmBoyBenchmarkApp extends Component {
 
   render() {
     return (
-      <div>
-        <h1>WasmBoy Benchmarking</h1>
+      <div class="wasmboy-benchmark">
+        <h1 class="wasmboy-benchmark__title">WasmBoy Benchmarking</h1>
 
-        <table>
-          <tr>
-            <th>Current Device</th>
-          </tr>
-          <tr>
-            <td>Browser</td>
-            <td>
-              {this.state.browserInfo.name} {this.state.browserInfo.version}
-            </td>
-          </tr>
-          <tr>
-            <td>Operating System</td>
-            <td>{this.state.browserInfo.os}</td>
-          </tr>
+        <table class="table is-bordered is-striped is-narrow is-fullwidth">
+          <thead>
+            <tr>
+              <th>Current Enviroment</th>
+              <th />
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Browser</td>
+              <td>
+                {this.state.browserInfo.name.charAt(0).toUpperCase() + this.state.browserInfo.name.slice(1)}{' '}
+                {this.state.browserInfo.version}
+              </td>
+            </tr>
+            <tr>
+              <td>Operating System</td>
+              <td>{this.state.browserInfo.os}</td>
+            </tr>
+            <tr>
+              <td>WasmBoy Lib Version</td>
+              <td>{packageJson.version}</td>
+            </tr>
+          </tbody>
         </table>
 
         {this.state.loading ? (
-          <div class="donut" />
+          <div class="donut-center">
+            <div class="donut" />
+          </div>
         ) : (
           <main>
+            <hr />
+            <h1>Setup</h1>
+            <hr />
+
             <LoadROMSelector
               WasmBoyWasmCore={wasmboyWasmCore}
               WasmBoyTsCore={wasmboyTsCore}
               ROMLoaded={() => this.setState({ ...this.state, ready: true })}
             />
-            <BenchmarkRunner WasmBoyWasmCore={wasmboyWasmCore} WasmBoyTsCore={wasmboyTsCore} ready={this.state.ready} />
+
+            <hr />
+            <h1>Runner</h1>
+            <hr />
+
+            <BenchmarkRunner
+              WasmBoyWasmCore={wasmboyWasmCore}
+              WasmBoyTsCore={wasmboyTsCore}
+              WasmTimes={this.state.results.wasmTimes}
+              TsTimes={this.state.results.tsTimes}
+              ready={this.state.ready}
+              running={this.state.running}
+            />
+
+            <hr />
+            <h1>Results</h1>
+            <hr />
+
+            <BenchmarkResults WasmTimes={this.state.results.wasmTimes} TsTimes={this.state.results.tsTimes} running={this.state.running} />
           </main>
         )}
       </div>

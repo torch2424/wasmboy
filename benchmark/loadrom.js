@@ -14,7 +14,7 @@ export default class LoadROMSelector extends Component {
     super(props);
 
     this.state = {
-      ROM: null,
+      ROM: 'Please load a ROM...',
       showROMs: false,
       loading: false
     };
@@ -81,12 +81,12 @@ export default class LoadROMSelector extends Component {
 
   render() {
     return (
-      <div>
-        <h2>Select a ROM</h2>
+      <section class="load-rom">
+        <h2>Current ROM: {this.state.ROM}</h2>
         {this.state.loading ? (
           <div class="donut" />
         ) : (
-          <div>
+          <div class="load-rom__load-buttons">
             {/* Upload ROM from device */}
             <div class="file">
               <label class="file-label">
@@ -113,7 +113,7 @@ export default class LoadROMSelector extends Component {
             </div>
 
             {/* Open Source ROMs Button */}
-            <a class="button is-medium is-light file-button" onClick={() => this.setState({ ...this.state, showROMs: true })}>
+            <a class="button is-normal is-light file-button" onClick={() => this.setState({ ...this.state, showROMs: true })}>
               <span class="icon">
                 {/* Material open lock svg https://material.io/tools/icons/static/icons/baseline-lock_open-24px.svg */}
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -123,8 +123,6 @@ export default class LoadROMSelector extends Component {
               </span>
               <span>Open Source ROMs (Play Now)</span>
             </a>
-
-            <div>Current ROM: {this.state.ROM}</div>
           </div>
         )}
 
@@ -142,7 +140,7 @@ export default class LoadROMSelector extends Component {
             </div>
           </Portal>
         ) : null}
-      </div>
+      </section>
     );
   }
 }
