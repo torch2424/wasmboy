@@ -59,8 +59,8 @@ if (process.env.ROLLUP_WATCH) {
         dest: 'build/benchmark/assets'
       },
       {
-        files: 'benchmark/index.html',
-        dest: 'build/benchmark'
+        files: 'demo/benchmark/index.html',
+        dest: 'build/benchmark/'
       }
     ])
   ];
