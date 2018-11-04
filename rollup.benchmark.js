@@ -43,7 +43,7 @@ if (process.env.ROLLUP_WATCH) {
   plugins = [
     ...plugins,
     serve({
-      contentBase: ['dist/', 'dist/benchmark/', 'benchmark/', 'debugger/'],
+      contentBase: ['dist/', 'build/benchmark/', 'demo/benchmark/', 'demo/debugger/'],
       port: 8080
     })
   ];
@@ -54,7 +54,7 @@ if (process.env.ROLLUP_WATCH) {
     compiler(),
     copy([
       {
-        files: 'debugger/assets/**/*',
+        files: 'demo/debugger/assets/**/*',
         dest: 'build/benchmark'
       },
       {
@@ -69,7 +69,7 @@ plugins = [...plugins, bundleSize()];
 
 const benchmarkBundles = [
   {
-    input: 'benchmark/index.js',
+    input: 'demo/benchmark/index.js',
     output: {
       name: 'WasmBoyBenchmark',
       file: 'build/benchmark/index.iife.js',

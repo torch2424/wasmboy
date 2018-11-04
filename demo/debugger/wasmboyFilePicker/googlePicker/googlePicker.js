@@ -10,11 +10,10 @@ const GOOGLE_SDK_URL = 'https://apis.google.com/js/api.js';
 let scriptLoadingStarted = false;
 
 export default class GooglePicker extends Component {
-
   static defaultProps = {
     onChange: () => {},
     onAuthenticate: () => {},
-    scope:['https://www.googleapis.com/auth/drive.readonly'],
+    scope: ['https://www.googleapis.com/auth/drive.readonly'],
     viewId: 'DOCS',
     authImmediate: false,
     multiselect: false,
@@ -30,14 +29,14 @@ export default class GooglePicker extends Component {
   }
 
   componentDidMount() {
-    if(this.isGoogleReady()) {
+    if (this.isGoogleReady()) {
       // google api is already exists
       // init immediately
       this.onApiLoad();
     } else if (!scriptLoadingStarted) {
       // load google api and the init
       scriptLoadingStarted = true;
-      loadScript(GOOGLE_SDK_URL, this.onApiLoad)
+      loadScript(GOOGLE_SDK_URL, this.onApiLoad);
     } else {
       // is loading
     }
@@ -61,7 +60,8 @@ export default class GooglePicker extends Component {
   }
 
   doAuth(callback) {
-    window.gapi.auth.authorize({
+    window.gapi.auth.authorize(
+      {
         client_id: this.props.clientId,
         scope: this.props.scope,
         immediate: this.props.authImmediate
@@ -86,54 +86,44 @@ export default class GooglePicker extends Component {
   }
 
   createPicker(oauthToken) {
-
     this.props.onAuthenticate(oauthToken);
 
-    if(this.props.createPicker){
-      return this.props.createPicker(google, oauthToken)
+    if (this.props.createPicker) {
+      return this.props.createPicker(google, oauthToken);
     }
 
     const googleViewId = google.picker.ViewId[this.props.viewId];
     const view = new window.google.picker.View(googleViewId);
 
     if (this.props.mimeTypes) {
-      view.setMimeTypes(this.props.mimeTypes.join(','))
+      view.setMimeTypes(this.props.mimeTypes.join(','));
     }
 
     if (!view) {
-      throw new Error('Can\'t find view by viewId');
+      throw new Error("Can't find view by viewId");
     }
 
     const picker = new window.google.picker.PickerBuilder()
-                             .addView(view)
-                             .setOAuthToken(oauthToken)
-                             .setCallback(this.props.onChange);
+      .addView(view)
+      .setOAuthToken(oauthToken)
+      .setCallback(this.props.onChange);
 
     if (this.props.origin) {
       picker.setOrigin(this.props.origin);
     }
 
     if (this.props.navHidden) {
-      picker.enableFeature(window.google.picker.Feature.NAV_HIDDEN)
+      picker.enableFeature(window.google.picker.Feature.NAV_HIDDEN);
     }
 
     if (this.props.multiselect) {
-      picker.enableFeature(window.google.picker.Feature.MULTISELECT_ENABLED)
+      picker.enableFeature(window.google.picker.Feature.MULTISELECT_ENABLED);
     }
 
-    picker.build()
-          .setVisible(true);
+    picker.build().setVisible(true);
   }
 
   render() {
-    return (
-      <div onClick={this.onChoose}>
-        {
-          this.props.children ?
-            this.props.children :
-            <button>Open google chooser</button>
-        }
-      </div>
-    );
+    return <div onClick={this.onChoose}>{this.props.children ? this.props.children : <button>Open google chooser</button>}</div>;
   }
 }

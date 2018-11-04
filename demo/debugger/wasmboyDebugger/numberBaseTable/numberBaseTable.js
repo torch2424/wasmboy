@@ -4,7 +4,6 @@ import './numberBaseTable.css';
 // Component that takes in a JSON object, where the Keys are the column name,
 // And the Rows will represent each base value of the number in the value of the key
 export class NumberBaseTable extends Component {
-
   constructor() {
     super();
     this.state = {
@@ -20,49 +19,47 @@ export class NumberBaseTable extends Component {
 
   // Modifed from: https://ourcodeworld.com/articles/read/380/how-to-convert-a-binary-string-into-a-readable-string-and-vice-versa-with-javascript
   numberToBinaryString(number) {
+    // Simply Convert each place in hex to binary
+    const hexString = number.toString(16);
 
-     // Simply Convert each place in hex to binary
-     const hexString = number.toString(16);
+    let binaryString = '';
+    for (let i = 0; i < hexString.length; i++) {
+      let valueAtIncrementer = parseInt(hexString.charAt(i), 16).toString(2);
+      let paddedValueAtIncrementer = valueAtIncrementer;
+      // Pad to 4 bits
+      while (paddedValueAtIncrementer.length < 4) {
+        paddedValueAtIncrementer = '0' + paddedValueAtIncrementer;
+      }
 
-     let binaryString = '';
-     for(let i = 0; i < hexString.length; i++) {
-       let valueAtIncrementer = parseInt(hexString.charAt(i), 16).toString(2);
-       let paddedValueAtIncrementer = valueAtIncrementer;
-       // Pad to 4 bits
-       while(paddedValueAtIncrementer.length < 4) {
-         paddedValueAtIncrementer = '0' + paddedValueAtIncrementer
-       }
+      binaryString += paddedValueAtIncrementer;
 
-       binaryString += paddedValueAtIncrementer;
+      if (i !== hexString.length - 1) {
+        binaryString += ' ';
+      }
+    }
 
-       if(i !== hexString.length - 1) {
-         binaryString += ' ';
-       }
-     }
+    // Padd out to 8 bit increments
+    if (!(binaryString.length & 1)) {
+      binaryString = '0000 ' + binaryString;
+    }
 
-     // Padd out to 8 bit increments
-     if (!(binaryString.length & 1)) {
-       binaryString = '0000 ' + binaryString;
-     }
-
-     return binaryString;
+    return binaryString;
   }
 
   getTableCellsForValueWithBase(valueBase) {
     const tableCells = [];
-    Object.keys(this.state.object).forEach((key) => {
-      if(valueBase === 16) {
-        tableCells.push((
-          <td>0x{this.state.object[key].toString(16)}</td>
-        ))
-      } else if(valueBase === 2) {
-        tableCells.push((
-          <td>{this.numberToBinaryString(this.state.object[key])}</td>
-        ))
+    Object.keys(this.state.object).forEach(key => {
+      if (valueBase === 16) {
+        tableCells.push(
+          <td>
+            0x
+            {this.state.object[key].toString(16)}
+          </td>
+        );
+      } else if (valueBase === 2) {
+        tableCells.push(<td>{this.numberToBinaryString(this.state.object[key])}</td>);
       } else {
-        tableCells.push((
-          <td>{this.state.object[key]}</td>
-        ))
+        tableCells.push(<td>{this.state.object[key]}</td>);
       }
     });
 
@@ -70,31 +67,22 @@ export class NumberBaseTable extends Component {
   }
 
   getTableCellsForObjectKeys() {
-    if(!this.state.object) {
-      return (
-        <div></div>
-      )
+    if (!this.state.object) {
+      return <div />;
     }
 
     const objectKeysAsTableCells = [];
 
-    Object.keys(this.state.object).forEach((key) => {
-      objectKeysAsTableCells.push((
-        <th>
-          {key}
-        </th>
-      ))
+    Object.keys(this.state.object).forEach(key => {
+      objectKeysAsTableCells.push(<th>{key}</th>);
     });
 
     return objectKeysAsTableCells;
   }
 
   render() {
-
-    if(!this.state.object || Object.keys(this.state.object).length < 1) {
-      return (
-        <div></div>
-      )
+    if (!this.state.object || Object.keys(this.state.object).length < 1) {
+      return <div />;
     }
 
     return (
@@ -121,6 +109,6 @@ export class NumberBaseTable extends Component {
           </tr>
         </table>
       </div>
-    )
+    );
   }
 }
