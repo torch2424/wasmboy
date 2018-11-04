@@ -21,6 +21,17 @@ export const openSourceROMs = {
       </div>
     )
   },
+  backToColor: {
+    title: 'Back to Color',
+    url: backToColorDemoROM,
+    image: 'assets/back-to-color.gbc.noPerformanceOptions.png',
+    link: 'https://github.com/AntonioND/back-to-color',
+    infoElement: (
+      <div>
+        <p>Back to Color, a GBC demo for the GBDev 2014 compo. Made by AntonioND.</p>
+      </div>
+    )
+  },
   blarggsCpu: {
     title: "Blargg's CPU Test",
     url: blarggsCpuROM,
@@ -32,16 +43,19 @@ export const openSourceROMs = {
       </div>
     )
   },
-  backToColor: {
-    title: 'Back to Color',
-    url: backToColorDemoROM,
-    image: 'assets/back-to-color.gbc.noPerformanceOptions.png',
-    link: 'https://github.com/AntonioND/back-to-color',
-    infoElement: (
-      <div>
-        <p>Back to Color, a GBC demo for the GBDev 2014 compo. Made by AntonioND.</p>
-      </div>
-    )
+  moonTiming: {
+    title: 'moon Timing',
+    url: 'assets/tim10.gb',
+    image: 'assets/icon.png',
+    link: 'http://gbdev.gg8.se/wiki/articles/Test_ROMs',
+    infoElement: <div />
+  },
+  blarggTiming: {
+    title: "Blargg's Timing",
+    url: 'assets/instr_timing.gb',
+    image: 'assets/icon.png',
+    link: 'http://gbdev.gg8.se/wiki/articles/Test_ROMs',
+    infoElement: <div />
   }
 };
 
