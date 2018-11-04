@@ -66,6 +66,7 @@
     "benchmark:watch": "npx rollup -c -w --environment BENCHMARK",
     "demo:cname": "echo 'wasmboy.app' > build/CNAME",
     "demo:build": "npx run-s lib:build debugger:build benchmark:build",
+    "demo:dist": "cp -r dist/ build/dist",
     "demo:deploy": "npx run-s demo:build demo:cname demo:branchsite"
   },
   "files": [
