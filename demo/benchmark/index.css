@@ -1,0 +1,95 @@
+html {
+  background-color: #fcfcfc;
+}
+
+.wasmboy-benchmark {
+  padding: 10px;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.wasmboy-benchmark__title {
+  margin-bottom: 20px;
+}
+
+.wasmboy-benchmark__link {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.donut-center {
+  width: 100%;
+  height: 100px;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.load-rom__load-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.load-rom__load-buttons > * {
+  margin-right: 10px;
+}
+
+.load-rom__load-buttons .file-button {
+  border-color: #dbdbdb !important;
+}
+
+.runner__frames-to-run > label {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.runner__frames-to-run > label > * {
+  margin-right: 10px;
+  width: initial;
+}
+
+.runner__frames-to-run > label > button {
+  flex-grow: 1;
+}
+
+.runner__output {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.runner__output > div {
+  text-align: center;
+}
+
+.runner__output > div > canvas {
+  min-width: 160px;
+  min-height: 144px;
+}
+
+.results {
+  text-align: center;
+}
+
+.results button {
+  word-wrap: break-word;
+  margin-bottom: 10px;
+}
+
+.results table {
+  margin-top: 10px;
+  min-height: 100px;
+  margin-bottom: 10px;
+}

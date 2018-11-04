@@ -19,6 +19,7 @@ import {
 import { WASMBOY_WASM_PAGES } from './constants';
 import { Config } from './config';
 import { hexLog, log } from './helpers/index';
+import { u16Portable } from './portable/portable';
 
 // Grow our memory to the specified size
 if (memory.size() < WASMBOY_WASM_PAGES) {
@@ -194,7 +195,7 @@ export function executeFrame(): i32 {
   // TODO: Boot ROM handling
 
   // There was an error, return -1, and push the program counter back to grab the error opcode
-  Cpu.programCounter -= 1;
+  Cpu.programCounter = u16Portable(Cpu.programCounter - 1);
   return -1;
 }
 
@@ -236,7 +237,7 @@ export function executeFrameAndCheckAudio(maxAudioBuffer: i32): i32 {
   // TODO: Boot ROM handling
 
   // There was an error, return -1, and push the program counter back to grab the error opcode
-  Cpu.programCounter -= 1;
+  Cpu.programCounter = u16Portable(Cpu.programCounter - 1);
   return -1;
 }
 
@@ -274,7 +275,7 @@ export function executeStep(): i32 {
       // 12 ld (de),a
       opcode = <u8>eightBitLoadFromGBMemory(Cpu.programCounter);
       numberOfCycles = executeOpcode(opcode);
-      Cpu.programCounter -= 1;
+      Cpu.programCounter = u16Portable(Cpu.programCounter - 1);
     }
   }
 

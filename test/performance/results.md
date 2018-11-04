@@ -22,28 +22,28 @@ The Options passed into the emulator on each run are:
 
 | Performance Option(s)                        | Time (milliseconds) |
 | -------------------------------------------- | ------------------- |
-| noPerformanceOptions                         | 6728.951            |
-| tileRendering                                | 6257.8305           |
-| tileCaching                                  | 7124.955            |
-| tileRendering, tileCaching                   | 6335.224            |
-| audioBatchProcessing                         | 5087.030000000001   |
-| audioAccumulateSamples                       | 6950.9355           |
-| audioBatchProcessing, audioAccumulateSamples | 4759.665            |
-| timersBatchProcessing                        | 8493.6705           |
-| graphicsBatchProcessing                      | 7857.561            |
-| graphicsDisableScanlineRendering             | 7471.084            |
+| noPerformanceOptions                         | 8065.242            |
+| tileRendering                                | 7417.2625           |
+| tileCaching                                  | 9734.302            |
+| tileRendering, tileCaching                   | 6628.726500000001   |
+| audioBatchProcessing                         | 4188.3705           |
+| audioAccumulateSamples                       | 6066.9095           |
+| audioBatchProcessing, audioAccumulateSamples | 4136.645            |
+| timersBatchProcessing                        | 6399.095            |
+| graphicsBatchProcessing                      | 6153.2845           |
+| graphicsDisableScanlineRendering             | 6466.1720000000005  |
 
 ## tobutobugirl.gb
 
 | Performance Option(s)                        | Time (milliseconds) |
 | -------------------------------------------- | ------------------- |
-| noPerformanceOptions                         | 5458.086            |
-| tileRendering                                | 4033.121            |
-| tileCaching                                  | 4709.412            |
-| tileRendering, tileCaching                   | 5005.8595000000005  |
-| audioBatchProcessing                         | 3574.4855           |
-| audioAccumulateSamples                       | 4301.1195           |
-| audioBatchProcessing, audioAccumulateSamples | 4121.4895           |
-| timersBatchProcessing                        | 6274.267            |
-| graphicsBatchProcessing                      | 4408.202499999999   |
-| graphicsDisableScanlineRendering             | 4407.103            |
+| noPerformanceOptions                         | 4235.565            |
+| tileRendering                                | 3403.8779999999997  |
+| tileCaching                                  | 4494.6925           |
+| tileRendering, tileCaching                   | 3444.9385           |
+| audioBatchProcessing                         | 3311.665            |
+| audioAccumulateSamples                       | 4026.5254999999997  |
+| audioBatchProcessing, audioAccumulateSamples | 3295.882            |
+| timersBatchProcessing                        | 4211.6050000000005  |
+| graphicsBatchProcessing                      | 4053.669            |
+| graphicsDisableScanlineRendering             | 4306.104            |

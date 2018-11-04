@@ -21,6 +21,7 @@ import {
   concatenateBytes,
   hexLog
 } from '../helpers/index';
+import { u8Portable, u16Portable, i8Portable } from '../portable/portable';
 
 // General Logic Instructions
 // Such as the ones found on the CB table and 0x40 - 0xBF
@@ -29,7 +30,7 @@ import {
 export function addARegister(register: u8): void {
   checkAndSetEightBitHalfCarryFlag(Cpu.registerA, register);
   checkAndSetEightBitCarryFlag(Cpu.registerA, register);
-  Cpu.registerA += register;
+  Cpu.registerA = u8Portable(Cpu.registerA + register);
   if (Cpu.registerA === 0) {
     setZeroFlag(1);
   } else {
@@ -42,14 +43,14 @@ export function addAThroughCarryRegister(register: u8): void {
   // Handling flags manually as they require some special overflow
   // From: https://github.com/nakardo/node-gameboy/blob/master/lib/cpu/opcodes.js
   // CTRL+F adc
-  let result: u8 = Cpu.registerA + register + getCarryFlag();
-  if (((Cpu.registerA ^ register ^ result) & 0x10) != 0) {
+  let result: u8 = u8Portable(Cpu.registerA + register + getCarryFlag());
+  if ((u8Portable(Cpu.registerA ^ register ^ result) & 0x10) != 0) {
     setHalfCarryFlag(1);
   } else {
     setHalfCarryFlag(0);
   }
 
-  let overflowedResult: u16 = <u16>Cpu.registerA + <u16>register + <u16>getCarryFlag();
+  let overflowedResult: u16 = u16Portable(<u16>Cpu.registerA + <u16>register + <u16>getCarryFlag());
   if ((overflowedResult & 0x100) > 0) {
     setCarryFlag(1);
   } else {
@@ -72,7 +73,7 @@ export function subARegister(register: u8): void {
 
   checkAndSetEightBitHalfCarryFlag(Cpu.registerA, negativeRegister);
   checkAndSetEightBitCarryFlag(Cpu.registerA, negativeRegister);
-  Cpu.registerA -= register;
+  Cpu.registerA = u8Portable(Cpu.registerA - register);
   if (Cpu.registerA === 0) {
     setZeroFlag(1);
   } else {
@@ -85,15 +86,16 @@ export function subAThroughCarryRegister(register: u8): void {
   // Handling flags manually as they require some special overflow
   // From: https://github.com/nakardo/node-gameboy/blob/master/lib/cpu/opcodes.js
   // CTRL+F adc
-  let result: u8 = Cpu.registerA - register - getCarryFlag();
+  let result: u8 = u8Portable(Cpu.registerA - register - getCarryFlag());
 
-  if (((Cpu.registerA ^ register ^ result) & 0x10) != 0) {
+  let carryRegisterCheck = u8Portable((Cpu.registerA ^ register ^ result) & 0x10);
+  if (carryRegisterCheck != 0) {
     setHalfCarryFlag(1);
   } else {
     setHalfCarryFlag(0);
   }
 
-  let overflowedResult: u16 = <u16>Cpu.registerA - <u16>register - <u16>getCarryFlag();
+  let overflowedResult: u16 = u16Portable(<u16>Cpu.registerA - <u16>register - <u16>getCarryFlag());
   if ((overflowedResult & 0x100) > 0) {
     setCarryFlag(1);
   } else {
@@ -122,7 +124,7 @@ export function andARegister(register: u8): void {
 }
 
 export function xorARegister(register: u8): void {
-  Cpu.registerA = Cpu.registerA ^ register;
+  Cpu.registerA = u8Portable(Cpu.registerA ^ register);
   if (Cpu.registerA === 0) {
     setZeroFlag(1);
   } else {
@@ -273,7 +275,7 @@ export function shiftLeftRegister(register: u8): u8 {
     hasHighbit = true;
   }
 
-  register = register << 1;
+  register = u8Portable(register << 1);
 
   if (hasHighbit) {
     setCarryFlag(1);
@@ -308,7 +310,7 @@ export function shiftRightArithmeticRegister(register: u8): u8 {
     hasLowbit = true;
   }
 
-  register = register >> 1;
+  register = u8Portable(register >> 1);
 
   if (hasHighbit) {
     register = register | 0x80;
@@ -337,7 +339,7 @@ export function swapNibblesOnRegister(register: u8): u8 {
   // Z 0 0 0
   let highNibble = register & 0xf0;
   let lowNibble = register & 0x0f;
-  register = (lowNibble << 4) | (highNibble >> 4);
+  register = u8Portable((lowNibble << 4) | (highNibble >> 4));
 
   if (register === 0) {
     setZeroFlag(1);
@@ -363,7 +365,7 @@ export function shiftRightLogicalRegister(register: u8): u8 {
     hasLowbit = true;
   }
 
-  register = register >> 1;
+  register = u8Portable(register >> 1);
 
   if (register === 0) {
     setZeroFlag(1);
@@ -420,13 +422,13 @@ export function setBitOnRegister(bitPosition: u8, bitValue: i32, register: u8): 
 // Private function for our relative jumps
 export function relativeJump(value: u8): void {
   // Need to convert the value to i8, since in this case, u8 can be negative
-  let relativeJumpOffset: i8 = <i8>value;
+  let relativeJumpOffset: i8 = i8Portable(<i8>value);
 
-  Cpu.programCounter += relativeJumpOffset;
+  Cpu.programCounter = u16Portable(Cpu.programCounter + relativeJumpOffset);
   // Realtive jump, using bgb debugger
   // and my debugger shows,
   // on JR you need to jump to the relative jump offset,
   // However, if the jump fails (such as conditional), only jump +2 in total
 
-  Cpu.programCounter += 1;
+  Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
 }
