@@ -10,8 +10,6 @@ import BenchmarkResults from './benchmarkResults';
 let wasmTimes = [];
 let tsTimes = [];
 
-const maxCycles = 200;
-
 const toSeconds = microSeconds => {
   return microSeconds / 1000000;
 };
@@ -66,6 +64,7 @@ export default class BenchmarkRunner extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      cyclesToRun: 2500,
       running: false
     };
   }
@@ -94,10 +93,10 @@ export default class BenchmarkRunner extends Component {
 
         const benchmarkTask = async () => {
           WasmBoyGraphics.initialize(document.getElementById('wasm-canvas'));
-          await coreBenchmark(this.props.WasmBoyWasmCore, wasmTimes, maxCycles, asyncLoopCallback);
+          await coreBenchmark(this.props.WasmBoyWasmCore, wasmTimes, this.state.cyclesToRun, asyncLoopCallback);
 
           WasmBoyGraphics.initialize(document.getElementById('ts-canvas'));
-          await coreBenchmark(this.props.WasmBoyTsCore, tsTimes, maxCycles, asyncLoopCallback);
+          await coreBenchmark(this.props.WasmBoyTsCore, tsTimes, this.state.cyclesToRun, asyncLoopCallback);
 
           this.benchmarkComplete();
         };
@@ -107,12 +106,6 @@ export default class BenchmarkRunner extends Component {
   }
 
   benchmarkComplete() {
-    console.log('wasm times', wasmTimes);
-    console.log('ts times', tsTimes);
-
-    console.log('wasm mean', stats.mean(wasmTimes), 'sum', stats.sum(wasmTimes));
-    console.log('ts mean', stats.mean(tsTimes), 'sum', stats.sum(tsTimes));
-
     this.setState({
       ...this.state,
       running: false
@@ -126,8 +119,23 @@ export default class BenchmarkRunner extends Component {
 
     return (
       <div class="runner">
-        <div class="button is-success" disabled={!this.props.ready || this.state.running} onClick={() => this.runBenchmark()}>
-          Run
+        <div>
+          <label>
+            Frames to run:
+            <input
+              class="input"
+              type="number"
+              min="0"
+              value={this.state.cyclesToRun}
+              disabled={!this.props.ready || this.state.running}
+              onChange={event => {
+                this.setState({ ...this.state, cyclesToRun: event.target.value });
+              }}
+            />
+          </label>
+          <button class="button is-success" disabled={!this.props.ready || this.state.running} onClick={() => this.runBenchmark()}>
+            Run
+          </button>
         </div>
 
         <div class="runner__output">

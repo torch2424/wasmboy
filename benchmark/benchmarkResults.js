@@ -1,7 +1,6 @@
 import { h, Component } from 'preact';
 
 import Chart from 'chart.js';
-import browserDetect from 'browser-detect';
 import stats from 'stats-lite';
 
 import { getChartConfig } from './benchmarkChart';
@@ -13,7 +12,6 @@ let generalStatsTable = [];
 export default class BenchmarkRunner extends Component {
   constructor(props) {
     super(props);
-    console.log(browserDetect());
   }
 
   componentDidMount() {
@@ -28,8 +26,12 @@ export default class BenchmarkRunner extends Component {
   }
 
   generateTable(wasmTimes, tsTimes) {
+    if (!wasmTimes || !tsTimes || wasmTimes.length <= 0 || tsTimes.length <= 0) {
+      return;
+    }
+
     generalStatsTable = (
-      <table>
+      <table class="stats-table">
         <tr>
           <th>Statistic</th>
           <th>Wasm</th>
@@ -198,6 +200,24 @@ export default class BenchmarkRunner extends Component {
   render() {
     return (
       <div>
+        <div>
+          <button
+            class="button"
+            onClick={() => {
+              console.log('Wasm Times:', this.props.WasmTimes);
+              console.log('Js Times:', this.props.TsTimes);
+            }}
+            disabled={
+              !this.props ||
+              !this.props.WasmTimes ||
+              !this.props.TsTimes ||
+              this.props.WasmTimes.length <= 0 ||
+              this.props.TsTimes.length <= 0
+            }
+          >
+            Log Raw Frame Execution Times (in microseconds) to Console
+          </button>
+        </div>
         <div>
           General Statistics of Times (In Microseconds):
           {generalStatsTable}

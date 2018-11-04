@@ -82,6 +82,7 @@ export default class LoadROMSelector extends Component {
   render() {
     return (
       <div>
+        <h2>Select a ROM</h2>
         {this.state.loading ? (
           <div class="donut" />
         ) : (

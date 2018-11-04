@@ -3,6 +3,8 @@ import { h, render, Component } from 'preact';
 import '../debugger/style.css';
 import 'bulma/css/bulma.css';
 
+import browserDetect from 'browser-detect';
+
 // Import our cores
 import getWasmBoyWasmCore from '../dist/core/getWasmBoyWasmCore.esm';
 import getWasmBoyTsCore from '../dist/core/getWasmBoyTsCore.esm';
@@ -17,9 +19,14 @@ class WasmBoyBenchmarkApp extends Component {
   constructor() {
     super();
 
+    const browserInfo = browserDetect();
+
     this.state = {
       ready: false,
-      loading: false
+      loading: false,
+      browserInfo: {
+        ...browserInfo
+      }
     };
   }
 
@@ -50,18 +57,33 @@ class WasmBoyBenchmarkApp extends Component {
       <div>
         <h1>WasmBoy Benchmarking</h1>
 
+        <table>
+          <tr>
+            <th>Current Device</th>
+          </tr>
+          <tr>
+            <td>Browser</td>
+            <td>
+              {this.state.browserInfo.name} {this.state.browserInfo.version}
+            </td>
+          </tr>
+          <tr>
+            <td>Operating System</td>
+            <td>{this.state.browserInfo.os}</td>
+          </tr>
+        </table>
+
         {this.state.loading ? (
           <div class="donut" />
         ) : (
-          <div>
-            <h2>Select a ROM</h2>
+          <main>
             <LoadROMSelector
               WasmBoyWasmCore={wasmboyWasmCore}
               WasmBoyTsCore={wasmboyTsCore}
               ROMLoaded={() => this.setState({ ...this.state, ready: true })}
             />
             <BenchmarkRunner WasmBoyWasmCore={wasmboyWasmCore} WasmBoyTsCore={wasmboyTsCore} ready={this.state.ready} />
-          </div>
+          </main>
         )}
       </div>
     );
