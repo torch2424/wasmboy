@@ -13,6 +13,12 @@ html {
   margin-bottom: 20px;
 }
 
+.wasmboy-benchmark__link {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
 .donut-center {
   width: 100%;
   height: 100px;

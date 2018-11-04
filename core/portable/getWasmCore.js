@@ -49,7 +49,7 @@ const getWasmBoyWasmCore = async () => {
   return {
     instance,
     byteMemory,
-    type: 'wasm'
+    type: 'Web Assembly'
   };
 };
 

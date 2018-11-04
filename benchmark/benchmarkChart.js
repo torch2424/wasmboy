@@ -7,14 +7,14 @@ export const getChartConfig = (title, xAxisTitle, yAxisTitle, isHigherBetter, th
       labels: cycleNumberLabels,
       datasets: [
         {
-          label: 'Wasm',
+          label: 'AssemblyScript (Web Assembly)',
           backgroundColor: '#6447f4',
           borderColor: '#6447f4',
           fill: false,
           data: wasmData
         },
         {
-          label: 'Ts',
+          label: 'Javascript (TypeScript)',
           backgroundColor: '#f7a800',
           borderColor: '#f7a800',
           fill: false,

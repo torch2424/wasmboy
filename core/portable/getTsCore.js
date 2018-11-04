@@ -6,7 +6,7 @@ const getWasmBoyTsCore = async () => {
       exports: WasmBoyCore
     },
     byteMemory: WasmBoyCore.memory.wasmByteMemory,
-    type: 'js'
+    type: 'TypeScript'
   };
   return response;
 };

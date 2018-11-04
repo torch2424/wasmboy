@@ -127,16 +127,18 @@ export default class BenchmarkRunner extends Component {
 
         <div class="runner__output">
           <div>
-            <h1>Wasm</h1>
-            <h1>Wasm Frames Run: {this.props.WasmTimes().length}</h1>
-            <h1>Current Wasm FPS Average: {this.props.WasmTimes().length > 0 ? averageFpsFromTimes(this.props.WasmTimes()) : 0}</h1>
+            <h1>AssemblyScript (Web Assembly)</h1>
+            <h1>AssemblyScript Frames Run: {this.props.WasmTimes().length}</h1>
+            <h1>
+              Current AssemblyScript FPS Average: {this.props.WasmTimes().length > 0 ? averageFpsFromTimes(this.props.WasmTimes()) : 0}
+            </h1>
             <canvas id="wasm-canvas" />
           </div>
 
           <div>
-            <h1>Ts</h1>
-            <h1>Ts Frames Run: {this.props.TsTimes().length}</h1>
-            <h1>Current Ts FPS Average: {this.props.TsTimes().length > 0 ? averageFpsFromTimes(this.props.TsTimes()) : 0}</h1>
+            <h1>Javascript (TypeScript)</h1>
+            <h1>Javascript Frames Run: {this.props.TsTimes().length}</h1>
+            <h1>Current Javascript FPS Average: {this.props.TsTimes().length > 0 ? averageFpsFromTimes(this.props.TsTimes()) : 0}</h1>
             <canvas id="ts-canvas" />
           </div>
         </div>

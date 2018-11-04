@@ -37,8 +37,8 @@ export default class BenchmarkRunner extends Component {
         <thead>
           <tr>
             <th>Statistic</th>
-            <th>Wasm</th>
-            <th>Ts</th>
+            <th>AssemblyScript (Web Assembly)</th>
+            <th>Javascript (TypeScript)</th>
           </tr>
         </thead>
         <tbody>

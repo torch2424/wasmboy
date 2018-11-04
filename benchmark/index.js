@@ -76,6 +76,12 @@ class WasmBoyBenchmarkApp extends Component {
       <div class="wasmboy-benchmark">
         <h1 class="wasmboy-benchmark__title">WasmBoy Benchmarking</h1>
 
+        <div class="wasmboy-benchmark__link">
+          <a href="https://github.com/torch2424/wasmBoy" target="_blank">
+            Fork Me on Github
+          </a>
+        </div>
+
         <table class="table is-bordered is-striped is-narrow is-fullwidth">
           <thead>
             <tr>
