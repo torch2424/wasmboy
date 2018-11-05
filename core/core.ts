@@ -333,7 +333,7 @@ export function executeStep(): i32 {
 // this is to regulate our 20 slots
 // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
 export function getSaveStateMemoryOffset(offset: i32, saveStateSlot: i32): i32 {
-  // 50 byutes per save state memory partiton sli32
+  // 50 bytes per save state memory partiton sli32
   return WASMBOY_STATE_LOCATION + offset + 50 * saveStateSlot;
 }
 

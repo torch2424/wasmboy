@@ -43,9 +43,9 @@ export const openSourceROMs = {
       </div>
     )
   },
-  moonTiming: {
-    title: 'moon Timing',
-    url: 'assets/tim10.gb',
+  moonTiming01: {
+    title: 'moon Timing tim01',
+    url: 'assets/tim01.gb',
     image: 'assets/icon.png',
     link: 'http://gbdev.gg8.se/wiki/articles/Test_ROMs',
     infoElement: <div />

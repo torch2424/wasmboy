@@ -6,7 +6,7 @@ import { eightBitStoreIntoGBMemory } from './store';
 import { eightBitLoadFromGBMemory } from './load';
 import { Joypad, getJoypadState } from '../joypad/index';
 import { Timers } from '../timers/index';
-import { hexLog } from '../helpers/index';
+import { splitHighByte, hexLog } from '../helpers/index';
 
 // Returns -1 if no trap found, otherwise returns a value that should be fed for the address
 export function checkReadTraps(offset: i32): i32 {
@@ -79,8 +79,11 @@ export function checkReadTraps(offset: i32): i32 {
 
   // Timers
   if (offset === Timers.memoryLocationDividerRegister) {
-    eightBitStoreIntoGBMemory(offset, Timers.dividerRegister);
-    return Timers.dividerRegister;
+    // Divider register in memory is just the upper 8 bits
+    // http://gbdev.gg8.se/wiki/articles/Timer_Obscure_Behaviour
+    let upperDividerRegisterBits = splitHighByte(Timers.dividerRegister);
+    eightBitStoreIntoGBMemory(offset, upperDividerRegisterBits);
+    return upperDividerRegisterBits;
   }
   if (offset === Timers.memoryLocationTimerCounter) {
     eightBitStoreIntoGBMemory(offset, Timers.timerCounter);
