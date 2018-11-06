@@ -1,7 +1,9 @@
 // Import object for our core js wrapper
 
 // Log throttling for our core
-let logRequest = undefined;
+// The same log can't be output more than once every half second
+let logRequest = {};
+let logThrottleLength = 100;
 
 const wasmImportObject = {
   env: {
@@ -19,7 +21,7 @@ const wasmImportObject = {
       console.log('[WasmBoy] ' + str);
     },
     hexLog: (arg0, arg1, arg2, arg3, arg4, arg5) => {
-      if (!logRequest) {
+      if (!logRequest[arg0]) {
         // Grab our arguments, and log as hex
         let logString = '[WasmBoy]';
         if (arg0 !== -9999) logString += ` 0x${arg0.toString(16)} `;
@@ -33,11 +35,11 @@ const wasmImportObject = {
         //console.log(logString);
 
         // Comment the lines below to disable throttle
-        logRequest = true;
+        logRequest[arg0] = true;
         setTimeout(() => {
           console.log(logString);
-          logRequest = false;
-        }, Math.floor(Math.random() * 500));
+          logRequest[arg0] = false;
+        }, logThrottleLength);
       }
     }
   }
