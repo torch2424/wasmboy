@@ -190,11 +190,10 @@ export function batchProcessTimers(): void {
 }
 
 export function updateTimers(numberOfCycles: i32): void {
-  let oldDividerRegister: i32 = Timers.dividerRegister;
-
   // Want to increment 4 cycles at a time like an actual GB would
   let cyclesIncreased: i32 = 0;
   while (cyclesIncreased < numberOfCycles) {
+    let oldDividerRegister: i32 = Timers.dividerRegister;
     cyclesIncreased += 4;
     Timers.dividerRegister += 4;
 

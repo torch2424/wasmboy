@@ -1532,7 +1532,7 @@
  )
  (func $core/timers/timers/_getTimerCounterMaskBit (; 17 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
-  ;;@ core/timers/timers.ts:270:2
+  ;;@ core/timers/timers.ts:257:2
   (block $break|0
    (block $case3|0
     (block $case2|0
@@ -1545,43 +1545,43 @@
           (tee_local $1
            (get_local $0)
           )
-          ;;@ core/timers/timers.ts:273:9
+          ;;@ core/timers/timers.ts:260:9
           (i32.const 1)
          )
         )
         (br_if $case2|0
          (i32.eq
           (get_local $1)
-          ;;@ core/timers/timers.ts:275:9
+          ;;@ core/timers/timers.ts:262:9
           (i32.const 2)
          )
         )
         (br_if $case3|0
          (i32.eq
           (get_local $1)
-          ;;@ core/timers/timers.ts:277:9
+          ;;@ core/timers/timers.ts:264:9
           (i32.const 3)
          )
         )
         (br $break|0)
        )
       )
-      ;;@ core/timers/timers.ts:272:13
+      ;;@ core/timers/timers.ts:259:13
       (return
        (i32.const 9)
       )
      )
-     ;;@ core/timers/timers.ts:274:13
+     ;;@ core/timers/timers.ts:261:13
      (return
       (i32.const 3)
      )
     )
-    ;;@ core/timers/timers.ts:276:13
+    ;;@ core/timers/timers.ts:263:13
     (return
      (i32.const 5)
     )
    )
-   ;;@ core/timers/timers.ts:278:13
+   ;;@ core/timers/timers.ts:265:13
    (return
     (i32.const 7)
    )
@@ -1589,32 +1589,32 @@
   (i32.const 0)
  )
  (func $core/timers/timers/_incrementTimerCounter (; 18 ;) (; has Stack IR ;) (type $v)
-  ;;@ core/timers/timers.ts:236:2
+  ;;@ core/timers/timers.ts:226:2
   (set_global $core/timers/timers/Timers.timerCounter
    (i32.add
     (get_global $core/timers/timers/Timers.timerCounter)
-    ;;@ core/timers/timers.ts:236:25
+    ;;@ core/timers/timers.ts:226:25
     (i32.const 1)
    )
   )
-  ;;@ core/timers/timers.ts:237:2
+  ;;@ core/timers/timers.ts:227:2
   (if
-   ;;@ core/timers/timers.ts:237:6
+   ;;@ core/timers/timers.ts:227:6
    (i32.ge_s
     (get_global $core/timers/timers/Timers.timerCounter)
-    ;;@ core/timers/timers.ts:237:29
+    ;;@ core/timers/timers.ts:227:29
     (i32.const 255)
    )
-   ;;@ core/timers/timers.ts:237:34
+   ;;@ core/timers/timers.ts:227:34
    (block
-    ;;@ core/timers/timers.ts:241:4
+    ;;@ core/timers/timers.ts:231:4
     (set_global $core/timers/timers/Timers.timerCounterOverflowDelay
-     ;;@ core/timers/timers.ts:241:39
+     ;;@ core/timers/timers.ts:231:39
      (i32.const 1)
     )
-    ;;@ core/timers/timers.ts:242:4
+    ;;@ core/timers/timers.ts:232:4
     (set_global $core/timers/timers/Timers.timerCounter
-     ;;@ core/timers/timers.ts:242:26
+     ;;@ core/timers/timers.ts:232:26
      (i32.const 0)
     )
    )
@@ -1623,183 +1623,183 @@
  (func $core/timers/timers/Timers.updateTimerControl (; 19 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
-  ;;@ core/timers/timers.ts:111:4
+  ;;@ core/timers/timers.ts:106:4
   (set_local $1
-   ;;@ core/timers/timers.ts:111:35
+   ;;@ core/timers/timers.ts:106:35
    (get_global $core/timers/timers/Timers.timerEnabled)
   )
-  ;;@ core/timers/timers.ts:112:4
+  ;;@ core/timers/timers.ts:107:4
   (set_global $core/timers/timers/Timers.timerEnabled
-   ;;@ core/timers/timers.ts:112:26
+   ;;@ core/timers/timers.ts:107:26
    (call $core/helpers/index/checkBitOnByte
-    ;;@ core/timers/timers.ts:112:41
+    ;;@ core/timers/timers.ts:107:41
     (i32.const 2)
     (get_local $0)
    )
   )
-  ;;@ core/timers/timers.ts:113:4
+  ;;@ core/timers/timers.ts:108:4
   (set_local $2
-   ;;@ core/timers/timers.ts:113:34
+   ;;@ core/timers/timers.ts:108:34
    (i32.and
     (get_local $0)
-    ;;@ core/timers/timers.ts:113:42
+    ;;@ core/timers/timers.ts:108:42
     (i32.const 3)
    )
   )
-  ;;@ core/timers/timers.ts:117:4
+  ;;@ core/timers/timers.ts:112:4
   (if
-   ;;@ core/timers/timers.ts:117:8
+   ;;@ core/timers/timers.ts:112:8
    (i32.eqz
     (get_local $1)
    )
-   ;;@ core/timers/timers.ts:117:26
+   ;;@ core/timers/timers.ts:112:26
    (block
-    ;;@ core/timers/timers.ts:119:6
+    ;;@ core/timers/timers.ts:113:6
     (set_local $0
-     ;;@ core/timers/timers.ts:119:40
+     ;;@ core/timers/timers.ts:113:40
      (call $core/timers/timers/_getTimerCounterMaskBit
-      ;;@ core/timers/timers.ts:119:64
+      ;;@ core/timers/timers.ts:113:64
       (get_global $core/timers/timers/Timers.timerInputClock)
      )
     )
-    ;;@ core/timers/timers.ts:120:6
+    ;;@ core/timers/timers.ts:114:6
     (set_local $1
-     ;;@ core/timers/timers.ts:120:40
+     ;;@ core/timers/timers.ts:114:40
      (call $core/timers/timers/_getTimerCounterMaskBit
       (get_local $2)
      )
     )
-    ;;@ core/timers/timers.ts:123:6
+    ;;@ core/timers/timers.ts:117:6
     (if
-     ;;@ core/timers/timers.ts:123:10
+     ;;@ core/timers/timers.ts:117:10
      (get_global $core/timers/timers/Timers.timerEnabled)
-     ;;@ core/timers/timers.ts:123:31
+     ;;@ core/timers/timers.ts:117:31
      (set_local $0
-      ;;@ core/timers/timers.ts:124:38
+      ;;@ core/timers/timers.ts:118:38
       (call $core/helpers/index/checkBitOnByte
        (get_local $0)
-       ;;@ core/timers/timers.ts:124:77
+       ;;@ core/timers/timers.ts:118:77
        (get_global $core/timers/timers/Timers.dividerRegister)
       )
      )
-     ;;@ core/timers/timers.ts:127:10
+     ;;@ core/timers/timers.ts:121:10
      (if
       (tee_local $0
        (call $core/helpers/index/checkBitOnByte
         (get_local $0)
-        ;;@ core/timers/timers.ts:127:49
+        ;;@ core/timers/timers.ts:121:49
         (get_global $core/timers/timers/Timers.dividerRegister)
        )
       )
       (set_local $0
-       ;;@ core/timers/timers.ts:128:10
+       ;;@ core/timers/timers.ts:121:76
        (call $core/helpers/index/checkBitOnByte
         (get_local $1)
-        ;;@ core/timers/timers.ts:128:49
+        ;;@ core/timers/timers.ts:121:115
         (get_global $core/timers/timers/Timers.dividerRegister)
        )
       )
      )
     )
-    ;;@ core/timers/timers.ts:131:6
+    ;;@ core/timers/timers.ts:124:6
     (if
      (get_local $0)
-     ;;@ core/timers/timers.ts:131:39
+     ;;@ core/timers/timers.ts:124:39
      (call $core/timers/timers/_incrementTimerCounter)
     )
    )
   )
-  ;;@ core/timers/timers.ts:136:4
+  ;;@ core/timers/timers.ts:129:4
   (set_global $core/timers/timers/Timers.timerInputClock
    (get_local $2)
   )
  )
  (func $core/timers/timers/initializeTimers (; 20 ;) (; has Stack IR ;) (type $v)
-  ;;@ core/timers/timers.ts:168:2
+  ;;@ core/timers/timers.ts:161:2
   (set_global $core/timers/timers/Timers.currentCycles
-   ;;@ core/timers/timers.ts:168:25
+   ;;@ core/timers/timers.ts:161:25
    (i32.const 0)
   )
-  ;;@ core/timers/timers.ts:169:2
+  ;;@ core/timers/timers.ts:162:2
   (set_global $core/timers/timers/Timers.dividerRegister
-   ;;@ core/timers/timers.ts:169:27
+   ;;@ core/timers/timers.ts:162:27
+   (i32.const 0)
+  )
+  ;;@ core/timers/timers.ts:163:2
+  (set_global $core/timers/timers/Timers.timerCounter
+   ;;@ core/timers/timers.ts:163:24
+   (i32.const 0)
+  )
+  ;;@ core/timers/timers.ts:164:2
+  (set_global $core/timers/timers/Timers.timerModulo
+   ;;@ core/timers/timers.ts:164:23
+   (i32.const 0)
+  )
+  ;;@ core/timers/timers.ts:165:2
+  (set_global $core/timers/timers/Timers.timerEnabled
+   ;;@ core/timers/timers.ts:165:24
+   (i32.const 0)
+  )
+  ;;@ core/timers/timers.ts:166:2
+  (set_global $core/timers/timers/Timers.timerInputClock
+   ;;@ core/timers/timers.ts:166:27
+   (i32.const 0)
+  )
+  ;;@ core/timers/timers.ts:167:2
+  (set_global $core/timers/timers/Timers.timerCounterOverflowDelay
+   ;;@ core/timers/timers.ts:167:37
+   (i32.const 0)
+  )
+  ;;@ core/timers/timers.ts:168:2
+  (set_global $core/timers/timers/Timers.timerCounterWasReset
+   ;;@ core/timers/timers.ts:168:32
    (i32.const 0)
   )
   ;;@ core/timers/timers.ts:170:2
-  (set_global $core/timers/timers/Timers.timerCounter
-   ;;@ core/timers/timers.ts:170:24
-   (i32.const 0)
-  )
-  ;;@ core/timers/timers.ts:171:2
-  (set_global $core/timers/timers/Timers.timerModulo
-   ;;@ core/timers/timers.ts:171:23
-   (i32.const 0)
-  )
-  ;;@ core/timers/timers.ts:172:2
-  (set_global $core/timers/timers/Timers.timerEnabled
-   ;;@ core/timers/timers.ts:172:24
-   (i32.const 0)
-  )
-  ;;@ core/timers/timers.ts:173:2
-  (set_global $core/timers/timers/Timers.timerInputClock
-   ;;@ core/timers/timers.ts:173:27
-   (i32.const 0)
-  )
-  ;;@ core/timers/timers.ts:174:2
-  (set_global $core/timers/timers/Timers.timerCounterOverflowDelay
-   ;;@ core/timers/timers.ts:174:37
-   (i32.const 0)
-  )
-  ;;@ core/timers/timers.ts:175:2
-  (set_global $core/timers/timers/Timers.timerCounterWasReset
-   ;;@ core/timers/timers.ts:175:32
-   (i32.const 0)
-  )
-  ;;@ core/timers/timers.ts:177:2
   (if
-   ;;@ core/timers/timers.ts:177:6
+   ;;@ core/timers/timers.ts:170:6
    (get_global $core/cpu/cpu/Cpu.GBCEnabled)
-   ;;@ core/timers/timers.ts:177:22
+   ;;@ core/timers/timers.ts:170:22
    (block
-    ;;@ core/timers/timers.ts:178:4
+    ;;@ core/timers/timers.ts:171:4
     (call $core/memory/store/eightBitStoreIntoGBMemory
-     ;;@ core/timers/timers.ts:178:30
+     ;;@ core/timers/timers.ts:171:30
      (i32.const 65284)
-     ;;@ core/timers/timers.ts:178:38
+     ;;@ core/timers/timers.ts:171:38
      (i32.const 47)
     )
-    ;;@ core/timers/timers.ts:179:4
+    ;;@ core/timers/timers.ts:172:4
     (set_global $core/timers/timers/Timers.dividerRegister
-     ;;@ core/timers/timers.ts:179:29
+     ;;@ core/timers/timers.ts:172:29
      (i32.const 7840)
     )
    )
-   ;;@ core/timers/timers.ts:183:9
+   ;;@ core/timers/timers.ts:176:9
    (block
-    ;;@ core/timers/timers.ts:184:4
+    ;;@ core/timers/timers.ts:177:4
     (call $core/memory/store/eightBitStoreIntoGBMemory
-     ;;@ core/timers/timers.ts:184:30
+     ;;@ core/timers/timers.ts:177:30
      (i32.const 65284)
-     ;;@ core/timers/timers.ts:184:38
+     ;;@ core/timers/timers.ts:177:38
      (i32.const 171)
     )
-    ;;@ core/timers/timers.ts:185:4
+    ;;@ core/timers/timers.ts:178:4
     (set_global $core/timers/timers/Timers.dividerRegister
-     ;;@ core/timers/timers.ts:185:29
+     ;;@ core/timers/timers.ts:178:29
      (i32.const 43980)
     )
    )
   )
-  ;;@ core/timers/timers.ts:181:4
+  ;;@ core/timers/timers.ts:174:4
   (call $core/memory/store/eightBitStoreIntoGBMemory
-   ;;@ core/timers/timers.ts:181:30
+   ;;@ core/timers/timers.ts:174:30
    (i32.const 65287)
-   ;;@ core/timers/timers.ts:181:38
+   ;;@ core/timers/timers.ts:174:38
    (i32.const 248)
   )
-  ;;@ core/timers/timers.ts:182:11
+  ;;@ core/timers/timers.ts:175:11
   (call $core/timers/timers/Timers.updateTimerControl
-   ;;@ core/timers/timers.ts:182:30
+   ;;@ core/timers/timers.ts:175:30
    (i32.const 248)
   )
  )
@@ -7845,15 +7845,15 @@
  )
  (func $core/timers/timers/_checkDividerRegisterFallingEdgeDetector (; 116 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
-  ;;@ core/timers/timers.ts:257:6
+  ;;@ core/timers/timers.ts:246:6
   (if
    (tee_local $0
     (call $core/helpers/index/checkBitOnByte
-     ;;@ core/timers/timers.ts:253:2
+     ;;@ core/timers/timers.ts:242:2
      (tee_local $2
-      ;;@ core/timers/timers.ts:253:28
+      ;;@ core/timers/timers.ts:242:28
       (call $core/timers/timers/_getTimerCounterMaskBit
-       ;;@ core/timers/timers.ts:253:52
+       ;;@ core/timers/timers.ts:242:52
        (get_global $core/timers/timers/Timers.timerInputClock)
       )
      )
@@ -7861,9 +7861,9 @@
     )
    )
    (set_local $0
-    ;;@ core/timers/timers.ts:258:4
+    ;;@ core/timers/timers.ts:246:65
     (i32.eqz
-     ;;@ core/timers/timers.ts:258:5
+     ;;@ core/timers/timers.ts:246:66
      (call $core/helpers/index/checkBitOnByte
       (get_local $2)
       (get_local $1)
@@ -7871,7 +7871,7 @@
     )
    )
   )
-  ;;@ core/timers/timers.ts:257:2
+  ;;@ core/timers/timers.ts:246:2
   (if
    (get_local $0)
    (return
@@ -7881,80 +7881,80 @@
   (i32.const 0)
  )
  (func $core/timers/timers/Timers.updateDividerRegister (; 117 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
-  ;;@ core/timers/timers.ts:35:4
+  ;;@ core/timers/timers.ts:34:4
   (set_local $0
-   ;;@ core/timers/timers.ts:35:34
+   ;;@ core/timers/timers.ts:34:34
    (get_global $core/timers/timers/Timers.dividerRegister)
   )
-  ;;@ core/timers/timers.ts:37:4
+  ;;@ core/timers/timers.ts:36:4
   (set_global $core/timers/timers/Timers.dividerRegister
-   ;;@ core/timers/timers.ts:37:29
+   ;;@ core/timers/timers.ts:36:29
    (i32.const 0)
   )
-  ;;@ core/timers/timers.ts:38:4
+  ;;@ core/timers/timers.ts:37:4
   (call $core/memory/store/eightBitStoreIntoGBMemory
    (i32.const 65284)
-   ;;@ core/timers/timers.ts:38:68
+   ;;@ core/timers/timers.ts:37:68
    (i32.const 0)
   )
-  ;;@ core/timers/timers.ts:43:4
+  ;;@ core/timers/timers.ts:42:4
   (if
    (tee_local $0
-    ;;@ core/timers/timers.ts:43:8
+    ;;@ core/timers/timers.ts:42:8
     (if (result i32)
      (get_global $core/timers/timers/Timers.timerEnabled)
-     ;;@ core/timers/timers.ts:43:31
+     ;;@ core/timers/timers.ts:42:31
      (call $core/timers/timers/_checkDividerRegisterFallingEdgeDetector
       (get_local $0)
-      ;;@ core/timers/timers.ts:43:92
+      ;;@ core/timers/timers.ts:42:92
       (get_global $core/timers/timers/Timers.dividerRegister)
      )
      (get_global $core/timers/timers/Timers.timerEnabled)
     )
    )
-   ;;@ core/timers/timers.ts:43:117
+   ;;@ core/timers/timers.ts:42:117
    (call $core/timers/timers/_incrementTimerCounter)
   )
  )
  (func $core/timers/timers/Timers.updateTimerCounter (; 118 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
-  ;;@ core/timers/timers.ts:62:4
+  ;;@ core/timers/timers.ts:60:4
   (if
-   ;;@ core/timers/timers.ts:62:8
+   ;;@ core/timers/timers.ts:60:8
    (get_global $core/timers/timers/Timers.timerCounterOverflowDelay)
-   ;;@ core/timers/timers.ts:62:42
+   ;;@ core/timers/timers.ts:60:42
    (set_global $core/timers/timers/Timers.timerCounterOverflowDelay
-    ;;@ core/timers/timers.ts:63:41
+    ;;@ core/timers/timers.ts:61:41
     (i32.const 0)
    )
   )
-  ;;@ core/timers/timers.ts:67:4
+  ;;@ core/timers/timers.ts:65:4
   (if
-   ;;@ core/timers/timers.ts:67:8
+   ;;@ core/timers/timers.ts:65:8
    (get_global $core/timers/timers/Timers.timerCounterWasReset)
    (return)
   )
-  ;;@ core/timers/timers.ts:71:4
+  ;;@ core/timers/timers.ts:69:4
   (set_global $core/timers/timers/Timers.timerCounter
    (get_local $0)
   )
  )
  (func $core/timers/timers/Timers.updateTimerModulo (; 119 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
-  ;;@ core/timers/timers.ts:85:4
+  ;;@ core/timers/timers.ts:81:4
   (set_global $core/timers/timers/Timers.timerModulo
    (get_local $0)
   )
-  ;;@ core/timers/timers.ts:89:4
+  ;;@ core/timers/timers.ts:85:4
   (if
-   ;;@ core/timers/timers.ts:89:8
+   ;;@ core/timers/timers.ts:85:8
    (if (result i32)
     (get_global $core/timers/timers/Timers.timerEnabled)
-    ;;@ core/timers/timers.ts:89:31
+    ;;@ core/timers/timers.ts:85:31
     (get_global $core/timers/timers/Timers.timerCounterWasReset)
     (get_global $core/timers/timers/Timers.timerEnabled)
    )
-   ;;@ core/timers/timers.ts:89:60
+   ;;@ core/timers/timers.ts:85:60
    (set_global $core/timers/timers/Timers.timerInputClock
-    ;;@ core/timers/timers.ts:90:31
+    ;;@ core/timers/timers.ts:86:31
     (get_global $core/timers/timers/Timers.timerModulo)
    )
   )
@@ -21411,103 +21411,103 @@
  (func $core/timers/timers/updateTimers (; 223 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
-  ;;@ core/timers/timers.ts:201:2
+  ;;@ core/timers/timers.ts:193:2
   (set_local $2
-   ;;@ core/timers/timers.ts:201:32
+   ;;@ core/timers/timers.ts:193:32
    (get_global $core/timers/timers/Timers.dividerRegister)
   )
   (loop $continue|0
    (if
-    ;;@ core/timers/timers.ts:205:9
+    ;;@ core/timers/timers.ts:197:9
     (i32.lt_s
      (get_local $1)
      (get_local $0)
     )
     (block
-     ;;@ core/timers/timers.ts:206:4
+     ;;@ core/timers/timers.ts:198:4
      (set_local $1
       (i32.add
        (get_local $1)
-       ;;@ core/timers/timers.ts:206:23
+       ;;@ core/timers/timers.ts:198:23
        (i32.const 4)
       )
      )
-     ;;@ core/timers/timers.ts:207:4
+     ;;@ core/timers/timers.ts:199:4
      (set_global $core/timers/timers/Timers.dividerRegister
       (i32.add
        (get_global $core/timers/timers/Timers.dividerRegister)
-       ;;@ core/timers/timers.ts:207:30
+       ;;@ core/timers/timers.ts:199:30
        (i32.const 4)
       )
      )
-     ;;@ core/timers/timers.ts:209:4
+     ;;@ core/timers/timers.ts:201:4
      (if
-      ;;@ core/timers/timers.ts:209:8
+      ;;@ core/timers/timers.ts:201:8
       (i32.gt_s
        (get_global $core/timers/timers/Timers.dividerRegister)
-       ;;@ core/timers/timers.ts:209:33
+       ;;@ core/timers/timers.ts:201:33
        (i32.const 65535)
       )
-      ;;@ core/timers/timers.ts:209:41
+      ;;@ core/timers/timers.ts:201:41
       (set_global $core/timers/timers/Timers.dividerRegister
        (i32.sub
-        ;;@ core/timers/timers.ts:210:6
+        ;;@ core/timers/timers.ts:202:6
         (get_global $core/timers/timers/Timers.dividerRegister)
-        ;;@ core/timers/timers.ts:210:32
+        ;;@ core/timers/timers.ts:202:32
         (i32.const 65536)
        )
       )
      )
-     ;;@ core/timers/timers.ts:213:4
+     ;;@ core/timers/timers.ts:205:4
      (if
-      ;;@ core/timers/timers.ts:213:8
+      ;;@ core/timers/timers.ts:205:8
       (get_global $core/timers/timers/Timers.timerEnabled)
-      ;;@ core/timers/timers.ts:213:29
+      ;;@ core/timers/timers.ts:205:29
       (block
-       ;;@ core/timers/timers.ts:215:6
+       ;;@ core/timers/timers.ts:206:6
        (if
-        ;;@ core/timers/timers.ts:215:10
+        ;;@ core/timers/timers.ts:206:10
         (get_global $core/timers/timers/Timers.timerCounterOverflowDelay)
-        ;;@ core/timers/timers.ts:215:44
+        ;;@ core/timers/timers.ts:206:44
         (block
-         ;;@ core/timers/timers.ts:216:8
+         ;;@ core/timers/timers.ts:207:8
          (set_global $core/timers/timers/Timers.timerCounter
-          ;;@ core/timers/timers.ts:216:30
+          ;;@ core/timers/timers.ts:207:30
           (get_global $core/timers/timers/Timers.timerModulo)
          )
-         ;;@ core/timers/timers.ts:218:8
+         ;;@ core/timers/timers.ts:209:8
          (call $core/interrupts/interrupts/requestTimerInterrupt)
-         ;;@ core/timers/timers.ts:219:8
+         ;;@ core/timers/timers.ts:210:8
          (set_global $core/timers/timers/Timers.timerCounterOverflowDelay
-          ;;@ core/timers/timers.ts:219:43
+          ;;@ core/timers/timers.ts:210:43
           (i32.const 0)
          )
-         ;;@ core/timers/timers.ts:220:8
+         ;;@ core/timers/timers.ts:211:8
          (set_global $core/timers/timers/Timers.timerCounterWasReset
-          ;;@ core/timers/timers.ts:220:38
+          ;;@ core/timers/timers.ts:211:38
           (i32.const 1)
          )
         )
-        ;;@ core/timers/timers.ts:221:13
+        ;;@ core/timers/timers.ts:212:13
         (if
-         ;;@ core/timers/timers.ts:221:17
+         ;;@ core/timers/timers.ts:212:17
          (get_global $core/timers/timers/Timers.timerCounterWasReset)
-         ;;@ core/timers/timers.ts:221:46
+         ;;@ core/timers/timers.ts:212:46
          (set_global $core/timers/timers/Timers.timerCounterWasReset
-          ;;@ core/timers/timers.ts:222:38
+          ;;@ core/timers/timers.ts:213:38
           (i32.const 0)
          )
         )
        )
-       ;;@ core/timers/timers.ts:225:6
+       ;;@ core/timers/timers.ts:216:6
        (if
-        ;;@ core/timers/timers.ts:225:10
+        ;;@ core/timers/timers.ts:216:10
         (call $core/timers/timers/_checkDividerRegisterFallingEdgeDetector
          (get_local $2)
-         ;;@ core/timers/timers.ts:225:71
+         ;;@ core/timers/timers.ts:216:71
          (get_global $core/timers/timers/Timers.dividerRegister)
         )
-        ;;@ core/timers/timers.ts:225:96
+        ;;@ core/timers/timers.ts:216:96
         (call $core/timers/timers/_incrementTimerCounter)
        )
       )
@@ -22309,32 +22309,32 @@
   )
  )
  (func $core/timers/timers/Timers.saveState (; 234 ;) (; has Stack IR ;) (type $v)
-  ;;@ core/timers/timers.ts:147:4
+  ;;@ core/timers/timers.ts:140:4
   (i32.store
-   ;;@ core/timers/timers.ts:147:15
+   ;;@ core/timers/timers.ts:140:15
    (call $core/core/getSaveStateMemoryOffset
-    ;;@ core/timers/timers.ts:147:40
+    ;;@ core/timers/timers.ts:140:40
     (i32.const 8)
     (i32.const 5)
    )
-   ;;@ core/timers/timers.ts:147:69
+   ;;@ core/timers/timers.ts:140:69
    (get_global $core/timers/timers/Timers.dividerRegister)
   )
-  ;;@ core/timers/timers.ts:148:4
+  ;;@ core/timers/timers.ts:141:4
   (call $core/memory/store/storeBooleanDirectlyToWasmMemory
-   ;;@ core/timers/timers.ts:148:37
+   ;;@ core/timers/timers.ts:141:37
    (call $core/core/getSaveStateMemoryOffset
-    ;;@ core/timers/timers.ts:148:62
+    ;;@ core/timers/timers.ts:141:62
     (i32.const 11)
     (i32.const 5)
    )
-   ;;@ core/timers/timers.ts:148:91
+   ;;@ core/timers/timers.ts:141:91
    (get_global $core/timers/timers/Timers.timerCounterOverflowDelay)
   )
-  ;;@ core/timers/timers.ts:150:4
+  ;;@ core/timers/timers.ts:143:4
   (call $core/memory/store/eightBitStoreIntoGBMemory
    (i32.const 65285)
-   ;;@ core/timers/timers.ts:150:65
+   ;;@ core/timers/timers.ts:143:65
    (get_global $core/timers/timers/Timers.timerCounter)
   )
  )
@@ -23083,47 +23083,47 @@
   )
  )
  (func $core/timers/timers/Timers.loadState (; 247 ;) (; has Stack IR ;) (type $v)
-  ;;@ core/timers/timers.ts:157:4
+  ;;@ core/timers/timers.ts:150:4
   (set_global $core/timers/timers/Timers.dividerRegister
-   ;;@ core/timers/timers.ts:157:29
+   ;;@ core/timers/timers.ts:150:29
    (i32.load
-    ;;@ core/timers/timers.ts:157:39
+    ;;@ core/timers/timers.ts:150:39
     (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/timers/timers.ts:157:64
+     ;;@ core/timers/timers.ts:150:64
      (i32.const 8)
      (i32.const 5)
     )
    )
   )
-  ;;@ core/timers/timers.ts:158:4
+  ;;@ core/timers/timers.ts:151:4
   (set_global $core/timers/timers/Timers.timerCounterOverflowDelay
-   ;;@ core/timers/timers.ts:158:39
+   ;;@ core/timers/timers.ts:151:39
    (call $core/memory/load/loadBooleanDirectlyFromWasmMemory
-    ;;@ core/timers/timers.ts:158:73
+    ;;@ core/timers/timers.ts:151:73
     (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/timers/timers.ts:158:98
+     ;;@ core/timers/timers.ts:151:98
      (i32.const 11)
      (i32.const 5)
     )
    )
   )
-  ;;@ core/timers/timers.ts:160:11
+  ;;@ core/timers/timers.ts:153:11
   (call $core/timers/timers/Timers.updateTimerCounter
-   ;;@ core/timers/timers.ts:160:30
+   ;;@ core/timers/timers.ts:153:30
    (call $core/memory/load/eightBitLoadFromGBMemory
     (i32.const 65285)
    )
   )
-  ;;@ core/timers/timers.ts:161:11
+  ;;@ core/timers/timers.ts:154:11
   (call $core/timers/timers/Timers.updateTimerModulo
-   ;;@ core/timers/timers.ts:161:29
+   ;;@ core/timers/timers.ts:154:29
    (call $core/memory/load/eightBitLoadFromGBMemory
     (i32.const 65286)
    )
   )
-  ;;@ core/timers/timers.ts:162:11
+  ;;@ core/timers/timers.ts:155:11
   (call $core/timers/timers/Timers.updateTimerControl
-   ;;@ core/timers/timers.ts:162:30
+   ;;@ core/timers/timers.ts:155:30
    (call $core/memory/load/eightBitLoadFromGBMemory
     (i32.const 65287)
    )
