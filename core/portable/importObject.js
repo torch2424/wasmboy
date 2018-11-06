@@ -32,12 +32,12 @@ const wasmImportObject = {
         if (arg5 !== -9999) logString += ` 0x${arg5.toString(16)} `;
 
         // Uncomment to unthrottle
-        //console.log(logString);
+        console.log(logString);
 
         // Comment the lines below to disable throttle
         logRequest[arg0] = true;
         setTimeout(() => {
-          console.log(logString);
+          // console.log(logString);
           logRequest[arg0] = false;
         }, logThrottleLength);
       }

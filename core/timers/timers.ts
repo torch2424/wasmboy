@@ -36,9 +36,6 @@ export class Timers {
     Timers.dividerRegister = 0;
     eightBitStoreIntoGBMemory(Timers.memoryLocationDividerRegister, 0);
 
-    // Also, mooneye tests, resetting DIV resets the timer
-    // Timers.timerCounter = Timers.timerModulo;
-
     if (Timers.timerEnabled && _checkDividerRegisterFallingEdgeDetector(oldDividerRegister, Timers.dividerRegister)) {
       _incrementTimerCounter();
     }
@@ -54,16 +51,18 @@ export class Timers {
   static timerCounterWasReset: boolean = false;
   static timerCounterMask: i32 = 0;
   static updateTimerCounter(value: i32): void {
-    // Mooneye Test, tima_write_reloading
-    // Writing in this strange delay cycle, will cancel
-    // Both the interrupt and the TMA reload
-    if (Timers.timerCounterOverflowDelay) {
-      Timers.timerCounterOverflowDelay = false;
-    }
+    if (Timers.timerEnabled) {
+      // From binjgb, dont write TIMA if we were just reset
+      if (Timers.timerCounterWasReset) {
+        return;
+      }
 
-    // From binjgb, dont write TIMA if we were just reset
-    if (Timers.timerCounterWasReset) {
-      return;
+      // Mooneye Test, tima_write_reloading
+      // Writing in this strange delay cycle, will cancel
+      // Both the interrupt and the TMA reload
+      if (Timers.timerCounterOverflowDelay) {
+        Timers.timerCounterOverflowDelay = false;
+      }
     }
 
     Timers.timerCounter = value;
@@ -83,7 +82,8 @@ export class Timers {
     // Mooneye Test, tma_write_reloading
     // Don't update if we were reloading
     if (Timers.timerEnabled && Timers.timerCounterWasReset) {
-      Timers.timerInputClock = Timers.timerModulo;
+      Timers.timerCounter = Timers.timerModulo;
+      Timers.timerCounterWasReset = false;
     }
   }
 
@@ -223,7 +223,7 @@ export function updateTimers(numberOfCycles: i32): void {
 // This fires off interrupts once we overflow
 function _incrementTimerCounter(): void {
   Timers.timerCounter += 1;
-  if (Timers.timerCounter >= 255) {
+  if (Timers.timerCounter > 255) {
     // Whenever the timer overflows, there is a slight delay (4 cycles)
     // Of when TIMA gets TMA's value, and the interrupt is fired.
     // Thus we will set the delay, which can be handled in the update timer or write trap
