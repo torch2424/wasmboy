@@ -168,17 +168,25 @@ export function initializeTimers(): void {
   Timers.timerCounterWasReset = false;
 
   if (Cpu.GBCEnabled) {
-    eightBitStoreIntoGBMemory(0xff04, 0x2f);
+    // DIV
+    eightBitStoreIntoGBMemory(0xff04, 0x1e);
     Timers.dividerRegister = 0x1ea0;
+
     // 0xFF05 -> 0xFF06 = 0x00
+
+    // TAC
     eightBitStoreIntoGBMemory(0xff07, 0xf8);
-    Timers.updateTimerControl(0xf8);
+    Timers.timerInputClock(0xf8);
   } else {
+    // DIV
     eightBitStoreIntoGBMemory(0xff04, 0xab);
     Timers.dividerRegister = 0xabcc;
+
     // 0xFF05 -> 0xFF06 = 0x00
+
+    // TAC
     eightBitStoreIntoGBMemory(0xff07, 0xf8);
-    Timers.updateTimerControl(0xf8);
+    Timers.timerInputClock(0xf8);
   }
 }
 
