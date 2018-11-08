@@ -325,8 +325,8 @@ function handleOpcode1x(opcode: i32): i32 {
         }
       }
 
-      // NOTE: This breaks Blarggs CPU tests, therefore, need to implement STOP at somepoint to get around this
-      //Cpu.isStopped = true;
+      // NOTE: This breaks Blarggs CPU testsif CGB Stop is not implemented
+      Cpu.isStopped = true;
       Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
       return 4;
     case 0x11:
@@ -1024,9 +1024,9 @@ function handleOpcode5x(opcode: i32): i32 {
       return 4;
     case 0x5e:
       // LD E,(HL)
-      // 1 4
+      // 1 8
       Cpu.registerE = <u8>eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
-      return 4;
+      return 8;
     case 0x5f:
       // LD E,A
       // 1 4
@@ -1040,10 +1040,9 @@ function handleOpcode6x(opcode: i32): i32 {
   switch (opcode) {
     case 0x60:
       // LD H,B
-      // 1 8
-      // NOTE: Thanks to @binji for catching that this should be 8 cycles, not 4
+      // 1 4
       Cpu.registerH = Cpu.registerB;
-      return 8;
+      return 4;
     case 0x61:
       // LD H,C
       // 1 4
