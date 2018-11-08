@@ -318,10 +318,15 @@ export function handleCbOpcode(cbOpcode: i32): i32 {
   // Finally our number of cycles
   // Set if we handled the opcode
   if (handledOpcode) {
-    // Next if register number was 6 (HL), number of cycles is 16
     numberOfCycles = 8;
+
+    // If register number was 6 (HL), number of cycles is larger
     if (registerNumber === 6) {
-      numberOfCycles = 16;
+      if (opcodeHighNibble >= 4 && opcodeHighNibble <= 7) {
+        numberOfCycles = 12;
+      } else {
+        numberOfCycles = 16;
+      }
     }
   }
 

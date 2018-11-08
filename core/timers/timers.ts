@@ -176,7 +176,7 @@ export function initializeTimers(): void {
 
     // TAC
     eightBitStoreIntoGBMemory(0xff07, 0xf8);
-    Timers.timerInputClock(0xf8);
+    Timers.timerInputClock = 0xf8;
   } else {
     // DIV
     eightBitStoreIntoGBMemory(0xff04, 0xab);
@@ -186,7 +186,7 @@ export function initializeTimers(): void {
 
     // TAC
     eightBitStoreIntoGBMemory(0xff07, 0xf8);
-    Timers.timerInputClock(0xf8);
+    Timers.timerInputClock = 0xf8;
   }
 }
 

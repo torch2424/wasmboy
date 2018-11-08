@@ -430,6 +430,5 @@ export function relativeJump(value: u8): void {
   // on JR you need to jump to the relative jump offset,
   // However, if the jump fails (such as conditional), only jump +2 in total
 
-  // TODO: May not need to increment PC Here?
   Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
 }
