@@ -241,6 +241,43 @@ export function executeFrameAndCheckAudio(maxAudioBuffer: i32): i32 {
   return -1;
 }
 
+// Public function to run opcodes until,
+// a breakpoint is reached
+// -1 = error
+// 0 = frame executed
+// 1 = reached breakpoint
+export function executeFrameUntilBreakpoint(breakpoint: i32): i32 {
+  let error: boolean = false;
+  let numberOfCycles: i32 = -1;
+
+  while (!error && Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME() && Cpu.programCounter !== breakpoint) {
+    numberOfCycles = executeStep();
+    if (numberOfCycles < 0) {
+      error = true;
+    }
+  }
+
+  // Find our exit reason
+  if (Cpu.currentCycles >= Cpu.MAX_CYCLES_PER_FRAME()) {
+    // Render a frame
+
+    // Reset our currentCycles
+    Cpu.currentCycles -= Cpu.MAX_CYCLES_PER_FRAME();
+
+    return 0;
+  }
+  if (Cpu.programCounter === breakpoint) {
+    // breakpoint
+    return 1;
+  }
+
+  // TODO: Boot ROM handling
+
+  // There was an error, return -1, and push the program counter back to grab the error opcode
+  Cpu.programCounter = u16Portable(Cpu.programCounter - 1);
+  return -1;
+}
+
 // Function to execute an opcode, and update other gameboy hardware.
 // http://www.codeslinger.co.uk/pages/projects/gameboy/beginning.html
 export function executeStep(): i32 {
@@ -287,15 +324,25 @@ export function executeStep(): i32 {
     return numberOfCycles;
   }
 
+  // Interrupt Handling requires 20 cycles
+  // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
+  // Only check interrupts after an opcode is executed
+  // Since we don't want to mess up our PC as we are executing
+  numberOfCycles += checkInterrupts();
+
+  // Sync other GB Components with the number of cycles
+  syncCycles(numberOfCycles);
+
+  return numberOfCycles;
+}
+
+// Sync other GB Components with the number of cycles
+export function syncCycles(numberOfCycles: i32): void {
   // Check if we did a DMA TRansfer, if we did add the cycles
   if (Memory.DMACycles > 0) {
     numberOfCycles += Memory.DMACycles;
     Memory.DMACycles = 0;
   }
-
-  // Interrupt Handling requires 20 cycles
-  // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
-  numberOfCycles += checkInterrupts();
 
   // Finally, Add our number of cycles to the CPU Cycles
   Cpu.currentCycles += numberOfCycles;
@@ -325,15 +372,13 @@ export function executeStep(): i32 {
   } else {
     updateTimers(numberOfCycles);
   }
-
-  return numberOfCycles;
 }
 
 // Function to return an address to store into save state memory
 // this is to regulate our 20 slots
 // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
 export function getSaveStateMemoryOffset(offset: i32, saveStateSlot: i32): i32 {
-  // 50 byutes per save state memory partiton sli32
+  // 50 bytes per save state memory partiton sli32
   return WASMBOY_STATE_LOCATION + offset + 50 * saveStateSlot;
 }
 

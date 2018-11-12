@@ -14,6 +14,11 @@ import { Cpu } from '../cpu/index';
 import { eightBitLoadFromGBMemory, Memory } from '../memory/index';
 import { checkBitOnByte, hexLog } from '../helpers/index';
 
+// Some Simple internal getters
+export function getLY(): i32 {
+  return Graphics.scanlineRegister;
+}
+
 export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
   // http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html
   // Bit 7 - LCD Display Enable (0=Off, 1=On)

@@ -12,13 +12,8 @@ import {
   testBitOnRegister,
   setBitOnRegister
 } from './instructions';
+import { eightBitLoadSyncCycles, eightBitStoreSyncCycles, sixteenBitLoadSyncCycles, sixteenBitStoreSyncCycles } from './opcodes';
 import { concatenateBytes, performanceTimestamp } from '../helpers/index';
-import {
-  eightBitStoreIntoGBMemoryWithTraps,
-  sixteenBitStoreIntoGBMemoryWithTraps,
-  eightBitLoadFromGBMemoryWithTraps,
-  sixteenBitLoadFromGBMemory
-} from '../memory/index';
 import { u8Portable, u16Portable } from '../portable/portable';
 
 // Handle CB Opcodes
@@ -26,7 +21,7 @@ import { u8Portable, u16Portable } from '../portable/portable';
 // NOTE: Doing some funny stuff to get around not having arrays or objects
 export function handleCbOpcode(cbOpcode: i32): i32 {
   let numberOfCycles: i32 = -1;
-  let handledOpcode = false;
+  let handledOpcode: boolean = false;
 
   // The result of our cb logic instruction
   let instructionRegisterValue: u8 = 0;
@@ -58,7 +53,8 @@ export function handleCbOpcode(cbOpcode: i32): i32 {
       break;
     case 6:
       // Value at register HL
-      instructionRegisterValue = <u8>eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
+      // 4 cycles
+      instructionRegisterValue = <u8>eightBitLoadSyncCycles(concatenateBytes(Cpu.registerH, Cpu.registerL));
       break;
     case 7:
       instructionRegisterValue = Cpu.registerA;
@@ -304,25 +300,25 @@ export function handleCbOpcode(cbOpcode: i32): i32 {
       break;
     case 6:
       // Value at register HL
-      eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL), instructionRegisterResult);
+
+      // Opcodes 0x40 -> 0x7F only do simple
+      // Bit test, and don't need to be stored back in memory
+      // Thus they take 4 less cycles to run
+      if (opcodeHighNibble < 0x04 || opcodeHighNibble > 0x07) {
+        // Store the result back
+        // 4 cycles
+        eightBitStoreSyncCycles(concatenateBytes(Cpu.registerH, Cpu.registerL), instructionRegisterResult);
+      }
       break;
     case 7:
       Cpu.registerA = instructionRegisterResult;
       break;
   }
 
-  // Increase program counter, as all CB codes take two bytes
-  // Program counter will really increase by two since opcodes handles the other
-  Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
-
   // Finally our number of cycles
   // Set if we handled the opcode
   if (handledOpcode) {
-    // Next if register number was 6 (HL), number of cycles is 16
-    numberOfCycles = 8;
-    if (registerNumber === 6) {
-      numberOfCycles = 16;
-    }
+    numberOfCycles = 4;
   }
 
   // Return our number of cycles

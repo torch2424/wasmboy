@@ -113,6 +113,7 @@
     "preact-portal": "^1.1.3",
     "prettier": "^1.12.1",
     "pretty-quick": "^1.6.0",
+    "recursive-readdir-sync": "^1.0.6",
     "rollup": "^0.66.1",
     "rollup-plugin-babel": "^4.0.3",
     "rollup-plugin-bundle-size": "^1.0.2",

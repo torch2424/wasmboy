@@ -135,14 +135,14 @@ export class WasmBoyDebugger extends Component {
         await this.runNumberOfOpcodes(1, breakPoint);
       }
 
-      const programCounter = await WasmBoy._runWasmExport('getProgramCounter');
-      if (programCounter !== breakPoint) {
+      const response = await WasmBoy._runWasmExport('executeFrameUntilBreakpoint', [breakPoint]);
+      if (response === 0) {
         requestAnimationFrame(() => {
-          this.runNumberOfOpcodes(2000 + Math.floor(Math.random() * 10), breakPoint, true).then(() => {
-            this.updateValueTable();
-            this.breakPoint(true);
-          });
+          this.updateValueTable();
+          this.breakPoint(true);
         });
+      } else if (response === -1) {
+        throw new Error('WasmBoy Crashed while trying to reach the breakpoint');
       } else {
         console.log('Reached Breakpoint, that satisfies test inside runNumberOfOpcodes');
         this.updateValueTable();
@@ -193,7 +193,7 @@ export class WasmBoyDebugger extends Component {
       const debugMemory = await WasmBoy._getWasmMemorySection(debugMemoryStart, debugMemoryEnd + 1);
 
       // Update PPI
-      valueTable.ppu['Scanline Register (LY) - 0xFF44'] = debugMemory[0x0044];
+      valueTable.ppu['Scanline Register (LY) - 0xFF44'] = await WasmBoy._runWasmExport('getLY');
       valueTable.ppu['LCD Status (STAT) - 0xFF41'] = debugMemory[0x0041];
       valueTable.ppu['LCD Control (LCDC) - 0xFF40'] = debugMemory[0x0040];
       valueTable.ppu['Scroll X - 0xFF43'] = debugMemory[0x0043];
@@ -202,10 +202,10 @@ export class WasmBoyDebugger extends Component {
       valueTable.ppu['Window Y - 0xFF4A'] = debugMemory[0x004a];
 
       // Update Timers valueTable
-      valueTable.timers['TIMA - 0xFF05'] = debugMemory[0x0005];
-      valueTable.timers['TMA - 0xFF06'] = debugMemory[0x0006];
-      valueTable.timers['TIMC/TAC - 0xFF07'] = debugMemory[0x0007];
-      valueTable.timers['DIV/Divider Register - 0xFF04'] = debugMemory[0x0004];
+      valueTable.timers['TIMA - 0xFF05'] = await WasmBoy._runWasmExport('getTIMA');
+      valueTable.timers['TMA - 0xFF06'] = await WasmBoy._runWasmExport('getTMA');
+      valueTable.timers['TIMC/TAC - 0xFF07'] = await WasmBoy._runWasmExport('getTAC');
+      valueTable.timers['DIV/Divider Register - 0xFF04'] = await WasmBoy._runWasmExport('getDIV');
 
       // Update interrupts valueTable
       // TODO: Interrupot master switch

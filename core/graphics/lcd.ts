@@ -12,7 +12,7 @@ export class Lcd {
   // Also known at STAT
   // LCD Status (0xFF41) bits Explanation
   // 0                0                    000                    0             00
-  //       |Coicedence Interrupt|     |Mode Interrupts|  |coincidence flag|    | Mode |
+  //       |Coicedence Interrupt|     |Mode Interrupts|  |coincidence flag|  | Mode |
   // Modes:
   // 0 or 00: H-Blank
   // 1 or 01: V-Blank

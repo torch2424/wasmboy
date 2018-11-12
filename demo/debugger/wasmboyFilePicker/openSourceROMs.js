@@ -2,7 +2,8 @@
 import { h } from 'preact';
 
 // Import our demo roms
-import blarggsCpuROM from '../../../test/accuracy/testroms/blargg/cpu_instrs.gb';
+import blarggsCpuROM from '../../../test/accuracy/testroms/blargg/cpu_instrs/cpu_instrs.gb';
+import blarggsInstrTimingROM from '../../../test/accuracy/testroms/blargg/instr_timing/instr_timing.gb';
 import tobuTobuGirlROM from '../../../test/performance/testroms/tobutobugirl/tobutobugirl.gb';
 import backToColorDemoROM from '../../../test/performance/testroms/back-to-color/back-to-color.gbc';
 
@@ -21,17 +22,6 @@ export const openSourceROMs = {
       </div>
     )
   },
-  blarggsCpu: {
-    title: "Blargg's CPU Test",
-    url: blarggsCpuROM,
-    image: 'assets/cpu_instrs.golden.png',
-    link: 'http://gbdev.gg8.se/wiki/articles/Test_ROMs',
-    infoElement: (
-      <div>
-        <p>Test ROM for testing CPU instructions. Made by Blargg.</p>
-      </div>
-    )
-  },
   backToColor: {
     title: 'Back to Color',
     url: backToColorDemoROM,
@@ -40,6 +30,28 @@ export const openSourceROMs = {
     infoElement: (
       <div>
         <p>Back to Color, a GBC demo for the GBDev 2014 compo. Made by AntonioND.</p>
+      </div>
+    )
+  },
+  blarggsCpu: {
+    title: "Blargg's CPU Test",
+    url: blarggsCpuROM,
+    image: 'assets/cpu_instrs.golden.png',
+    link: 'http://gbdev.gg8.se/wiki/articles/Test_ROMs',
+    infoElement: (
+      <div>
+        <p>Test ROM for testing CPU instruction's operation. Made by Blargg.</p>
+      </div>
+    )
+  },
+  blarggsInstrTiming: {
+    title: "Blargg's instr_timing Test",
+    url: blarggsInstrTimingROM,
+    image: 'assets/instr_timing.golden.png',
+    link: 'http://gbdev.gg8.se/wiki/articles/Test_ROMs',
+    infoElement: (
+      <div>
+        <p>Test ROM for testing CPU instruction's timing. Made by Blargg.</p>
       </div>
     )
   }

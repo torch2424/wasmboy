@@ -33,6 +33,7 @@
 - [Example Gifs &amp; Screenshots](#example-gifs--screenshots)
 - [Tests](#tests)
   - [Blarrg](#blarrg)
+  - [Mooneye](#mooneye)
 - [Contributing](#contributing)
   - [Installation](#installation)
   - [CLI Commands / Npm Scripts](#cli-commands--npm-scripts)
@@ -88,11 +89,40 @@ Try to test and aim for support on all major browsers (Chrome, Firefox, and Safa
 
 # Tests
 
+These are all currently known passing tests (by me), there may be more test roms out there that pass. Feel free to open an issue or PR to add the tests to this list 😄 . **The test names are listed from left to right, top to bottom**.
+
 ### Blarrg
 
-**cpu_instrs**
+[Repo with all blargg's tests and source](https://github.com/retrio/gb-test-roms)
 
-![Cpu Instructions all tests passing](./test/accuracy/testroms/blargg/cpu_instrs.golden.png)
+cpu_instrs, instr_timing, mem_timing, mem_timing-2
+
+![Cpu Instructions all tests passing](./test/accuracy/testroms/blargg/cpu_instrs/cpu_instrs.golden.png)
+![Instruction timing all tests passing](./test/accuracy/testroms/blargg/instr_timing/instr_timing.golden.png)
+![Memory timing all tests passing](./test/accuracy/testroms/blargg/mem_timing/mem_timing.golden.png)
+![Memory timing 2 all tests passing](./test/accuracy/testroms/blargg/mem_timing-2/mem_timing-2.golden.png)
+
+### Mooneye
+
+[Mooneye GB Emulator / Tests](https://github.com/Gekkio/mooneye-gb)
+
+#### Timing
+
+div_write, rapid_toggle, tim00, tim00_div_trigger, tim01, tim01_div_trigger, tim10, tim10_div_trigger, tim11, tim11_div_trigger, tima_reload, tima_write_reloading, tma_write_reloading
+
+![div write test passing](./test/accuracy/testroms/mooneye/timer/div_write/div_write.golden.png)
+![rapid toggle test passing](./test/accuracy/testroms/mooneye/timer/rapid_toggle/rapid_toggle.golden.png)
+![tim00 test passing](./test/accuracy/testroms/mooneye/timer/tim00/tim00.golden.png)
+![tim00 div trigger test passing](./test/accuracy/testroms/mooneye/timer/tim00_div_trigger/tim00_div_trigger.golden.png)
+![tim01 test passing](./test/accuracy/testroms/mooneye/timer/tim01/tim01.golden.png)
+![tim01 div trigger test passing](./test/accuracy/testroms/mooneye/timer/tim01_div_trigger/tim01_div_trigger.golden.png)
+![tim10 test passing](./test/accuracy/testroms/mooneye/timer/tim10/tim10.golden.png)
+![tim10 div trigger test passing](./test/accuracy/testroms/mooneye/timer/tim10_div_trigger/tim10_div_trigger.golden.png)
+![tim11 test passing](./test/accuracy/testroms/mooneye/timer/tim11/tim11.golden.png)
+![tim11 div trigger test passing](./test/accuracy/testroms/mooneye/timer/tim11_div_trigger/tim11_div_trigger.golden.png)
+![tima reload test passing](./test/accuracy/testroms/mooneye/timer/tima_reload/tima_reload.golden.png)
+![tima write reloading test passing](./test/accuracy/testroms/mooneye/timer/tima_write_reloading/tima_write_reloading.golden.png)
+![tma write reloading test passing](./test/accuracy/testroms/mooneye/timer/tma_write_reloading/tma_write_reloading.golden.png)
 
 # Contributing
 
@@ -178,6 +208,10 @@ Using the [gh-pages](https://www.npmjs.com/package/gh-pages) for debugger/demo d
 - [dcodeIO for building and fixing bugs with AssemblyScript](https://github.com/AssemblyScript/assemblyscript). And for being awesome!
 
 - [r/emudev](https://www.reddit.com/r/EmuDev/), especially to [binjimint](https://www.reddit.com/r/EmuDev/comments/7y2bux/gameboy_gb_graphical_bugs_game_writes_zeroes_into/dudlj3w/) for helping me sooooo much!
+
+- [mooneye GB](https://github.com/Gekkio/mooneye-gb) Thank you Gekkio for all the contributions to the communitty, and all the awesome tests!
+
+- Blargg. Wherever you may be, thank you for all the awesome tests!
 
 # Resources
 

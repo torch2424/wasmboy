@@ -11,12 +11,9 @@ const fs = require('fs');
 const assert = require('assert');
 
 // Some Timeouts for specified test roms
-// Default is 20 seconds, as it runs cpu_instrs in that time
-// on my mid-tier 2015 MBP. and cpu_instrs takes a while :)
-const TEST_ROM_DEFAULT_TIMEOUT = 25000;
-const TEST_ROM_TIMEOUT = {
-  cpu_instrs: 17500
-};
+const TEST_ROM_DEFAULT_TIMEOUT = 7500;
+const TEST_ROM_TIMEOUT = {};
+TEST_ROM_TIMEOUT['cpu_instrs/cpu_instrs.gb'] = 20500;
 
 // Print our version
 console.log(`WasmBoy version: ${WasmBoy.getVersion()}`);
@@ -51,8 +48,8 @@ commonTest.getDirectories(testRomsPath).forEach(directory => {
           this.timeout(7500);
 
           // Get our current test rom timeout
-          if (TEST_ROM_TIMEOUT[testRom.replace('.gb', '')]) {
-            timeToWaitForTestRom = TEST_ROM_TIMEOUT[testRom.replace('.gb', '')];
+          if (TEST_ROM_TIMEOUT[testRom]) {
+            timeToWaitForTestRom = TEST_ROM_TIMEOUT[testRom];
           }
 
           // Read the test rom a a Uint8Array and pass to wasmBoy
@@ -69,7 +66,9 @@ commonTest.getDirectories(testRomsPath).forEach(directory => {
 
           WasmBoy.play();
 
+          console.log(' ');
           console.log(`Running the following test rom: ${directory}/${testRom}`);
+          console.log(`Waiting for this amount of time: ${Math.floor(timeToWaitForTestRom / 1000)}s`);
 
           setTimeout(() => {
             const wasmboyOutputImageTest = async () => {
