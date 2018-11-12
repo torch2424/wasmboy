@@ -141,6 +141,7 @@ export function sixteenBitStoreSyncCycles(gameboyOffset: i32, value: i32): void 
 }
 
 // Functions to access the next operands of a opcode, reffering to them as "dataBytes"
+// TODO: Mooneye rapid_toggle tests, sycing cycles here will black screen :P
 function getDataByteOne(): u8 {
   syncCycles(4);
   return <u8>eightBitLoadFromGBMemory(Cpu.programCounter);
