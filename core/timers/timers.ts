@@ -95,10 +95,10 @@ export class Timers {
   static readonly memoryLocationTimerControl: i32 = 0xff07;
   // Bit 2    - Timer Stop  (0=Stop, 1=Start)
   // Bits 1-0 - Input Clock Select
-  //            00:   4096 Hz    (~4194 Hz SGB)
-  //            01: 262144 Hz  (~268400 Hz SGB)
-  //            10:  65536 Hz   (~67110 Hz SGB)
-  //            11:  16384 Hz   (~16780 Hz SGB)
+  //            00:   4096 Hz    (~4194 Hz SGB) (1024 cycles)
+  //            01: 262144 Hz  (~268400 Hz SGB) (16 cycles)
+  //            10:  65536 Hz   (~67110 Hz SGB) (64 cycles)
+  //            11:  16384 Hz   (~16780 Hz SGB) (256 cycles)
   static timerEnabled: boolean = false;
   static timerInputClock: i32 = 0;
   static updateTimerControl(value: i32): void {

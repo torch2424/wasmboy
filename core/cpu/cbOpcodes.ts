@@ -26,7 +26,7 @@ import { u8Portable, u16Portable } from '../portable/portable';
 // NOTE: Doing some funny stuff to get around not having arrays or objects
 export function handleCbOpcode(cbOpcode: i32): i32 {
   let numberOfCycles: i32 = -1;
-  let handledOpcode = false;
+  let handledOpcode: boolean = false;
 
   // The result of our cb logic instruction
   let instructionRegisterValue: u8 = 0;

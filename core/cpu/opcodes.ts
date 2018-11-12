@@ -25,6 +25,7 @@ import {
   cpARegister,
   relativeJump
 } from './instructions';
+import { syncCycles } from '../core';
 import { Config } from '../config';
 import {
   log,
@@ -1903,9 +1904,14 @@ function handleOpcodeEx(opcode: i32): i32 {
 
       // Store value in high RAM ($FF00 + a8)
       let largeDataByteOne: i32 = getDataByteOne();
+
+      // Sync the first two bytes
+      syncCycles(8);
+
       eightBitStoreIntoGBMemoryWithTraps(0xff00 + largeDataByteOne, Cpu.registerA);
       Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
-      return 12;
+      // return 12;
+      return 4;
     case 0xe1:
       // POP HL
       // 1  12

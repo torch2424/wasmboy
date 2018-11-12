@@ -141,7 +141,8 @@ export function initializeGraphics(): void {
   Graphics.windowY = 0;
 
   if (Cpu.GBCEnabled) {
-    Graphics.scanlineRegister = 0x91;
+    // Bgb says LY is 90 on boot
+    Graphics.scanlineRegister = 0x90;
     eightBitStoreIntoGBMemory(0xff40, 0x91);
     eightBitStoreIntoGBMemory(0xff41, 0x81);
     // 0xFF42 -> 0xFF43 = 0x00
@@ -154,7 +155,7 @@ export function initializeGraphics(): void {
     eightBitStoreIntoGBMemory(0xff4f, 0x00);
     eightBitStoreIntoGBMemory(0xff70, 0x01);
   } else {
-    Graphics.scanlineRegister = 0x91;
+    Graphics.scanlineRegister = 0x90;
     eightBitStoreIntoGBMemory(0xff40, 0x91);
     eightBitStoreIntoGBMemory(0xff41, 0x85);
     // 0xFF42 -> 0xFF45 = 0x00
@@ -174,7 +175,7 @@ export function updateGraphics(numberOfCycles: i32): void {
   if (Lcd.enabled) {
     Graphics.scanlineCycleCounter += numberOfCycles;
 
-    if (Graphics.scanlineCycleCounter >= Graphics.MAX_CYCLES_PER_SCANLINE()) {
+    while (Graphics.scanlineCycleCounter >= Graphics.MAX_CYCLES_PER_SCANLINE()) {
       // Reset the scanlineCycleCounter
       // Don't set to zero to catch extra cycles
       Graphics.scanlineCycleCounter -= Graphics.MAX_CYCLES_PER_SCANLINE();

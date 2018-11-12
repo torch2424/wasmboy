@@ -1,5 +1,14 @@
 // Public Exports
-export { config, executeFrame, executeFrameAndCheckAudio, executeStep, saveState, loadState, hasCoreStarted } from './core';
+export {
+  config,
+  executeFrame,
+  executeFrameAndCheckAudio,
+  executeFrameUntilBreakpoint,
+  executeStep,
+  saveState,
+  loadState,
+  hasCoreStarted
+} from './core';
 export { setJoypadState } from './joypad/joypad';
 export { getNumberOfSamplesInAudioBuffer, clearAudioBuffer } from './sound/sound';
 export {
@@ -53,7 +62,8 @@ export {
   getStackPointer,
   getOpcodeAtProgramCounter
 } from './debug/debug-cpu';
-export { drawBackgroundMapToWasmMemory, drawTileDataToWasmMemory } from './debug/debug-graphics';
+export { getLY, drawBackgroundMapToWasmMemory, drawTileDataToWasmMemory } from './debug/debug-graphics';
+export { getDIV, getTIMA, getTMA, getTAC } from './debug/debug-timer';
 export {
   update,
   emulationStep,

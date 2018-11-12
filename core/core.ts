@@ -241,6 +241,43 @@ export function executeFrameAndCheckAudio(maxAudioBuffer: i32): i32 {
   return -1;
 }
 
+// Public function to run opcodes until,
+// a breakpoint is reached
+// -1 = error
+// 0 = frame executed
+// 1 = reached breakpoint
+export function executeFrameUntilBreakpoint(breakpoint: i32): i32 {
+  let error: boolean = false;
+  let numberOfCycles: i32 = -1;
+
+  while (!error && Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME() && Cpu.programCounter !== breakpoint) {
+    numberOfCycles = executeStep();
+    if (numberOfCycles < 0) {
+      error = true;
+    }
+  }
+
+  // Find our exit reason
+  if (Cpu.currentCycles >= Cpu.MAX_CYCLES_PER_FRAME()) {
+    // Render a frame
+
+    // Reset our currentCycles
+    Cpu.currentCycles -= Cpu.MAX_CYCLES_PER_FRAME();
+
+    return 0;
+  }
+  if (Cpu.programCounter === breakpoint) {
+    // breakpoint
+    return 1;
+  }
+
+  // TODO: Boot ROM handling
+
+  // There was an error, return -1, and push the program counter back to grab the error opcode
+  Cpu.programCounter = u16Portable(Cpu.programCounter - 1);
+  return -1;
+}
+
 // Function to execute an opcode, and update other gameboy hardware.
 // http://www.codeslinger.co.uk/pages/projects/gameboy/beginning.html
 export function executeStep(): i32 {
@@ -287,6 +324,14 @@ export function executeStep(): i32 {
     return numberOfCycles;
   }
 
+  // Sync other GB Components with the number of cycles
+  syncCycles(numberOfCycles);
+
+  return numberOfCycles;
+}
+
+// Sync other GB Components with the number of cycles
+export function syncCycles(numberOfCycles: i32): void {
   // Check if we did a DMA TRansfer, if we did add the cycles
   if (Memory.DMACycles > 0) {
     numberOfCycles += Memory.DMACycles;
@@ -325,8 +370,6 @@ export function executeStep(): i32 {
   } else {
     updateTimers(numberOfCycles);
   }
-
-  return numberOfCycles;
 }
 
 // Function to return an address to store into save state memory
