@@ -106,11 +106,25 @@ cpu_instrs, instr_timing, mem_timing, mem_timing-2
 
 [Mooneye GB Emulator / Tests](https://github.com/Gekkio/mooneye-gb)
 
+#### Timing
+
 **From Left to Right, Top to Bottom:**
 
-div_write
+div_write, rapid_toggle, tim00, tim00_div_trigger, tim01, tim01_div_trigger, tim10, tim10_div_trigger, tim11, tim11_div_trigger, tima_reload, tima_write_reloading, tma_write_reloading
 
 ![div write test passing](./test/accuracy/testroms/mooneye/timer/div_write/div_write.golden.png)
+![rapid toggle test passing](./test/accuracy/testroms/mooneye/timer/rapid_toggle/rapid_toggle.golden.png)
+![tim00 test passing](./test/accuracy/testroms/mooneye/timer/tim00/tim00.golden.png)
+![tim00 div trigger test passing](./test/accuracy/testroms/mooneye/timer/tim00_div_trigger/tim00_div_trigger.golden.png)
+![tim01 test passing](./test/accuracy/testroms/mooneye/timer/tim01/tim01.golden.png)
+![tim01 div trigger test passing](./test/accuracy/testroms/mooneye/timer/tim01_div_trigger/tim01_div_trigger.golden.png)
+![tim10 test passing](./test/accuracy/testroms/mooneye/timer/tim10/tim10.golden.png)
+![tim10 div trigger test passing](./test/accuracy/testroms/mooneye/timer/tim10_div_trigger/tim10_div_trigger.golden.png)
+![tim11 test passing](./test/accuracy/testroms/mooneye/timer/tim11/tim11.golden.png)
+![tim11 div trigger test passing](./test/accuracy/testroms/mooneye/timer/tim11_div_trigger/tim11_div_trigger.golden.png)
+![tima reload test passing](./test/accuracy/testroms/mooneye/timer/tima_reload/tima_reload.golden.png)
+![tima write reloading test passing](./test/accuracy/testroms/mooneye/timer/tima_write_reloading/tima_write_reloading.golden.png)
+![tma write reloading test passing](./test/accuracy/testroms/mooneye/timer/tma_write_reloading/tma_write_reloading.golden.png)
 
 # Contributing
 
