@@ -89,13 +89,11 @@ Try to test and aim for support on all major browsers (Chrome, Firefox, and Safa
 
 # Tests
 
-These are all currently known passing tests (by me), there may be more test roms out there that pass. Feel free to open an issue or PR to add the tests to this list 😄
+These are all currently known passing tests (by me), there may be more test roms out there that pass. Feel free to open an issue or PR to add the tests to this list 😄 . **The test names are listed from left to right, top to bottom**.
 
 ### Blarrg
 
 [Repo with all blargg's tests and source](https://github.com/retrio/gb-test-roms)
-
-**From Left to Right, Top to Bottom:**
 
 cpu_instrs, instr_timing, mem_timing, mem_timing-2
 
@@ -109,8 +107,6 @@ cpu_instrs, instr_timing, mem_timing, mem_timing-2
 [Mooneye GB Emulator / Tests](https://github.com/Gekkio/mooneye-gb)
 
 #### Timing
-
-**From Left to Right, Top to Bottom:**
 
 div_write, rapid_toggle, tim00, tim00_div_trigger, tim01, tim01_div_trigger, tim10, tim10_div_trigger, tim11, tim11_div_trigger, tima_reload, tima_write_reloading, tma_write_reloading
 
