@@ -324,6 +324,12 @@ export function executeStep(): i32 {
     return numberOfCycles;
   }
 
+  // Interrupt Handling requires 20 cycles
+  // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
+  // Only check interrupts after an opcode is executed
+  // Since we don't want to mess up our PC as we are executing
+  numberOfCycles += checkInterrupts();
+
   // Sync other GB Components with the number of cycles
   syncCycles(numberOfCycles);
 
@@ -337,10 +343,6 @@ export function syncCycles(numberOfCycles: i32): void {
     numberOfCycles += Memory.DMACycles;
     Memory.DMACycles = 0;
   }
-
-  // Interrupt Handling requires 20 cycles
-  // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
-  numberOfCycles += checkInterrupts();
 
   // Finally, Add our number of cycles to the CPU Cycles
   Cpu.currentCycles += numberOfCycles;
