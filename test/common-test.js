@@ -7,6 +7,7 @@ const PNGImage = require('pngjs-image');
 // File management
 const fs = require('fs');
 const path = require('path');
+const recursive = require('recursive-readdir-sync');
 
 // Define some constants
 const GAMEBOY_CAMERA_WIDTH = 160;
@@ -94,11 +95,15 @@ const getDirectories = source =>
 
 const getAllRomsInDirectory = directory => {
   // Get all test roms for the directory
-  const files = fs.readdirSync(directory);
-  const testRoms = files.filter(function(file) {
-    const fileExt = path.extname(file).toLowerCase();
-    return fileExt === '.gb' || fileExt === '.gbc';
-  });
+  const files = recursive(directory);
+  const testRoms = files
+    .filter(function(file) {
+      const fileExt = path.extname(file).toLowerCase();
+      return fileExt === '.gb' || fileExt === '.gbc';
+    })
+    .map(file => {
+      return file.replace(directory + '/', '');
+    });
 
   return testRoms;
 };

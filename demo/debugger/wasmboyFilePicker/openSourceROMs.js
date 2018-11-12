@@ -2,7 +2,7 @@
 import { h } from 'preact';
 
 // Import our demo roms
-import blarggsCpuROM from '../../../test/accuracy/testroms/blargg/cpu_instrs.gb';
+import blarggsCpuROM from '../../../test/accuracy/testroms/blargg/cpu_instrs/cpu_instrs.gb';
 import tobuTobuGirlROM from '../../../test/performance/testroms/tobutobugirl/tobutobugirl.gb';
 import backToColorDemoROM from '../../../test/performance/testroms/back-to-color/back-to-color.gbc';
 
@@ -42,20 +42,6 @@ export const openSourceROMs = {
         <p>Test ROM for testing CPU instructions. Made by Blargg.</p>
       </div>
     )
-  },
-  moonTiming01: {
-    title: 'moon Timing tim01',
-    url: 'assets/tim01.gb',
-    image: 'assets/icon.png',
-    link: 'http://gbdev.gg8.se/wiki/articles/Test_ROMs',
-    infoElement: <div />
-  },
-  blarggTiming: {
-    title: "Blargg's Timing",
-    url: 'assets/instr_timing.gb',
-    image: 'assets/icon.png',
-    link: 'http://gbdev.gg8.se/wiki/articles/Test_ROMs',
-    infoElement: <div />
   }
 };
 
