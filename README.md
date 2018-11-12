@@ -89,6 +89,8 @@ Try to test and aim for support on all major browsers (Chrome, Firefox, and Safa
 
 # Tests
 
+These are all currently known passing tests (by me), there may be more test roms out there that pass. Feel free to open an issue or PR to add the tests to this list 😄
+
 ### Blarrg
 
 [Repo with all blargg's tests and source](https://github.com/retrio/gb-test-roms)
