@@ -17,6 +17,7 @@ export function eightBitLoadFromGBMemoryWithTraps(offset: i32): i32 {
   }
 }
 
+// TODO: Rename this to sixteenBitLoadFromGBMemoryWithTraps
 export function sixteenBitLoadFromGBMemory(offset: i32): i32 {
   // Get our low byte
   let lowByte: i32 = 0;
