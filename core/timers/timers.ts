@@ -135,24 +135,24 @@ export class Timers {
   // Function to save the state of the class
   // TODO: Save state for new properties on Timers
   static saveState(): void {
-    // store<i32>(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot), Timers.cycleCounter);
-    // store<i32>(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot), Timers.currentMaxCycleCount);
-    store<i32>(getSaveStateMemoryOffset(0x08, Timers.saveStateSlot), Timers.dividerRegister);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0b, Timers.saveStateSlot), Timers.timerCounterOverflowDelay);
+    store<i32>(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot), Timers.currentCycles);
+    store<i32>(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot), Timers.dividerRegister);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x08, Timers.saveStateSlot), Timers.timerCounterOverflowDelay);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0b, Timers.saveStateSlot), Timers.timerCounterWasReset);
 
     eightBitStoreIntoGBMemory(Timers.memoryLocationTimerCounter, Timers.timerCounter);
   }
 
   // Function to load the save state from memory
   static loadState(): void {
-    // Timers.cycleCounter = load<i32>(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot));
-    // Timers.currentMaxCycleCount = load<i32>(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot));
-    Timers.dividerRegister = load<i32>(getSaveStateMemoryOffset(0x08, Timers.saveStateSlot));
-    Timers.timerCounterOverflowDelay = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0b, Timers.saveStateSlot));
+    Timers.currentCycles = load<i32>(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot));
+    Timers.dividerRegister = load<i32>(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot));
+    Timers.timerCounterOverflowDelay = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x08, Timers.saveStateSlot));
+    Timers.timerCounterWasReset = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0b, Timers.saveStateSlot));
 
-    Timers.updateTimerCounter(eightBitLoadFromGBMemory(Timers.memoryLocationTimerCounter));
-    Timers.updateTimerModulo(eightBitLoadFromGBMemory(Timers.memoryLocationTimerModulo));
-    Timers.updateTimerControl(eightBitLoadFromGBMemory(Timers.memoryLocationTimerControl));
+    Timers.timerCounter = eightBitLoadFromGBMemory(Timers.memoryLocationTimerCounter);
+    Timers.timerModulo = eightBitLoadFromGBMemory(Timers.memoryLocationTimerModulo);
+    Timers.timerInputClock = eightBitLoadFromGBMemory(Timers.memoryLocationTimerControl);
   }
 }
 

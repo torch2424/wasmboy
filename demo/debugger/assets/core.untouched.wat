@@ -22325,16 +22325,38 @@
   )
  )
  (func $core/timers/timers/Timers.saveState (; 241 ;) (; has Stack IR ;) (type $v)
-  ;;@ core/timers/timers.ts:140:4
+  ;;@ core/timers/timers.ts:138:4
   (i32.store
-   ;;@ core/timers/timers.ts:140:15
+   ;;@ core/timers/timers.ts:138:15
    (call $core/core/getSaveStateMemoryOffset
-    ;;@ core/timers/timers.ts:140:40
+    ;;@ core/timers/timers.ts:138:40
+    (i32.const 0)
+    (i32.const 5)
+   )
+   ;;@ core/timers/timers.ts:138:69
+   (get_global $core/timers/timers/Timers.currentCycles)
+  )
+  ;;@ core/timers/timers.ts:139:4
+  (i32.store
+   ;;@ core/timers/timers.ts:139:15
+   (call $core/core/getSaveStateMemoryOffset
+    ;;@ core/timers/timers.ts:139:40
+    (i32.const 4)
+    (i32.const 5)
+   )
+   ;;@ core/timers/timers.ts:139:69
+   (get_global $core/timers/timers/Timers.dividerRegister)
+  )
+  ;;@ core/timers/timers.ts:140:4
+  (call $core/memory/store/storeBooleanDirectlyToWasmMemory
+   ;;@ core/timers/timers.ts:140:37
+   (call $core/core/getSaveStateMemoryOffset
+    ;;@ core/timers/timers.ts:140:62
     (i32.const 8)
     (i32.const 5)
    )
-   ;;@ core/timers/timers.ts:140:69
-   (get_global $core/timers/timers/Timers.dividerRegister)
+   ;;@ core/timers/timers.ts:140:91
+   (get_global $core/timers/timers/Timers.timerCounterOverflowDelay)
   )
   ;;@ core/timers/timers.ts:141:4
   (call $core/memory/store/storeBooleanDirectlyToWasmMemory
@@ -22345,7 +22367,7 @@
     (i32.const 5)
    )
    ;;@ core/timers/timers.ts:141:91
-   (get_global $core/timers/timers/Timers.timerCounterOverflowDelay)
+   (get_global $core/timers/timers/Timers.timerCounterWasReset)
   )
   ;;@ core/timers/timers.ts:143:4
   (call $core/memory/store/eightBitStoreIntoGBMemory
@@ -23099,47 +23121,71 @@
   )
  )
  (func $core/timers/timers/Timers.loadState (; 254 ;) (; has Stack IR ;) (type $v)
-  ;;@ core/timers/timers.ts:150:4
-  (set_global $core/timers/timers/Timers.dividerRegister
-   ;;@ core/timers/timers.ts:150:29
+  ;;@ core/timers/timers.ts:148:4
+  (set_global $core/timers/timers/Timers.currentCycles
+   ;;@ core/timers/timers.ts:148:27
    (i32.load
-    ;;@ core/timers/timers.ts:150:39
+    ;;@ core/timers/timers.ts:148:37
     (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/timers/timers.ts:150:64
+     ;;@ core/timers/timers.ts:148:62
+     (i32.const 0)
+     (i32.const 5)
+    )
+   )
+  )
+  ;;@ core/timers/timers.ts:149:4
+  (set_global $core/timers/timers/Timers.dividerRegister
+   ;;@ core/timers/timers.ts:149:29
+   (i32.load
+    ;;@ core/timers/timers.ts:149:39
+    (call $core/core/getSaveStateMemoryOffset
+     ;;@ core/timers/timers.ts:149:64
+     (i32.const 4)
+     (i32.const 5)
+    )
+   )
+  )
+  ;;@ core/timers/timers.ts:150:4
+  (set_global $core/timers/timers/Timers.timerCounterOverflowDelay
+   ;;@ core/timers/timers.ts:150:39
+   (call $core/memory/load/loadBooleanDirectlyFromWasmMemory
+    ;;@ core/timers/timers.ts:150:73
+    (call $core/core/getSaveStateMemoryOffset
+     ;;@ core/timers/timers.ts:150:98
      (i32.const 8)
      (i32.const 5)
     )
    )
   )
   ;;@ core/timers/timers.ts:151:4
-  (set_global $core/timers/timers/Timers.timerCounterOverflowDelay
-   ;;@ core/timers/timers.ts:151:39
+  (set_global $core/timers/timers/Timers.timerCounterWasReset
+   ;;@ core/timers/timers.ts:151:34
    (call $core/memory/load/loadBooleanDirectlyFromWasmMemory
-    ;;@ core/timers/timers.ts:151:73
+    ;;@ core/timers/timers.ts:151:68
     (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/timers/timers.ts:151:98
+     ;;@ core/timers/timers.ts:151:93
      (i32.const 11)
      (i32.const 5)
     )
    )
   )
-  ;;@ core/timers/timers.ts:153:11
-  (call $core/timers/timers/Timers.updateTimerCounter
-   ;;@ core/timers/timers.ts:153:30
+  ;;@ core/timers/timers.ts:153:4
+  (set_global $core/timers/timers/Timers.timerCounter
+   ;;@ core/timers/timers.ts:153:26
    (call $core/memory/load/eightBitLoadFromGBMemory
     (i32.const 65285)
    )
   )
-  ;;@ core/timers/timers.ts:154:11
-  (call $core/timers/timers/Timers.updateTimerModulo
-   ;;@ core/timers/timers.ts:154:29
+  ;;@ core/timers/timers.ts:154:4
+  (set_global $core/timers/timers/Timers.timerModulo
+   ;;@ core/timers/timers.ts:154:25
    (call $core/memory/load/eightBitLoadFromGBMemory
     (i32.const 65286)
    )
   )
-  ;;@ core/timers/timers.ts:155:11
-  (call $core/timers/timers/Timers.updateTimerControl
-   ;;@ core/timers/timers.ts:155:30
+  ;;@ core/timers/timers.ts:155:4
+  (set_global $core/timers/timers/Timers.timerInputClock
+   ;;@ core/timers/timers.ts:155:29
    (call $core/memory/load/eightBitLoadFromGBMemory
     (i32.const 65287)
    )
