@@ -194,7 +194,10 @@ export function initializeTimers(): void {
 // Only checked on writes
 // Function to batch process our Timers after we skipped so many cycles
 export function batchProcessTimers(): void {
-  // TODO:
+  // TODO: Did a timer rewrite, make a proper batch processing
+  // For timers
+  updateTimers(Timers.currentCycles);
+  Timers.currentCycles = 0;
 }
 
 export function updateTimers(numberOfCycles: i32): void {
