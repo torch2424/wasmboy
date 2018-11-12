@@ -94,19 +94,12 @@ Try to test and aim for support on all major browsers (Chrome, Firefox, and Safa
 [Repo with all blargg's tests and source](https://github.com/retrio/gb-test-roms)
 
 **cpu_instrs**
-
 ![Cpu Instructions all tests passing](./test/accuracy/testroms/blargg/cpu_instrs/cpu_instrs.golden.png)
-
 **instr_timing**
-
 ![Instruction timing all tests passing](./test/accuracy/testroms/blargg/instr_timing/instr_timing.golden.png)
-
 **mem_timing**
-
 ![Memory timing all tests passing](./test/accuracy/testroms/blargg/mem_timing/mem_timing.golden.png)
-
 **mem_timing-2**
-
 ![Memory timing 2 all tests passing](./test/accuracy/testroms/blargg/mem_timing-2/mem_timing-2.golden.png)
 
 ### Mooneye
