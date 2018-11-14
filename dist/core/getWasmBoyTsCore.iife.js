@@ -2743,93 +2743,138 @@ var WasmBoyTsCore = (function () {
     };
 
     Timers.updateDividerRegister = function (value) {
+      var oldDividerRegister = Timers.dividerRegister;
       Timers.dividerRegister = 0;
-      eightBitStoreIntoGBMemory(Timers.memoryLocationDividerRegister, 0); // Also, mooneye tests, resetting DIV resets the timer
+      eightBitStoreIntoGBMemory(Timers.memoryLocationDividerRegister, 0);
 
-      Timers.cycleCounter = 0;
-      Timers.timerCounter = Timers.timerModulo;
+      if (Timers.timerEnabled && _checkDividerRegisterFallingEdgeDetector(oldDividerRegister, Timers.dividerRegister)) {
+        _incrementTimerCounter();
+      }
     };
 
     Timers.updateTimerCounter = function (value) {
+      if (Timers.timerEnabled) {
+        // From binjgb, dont write TIMA if we were just reset
+        if (Timers.timerCounterWasReset) {
+          return;
+        } // Mooneye Test, tima_write_reloading
+        // Writing in this strange delay cycle, will cancel
+        // Both the interrupt and the TMA reload
+
+
+        if (Timers.timerCounterOverflowDelay) {
+          Timers.timerCounterOverflowDelay = false;
+        }
+      }
+
       Timers.timerCounter = value;
     };
 
     Timers.updateTimerModulo = function (value) {
-      Timers.timerModulo = value;
+      Timers.timerModulo = value; // Mooneye Test, tma_write_reloading
+      // Don't update if we were reloading
+
+      if (Timers.timerEnabled && Timers.timerCounterWasReset) {
+        Timers.timerCounter = Timers.timerModulo;
+        Timers.timerCounterWasReset = false;
+      }
     };
 
     Timers.updateTimerControl = function (value) {
+      // Get some initial values
+      var oldTimerEnabled = Timers.timerEnabled;
       Timers.timerEnabled = checkBitOnByte(2, value);
+      var newTimerInputClock = value & 0x03; // Do some obscure behavior for if we should increment TIMA
+      // This does the timer increments from rapid_toggle mooneye tests
 
-      if (!Timers.timerEnabled) {
-        return;
+      if (!oldTimerEnabled) {
+        var oldTimerCounterMaskBit = _getTimerCounterMaskBit(Timers.timerInputClock);
+
+        var newTimerCounterMaskBit = _getTimerCounterMaskBit(newTimerInputClock);
+
+        var shouldIncrementTimerCounter = false;
+
+        if (Timers.timerEnabled) {
+          shouldIncrementTimerCounter = checkBitOnByte(oldTimerCounterMaskBit, Timers.dividerRegister);
+        } else {
+          shouldIncrementTimerCounter = checkBitOnByte(oldTimerCounterMaskBit, Timers.dividerRegister) && checkBitOnByte(newTimerCounterMaskBit, Timers.dividerRegister);
+        }
+
+        if (shouldIncrementTimerCounter) {
+          _incrementTimerCounter();
+        }
       }
 
-      Timers.timerInputClock = value & 0x03; // Set our new current max, and reset the cycle counter
-
-      Timers.cycleCounter = 0;
-      Timers.currentMaxCycleCount = getFrequencyFromInputClockSelect();
-    };
-
-    Timers.dividerRegisterMaxCycleCount = function () {
-      return 256;
+      Timers.timerInputClock = newTimerInputClock;
     }; // Function to save the state of the class
     // TODO: Save state for new properties on Timers
 
 
     Timers.saveState = function () {
-      store(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot), Timers.cycleCounter);
-      store(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot), Timers.currentMaxCycleCount);
-      store(getSaveStateMemoryOffset(0x08, Timers.saveStateSlot), Timers.dividerRegisterCycleCounter);
-      eightBitStoreIntoGBMemory(Timers.memoryLocationDividerRegister, Timers.dividerRegister);
+      store(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot), Timers.currentCycles);
+      store(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot), Timers.dividerRegister);
+      storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x08, Timers.saveStateSlot), Timers.timerCounterOverflowDelay);
+      storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0b, Timers.saveStateSlot), Timers.timerCounterWasReset);
       eightBitStoreIntoGBMemory(Timers.memoryLocationTimerCounter, Timers.timerCounter);
     }; // Function to load the save state from memory
 
 
     Timers.loadState = function () {
-      Timers.cycleCounter = load(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot));
-      Timers.currentMaxCycleCount = load(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot));
-      Timers.dividerRegisterCycleCounter = load(getSaveStateMemoryOffset(0x08, Timers.saveStateSlot));
-      Timers.dividerRegister = eightBitLoadFromGBMemory(Timers.memoryLocationDividerRegister);
-      Timers.updateTimerCounter(eightBitLoadFromGBMemory(Timers.memoryLocationTimerCounter));
-      Timers.updateTimerModulo(eightBitLoadFromGBMemory(Timers.memoryLocationTimerModulo));
-      Timers.updateTimerControl(eightBitLoadFromGBMemory(Timers.memoryLocationTimerControl));
+      Timers.currentCycles = load(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot));
+      Timers.dividerRegister = load(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot));
+      Timers.timerCounterOverflowDelay = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x08, Timers.saveStateSlot));
+      Timers.timerCounterWasReset = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0b, Timers.saveStateSlot));
+      Timers.timerCounter = eightBitLoadFromGBMemory(Timers.memoryLocationTimerCounter);
+      Timers.timerModulo = eightBitLoadFromGBMemory(Timers.memoryLocationTimerModulo);
+      Timers.timerInputClock = eightBitLoadFromGBMemory(Timers.memoryLocationTimerControl);
     }; // Current cycles
     // This will be used for batch processing
 
 
-    Timers.currentCycles = 0;
+    Timers.currentCycles = 0; // Divider Register = DIV
+    // Divider Register is 16 bits.
+    // Divider Register when read is just the upper 8 bits
+    // But internally is used as the full 16
+    // Essentially dividerRegister is an always counting clock
+    // DIV Drives everything, it is the heart of the timer.
+    // All other timing registers base them selves relative to the DIV register
+    // Think of the div register as like a cycle counter :)
+    // DIV will increment TIMA, whenever there is a falling edge, see below for that.
+
     Timers.memoryLocationDividerRegister = 0xff04; // DIV
 
-    Timers.dividerRegister = 0;
-    Timers.memoryLocationTimerCounter = 0xff05; // TIMA
+    Timers.dividerRegister = 0; // timerCounter = TIMA
+    // TIMA is the actual counter.
+    // Whenever the DIV gets the falling edge, and other obscure cases,
+    // This is incremented. When this overflows, we need to fire an interrupt.
 
+    Timers.memoryLocationTimerCounter = 0xff05;
     Timers.timerCounter = 0;
-    Timers.memoryLocationTimerModulo = 0xff06; // TMA
+    Timers.timerCounterOverflowDelay = false;
+    Timers.timerCounterWasReset = false;
+    Timers.timerCounterMask = 0; // Timer Modulo = TMA
+    // TMA is what TIMA (Notice the I :p) is counting from, and TIMA will load
+    // Whenever TIMA overflow.
+    // For instance, we count like 1,2,3,4,5,6,7,8,9, and then overflow to 10.
+    // TMA would be like "Hey, start counting from 5 whenever we reset"
+    // Then we would be like 5,6,7,8,9...5,6,7,8,9...etc...
 
-    Timers.timerModulo = 0;
-    Timers.memoryLocationTimerControl = 0xff07; // TAC
-    // Bit 2    - Timer Stop  (0=Stop, 1=Start)
+    Timers.memoryLocationTimerModulo = 0xff06;
+    Timers.timerModulo = 0; // Timer Control = TAC
+    // TAC Says how fast we are counting.
+    // TAC controls which bit we are watching for the falling edge on the DIV register
+    // And whenever the bit has the falling edge, we increment TIMA (The thing counting).
+    // Therefore, depending on the value, we will either count faster or slower.
+
+    Timers.memoryLocationTimerControl = 0xff07; // Bit 2    - Timer Stop  (0=Stop, 1=Start)
     // Bits 1-0 - Input Clock Select
-    //            00:   4096 Hz    (~4194 Hz SGB)
-    //            01: 262144 Hz  (~268400 Hz SGB)
-    //            10:  65536 Hz   (~67110 Hz SGB)
-    //            11:  16384 Hz   (~16780 Hz SGB)
+    //            00:   4096 Hz    (~4194 Hz SGB) (1024 cycles)
+    //            01: 262144 Hz  (~268400 Hz SGB) (16 cycles)
+    //            10:  65536 Hz   (~67110 Hz SGB) (64 cycles)
+    //            11:  16384 Hz   (~16780 Hz SGB) (256 cycles)
 
     Timers.timerEnabled = false;
-    Timers.timerInputClock = 0; // Cycle counter. This is used to determine if we should increment the REAL timer
-    // I know this is weird, but it's all to make sure the emulation is in sync :p
-
-    Timers.cycleCounter = 0x00;
-    Timers.currentMaxCycleCount = 256; // Another timer, that doesn't fire intterupts, but jsut counts to 255, and back to zero :p
-    // In Cgb mode, this still counts at the same rate since the CPU doubles and so does this counter
-    // RealBoy Blog Post:
-    // we also know that we have to increment the DIV register 16384 times per second.
-    // Recall that the CPU frequency is 4194304 Hz, which means that every second the CPU produces 4194304 cycles.
-    // We want to know the amount of cycles required for the DIV register to be incremented;
-    // we get that 4194304/16384=256 CPU cycles are required before incrementing the DIV register.
-
-    Timers.dividerRegisterCycleCounter = 0x00; // Save States
+    Timers.timerInputClock = 0; // Save States
 
     Timers.saveStateSlot = 5;
     return Timers;
@@ -2843,21 +2888,25 @@ var WasmBoyTsCore = (function () {
     Timers.timerModulo = 0;
     Timers.timerEnabled = false;
     Timers.timerInputClock = 0;
-    Timers.cycleCounter = 0;
-    Timers.dividerRegisterCycleCounter = 0;
+    Timers.timerCounterOverflowDelay = false;
+    Timers.timerCounterWasReset = false;
 
     if (Cpu.GBCEnabled) {
-      eightBitStoreIntoGBMemory(0xff04, 0x2f);
-      Timers.dividerRegister = 0x2f; // 0xFF05 -> 0xFF06 = 0x00
+      // DIV
+      eightBitStoreIntoGBMemory(0xff04, 0x1e);
+      Timers.dividerRegister = 0x1ea0; // 0xFF05 -> 0xFF06 = 0x00
+      // TAC
 
       eightBitStoreIntoGBMemory(0xff07, 0xf8);
-      Timers.updateTimerControl(0xf8);
+      Timers.timerInputClock = 0xf8;
     } else {
+      // DIV
       eightBitStoreIntoGBMemory(0xff04, 0xab);
-      Timers.dividerRegister = 0xab; // 0xFF05 -> 0xFF06 = 0x00
+      Timers.dividerRegister = 0xabcc; // 0xFF05 -> 0xFF06 = 0x00
+      // TAC
 
       eightBitStoreIntoGBMemory(0xff07, 0xf8);
-      Timers.updateTimerControl(0xf8);
+      Timers.timerInputClock = 0xf8;
     }
   } // Batch Process Timers
   // Only checked on writes
@@ -2865,114 +2914,93 @@ var WasmBoyTsCore = (function () {
 
 
   function batchProcessTimers() {
-    // Get our current batch process cycles
-    // This will depend on the least amount of cycles we need to update
-    // Something
-    var batchProcessCycles = Timers.batchProcessCycles();
-
-    if (Timers.timerEnabled && Timers.currentMaxCycleCount < batchProcessCycles) {
-      batchProcessCycles = Timers.currentMaxCycleCount;
-    }
-
-    if (Timers.currentCycles < batchProcessCycles) {
-      return;
-    }
-
-    while (Timers.currentCycles >= batchProcessCycles) {
-      updateTimers(batchProcessCycles);
-      Timers.currentCycles = Timers.currentCycles - batchProcessCycles;
-    }
+    // TODO: Did a timer rewrite, make a proper batch processing
+    // For timers
+    updateTimers(Timers.currentCycles);
+    Timers.currentCycles = 0;
   }
 
   function updateTimers(numberOfCycles) {
-    _checkDividerRegister(numberOfCycles);
+    // Want to increment 4 cycles at a time like an actual GB would
+    var cyclesIncreased = 0;
 
-    if (!Timers.timerEnabled) {
-      return;
-    } // Add our cycles our cycle counter
+    while (cyclesIncreased < numberOfCycles) {
+      var oldDividerRegister = Timers.dividerRegister;
+      cyclesIncreased += 4;
+      Timers.dividerRegister += 4;
 
-
-    Timers.cycleCounter += numberOfCycles;
-
-    while (Timers.cycleCounter >= Timers.currentMaxCycleCount) {
-      // Reset our cycle counters
-      // Not setting to zero as we do not want to drop cycles
-      Timers.cycleCounter -= Timers.currentMaxCycleCount;
-
-      if (Timers.timerCounter >= 255) {
-        // Store Timer Modulator inside of TIMA
-        Timers.timerCounter = Timers.timerModulo; // Fire off timer interrupt
-
-        requestTimerInterrupt();
-      } else {
-        Timers.timerCounter += 1;
+      if (Timers.dividerRegister > 0xffff) {
+        Timers.dividerRegister -= 0x10000;
       }
-    }
-  } // Function to update our divider register
 
+      if (Timers.timerEnabled) {
+        if (Timers.timerCounterOverflowDelay) {
+          Timers.timerCounter = Timers.timerModulo; // Fire off timer interrupt
 
-  function _checkDividerRegister(numberOfCycles) {
-    // Every 256 clock cycles need to increment
-    Timers.dividerRegisterCycleCounter += numberOfCycles;
-
-    if (Timers.dividerRegisterCycleCounter >= Timers.dividerRegisterMaxCycleCount()) {
-      // Reset the cycle counter
-      // - 255 to catch any overflow with the cycles
-      Timers.dividerRegisterCycleCounter -= Timers.dividerRegisterMaxCycleCount();
-      Timers.dividerRegister += 1;
-
-      if (Timers.dividerRegister > 0xff) {
-        Timers.dividerRegister = 0;
-      }
-    }
-  } // Function to get a cycle count from a passed Timer clock
-
-
-  function getFrequencyFromInputClockSelect() {
-    // Returns value equivalent to
-    // Cpu.CLOCK_SPEED / timc frequency
-    // TIMC -> 16382
-    // Default to 0x03
-    var cycleCount = 256;
-
-    if (Cpu.GBCDoubleSpeed) {
-      cycleCount = 512;
-    }
-
-    switch (Timers.timerInputClock) {
-      case 0x00:
-        // TIMC -> 4096
-        cycleCount = 1024;
-
-        if (Cpu.GBCDoubleSpeed) {
-          cycleCount = 2048;
+          requestTimerInterrupt();
+          Timers.timerCounterOverflowDelay = false;
+          Timers.timerCounterWasReset = true;
+        } else if (Timers.timerCounterWasReset) {
+          Timers.timerCounterWasReset = false;
         }
 
-        return cycleCount;
+        if (_checkDividerRegisterFallingEdgeDetector(oldDividerRegister, Timers.dividerRegister)) {
+          _incrementTimerCounter();
+        }
+      }
+    }
+  } // Function to increment our Timer Counter
+  // This fires off interrupts once we overflow
+
+
+  function _incrementTimerCounter() {
+    Timers.timerCounter += 1;
+
+    if (Timers.timerCounter > 255) {
+      // Whenever the timer overflows, there is a slight delay (4 cycles)
+      // Of when TIMA gets TMA's value, and the interrupt is fired.
+      // Thus we will set the delay, which can be handled in the update timer or write trap
+      Timers.timerCounterOverflowDelay = true;
+      Timers.timerCounter = 0;
+    }
+  } // Function to act as our falling edge detector
+  // Whenever we have a falling edge, we need to increment TIMA
+  // http://gbdev.gg8.se/wiki/articles/Timer_Obscure_Behaviour
+  // https://github.com/binji/binjgb/blob/master/src/emulator.c#L1944
+
+
+  function _checkDividerRegisterFallingEdgeDetector(oldDividerRegister, newDividerRegister) {
+    // Get our mask
+    var timerCounterMaskBit = _getTimerCounterMaskBit(Timers.timerInputClock); // If the old register's watched bit was zero,
+    // but after adding the new registers wastch bit is now 1
+
+
+    if (checkBitOnByte(timerCounterMaskBit, oldDividerRegister) && !checkBitOnByte(timerCounterMaskBit, newDividerRegister)) {
+      return true;
+    }
+
+    return false;
+  } // Function to get our current tima mask bit
+  // used for our falling edge detector
+  // See The docs linked above, or TCAGB for this bit mapping
+
+
+  function _getTimerCounterMaskBit(timerInputClock) {
+    switch (timerInputClock) {
+      case 0x00:
+        return 9;
 
       case 0x01:
-        // TIMC -> 262144
-        // TODO: Fix tests involving the 16 cycle timer mode. This is the reason why blargg tests break
-        cycleCount = 16;
-
-        if (Cpu.GBCDoubleSpeed) {
-          cycleCount = 32;
-        }
-
-        return cycleCount;
+        return 3;
 
       case 0x02:
-        // TIMC -> 65536
-        cycleCount = 64;
+        return 5;
 
-        if (Cpu.GBCDoubleSpeed) {
-          cycleCount = 126;
-        }
-
-        return cycleCount;
+      case 0x03:
+        return 7;
     }
 
-    return cycleCount;
+    return 0;
   } // http://www.codeslinger.co.uk/pages/projects/gameboy/joypad.html
   // Joypad Register
   // Taken from pandocs
@@ -3889,7 +3917,7 @@ var WasmBoyTsCore = (function () {
     // Also known at STAT
     // LCD Status (0xFF41) bits Explanation
     // 0                0                    000                    0             00
-    //       |Coicedence Interrupt|     |Mode Interrupts|  |coincidence flag|    | Mode |
+    //       |Coicedence Interrupt|     |Mode Interrupts|  |coincidence flag|  | Mode |
     // Modes:
     // 0 or 00: H-Blank
     // 1 or 01: V-Blank
@@ -4684,7 +4712,8 @@ var WasmBoyTsCore = (function () {
     Graphics.windowY = 0;
 
     if (Cpu.GBCEnabled) {
-      Graphics.scanlineRegister = 0x91;
+      // Bgb says LY is 90 on boot
+      Graphics.scanlineRegister = 0x90;
       eightBitStoreIntoGBMemory(0xff40, 0x91);
       eightBitStoreIntoGBMemory(0xff41, 0x81); // 0xFF42 -> 0xFF43 = 0x00
 
@@ -4696,7 +4725,7 @@ var WasmBoyTsCore = (function () {
       eightBitStoreIntoGBMemory(0xff4f, 0x00);
       eightBitStoreIntoGBMemory(0xff70, 0x01);
     } else {
-      Graphics.scanlineRegister = 0x91;
+      Graphics.scanlineRegister = 0x90;
       eightBitStoreIntoGBMemory(0xff40, 0x91);
       eightBitStoreIntoGBMemory(0xff41, 0x85); // 0xFF42 -> 0xFF45 = 0x00
 
@@ -4715,7 +4744,7 @@ var WasmBoyTsCore = (function () {
     if (Lcd.enabled) {
       Graphics.scanlineCycleCounter += numberOfCycles;
 
-      if (Graphics.scanlineCycleCounter >= Graphics.MAX_CYCLES_PER_SCANLINE()) {
+      while (Graphics.scanlineCycleCounter >= Graphics.MAX_CYCLES_PER_SCANLINE()) {
         // Reset the scanlineCycleCounter
         // Don't set to zero to catch extra cycles
         Graphics.scanlineCycleCounter -= Graphics.MAX_CYCLES_PER_SCANLINE(); // Move to next scanline
@@ -4911,8 +4940,11 @@ var WasmBoyTsCore = (function () {
 
 
     if (offset === Timers.memoryLocationDividerRegister) {
-      eightBitStoreIntoGBMemory(offset, Timers.dividerRegister);
-      return Timers.dividerRegister;
+      // Divider register in memory is just the upper 8 bits
+      // http://gbdev.gg8.se/wiki/articles/Timer_Obscure_Behaviour
+      var upperDividerRegisterBits = splitHighByte(Timers.dividerRegister);
+      eightBitStoreIntoGBMemory(offset, upperDividerRegisterBits);
+      return upperDividerRegisterBits;
     }
 
     if (offset === Timers.memoryLocationTimerCounter) {
@@ -4943,7 +4975,8 @@ var WasmBoyTsCore = (function () {
       default:
         return readTrapResult;
     }
-  }
+  } // TODO: Rename this to sixteenBitLoadFromGBMemoryWithTraps
+
 
   function sixteenBitLoadFromGBMemory(offset) {
     // Get our low byte
@@ -5720,7 +5753,8 @@ var WasmBoyTsCore = (function () {
 
       case 6:
         // Value at register HL
-        instructionRegisterValue = eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
+        // 4 cycles
+        instructionRegisterValue = eightBitLoadSyncCycles(concatenateBytes(Cpu.registerH, Cpu.registerL));
         break;
 
       case 7:
@@ -6003,26 +6037,26 @@ var WasmBoyTsCore = (function () {
 
       case 6:
         // Value at register HL
-        eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL), instructionRegisterResult);
+        // Opcodes 0x40 -> 0x7F only do simple
+        // Bit test, and don't need to be stored back in memory
+        // Thus they take 4 less cycles to run
+        if (opcodeHighNibble < 0x04 || opcodeHighNibble > 0x07) {
+          // Store the result back
+          // 4 cycles
+          eightBitStoreSyncCycles(concatenateBytes(Cpu.registerH, Cpu.registerL), instructionRegisterResult);
+        }
+
         break;
 
       case 7:
         Cpu.registerA = instructionRegisterResult;
         break;
-    } // Increase program counter, as all CB codes take two bytes
-    // Program counter will really increase by two since opcodes handles the other
-
-
-    Cpu.programCounter = u16Portable(Cpu.programCounter + 1); // Finally our number of cycles
+    } // Finally our number of cycles
     // Set if we handled the opcode
 
-    if (handledOpcode) {
-      // Next if register number was 6 (HL), number of cycles is 16
-      numberOfCycles = 8;
 
-      if (registerNumber === 6) {
-        numberOfCycles = 16;
-      }
+    if (handledOpcode) {
+      numberOfCycles = 4;
     } // Return our number of cycles
 
 
@@ -6097,14 +6131,38 @@ var WasmBoyTsCore = (function () {
       default:
         return handleOpcodeFx(opcode);
     }
+  } // Wrapper functions around loading and storing memory, and syncing those cycles
+
+
+  function eightBitLoadSyncCycles(gameboyOffset) {
+    syncCycles(4);
+    return eightBitLoadFromGBMemoryWithTraps(gameboyOffset);
+  }
+
+  function eightBitStoreSyncCycles(gameboyOffset, value) {
+    syncCycles(4);
+    eightBitStoreIntoGBMemoryWithTraps(gameboyOffset, value);
+  }
+
+  function sixteenBitLoadSyncCycles(gameboyOffset) {
+    syncCycles(8); // sixteen bit load has traps even though it has no label
+
+    return sixteenBitLoadFromGBMemory(gameboyOffset);
+  }
+
+  function sixteenBitStoreSyncCycles(gameboyOffset, value) {
+    syncCycles(8);
+    sixteenBitStoreIntoGBMemoryWithTraps(gameboyOffset, value);
   } // Functions to access the next operands of a opcode, reffering to them as "dataBytes"
 
 
   function getDataByteOne() {
+    syncCycles(4);
     return eightBitLoadFromGBMemory(Cpu.programCounter);
   }
 
   function getDataByteTwo() {
+    syncCycles(4);
     return eightBitLoadFromGBMemory(u16Portable(Cpu.programCounter + 1));
   } // Get our concatenated databyte one and getDataByteTwo()
   // Find and replace with : getConcatenatedDataByte()
@@ -6125,17 +6183,20 @@ var WasmBoyTsCore = (function () {
       case 0x01:
         // LD BC,d16
         // 3  12
-        Cpu.registerB = splitHighByte(getConcatenatedDataByte());
-        Cpu.registerC = splitLowByte(getConcatenatedDataByte());
+        // 8 cycles
+        var concatenatedDataByte = getConcatenatedDataByte();
+        Cpu.registerB = splitHighByte(concatenatedDataByte);
+        Cpu.registerC = splitLowByte(concatenatedDataByte);
         Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
-        return 12;
+        return 4;
 
       case 0x02:
         // LD (BC),A
         // 1  8
         // () means load into address pointed by BC
-        eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerB, Cpu.registerC), Cpu.registerA);
-        return 8;
+        // 4 cycles
+        eightBitStoreSyncCycles(concatenateBytes(Cpu.registerB, Cpu.registerC), Cpu.registerA);
+        return 4;
 
       case 0x03:
         // INC BC
@@ -6181,9 +6242,10 @@ var WasmBoyTsCore = (function () {
       case 0x06:
         // LD B,d8
         // 2  8
+        // 4 cycles
         Cpu.registerB = getDataByteOne();
         Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
-        return 8;
+        return 4;
 
       case 0x07:
         // RLCA
@@ -6207,9 +6269,10 @@ var WasmBoyTsCore = (function () {
         // LD (a16),SP
         // 3  20
         // Load the stack pointer into the 16 bit address represented by the two data bytes
-        sixteenBitStoreIntoGBMemoryWithTraps(getConcatenatedDataByte(), Cpu.stackPointer);
+        // 16 cycles, 8 from data byte, 8 from sixteenbit store
+        sixteenBitStoreSyncCycles(getConcatenatedDataByte(), Cpu.stackPointer);
         Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
-        return 20;
+        return 4;
 
       case 0x09:
         // ADD HL,BC
@@ -6227,8 +6290,9 @@ var WasmBoyTsCore = (function () {
       case 0x0a:
         // LD A,(BC)
         // 1 8
-        Cpu.registerA = eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerB, Cpu.registerC));
-        return 8;
+        // 4 cycles from load
+        Cpu.registerA = eightBitLoadSyncCycles(concatenateBytes(Cpu.registerB, Cpu.registerC));
+        return 4;
 
       case 0x0b:
         // DEC BC
@@ -6274,9 +6338,10 @@ var WasmBoyTsCore = (function () {
       case 0x0e:
         // LD C,d8
         // 2 8
+        // 4 cycles
         Cpu.registerC = getDataByteOne();
         Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
-        return 8;
+        return 4;
 
       case 0x0f:
         // RRCA
@@ -6310,7 +6375,8 @@ var WasmBoyTsCore = (function () {
         // See HALT
         // If we are in gameboy color mode, set the new speed
         if (Cpu.GBCEnabled) {
-          var speedSwitch = eightBitLoadFromGBMemoryWithTraps(Cpu.memoryLocationSpeedSwitch);
+          // 4 cycles
+          var speedSwitch = eightBitLoadSyncCycles(Cpu.memoryLocationSpeedSwitch);
 
           if (checkBitOnByte(0, speedSwitch)) {
             // Reset the prepare bit
@@ -6323,32 +6389,37 @@ var WasmBoyTsCore = (function () {
               Cpu.GBCDoubleSpeed = false;
               speedSwitch = resetBitOnByte(7, speedSwitch);
             } // Store the final speed switch
+            // 4 cycles
 
 
-            eightBitStoreIntoGBMemoryWithTraps(Cpu.memoryLocationSpeedSwitch, speedSwitch); // Cycle accurate gameboy docs says this takes 76 clocks
+            eightBitStoreSyncCycles(Cpu.memoryLocationSpeedSwitch, speedSwitch); // Cycle accurate gameboy docs says this takes 76 clocks
+            // 76 - 8 cycles (from load/store) = 68
 
-            return 76;
+            return 68;
           }
-        } // NOTE: This breaks Blarggs CPU tests, therefore, need to implement STOP at somepoint to get around this
-        //Cpu.isStopped = true;
+        } // NOTE: This breaks Blarggs CPU testsif CGB Stop is not implemented
 
 
+        Cpu.isStopped = true;
         Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
         return 4;
 
       case 0x11:
         // LD DE,d16
         // 3  12
-        Cpu.registerD = splitHighByte(getConcatenatedDataByte());
-        Cpu.registerE = splitLowByte(getConcatenatedDataByte());
+        // 8 cycles
+        var concatenatedDataByte = getConcatenatedDataByte();
+        Cpu.registerD = splitHighByte(concatenatedDataByte);
+        Cpu.registerE = splitLowByte(concatenatedDataByte);
         Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
-        return 12;
+        return 4;
 
       case 0x12:
         // LD (DE),A
         // 1 8
-        eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerD, Cpu.registerE), Cpu.registerA);
-        return 8;
+        // 4 cycles
+        eightBitStoreSyncCycles(concatenateBytes(Cpu.registerD, Cpu.registerE), Cpu.registerA);
+        return 4;
 
       case 0x13:
         // INC DE
@@ -6394,9 +6465,10 @@ var WasmBoyTsCore = (function () {
       case 0x16:
         // LD D,d8
         // 2 8
+        // 4 cycles
         Cpu.registerD = getDataByteOne();
         Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
-        return 8;
+        return 4;
 
       case 0x17:
         // RLA
@@ -6429,8 +6501,9 @@ var WasmBoyTsCore = (function () {
         // 2  12
         // NOTE: Discoved dataByte is signed
         // However the relative Jump Function handles this
+        // 4 cycles
         relativeJump(getDataByteOne());
-        return 12;
+        return 8;
       // Relative Jump Function Handles program counter
 
       case 0x19:
@@ -6449,9 +6522,10 @@ var WasmBoyTsCore = (function () {
       case 0x1a:
         // LD A,(DE)
         // 1 8
-        var registerDEA = concatenateBytes(Cpu.registerD, Cpu.registerE);
-        Cpu.registerA = eightBitLoadFromGBMemoryWithTraps(registerDEA);
-        return 8;
+        var registerDEA = concatenateBytes(Cpu.registerD, Cpu.registerE); // 4 cycles
+
+        Cpu.registerA = eightBitLoadSyncCycles(registerDEA);
+        return 4;
 
       case 0x1b:
         // DEC DE
@@ -6497,9 +6571,10 @@ var WasmBoyTsCore = (function () {
       case 0x1e:
         // LD E,d8
         // 2 8
+        // 4 cycles
         Cpu.registerE = getDataByteOne();
         Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
-        return 8;
+        return 4;
 
       case 0x1f:
         // RRA
@@ -6539,31 +6614,34 @@ var WasmBoyTsCore = (function () {
         // NOTE: NZ stands for not [flag], so in this case, not zero flag
         // Also, / means, if condition. so if met, 12 cycles, otherwise 8 cycles
         if (getZeroFlag$$1() === 0) {
-          relativeJump(getDataByteOne());
-          return 12; // Relative Jump Funciton handles program counter
+          // 4 cycles
+          relativeJump(getDataByteOne()); // Relative Jump Funciton handles program counter
         } else {
           Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
-          return 8;
         }
+
+        return 8;
 
       case 0x21:
         // LD HL,d16
         // 3  12
+        // 8 cycles
         var sixteenBitDataByte = getConcatenatedDataByte();
         Cpu.registerH = splitHighByte(sixteenBitDataByte);
         Cpu.registerL = splitLowByte(sixteenBitDataByte);
         Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
-        return 12;
+        return 4;
 
       case 0x22:
         // LD (HL+),A
         // 1 8
-        var registerHL2 = concatenateBytes(Cpu.registerH, Cpu.registerL);
-        eightBitStoreIntoGBMemoryWithTraps(registerHL2, Cpu.registerA);
+        var registerHL2 = concatenateBytes(Cpu.registerH, Cpu.registerL); // 4 cycles
+
+        eightBitStoreSyncCycles(registerHL2, Cpu.registerA);
         registerHL2 = u16Portable(registerHL2 + 1);
         Cpu.registerH = splitHighByte(registerHL2);
         Cpu.registerL = splitLowByte(registerHL2);
-        return 8;
+        return 4;
 
       case 0x23:
         // INC HL
@@ -6609,9 +6687,10 @@ var WasmBoyTsCore = (function () {
       case 0x26:
         // LD H,d8
         // 2 8
+        // 4 cycles
         Cpu.registerH = getDataByteOne();
         Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
-        return 8;
+        return 4;
 
       case 0x27:
         // DAA
@@ -6663,12 +6742,13 @@ var WasmBoyTsCore = (function () {
         // JR Z,r8
         // 2  12/8
         if (getZeroFlag$$1() > 0) {
-          relativeJump(getDataByteOne());
-          return 12; // Relative Jump funciton handles pogram counter
+          // 4 cycles
+          relativeJump(getDataByteOne()); // Relative Jump funciton handles pogram counter
         } else {
           Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
-          return 8;
         }
+
+        return 8;
 
       case 0x29:
         // ADD HL,HL
@@ -6685,12 +6765,13 @@ var WasmBoyTsCore = (function () {
       case 0x2a:
         // LD A,(HL+)
         // 1  8
-        var registerHLA = concatenateBytes(Cpu.registerH, Cpu.registerL);
-        Cpu.registerA = eightBitLoadFromGBMemoryWithTraps(registerHLA);
+        var registerHLA = concatenateBytes(Cpu.registerH, Cpu.registerL); // 4 cycles
+
+        Cpu.registerA = eightBitLoadSyncCycles(registerHLA);
         registerHLA = u16Portable(registerHLA + 1);
         Cpu.registerH = splitHighByte(registerHLA);
         Cpu.registerL = splitLowByte(registerHLA);
-        return 8;
+        return 4;
 
       case 0x2b:
         // DEC HL
@@ -6736,9 +6817,10 @@ var WasmBoyTsCore = (function () {
       case 0x2e:
         // LD L,d8
         // 2  8
+        // 4 cycles
         Cpu.registerL = getDataByteOne();
         Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
-        return 8;
+        return 4;
 
       case 0x2f:
         // CPL
@@ -6759,29 +6841,32 @@ var WasmBoyTsCore = (function () {
         // JR NC,r8
         // 2 12 / 8
         if (getCarryFlag$$1() === 0) {
-          relativeJump(getDataByteOne());
-          return 12; // Relative Jump function handles program counter
+          // 4 cycles
+          relativeJump(getDataByteOne()); // Relative Jump function handles program counter
         } else {
           Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
-          return 8;
         }
+
+        return 8;
 
       case 0x31:
         // LD SP,d16
         // 3 12
+        // 8 cycles
         Cpu.stackPointer = getConcatenatedDataByte();
         Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
-        return 12;
+        return 4;
 
       case 0x32:
         // LD (HL-),A
         // 1 8
-        var registerHL2 = concatenateBytes(Cpu.registerH, Cpu.registerL);
-        eightBitStoreIntoGBMemoryWithTraps(registerHL2, Cpu.registerA);
+        var registerHL2 = concatenateBytes(Cpu.registerH, Cpu.registerL); // 4 cycles
+
+        eightBitStoreSyncCycles(registerHL2, Cpu.registerA);
         registerHL2 = u16Portable(registerHL2 - 1);
         Cpu.registerH = splitHighByte(registerHL2);
         Cpu.registerL = splitLowByte(registerHL2);
-        return 8;
+        return 4;
 
       case 0x33:
         // INC SP
@@ -6793,8 +6878,9 @@ var WasmBoyTsCore = (function () {
         // INC (HL)
         // 1  12
         // Z 0 H -
-        var registerHL4 = concatenateBytes(Cpu.registerH, Cpu.registerL);
-        var valueAtHL4 = eightBitLoadFromGBMemoryWithTraps(registerHL4); // Creating a varible for this to fix assemblyscript overflow bug
+        var registerHL4 = concatenateBytes(Cpu.registerH, Cpu.registerL); // 4 cycles
+
+        var valueAtHL4 = eightBitLoadSyncCycles(registerHL4); // Creating a varible for this to fix assemblyscript overflow bug
         // Requires explicit casting
         // https://github.com/AssemblyScript/assemblyscript/issues/26
 
@@ -6808,16 +6894,18 @@ var WasmBoyTsCore = (function () {
           setZeroFlag$$1(0);
         }
 
-        setSubtractFlag(0);
-        eightBitStoreIntoGBMemoryWithTraps(registerHL4, valueAtHL4);
-        return 12;
+        setSubtractFlag(0); // 4 cycles
+
+        eightBitStoreSyncCycles(registerHL4, valueAtHL4);
+        return 4;
 
       case 0x35:
         // DEC (HL)
         // 1  12
         // Z 1 H -
-        var registerHL5 = concatenateBytes(Cpu.registerH, Cpu.registerL);
-        var valueAtHL5 = eightBitLoadFromGBMemoryWithTraps(registerHL5); // NOTE: This opcode may not overflow correctly,
+        var registerHL5 = concatenateBytes(Cpu.registerH, Cpu.registerL); // 4 cycles
+
+        var valueAtHL5 = eightBitLoadSyncCycles(registerHL5); // NOTE: This opcode may not overflow correctly,
         // Please see previous opcode
 
         checkAndSetEightBitHalfCarryFlag(valueAtHL5, -1);
@@ -6829,16 +6917,18 @@ var WasmBoyTsCore = (function () {
           setZeroFlag$$1(0);
         }
 
-        setSubtractFlag(1);
-        eightBitStoreIntoGBMemoryWithTraps(registerHL5, valueAtHL5);
-        return 12;
+        setSubtractFlag(1); // 4 cycles
+
+        eightBitStoreSyncCycles(registerHL5, valueAtHL5);
+        return 4;
 
       case 0x36:
         // LD (HL),d8
         // 2  12
-        eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL), getDataByteOne());
+        // 8 cycles, 4 from store, 4 from data byte
+        eightBitStoreSyncCycles(concatenateBytes(Cpu.registerH, Cpu.registerL), getDataByteOne());
         Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
-        return 12;
+        return 4;
 
       case 0x37:
         // SCF
@@ -6854,12 +6944,13 @@ var WasmBoyTsCore = (function () {
         // JR C,r8
         // 2 12/8
         if (getCarryFlag$$1() === 1) {
-          relativeJump(getDataByteOne());
-          return 12; // Relative Jump Funciton handles program counter
+          // 4 cycles
+          relativeJump(getDataByteOne()); // Relative Jump Funciton handles program counter
         } else {
           Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
-          return 8;
         }
+
+        return 8;
 
       case 0x39:
         // ADD HL,SP
@@ -6876,12 +6967,13 @@ var WasmBoyTsCore = (function () {
       case 0x3a:
         // LD A,(HL-)
         // 1 8
-        var registerHLA = concatenateBytes(Cpu.registerH, Cpu.registerL);
-        Cpu.registerA = eightBitLoadFromGBMemoryWithTraps(registerHLA);
+        var registerHLA = concatenateBytes(Cpu.registerH, Cpu.registerL); // 4 cycles
+
+        Cpu.registerA = eightBitLoadSyncCycles(registerHLA);
         registerHLA = u16Portable(registerHLA - 1);
         Cpu.registerH = splitHighByte(registerHLA);
         Cpu.registerL = splitLowByte(registerHLA);
-        return 8;
+        return 4;
 
       case 0x3b:
         // DEC SP
@@ -6924,9 +7016,10 @@ var WasmBoyTsCore = (function () {
       case 0x3e:
         // LD A,d8
         // 2 8
+        // 4 cycles
         Cpu.registerA = getDataByteOne();
         Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
-        return 8;
+        return 4;
 
       case 0x3f:
         // CCF
@@ -6988,8 +7081,9 @@ var WasmBoyTsCore = (function () {
       case 0x46:
         // LD B,(HL)
         // 1 8
-        Cpu.registerB = eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
-        return 8;
+        // 4 cycles
+        Cpu.registerB = eightBitLoadSyncCycles(concatenateBytes(Cpu.registerH, Cpu.registerL));
+        return 4;
 
       case 0x47:
         // LD B,A
@@ -7036,8 +7130,9 @@ var WasmBoyTsCore = (function () {
       case 0x4e:
         // LD C,(HL)
         // 1 8
-        Cpu.registerC = eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
-        return 8;
+        // 4 cycles
+        Cpu.registerC = eightBitLoadSyncCycles(concatenateBytes(Cpu.registerH, Cpu.registerL));
+        return 4;
 
       case 0x4f:
         // LD C,A
@@ -7090,8 +7185,9 @@ var WasmBoyTsCore = (function () {
       case 0x56:
         // LD D,(HL)
         // 1 8
-        Cpu.registerD = eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
-        return 8;
+        // 4 cycles
+        Cpu.registerD = eightBitLoadSyncCycles(concatenateBytes(Cpu.registerH, Cpu.registerL));
+        return 4;
 
       case 0x57:
         // LD D,A
@@ -7137,8 +7233,9 @@ var WasmBoyTsCore = (function () {
 
       case 0x5e:
         // LD E,(HL)
-        // 1 4
-        Cpu.registerE = eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
+        // 1 8
+        // 4 cycles
+        Cpu.registerE = eightBitLoadSyncCycles(concatenateBytes(Cpu.registerH, Cpu.registerL));
         return 4;
 
       case 0x5f:
@@ -7155,10 +7252,9 @@ var WasmBoyTsCore = (function () {
     switch (opcode) {
       case 0x60:
         // LD H,B
-        // 1 8
-        // NOTE: Thanks to @binji for catching that this should be 8 cycles, not 4
+        // 1 4
         Cpu.registerH = Cpu.registerB;
-        return 8;
+        return 4;
 
       case 0x61:
         // LD H,C
@@ -7193,8 +7289,9 @@ var WasmBoyTsCore = (function () {
       case 0x66:
         // LD H,(HL)
         // 1 8
-        Cpu.registerH = eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
-        return 8;
+        // 4 cycles
+        Cpu.registerH = eightBitLoadSyncCycles(concatenateBytes(Cpu.registerH, Cpu.registerL));
+        return 4;
 
       case 0x67:
         // LD H,A
@@ -7241,8 +7338,9 @@ var WasmBoyTsCore = (function () {
       case 0x6e:
         // LD L,(HL)
         // 1 8
-        Cpu.registerL = eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
-        return 8;
+        // 4 cycles
+        Cpu.registerL = eightBitLoadSyncCycles(concatenateBytes(Cpu.registerH, Cpu.registerL));
+        return 4;
 
       case 0x6f:
         // LD L,A
@@ -7259,38 +7357,44 @@ var WasmBoyTsCore = (function () {
       case 0x70:
         // LD (HL),B
         // 1 8
-        eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerB);
-        return 8;
+        // 4 cycles
+        eightBitStoreSyncCycles(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerB);
+        return 4;
 
       case 0x71:
         // LD (HL),C
         // 1 8
-        eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerC);
-        return 8;
+        // 4 cycles
+        eightBitStoreSyncCycles(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerC);
+        return 4;
 
       case 0x72:
         // LD (HL),D
         // 1 8
-        eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerD);
-        return 8;
+        // 4 cycles
+        eightBitStoreSyncCycles(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerD);
+        return 4;
 
       case 0x73:
         // LD (HL),E
         // 1 8
-        eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerE);
-        return 8;
+        // 4 cycles
+        eightBitStoreSyncCycles(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerE);
+        return 4;
 
       case 0x74:
         // LD (HL),H
         // 1 8
-        eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerH);
-        return 8;
+        // 4 cycles
+        eightBitStoreSyncCycles(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerH);
+        return 4;
 
       case 0x75:
         // LD (HL),L
         // 1 8
-        eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerL);
-        return 8;
+        // 4 cycles
+        eightBitStoreSyncCycles(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerL);
+        return 4;
 
       case 0x76:
         // HALT
@@ -7309,8 +7413,9 @@ var WasmBoyTsCore = (function () {
       case 0x77:
         // LD (HL),A
         // 1 8
-        eightBitStoreIntoGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerA);
-        return 8;
+        // 4 cycles
+        eightBitStoreSyncCycles(concatenateBytes(Cpu.registerH, Cpu.registerL), Cpu.registerA);
+        return 4;
 
       case 0x78:
         // LD A,B
@@ -7352,8 +7457,9 @@ var WasmBoyTsCore = (function () {
         // LD A,(HL)
         // 1 8
         // NOTE: Thanks to @binji for catching that this should be 8 cycles, not 4
-        Cpu.registerA = eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
-        return 8;
+        // 4 cycles
+        Cpu.registerA = eightBitLoadSyncCycles(concatenateBytes(Cpu.registerH, Cpu.registerL));
+        return 4;
 
       case 0x7f:
         // LD A,A
@@ -7413,9 +7519,10 @@ var WasmBoyTsCore = (function () {
         // ADD A,(HL)
         // 1 8
         // Z 0 H C
-        var valueAtHL6 = eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
+        // 4 cycles
+        var valueAtHL6 = eightBitLoadSyncCycles(concatenateBytes(Cpu.registerH, Cpu.registerL));
         addARegister(valueAtHL6);
-        return 8;
+        return 4;
 
       case 0x87:
         // ADD A,A
@@ -7470,9 +7577,10 @@ var WasmBoyTsCore = (function () {
         // ADC A,(HL)
         // 1 8
         // Z 0 H C
-        var valueAtHLE = eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
+        // 4 cycles
+        var valueAtHLE = eightBitLoadSyncCycles(concatenateBytes(Cpu.registerH, Cpu.registerL));
         addAThroughCarryRegister(valueAtHLE);
-        return 8;
+        return 4;
 
       case 0x8f:
         // ADC A,A
@@ -7533,9 +7641,10 @@ var WasmBoyTsCore = (function () {
         // SUB (HL)
         // 1  8
         // Z 1 H C
-        var valueAtHL6 = eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
+        // 4 cycles
+        var valueAtHL6 = eightBitLoadSyncCycles(concatenateBytes(Cpu.registerH, Cpu.registerL));
         subARegister(valueAtHL6);
-        return 8;
+        return 4;
 
       case 0x97:
         // SUB A
@@ -7590,9 +7699,10 @@ var WasmBoyTsCore = (function () {
         // SBC A,(HL)
         // 1  8
         // Z 1 H C
-        var valueAtHLE = eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
+        // 4 cycles
+        var valueAtHLE = eightBitLoadSyncCycles(concatenateBytes(Cpu.registerH, Cpu.registerL));
         subAThroughCarryRegister(valueAtHLE);
-        return 8;
+        return 4;
 
       case 0x9f:
         // SBC A,A
@@ -7653,9 +7763,10 @@ var WasmBoyTsCore = (function () {
         // AND (HL)
         // 1  8
         // Z 0 1 0
-        var valueAtHL6 = eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
+        // 4 cycles
+        var valueAtHL6 = eightBitLoadSyncCycles(concatenateBytes(Cpu.registerH, Cpu.registerL));
         andARegister(valueAtHL6);
-        return 8;
+        return 4;
 
       case 0xa7:
         // AND A
@@ -7711,9 +7822,10 @@ var WasmBoyTsCore = (function () {
         // XOR (HL)
         // 1  8
         // Z 0 0 0
-        var valueAtHLE = eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
+        // 4 cycles
+        var valueAtHLE = eightBitLoadSyncCycles(concatenateBytes(Cpu.registerH, Cpu.registerL));
         xorARegister(valueAtHLE);
-        return 8;
+        return 4;
 
       case 0xaf:
         // XOR A
@@ -7774,9 +7886,10 @@ var WasmBoyTsCore = (function () {
         // OR (HL)
         // 1  8
         // Z 0 0 0
-        var valueAtHL6 = eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
+        // 4 cycles
+        var valueAtHL6 = eightBitLoadSyncCycles(concatenateBytes(Cpu.registerH, Cpu.registerL));
         orARegister(valueAtHL6);
-        return 8;
+        return 4;
 
       case 0xb7:
         // OR A
@@ -7831,9 +7944,10 @@ var WasmBoyTsCore = (function () {
         // CP (HL)
         // 1  8
         // Z 1 H C
-        var valueAtHLE = eightBitLoadFromGBMemoryWithTraps(concatenateBytes(Cpu.registerH, Cpu.registerL));
+        // 4 cycles
+        var valueAtHLE = eightBitLoadSyncCycles(concatenateBytes(Cpu.registerH, Cpu.registerL));
         cpARegister(valueAtHLE);
-        return 8;
+        return 4;
 
       case 0xbf:
         // CP A
@@ -7852,9 +7966,10 @@ var WasmBoyTsCore = (function () {
         // RET NZ
         // 1  20/8
         if (getZeroFlag$$1() === 0) {
-          Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
+          // 8 cycles
+          Cpu.programCounter = sixteenBitLoadSyncCycles(Cpu.stackPointer);
           Cpu.stackPointer = u16Portable(Cpu.stackPointer + 2);
-          return 20;
+          return 12;
         } else {
           return 8;
         }
@@ -7862,18 +7977,20 @@ var WasmBoyTsCore = (function () {
       case 0xc1:
         // POP BC
         // 1  12
-        var registerBC1 = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
+        // 8 cycles
+        var registerBC1 = sixteenBitLoadSyncCycles(Cpu.stackPointer);
         Cpu.stackPointer = u16Portable(Cpu.stackPointer + 2);
         Cpu.registerB = splitHighByte(registerBC1);
         Cpu.registerC = splitLowByte(registerBC1);
-        return 12;
+        return 4;
 
       case 0xc2:
         // JP NZ,a16
         // 3  16/12
         if (getZeroFlag$$1() === 0) {
+          // 8 cycles
           Cpu.programCounter = getConcatenatedDataByte();
-          return 16;
+          return 8;
         } else {
           Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
           return 12;
@@ -7882,17 +7999,20 @@ var WasmBoyTsCore = (function () {
       case 0xc3:
         // JP a16
         // 3  16
+        // 8 cycles
         Cpu.programCounter = getConcatenatedDataByte();
-        return 16;
+        return 8;
 
       case 0xc4:
         // CALL NZ,a16
         // 3  24/12
         if (getZeroFlag$$1() === 0) {
-          Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
-          sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, u16Portable(Cpu.programCounter + 2));
+          Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2); // 8 cycles
+
+          sixteenBitStoreSyncCycles(Cpu.stackPointer, u16Portable(Cpu.programCounter + 2)); // 8 cycles
+
           Cpu.programCounter = getConcatenatedDataByte();
-          return 24;
+          return 8;
         } else {
           Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
           return 12;
@@ -7901,33 +8021,37 @@ var WasmBoyTsCore = (function () {
       case 0xc5:
         // PUSH BC
         // 1  16
-        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
-        sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, concatenateBytes(Cpu.registerB, Cpu.registerC));
-        return 16;
+        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2); // 8 cycles
+
+        sixteenBitStoreSyncCycles(Cpu.stackPointer, concatenateBytes(Cpu.registerB, Cpu.registerC));
+        return 8;
 
       case 0xc6:
         // ADD A,d8
         // 2 8
         // Z 0 H C
+        // 4 cycles
         addARegister(getDataByteOne());
         Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
-        return 8;
+        return 4;
 
       case 0xc7:
         // RST 00H
         // 1 16
-        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
-        sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter);
+        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2); // 8 cycles
+
+        sixteenBitStoreSyncCycles(Cpu.stackPointer, Cpu.programCounter);
         Cpu.programCounter = 0x00;
-        return 16;
+        return 8;
 
       case 0xc8:
         // RET Z
         // 1  20/8
         if (getZeroFlag$$1() === 1) {
-          Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
+          // 8 cycles
+          Cpu.programCounter = sixteenBitLoadSyncCycles(Cpu.stackPointer);
           Cpu.stackPointer = u16Portable(Cpu.stackPointer + 2);
-          return 20;
+          return 12;
         } else {
           return 8;
         }
@@ -7935,16 +8059,18 @@ var WasmBoyTsCore = (function () {
       case 0xc9:
         // RET
         // 1 16
-        Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
+        // 8 cycles
+        Cpu.programCounter = sixteenBitLoadSyncCycles(Cpu.stackPointer);
         Cpu.stackPointer = u16Portable(Cpu.stackPointer + 2);
-        return 16;
+        return 8;
 
       case 0xca:
         // JP Z,a16
         // 3 16/12
         if (getZeroFlag$$1() === 1) {
+          // 8 cycles
           Cpu.programCounter = getConcatenatedDataByte();
-          return 16;
+          return 8;
         } else {
           Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
           return 12;
@@ -7953,22 +8079,21 @@ var WasmBoyTsCore = (function () {
       case 0xcb:
         // PREFIX CB
         // 1  4
+        // 4 cycles
         var cbCycles = handleCbOpcode(getDataByteOne());
-
-        if (cbCycles > 0) {
-          cbCycles += 4;
-        }
-
+        Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
         return cbCycles;
 
       case 0xcc:
         // CALL Z,a16
         // 3  24/12
         if (getZeroFlag$$1() === 1) {
-          Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
-          sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter + 2);
+          Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2); // 8 cycles
+
+          sixteenBitStoreSyncCycles(Cpu.stackPointer, Cpu.programCounter + 2); // 8 cycles
+
           Cpu.programCounter = getConcatenatedDataByte();
-          return 24;
+          return 8;
         } else {
           Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
           return 12;
@@ -7977,26 +8102,30 @@ var WasmBoyTsCore = (function () {
       case 0xcd:
         // CALL a16
         // 3  24
-        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
-        sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, u16Portable(Cpu.programCounter + 2));
+        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2); // 8 cycles
+
+        sixteenBitStoreSyncCycles(Cpu.stackPointer, u16Portable(Cpu.programCounter + 2)); // 8 cycles
+
         Cpu.programCounter = getConcatenatedDataByte();
-        return 24;
+        return 8;
 
       case 0xce:
         // ADC A,d8
         // 2  8
         // Z 0 H C
+        // 4 cycles
         addAThroughCarryRegister(getDataByteOne());
         Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
-        return 8;
+        return 4;
 
       case 0xcf:
         // RST 08H
         // 1 16
-        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
-        sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter);
+        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2); // 8 cycles
+
+        sixteenBitStoreSyncCycles(Cpu.stackPointer, Cpu.programCounter);
         Cpu.programCounter = 0x08;
-        return 16;
+        return 8;
     }
 
     return -1;
@@ -8008,9 +8137,10 @@ var WasmBoyTsCore = (function () {
         // RET NC
         // 1  20/8
         if (getCarryFlag$$1() === 0) {
-          Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
+          // 8 cycles
+          Cpu.programCounter = sixteenBitLoadSyncCycles(Cpu.stackPointer);
           Cpu.stackPointer = u16Portable(Cpu.stackPointer + 2);
-          return 20;
+          return 12;
         } else {
           return 8;
         }
@@ -8018,18 +8148,20 @@ var WasmBoyTsCore = (function () {
       case 0xd1:
         // POP DE
         // 1  12
-        var registerDE1 = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
+        // 8 cycles
+        var registerDE1 = sixteenBitLoadSyncCycles(Cpu.stackPointer);
         Cpu.stackPointer = u16Portable(Cpu.stackPointer + 2);
         Cpu.registerD = splitHighByte(registerDE1);
         Cpu.registerE = splitLowByte(registerDE1);
-        return 12;
+        return 4;
 
       case 0xd2:
         // JP NC,a16
         // 3  16/12
         if (getCarryFlag$$1() === 0) {
+          // 8 cycles
           Cpu.programCounter = getConcatenatedDataByte();
-          return 16;
+          return 8;
         } else {
           Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
           return 12;
@@ -8041,10 +8173,12 @@ var WasmBoyTsCore = (function () {
         // CALL NC,a16
         // 3  24/12
         if (getCarryFlag$$1() === 0) {
-          Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
-          sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter + 2);
+          Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2); // 8 cycles
+
+          sixteenBitStoreSyncCycles(Cpu.stackPointer, Cpu.programCounter + 2); // 8 cycles
+
           Cpu.programCounter = getConcatenatedDataByte();
-          return 24;
+          return 8;
         } else {
           Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
           return 12;
@@ -8053,33 +8187,37 @@ var WasmBoyTsCore = (function () {
       case 0xd5:
         // PUSH DE
         // 1 16
-        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
-        sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, concatenateBytes(Cpu.registerD, Cpu.registerE));
-        return 16;
+        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2); // 8 cycles
+
+        sixteenBitStoreSyncCycles(Cpu.stackPointer, concatenateBytes(Cpu.registerD, Cpu.registerE));
+        return 8;
 
       case 0xd6:
         // SUB d8
         // 2  8
         // Z 1 H C
+        // 4 cycles
         subARegister(getDataByteOne());
         Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
-        return 8;
+        return 4;
 
       case 0xd7:
         // RST 10H
         // 1 16
-        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
-        sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter);
+        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2); // 8 cycles
+
+        sixteenBitStoreSyncCycles(Cpu.stackPointer, Cpu.programCounter);
         Cpu.programCounter = 0x10;
-        return 16;
+        return 8;
 
       case 0xd8:
         // RET C
         // 1  20/8
         if (getCarryFlag$$1() === 1) {
-          Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
+          // 8 cycles
+          Cpu.programCounter = sixteenBitLoadSyncCycles(Cpu.stackPointer);
           Cpu.stackPointer = u16Portable(Cpu.stackPointer + 2);
-          return 20;
+          return 12;
         } else {
           return 8;
         }
@@ -8087,18 +8225,20 @@ var WasmBoyTsCore = (function () {
       case 0xd9:
         // RETI
         // 1  16
-        Cpu.programCounter = sixteenBitLoadFromGBMemory(Cpu.stackPointer); // Enable interrupts
+        // 8 cycles
+        Cpu.programCounter = sixteenBitLoadSyncCycles(Cpu.stackPointer); // Enable interrupts
 
         setInterrupts(true);
         Cpu.stackPointer = u16Portable(Cpu.stackPointer + 2);
-        return 16;
+        return 8;
 
       case 0xda:
         // JP C,a16
         // 3 16/12
         if (getCarryFlag$$1() === 1) {
+          // 8 cycles
           Cpu.programCounter = getConcatenatedDataByte();
-          return 16;
+          return 8;
         } else {
           Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
           return 12;
@@ -8110,10 +8250,12 @@ var WasmBoyTsCore = (function () {
         // CALL C,a16
         // 3  24/12
         if (getCarryFlag$$1() === 1) {
-          Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
-          sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, u16Portable(Cpu.programCounter + 2));
+          Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2); // 8 cycles
+
+          sixteenBitStoreSyncCycles(Cpu.stackPointer, u16Portable(Cpu.programCounter + 2)); // 8 cycles
+
           Cpu.programCounter = getConcatenatedDataByte();
-          return 24;
+          return 8;
         } else {
           Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
           return 12;
@@ -8125,17 +8267,19 @@ var WasmBoyTsCore = (function () {
         // SBC A,d8
         // 2 8
         // Z 1 H C
+        // 4 cycles
         subAThroughCarryRegister(getDataByteOne());
         Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
-        return 8;
+        return 4;
 
       case 0xdf:
         // RST 18H
         // 1 16
-        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
-        sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter);
+        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2); // 8 cycles
+
+        sixteenBitStoreSyncCycles(Cpu.stackPointer, Cpu.programCounter);
         Cpu.programCounter = 0x18;
-        return 16;
+        return 8;
     }
 
     return -1;
@@ -8147,19 +8291,22 @@ var WasmBoyTsCore = (function () {
         // LDH (a8),A
         // 2  12
         // Store value in high RAM ($FF00 + a8)
-        var largeDataByteOne = getDataByteOne();
-        eightBitStoreIntoGBMemoryWithTraps(0xff00 + largeDataByteOne, Cpu.registerA);
+        // 4 cycles
+        var largeDataByteOne = getDataByteOne(); // 4 cycles
+
+        eightBitStoreSyncCycles(0xff00 + largeDataByteOne, Cpu.registerA);
         Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
-        return 12;
+        return 4;
 
       case 0xe1:
         // POP HL
         // 1  12
-        var registerHL1 = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
+        // 8 cycles
+        var registerHL1 = sixteenBitLoadSyncCycles(Cpu.stackPointer);
         Cpu.stackPointer = u16Portable(Cpu.stackPointer + 2);
         Cpu.registerH = splitHighByte(registerHL1);
         Cpu.registerL = splitLowByte(registerHL1);
-        return 12;
+        return 4;
 
       case 0xe2:
         // LD (C),A
@@ -8168,46 +8315,51 @@ var WasmBoyTsCore = (function () {
         // But stepping through the boot rom, should be one
         // Also should change 0xF2
         // Store value in high RAM ($FF00 + register c)
-        eightBitStoreIntoGBMemoryWithTraps(0xff00 + Cpu.registerC, Cpu.registerA);
-        return 8;
+        // 4 cycles
+        eightBitStoreSyncCycles(0xff00 + Cpu.registerC, Cpu.registerA);
+        return 4;
 
       /* No Opcode for: 0xE3, 0xE4 */
 
       case 0xe5:
         // PUSH HL
         // 1 16
-        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
-        sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, concatenateBytes(Cpu.registerH, Cpu.registerL));
-        return 16;
+        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2); // 8 cycles
+
+        sixteenBitStoreSyncCycles(Cpu.stackPointer, concatenateBytes(Cpu.registerH, Cpu.registerL));
+        return 8;
 
       case 0xe6:
         // AND d8
         // 2  8
         // Z 0 1 0
+        // 4 cycles
         andARegister(getDataByteOne());
         Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
-        return 8;
+        return 4;
 
       case 0xe7:
         // RST 20H
         // 1 16
-        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
-        sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter);
+        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2); // 8 cycles
+
+        sixteenBitStoreSyncCycles(Cpu.stackPointer, Cpu.programCounter);
         Cpu.programCounter = 0x20;
-        return 16;
+        return 8;
 
       case 0xe8:
         // ADD SP, r8
         // 2 16
         // 0 0 H C
         // NOTE: Discoved dataByte is signed
+        // 4 cycles
         var signedDataByteOne = i8Portable(getDataByteOne());
         checkAndSetSixteenBitFlagsAddOverflow(Cpu.stackPointer, signedDataByteOne, true);
         Cpu.stackPointer = u16Portable(Cpu.stackPointer + signedDataByteOne);
         setZeroFlag$$1(0);
         setSubtractFlag(0);
         Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
-        return 16;
+        return 12;
 
       case 0xe9:
         // JP HL
@@ -8218,9 +8370,10 @@ var WasmBoyTsCore = (function () {
       case 0xea:
         // LD (a16),A
         // 3 16
-        eightBitStoreIntoGBMemoryWithTraps(getConcatenatedDataByte(), Cpu.registerA);
+        // 12 cycles, 4 from store, 8 from concatenated data byte
+        eightBitStoreSyncCycles(getConcatenatedDataByte(), Cpu.registerA);
         Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
-        return 16;
+        return 4;
 
       /* No Opcode for: 0xEB, 0xEC, 0xED */
 
@@ -8228,17 +8381,19 @@ var WasmBoyTsCore = (function () {
         // XOR d8
         // 2 8
         // Z 0 0 0
+        // 4 cycles
         xorARegister(getDataByteOne());
         Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
-        return 8;
+        return 4;
 
       case 0xef:
         // RST 28H
         // 1 16
-        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
-        sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter);
+        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2); // 8 cycles
+
+        sixteenBitStoreSyncCycles(Cpu.stackPointer, Cpu.programCounter);
         Cpu.programCounter = 0x28;
-        return 16;
+        return 8;
     }
 
     return -1;
@@ -8249,26 +8404,30 @@ var WasmBoyTsCore = (function () {
       case 0xf0:
         // LDH A,(a8)
         // 2 12
-        var largeDataByteOne = getDataByteOne();
-        Cpu.registerA = u8Portable(eightBitLoadFromGBMemoryWithTraps(0xff00 + largeDataByteOne));
+        // 4 cycles
+        var largeDataByteOne = getDataByteOne(); // 4 cycles
+
+        Cpu.registerA = u8Portable(eightBitLoadSyncCycles(0xff00 + largeDataByteOne));
         Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
-        return 12;
+        return 4;
 
       case 0xf1:
         // POP AF
         // 1 12
         // Z N H C (But No work require, flags are already set)
-        var registerAF1 = sixteenBitLoadFromGBMemory(Cpu.stackPointer);
+        // 8 cycles
+        var registerAF1 = sixteenBitLoadSyncCycles(Cpu.stackPointer);
         Cpu.stackPointer = u16Portable(Cpu.stackPointer + 2);
         Cpu.registerA = splitHighByte(registerAF1);
         Cpu.registerF = splitLowByte(registerAF1);
-        return 12;
+        return 4;
 
       case 0xf2:
         // LD A,(C)
         // 1 8
-        Cpu.registerA = u8Portable(eightBitLoadFromGBMemoryWithTraps(0xff00 + Cpu.registerC));
-        return 8;
+        // 4 cycles
+        Cpu.registerA = u8Portable(eightBitLoadSyncCycles(0xff00 + Cpu.registerC));
+        return 4;
 
       case 0xf3:
         // DI
@@ -8281,31 +8440,35 @@ var WasmBoyTsCore = (function () {
       case 0xf5:
         // PUSH AF
         // 1 16
-        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
-        sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, concatenateBytes(Cpu.registerA, Cpu.registerF));
-        return 16;
+        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2); // 8 cycles
+
+        sixteenBitStoreSyncCycles(Cpu.stackPointer, concatenateBytes(Cpu.registerA, Cpu.registerF));
+        return 8;
 
       case 0xf6:
         // OR d8
         // 2 8
         // Z 0 0 0
+        // 4 cycles
         orARegister(getDataByteOne());
         Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
-        return 8;
+        return 4;
 
       case 0xf7:
         // RST 30H
         // 1 16
-        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
-        sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter);
+        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2); // 8 cycles
+
+        sixteenBitStoreSyncCycles(Cpu.stackPointer, Cpu.programCounter);
         Cpu.programCounter = 0x30;
-        return 16;
+        return 8;
 
       case 0xf8:
         // LD HL,SP+r8
         // 2 12
         // 0 0 H C
         // NOTE: Discoved dataByte is signed
+        // 4 cycles
         var signedDataByteOne = i8Portable(getDataByteOne()); // First, let's handle flags
 
         setZeroFlag$$1(0);
@@ -8315,7 +8478,7 @@ var WasmBoyTsCore = (function () {
         Cpu.registerH = splitHighByte(registerHL);
         Cpu.registerL = splitLowByte(registerHL);
         Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
-        return 12;
+        return 8;
 
       case 0xf9:
         // LD SP,HL
@@ -8326,9 +8489,10 @@ var WasmBoyTsCore = (function () {
       case 0xfa:
         // LD A,(a16)
         // 3 16
-        Cpu.registerA = eightBitLoadFromGBMemoryWithTraps(getConcatenatedDataByte());
+        // 12 cycles, 4 from load, 8 from concatenated data byte
+        Cpu.registerA = eightBitLoadSyncCycles(getConcatenatedDataByte());
         Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
-        return 16;
+        return 4;
 
       case 0xfb:
         // EI
@@ -8342,17 +8506,19 @@ var WasmBoyTsCore = (function () {
         // CP d8
         // 2 8
         // Z 1 H C
+        // 4 cycles
         cpARegister(getDataByteOne());
         Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
-        return 8;
+        return 4;
 
       case 0xff:
         // RST 38H
         // 1 16
-        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
-        sixteenBitStoreIntoGBMemoryWithTraps(Cpu.stackPointer, Cpu.programCounter);
+        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2); // 8 cycles
+
+        sixteenBitStoreSyncCycles(Cpu.stackPointer, Cpu.programCounter);
         Cpu.programCounter = 0x38;
-        return 16;
+        return 8;
     }
 
     return -1;
@@ -8559,6 +8725,42 @@ var WasmBoyTsCore = (function () {
 
     Cpu.programCounter = u16Portable(Cpu.programCounter - 1);
     return -1;
+  } // Public function to run opcodes until,
+  // a breakpoint is reached
+  // -1 = error
+  // 0 = frame executed
+  // 1 = reached breakpoint
+
+
+  function executeFrameUntilBreakpoint(breakpoint) {
+    var error = false;
+    var numberOfCycles = -1;
+
+    while (!error && Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME() && Cpu.programCounter !== breakpoint) {
+      numberOfCycles = executeStep();
+
+      if (numberOfCycles < 0) {
+        error = true;
+      }
+    } // Find our exit reason
+
+
+    if (Cpu.currentCycles >= Cpu.MAX_CYCLES_PER_FRAME()) {
+      // Render a frame
+      // Reset our currentCycles
+      Cpu.currentCycles -= Cpu.MAX_CYCLES_PER_FRAME();
+      return 0;
+    }
+
+    if (Cpu.programCounter === breakpoint) {
+      // breakpoint
+      return 1;
+    } // TODO: Boot ROM handling
+    // There was an error, return -1, and push the program counter back to grab the error opcode
+
+
+    Cpu.programCounter = u16Portable(Cpu.programCounter - 1);
+    return -1;
   } // Function to execute an opcode, and update other gameboy hardware.
   // http://www.codeslinger.co.uk/pages/projects/gameboy/beginning.html
 
@@ -8600,17 +8802,26 @@ var WasmBoyTsCore = (function () {
 
     if (numberOfCycles <= 0) {
       return numberOfCycles;
-    } // Check if we did a DMA TRansfer, if we did add the cycles
+    } // Interrupt Handling requires 20 cycles
+    // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
+    // Only check interrupts after an opcode is executed
+    // Since we don't want to mess up our PC as we are executing
 
 
+    numberOfCycles += checkInterrupts(); // Sync other GB Components with the number of cycles
+
+    syncCycles(numberOfCycles);
+    return numberOfCycles;
+  } // Sync other GB Components with the number of cycles
+
+
+  function syncCycles(numberOfCycles) {
+    // Check if we did a DMA TRansfer, if we did add the cycles
     if (Memory.DMACycles > 0) {
       numberOfCycles += Memory.DMACycles;
       Memory.DMACycles = 0;
-    } // Interrupt Handling requires 20 cycles
-    // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
+    } // Finally, Add our number of cycles to the CPU Cycles
 
-
-    numberOfCycles += checkInterrupts(); // Finally, Add our number of cycles to the CPU Cycles
 
     Cpu.currentCycles += numberOfCycles; // Check other Gameboy components
 
@@ -8638,15 +8849,13 @@ var WasmBoyTsCore = (function () {
     } else {
       updateTimers(numberOfCycles);
     }
-
-    return numberOfCycles;
   } // Function to return an address to store into save state memory
   // this is to regulate our 20 slots
   // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
 
 
   function getSaveStateMemoryOffset(offset, saveStateSlot) {
-    // 50 byutes per save state memory partiton sli32
+    // 50 bytes per save state memory partiton sli32
     return WASMBOY_STATE_LOCATION + offset + 50 * saveStateSlot;
   } // Function to save state to memory for all of our classes
 
@@ -8728,7 +8937,12 @@ var WasmBoyTsCore = (function () {
   function getOpcodeAtProgramCounter() {
     return eightBitLoadFromGBMemory(Cpu.programCounter);
   } // Functions to debug graphical output
+  // Some Simple internal getters
 
+
+  function getLY() {
+    return Graphics.scanlineRegister;
+  }
 
   function drawBackgroundMapToWasmMemory(showColor) {
     // http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html
@@ -8926,6 +9140,28 @@ var WasmBoyTsCore = (function () {
         }
       }
     }
+  }
+
+  function getDIV() {
+    return Timers.dividerRegister;
+  }
+
+  function getTIMA() {
+    return Timers.timerCounter;
+  }
+
+  function getTMA() {
+    return Timers.timerModulo;
+  }
+
+  function getTAC() {
+    var response = Timers.timerInputClock;
+
+    if (Timers.timerEnabled) {
+      response = setBitOnByte(2, response);
+    }
+
+    return response;
   } // These are legacy aliases for the original WasmBoy api
   // WasmBoy
 
@@ -8955,6 +9191,7 @@ var WasmBoyTsCore = (function () {
     config: config,
     executeFrame: executeFrame,
     executeFrameAndCheckAudio: executeFrameAndCheckAudio,
+    executeFrameUntilBreakpoint: executeFrameUntilBreakpoint,
     executeStep: executeStep,
     saveState: saveState,
     loadState: loadState,
@@ -9009,8 +9246,13 @@ var WasmBoyTsCore = (function () {
     getProgramCounter: getProgramCounter,
     getStackPointer: getStackPointer,
     getOpcodeAtProgramCounter: getOpcodeAtProgramCounter,
+    getLY: getLY,
     drawBackgroundMapToWasmMemory: drawBackgroundMapToWasmMemory,
     drawTileDataToWasmMemory: drawTileDataToWasmMemory,
+    getDIV: getDIV,
+    getTIMA: getTIMA,
+    getTMA: getTMA,
+    getTAC: getTAC,
     update: executeFrame,
     emulationStep: executeStep,
     getAudioQueueIndex: getNumberOfSamplesInAudioBuffer,
