@@ -63,7 +63,6 @@
     "debugger:serve": "npx run-s debugger:build debugger:serve:nobuild",
     "debugger:serve:nobuild": "preact serve",
     "debugger:build": "preact build -p --src demo/debugger --no-prerender --service-worker false",
-    "debugger:deploy": "npx run-s debugger:build",
     "benchmark:build": "npx rollup -c --environment PROD,BENCHMARK",
     "benchmark:watch": "npx rollup -c -w --environment BENCHMARK",
     "demo:cname": "echo 'wasmboy.app' > build/CNAME",
