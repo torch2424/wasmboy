@@ -1,7 +1,7 @@
 # .gitattributes
 # https://stackoverflow.com/questions/34713765/github-changes-repository-to-wrong-language
 * linguist-vendored
-*.js linguist-vendored=false
+#*.js linguist-vendored=false
 *.ts linguist-vendored=false
 *.wasm linguist-vendored=false
 *.wast linguist-vendored=false
