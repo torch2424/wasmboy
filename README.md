@@ -15,6 +15,8 @@
 
 **Project is still < 1.0.0. Most games are playable, but the emulator is still not very accurate. Expect bugs.**
 
+[1.0 Roadmap Tracking Issue](https://github.com/torch2424/wasmBoy/issues/197)
+
 [Debugger / Demo with support for mobile controls](https://torch2424.github.io/wasmBoy/)
 
 [Documentation](https://github.com/torch2424/wasmBoy/wiki)
@@ -58,6 +60,8 @@
 # Usage
 
 **Project is still < 1.0.0. Most games are playable, but the emulator is still not very accurate. Expect bugs.**
+
+[1.0 Roadmap Tracking Issue](https://github.com/torch2424/wasmBoy/issues/197)
 
 Simply install through npm:
 
