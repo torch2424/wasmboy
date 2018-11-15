@@ -1,7 +1,8 @@
 # .gitattributes
-* text=auto
-*.js text
-*.css text
-
-# help to Github linguist determine this code as AssemblyScript mostly
-*.ts linguist-language=AssemblyScript
+# https://stackoverflow.com/questions/34713765/github-changes-repository-to-wrong-language
+* linguist-vendored
+*.js linguist-vendored=false
+*.ts linguist-vendored=false
+*.wasm linguist-vendored=false
+*.wast linguist-vendored=false
+*.wat linguist-vendored=false
