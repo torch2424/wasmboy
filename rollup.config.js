@@ -5,14 +5,14 @@ import coreTsBundles from './rollup.core';
 import getCoreBundles from './rollup.getcore';
 import benchmarkBundles from './rollup.benchmark';
 
-let exports = [];
-if (process.env.BENCHMARK) {
-  exports = [...benchmarkBundles];
-} else {
-  exports = [...getCoreBundles, ...workerBundles, ...libBundles];
-  if (process.env.TS) {
-    exports = [...coreTsBundles, ...exports];
-  }
+let exports = [...getCoreBundles, ...workerBundles, ...libBundles];
+
+// Add TS Bundles
+if (process.env.TS) {
+  exports = [...coreTsBundles, ...exports];
 }
 
+if (process.env.BENCHMARK) {
+  exports = [...exports, ...benchmarkBundles];
+}
 export default exports;

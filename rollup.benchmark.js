@@ -40,7 +40,7 @@ let plugins = [
 ];
 
 let sourcemap = false;
-if (process.env.ROLLUP_WATCH) {
+if (process.env.SERVE) {
   plugins = [
     ...plugins,
     serve({
