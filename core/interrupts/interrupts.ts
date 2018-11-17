@@ -97,7 +97,7 @@ export function checkInterrupts(): i32 {
 
     // Service our interrupts, if we have the master switch enabled
     // https://www.reddit.com/r/EmuDev/comments/5ie3k7/infinite_loop_trying_to_pass_blarggs_interrupt/
-    if (Interrupts.masterInterruptSwitch) {
+    if (Interrupts.masterInterruptSwitch && !Cpu.isHaltNoJump) {
       if (Interrupts.isVBlankInterruptEnabled && Interrupts.isVBlankInterruptRequested) {
         _handleInterrupt(Interrupts.bitPositionVBlankInterrupt);
         wasInterruptHandled = true;
