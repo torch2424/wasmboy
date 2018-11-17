@@ -1250,7 +1250,7 @@ function handleOpcode7x(opcode: i32): i32 {
       // Can't Halt during an HDMA
       // https://gist.github.com/drhelius/3394856
       if (!Memory.isHblankHdmaActive) {
-        Cpu.isHalted = true;
+        Cpu.enableHalt();
       }
       return 4;
     case 0x77:

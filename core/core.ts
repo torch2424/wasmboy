@@ -284,36 +284,41 @@ export function executeStep(): i32 {
   // Set has started to 1 since we ran a emulation step
   hasStarted = true;
 
+  // Check if we are in the halt bug
+  if (Cpu.isHaltBug) {
+    // Need to run the next opcode twice
+
+    // E.g
+    // 0x76 - halt
+    // FA 34 12 - ld a,(1234)
+    // Becomes
+    // FA FA 34 ld a,(34FA)
+    // 12 ld (de),a
+
+    let haltBugOpcode: i32 = <u8>eightBitLoadFromGBMemory(Cpu.programCounter);
+    let haltBugCycles: i32 = executeOpcode(haltBugOpcode);
+    syncCycles(haltBugCycles);
+    Cpu.programCounter = u16Portable(Cpu.programCounter - 1);
+    Cpu.exitHalt();
+  }
+
+  // Interrupts should be handled before reading an opcode
+  // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
+  let interruptCycles: i32 = checkInterrupts();
+  if (interruptCycles > 0) {
+    syncCycles(interruptCycles);
+  }
+
   // Get the opcode, and additional bytes to be handled
   // Number of cycles defaults to 4, because while we're halted, we run 4 cycles (according to matt :))
   let numberOfCycles: i32 = 4;
   let opcode: i32 = 0;
 
-  // Cpu Halting best explained: https://www.reddit.com/r/EmuDev/comments/5ie3k7/infinite_loop_trying_to_pass_blarggs_interrupt/db7xnbe/
-  if (!Cpu.isHalted && !Cpu.isStopped) {
+  // If we are not halted or stopped, run instructions
+  // If we are halted, this will be skipped and just sync the 4 cycles
+  if (!Cpu.isHalted() && !Cpu.isStopped) {
     opcode = <u8>eightBitLoadFromGBMemory(Cpu.programCounter);
     numberOfCycles = executeOpcode(opcode);
-  } else {
-    // if we were halted, and interrupts were disabled but interrupts are pending, stop waiting
-    if (Cpu.isHalted && !Interrupts.masterInterruptSwitch && Interrupts.areInterruptsPending()) {
-      Cpu.isHalted = false;
-      Cpu.isStopped = false;
-
-      // Need to run the next opcode twice, it's a bug menitoned in
-      // The reddit comment mentioned above
-
-      // CTRL+F "low-power" on gameboy cpu manual
-      // http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf
-      // E.g
-      // 0x76 - halt
-      // FA 34 12 - ld a,(1234)
-      // Becomes
-      // FA FA 34 ld a,(34FA)
-      // 12 ld (de),a
-      opcode = <u8>eightBitLoadFromGBMemory(Cpu.programCounter);
-      numberOfCycles = executeOpcode(opcode);
-      Cpu.programCounter = u16Portable(Cpu.programCounter - 1);
-    }
   }
 
   // blarggFixes, don't allow register F to have the bottom nibble
@@ -323,12 +328,6 @@ export function executeStep(): i32 {
   if (numberOfCycles <= 0) {
     return numberOfCycles;
   }
-
-  // Interrupt Handling requires 20 cycles
-  // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
-  // Only check interrupts after an opcode is executed
-  // Since we don't want to mess up our PC as we are executing
-  numberOfCycles += checkInterrupts();
 
   // Sync other GB Components with the number of cycles
   syncCycles(numberOfCycles);

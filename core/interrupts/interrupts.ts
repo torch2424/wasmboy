@@ -22,7 +22,7 @@ export class Interrupts {
   static readonly bitPositionTimerInterrupt: i32 = 2;
   static readonly bitPositionJoypadInterrupt: i32 = 4;
 
-  static readonly memoryLocationInterruptEnabled: i32 = 0xffff;
+  static readonly memoryLocationInterruptEnabled: i32 = 0xffff; // A.K.A interrupt Flag (IE)
   // Cache which Interrupts are enabled
   static interruptsEnabledValue: i32 = 0;
   static isVBlankInterruptEnabled: boolean = false;
@@ -78,40 +78,59 @@ export class Interrupts {
   }
 }
 
+// NOTE: Interrupts should be handled before reading an opcode
 export function checkInterrupts(): i32 {
-  if (Interrupts.masterInterruptSwitch && Interrupts.interruptsEnabledValue > 0 && Interrupts.interruptsRequestedValue > 0) {
+  // First check for our delay was enabled
+  if (Interrupts.masterInterruptSwitchDelay) {
+    Interrupts.masterInterruptSwitch = true;
+    Interrupts.masterInterruptSwitchDelay = false;
+  }
+
+  // Check if we have an enabled and requested interrupt
+  let isAnInterruptRequestedAndEnabledValue: i32 = Interrupts.interruptsEnabledValue & Interrupts.interruptsRequestedValue & 0x1f;
+
+  if (isAnInterruptRequestedAndEnabledValue > 0) {
     // Boolean to track if interrupts were handled
     // Interrupt handling requires 20 cycles
     // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
     let wasInterruptHandled: boolean = false;
 
-    // Check our interrupts
-    if (Interrupts.isVBlankInterruptEnabled && Interrupts.isVBlankInterruptRequested) {
-      _handleInterrupt(Interrupts.bitPositionVBlankInterrupt);
-      wasInterruptHandled = true;
-    } else if (Interrupts.isLcdInterruptEnabled && Interrupts.isLcdInterruptRequested) {
-      _handleInterrupt(Interrupts.bitPositionLcdInterrupt);
-      wasInterruptHandled = true;
-    } else if (Interrupts.isTimerInterruptEnabled && Interrupts.isTimerInterruptRequested) {
-      _handleInterrupt(Interrupts.bitPositionTimerInterrupt);
-      wasInterruptHandled = true;
-    } else if (Interrupts.isJoypadInterruptEnabled && Interrupts.isJoypadInterruptRequested) {
-      _handleInterrupt(Interrupts.bitPositionJoypadInterrupt);
-      wasInterruptHandled = true;
+    // Service our interrupts, if we have the master switch enabled
+    // https://www.reddit.com/r/EmuDev/comments/5ie3k7/infinite_loop_trying_to_pass_blarggs_interrupt/
+    if (Interrupts.masterInterruptSwitch) {
+      if (Interrupts.isVBlankInterruptEnabled && Interrupts.isVBlankInterruptRequested) {
+        _handleInterrupt(Interrupts.bitPositionVBlankInterrupt);
+        wasInterruptHandled = true;
+      } else if (Interrupts.isLcdInterruptEnabled && Interrupts.isLcdInterruptRequested) {
+        _handleInterrupt(Interrupts.bitPositionLcdInterrupt);
+        wasInterruptHandled = true;
+      } else if (Interrupts.isTimerInterruptEnabled && Interrupts.isTimerInterruptRequested) {
+        _handleInterrupt(Interrupts.bitPositionTimerInterrupt);
+        wasInterruptHandled = true;
+      } else if (Interrupts.isJoypadInterruptEnabled && Interrupts.isJoypadInterruptRequested) {
+        _handleInterrupt(Interrupts.bitPositionJoypadInterrupt);
+        wasInterruptHandled = true;
+      }
     }
 
-    // Interrupt handling requires 20 cycles, TCAGBD
+    let interuptHandlerCycles: i32 = 0;
     if (wasInterruptHandled) {
-      let intteruptHandlerCycles: i32 = 20;
-      if (Cpu.isHalted) {
+      // Interrupt handling requires 20 cycles, TCAGBD
+      interuptHandlerCycles = 20;
+      if (Cpu.isHalted()) {
         // If the CPU was halted, now is the time to un-halt
         // Should be done here when the jump occurs according to:
         // https://www.reddit.com/r/EmuDev/comments/6fmjch/gb_glitches_in_links_awakening_and_pok%C3%A9mon_gold/
-        Cpu.isHalted = false;
-        intteruptHandlerCycles += 4;
+        Cpu.exitHalt();
+        interuptHandlerCycles += 4;
       }
-      return intteruptHandlerCycles;
     }
+
+    if (Cpu.isHalted()) {
+      Cpu.exitHalt();
+    }
+
+    return interuptHandlerCycles;
   }
 
   return 0;
@@ -128,8 +147,13 @@ function _handleInterrupt(bitPosition: i32): void {
   eightBitStoreIntoGBMemory(Interrupts.memoryLocationInterruptRequest, interruptRequest);
 
   // Push the programCounter onto the stacks
+  // Push the next instruction, not the halt itself (TCAGBD).
   Cpu.stackPointer = Cpu.stackPointer - 2;
-  sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
+  if (Cpu.isHalted()) {
+    sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 1);
+  } else {
+    sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
+  }
 
   // Jump to the correct interrupt location
   // Also puiggyback off of the switch to reset our HW Register caching
@@ -166,7 +190,13 @@ function _requestInterrupt(bitPosition: i32): void {
 }
 
 export function setInterrupts(value: boolean): void {
-  Interrupts.masterInterruptSwitch = value;
+  // If we are enabling interrupts,
+  // we want to wait 4 cycles before enabling
+  if (value) {
+    Interrupts.masterInterruptSwitchDelay = true;
+  } else {
+    Interrupts.masterInterruptSwitch = false;
+  }
 }
 
 export function requestVBlankInterrupt(): void {
