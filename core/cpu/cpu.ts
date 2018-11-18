@@ -86,10 +86,11 @@ export class Cpu {
     Cpu.isHaltBug = true;
   }
 
-  static exitHalt(): void {
+  static exitHaltAndStop(): void {
     Cpu.isHaltNoJump = false;
     Cpu.isHaltNormal = false;
     Cpu.isHaltBug = false;
+    Cpu.isStopped = false;
   }
 
   static isHalted(): boolean {

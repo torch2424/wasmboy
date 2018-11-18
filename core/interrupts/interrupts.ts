@@ -100,6 +100,7 @@ export function checkInterrupts(): i32 {
     if (Interrupts.masterInterruptSwitch && !Cpu.isHaltNoJump) {
       if (Interrupts.isVBlankInterruptEnabled && Interrupts.isVBlankInterruptRequested) {
         _handleInterrupt(Interrupts.bitPositionVBlankInterrupt);
+        hexLog(0x05, 0x01);
         wasInterruptHandled = true;
       } else if (Interrupts.isLcdInterruptEnabled && Interrupts.isLcdInterruptRequested) {
         _handleInterrupt(Interrupts.bitPositionLcdInterrupt);
@@ -121,13 +122,13 @@ export function checkInterrupts(): i32 {
         // If the CPU was halted, now is the time to un-halt
         // Should be done here when the jump occurs according to:
         // https://www.reddit.com/r/EmuDev/comments/6fmjch/gb_glitches_in_links_awakening_and_pok%C3%A9mon_gold/
-        Cpu.exitHalt();
+        Cpu.exitHaltAndStop();
         interuptHandlerCycles += 4;
       }
     }
 
     if (Cpu.isHalted()) {
-      Cpu.exitHalt();
+      Cpu.exitHaltAndStop();
     }
 
     return interuptHandlerCycles;

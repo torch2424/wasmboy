@@ -299,7 +299,7 @@ export function executeStep(): i32 {
     let haltBugCycles: i32 = executeOpcode(haltBugOpcode);
     syncCycles(haltBugCycles);
     Cpu.programCounter = u16Portable(Cpu.programCounter - 1);
-    Cpu.exitHalt();
+    Cpu.exitHaltAndStop();
   }
 
   // Interrupts should be handled before reading an opcode
