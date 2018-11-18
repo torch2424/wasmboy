@@ -599,185 +599,185 @@
   )
  )
  (func $core/cpu/cpu/initializeCpu (; 4 ;) (; has Stack IR ;) (type $v)
-  ;;@ core/cpu/cpu.ts:159:2
+  ;;@ core/cpu/cpu.ts:157:2
   (set_global $core/cpu/cpu/Cpu.GBCDoubleSpeed
-   ;;@ core/cpu/cpu.ts:159:23
+   ;;@ core/cpu/cpu.ts:157:23
+   (i32.const 0)
+  )
+  ;;@ core/cpu/cpu.ts:158:2
+  (set_global $core/cpu/cpu/Cpu.registerA
+   ;;@ core/cpu/cpu.ts:158:18
+   (i32.const 0)
+  )
+  ;;@ core/cpu/cpu.ts:159:2
+  (set_global $core/cpu/cpu/Cpu.registerB
+   ;;@ core/cpu/cpu.ts:159:18
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:160:2
-  (set_global $core/cpu/cpu/Cpu.registerA
+  (set_global $core/cpu/cpu/Cpu.registerC
    ;;@ core/cpu/cpu.ts:160:18
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:161:2
-  (set_global $core/cpu/cpu/Cpu.registerB
+  (set_global $core/cpu/cpu/Cpu.registerD
    ;;@ core/cpu/cpu.ts:161:18
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:162:2
-  (set_global $core/cpu/cpu/Cpu.registerC
+  (set_global $core/cpu/cpu/Cpu.registerE
    ;;@ core/cpu/cpu.ts:162:18
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:163:2
-  (set_global $core/cpu/cpu/Cpu.registerD
+  (set_global $core/cpu/cpu/Cpu.registerH
    ;;@ core/cpu/cpu.ts:163:18
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:164:2
-  (set_global $core/cpu/cpu/Cpu.registerE
+  (set_global $core/cpu/cpu/Cpu.registerL
    ;;@ core/cpu/cpu.ts:164:18
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:165:2
-  (set_global $core/cpu/cpu/Cpu.registerH
+  (set_global $core/cpu/cpu/Cpu.registerF
    ;;@ core/cpu/cpu.ts:165:18
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:166:2
-  (set_global $core/cpu/cpu/Cpu.registerL
-   ;;@ core/cpu/cpu.ts:166:18
+  (set_global $core/cpu/cpu/Cpu.stackPointer
+   ;;@ core/cpu/cpu.ts:166:21
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:167:2
-  (set_global $core/cpu/cpu/Cpu.registerF
-   ;;@ core/cpu/cpu.ts:167:18
+  (set_global $core/cpu/cpu/Cpu.programCounter
+   ;;@ core/cpu/cpu.ts:167:23
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:168:2
-  (set_global $core/cpu/cpu/Cpu.stackPointer
-   ;;@ core/cpu/cpu.ts:168:21
+  (set_global $core/cpu/cpu/Cpu.currentCycles
+   ;;@ core/cpu/cpu.ts:168:22
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:169:2
-  (set_global $core/cpu/cpu/Cpu.programCounter
-   ;;@ core/cpu/cpu.ts:169:23
+  (set_global $core/cpu/cpu/Cpu.isHaltNormal
+   ;;@ core/cpu/cpu.ts:169:21
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:170:2
-  (set_global $core/cpu/cpu/Cpu.currentCycles
-   ;;@ core/cpu/cpu.ts:170:22
+  (set_global $core/cpu/cpu/Cpu.isHaltNoJump
+   ;;@ core/cpu/cpu.ts:170:21
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:171:2
-  (set_global $core/cpu/cpu/Cpu.isHaltNormal
-   ;;@ core/cpu/cpu.ts:171:21
+  (set_global $core/cpu/cpu/Cpu.isHaltBug
+   ;;@ core/cpu/cpu.ts:171:18
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:172:2
-  (set_global $core/cpu/cpu/Cpu.isHaltNoJump
-   ;;@ core/cpu/cpu.ts:172:21
-   (i32.const 0)
-  )
-  ;;@ core/cpu/cpu.ts:173:2
-  (set_global $core/cpu/cpu/Cpu.isHaltBug
-   ;;@ core/cpu/cpu.ts:173:18
+  (set_global $core/cpu/cpu/Cpu.isStopped
+   ;;@ core/cpu/cpu.ts:172:18
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:174:2
-  (set_global $core/cpu/cpu/Cpu.isStopped
-   ;;@ core/cpu/cpu.ts:174:18
-   (i32.const 0)
-  )
-  ;;@ core/cpu/cpu.ts:176:2
   (if
-   ;;@ core/cpu/cpu.ts:176:6
+   ;;@ core/cpu/cpu.ts:174:6
    (get_global $core/cpu/cpu/Cpu.GBCEnabled)
-   ;;@ core/cpu/cpu.ts:176:22
+   ;;@ core/cpu/cpu.ts:174:22
    (block
-    ;;@ core/cpu/cpu.ts:178:4
+    ;;@ core/cpu/cpu.ts:176:4
     (set_global $core/cpu/cpu/Cpu.registerA
-     ;;@ core/cpu/cpu.ts:178:20
+     ;;@ core/cpu/cpu.ts:176:20
      (i32.const 17)
     )
-    ;;@ core/cpu/cpu.ts:179:4
+    ;;@ core/cpu/cpu.ts:177:4
     (set_global $core/cpu/cpu/Cpu.registerF
-     ;;@ core/cpu/cpu.ts:179:20
+     ;;@ core/cpu/cpu.ts:177:20
      (i32.const 128)
     )
-    ;;@ core/cpu/cpu.ts:180:4
+    ;;@ core/cpu/cpu.ts:178:4
     (set_global $core/cpu/cpu/Cpu.registerB
-     ;;@ core/cpu/cpu.ts:180:20
+     ;;@ core/cpu/cpu.ts:178:20
      (i32.const 0)
     )
-    ;;@ core/cpu/cpu.ts:181:4
+    ;;@ core/cpu/cpu.ts:179:4
     (set_global $core/cpu/cpu/Cpu.registerC
-     ;;@ core/cpu/cpu.ts:181:20
+     ;;@ core/cpu/cpu.ts:179:20
      (i32.const 0)
     )
-    ;;@ core/cpu/cpu.ts:182:4
+    ;;@ core/cpu/cpu.ts:180:4
     (set_global $core/cpu/cpu/Cpu.registerD
-     ;;@ core/cpu/cpu.ts:182:20
+     ;;@ core/cpu/cpu.ts:180:20
      (i32.const 255)
     )
-    ;;@ core/cpu/cpu.ts:183:4
+    ;;@ core/cpu/cpu.ts:181:4
     (set_global $core/cpu/cpu/Cpu.registerE
-     ;;@ core/cpu/cpu.ts:183:20
+     ;;@ core/cpu/cpu.ts:181:20
      (i32.const 86)
     )
-    ;;@ core/cpu/cpu.ts:184:4
+    ;;@ core/cpu/cpu.ts:182:4
     (set_global $core/cpu/cpu/Cpu.registerH
-     ;;@ core/cpu/cpu.ts:184:20
+     ;;@ core/cpu/cpu.ts:182:20
      (i32.const 0)
     )
-    ;;@ core/cpu/cpu.ts:185:4
+    ;;@ core/cpu/cpu.ts:183:4
     (set_global $core/cpu/cpu/Cpu.registerL
-     ;;@ core/cpu/cpu.ts:185:20
+     ;;@ core/cpu/cpu.ts:183:20
      (i32.const 13)
     )
    )
-   ;;@ core/cpu/cpu.ts:190:9
+   ;;@ core/cpu/cpu.ts:188:9
    (block
-    ;;@ core/cpu/cpu.ts:192:4
+    ;;@ core/cpu/cpu.ts:190:4
     (set_global $core/cpu/cpu/Cpu.registerA
-     ;;@ core/cpu/cpu.ts:192:20
+     ;;@ core/cpu/cpu.ts:190:20
      (i32.const 1)
     )
-    ;;@ core/cpu/cpu.ts:193:4
+    ;;@ core/cpu/cpu.ts:191:4
     (set_global $core/cpu/cpu/Cpu.registerF
-     ;;@ core/cpu/cpu.ts:193:20
+     ;;@ core/cpu/cpu.ts:191:20
      (i32.const 176)
     )
-    ;;@ core/cpu/cpu.ts:194:4
+    ;;@ core/cpu/cpu.ts:192:4
     (set_global $core/cpu/cpu/Cpu.registerB
+     ;;@ core/cpu/cpu.ts:192:20
+     (i32.const 0)
+    )
+    ;;@ core/cpu/cpu.ts:193:4
+    (set_global $core/cpu/cpu/Cpu.registerC
+     ;;@ core/cpu/cpu.ts:193:20
+     (i32.const 19)
+    )
+    ;;@ core/cpu/cpu.ts:194:4
+    (set_global $core/cpu/cpu/Cpu.registerD
      ;;@ core/cpu/cpu.ts:194:20
      (i32.const 0)
     )
     ;;@ core/cpu/cpu.ts:195:4
-    (set_global $core/cpu/cpu/Cpu.registerC
-     ;;@ core/cpu/cpu.ts:195:20
-     (i32.const 19)
-    )
-    ;;@ core/cpu/cpu.ts:196:4
-    (set_global $core/cpu/cpu/Cpu.registerD
-     ;;@ core/cpu/cpu.ts:196:20
-     (i32.const 0)
-    )
-    ;;@ core/cpu/cpu.ts:197:4
     (set_global $core/cpu/cpu/Cpu.registerE
-     ;;@ core/cpu/cpu.ts:197:20
+     ;;@ core/cpu/cpu.ts:195:20
      (i32.const 216)
     )
-    ;;@ core/cpu/cpu.ts:198:4
+    ;;@ core/cpu/cpu.ts:196:4
     (set_global $core/cpu/cpu/Cpu.registerH
-     ;;@ core/cpu/cpu.ts:198:20
+     ;;@ core/cpu/cpu.ts:196:20
      (i32.const 1)
     )
-    ;;@ core/cpu/cpu.ts:199:4
+    ;;@ core/cpu/cpu.ts:197:4
     (set_global $core/cpu/cpu/Cpu.registerL
-     ;;@ core/cpu/cpu.ts:199:20
+     ;;@ core/cpu/cpu.ts:197:20
      (i32.const 77)
     )
    )
   )
-  ;;@ core/cpu/cpu.ts:188:4
+  ;;@ core/cpu/cpu.ts:186:4
   (set_global $core/cpu/cpu/Cpu.programCounter
-   ;;@ core/cpu/cpu.ts:188:25
+   ;;@ core/cpu/cpu.ts:186:25
    (i32.const 256)
   )
-  ;;@ core/cpu/cpu.ts:189:4
+  ;;@ core/cpu/cpu.ts:187:4
   (set_global $core/cpu/cpu/Cpu.stackPointer
-   ;;@ core/cpu/cpu.ts:189:23
+   ;;@ core/cpu/cpu.ts:187:23
    (i32.const 65534)
   )
  )
@@ -12383,45 +12383,45 @@
   )
  )
  (func $core/cpu/opcodes/getDataByteTwo (; 162 ;) (; has Stack IR ;) (type $i) (result i32)
-  ;;@ core/cpu/opcodes.ts:165:2
+  ;;@ core/cpu/opcodes.ts:164:2
   (call $core/core/syncCycles
-   ;;@ core/cpu/opcodes.ts:165:13
+   ;;@ core/cpu/opcodes.ts:164:13
    (i32.const 4)
   )
-  ;;@ core/cpu/opcodes.ts:166:73
+  ;;@ core/cpu/opcodes.ts:165:73
   (call $core/memory/load/eightBitLoadFromGBMemory
-   ;;@ core/cpu/opcodes.ts:166:38
+   ;;@ core/cpu/opcodes.ts:165:38
    (call $core/portable/portable/u16Portable
-    ;;@ core/cpu/opcodes.ts:166:50
+    ;;@ core/cpu/opcodes.ts:165:50
     (i32.add
      (get_global $core/cpu/cpu/Cpu.programCounter)
-     ;;@ core/cpu/opcodes.ts:166:71
+     ;;@ core/cpu/opcodes.ts:165:71
      (i32.const 1)
     )
    )
   )
  )
  (func $core/cpu/opcodes/getDataByteOne (; 163 ;) (; has Stack IR ;) (type $i) (result i32)
-  ;;@ core/cpu/opcodes.ts:160:2
+  ;;@ core/cpu/opcodes.ts:159:2
   (call $core/core/syncCycles
-   ;;@ core/cpu/opcodes.ts:160:13
+   ;;@ core/cpu/opcodes.ts:159:13
    (i32.const 4)
   )
-  ;;@ core/cpu/opcodes.ts:161:56
+  ;;@ core/cpu/opcodes.ts:160:56
   (call $core/memory/load/eightBitLoadFromGBMemory
-   ;;@ core/cpu/opcodes.ts:161:38
+   ;;@ core/cpu/opcodes.ts:160:38
    (get_global $core/cpu/cpu/Cpu.programCounter)
   )
  )
  (func $core/cpu/opcodes/getConcatenatedDataByte (; 164 ;) (; has Stack IR ;) (type $i) (result i32)
-  ;;@ core/cpu/opcodes.ts:171:65
+  ;;@ core/cpu/opcodes.ts:170:65
   (call $core/helpers/index/concatenateBytes
-   ;;@ core/cpu/opcodes.ts:171:31
+   ;;@ core/cpu/opcodes.ts:170:31
    (i32.and
     (call $core/cpu/opcodes/getDataByteTwo)
     (i32.const 255)
    )
-   ;;@ core/cpu/opcodes.ts:171:49
+   ;;@ core/cpu/opcodes.ts:170:49
    (i32.and
     (call $core/cpu/opcodes/getDataByteOne)
     (i32.const 255)
@@ -12429,12 +12429,12 @@
   )
  )
  (func $core/cpu/opcodes/eightBitStoreSyncCycles (; 165 ;) (; has Stack IR ;) (type $iiv) (param $0 i32) (param $1 i32)
-  ;;@ core/cpu/opcodes.ts:143:2
+  ;;@ core/cpu/opcodes.ts:142:2
   (call $core/core/syncCycles
-   ;;@ core/cpu/opcodes.ts:143:13
+   ;;@ core/cpu/opcodes.ts:142:13
    (i32.const 4)
   )
-  ;;@ core/cpu/opcodes.ts:144:2
+  ;;@ core/cpu/opcodes.ts:143:2
   (call $core/memory/store/eightBitStoreIntoGBMemoryWithTraps
    (get_local $0)
    (get_local $1)
@@ -12686,12 +12686,12 @@
   )
  )
  (func $core/cpu/opcodes/sixteenBitStoreSyncCycles (; 174 ;) (; has Stack IR ;) (type $iiv) (param $0 i32) (param $1 i32)
-  ;;@ core/cpu/opcodes.ts:154:2
+  ;;@ core/cpu/opcodes.ts:153:2
   (call $core/core/syncCycles
-   ;;@ core/cpu/opcodes.ts:154:13
+   ;;@ core/cpu/opcodes.ts:153:13
    (i32.const 8)
   )
-  ;;@ core/cpu/opcodes.ts:155:2
+  ;;@ core/cpu/opcodes.ts:154:2
   (call $core/memory/store/sixteenBitStoreIntoGBMemoryWithTraps
    (get_local $0)
    (get_local $1)
@@ -12836,12 +12836,12 @@
   )
  )
  (func $core/cpu/opcodes/eightBitLoadSyncCycles (; 176 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
-  ;;@ core/cpu/opcodes.ts:138:2
+  ;;@ core/cpu/opcodes.ts:137:2
   (call $core/core/syncCycles
-   ;;@ core/cpu/opcodes.ts:138:13
+   ;;@ core/cpu/opcodes.ts:137:13
    (i32.const 4)
   )
-  ;;@ core/cpu/opcodes.ts:139:60
+  ;;@ core/cpu/opcodes.ts:138:60
   (call $core/memory/load/eightBitLoadFromGBMemoryWithTraps
    (get_local $0)
   )
@@ -12907,14 +12907,14 @@
                        )
                        (br $folding-inner4)
                       )
-                      ;;@ core/cpu/opcodes.ts:188:6
+                      ;;@ core/cpu/opcodes.ts:187:6
                       (set_global $core/cpu/cpu/Cpu.registerB
                        (i32.and
-                        ;;@ core/cpu/opcodes.ts:188:22
+                        ;;@ core/cpu/opcodes.ts:187:22
                         (call $core/helpers/index/splitHighByte
-                         ;;@ core/cpu/opcodes.ts:186:6
+                         ;;@ core/cpu/opcodes.ts:185:6
                          (tee_local $0
-                          ;;@ core/cpu/opcodes.ts:186:38
+                          ;;@ core/cpu/opcodes.ts:185:38
                           (i32.and
                            (call $core/cpu/opcodes/getConcatenatedDataByte)
                            (i32.const 65535)
@@ -12924,10 +12924,10 @@
                         (i32.const 255)
                        )
                       )
-                      ;;@ core/cpu/opcodes.ts:189:6
+                      ;;@ core/cpu/opcodes.ts:188:6
                       (set_global $core/cpu/cpu/Cpu.registerC
                        (i32.and
-                        ;;@ core/cpu/opcodes.ts:189:22
+                        ;;@ core/cpu/opcodes.ts:188:22
                         (call $core/helpers/index/splitLowByte
                          (get_local $0)
                         )
@@ -12936,34 +12936,34 @@
                       )
                       (br $folding-inner2)
                      )
-                     ;;@ core/cpu/opcodes.ts:199:6
+                     ;;@ core/cpu/opcodes.ts:198:6
                      (call $core/cpu/opcodes/eightBitStoreSyncCycles
-                      ;;@ core/cpu/opcodes.ts:199:30
+                      ;;@ core/cpu/opcodes.ts:198:30
                       (call $core/helpers/index/concatenateBytes
-                       ;;@ core/cpu/opcodes.ts:199:47
+                       ;;@ core/cpu/opcodes.ts:198:47
                        (get_global $core/cpu/cpu/Cpu.registerB)
-                       ;;@ core/cpu/opcodes.ts:199:62
+                       ;;@ core/cpu/opcodes.ts:198:62
                        (get_global $core/cpu/cpu/Cpu.registerC)
                       )
-                      ;;@ core/cpu/opcodes.ts:199:78
+                      ;;@ core/cpu/opcodes.ts:198:78
                       (get_global $core/cpu/cpu/Cpu.registerA)
                      )
                      (br $folding-inner4)
                     )
-                    ;;@ core/cpu/opcodes.ts:207:6
+                    ;;@ core/cpu/opcodes.ts:206:6
                     (set_global $core/cpu/cpu/Cpu.registerB
                      (i32.and
-                      ;;@ core/cpu/opcodes.ts:207:22
+                      ;;@ core/cpu/opcodes.ts:206:22
                       (call $core/helpers/index/splitHighByte
                        (tee_local $0
-                        ;;@ core/cpu/opcodes.ts:207:40
+                        ;;@ core/cpu/opcodes.ts:206:40
                         (i32.and
                          (i32.add
-                          ;;@ core/cpu/opcodes.ts:205:29
+                          ;;@ core/cpu/opcodes.ts:204:29
                           (call $core/helpers/index/concatenateBytes
-                           ;;@ core/cpu/opcodes.ts:205:51
+                           ;;@ core/cpu/opcodes.ts:204:51
                            (get_global $core/cpu/cpu/Cpu.registerB)
-                           ;;@ core/cpu/opcodes.ts:205:66
+                           ;;@ core/cpu/opcodes.ts:204:66
                            (get_global $core/cpu/cpu/Cpu.registerC)
                           )
                           (i32.const 1)
@@ -12977,183 +12977,183 @@
                     )
                     (br $folding-inner0)
                    )
-                   ;;@ core/cpu/opcodes.ts:214:6
+                   ;;@ core/cpu/opcodes.ts:213:6
                    (call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
-                    ;;@ core/cpu/opcodes.ts:214:39
+                    ;;@ core/cpu/opcodes.ts:213:39
                     (get_global $core/cpu/cpu/Cpu.registerB)
-                    ;;@ core/cpu/opcodes.ts:214:54
+                    ;;@ core/cpu/opcodes.ts:213:54
                     (i32.const 1)
                    )
-                   ;;@ core/cpu/opcodes.ts:215:6
+                   ;;@ core/cpu/opcodes.ts:214:6
                    (set_global $core/cpu/cpu/Cpu.registerB
-                    ;;@ core/cpu/opcodes.ts:215:22
+                    ;;@ core/cpu/opcodes.ts:214:22
                     (call $core/helpers/index/splitLowByte
-                     ;;@ core/cpu/opcodes.ts:215:33
+                     ;;@ core/cpu/opcodes.ts:214:33
                      (i32.add
                       (get_global $core/cpu/cpu/Cpu.registerB)
-                      ;;@ core/cpu/opcodes.ts:215:49
+                      ;;@ core/cpu/opcodes.ts:214:49
                       (i32.const 1)
                      )
                     )
                    )
-                   ;;@ core/cpu/opcodes.ts:216:6
+                   ;;@ core/cpu/opcodes.ts:215:6
                    (if
-                    ;;@ core/cpu/opcodes.ts:216:10
+                    ;;@ core/cpu/opcodes.ts:215:10
                     (get_global $core/cpu/cpu/Cpu.registerB)
-                    ;;@ core/cpu/opcodes.ts:218:13
+                    ;;@ core/cpu/opcodes.ts:217:13
                     (call $core/cpu/flags/setZeroFlag
-                     ;;@ core/cpu/opcodes.ts:219:20
+                     ;;@ core/cpu/opcodes.ts:218:20
                      (i32.const 0)
                     )
-                    ;;@ core/cpu/opcodes.ts:216:31
+                    ;;@ core/cpu/opcodes.ts:215:31
                     (call $core/cpu/flags/setZeroFlag
-                     ;;@ core/cpu/opcodes.ts:217:20
+                     ;;@ core/cpu/opcodes.ts:216:20
                      (i32.const 1)
                     )
                    )
-                   ;;@ core/cpu/opcodes.ts:221:6
+                   ;;@ core/cpu/opcodes.ts:220:6
                    (call $core/cpu/flags/setSubtractFlag
-                    ;;@ core/cpu/opcodes.ts:221:22
+                    ;;@ core/cpu/opcodes.ts:220:22
                     (i32.const 0)
                    )
                    (br $folding-inner4)
                   )
-                  ;;@ core/cpu/opcodes.ts:227:6
+                  ;;@ core/cpu/opcodes.ts:226:6
                   (call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
-                   ;;@ core/cpu/opcodes.ts:227:39
+                   ;;@ core/cpu/opcodes.ts:226:39
                    (get_global $core/cpu/cpu/Cpu.registerB)
-                   ;;@ core/cpu/opcodes.ts:227:54
+                   ;;@ core/cpu/opcodes.ts:226:54
                    (i32.const -1)
                   )
-                  ;;@ core/cpu/opcodes.ts:228:6
+                  ;;@ core/cpu/opcodes.ts:227:6
                   (set_global $core/cpu/cpu/Cpu.registerB
-                   ;;@ core/cpu/opcodes.ts:228:22
+                   ;;@ core/cpu/opcodes.ts:227:22
                    (call $core/helpers/index/splitLowByte
-                    ;;@ core/cpu/opcodes.ts:228:33
+                    ;;@ core/cpu/opcodes.ts:227:33
                     (i32.sub
                      (get_global $core/cpu/cpu/Cpu.registerB)
-                     ;;@ core/cpu/opcodes.ts:228:49
+                     ;;@ core/cpu/opcodes.ts:227:49
                      (i32.const 1)
                     )
                    )
                   )
-                  ;;@ core/cpu/opcodes.ts:229:6
+                  ;;@ core/cpu/opcodes.ts:228:6
                   (if
-                   ;;@ core/cpu/opcodes.ts:229:10
+                   ;;@ core/cpu/opcodes.ts:228:10
                    (get_global $core/cpu/cpu/Cpu.registerB)
-                   ;;@ core/cpu/opcodes.ts:231:13
+                   ;;@ core/cpu/opcodes.ts:230:13
                    (call $core/cpu/flags/setZeroFlag
-                    ;;@ core/cpu/opcodes.ts:232:20
+                    ;;@ core/cpu/opcodes.ts:231:20
                     (i32.const 0)
                    )
-                   ;;@ core/cpu/opcodes.ts:229:31
+                   ;;@ core/cpu/opcodes.ts:228:31
                    (call $core/cpu/flags/setZeroFlag
-                    ;;@ core/cpu/opcodes.ts:230:20
+                    ;;@ core/cpu/opcodes.ts:229:20
                     (i32.const 1)
                    )
                   )
-                  ;;@ core/cpu/opcodes.ts:234:6
+                  ;;@ core/cpu/opcodes.ts:233:6
                   (call $core/cpu/flags/setSubtractFlag
-                   ;;@ core/cpu/opcodes.ts:234:22
+                   ;;@ core/cpu/opcodes.ts:233:22
                    (i32.const 1)
                   )
                   (br $folding-inner4)
                  )
-                 ;;@ core/cpu/opcodes.ts:241:6
+                 ;;@ core/cpu/opcodes.ts:240:6
                  (set_global $core/cpu/cpu/Cpu.registerB
                   (i32.and
-                   ;;@ core/cpu/opcodes.ts:241:22
+                   ;;@ core/cpu/opcodes.ts:240:22
                    (call $core/cpu/opcodes/getDataByteOne)
                    (i32.const 255)
                   )
                  )
                  (br $folding-inner3)
                 )
-                ;;@ core/cpu/opcodes.ts:250:6
+                ;;@ core/cpu/opcodes.ts:249:6
                 (if
-                 ;;@ core/cpu/opcodes.ts:250:10
+                 ;;@ core/cpu/opcodes.ts:249:10
                  (i32.eq
                   (i32.and
-                   ;;@ core/cpu/opcodes.ts:250:11
+                   ;;@ core/cpu/opcodes.ts:249:11
                    (get_global $core/cpu/cpu/Cpu.registerA)
-                   ;;@ core/cpu/opcodes.ts:250:27
+                   ;;@ core/cpu/opcodes.ts:249:27
                    (i32.const 128)
                   )
-                  ;;@ core/cpu/opcodes.ts:250:37
+                  ;;@ core/cpu/opcodes.ts:249:37
                   (i32.const 128)
                  )
-                 ;;@ core/cpu/opcodes.ts:250:43
+                 ;;@ core/cpu/opcodes.ts:249:43
                  (call $core/cpu/flags/setCarryFlag
-                  ;;@ core/cpu/opcodes.ts:251:21
+                  ;;@ core/cpu/opcodes.ts:250:21
                   (i32.const 1)
                  )
-                 ;;@ core/cpu/opcodes.ts:252:13
+                 ;;@ core/cpu/opcodes.ts:251:13
                  (call $core/cpu/flags/setCarryFlag
-                  ;;@ core/cpu/opcodes.ts:253:21
+                  ;;@ core/cpu/opcodes.ts:252:21
                   (i32.const 0)
                  )
                 )
-                ;;@ core/cpu/opcodes.ts:255:6
+                ;;@ core/cpu/opcodes.ts:254:6
                 (set_global $core/cpu/cpu/Cpu.registerA
-                 ;;@ core/cpu/opcodes.ts:255:22
+                 ;;@ core/cpu/opcodes.ts:254:22
                  (call $core/helpers/index/rotateByteLeft
-                  ;;@ core/cpu/opcodes.ts:255:37
+                  ;;@ core/cpu/opcodes.ts:254:37
                   (get_global $core/cpu/cpu/Cpu.registerA)
                  )
                 )
                 (br $folding-inner1)
                )
-               ;;@ core/cpu/opcodes.ts:267:6
+               ;;@ core/cpu/opcodes.ts:266:6
                (call $core/cpu/opcodes/sixteenBitStoreSyncCycles
-                ;;@ core/cpu/opcodes.ts:267:32
+                ;;@ core/cpu/opcodes.ts:266:32
                 (i32.and
                  (call $core/cpu/opcodes/getConcatenatedDataByte)
                  (i32.const 65535)
                 )
-                ;;@ core/cpu/opcodes.ts:267:59
+                ;;@ core/cpu/opcodes.ts:266:59
                 (get_global $core/cpu/cpu/Cpu.stackPointer)
                )
                (br $folding-inner2)
               )
-              ;;@ core/cpu/opcodes.ts:277:6
+              ;;@ core/cpu/opcodes.ts:276:6
               (call $core/cpu/flags/checkAndSetSixteenBitFlagsAddOverflow
-               ;;@ core/cpu/opcodes.ts:275:6
+               ;;@ core/cpu/opcodes.ts:274:6
                (tee_local $0
-                ;;@ core/cpu/opcodes.ts:275:28
+                ;;@ core/cpu/opcodes.ts:274:28
                 (call $core/helpers/index/concatenateBytes
-                 ;;@ core/cpu/opcodes.ts:275:50
+                 ;;@ core/cpu/opcodes.ts:274:50
                  (get_global $core/cpu/cpu/Cpu.registerH)
-                 ;;@ core/cpu/opcodes.ts:275:65
+                 ;;@ core/cpu/opcodes.ts:274:65
                  (get_global $core/cpu/cpu/Cpu.registerL)
                 )
                )
-               ;;@ core/cpu/opcodes.ts:277:61
+               ;;@ core/cpu/opcodes.ts:276:61
                (i32.and
-                ;;@ core/cpu/opcodes.ts:276:6
+                ;;@ core/cpu/opcodes.ts:275:6
                 (tee_local $1
-                 ;;@ core/cpu/opcodes.ts:276:29
+                 ;;@ core/cpu/opcodes.ts:275:29
                  (call $core/helpers/index/concatenateBytes
-                  ;;@ core/cpu/opcodes.ts:276:51
+                  ;;@ core/cpu/opcodes.ts:275:51
                   (get_global $core/cpu/cpu/Cpu.registerB)
-                  ;;@ core/cpu/opcodes.ts:276:66
+                  ;;@ core/cpu/opcodes.ts:275:66
                   (get_global $core/cpu/cpu/Cpu.registerC)
                  )
                 )
                 (i32.const 65535)
                )
-               ;;@ core/cpu/opcodes.ts:277:79
+               ;;@ core/cpu/opcodes.ts:276:79
                (i32.const 0)
               )
-              ;;@ core/cpu/opcodes.ts:279:6
+              ;;@ core/cpu/opcodes.ts:278:6
               (set_global $core/cpu/cpu/Cpu.registerH
                (i32.and
-                ;;@ core/cpu/opcodes.ts:279:22
+                ;;@ core/cpu/opcodes.ts:278:22
                 (call $core/helpers/index/splitHighByte
-                 ;;@ core/cpu/opcodes.ts:278:6
+                 ;;@ core/cpu/opcodes.ts:277:6
                  (tee_local $0
-                  ;;@ core/cpu/opcodes.ts:278:24
+                  ;;@ core/cpu/opcodes.ts:277:24
                   (call $core/portable/portable/u16Portable
-                   ;;@ core/cpu/opcodes.ts:278:36
+                   ;;@ core/cpu/opcodes.ts:277:36
                    (i32.add
                     (get_local $0)
                     (get_local $1)
@@ -13164,36 +13164,36 @@
                 (i32.const 255)
                )
               )
-              ;;@ core/cpu/opcodes.ts:280:6
+              ;;@ core/cpu/opcodes.ts:279:6
               (set_global $core/cpu/cpu/Cpu.registerL
                (i32.and
-                ;;@ core/cpu/opcodes.ts:280:22
+                ;;@ core/cpu/opcodes.ts:279:22
                 (call $core/helpers/index/splitLowByte
                  (get_local $0)
                 )
                 (i32.const 255)
                )
               )
-              ;;@ core/cpu/opcodes.ts:281:6
+              ;;@ core/cpu/opcodes.ts:280:6
               (call $core/cpu/flags/setSubtractFlag
-               ;;@ core/cpu/opcodes.ts:281:22
+               ;;@ core/cpu/opcodes.ts:280:22
                (i32.const 0)
               )
-              ;;@ core/cpu/opcodes.ts:282:13
+              ;;@ core/cpu/opcodes.ts:281:13
               (return
                (i32.const 8)
               )
              )
-             ;;@ core/cpu/opcodes.ts:288:6
+             ;;@ core/cpu/opcodes.ts:287:6
              (set_global $core/cpu/cpu/Cpu.registerA
               (i32.and
-               ;;@ core/cpu/opcodes.ts:288:22
+               ;;@ core/cpu/opcodes.ts:287:22
                (call $core/cpu/opcodes/eightBitLoadSyncCycles
-                ;;@ core/cpu/opcodes.ts:288:49
+                ;;@ core/cpu/opcodes.ts:287:49
                 (call $core/helpers/index/concatenateBytes
-                 ;;@ core/cpu/opcodes.ts:288:66
+                 ;;@ core/cpu/opcodes.ts:287:66
                  (get_global $core/cpu/cpu/Cpu.registerB)
-                 ;;@ core/cpu/opcodes.ts:288:81
+                 ;;@ core/cpu/opcodes.ts:287:81
                  (get_global $core/cpu/cpu/Cpu.registerC)
                 )
                )
@@ -13202,25 +13202,25 @@
              )
              (br $folding-inner4)
             )
-            ;;@ core/cpu/opcodes.ts:296:6
+            ;;@ core/cpu/opcodes.ts:295:6
             (set_global $core/cpu/cpu/Cpu.registerB
              (i32.and
-              ;;@ core/cpu/opcodes.ts:296:22
+              ;;@ core/cpu/opcodes.ts:295:22
               (call $core/helpers/index/splitHighByte
-               ;;@ core/cpu/opcodes.ts:295:6
+               ;;@ core/cpu/opcodes.ts:294:6
                (tee_local $0
-                ;;@ core/cpu/opcodes.ts:295:20
+                ;;@ core/cpu/opcodes.ts:294:20
                 (call $core/portable/portable/u16Portable
-                 ;;@ core/cpu/opcodes.ts:295:32
+                 ;;@ core/cpu/opcodes.ts:294:32
                  (i32.sub
-                  ;;@ core/cpu/opcodes.ts:294:29
+                  ;;@ core/cpu/opcodes.ts:293:29
                   (call $core/helpers/index/concatenateBytes
-                   ;;@ core/cpu/opcodes.ts:294:51
+                   ;;@ core/cpu/opcodes.ts:293:51
                    (get_global $core/cpu/cpu/Cpu.registerB)
-                   ;;@ core/cpu/opcodes.ts:294:66
+                   ;;@ core/cpu/opcodes.ts:293:66
                    (get_global $core/cpu/cpu/Cpu.registerC)
                   )
-                  ;;@ core/cpu/opcodes.ts:295:46
+                  ;;@ core/cpu/opcodes.ts:294:46
                   (i32.const 1)
                  )
                 )
@@ -13231,127 +13231,127 @@
             )
             (br $folding-inner0)
            )
-           ;;@ core/cpu/opcodes.ts:303:6
+           ;;@ core/cpu/opcodes.ts:302:6
            (call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
-            ;;@ core/cpu/opcodes.ts:303:39
+            ;;@ core/cpu/opcodes.ts:302:39
             (get_global $core/cpu/cpu/Cpu.registerC)
-            ;;@ core/cpu/opcodes.ts:303:54
+            ;;@ core/cpu/opcodes.ts:302:54
             (i32.const 1)
            )
-           ;;@ core/cpu/opcodes.ts:304:6
+           ;;@ core/cpu/opcodes.ts:303:6
            (set_global $core/cpu/cpu/Cpu.registerC
-            ;;@ core/cpu/opcodes.ts:304:22
+            ;;@ core/cpu/opcodes.ts:303:22
             (call $core/helpers/index/splitLowByte
-             ;;@ core/cpu/opcodes.ts:304:33
+             ;;@ core/cpu/opcodes.ts:303:33
              (i32.add
               (get_global $core/cpu/cpu/Cpu.registerC)
-              ;;@ core/cpu/opcodes.ts:304:49
+              ;;@ core/cpu/opcodes.ts:303:49
               (i32.const 1)
              )
             )
            )
-           ;;@ core/cpu/opcodes.ts:305:6
+           ;;@ core/cpu/opcodes.ts:304:6
            (if
-            ;;@ core/cpu/opcodes.ts:305:10
+            ;;@ core/cpu/opcodes.ts:304:10
             (get_global $core/cpu/cpu/Cpu.registerC)
-            ;;@ core/cpu/opcodes.ts:307:13
+            ;;@ core/cpu/opcodes.ts:306:13
             (call $core/cpu/flags/setZeroFlag
-             ;;@ core/cpu/opcodes.ts:308:20
+             ;;@ core/cpu/opcodes.ts:307:20
              (i32.const 0)
             )
-            ;;@ core/cpu/opcodes.ts:305:31
+            ;;@ core/cpu/opcodes.ts:304:31
             (call $core/cpu/flags/setZeroFlag
-             ;;@ core/cpu/opcodes.ts:306:20
+             ;;@ core/cpu/opcodes.ts:305:20
              (i32.const 1)
             )
            )
-           ;;@ core/cpu/opcodes.ts:310:6
+           ;;@ core/cpu/opcodes.ts:309:6
            (call $core/cpu/flags/setSubtractFlag
-            ;;@ core/cpu/opcodes.ts:310:22
+            ;;@ core/cpu/opcodes.ts:309:22
             (i32.const 0)
            )
            (br $folding-inner4)
           )
-          ;;@ core/cpu/opcodes.ts:316:6
+          ;;@ core/cpu/opcodes.ts:315:6
           (call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
-           ;;@ core/cpu/opcodes.ts:316:39
+           ;;@ core/cpu/opcodes.ts:315:39
            (get_global $core/cpu/cpu/Cpu.registerC)
-           ;;@ core/cpu/opcodes.ts:316:54
+           ;;@ core/cpu/opcodes.ts:315:54
            (i32.const -1)
           )
-          ;;@ core/cpu/opcodes.ts:317:6
+          ;;@ core/cpu/opcodes.ts:316:6
           (set_global $core/cpu/cpu/Cpu.registerC
-           ;;@ core/cpu/opcodes.ts:317:22
+           ;;@ core/cpu/opcodes.ts:316:22
            (call $core/helpers/index/splitLowByte
-            ;;@ core/cpu/opcodes.ts:317:33
+            ;;@ core/cpu/opcodes.ts:316:33
             (i32.sub
              (get_global $core/cpu/cpu/Cpu.registerC)
-             ;;@ core/cpu/opcodes.ts:317:49
+             ;;@ core/cpu/opcodes.ts:316:49
              (i32.const 1)
             )
            )
           )
-          ;;@ core/cpu/opcodes.ts:318:6
+          ;;@ core/cpu/opcodes.ts:317:6
           (if
-           ;;@ core/cpu/opcodes.ts:318:10
+           ;;@ core/cpu/opcodes.ts:317:10
            (get_global $core/cpu/cpu/Cpu.registerC)
-           ;;@ core/cpu/opcodes.ts:320:13
+           ;;@ core/cpu/opcodes.ts:319:13
            (call $core/cpu/flags/setZeroFlag
-            ;;@ core/cpu/opcodes.ts:321:20
+            ;;@ core/cpu/opcodes.ts:320:20
             (i32.const 0)
            )
-           ;;@ core/cpu/opcodes.ts:318:31
+           ;;@ core/cpu/opcodes.ts:317:31
            (call $core/cpu/flags/setZeroFlag
-            ;;@ core/cpu/opcodes.ts:319:20
+            ;;@ core/cpu/opcodes.ts:318:20
             (i32.const 1)
            )
           )
-          ;;@ core/cpu/opcodes.ts:323:6
+          ;;@ core/cpu/opcodes.ts:322:6
           (call $core/cpu/flags/setSubtractFlag
-           ;;@ core/cpu/opcodes.ts:323:22
+           ;;@ core/cpu/opcodes.ts:322:22
            (i32.const 1)
           )
           (br $folding-inner4)
          )
-         ;;@ core/cpu/opcodes.ts:330:6
+         ;;@ core/cpu/opcodes.ts:329:6
          (set_global $core/cpu/cpu/Cpu.registerC
           (i32.and
-           ;;@ core/cpu/opcodes.ts:330:22
+           ;;@ core/cpu/opcodes.ts:329:22
            (call $core/cpu/opcodes/getDataByteOne)
            (i32.const 255)
           )
          )
          (br $folding-inner3)
         )
-        ;;@ core/cpu/opcodes.ts:339:6
+        ;;@ core/cpu/opcodes.ts:338:6
         (if
-         ;;@ core/cpu/opcodes.ts:339:10
+         ;;@ core/cpu/opcodes.ts:338:10
          (i32.gt_u
           (i32.and
-           ;;@ core/cpu/opcodes.ts:339:11
+           ;;@ core/cpu/opcodes.ts:338:11
            (get_global $core/cpu/cpu/Cpu.registerA)
-           ;;@ core/cpu/opcodes.ts:339:27
+           ;;@ core/cpu/opcodes.ts:338:27
            (i32.const 1)
           )
-          ;;@ core/cpu/opcodes.ts:339:35
+          ;;@ core/cpu/opcodes.ts:338:35
           (i32.const 0)
          )
-         ;;@ core/cpu/opcodes.ts:339:38
+         ;;@ core/cpu/opcodes.ts:338:38
          (call $core/cpu/flags/setCarryFlag
-          ;;@ core/cpu/opcodes.ts:340:21
+          ;;@ core/cpu/opcodes.ts:339:21
           (i32.const 1)
          )
-         ;;@ core/cpu/opcodes.ts:341:13
+         ;;@ core/cpu/opcodes.ts:340:13
          (call $core/cpu/flags/setCarryFlag
-          ;;@ core/cpu/opcodes.ts:342:21
+          ;;@ core/cpu/opcodes.ts:341:21
           (i32.const 0)
          )
         )
-        ;;@ core/cpu/opcodes.ts:344:6
+        ;;@ core/cpu/opcodes.ts:343:6
         (set_global $core/cpu/cpu/Cpu.registerA
-         ;;@ core/cpu/opcodes.ts:344:22
+         ;;@ core/cpu/opcodes.ts:343:22
          (call $core/helpers/index/rotateByteRight
-          ;;@ core/cpu/opcodes.ts:344:38
+          ;;@ core/cpu/opcodes.ts:343:38
           (get_global $core/cpu/cpu/Cpu.registerA)
          )
         )
@@ -13361,66 +13361,66 @@
         (i32.const -1)
        )
       )
-      ;;@ core/cpu/opcodes.ts:208:6
+      ;;@ core/cpu/opcodes.ts:207:6
       (set_global $core/cpu/cpu/Cpu.registerC
        (i32.and
-        ;;@ core/cpu/opcodes.ts:208:22
+        ;;@ core/cpu/opcodes.ts:207:22
         (call $core/helpers/index/splitLowByte
          (get_local $0)
         )
         (i32.const 255)
        )
       )
-      ;;@ core/cpu/opcodes.ts:209:13
+      ;;@ core/cpu/opcodes.ts:208:13
       (return
        (i32.const 8)
       )
      )
-     ;;@ core/cpu/opcodes.ts:257:6
+     ;;@ core/cpu/opcodes.ts:256:6
      (call $core/cpu/flags/setZeroFlag
-      ;;@ core/cpu/opcodes.ts:257:18
+      ;;@ core/cpu/opcodes.ts:256:18
+      (i32.const 0)
+     )
+     ;;@ core/cpu/opcodes.ts:257:6
+     (call $core/cpu/flags/setSubtractFlag
+      ;;@ core/cpu/opcodes.ts:257:22
       (i32.const 0)
      )
      ;;@ core/cpu/opcodes.ts:258:6
-     (call $core/cpu/flags/setSubtractFlag
-      ;;@ core/cpu/opcodes.ts:258:22
-      (i32.const 0)
-     )
-     ;;@ core/cpu/opcodes.ts:259:6
      (call $core/cpu/flags/setHalfCarryFlag
-      ;;@ core/cpu/opcodes.ts:259:23
+      ;;@ core/cpu/opcodes.ts:258:23
       (i32.const 0)
      )
      (br $folding-inner4)
     )
-    ;;@ core/cpu/opcodes.ts:190:6
+    ;;@ core/cpu/opcodes.ts:189:6
     (set_global $core/cpu/cpu/Cpu.programCounter
-     ;;@ core/cpu/opcodes.ts:190:27
+     ;;@ core/cpu/opcodes.ts:189:27
      (call $core/portable/portable/u16Portable
-      ;;@ core/cpu/opcodes.ts:190:39
+      ;;@ core/cpu/opcodes.ts:189:39
       (i32.add
        (get_global $core/cpu/cpu/Cpu.programCounter)
-       ;;@ core/cpu/opcodes.ts:190:60
+       ;;@ core/cpu/opcodes.ts:189:60
        (i32.const 2)
       )
      )
     )
     (br $folding-inner4)
    )
-   ;;@ core/cpu/opcodes.ts:242:6
+   ;;@ core/cpu/opcodes.ts:241:6
    (set_global $core/cpu/cpu/Cpu.programCounter
-    ;;@ core/cpu/opcodes.ts:242:27
+    ;;@ core/cpu/opcodes.ts:241:27
     (call $core/portable/portable/u16Portable
-     ;;@ core/cpu/opcodes.ts:242:39
+     ;;@ core/cpu/opcodes.ts:241:39
      (i32.add
       (get_global $core/cpu/cpu/Cpu.programCounter)
-      ;;@ core/cpu/opcodes.ts:242:60
+      ;;@ core/cpu/opcodes.ts:241:60
       (i32.const 1)
      )
     )
    )
   )
-  ;;@ core/cpu/opcodes.ts:180:13
+  ;;@ core/cpu/opcodes.ts:179:13
   (i32.const 4)
  )
  (func $core/cpu/flags/getCarryFlag (; 179 ;) (; has Stack IR ;) (type $i) (result i32)
@@ -13582,7 +13582,7 @@
                       (if
                        (i32.ne
                         (get_local $0)
-                        ;;@ core/cpu/opcodes.ts:356:9
+                        ;;@ core/cpu/opcodes.ts:355:9
                         (i32.const 16)
                        )
                        (block
@@ -13597,19 +13597,19 @@
                         (br $break|0)
                        )
                       )
-                      ;;@ core/cpu/opcodes.ts:364:6
+                      ;;@ core/cpu/opcodes.ts:363:6
                       (if
-                       ;;@ core/cpu/opcodes.ts:364:10
+                       ;;@ core/cpu/opcodes.ts:363:10
                        (get_global $core/cpu/cpu/Cpu.GBCEnabled)
-                       ;;@ core/cpu/opcodes.ts:367:8
+                       ;;@ core/cpu/opcodes.ts:366:8
                        (if
-                        ;;@ core/cpu/opcodes.ts:367:12
+                        ;;@ core/cpu/opcodes.ts:366:12
                         (call $core/helpers/index/checkBitOnByte
-                         ;;@ core/cpu/opcodes.ts:367:27
+                         ;;@ core/cpu/opcodes.ts:366:27
                          (i32.const 0)
-                         ;;@ core/cpu/opcodes.ts:366:8
+                         ;;@ core/cpu/opcodes.ts:365:8
                          (tee_local $0
-                          ;;@ core/cpu/opcodes.ts:366:31
+                          ;;@ core/cpu/opcodes.ts:365:31
                           (i32.and
                            (call $core/cpu/opcodes/eightBitLoadSyncCycles
                             (i32.const 65357)
@@ -13618,52 +13618,52 @@
                           )
                          )
                         )
-                        ;;@ core/cpu/opcodes.ts:367:44
+                        ;;@ core/cpu/opcodes.ts:366:44
                         (block
-                         ;;@ core/cpu/opcodes.ts:382:10
+                         ;;@ core/cpu/opcodes.ts:381:10
                          (call $core/cpu/opcodes/eightBitStoreSyncCycles
                           (i32.const 65357)
                           (tee_local $0
-                           ;;@ core/cpu/opcodes.ts:372:10
+                           ;;@ core/cpu/opcodes.ts:371:10
                            (if (result i32)
-                            ;;@ core/cpu/opcodes.ts:372:15
+                            ;;@ core/cpu/opcodes.ts:371:15
                             (call $core/helpers/index/checkBitOnByte
-                             ;;@ core/cpu/opcodes.ts:372:30
+                             ;;@ core/cpu/opcodes.ts:371:30
                              (i32.const 7)
-                             ;;@ core/cpu/opcodes.ts:369:10
+                             ;;@ core/cpu/opcodes.ts:368:10
                              (tee_local $0
-                              ;;@ core/cpu/opcodes.ts:369:24
+                              ;;@ core/cpu/opcodes.ts:368:24
                               (call $core/helpers/index/resetBitOnByte
-                               ;;@ core/cpu/opcodes.ts:369:39
+                               ;;@ core/cpu/opcodes.ts:368:39
                                (i32.const 0)
                                (get_local $0)
                               )
                              )
                             )
-                            ;;@ core/cpu/opcodes.ts:375:17
+                            ;;@ core/cpu/opcodes.ts:374:17
                             (block (result i32)
-                             ;;@ core/cpu/opcodes.ts:376:12
+                             ;;@ core/cpu/opcodes.ts:375:12
                              (set_global $core/cpu/cpu/Cpu.GBCDoubleSpeed
-                              ;;@ core/cpu/opcodes.ts:376:33
+                              ;;@ core/cpu/opcodes.ts:375:33
                               (i32.const 0)
                              )
-                             ;;@ core/cpu/opcodes.ts:377:26
+                             ;;@ core/cpu/opcodes.ts:376:26
                              (call $core/helpers/index/resetBitOnByte
-                              ;;@ core/cpu/opcodes.ts:377:41
+                              ;;@ core/cpu/opcodes.ts:376:41
                               (i32.const 7)
                               (get_local $0)
                              )
                             )
-                            ;;@ core/cpu/opcodes.ts:372:47
+                            ;;@ core/cpu/opcodes.ts:371:47
                             (block (result i32)
-                             ;;@ core/cpu/opcodes.ts:373:12
+                             ;;@ core/cpu/opcodes.ts:372:12
                              (set_global $core/cpu/cpu/Cpu.GBCDoubleSpeed
-                              ;;@ core/cpu/opcodes.ts:373:33
+                              ;;@ core/cpu/opcodes.ts:372:33
                               (i32.const 1)
                              )
-                             ;;@ core/cpu/opcodes.ts:374:26
+                             ;;@ core/cpu/opcodes.ts:373:26
                              (call $core/helpers/index/setBitOnByte
-                              ;;@ core/cpu/opcodes.ts:374:39
+                              ;;@ core/cpu/opcodes.ts:373:39
                               (i32.const 7)
                               (get_local $0)
                              )
@@ -13671,28 +13671,28 @@
                            )
                           )
                          )
-                         ;;@ core/cpu/opcodes.ts:386:17
+                         ;;@ core/cpu/opcodes.ts:385:17
                          (return
                           (i32.const 68)
                          )
                         )
                        )
                       )
-                      ;;@ core/cpu/opcodes.ts:391:6
+                      ;;@ core/cpu/opcodes.ts:390:6
                       (set_global $core/cpu/cpu/Cpu.isStopped
-                       ;;@ core/cpu/opcodes.ts:391:22
+                       ;;@ core/cpu/opcodes.ts:390:22
                        (i32.const 1)
                       )
                       (br $folding-inner2)
                      )
-                     ;;@ core/cpu/opcodes.ts:401:6
+                     ;;@ core/cpu/opcodes.ts:400:6
                      (set_global $core/cpu/cpu/Cpu.registerD
                       (i32.and
-                       ;;@ core/cpu/opcodes.ts:401:22
+                       ;;@ core/cpu/opcodes.ts:400:22
                        (call $core/helpers/index/splitHighByte
-                        ;;@ core/cpu/opcodes.ts:399:6
+                        ;;@ core/cpu/opcodes.ts:398:6
                         (tee_local $0
-                         ;;@ core/cpu/opcodes.ts:399:38
+                         ;;@ core/cpu/opcodes.ts:398:38
                          (i32.and
                           (call $core/cpu/opcodes/getConcatenatedDataByte)
                           (i32.const 65535)
@@ -13702,63 +13702,63 @@
                        (i32.const 255)
                       )
                      )
-                     ;;@ core/cpu/opcodes.ts:402:6
+                     ;;@ core/cpu/opcodes.ts:401:6
                      (set_global $core/cpu/cpu/Cpu.registerE
                       (i32.and
-                       ;;@ core/cpu/opcodes.ts:402:22
+                       ;;@ core/cpu/opcodes.ts:401:22
                        (call $core/helpers/index/splitLowByte
                         (get_local $0)
                        )
                        (i32.const 255)
                       )
                      )
-                     ;;@ core/cpu/opcodes.ts:403:6
+                     ;;@ core/cpu/opcodes.ts:402:6
                      (set_global $core/cpu/cpu/Cpu.programCounter
-                      ;;@ core/cpu/opcodes.ts:403:27
+                      ;;@ core/cpu/opcodes.ts:402:27
                       (call $core/portable/portable/u16Portable
-                       ;;@ core/cpu/opcodes.ts:403:39
+                       ;;@ core/cpu/opcodes.ts:402:39
                        (i32.add
                         (get_global $core/cpu/cpu/Cpu.programCounter)
-                        ;;@ core/cpu/opcodes.ts:403:60
+                        ;;@ core/cpu/opcodes.ts:402:60
                         (i32.const 2)
                        )
                       )
                      )
                      (br $folding-inner3)
                     )
-                    ;;@ core/cpu/opcodes.ts:410:6
+                    ;;@ core/cpu/opcodes.ts:409:6
                     (call $core/cpu/opcodes/eightBitStoreSyncCycles
-                     ;;@ core/cpu/opcodes.ts:410:30
+                     ;;@ core/cpu/opcodes.ts:409:30
                      (call $core/helpers/index/concatenateBytes
-                      ;;@ core/cpu/opcodes.ts:410:47
+                      ;;@ core/cpu/opcodes.ts:409:47
                       (get_global $core/cpu/cpu/Cpu.registerD)
-                      ;;@ core/cpu/opcodes.ts:410:62
+                      ;;@ core/cpu/opcodes.ts:409:62
                       (get_global $core/cpu/cpu/Cpu.registerE)
                      )
-                     ;;@ core/cpu/opcodes.ts:410:78
+                     ;;@ core/cpu/opcodes.ts:409:78
                      (get_global $core/cpu/cpu/Cpu.registerA)
                     )
                     (br $folding-inner3)
                    )
-                   ;;@ core/cpu/opcodes.ts:417:6
+                   ;;@ core/cpu/opcodes.ts:416:6
                    (set_global $core/cpu/cpu/Cpu.registerD
                     (i32.and
-                     ;;@ core/cpu/opcodes.ts:417:22
+                     ;;@ core/cpu/opcodes.ts:416:22
                      (call $core/helpers/index/splitHighByte
-                      ;;@ core/cpu/opcodes.ts:416:6
+                      ;;@ core/cpu/opcodes.ts:415:6
                       (tee_local $0
-                       ;;@ core/cpu/opcodes.ts:416:20
+                       ;;@ core/cpu/opcodes.ts:415:20
                        (call $core/portable/portable/u16Portable
-                        ;;@ core/cpu/opcodes.ts:416:32
+                        ;;@ core/cpu/opcodes.ts:415:32
                         (i32.add
-                         ;;@ core/cpu/opcodes.ts:415:24
+                         ;;@ core/cpu/opcodes.ts:414:24
                          (call $core/helpers/index/concatenateBytes
-                          ;;@ core/cpu/opcodes.ts:415:46
+                          ;;@ core/cpu/opcodes.ts:414:46
                           (get_global $core/cpu/cpu/Cpu.registerD)
-                          ;;@ core/cpu/opcodes.ts:415:61
+                          ;;@ core/cpu/opcodes.ts:414:61
                           (get_global $core/cpu/cpu/Cpu.registerE)
                          )
-                         ;;@ core/cpu/opcodes.ts:416:46
+                         ;;@ core/cpu/opcodes.ts:415:46
                          (i32.const 1)
                         )
                        )
@@ -13769,181 +13769,181 @@
                    )
                    (br $folding-inner0)
                   )
-                  ;;@ core/cpu/opcodes.ts:424:6
+                  ;;@ core/cpu/opcodes.ts:423:6
                   (call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
-                   ;;@ core/cpu/opcodes.ts:424:39
+                   ;;@ core/cpu/opcodes.ts:423:39
                    (get_global $core/cpu/cpu/Cpu.registerD)
-                   ;;@ core/cpu/opcodes.ts:424:54
+                   ;;@ core/cpu/opcodes.ts:423:54
                    (i32.const 1)
                   )
-                  ;;@ core/cpu/opcodes.ts:425:6
+                  ;;@ core/cpu/opcodes.ts:424:6
                   (set_global $core/cpu/cpu/Cpu.registerD
-                   ;;@ core/cpu/opcodes.ts:425:22
+                   ;;@ core/cpu/opcodes.ts:424:22
                    (call $core/helpers/index/splitLowByte
-                    ;;@ core/cpu/opcodes.ts:425:33
+                    ;;@ core/cpu/opcodes.ts:424:33
                     (i32.add
                      (get_global $core/cpu/cpu/Cpu.registerD)
-                     ;;@ core/cpu/opcodes.ts:425:49
+                     ;;@ core/cpu/opcodes.ts:424:49
                      (i32.const 1)
                     )
                    )
                   )
-                  ;;@ core/cpu/opcodes.ts:426:6
+                  ;;@ core/cpu/opcodes.ts:425:6
                   (if
-                   ;;@ core/cpu/opcodes.ts:426:10
+                   ;;@ core/cpu/opcodes.ts:425:10
                    (get_global $core/cpu/cpu/Cpu.registerD)
-                   ;;@ core/cpu/opcodes.ts:428:13
+                   ;;@ core/cpu/opcodes.ts:427:13
                    (call $core/cpu/flags/setZeroFlag
-                    ;;@ core/cpu/opcodes.ts:429:20
+                    ;;@ core/cpu/opcodes.ts:428:20
                     (i32.const 0)
                    )
-                   ;;@ core/cpu/opcodes.ts:426:31
+                   ;;@ core/cpu/opcodes.ts:425:31
                    (call $core/cpu/flags/setZeroFlag
-                    ;;@ core/cpu/opcodes.ts:427:20
+                    ;;@ core/cpu/opcodes.ts:426:20
                     (i32.const 1)
                    )
                   )
-                  ;;@ core/cpu/opcodes.ts:431:6
+                  ;;@ core/cpu/opcodes.ts:430:6
                   (call $core/cpu/flags/setSubtractFlag
-                   ;;@ core/cpu/opcodes.ts:431:22
+                   ;;@ core/cpu/opcodes.ts:430:22
                    (i32.const 0)
                   )
                   (br $folding-inner3)
                  )
-                 ;;@ core/cpu/opcodes.ts:437:6
+                 ;;@ core/cpu/opcodes.ts:436:6
                  (call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
-                  ;;@ core/cpu/opcodes.ts:437:39
+                  ;;@ core/cpu/opcodes.ts:436:39
                   (get_global $core/cpu/cpu/Cpu.registerD)
-                  ;;@ core/cpu/opcodes.ts:437:54
+                  ;;@ core/cpu/opcodes.ts:436:54
                   (i32.const -1)
                  )
-                 ;;@ core/cpu/opcodes.ts:438:6
+                 ;;@ core/cpu/opcodes.ts:437:6
                  (set_global $core/cpu/cpu/Cpu.registerD
-                  ;;@ core/cpu/opcodes.ts:438:22
+                  ;;@ core/cpu/opcodes.ts:437:22
                   (call $core/helpers/index/splitLowByte
-                   ;;@ core/cpu/opcodes.ts:438:33
+                   ;;@ core/cpu/opcodes.ts:437:33
                    (i32.sub
                     (get_global $core/cpu/cpu/Cpu.registerD)
-                    ;;@ core/cpu/opcodes.ts:438:49
+                    ;;@ core/cpu/opcodes.ts:437:49
                     (i32.const 1)
                    )
                   )
                  )
-                 ;;@ core/cpu/opcodes.ts:439:6
+                 ;;@ core/cpu/opcodes.ts:438:6
                  (if
-                  ;;@ core/cpu/opcodes.ts:439:10
+                  ;;@ core/cpu/opcodes.ts:438:10
                   (get_global $core/cpu/cpu/Cpu.registerD)
-                  ;;@ core/cpu/opcodes.ts:441:13
+                  ;;@ core/cpu/opcodes.ts:440:13
                   (call $core/cpu/flags/setZeroFlag
-                   ;;@ core/cpu/opcodes.ts:442:20
+                   ;;@ core/cpu/opcodes.ts:441:20
                    (i32.const 0)
                   )
-                  ;;@ core/cpu/opcodes.ts:439:31
+                  ;;@ core/cpu/opcodes.ts:438:31
                   (call $core/cpu/flags/setZeroFlag
-                   ;;@ core/cpu/opcodes.ts:440:20
+                   ;;@ core/cpu/opcodes.ts:439:20
                    (i32.const 1)
                   )
                  )
-                 ;;@ core/cpu/opcodes.ts:444:6
+                 ;;@ core/cpu/opcodes.ts:443:6
                  (call $core/cpu/flags/setSubtractFlag
-                  ;;@ core/cpu/opcodes.ts:444:22
+                  ;;@ core/cpu/opcodes.ts:443:22
                   (i32.const 1)
                  )
                  (br $folding-inner3)
                 )
-                ;;@ core/cpu/opcodes.ts:451:6
+                ;;@ core/cpu/opcodes.ts:450:6
                 (set_global $core/cpu/cpu/Cpu.registerD
                  (i32.and
-                  ;;@ core/cpu/opcodes.ts:451:22
+                  ;;@ core/cpu/opcodes.ts:450:22
                   (call $core/cpu/opcodes/getDataByteOne)
                   (i32.const 255)
                  )
                 )
                 (br $folding-inner2)
                )
-               ;;@ core/cpu/opcodes.ts:460:6
+               ;;@ core/cpu/opcodes.ts:459:6
                (set_local $0
-                ;;@ core/cpu/opcodes.ts:460:23
+                ;;@ core/cpu/opcodes.ts:459:23
                 (i32.const 0)
                )
-               ;;@ core/cpu/opcodes.ts:461:6
+               ;;@ core/cpu/opcodes.ts:460:6
                (if
-                ;;@ core/cpu/opcodes.ts:461:10
+                ;;@ core/cpu/opcodes.ts:460:10
                 (i32.eq
                  (i32.and
-                  ;;@ core/cpu/opcodes.ts:461:11
+                  ;;@ core/cpu/opcodes.ts:460:11
                   (get_global $core/cpu/cpu/Cpu.registerA)
-                  ;;@ core/cpu/opcodes.ts:461:27
+                  ;;@ core/cpu/opcodes.ts:460:27
                   (i32.const 128)
                  )
-                 ;;@ core/cpu/opcodes.ts:461:37
+                 ;;@ core/cpu/opcodes.ts:460:37
                  (i32.const 128)
                 )
-                ;;@ core/cpu/opcodes.ts:461:43
+                ;;@ core/cpu/opcodes.ts:460:43
                 (set_local $0
-                 ;;@ core/cpu/opcodes.ts:462:21
+                 ;;@ core/cpu/opcodes.ts:461:21
                  (i32.const 1)
                 )
                )
-               ;;@ core/cpu/opcodes.ts:464:6
+               ;;@ core/cpu/opcodes.ts:463:6
                (set_global $core/cpu/cpu/Cpu.registerA
-                ;;@ core/cpu/opcodes.ts:464:22
+                ;;@ core/cpu/opcodes.ts:463:22
                 (call $core/helpers/index/rotateByteLeftThroughCarry
-                 ;;@ core/cpu/opcodes.ts:464:49
+                 ;;@ core/cpu/opcodes.ts:463:49
                  (get_global $core/cpu/cpu/Cpu.registerA)
                 )
                )
                (br $folding-inner1)
               )
-              ;;@ core/cpu/opcodes.ts:483:6
+              ;;@ core/cpu/opcodes.ts:482:6
               (call $core/cpu/instructions/relativeJump
-               ;;@ core/cpu/opcodes.ts:483:19
+               ;;@ core/cpu/opcodes.ts:482:19
                (call $core/cpu/opcodes/getDataByteOne)
               )
-              ;;@ core/cpu/opcodes.ts:484:13
+              ;;@ core/cpu/opcodes.ts:483:13
               (return
                (i32.const 8)
               )
              )
-             ;;@ core/cpu/opcodes.ts:492:6
+             ;;@ core/cpu/opcodes.ts:491:6
              (call $core/cpu/flags/checkAndSetSixteenBitFlagsAddOverflow
-              ;;@ core/cpu/opcodes.ts:490:6
+              ;;@ core/cpu/opcodes.ts:489:6
               (tee_local $0
-               ;;@ core/cpu/opcodes.ts:490:28
+               ;;@ core/cpu/opcodes.ts:489:28
                (call $core/helpers/index/concatenateBytes
-                ;;@ core/cpu/opcodes.ts:490:50
+                ;;@ core/cpu/opcodes.ts:489:50
                 (get_global $core/cpu/cpu/Cpu.registerH)
-                ;;@ core/cpu/opcodes.ts:490:65
+                ;;@ core/cpu/opcodes.ts:489:65
                 (get_global $core/cpu/cpu/Cpu.registerL)
                )
               )
-              ;;@ core/cpu/opcodes.ts:492:61
+              ;;@ core/cpu/opcodes.ts:491:61
               (i32.and
-               ;;@ core/cpu/opcodes.ts:491:6
+               ;;@ core/cpu/opcodes.ts:490:6
                (tee_local $1
-                ;;@ core/cpu/opcodes.ts:491:29
+                ;;@ core/cpu/opcodes.ts:490:29
                 (call $core/helpers/index/concatenateBytes
-                 ;;@ core/cpu/opcodes.ts:491:51
+                 ;;@ core/cpu/opcodes.ts:490:51
                  (get_global $core/cpu/cpu/Cpu.registerD)
-                 ;;@ core/cpu/opcodes.ts:491:66
+                 ;;@ core/cpu/opcodes.ts:490:66
                  (get_global $core/cpu/cpu/Cpu.registerE)
                 )
                )
                (i32.const 65535)
               )
-              ;;@ core/cpu/opcodes.ts:492:79
+              ;;@ core/cpu/opcodes.ts:491:79
               (i32.const 0)
              )
-             ;;@ core/cpu/opcodes.ts:494:6
+             ;;@ core/cpu/opcodes.ts:493:6
              (set_global $core/cpu/cpu/Cpu.registerH
               (i32.and
-               ;;@ core/cpu/opcodes.ts:494:22
+               ;;@ core/cpu/opcodes.ts:493:22
                (call $core/helpers/index/splitHighByte
-                ;;@ core/cpu/opcodes.ts:493:6
+                ;;@ core/cpu/opcodes.ts:492:6
                 (tee_local $0
-                 ;;@ core/cpu/opcodes.ts:493:24
+                 ;;@ core/cpu/opcodes.ts:492:24
                  (call $core/portable/portable/u16Portable
-                  ;;@ core/cpu/opcodes.ts:493:36
+                  ;;@ core/cpu/opcodes.ts:492:36
                   (i32.add
                    (get_local $0)
                    (get_local $1)
@@ -13954,38 +13954,38 @@
                (i32.const 255)
               )
              )
-             ;;@ core/cpu/opcodes.ts:495:6
+             ;;@ core/cpu/opcodes.ts:494:6
              (set_global $core/cpu/cpu/Cpu.registerL
               (i32.and
-               ;;@ core/cpu/opcodes.ts:495:22
+               ;;@ core/cpu/opcodes.ts:494:22
                (call $core/helpers/index/splitLowByte
                 (get_local $0)
                )
                (i32.const 255)
               )
              )
-             ;;@ core/cpu/opcodes.ts:496:6
+             ;;@ core/cpu/opcodes.ts:495:6
              (call $core/cpu/flags/setSubtractFlag
-              ;;@ core/cpu/opcodes.ts:496:22
+              ;;@ core/cpu/opcodes.ts:495:22
               (i32.const 0)
              )
-             ;;@ core/cpu/opcodes.ts:497:13
+             ;;@ core/cpu/opcodes.ts:496:13
              (return
               (i32.const 8)
              )
             )
-            ;;@ core/cpu/opcodes.ts:503:6
+            ;;@ core/cpu/opcodes.ts:502:6
             (set_global $core/cpu/cpu/Cpu.registerA
              (i32.and
-              ;;@ core/cpu/opcodes.ts:503:22
+              ;;@ core/cpu/opcodes.ts:502:22
               (call $core/cpu/opcodes/eightBitLoadSyncCycles
-               ;;@ core/cpu/opcodes.ts:503:49
+               ;;@ core/cpu/opcodes.ts:502:49
                (i32.and
-                ;;@ core/cpu/opcodes.ts:501:29
+                ;;@ core/cpu/opcodes.ts:500:29
                 (call $core/helpers/index/concatenateBytes
-                 ;;@ core/cpu/opcodes.ts:501:51
+                 ;;@ core/cpu/opcodes.ts:500:51
                  (get_global $core/cpu/cpu/Cpu.registerD)
-                 ;;@ core/cpu/opcodes.ts:501:66
+                 ;;@ core/cpu/opcodes.ts:500:66
                  (get_global $core/cpu/cpu/Cpu.registerE)
                 )
                 (i32.const 65535)
@@ -13996,25 +13996,25 @@
             )
             (br $folding-inner3)
            )
-           ;;@ core/cpu/opcodes.ts:510:6
+           ;;@ core/cpu/opcodes.ts:509:6
            (set_global $core/cpu/cpu/Cpu.registerD
             (i32.and
-             ;;@ core/cpu/opcodes.ts:510:22
+             ;;@ core/cpu/opcodes.ts:509:22
              (call $core/helpers/index/splitHighByte
-              ;;@ core/cpu/opcodes.ts:509:6
+              ;;@ core/cpu/opcodes.ts:508:6
               (tee_local $0
-               ;;@ core/cpu/opcodes.ts:509:20
+               ;;@ core/cpu/opcodes.ts:508:20
                (call $core/portable/portable/u16Portable
-                ;;@ core/cpu/opcodes.ts:509:32
+                ;;@ core/cpu/opcodes.ts:508:32
                 (i32.sub
-                 ;;@ core/cpu/opcodes.ts:508:29
+                 ;;@ core/cpu/opcodes.ts:507:29
                  (call $core/helpers/index/concatenateBytes
-                  ;;@ core/cpu/opcodes.ts:508:51
+                  ;;@ core/cpu/opcodes.ts:507:51
                   (get_global $core/cpu/cpu/Cpu.registerD)
-                  ;;@ core/cpu/opcodes.ts:508:66
+                  ;;@ core/cpu/opcodes.ts:507:66
                   (get_global $core/cpu/cpu/Cpu.registerE)
                  )
-                 ;;@ core/cpu/opcodes.ts:509:46
+                 ;;@ core/cpu/opcodes.ts:508:46
                  (i32.const 1)
                 )
                )
@@ -14025,127 +14025,127 @@
            )
            (br $folding-inner0)
           )
-          ;;@ core/cpu/opcodes.ts:517:6
+          ;;@ core/cpu/opcodes.ts:516:6
           (call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
-           ;;@ core/cpu/opcodes.ts:517:39
+           ;;@ core/cpu/opcodes.ts:516:39
            (get_global $core/cpu/cpu/Cpu.registerE)
-           ;;@ core/cpu/opcodes.ts:517:54
+           ;;@ core/cpu/opcodes.ts:516:54
            (i32.const 1)
           )
-          ;;@ core/cpu/opcodes.ts:518:6
+          ;;@ core/cpu/opcodes.ts:517:6
           (set_global $core/cpu/cpu/Cpu.registerE
-           ;;@ core/cpu/opcodes.ts:518:22
+           ;;@ core/cpu/opcodes.ts:517:22
            (call $core/helpers/index/splitLowByte
-            ;;@ core/cpu/opcodes.ts:518:33
+            ;;@ core/cpu/opcodes.ts:517:33
             (i32.add
              (get_global $core/cpu/cpu/Cpu.registerE)
-             ;;@ core/cpu/opcodes.ts:518:49
+             ;;@ core/cpu/opcodes.ts:517:49
              (i32.const 1)
             )
            )
           )
-          ;;@ core/cpu/opcodes.ts:519:6
+          ;;@ core/cpu/opcodes.ts:518:6
           (if
-           ;;@ core/cpu/opcodes.ts:519:10
+           ;;@ core/cpu/opcodes.ts:518:10
            (get_global $core/cpu/cpu/Cpu.registerE)
-           ;;@ core/cpu/opcodes.ts:521:13
+           ;;@ core/cpu/opcodes.ts:520:13
            (call $core/cpu/flags/setZeroFlag
-            ;;@ core/cpu/opcodes.ts:522:20
+            ;;@ core/cpu/opcodes.ts:521:20
             (i32.const 0)
            )
-           ;;@ core/cpu/opcodes.ts:519:31
+           ;;@ core/cpu/opcodes.ts:518:31
            (call $core/cpu/flags/setZeroFlag
-            ;;@ core/cpu/opcodes.ts:520:20
+            ;;@ core/cpu/opcodes.ts:519:20
             (i32.const 1)
            )
           )
-          ;;@ core/cpu/opcodes.ts:524:6
+          ;;@ core/cpu/opcodes.ts:523:6
           (call $core/cpu/flags/setSubtractFlag
-           ;;@ core/cpu/opcodes.ts:524:22
+           ;;@ core/cpu/opcodes.ts:523:22
            (i32.const 0)
           )
           (br $folding-inner3)
          )
-         ;;@ core/cpu/opcodes.ts:530:6
+         ;;@ core/cpu/opcodes.ts:529:6
          (call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
-          ;;@ core/cpu/opcodes.ts:530:39
+          ;;@ core/cpu/opcodes.ts:529:39
           (get_global $core/cpu/cpu/Cpu.registerE)
-          ;;@ core/cpu/opcodes.ts:530:54
+          ;;@ core/cpu/opcodes.ts:529:54
           (i32.const -1)
          )
-         ;;@ core/cpu/opcodes.ts:531:6
+         ;;@ core/cpu/opcodes.ts:530:6
          (set_global $core/cpu/cpu/Cpu.registerE
-          ;;@ core/cpu/opcodes.ts:531:22
+          ;;@ core/cpu/opcodes.ts:530:22
           (call $core/helpers/index/splitLowByte
-           ;;@ core/cpu/opcodes.ts:531:33
+           ;;@ core/cpu/opcodes.ts:530:33
            (i32.sub
             (get_global $core/cpu/cpu/Cpu.registerE)
-            ;;@ core/cpu/opcodes.ts:531:49
+            ;;@ core/cpu/opcodes.ts:530:49
             (i32.const 1)
            )
           )
          )
-         ;;@ core/cpu/opcodes.ts:532:6
+         ;;@ core/cpu/opcodes.ts:531:6
          (if
-          ;;@ core/cpu/opcodes.ts:532:10
+          ;;@ core/cpu/opcodes.ts:531:10
           (get_global $core/cpu/cpu/Cpu.registerE)
-          ;;@ core/cpu/opcodes.ts:534:13
+          ;;@ core/cpu/opcodes.ts:533:13
           (call $core/cpu/flags/setZeroFlag
-           ;;@ core/cpu/opcodes.ts:535:20
+           ;;@ core/cpu/opcodes.ts:534:20
            (i32.const 0)
           )
-          ;;@ core/cpu/opcodes.ts:532:31
+          ;;@ core/cpu/opcodes.ts:531:31
           (call $core/cpu/flags/setZeroFlag
-           ;;@ core/cpu/opcodes.ts:533:20
+           ;;@ core/cpu/opcodes.ts:532:20
            (i32.const 1)
           )
          )
-         ;;@ core/cpu/opcodes.ts:537:6
+         ;;@ core/cpu/opcodes.ts:536:6
          (call $core/cpu/flags/setSubtractFlag
-          ;;@ core/cpu/opcodes.ts:537:22
+          ;;@ core/cpu/opcodes.ts:536:22
           (i32.const 1)
          )
          (br $folding-inner3)
         )
-        ;;@ core/cpu/opcodes.ts:544:6
+        ;;@ core/cpu/opcodes.ts:543:6
         (set_global $core/cpu/cpu/Cpu.registerE
          (i32.and
-          ;;@ core/cpu/opcodes.ts:544:22
+          ;;@ core/cpu/opcodes.ts:543:22
           (call $core/cpu/opcodes/getDataByteOne)
           (i32.const 255)
          )
         )
         (br $folding-inner2)
        )
-       ;;@ core/cpu/opcodes.ts:553:6
+       ;;@ core/cpu/opcodes.ts:552:6
        (set_local $0
-        ;;@ core/cpu/opcodes.ts:553:22
+        ;;@ core/cpu/opcodes.ts:552:22
         (i32.const 0)
        )
-       ;;@ core/cpu/opcodes.ts:554:6
+       ;;@ core/cpu/opcodes.ts:553:6
        (if
-        ;;@ core/cpu/opcodes.ts:554:10
+        ;;@ core/cpu/opcodes.ts:553:10
         (i32.eq
          (i32.and
-          ;;@ core/cpu/opcodes.ts:554:11
+          ;;@ core/cpu/opcodes.ts:553:11
           (get_global $core/cpu/cpu/Cpu.registerA)
-          ;;@ core/cpu/opcodes.ts:554:27
+          ;;@ core/cpu/opcodes.ts:553:27
           (i32.const 1)
          )
-         ;;@ core/cpu/opcodes.ts:554:37
+         ;;@ core/cpu/opcodes.ts:553:37
          (i32.const 1)
         )
-        ;;@ core/cpu/opcodes.ts:554:43
+        ;;@ core/cpu/opcodes.ts:553:43
         (set_local $0
-         ;;@ core/cpu/opcodes.ts:555:20
+         ;;@ core/cpu/opcodes.ts:554:20
          (i32.const 1)
         )
        )
-       ;;@ core/cpu/opcodes.ts:557:6
+       ;;@ core/cpu/opcodes.ts:556:6
        (set_global $core/cpu/cpu/Cpu.registerA
-        ;;@ core/cpu/opcodes.ts:557:22
+        ;;@ core/cpu/opcodes.ts:556:22
         (call $core/helpers/index/rotateByteRightThroughCarry
-         ;;@ core/cpu/opcodes.ts:557:50
+         ;;@ core/cpu/opcodes.ts:556:50
          (get_global $core/cpu/cpu/Cpu.registerA)
         )
        )
@@ -14155,66 +14155,66 @@
        (i32.const -1)
       )
      )
-     ;;@ core/cpu/opcodes.ts:418:6
+     ;;@ core/cpu/opcodes.ts:417:6
      (set_global $core/cpu/cpu/Cpu.registerE
       (i32.and
-       ;;@ core/cpu/opcodes.ts:418:22
+       ;;@ core/cpu/opcodes.ts:417:22
        (call $core/helpers/index/splitLowByte
         (get_local $0)
        )
        (i32.const 255)
       )
      )
-     ;;@ core/cpu/opcodes.ts:419:13
+     ;;@ core/cpu/opcodes.ts:418:13
      (return
       (i32.const 8)
      )
     )
-    ;;@ core/cpu/opcodes.ts:466:6
+    ;;@ core/cpu/opcodes.ts:465:6
     (if
      (get_local $0)
-     ;;@ core/cpu/opcodes.ts:466:22
+     ;;@ core/cpu/opcodes.ts:465:22
      (call $core/cpu/flags/setCarryFlag
-      ;;@ core/cpu/opcodes.ts:467:21
+      ;;@ core/cpu/opcodes.ts:466:21
       (i32.const 1)
      )
-     ;;@ core/cpu/opcodes.ts:468:13
+     ;;@ core/cpu/opcodes.ts:467:13
      (call $core/cpu/flags/setCarryFlag
-      ;;@ core/cpu/opcodes.ts:469:21
+      ;;@ core/cpu/opcodes.ts:468:21
       (i32.const 0)
      )
     )
-    ;;@ core/cpu/opcodes.ts:472:6
+    ;;@ core/cpu/opcodes.ts:471:6
     (call $core/cpu/flags/setZeroFlag
-     ;;@ core/cpu/opcodes.ts:472:18
+     ;;@ core/cpu/opcodes.ts:471:18
+     (i32.const 0)
+    )
+    ;;@ core/cpu/opcodes.ts:472:6
+    (call $core/cpu/flags/setSubtractFlag
+     ;;@ core/cpu/opcodes.ts:472:22
      (i32.const 0)
     )
     ;;@ core/cpu/opcodes.ts:473:6
-    (call $core/cpu/flags/setSubtractFlag
-     ;;@ core/cpu/opcodes.ts:473:22
-     (i32.const 0)
-    )
-    ;;@ core/cpu/opcodes.ts:474:6
     (call $core/cpu/flags/setHalfCarryFlag
-     ;;@ core/cpu/opcodes.ts:474:23
+     ;;@ core/cpu/opcodes.ts:473:23
      (i32.const 0)
     )
     (br $folding-inner3)
    )
-   ;;@ core/cpu/opcodes.ts:392:6
+   ;;@ core/cpu/opcodes.ts:391:6
    (set_global $core/cpu/cpu/Cpu.programCounter
-    ;;@ core/cpu/opcodes.ts:392:27
+    ;;@ core/cpu/opcodes.ts:391:27
     (call $core/portable/portable/u16Portable
-     ;;@ core/cpu/opcodes.ts:392:39
+     ;;@ core/cpu/opcodes.ts:391:39
      (i32.add
       (get_global $core/cpu/cpu/Cpu.programCounter)
-      ;;@ core/cpu/opcodes.ts:392:60
+      ;;@ core/cpu/opcodes.ts:391:60
       (i32.const 1)
      )
     )
    )
   )
-  ;;@ core/cpu/opcodes.ts:404:13
+  ;;@ core/cpu/opcodes.ts:403:13
   (i32.const 4)
  )
  (func $core/cpu/flags/getZeroFlag (; 185 ;) (; has Stack IR ;) (type $i) (result i32)
@@ -14282,7 +14282,7 @@
                     (if
                      (i32.ne
                       (get_local $0)
-                      ;;@ core/cpu/opcodes.ts:576:9
+                      ;;@ core/cpu/opcodes.ts:575:9
                       (i32.const 32)
                      )
                      (block
@@ -14297,42 +14297,42 @@
                       (br $break|0)
                      )
                     )
-                    ;;@ core/cpu/opcodes.ts:581:6
+                    ;;@ core/cpu/opcodes.ts:580:6
                     (if
-                     ;;@ core/cpu/opcodes.ts:581:10
+                     ;;@ core/cpu/opcodes.ts:580:10
                      (call $core/cpu/flags/getZeroFlag)
-                     ;;@ core/cpu/opcodes.ts:585:13
+                     ;;@ core/cpu/opcodes.ts:584:13
                      (set_global $core/cpu/cpu/Cpu.programCounter
-                      ;;@ core/cpu/opcodes.ts:586:29
+                      ;;@ core/cpu/opcodes.ts:585:29
                       (call $core/portable/portable/u16Portable
-                       ;;@ core/cpu/opcodes.ts:586:41
+                       ;;@ core/cpu/opcodes.ts:585:41
                        (i32.add
                         (get_global $core/cpu/cpu/Cpu.programCounter)
-                        ;;@ core/cpu/opcodes.ts:586:62
+                        ;;@ core/cpu/opcodes.ts:585:62
                         (i32.const 1)
                        )
                       )
                      )
-                     ;;@ core/cpu/opcodes.ts:581:31
+                     ;;@ core/cpu/opcodes.ts:580:31
                      (call $core/cpu/instructions/relativeJump
-                      ;;@ core/cpu/opcodes.ts:583:21
+                      ;;@ core/cpu/opcodes.ts:582:21
                       (call $core/cpu/opcodes/getDataByteOne)
                      )
                     )
-                    ;;@ core/cpu/opcodes.ts:588:13
+                    ;;@ core/cpu/opcodes.ts:587:13
                     (return
                      (i32.const 8)
                     )
                    )
-                   ;;@ core/cpu/opcodes.ts:594:6
+                   ;;@ core/cpu/opcodes.ts:593:6
                    (set_global $core/cpu/cpu/Cpu.registerH
                     (i32.and
-                     ;;@ core/cpu/opcodes.ts:594:22
+                     ;;@ core/cpu/opcodes.ts:593:22
                      (call $core/helpers/index/splitHighByte
                       (tee_local $0
-                       ;;@ core/cpu/opcodes.ts:594:40
+                       ;;@ core/cpu/opcodes.ts:593:40
                        (i32.and
-                        ;;@ core/cpu/opcodes.ts:593:31
+                        ;;@ core/cpu/opcodes.ts:592:31
                         (call $core/cpu/opcodes/getConcatenatedDataByte)
                         (i32.const 65535)
                        )
@@ -14341,62 +14341,62 @@
                      (i32.const 255)
                     )
                    )
-                   ;;@ core/cpu/opcodes.ts:595:6
+                   ;;@ core/cpu/opcodes.ts:594:6
                    (set_global $core/cpu/cpu/Cpu.registerL
                     (i32.and
-                     ;;@ core/cpu/opcodes.ts:595:22
+                     ;;@ core/cpu/opcodes.ts:594:22
                      (call $core/helpers/index/splitLowByte
                       (get_local $0)
                      )
                      (i32.const 255)
                     )
                    )
-                   ;;@ core/cpu/opcodes.ts:596:6
+                   ;;@ core/cpu/opcodes.ts:595:6
                    (set_global $core/cpu/cpu/Cpu.programCounter
-                    ;;@ core/cpu/opcodes.ts:596:27
+                    ;;@ core/cpu/opcodes.ts:595:27
                     (call $core/portable/portable/u16Portable
-                     ;;@ core/cpu/opcodes.ts:596:39
+                     ;;@ core/cpu/opcodes.ts:595:39
                      (i32.add
                       (get_global $core/cpu/cpu/Cpu.programCounter)
-                      ;;@ core/cpu/opcodes.ts:596:60
+                      ;;@ core/cpu/opcodes.ts:595:60
                       (i32.const 2)
                      )
                     )
                    )
                    (br $folding-inner1)
                   )
-                  ;;@ core/cpu/opcodes.ts:603:6
+                  ;;@ core/cpu/opcodes.ts:602:6
                   (call $core/cpu/opcodes/eightBitStoreSyncCycles
-                   ;;@ core/cpu/opcodes.ts:603:30
+                   ;;@ core/cpu/opcodes.ts:602:30
                    (i32.and
-                    ;;@ core/cpu/opcodes.ts:601:6
+                    ;;@ core/cpu/opcodes.ts:600:6
                     (tee_local $0
-                     ;;@ core/cpu/opcodes.ts:601:29
+                     ;;@ core/cpu/opcodes.ts:600:29
                      (call $core/helpers/index/concatenateBytes
-                      ;;@ core/cpu/opcodes.ts:601:51
+                      ;;@ core/cpu/opcodes.ts:600:51
                       (get_global $core/cpu/cpu/Cpu.registerH)
-                      ;;@ core/cpu/opcodes.ts:601:66
+                      ;;@ core/cpu/opcodes.ts:600:66
                       (get_global $core/cpu/cpu/Cpu.registerL)
                      )
                     )
                     (i32.const 65535)
                    )
-                   ;;@ core/cpu/opcodes.ts:603:43
+                   ;;@ core/cpu/opcodes.ts:602:43
                    (get_global $core/cpu/cpu/Cpu.registerA)
                   )
-                  ;;@ core/cpu/opcodes.ts:605:6
+                  ;;@ core/cpu/opcodes.ts:604:6
                   (set_global $core/cpu/cpu/Cpu.registerH
                    (i32.and
-                    ;;@ core/cpu/opcodes.ts:605:22
+                    ;;@ core/cpu/opcodes.ts:604:22
                     (call $core/helpers/index/splitHighByte
-                     ;;@ core/cpu/opcodes.ts:604:6
+                     ;;@ core/cpu/opcodes.ts:603:6
                      (tee_local $0
-                      ;;@ core/cpu/opcodes.ts:604:20
+                      ;;@ core/cpu/opcodes.ts:603:20
                       (call $core/portable/portable/u16Portable
-                       ;;@ core/cpu/opcodes.ts:604:32
+                       ;;@ core/cpu/opcodes.ts:603:32
                        (i32.add
                         (get_local $0)
-                        ;;@ core/cpu/opcodes.ts:604:46
+                        ;;@ core/cpu/opcodes.ts:603:46
                         (i32.const 1)
                        )
                       )
@@ -14405,10 +14405,10 @@
                     (i32.const 255)
                    )
                   )
-                  ;;@ core/cpu/opcodes.ts:606:6
+                  ;;@ core/cpu/opcodes.ts:605:6
                   (set_global $core/cpu/cpu/Cpu.registerL
                    (i32.and
-                    ;;@ core/cpu/opcodes.ts:606:22
+                    ;;@ core/cpu/opcodes.ts:605:22
                     (call $core/helpers/index/splitLowByte
                      (get_local $0)
                     )
@@ -14417,25 +14417,25 @@
                   )
                   (br $folding-inner1)
                  )
-                 ;;@ core/cpu/opcodes.ts:613:6
+                 ;;@ core/cpu/opcodes.ts:612:6
                  (set_global $core/cpu/cpu/Cpu.registerH
                   (i32.and
-                   ;;@ core/cpu/opcodes.ts:613:22
+                   ;;@ core/cpu/opcodes.ts:612:22
                    (call $core/helpers/index/splitHighByte
-                    ;;@ core/cpu/opcodes.ts:612:6
+                    ;;@ core/cpu/opcodes.ts:611:6
                     (tee_local $0
-                     ;;@ core/cpu/opcodes.ts:612:20
+                     ;;@ core/cpu/opcodes.ts:611:20
                      (call $core/portable/portable/u16Portable
-                      ;;@ core/cpu/opcodes.ts:612:32
+                      ;;@ core/cpu/opcodes.ts:611:32
                       (i32.add
-                       ;;@ core/cpu/opcodes.ts:611:24
+                       ;;@ core/cpu/opcodes.ts:610:24
                        (call $core/helpers/index/concatenateBytes
-                        ;;@ core/cpu/opcodes.ts:611:46
+                        ;;@ core/cpu/opcodes.ts:610:46
                         (get_global $core/cpu/cpu/Cpu.registerH)
-                        ;;@ core/cpu/opcodes.ts:611:61
+                        ;;@ core/cpu/opcodes.ts:610:61
                         (get_global $core/cpu/cpu/Cpu.registerL)
                        )
-                       ;;@ core/cpu/opcodes.ts:612:46
+                       ;;@ core/cpu/opcodes.ts:611:46
                        (i32.const 1)
                       )
                      )
@@ -14444,209 +14444,209 @@
                    (i32.const 255)
                   )
                  )
-                 ;;@ core/cpu/opcodes.ts:614:6
+                 ;;@ core/cpu/opcodes.ts:613:6
                  (set_global $core/cpu/cpu/Cpu.registerL
                   (i32.and
-                   ;;@ core/cpu/opcodes.ts:614:22
+                   ;;@ core/cpu/opcodes.ts:613:22
                    (call $core/helpers/index/splitLowByte
                     (get_local $0)
                    )
                    (i32.const 255)
                   )
                  )
-                 ;;@ core/cpu/opcodes.ts:615:13
+                 ;;@ core/cpu/opcodes.ts:614:13
                  (return
                   (i32.const 8)
                  )
                 )
-                ;;@ core/cpu/opcodes.ts:620:6
+                ;;@ core/cpu/opcodes.ts:619:6
                 (call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
-                 ;;@ core/cpu/opcodes.ts:620:39
+                 ;;@ core/cpu/opcodes.ts:619:39
                  (get_global $core/cpu/cpu/Cpu.registerH)
-                 ;;@ core/cpu/opcodes.ts:620:54
+                 ;;@ core/cpu/opcodes.ts:619:54
                  (i32.const 1)
                 )
-                ;;@ core/cpu/opcodes.ts:621:6
+                ;;@ core/cpu/opcodes.ts:620:6
                 (set_global $core/cpu/cpu/Cpu.registerH
-                 ;;@ core/cpu/opcodes.ts:621:22
+                 ;;@ core/cpu/opcodes.ts:620:22
                  (call $core/helpers/index/splitLowByte
-                  ;;@ core/cpu/opcodes.ts:621:33
+                  ;;@ core/cpu/opcodes.ts:620:33
                   (i32.add
                    (get_global $core/cpu/cpu/Cpu.registerH)
-                   ;;@ core/cpu/opcodes.ts:621:49
+                   ;;@ core/cpu/opcodes.ts:620:49
                    (i32.const 1)
                   )
                  )
                 )
-                ;;@ core/cpu/opcodes.ts:622:6
+                ;;@ core/cpu/opcodes.ts:621:6
                 (if
-                 ;;@ core/cpu/opcodes.ts:622:10
+                 ;;@ core/cpu/opcodes.ts:621:10
                  (get_global $core/cpu/cpu/Cpu.registerH)
-                 ;;@ core/cpu/opcodes.ts:624:13
+                 ;;@ core/cpu/opcodes.ts:623:13
                  (call $core/cpu/flags/setZeroFlag
-                  ;;@ core/cpu/opcodes.ts:625:20
+                  ;;@ core/cpu/opcodes.ts:624:20
                   (i32.const 0)
                  )
-                 ;;@ core/cpu/opcodes.ts:622:31
+                 ;;@ core/cpu/opcodes.ts:621:31
                  (call $core/cpu/flags/setZeroFlag
-                  ;;@ core/cpu/opcodes.ts:623:20
+                  ;;@ core/cpu/opcodes.ts:622:20
                   (i32.const 1)
                  )
                 )
-                ;;@ core/cpu/opcodes.ts:627:6
+                ;;@ core/cpu/opcodes.ts:626:6
                 (call $core/cpu/flags/setSubtractFlag
-                 ;;@ core/cpu/opcodes.ts:627:22
+                 ;;@ core/cpu/opcodes.ts:626:22
                  (i32.const 0)
                 )
                 (br $folding-inner1)
                )
-               ;;@ core/cpu/opcodes.ts:633:6
+               ;;@ core/cpu/opcodes.ts:632:6
                (call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
-                ;;@ core/cpu/opcodes.ts:633:39
+                ;;@ core/cpu/opcodes.ts:632:39
                 (get_global $core/cpu/cpu/Cpu.registerH)
-                ;;@ core/cpu/opcodes.ts:633:54
+                ;;@ core/cpu/opcodes.ts:632:54
                 (i32.const -1)
                )
-               ;;@ core/cpu/opcodes.ts:634:6
+               ;;@ core/cpu/opcodes.ts:633:6
                (set_global $core/cpu/cpu/Cpu.registerH
-                ;;@ core/cpu/opcodes.ts:634:22
+                ;;@ core/cpu/opcodes.ts:633:22
                 (call $core/helpers/index/splitLowByte
-                 ;;@ core/cpu/opcodes.ts:634:33
+                 ;;@ core/cpu/opcodes.ts:633:33
                  (i32.sub
                   (get_global $core/cpu/cpu/Cpu.registerH)
-                  ;;@ core/cpu/opcodes.ts:634:49
+                  ;;@ core/cpu/opcodes.ts:633:49
                   (i32.const 1)
                  )
                 )
                )
-               ;;@ core/cpu/opcodes.ts:635:6
+               ;;@ core/cpu/opcodes.ts:634:6
                (if
-                ;;@ core/cpu/opcodes.ts:635:10
+                ;;@ core/cpu/opcodes.ts:634:10
                 (get_global $core/cpu/cpu/Cpu.registerH)
-                ;;@ core/cpu/opcodes.ts:637:13
+                ;;@ core/cpu/opcodes.ts:636:13
                 (call $core/cpu/flags/setZeroFlag
-                 ;;@ core/cpu/opcodes.ts:638:20
+                 ;;@ core/cpu/opcodes.ts:637:20
                  (i32.const 0)
                 )
-                ;;@ core/cpu/opcodes.ts:635:31
+                ;;@ core/cpu/opcodes.ts:634:31
                 (call $core/cpu/flags/setZeroFlag
-                 ;;@ core/cpu/opcodes.ts:636:20
+                 ;;@ core/cpu/opcodes.ts:635:20
                  (i32.const 1)
                 )
                )
-               ;;@ core/cpu/opcodes.ts:640:6
+               ;;@ core/cpu/opcodes.ts:639:6
                (call $core/cpu/flags/setSubtractFlag
-                ;;@ core/cpu/opcodes.ts:640:22
+                ;;@ core/cpu/opcodes.ts:639:22
                 (i32.const 1)
                )
                (br $folding-inner1)
               )
-              ;;@ core/cpu/opcodes.ts:647:6
+              ;;@ core/cpu/opcodes.ts:646:6
               (set_global $core/cpu/cpu/Cpu.registerH
                (i32.and
-                ;;@ core/cpu/opcodes.ts:647:22
+                ;;@ core/cpu/opcodes.ts:646:22
                 (call $core/cpu/opcodes/getDataByteOne)
                 (i32.const 255)
                )
               )
               (br $folding-inner0)
              )
-             ;;@ core/cpu/opcodes.ts:657:6
+             ;;@ core/cpu/opcodes.ts:656:6
              (if
-              ;;@ core/cpu/opcodes.ts:657:10
+              ;;@ core/cpu/opcodes.ts:656:10
               (i32.gt_u
                (call $core/cpu/flags/getHalfCarryFlag)
-               ;;@ core/cpu/opcodes.ts:657:31
+               ;;@ core/cpu/opcodes.ts:656:31
                (i32.const 0)
               )
-              ;;@ core/cpu/opcodes.ts:657:34
+              ;;@ core/cpu/opcodes.ts:656:34
               (set_local $1
                (i32.const 6)
               )
              )
-             ;;@ core/cpu/opcodes.ts:660:6
+             ;;@ core/cpu/opcodes.ts:659:6
              (if
-              ;;@ core/cpu/opcodes.ts:660:10
+              ;;@ core/cpu/opcodes.ts:659:10
               (i32.gt_u
                (call $core/cpu/flags/getCarryFlag)
-               ;;@ core/cpu/opcodes.ts:660:27
+               ;;@ core/cpu/opcodes.ts:659:27
                (i32.const 0)
               )
-              ;;@ core/cpu/opcodes.ts:660:30
+              ;;@ core/cpu/opcodes.ts:659:30
               (set_local $1
-               ;;@ core/cpu/opcodes.ts:661:21
+               ;;@ core/cpu/opcodes.ts:660:21
                (i32.or
                 (get_local $1)
-                ;;@ core/cpu/opcodes.ts:661:34
+                ;;@ core/cpu/opcodes.ts:660:34
                 (i32.const 96)
                )
               )
              )
-             ;;@ core/cpu/opcodes.ts:677:6
+             ;;@ core/cpu/opcodes.ts:676:6
              (if
               (tee_local $0
-               ;;@ core/cpu/opcodes.ts:664:6
+               ;;@ core/cpu/opcodes.ts:663:6
                (if (result i32)
-                ;;@ core/cpu/opcodes.ts:664:10
+                ;;@ core/cpu/opcodes.ts:663:10
                 (i32.gt_u
                  (call $core/cpu/flags/getSubtractFlag)
-                 ;;@ core/cpu/opcodes.ts:664:30
+                 ;;@ core/cpu/opcodes.ts:663:30
                  (i32.const 0)
                 )
-                ;;@ core/cpu/opcodes.ts:665:27
+                ;;@ core/cpu/opcodes.ts:664:27
                 (call $core/helpers/index/splitLowByte
-                 ;;@ core/cpu/opcodes.ts:665:38
+                 ;;@ core/cpu/opcodes.ts:664:38
                  (i32.sub
                   (get_global $core/cpu/cpu/Cpu.registerA)
                   (get_local $1)
                  )
                 )
-                ;;@ core/cpu/opcodes.ts:666:13
+                ;;@ core/cpu/opcodes.ts:665:13
                 (block (result i32)
-                 ;;@ core/cpu/opcodes.ts:667:8
+                 ;;@ core/cpu/opcodes.ts:666:8
                  (if
-                  ;;@ core/cpu/opcodes.ts:667:12
+                  ;;@ core/cpu/opcodes.ts:666:12
                   (i32.gt_u
                    (i32.and
-                    ;;@ core/cpu/opcodes.ts:667:13
+                    ;;@ core/cpu/opcodes.ts:666:13
                     (get_global $core/cpu/cpu/Cpu.registerA)
-                    ;;@ core/cpu/opcodes.ts:667:29
+                    ;;@ core/cpu/opcodes.ts:666:29
                     (i32.const 15)
                    )
-                   ;;@ core/cpu/opcodes.ts:667:37
+                   ;;@ core/cpu/opcodes.ts:666:37
                    (i32.const 9)
                   )
-                  ;;@ core/cpu/opcodes.ts:667:43
+                  ;;@ core/cpu/opcodes.ts:666:43
                   (set_local $1
-                   ;;@ core/cpu/opcodes.ts:668:23
+                   ;;@ core/cpu/opcodes.ts:667:23
                    (i32.or
                     (get_local $1)
-                    ;;@ core/cpu/opcodes.ts:668:36
+                    ;;@ core/cpu/opcodes.ts:667:36
                     (i32.const 6)
                    )
                   )
                  )
-                 ;;@ core/cpu/opcodes.ts:670:8
+                 ;;@ core/cpu/opcodes.ts:669:8
                  (if
-                  ;;@ core/cpu/opcodes.ts:670:12
+                  ;;@ core/cpu/opcodes.ts:669:12
                   (i32.gt_u
                    (get_global $core/cpu/cpu/Cpu.registerA)
-                   ;;@ core/cpu/opcodes.ts:670:28
+                   ;;@ core/cpu/opcodes.ts:669:28
                    (i32.const 153)
                   )
-                  ;;@ core/cpu/opcodes.ts:670:34
+                  ;;@ core/cpu/opcodes.ts:669:34
                   (set_local $1
-                   ;;@ core/cpu/opcodes.ts:671:23
+                   ;;@ core/cpu/opcodes.ts:670:23
                    (i32.or
                     (get_local $1)
-                    ;;@ core/cpu/opcodes.ts:671:36
+                    ;;@ core/cpu/opcodes.ts:670:36
                     (i32.const 96)
                    )
                   )
                  )
-                 ;;@ core/cpu/opcodes.ts:673:27
+                 ;;@ core/cpu/opcodes.ts:672:27
                  (call $core/helpers/index/splitLowByte
-                  ;;@ core/cpu/opcodes.ts:673:38
+                  ;;@ core/cpu/opcodes.ts:672:38
                   (i32.add
                    (get_global $core/cpu/cpu/Cpu.registerA)
                    (get_local $1)
@@ -14655,111 +14655,111 @@
                 )
                )
               )
-              ;;@ core/cpu/opcodes.ts:679:13
+              ;;@ core/cpu/opcodes.ts:678:13
               (call $core/cpu/flags/setZeroFlag
-               ;;@ core/cpu/opcodes.ts:680:20
+               ;;@ core/cpu/opcodes.ts:679:20
                (i32.const 0)
               )
-              ;;@ core/cpu/opcodes.ts:677:34
+              ;;@ core/cpu/opcodes.ts:676:34
               (call $core/cpu/flags/setZeroFlag
-               ;;@ core/cpu/opcodes.ts:678:20
+               ;;@ core/cpu/opcodes.ts:677:20
                (i32.const 1)
               )
              )
-             ;;@ core/cpu/opcodes.ts:682:6
+             ;;@ core/cpu/opcodes.ts:681:6
              (if
-              ;;@ core/cpu/opcodes.ts:682:10
+              ;;@ core/cpu/opcodes.ts:681:10
               (i32.and
                (get_local $1)
-               ;;@ core/cpu/opcodes.ts:682:24
+               ;;@ core/cpu/opcodes.ts:681:24
                (i32.const 96)
               )
-              ;;@ core/cpu/opcodes.ts:682:37
+              ;;@ core/cpu/opcodes.ts:681:37
               (call $core/cpu/flags/setCarryFlag
-               ;;@ core/cpu/opcodes.ts:683:21
+               ;;@ core/cpu/opcodes.ts:682:21
                (i32.const 1)
               )
-              ;;@ core/cpu/opcodes.ts:684:13
+              ;;@ core/cpu/opcodes.ts:683:13
               (call $core/cpu/flags/setCarryFlag
-               ;;@ core/cpu/opcodes.ts:685:21
+               ;;@ core/cpu/opcodes.ts:684:21
                (i32.const 0)
               )
              )
-             ;;@ core/cpu/opcodes.ts:687:6
+             ;;@ core/cpu/opcodes.ts:686:6
              (call $core/cpu/flags/setHalfCarryFlag
-              ;;@ core/cpu/opcodes.ts:687:23
+              ;;@ core/cpu/opcodes.ts:686:23
               (i32.const 0)
              )
-             ;;@ core/cpu/opcodes.ts:689:6
+             ;;@ core/cpu/opcodes.ts:688:6
              (set_global $core/cpu/cpu/Cpu.registerA
               (get_local $0)
              )
              (br $folding-inner1)
             )
-            ;;@ core/cpu/opcodes.ts:694:6
+            ;;@ core/cpu/opcodes.ts:693:6
             (if
-             ;;@ core/cpu/opcodes.ts:694:10
+             ;;@ core/cpu/opcodes.ts:693:10
              (i32.gt_u
               (call $core/cpu/flags/getZeroFlag)
-              ;;@ core/cpu/opcodes.ts:694:26
+              ;;@ core/cpu/opcodes.ts:693:26
               (i32.const 0)
              )
-             ;;@ core/cpu/opcodes.ts:694:29
+             ;;@ core/cpu/opcodes.ts:693:29
              (call $core/cpu/instructions/relativeJump
-              ;;@ core/cpu/opcodes.ts:696:21
+              ;;@ core/cpu/opcodes.ts:695:21
               (call $core/cpu/opcodes/getDataByteOne)
              )
-             ;;@ core/cpu/opcodes.ts:698:13
+             ;;@ core/cpu/opcodes.ts:697:13
              (set_global $core/cpu/cpu/Cpu.programCounter
-              ;;@ core/cpu/opcodes.ts:699:29
+              ;;@ core/cpu/opcodes.ts:698:29
               (call $core/portable/portable/u16Portable
-               ;;@ core/cpu/opcodes.ts:699:41
+               ;;@ core/cpu/opcodes.ts:698:41
                (i32.add
                 (get_global $core/cpu/cpu/Cpu.programCounter)
-                ;;@ core/cpu/opcodes.ts:699:62
+                ;;@ core/cpu/opcodes.ts:698:62
                 (i32.const 1)
                )
               )
              )
             )
-            ;;@ core/cpu/opcodes.ts:701:13
+            ;;@ core/cpu/opcodes.ts:700:13
             (return
              (i32.const 8)
             )
            )
-           ;;@ core/cpu/opcodes.ts:707:6
+           ;;@ core/cpu/opcodes.ts:706:6
            (call $core/cpu/flags/checkAndSetSixteenBitFlagsAddOverflow
-            ;;@ core/cpu/opcodes.ts:706:6
+            ;;@ core/cpu/opcodes.ts:705:6
             (tee_local $1
-             ;;@ core/cpu/opcodes.ts:706:29
+             ;;@ core/cpu/opcodes.ts:705:29
              (call $core/helpers/index/concatenateBytes
-              ;;@ core/cpu/opcodes.ts:706:51
+              ;;@ core/cpu/opcodes.ts:705:51
               (get_global $core/cpu/cpu/Cpu.registerH)
-              ;;@ core/cpu/opcodes.ts:706:66
+              ;;@ core/cpu/opcodes.ts:705:66
               (get_global $core/cpu/cpu/Cpu.registerL)
              )
             )
-            ;;@ core/cpu/opcodes.ts:707:57
+            ;;@ core/cpu/opcodes.ts:706:57
             (i32.and
              (get_local $1)
              (i32.const 65535)
             )
-            ;;@ core/cpu/opcodes.ts:707:70
+            ;;@ core/cpu/opcodes.ts:706:70
             (i32.const 0)
            )
-           ;;@ core/cpu/opcodes.ts:709:6
+           ;;@ core/cpu/opcodes.ts:708:6
            (set_global $core/cpu/cpu/Cpu.registerH
             (i32.and
-             ;;@ core/cpu/opcodes.ts:709:22
+             ;;@ core/cpu/opcodes.ts:708:22
              (call $core/helpers/index/splitHighByte
-              ;;@ core/cpu/opcodes.ts:708:6
+              ;;@ core/cpu/opcodes.ts:707:6
               (tee_local $1
-               ;;@ core/cpu/opcodes.ts:708:20
+               ;;@ core/cpu/opcodes.ts:707:20
                (call $core/portable/portable/u16Portable
-                ;;@ core/cpu/opcodes.ts:708:32
+                ;;@ core/cpu/opcodes.ts:707:32
                 (i32.shl
                  (get_local $1)
-                 ;;@ core/cpu/opcodes.ts:708:46
+                 ;;@ core/cpu/opcodes.ts:707:46
                  (i32.const 1)
                 )
                )
@@ -14768,40 +14768,40 @@
              (i32.const 255)
             )
            )
-           ;;@ core/cpu/opcodes.ts:710:6
+           ;;@ core/cpu/opcodes.ts:709:6
            (set_global $core/cpu/cpu/Cpu.registerL
             (i32.and
-             ;;@ core/cpu/opcodes.ts:710:22
+             ;;@ core/cpu/opcodes.ts:709:22
              (call $core/helpers/index/splitLowByte
               (get_local $1)
              )
              (i32.const 255)
             )
            )
-           ;;@ core/cpu/opcodes.ts:711:6
+           ;;@ core/cpu/opcodes.ts:710:6
            (call $core/cpu/flags/setSubtractFlag
-            ;;@ core/cpu/opcodes.ts:711:22
+            ;;@ core/cpu/opcodes.ts:710:22
             (i32.const 0)
            )
-           ;;@ core/cpu/opcodes.ts:712:13
+           ;;@ core/cpu/opcodes.ts:711:13
            (return
             (i32.const 8)
            )
           )
-          ;;@ core/cpu/opcodes.ts:718:6
+          ;;@ core/cpu/opcodes.ts:717:6
           (set_global $core/cpu/cpu/Cpu.registerA
            (i32.and
-            ;;@ core/cpu/opcodes.ts:718:22
+            ;;@ core/cpu/opcodes.ts:717:22
             (call $core/cpu/opcodes/eightBitLoadSyncCycles
-             ;;@ core/cpu/opcodes.ts:718:49
+             ;;@ core/cpu/opcodes.ts:717:49
              (i32.and
-              ;;@ core/cpu/opcodes.ts:716:6
+              ;;@ core/cpu/opcodes.ts:715:6
               (tee_local $1
-               ;;@ core/cpu/opcodes.ts:716:29
+               ;;@ core/cpu/opcodes.ts:715:29
                (call $core/helpers/index/concatenateBytes
-                ;;@ core/cpu/opcodes.ts:716:51
+                ;;@ core/cpu/opcodes.ts:715:51
                 (get_global $core/cpu/cpu/Cpu.registerH)
-                ;;@ core/cpu/opcodes.ts:716:66
+                ;;@ core/cpu/opcodes.ts:715:66
                 (get_global $core/cpu/cpu/Cpu.registerL)
                )
               )
@@ -14811,19 +14811,19 @@
             (i32.const 255)
            )
           )
-          ;;@ core/cpu/opcodes.ts:720:6
+          ;;@ core/cpu/opcodes.ts:719:6
           (set_global $core/cpu/cpu/Cpu.registerH
            (i32.and
-            ;;@ core/cpu/opcodes.ts:720:22
+            ;;@ core/cpu/opcodes.ts:719:22
             (call $core/helpers/index/splitHighByte
-             ;;@ core/cpu/opcodes.ts:719:6
+             ;;@ core/cpu/opcodes.ts:718:6
              (tee_local $1
-              ;;@ core/cpu/opcodes.ts:719:20
+              ;;@ core/cpu/opcodes.ts:718:20
               (call $core/portable/portable/u16Portable
-               ;;@ core/cpu/opcodes.ts:719:32
+               ;;@ core/cpu/opcodes.ts:718:32
                (i32.add
                 (get_local $1)
-                ;;@ core/cpu/opcodes.ts:719:46
+                ;;@ core/cpu/opcodes.ts:718:46
                 (i32.const 1)
                )
               )
@@ -14832,10 +14832,10 @@
             (i32.const 255)
            )
           )
-          ;;@ core/cpu/opcodes.ts:721:6
+          ;;@ core/cpu/opcodes.ts:720:6
           (set_global $core/cpu/cpu/Cpu.registerL
            (i32.and
-            ;;@ core/cpu/opcodes.ts:721:22
+            ;;@ core/cpu/opcodes.ts:720:22
             (call $core/helpers/index/splitLowByte
              (get_local $1)
             )
@@ -14844,25 +14844,25 @@
           )
           (br $folding-inner1)
          )
-         ;;@ core/cpu/opcodes.ts:728:6
+         ;;@ core/cpu/opcodes.ts:727:6
          (set_global $core/cpu/cpu/Cpu.registerH
           (i32.and
-           ;;@ core/cpu/opcodes.ts:728:22
+           ;;@ core/cpu/opcodes.ts:727:22
            (call $core/helpers/index/splitHighByte
-            ;;@ core/cpu/opcodes.ts:727:6
+            ;;@ core/cpu/opcodes.ts:726:6
             (tee_local $1
-             ;;@ core/cpu/opcodes.ts:727:20
+             ;;@ core/cpu/opcodes.ts:726:20
              (call $core/portable/portable/u16Portable
-              ;;@ core/cpu/opcodes.ts:727:32
+              ;;@ core/cpu/opcodes.ts:726:32
               (i32.sub
-               ;;@ core/cpu/opcodes.ts:726:24
+               ;;@ core/cpu/opcodes.ts:725:24
                (call $core/helpers/index/concatenateBytes
-                ;;@ core/cpu/opcodes.ts:726:46
+                ;;@ core/cpu/opcodes.ts:725:46
                 (get_global $core/cpu/cpu/Cpu.registerH)
-                ;;@ core/cpu/opcodes.ts:726:61
+                ;;@ core/cpu/opcodes.ts:725:61
                 (get_global $core/cpu/cpu/Cpu.registerL)
                )
-               ;;@ core/cpu/opcodes.ts:727:46
+               ;;@ core/cpu/opcodes.ts:726:46
                (i32.const 1)
               )
              )
@@ -14871,133 +14871,133 @@
            (i32.const 255)
           )
          )
-         ;;@ core/cpu/opcodes.ts:729:6
+         ;;@ core/cpu/opcodes.ts:728:6
          (set_global $core/cpu/cpu/Cpu.registerL
           (i32.and
-           ;;@ core/cpu/opcodes.ts:729:22
+           ;;@ core/cpu/opcodes.ts:728:22
            (call $core/helpers/index/splitLowByte
             (get_local $1)
            )
            (i32.const 255)
           )
          )
-         ;;@ core/cpu/opcodes.ts:730:13
+         ;;@ core/cpu/opcodes.ts:729:13
          (return
           (i32.const 8)
          )
         )
-        ;;@ core/cpu/opcodes.ts:735:6
+        ;;@ core/cpu/opcodes.ts:734:6
         (call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
-         ;;@ core/cpu/opcodes.ts:735:39
+         ;;@ core/cpu/opcodes.ts:734:39
          (get_global $core/cpu/cpu/Cpu.registerL)
-         ;;@ core/cpu/opcodes.ts:735:54
+         ;;@ core/cpu/opcodes.ts:734:54
          (i32.const 1)
         )
-        ;;@ core/cpu/opcodes.ts:736:6
+        ;;@ core/cpu/opcodes.ts:735:6
         (set_global $core/cpu/cpu/Cpu.registerL
-         ;;@ core/cpu/opcodes.ts:736:22
+         ;;@ core/cpu/opcodes.ts:735:22
          (call $core/helpers/index/splitLowByte
-          ;;@ core/cpu/opcodes.ts:736:33
+          ;;@ core/cpu/opcodes.ts:735:33
           (i32.add
            (get_global $core/cpu/cpu/Cpu.registerL)
-           ;;@ core/cpu/opcodes.ts:736:49
+           ;;@ core/cpu/opcodes.ts:735:49
            (i32.const 1)
           )
          )
         )
-        ;;@ core/cpu/opcodes.ts:737:6
+        ;;@ core/cpu/opcodes.ts:736:6
         (if
-         ;;@ core/cpu/opcodes.ts:737:10
+         ;;@ core/cpu/opcodes.ts:736:10
          (get_global $core/cpu/cpu/Cpu.registerL)
-         ;;@ core/cpu/opcodes.ts:739:13
+         ;;@ core/cpu/opcodes.ts:738:13
          (call $core/cpu/flags/setZeroFlag
-          ;;@ core/cpu/opcodes.ts:740:20
+          ;;@ core/cpu/opcodes.ts:739:20
           (i32.const 0)
          )
-         ;;@ core/cpu/opcodes.ts:737:31
+         ;;@ core/cpu/opcodes.ts:736:31
          (call $core/cpu/flags/setZeroFlag
-          ;;@ core/cpu/opcodes.ts:738:20
+          ;;@ core/cpu/opcodes.ts:737:20
           (i32.const 1)
          )
         )
-        ;;@ core/cpu/opcodes.ts:742:6
+        ;;@ core/cpu/opcodes.ts:741:6
         (call $core/cpu/flags/setSubtractFlag
-         ;;@ core/cpu/opcodes.ts:742:22
+         ;;@ core/cpu/opcodes.ts:741:22
          (i32.const 0)
         )
         (br $folding-inner1)
        )
-       ;;@ core/cpu/opcodes.ts:748:6
+       ;;@ core/cpu/opcodes.ts:747:6
        (call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
-        ;;@ core/cpu/opcodes.ts:748:39
+        ;;@ core/cpu/opcodes.ts:747:39
         (get_global $core/cpu/cpu/Cpu.registerL)
-        ;;@ core/cpu/opcodes.ts:748:54
+        ;;@ core/cpu/opcodes.ts:747:54
         (i32.const -1)
        )
-       ;;@ core/cpu/opcodes.ts:749:6
+       ;;@ core/cpu/opcodes.ts:748:6
        (set_global $core/cpu/cpu/Cpu.registerL
-        ;;@ core/cpu/opcodes.ts:749:22
+        ;;@ core/cpu/opcodes.ts:748:22
         (call $core/helpers/index/splitLowByte
-         ;;@ core/cpu/opcodes.ts:749:33
+         ;;@ core/cpu/opcodes.ts:748:33
          (i32.sub
           (get_global $core/cpu/cpu/Cpu.registerL)
-          ;;@ core/cpu/opcodes.ts:749:49
+          ;;@ core/cpu/opcodes.ts:748:49
           (i32.const 1)
          )
         )
        )
-       ;;@ core/cpu/opcodes.ts:750:6
+       ;;@ core/cpu/opcodes.ts:749:6
        (if
-        ;;@ core/cpu/opcodes.ts:750:10
+        ;;@ core/cpu/opcodes.ts:749:10
         (get_global $core/cpu/cpu/Cpu.registerL)
-        ;;@ core/cpu/opcodes.ts:752:13
+        ;;@ core/cpu/opcodes.ts:751:13
         (call $core/cpu/flags/setZeroFlag
-         ;;@ core/cpu/opcodes.ts:753:20
+         ;;@ core/cpu/opcodes.ts:752:20
          (i32.const 0)
         )
-        ;;@ core/cpu/opcodes.ts:750:31
+        ;;@ core/cpu/opcodes.ts:749:31
         (call $core/cpu/flags/setZeroFlag
-         ;;@ core/cpu/opcodes.ts:751:20
+         ;;@ core/cpu/opcodes.ts:750:20
          (i32.const 1)
         )
        )
-       ;;@ core/cpu/opcodes.ts:755:6
+       ;;@ core/cpu/opcodes.ts:754:6
        (call $core/cpu/flags/setSubtractFlag
-        ;;@ core/cpu/opcodes.ts:755:22
+        ;;@ core/cpu/opcodes.ts:754:22
         (i32.const 1)
        )
        (br $folding-inner1)
       )
-      ;;@ core/cpu/opcodes.ts:761:6
+      ;;@ core/cpu/opcodes.ts:760:6
       (set_global $core/cpu/cpu/Cpu.registerL
        (i32.and
-        ;;@ core/cpu/opcodes.ts:761:22
+        ;;@ core/cpu/opcodes.ts:760:22
         (call $core/cpu/opcodes/getDataByteOne)
         (i32.const 255)
        )
       )
       (br $folding-inner0)
      )
-     ;;@ core/cpu/opcodes.ts:768:6
+     ;;@ core/cpu/opcodes.ts:767:6
      (set_global $core/cpu/cpu/Cpu.registerA
       (i32.and
-       ;;@ core/cpu/opcodes.ts:768:22
+       ;;@ core/cpu/opcodes.ts:767:22
        (i32.xor
-        ;;@ core/cpu/opcodes.ts:768:23
+        ;;@ core/cpu/opcodes.ts:767:23
         (get_global $core/cpu/cpu/Cpu.registerA)
         (i32.const -1)
        )
        (i32.const 255)
       )
      )
-     ;;@ core/cpu/opcodes.ts:769:6
+     ;;@ core/cpu/opcodes.ts:768:6
      (call $core/cpu/flags/setSubtractFlag
-      ;;@ core/cpu/opcodes.ts:769:22
+      ;;@ core/cpu/opcodes.ts:768:22
       (i32.const 1)
      )
-     ;;@ core/cpu/opcodes.ts:770:6
+     ;;@ core/cpu/opcodes.ts:769:6
      (call $core/cpu/flags/setHalfCarryFlag
-      ;;@ core/cpu/opcodes.ts:770:23
+      ;;@ core/cpu/opcodes.ts:769:23
       (i32.const 1)
      )
      (br $folding-inner1)
@@ -15006,20 +15006,20 @@
      (i32.const -1)
     )
    )
-   ;;@ core/cpu/opcodes.ts:648:6
+   ;;@ core/cpu/opcodes.ts:647:6
    (set_global $core/cpu/cpu/Cpu.programCounter
-    ;;@ core/cpu/opcodes.ts:648:27
+    ;;@ core/cpu/opcodes.ts:647:27
     (call $core/portable/portable/u16Portable
-     ;;@ core/cpu/opcodes.ts:648:39
+     ;;@ core/cpu/opcodes.ts:647:39
      (i32.add
       (get_global $core/cpu/cpu/Cpu.programCounter)
-      ;;@ core/cpu/opcodes.ts:648:60
+      ;;@ core/cpu/opcodes.ts:647:60
       (i32.const 1)
      )
     )
    )
   )
-  ;;@ core/cpu/opcodes.ts:597:13
+  ;;@ core/cpu/opcodes.ts:596:13
   (i32.const 4)
  )
  (func $core/cpu/opcodes/handleOpcode3x (; 189 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
@@ -15047,7 +15047,7 @@
                       (if
                        (i32.ne
                         (get_local $0)
-                        ;;@ core/cpu/opcodes.ts:778:9
+                        ;;@ core/cpu/opcodes.ts:777:9
                         (i32.const 48)
                        )
                        (block
@@ -15062,108 +15062,108 @@
                         (br $break|0)
                        )
                       )
-                      ;;@ core/cpu/opcodes.ts:781:6
+                      ;;@ core/cpu/opcodes.ts:780:6
                       (if
-                       ;;@ core/cpu/opcodes.ts:781:10
+                       ;;@ core/cpu/opcodes.ts:780:10
                        (call $core/cpu/flags/getCarryFlag)
-                       ;;@ core/cpu/opcodes.ts:785:13
+                       ;;@ core/cpu/opcodes.ts:784:13
                        (set_global $core/cpu/cpu/Cpu.programCounter
-                        ;;@ core/cpu/opcodes.ts:786:29
+                        ;;@ core/cpu/opcodes.ts:785:29
                         (call $core/portable/portable/u16Portable
-                         ;;@ core/cpu/opcodes.ts:786:41
+                         ;;@ core/cpu/opcodes.ts:785:41
                          (i32.add
                           (get_global $core/cpu/cpu/Cpu.programCounter)
-                          ;;@ core/cpu/opcodes.ts:786:62
+                          ;;@ core/cpu/opcodes.ts:785:62
                           (i32.const 1)
                          )
                         )
                        )
-                       ;;@ core/cpu/opcodes.ts:781:32
+                       ;;@ core/cpu/opcodes.ts:780:32
                        (call $core/cpu/instructions/relativeJump
-                        ;;@ core/cpu/opcodes.ts:783:21
+                        ;;@ core/cpu/opcodes.ts:782:21
                         (call $core/cpu/opcodes/getDataByteOne)
                        )
                       )
-                      ;;@ core/cpu/opcodes.ts:788:13
+                      ;;@ core/cpu/opcodes.ts:787:13
                       (return
                        (i32.const 8)
                       )
                      )
-                     ;;@ core/cpu/opcodes.ts:793:6
+                     ;;@ core/cpu/opcodes.ts:792:6
                      (set_global $core/cpu/cpu/Cpu.stackPointer
                       (i32.and
-                       ;;@ core/cpu/opcodes.ts:793:25
+                       ;;@ core/cpu/opcodes.ts:792:25
                        (call $core/cpu/opcodes/getConcatenatedDataByte)
                        (i32.const 65535)
                       )
                      )
-                     ;;@ core/cpu/opcodes.ts:794:6
+                     ;;@ core/cpu/opcodes.ts:793:6
                      (set_global $core/cpu/cpu/Cpu.programCounter
-                      ;;@ core/cpu/opcodes.ts:794:27
+                      ;;@ core/cpu/opcodes.ts:793:27
                       (call $core/portable/portable/u16Portable
-                       ;;@ core/cpu/opcodes.ts:794:39
+                       ;;@ core/cpu/opcodes.ts:793:39
                        (i32.add
                         (get_global $core/cpu/cpu/Cpu.programCounter)
-                        ;;@ core/cpu/opcodes.ts:794:60
+                        ;;@ core/cpu/opcodes.ts:793:60
                         (i32.const 2)
                        )
                       )
                      )
                      (br $folding-inner3)
                     )
-                    ;;@ core/cpu/opcodes.ts:801:6
+                    ;;@ core/cpu/opcodes.ts:800:6
                     (call $core/cpu/opcodes/eightBitStoreSyncCycles
-                     ;;@ core/cpu/opcodes.ts:801:30
+                     ;;@ core/cpu/opcodes.ts:800:30
                      (i32.and
-                      ;;@ core/cpu/opcodes.ts:799:6
+                      ;;@ core/cpu/opcodes.ts:798:6
                       (tee_local $0
-                       ;;@ core/cpu/opcodes.ts:799:29
+                       ;;@ core/cpu/opcodes.ts:798:29
                        (call $core/helpers/index/concatenateBytes
-                        ;;@ core/cpu/opcodes.ts:799:51
+                        ;;@ core/cpu/opcodes.ts:798:51
                         (get_global $core/cpu/cpu/Cpu.registerH)
-                        ;;@ core/cpu/opcodes.ts:799:66
+                        ;;@ core/cpu/opcodes.ts:798:66
                         (get_global $core/cpu/cpu/Cpu.registerL)
                        )
                       )
                       (i32.const 65535)
                      )
-                     ;;@ core/cpu/opcodes.ts:801:43
+                     ;;@ core/cpu/opcodes.ts:800:43
                      (get_global $core/cpu/cpu/Cpu.registerA)
                     )
                     (br $folding-inner0)
                    )
-                   ;;@ core/cpu/opcodes.ts:809:6
+                   ;;@ core/cpu/opcodes.ts:808:6
                    (set_global $core/cpu/cpu/Cpu.stackPointer
-                    ;;@ core/cpu/opcodes.ts:809:25
+                    ;;@ core/cpu/opcodes.ts:808:25
                     (call $core/portable/portable/u16Portable
-                     ;;@ core/cpu/opcodes.ts:809:37
+                     ;;@ core/cpu/opcodes.ts:808:37
                      (i32.add
                       (get_global $core/cpu/cpu/Cpu.stackPointer)
-                      ;;@ core/cpu/opcodes.ts:809:56
+                      ;;@ core/cpu/opcodes.ts:808:56
                       (i32.const 1)
                      )
                     )
                    )
-                   ;;@ core/cpu/opcodes.ts:810:13
+                   ;;@ core/cpu/opcodes.ts:809:13
                    (return
                     (i32.const 8)
                    )
                   )
-                  ;;@ core/cpu/opcodes.ts:822:6
+                  ;;@ core/cpu/opcodes.ts:821:6
                   (call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
-                   ;;@ core/cpu/opcodes.ts:817:6
+                   ;;@ core/cpu/opcodes.ts:816:6
                    (tee_local $1
-                    ;;@ core/cpu/opcodes.ts:817:27
+                    ;;@ core/cpu/opcodes.ts:816:27
                     (call $core/cpu/opcodes/eightBitLoadSyncCycles
-                     ;;@ core/cpu/opcodes.ts:817:54
+                     ;;@ core/cpu/opcodes.ts:816:54
                      (i32.and
-                      ;;@ core/cpu/opcodes.ts:815:6
+                      ;;@ core/cpu/opcodes.ts:814:6
                       (tee_local $0
-                       ;;@ core/cpu/opcodes.ts:815:29
+                       ;;@ core/cpu/opcodes.ts:814:29
                        (call $core/helpers/index/concatenateBytes
-                        ;;@ core/cpu/opcodes.ts:815:51
+                        ;;@ core/cpu/opcodes.ts:814:51
                         (get_global $core/cpu/cpu/Cpu.registerH)
-                        ;;@ core/cpu/opcodes.ts:815:66
+                        ;;@ core/cpu/opcodes.ts:814:66
                         (get_global $core/cpu/cpu/Cpu.registerL)
                        )
                       )
@@ -15173,52 +15173,52 @@
                    )
                    (i32.const 1)
                   )
-                  ;;@ core/cpu/opcodes.ts:825:6
+                  ;;@ core/cpu/opcodes.ts:824:6
                   (if
-                   ;;@ core/cpu/opcodes.ts:823:6
+                   ;;@ core/cpu/opcodes.ts:822:6
                    (tee_local $1
-                    ;;@ core/cpu/opcodes.ts:823:19
+                    ;;@ core/cpu/opcodes.ts:822:19
                     (call $core/helpers/index/splitLowByte
-                     ;;@ core/cpu/opcodes.ts:823:30
+                     ;;@ core/cpu/opcodes.ts:822:30
                      (i32.add
                       (get_local $1)
                       (i32.const 1)
                      )
                     )
                    )
-                   ;;@ core/cpu/opcodes.ts:827:13
+                   ;;@ core/cpu/opcodes.ts:826:13
                    (call $core/cpu/flags/setZeroFlag
-                    ;;@ core/cpu/opcodes.ts:828:20
+                    ;;@ core/cpu/opcodes.ts:827:20
                     (i32.const 0)
                    )
-                   ;;@ core/cpu/opcodes.ts:825:28
+                   ;;@ core/cpu/opcodes.ts:824:28
                    (call $core/cpu/flags/setZeroFlag
-                    ;;@ core/cpu/opcodes.ts:826:20
+                    ;;@ core/cpu/opcodes.ts:825:20
                     (i32.const 1)
                    )
                   )
-                  ;;@ core/cpu/opcodes.ts:830:6
+                  ;;@ core/cpu/opcodes.ts:829:6
                   (call $core/cpu/flags/setSubtractFlag
-                   ;;@ core/cpu/opcodes.ts:830:22
+                   ;;@ core/cpu/opcodes.ts:829:22
                    (i32.const 0)
                   )
                   (br $folding-inner1)
                  )
-                 ;;@ core/cpu/opcodes.ts:843:6
+                 ;;@ core/cpu/opcodes.ts:842:6
                  (call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
-                  ;;@ core/cpu/opcodes.ts:840:6
+                  ;;@ core/cpu/opcodes.ts:839:6
                   (tee_local $1
-                   ;;@ core/cpu/opcodes.ts:840:27
+                   ;;@ core/cpu/opcodes.ts:839:27
                    (call $core/cpu/opcodes/eightBitLoadSyncCycles
-                    ;;@ core/cpu/opcodes.ts:840:54
+                    ;;@ core/cpu/opcodes.ts:839:54
                     (i32.and
-                     ;;@ core/cpu/opcodes.ts:838:6
+                     ;;@ core/cpu/opcodes.ts:837:6
                      (tee_local $0
-                      ;;@ core/cpu/opcodes.ts:838:29
+                      ;;@ core/cpu/opcodes.ts:837:29
                       (call $core/helpers/index/concatenateBytes
-                       ;;@ core/cpu/opcodes.ts:838:51
+                       ;;@ core/cpu/opcodes.ts:837:51
                        (get_global $core/cpu/cpu/Cpu.registerH)
-                       ;;@ core/cpu/opcodes.ts:838:66
+                       ;;@ core/cpu/opcodes.ts:837:66
                        (get_global $core/cpu/cpu/Cpu.registerL)
                       )
                      )
@@ -15226,55 +15226,55 @@
                     )
                    )
                   )
-                  ;;@ core/cpu/opcodes.ts:843:55
+                  ;;@ core/cpu/opcodes.ts:842:55
                   (i32.const -1)
                  )
-                 ;;@ core/cpu/opcodes.ts:845:6
+                 ;;@ core/cpu/opcodes.ts:844:6
                  (if
-                  ;;@ core/cpu/opcodes.ts:844:6
+                  ;;@ core/cpu/opcodes.ts:843:6
                   (tee_local $1
-                   ;;@ core/cpu/opcodes.ts:844:19
+                   ;;@ core/cpu/opcodes.ts:843:19
                    (call $core/helpers/index/splitLowByte
-                    ;;@ core/cpu/opcodes.ts:844:30
+                    ;;@ core/cpu/opcodes.ts:843:30
                     (i32.sub
                      (get_local $1)
-                     ;;@ core/cpu/opcodes.ts:844:43
+                     ;;@ core/cpu/opcodes.ts:843:43
                      (i32.const 1)
                     )
                    )
                   )
-                  ;;@ core/cpu/opcodes.ts:847:13
+                  ;;@ core/cpu/opcodes.ts:846:13
                   (call $core/cpu/flags/setZeroFlag
-                   ;;@ core/cpu/opcodes.ts:848:20
+                   ;;@ core/cpu/opcodes.ts:847:20
                    (i32.const 0)
                   )
-                  ;;@ core/cpu/opcodes.ts:845:28
+                  ;;@ core/cpu/opcodes.ts:844:28
                   (call $core/cpu/flags/setZeroFlag
-                   ;;@ core/cpu/opcodes.ts:846:20
+                   ;;@ core/cpu/opcodes.ts:845:20
                    (i32.const 1)
                   )
                  )
-                 ;;@ core/cpu/opcodes.ts:850:6
+                 ;;@ core/cpu/opcodes.ts:849:6
                  (call $core/cpu/flags/setSubtractFlag
-                  ;;@ core/cpu/opcodes.ts:850:22
+                  ;;@ core/cpu/opcodes.ts:849:22
                   (i32.const 1)
                  )
                  (br $folding-inner1)
                 )
-                ;;@ core/cpu/opcodes.ts:858:6
+                ;;@ core/cpu/opcodes.ts:857:6
                 (call $core/cpu/opcodes/eightBitStoreSyncCycles
-                 ;;@ core/cpu/opcodes.ts:858:30
+                 ;;@ core/cpu/opcodes.ts:857:30
                  (i32.and
-                  ;;@ core/cpu/opcodes.ts:858:35
+                  ;;@ core/cpu/opcodes.ts:857:35
                   (call $core/helpers/index/concatenateBytes
-                   ;;@ core/cpu/opcodes.ts:858:52
+                   ;;@ core/cpu/opcodes.ts:857:52
                    (get_global $core/cpu/cpu/Cpu.registerH)
-                   ;;@ core/cpu/opcodes.ts:858:67
+                   ;;@ core/cpu/opcodes.ts:857:67
                    (get_global $core/cpu/cpu/Cpu.registerL)
                   )
                   (i32.const 65535)
                  )
-                 ;;@ core/cpu/opcodes.ts:858:83
+                 ;;@ core/cpu/opcodes.ts:857:83
                  (i32.and
                   (call $core/cpu/opcodes/getDataByteOne)
                   (i32.const 255)
@@ -15282,84 +15282,84 @@
                 )
                 (br $folding-inner2)
                )
-               ;;@ core/cpu/opcodes.ts:866:6
+               ;;@ core/cpu/opcodes.ts:865:6
                (call $core/cpu/flags/setSubtractFlag
-                ;;@ core/cpu/opcodes.ts:866:22
+                ;;@ core/cpu/opcodes.ts:865:22
+                (i32.const 0)
+               )
+               ;;@ core/cpu/opcodes.ts:866:6
+               (call $core/cpu/flags/setHalfCarryFlag
+                ;;@ core/cpu/opcodes.ts:866:23
                 (i32.const 0)
                )
                ;;@ core/cpu/opcodes.ts:867:6
-               (call $core/cpu/flags/setHalfCarryFlag
-                ;;@ core/cpu/opcodes.ts:867:23
-                (i32.const 0)
-               )
-               ;;@ core/cpu/opcodes.ts:868:6
                (call $core/cpu/flags/setCarryFlag
-                ;;@ core/cpu/opcodes.ts:868:19
+                ;;@ core/cpu/opcodes.ts:867:19
                 (i32.const 1)
                )
                (br $folding-inner3)
               )
-              ;;@ core/cpu/opcodes.ts:873:6
+              ;;@ core/cpu/opcodes.ts:872:6
               (if
-               ;;@ core/cpu/opcodes.ts:873:10
+               ;;@ core/cpu/opcodes.ts:872:10
                (i32.eq
                 (call $core/cpu/flags/getCarryFlag)
-                ;;@ core/cpu/opcodes.ts:873:29
+                ;;@ core/cpu/opcodes.ts:872:29
                 (i32.const 1)
                )
-               ;;@ core/cpu/opcodes.ts:873:32
+               ;;@ core/cpu/opcodes.ts:872:32
                (call $core/cpu/instructions/relativeJump
-                ;;@ core/cpu/opcodes.ts:875:21
+                ;;@ core/cpu/opcodes.ts:874:21
                 (call $core/cpu/opcodes/getDataByteOne)
                )
-               ;;@ core/cpu/opcodes.ts:877:13
+               ;;@ core/cpu/opcodes.ts:876:13
                (set_global $core/cpu/cpu/Cpu.programCounter
-                ;;@ core/cpu/opcodes.ts:878:29
+                ;;@ core/cpu/opcodes.ts:877:29
                 (call $core/portable/portable/u16Portable
-                 ;;@ core/cpu/opcodes.ts:878:41
+                 ;;@ core/cpu/opcodes.ts:877:41
                  (i32.add
                   (get_global $core/cpu/cpu/Cpu.programCounter)
-                  ;;@ core/cpu/opcodes.ts:878:62
+                  ;;@ core/cpu/opcodes.ts:877:62
                   (i32.const 1)
                  )
                 )
                )
               )
-              ;;@ core/cpu/opcodes.ts:880:13
+              ;;@ core/cpu/opcodes.ts:879:13
               (return
                (i32.const 8)
               )
              )
-             ;;@ core/cpu/opcodes.ts:886:6
+             ;;@ core/cpu/opcodes.ts:885:6
              (call $core/cpu/flags/checkAndSetSixteenBitFlagsAddOverflow
-              ;;@ core/cpu/opcodes.ts:885:6
+              ;;@ core/cpu/opcodes.ts:884:6
               (tee_local $1
-               ;;@ core/cpu/opcodes.ts:885:29
+               ;;@ core/cpu/opcodes.ts:884:29
                (call $core/helpers/index/concatenateBytes
-                ;;@ core/cpu/opcodes.ts:885:51
+                ;;@ core/cpu/opcodes.ts:884:51
                 (get_global $core/cpu/cpu/Cpu.registerH)
-                ;;@ core/cpu/opcodes.ts:885:66
+                ;;@ core/cpu/opcodes.ts:884:66
                 (get_global $core/cpu/cpu/Cpu.registerL)
                )
               )
-              ;;@ core/cpu/opcodes.ts:886:62
+              ;;@ core/cpu/opcodes.ts:885:62
               (get_global $core/cpu/cpu/Cpu.stackPointer)
-              ;;@ core/cpu/opcodes.ts:886:80
+              ;;@ core/cpu/opcodes.ts:885:80
               (i32.const 0)
              )
-             ;;@ core/cpu/opcodes.ts:888:6
+             ;;@ core/cpu/opcodes.ts:887:6
              (set_global $core/cpu/cpu/Cpu.registerH
               (i32.and
-               ;;@ core/cpu/opcodes.ts:888:22
+               ;;@ core/cpu/opcodes.ts:887:22
                (call $core/helpers/index/splitHighByte
-                ;;@ core/cpu/opcodes.ts:887:6
+                ;;@ core/cpu/opcodes.ts:886:6
                 (tee_local $0
-                 ;;@ core/cpu/opcodes.ts:887:24
+                 ;;@ core/cpu/opcodes.ts:886:24
                  (call $core/portable/portable/u16Portable
-                  ;;@ core/cpu/opcodes.ts:887:36
+                  ;;@ core/cpu/opcodes.ts:886:36
                   (i32.add
                    (get_local $1)
-                   ;;@ core/cpu/opcodes.ts:887:56
+                   ;;@ core/cpu/opcodes.ts:886:56
                    (get_global $core/cpu/cpu/Cpu.stackPointer)
                   )
                  )
@@ -15368,40 +15368,40 @@
                (i32.const 255)
               )
              )
-             ;;@ core/cpu/opcodes.ts:889:6
+             ;;@ core/cpu/opcodes.ts:888:6
              (set_global $core/cpu/cpu/Cpu.registerL
               (i32.and
-               ;;@ core/cpu/opcodes.ts:889:22
+               ;;@ core/cpu/opcodes.ts:888:22
                (call $core/helpers/index/splitLowByte
                 (get_local $0)
                )
                (i32.const 255)
               )
              )
-             ;;@ core/cpu/opcodes.ts:890:6
+             ;;@ core/cpu/opcodes.ts:889:6
              (call $core/cpu/flags/setSubtractFlag
-              ;;@ core/cpu/opcodes.ts:890:22
+              ;;@ core/cpu/opcodes.ts:889:22
               (i32.const 0)
              )
-             ;;@ core/cpu/opcodes.ts:891:13
+             ;;@ core/cpu/opcodes.ts:890:13
              (return
               (i32.const 8)
              )
             )
-            ;;@ core/cpu/opcodes.ts:897:6
+            ;;@ core/cpu/opcodes.ts:896:6
             (set_global $core/cpu/cpu/Cpu.registerA
              (i32.and
-              ;;@ core/cpu/opcodes.ts:897:22
+              ;;@ core/cpu/opcodes.ts:896:22
               (call $core/cpu/opcodes/eightBitLoadSyncCycles
-               ;;@ core/cpu/opcodes.ts:897:49
+               ;;@ core/cpu/opcodes.ts:896:49
                (i32.and
-                ;;@ core/cpu/opcodes.ts:895:6
+                ;;@ core/cpu/opcodes.ts:894:6
                 (tee_local $0
-                 ;;@ core/cpu/opcodes.ts:895:29
+                 ;;@ core/cpu/opcodes.ts:894:29
                  (call $core/helpers/index/concatenateBytes
-                  ;;@ core/cpu/opcodes.ts:895:51
+                  ;;@ core/cpu/opcodes.ts:894:51
                   (get_global $core/cpu/cpu/Cpu.registerH)
-                  ;;@ core/cpu/opcodes.ts:895:66
+                  ;;@ core/cpu/opcodes.ts:894:66
                   (get_global $core/cpu/cpu/Cpu.registerL)
                  )
                 )
@@ -15413,141 +15413,141 @@
             )
             (br $folding-inner0)
            )
-           ;;@ core/cpu/opcodes.ts:905:6
+           ;;@ core/cpu/opcodes.ts:904:6
            (set_global $core/cpu/cpu/Cpu.stackPointer
-            ;;@ core/cpu/opcodes.ts:905:25
+            ;;@ core/cpu/opcodes.ts:904:25
             (call $core/portable/portable/u16Portable
-             ;;@ core/cpu/opcodes.ts:905:37
+             ;;@ core/cpu/opcodes.ts:904:37
              (i32.sub
               (get_global $core/cpu/cpu/Cpu.stackPointer)
-              ;;@ core/cpu/opcodes.ts:905:56
+              ;;@ core/cpu/opcodes.ts:904:56
               (i32.const 1)
              )
             )
            )
-           ;;@ core/cpu/opcodes.ts:906:13
+           ;;@ core/cpu/opcodes.ts:905:13
            (return
             (i32.const 8)
            )
           )
-          ;;@ core/cpu/opcodes.ts:911:6
+          ;;@ core/cpu/opcodes.ts:910:6
           (call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
-           ;;@ core/cpu/opcodes.ts:911:39
+           ;;@ core/cpu/opcodes.ts:910:39
            (get_global $core/cpu/cpu/Cpu.registerA)
-           ;;@ core/cpu/opcodes.ts:911:54
+           ;;@ core/cpu/opcodes.ts:910:54
            (i32.const 1)
           )
-          ;;@ core/cpu/opcodes.ts:912:6
+          ;;@ core/cpu/opcodes.ts:911:6
           (set_global $core/cpu/cpu/Cpu.registerA
-           ;;@ core/cpu/opcodes.ts:912:22
+           ;;@ core/cpu/opcodes.ts:911:22
            (call $core/helpers/index/splitLowByte
-            ;;@ core/cpu/opcodes.ts:912:33
+            ;;@ core/cpu/opcodes.ts:911:33
             (i32.add
              (get_global $core/cpu/cpu/Cpu.registerA)
-             ;;@ core/cpu/opcodes.ts:912:49
+             ;;@ core/cpu/opcodes.ts:911:49
              (i32.const 1)
             )
            )
           )
-          ;;@ core/cpu/opcodes.ts:913:6
+          ;;@ core/cpu/opcodes.ts:912:6
           (if
-           ;;@ core/cpu/opcodes.ts:913:10
+           ;;@ core/cpu/opcodes.ts:912:10
            (get_global $core/cpu/cpu/Cpu.registerA)
-           ;;@ core/cpu/opcodes.ts:915:13
+           ;;@ core/cpu/opcodes.ts:914:13
            (call $core/cpu/flags/setZeroFlag
-            ;;@ core/cpu/opcodes.ts:916:20
+            ;;@ core/cpu/opcodes.ts:915:20
             (i32.const 0)
            )
-           ;;@ core/cpu/opcodes.ts:913:31
+           ;;@ core/cpu/opcodes.ts:912:31
            (call $core/cpu/flags/setZeroFlag
-            ;;@ core/cpu/opcodes.ts:914:20
+            ;;@ core/cpu/opcodes.ts:913:20
             (i32.const 1)
            )
           )
-          ;;@ core/cpu/opcodes.ts:918:6
+          ;;@ core/cpu/opcodes.ts:917:6
           (call $core/cpu/flags/setSubtractFlag
-           ;;@ core/cpu/opcodes.ts:918:22
+           ;;@ core/cpu/opcodes.ts:917:22
            (i32.const 0)
           )
           (br $folding-inner3)
          )
-         ;;@ core/cpu/opcodes.ts:924:6
+         ;;@ core/cpu/opcodes.ts:923:6
          (call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
-          ;;@ core/cpu/opcodes.ts:924:39
+          ;;@ core/cpu/opcodes.ts:923:39
           (get_global $core/cpu/cpu/Cpu.registerA)
-          ;;@ core/cpu/opcodes.ts:924:54
+          ;;@ core/cpu/opcodes.ts:923:54
           (i32.const -1)
          )
-         ;;@ core/cpu/opcodes.ts:925:6
+         ;;@ core/cpu/opcodes.ts:924:6
          (set_global $core/cpu/cpu/Cpu.registerA
-          ;;@ core/cpu/opcodes.ts:925:22
+          ;;@ core/cpu/opcodes.ts:924:22
           (call $core/helpers/index/splitLowByte
-           ;;@ core/cpu/opcodes.ts:925:33
+           ;;@ core/cpu/opcodes.ts:924:33
            (i32.sub
             (get_global $core/cpu/cpu/Cpu.registerA)
-            ;;@ core/cpu/opcodes.ts:925:49
+            ;;@ core/cpu/opcodes.ts:924:49
             (i32.const 1)
            )
           )
          )
-         ;;@ core/cpu/opcodes.ts:926:6
+         ;;@ core/cpu/opcodes.ts:925:6
          (if
-          ;;@ core/cpu/opcodes.ts:926:10
+          ;;@ core/cpu/opcodes.ts:925:10
           (get_global $core/cpu/cpu/Cpu.registerA)
-          ;;@ core/cpu/opcodes.ts:928:13
+          ;;@ core/cpu/opcodes.ts:927:13
           (call $core/cpu/flags/setZeroFlag
-           ;;@ core/cpu/opcodes.ts:929:20
+           ;;@ core/cpu/opcodes.ts:928:20
            (i32.const 0)
           )
-          ;;@ core/cpu/opcodes.ts:926:31
+          ;;@ core/cpu/opcodes.ts:925:31
           (call $core/cpu/flags/setZeroFlag
-           ;;@ core/cpu/opcodes.ts:927:20
+           ;;@ core/cpu/opcodes.ts:926:20
            (i32.const 1)
           )
          )
-         ;;@ core/cpu/opcodes.ts:931:6
+         ;;@ core/cpu/opcodes.ts:930:6
          (call $core/cpu/flags/setSubtractFlag
-          ;;@ core/cpu/opcodes.ts:931:22
+          ;;@ core/cpu/opcodes.ts:930:22
           (i32.const 1)
          )
          (br $folding-inner3)
         )
-        ;;@ core/cpu/opcodes.ts:937:6
+        ;;@ core/cpu/opcodes.ts:936:6
         (set_global $core/cpu/cpu/Cpu.registerA
          (i32.and
-          ;;@ core/cpu/opcodes.ts:937:22
+          ;;@ core/cpu/opcodes.ts:936:22
           (call $core/cpu/opcodes/getDataByteOne)
           (i32.const 255)
          )
         )
         (br $folding-inner2)
        )
-       ;;@ core/cpu/opcodes.ts:944:6
+       ;;@ core/cpu/opcodes.ts:943:6
        (call $core/cpu/flags/setSubtractFlag
-        ;;@ core/cpu/opcodes.ts:944:22
+        ;;@ core/cpu/opcodes.ts:943:22
+        (i32.const 0)
+       )
+       ;;@ core/cpu/opcodes.ts:944:6
+       (call $core/cpu/flags/setHalfCarryFlag
+        ;;@ core/cpu/opcodes.ts:944:23
         (i32.const 0)
        )
        ;;@ core/cpu/opcodes.ts:945:6
-       (call $core/cpu/flags/setHalfCarryFlag
-        ;;@ core/cpu/opcodes.ts:945:23
-        (i32.const 0)
-       )
-       ;;@ core/cpu/opcodes.ts:946:6
        (if
-        ;;@ core/cpu/opcodes.ts:946:10
+        ;;@ core/cpu/opcodes.ts:945:10
         (i32.gt_u
          (call $core/cpu/flags/getCarryFlag)
-         ;;@ core/cpu/opcodes.ts:946:27
+         ;;@ core/cpu/opcodes.ts:945:27
          (i32.const 0)
         )
-        ;;@ core/cpu/opcodes.ts:946:30
+        ;;@ core/cpu/opcodes.ts:945:30
         (call $core/cpu/flags/setCarryFlag
-         ;;@ core/cpu/opcodes.ts:947:21
+         ;;@ core/cpu/opcodes.ts:946:21
          (i32.const 0)
         )
-        ;;@ core/cpu/opcodes.ts:948:13
+        ;;@ core/cpu/opcodes.ts:947:13
         (call $core/cpu/flags/setCarryFlag
-         ;;@ core/cpu/opcodes.ts:949:21
+         ;;@ core/cpu/opcodes.ts:948:21
          (i32.const 1)
         )
        )
@@ -15557,19 +15557,19 @@
        (i32.const -1)
       )
      )
-     ;;@ core/cpu/opcodes.ts:803:6
+     ;;@ core/cpu/opcodes.ts:802:6
      (set_global $core/cpu/cpu/Cpu.registerH
       (i32.and
-       ;;@ core/cpu/opcodes.ts:803:22
+       ;;@ core/cpu/opcodes.ts:802:22
        (call $core/helpers/index/splitHighByte
-        ;;@ core/cpu/opcodes.ts:802:6
+        ;;@ core/cpu/opcodes.ts:801:6
         (tee_local $0
-         ;;@ core/cpu/opcodes.ts:802:20
+         ;;@ core/cpu/opcodes.ts:801:20
          (call $core/portable/portable/u16Portable
-          ;;@ core/cpu/opcodes.ts:802:32
+          ;;@ core/cpu/opcodes.ts:801:32
           (i32.sub
            (get_local $0)
-           ;;@ core/cpu/opcodes.ts:802:46
+           ;;@ core/cpu/opcodes.ts:801:46
            (i32.const 1)
           )
          )
@@ -15578,10 +15578,10 @@
        (i32.const 255)
       )
      )
-     ;;@ core/cpu/opcodes.ts:804:6
+     ;;@ core/cpu/opcodes.ts:803:6
      (set_global $core/cpu/cpu/Cpu.registerL
       (i32.and
-       ;;@ core/cpu/opcodes.ts:804:22
+       ;;@ core/cpu/opcodes.ts:803:22
        (call $core/helpers/index/splitLowByte
         (get_local $0)
        )
@@ -15590,9 +15590,9 @@
      )
      (br $folding-inner3)
     )
-    ;;@ core/cpu/opcodes.ts:832:6
+    ;;@ core/cpu/opcodes.ts:831:6
     (call $core/cpu/opcodes/eightBitStoreSyncCycles
-     ;;@ core/cpu/opcodes.ts:832:30
+     ;;@ core/cpu/opcodes.ts:831:30
      (i32.and
       (get_local $0)
       (i32.const 65535)
@@ -15601,20 +15601,20 @@
     )
     (br $folding-inner3)
    )
-   ;;@ core/cpu/opcodes.ts:859:6
+   ;;@ core/cpu/opcodes.ts:858:6
    (set_global $core/cpu/cpu/Cpu.programCounter
-    ;;@ core/cpu/opcodes.ts:859:27
+    ;;@ core/cpu/opcodes.ts:858:27
     (call $core/portable/portable/u16Portable
-     ;;@ core/cpu/opcodes.ts:859:39
+     ;;@ core/cpu/opcodes.ts:858:39
      (i32.add
       (get_global $core/cpu/cpu/Cpu.programCounter)
-      ;;@ core/cpu/opcodes.ts:859:60
+      ;;@ core/cpu/opcodes.ts:858:60
       (i32.const 1)
      )
     )
    )
   )
-  ;;@ core/cpu/opcodes.ts:795:13
+  ;;@ core/cpu/opcodes.ts:794:13
   (i32.const 4)
  )
  (func $core/cpu/opcodes/handleOpcode4x (; 190 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
@@ -15639,7 +15639,7 @@
                    (if
                     (i32.ne
                      (get_local $0)
-                     ;;@ core/cpu/opcodes.ts:958:9
+                     ;;@ core/cpu/opcodes.ts:957:9
                      (i32.const 64)
                     )
                     (block
@@ -15648,7 +15648,7 @@
                        (tee_local $1
                         (get_local $0)
                        )
-                       ;;@ core/cpu/opcodes.ts:963:9
+                       ;;@ core/cpu/opcodes.ts:962:9
                        (i32.const 65)
                       )
                      )
@@ -15665,51 +15665,51 @@
                    )
                    (br $folding-inner0)
                   )
-                  ;;@ core/cpu/opcodes.ts:966:6
+                  ;;@ core/cpu/opcodes.ts:965:6
                   (set_global $core/cpu/cpu/Cpu.registerB
-                   ;;@ core/cpu/opcodes.ts:966:22
+                   ;;@ core/cpu/opcodes.ts:965:22
                    (get_global $core/cpu/cpu/Cpu.registerC)
                   )
                   (br $folding-inner0)
                  )
-                 ;;@ core/cpu/opcodes.ts:971:6
+                 ;;@ core/cpu/opcodes.ts:970:6
                  (set_global $core/cpu/cpu/Cpu.registerB
-                  ;;@ core/cpu/opcodes.ts:971:22
+                  ;;@ core/cpu/opcodes.ts:970:22
                   (get_global $core/cpu/cpu/Cpu.registerD)
                  )
                  (br $folding-inner0)
                 )
-                ;;@ core/cpu/opcodes.ts:976:6
+                ;;@ core/cpu/opcodes.ts:975:6
                 (set_global $core/cpu/cpu/Cpu.registerB
-                 ;;@ core/cpu/opcodes.ts:976:22
+                 ;;@ core/cpu/opcodes.ts:975:22
                  (get_global $core/cpu/cpu/Cpu.registerE)
                 )
                 (br $folding-inner0)
                )
-               ;;@ core/cpu/opcodes.ts:981:6
+               ;;@ core/cpu/opcodes.ts:980:6
                (set_global $core/cpu/cpu/Cpu.registerB
-                ;;@ core/cpu/opcodes.ts:981:22
+                ;;@ core/cpu/opcodes.ts:980:22
                 (get_global $core/cpu/cpu/Cpu.registerH)
                )
                (br $folding-inner0)
               )
-              ;;@ core/cpu/opcodes.ts:986:6
+              ;;@ core/cpu/opcodes.ts:985:6
               (set_global $core/cpu/cpu/Cpu.registerB
-               ;;@ core/cpu/opcodes.ts:986:22
+               ;;@ core/cpu/opcodes.ts:985:22
                (get_global $core/cpu/cpu/Cpu.registerL)
               )
               (br $folding-inner0)
              )
-             ;;@ core/cpu/opcodes.ts:992:6
+             ;;@ core/cpu/opcodes.ts:991:6
              (set_global $core/cpu/cpu/Cpu.registerB
               (i32.and
-               ;;@ core/cpu/opcodes.ts:992:22
+               ;;@ core/cpu/opcodes.ts:991:22
                (call $core/cpu/opcodes/eightBitLoadSyncCycles
-                ;;@ core/cpu/opcodes.ts:992:49
+                ;;@ core/cpu/opcodes.ts:991:49
                 (call $core/helpers/index/concatenateBytes
-                 ;;@ core/cpu/opcodes.ts:992:66
+                 ;;@ core/cpu/opcodes.ts:991:66
                  (get_global $core/cpu/cpu/Cpu.registerH)
-                 ;;@ core/cpu/opcodes.ts:992:81
+                 ;;@ core/cpu/opcodes.ts:991:81
                  (get_global $core/cpu/cpu/Cpu.registerL)
                 )
                )
@@ -15718,60 +15718,60 @@
              )
              (br $folding-inner0)
             )
-            ;;@ core/cpu/opcodes.ts:997:6
+            ;;@ core/cpu/opcodes.ts:996:6
             (set_global $core/cpu/cpu/Cpu.registerB
-             ;;@ core/cpu/opcodes.ts:997:22
+             ;;@ core/cpu/opcodes.ts:996:22
              (get_global $core/cpu/cpu/Cpu.registerA)
             )
             (br $folding-inner0)
            )
-           ;;@ core/cpu/opcodes.ts:1002:6
+           ;;@ core/cpu/opcodes.ts:1001:6
            (set_global $core/cpu/cpu/Cpu.registerC
-            ;;@ core/cpu/opcodes.ts:1002:22
+            ;;@ core/cpu/opcodes.ts:1001:22
             (get_global $core/cpu/cpu/Cpu.registerB)
            )
            (br $folding-inner0)
           )
           (br $folding-inner0)
          )
-         ;;@ core/cpu/opcodes.ts:1012:6
+         ;;@ core/cpu/opcodes.ts:1011:6
          (set_global $core/cpu/cpu/Cpu.registerC
-          ;;@ core/cpu/opcodes.ts:1012:22
+          ;;@ core/cpu/opcodes.ts:1011:22
           (get_global $core/cpu/cpu/Cpu.registerD)
          )
          (br $folding-inner0)
         )
-        ;;@ core/cpu/opcodes.ts:1017:6
+        ;;@ core/cpu/opcodes.ts:1016:6
         (set_global $core/cpu/cpu/Cpu.registerC
-         ;;@ core/cpu/opcodes.ts:1017:22
+         ;;@ core/cpu/opcodes.ts:1016:22
          (get_global $core/cpu/cpu/Cpu.registerE)
         )
         (br $folding-inner0)
        )
-       ;;@ core/cpu/opcodes.ts:1022:6
+       ;;@ core/cpu/opcodes.ts:1021:6
        (set_global $core/cpu/cpu/Cpu.registerC
-        ;;@ core/cpu/opcodes.ts:1022:22
+        ;;@ core/cpu/opcodes.ts:1021:22
         (get_global $core/cpu/cpu/Cpu.registerH)
        )
        (br $folding-inner0)
       )
-      ;;@ core/cpu/opcodes.ts:1027:6
+      ;;@ core/cpu/opcodes.ts:1026:6
       (set_global $core/cpu/cpu/Cpu.registerC
-       ;;@ core/cpu/opcodes.ts:1027:22
+       ;;@ core/cpu/opcodes.ts:1026:22
        (get_global $core/cpu/cpu/Cpu.registerL)
       )
       (br $folding-inner0)
      )
-     ;;@ core/cpu/opcodes.ts:1033:6
+     ;;@ core/cpu/opcodes.ts:1032:6
      (set_global $core/cpu/cpu/Cpu.registerC
       (i32.and
-       ;;@ core/cpu/opcodes.ts:1033:22
+       ;;@ core/cpu/opcodes.ts:1032:22
        (call $core/cpu/opcodes/eightBitLoadSyncCycles
-        ;;@ core/cpu/opcodes.ts:1033:49
+        ;;@ core/cpu/opcodes.ts:1032:49
         (call $core/helpers/index/concatenateBytes
-         ;;@ core/cpu/opcodes.ts:1033:66
+         ;;@ core/cpu/opcodes.ts:1032:66
          (get_global $core/cpu/cpu/Cpu.registerH)
-         ;;@ core/cpu/opcodes.ts:1033:81
+         ;;@ core/cpu/opcodes.ts:1032:81
          (get_global $core/cpu/cpu/Cpu.registerL)
         )
        )
@@ -15780,9 +15780,9 @@
      )
      (br $folding-inner0)
     )
-    ;;@ core/cpu/opcodes.ts:1038:6
+    ;;@ core/cpu/opcodes.ts:1037:6
     (set_global $core/cpu/cpu/Cpu.registerC
-     ;;@ core/cpu/opcodes.ts:1038:22
+     ;;@ core/cpu/opcodes.ts:1037:22
      (get_global $core/cpu/cpu/Cpu.registerA)
     )
     (br $folding-inner0)
@@ -15791,7 +15791,7 @@
     (i32.const -1)
    )
   )
-  ;;@ core/cpu/opcodes.ts:962:13
+  ;;@ core/cpu/opcodes.ts:961:13
   (i32.const 4)
  )
  (func $core/cpu/opcodes/handleOpcode5x (; 191 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
@@ -15816,7 +15816,7 @@
                    (if
                     (i32.ne
                      (get_local $0)
-                     ;;@ core/cpu/opcodes.ts:1046:9
+                     ;;@ core/cpu/opcodes.ts:1045:9
                      (i32.const 80)
                     )
                     (block
@@ -15825,7 +15825,7 @@
                        (tee_local $1
                         (get_local $0)
                        )
-                       ;;@ core/cpu/opcodes.ts:1051:9
+                       ;;@ core/cpu/opcodes.ts:1050:9
                        (i32.const 81)
                       )
                      )
@@ -15840,53 +15840,53 @@
                      (br $break|0)
                     )
                    )
-                   ;;@ core/cpu/opcodes.ts:1049:6
+                   ;;@ core/cpu/opcodes.ts:1048:6
                    (set_global $core/cpu/cpu/Cpu.registerD
-                    ;;@ core/cpu/opcodes.ts:1049:22
+                    ;;@ core/cpu/opcodes.ts:1048:22
                     (get_global $core/cpu/cpu/Cpu.registerB)
                    )
                    (br $folding-inner0)
                   )
-                  ;;@ core/cpu/opcodes.ts:1054:6
+                  ;;@ core/cpu/opcodes.ts:1053:6
                   (set_global $core/cpu/cpu/Cpu.registerD
-                   ;;@ core/cpu/opcodes.ts:1054:22
+                   ;;@ core/cpu/opcodes.ts:1053:22
                    (get_global $core/cpu/cpu/Cpu.registerC)
                   )
                   (br $folding-inner0)
                  )
                  (br $folding-inner0)
                 )
-                ;;@ core/cpu/opcodes.ts:1064:6
+                ;;@ core/cpu/opcodes.ts:1063:6
                 (set_global $core/cpu/cpu/Cpu.registerD
-                 ;;@ core/cpu/opcodes.ts:1064:22
+                 ;;@ core/cpu/opcodes.ts:1063:22
                  (get_global $core/cpu/cpu/Cpu.registerE)
                 )
                 (br $folding-inner0)
                )
-               ;;@ core/cpu/opcodes.ts:1069:6
+               ;;@ core/cpu/opcodes.ts:1068:6
                (set_global $core/cpu/cpu/Cpu.registerD
-                ;;@ core/cpu/opcodes.ts:1069:22
+                ;;@ core/cpu/opcodes.ts:1068:22
                 (get_global $core/cpu/cpu/Cpu.registerH)
                )
                (br $folding-inner0)
               )
-              ;;@ core/cpu/opcodes.ts:1074:6
+              ;;@ core/cpu/opcodes.ts:1073:6
               (set_global $core/cpu/cpu/Cpu.registerD
-               ;;@ core/cpu/opcodes.ts:1074:22
+               ;;@ core/cpu/opcodes.ts:1073:22
                (get_global $core/cpu/cpu/Cpu.registerL)
               )
               (br $folding-inner0)
              )
-             ;;@ core/cpu/opcodes.ts:1080:6
+             ;;@ core/cpu/opcodes.ts:1079:6
              (set_global $core/cpu/cpu/Cpu.registerD
               (i32.and
-               ;;@ core/cpu/opcodes.ts:1080:22
+               ;;@ core/cpu/opcodes.ts:1079:22
                (call $core/cpu/opcodes/eightBitLoadSyncCycles
-                ;;@ core/cpu/opcodes.ts:1080:49
+                ;;@ core/cpu/opcodes.ts:1079:49
                 (call $core/helpers/index/concatenateBytes
-                 ;;@ core/cpu/opcodes.ts:1080:66
+                 ;;@ core/cpu/opcodes.ts:1079:66
                  (get_global $core/cpu/cpu/Cpu.registerH)
-                 ;;@ core/cpu/opcodes.ts:1080:81
+                 ;;@ core/cpu/opcodes.ts:1079:81
                  (get_global $core/cpu/cpu/Cpu.registerL)
                 )
                )
@@ -15895,60 +15895,60 @@
              )
              (br $folding-inner0)
             )
-            ;;@ core/cpu/opcodes.ts:1085:6
+            ;;@ core/cpu/opcodes.ts:1084:6
             (set_global $core/cpu/cpu/Cpu.registerD
-             ;;@ core/cpu/opcodes.ts:1085:22
+             ;;@ core/cpu/opcodes.ts:1084:22
              (get_global $core/cpu/cpu/Cpu.registerA)
             )
             (br $folding-inner0)
            )
-           ;;@ core/cpu/opcodes.ts:1090:6
+           ;;@ core/cpu/opcodes.ts:1089:6
            (set_global $core/cpu/cpu/Cpu.registerE
-            ;;@ core/cpu/opcodes.ts:1090:22
+            ;;@ core/cpu/opcodes.ts:1089:22
             (get_global $core/cpu/cpu/Cpu.registerB)
            )
            (br $folding-inner0)
           )
-          ;;@ core/cpu/opcodes.ts:1095:6
+          ;;@ core/cpu/opcodes.ts:1094:6
           (set_global $core/cpu/cpu/Cpu.registerE
-           ;;@ core/cpu/opcodes.ts:1095:22
+           ;;@ core/cpu/opcodes.ts:1094:22
            (get_global $core/cpu/cpu/Cpu.registerC)
           )
           (br $folding-inner0)
          )
-         ;;@ core/cpu/opcodes.ts:1100:6
+         ;;@ core/cpu/opcodes.ts:1099:6
          (set_global $core/cpu/cpu/Cpu.registerE
-          ;;@ core/cpu/opcodes.ts:1100:22
+          ;;@ core/cpu/opcodes.ts:1099:22
           (get_global $core/cpu/cpu/Cpu.registerD)
          )
          (br $folding-inner0)
         )
         (br $folding-inner0)
        )
-       ;;@ core/cpu/opcodes.ts:1110:6
+       ;;@ core/cpu/opcodes.ts:1109:6
        (set_global $core/cpu/cpu/Cpu.registerE
-        ;;@ core/cpu/opcodes.ts:1110:22
+        ;;@ core/cpu/opcodes.ts:1109:22
         (get_global $core/cpu/cpu/Cpu.registerH)
        )
        (br $folding-inner0)
       )
-      ;;@ core/cpu/opcodes.ts:1115:6
+      ;;@ core/cpu/opcodes.ts:1114:6
       (set_global $core/cpu/cpu/Cpu.registerE
-       ;;@ core/cpu/opcodes.ts:1115:22
+       ;;@ core/cpu/opcodes.ts:1114:22
        (get_global $core/cpu/cpu/Cpu.registerL)
       )
       (br $folding-inner0)
      )
-     ;;@ core/cpu/opcodes.ts:1121:6
+     ;;@ core/cpu/opcodes.ts:1120:6
      (set_global $core/cpu/cpu/Cpu.registerE
       (i32.and
-       ;;@ core/cpu/opcodes.ts:1121:22
+       ;;@ core/cpu/opcodes.ts:1120:22
        (call $core/cpu/opcodes/eightBitLoadSyncCycles
-        ;;@ core/cpu/opcodes.ts:1121:49
+        ;;@ core/cpu/opcodes.ts:1120:49
         (call $core/helpers/index/concatenateBytes
-         ;;@ core/cpu/opcodes.ts:1121:66
+         ;;@ core/cpu/opcodes.ts:1120:66
          (get_global $core/cpu/cpu/Cpu.registerH)
-         ;;@ core/cpu/opcodes.ts:1121:81
+         ;;@ core/cpu/opcodes.ts:1120:81
          (get_global $core/cpu/cpu/Cpu.registerL)
         )
        )
@@ -15957,9 +15957,9 @@
      )
      (br $folding-inner0)
     )
-    ;;@ core/cpu/opcodes.ts:1126:6
+    ;;@ core/cpu/opcodes.ts:1125:6
     (set_global $core/cpu/cpu/Cpu.registerE
-     ;;@ core/cpu/opcodes.ts:1126:22
+     ;;@ core/cpu/opcodes.ts:1125:22
      (get_global $core/cpu/cpu/Cpu.registerA)
     )
     (br $folding-inner0)
@@ -15968,7 +15968,7 @@
     (i32.const -1)
    )
   )
-  ;;@ core/cpu/opcodes.ts:1050:13
+  ;;@ core/cpu/opcodes.ts:1049:13
   (i32.const 4)
  )
  (func $core/cpu/opcodes/handleOpcode6x (; 192 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
@@ -15993,7 +15993,7 @@
                    (if
                     (i32.ne
                      (get_local $0)
-                     ;;@ core/cpu/opcodes.ts:1134:9
+                     ;;@ core/cpu/opcodes.ts:1133:9
                      (i32.const 96)
                     )
                     (block
@@ -16002,7 +16002,7 @@
                        (tee_local $1
                         (get_local $0)
                        )
-                       ;;@ core/cpu/opcodes.ts:1139:9
+                       ;;@ core/cpu/opcodes.ts:1138:9
                        (i32.const 97)
                       )
                      )
@@ -16017,53 +16017,53 @@
                      (br $break|0)
                     )
                    )
-                   ;;@ core/cpu/opcodes.ts:1137:6
+                   ;;@ core/cpu/opcodes.ts:1136:6
                    (set_global $core/cpu/cpu/Cpu.registerH
-                    ;;@ core/cpu/opcodes.ts:1137:22
+                    ;;@ core/cpu/opcodes.ts:1136:22
                     (get_global $core/cpu/cpu/Cpu.registerB)
                    )
                    (br $folding-inner0)
                   )
-                  ;;@ core/cpu/opcodes.ts:1142:6
+                  ;;@ core/cpu/opcodes.ts:1141:6
                   (set_global $core/cpu/cpu/Cpu.registerH
-                   ;;@ core/cpu/opcodes.ts:1142:22
+                   ;;@ core/cpu/opcodes.ts:1141:22
                    (get_global $core/cpu/cpu/Cpu.registerC)
                   )
                   (br $folding-inner0)
                  )
-                 ;;@ core/cpu/opcodes.ts:1147:6
+                 ;;@ core/cpu/opcodes.ts:1146:6
                  (set_global $core/cpu/cpu/Cpu.registerH
-                  ;;@ core/cpu/opcodes.ts:1147:22
+                  ;;@ core/cpu/opcodes.ts:1146:22
                   (get_global $core/cpu/cpu/Cpu.registerD)
                  )
                  (br $folding-inner0)
                 )
-                ;;@ core/cpu/opcodes.ts:1152:6
+                ;;@ core/cpu/opcodes.ts:1151:6
                 (set_global $core/cpu/cpu/Cpu.registerH
-                 ;;@ core/cpu/opcodes.ts:1152:22
+                 ;;@ core/cpu/opcodes.ts:1151:22
                  (get_global $core/cpu/cpu/Cpu.registerE)
                 )
                 (br $folding-inner0)
                )
                (br $folding-inner0)
               )
-              ;;@ core/cpu/opcodes.ts:1162:6
+              ;;@ core/cpu/opcodes.ts:1161:6
               (set_global $core/cpu/cpu/Cpu.registerH
-               ;;@ core/cpu/opcodes.ts:1162:22
+               ;;@ core/cpu/opcodes.ts:1161:22
                (get_global $core/cpu/cpu/Cpu.registerL)
               )
               (br $folding-inner0)
              )
-             ;;@ core/cpu/opcodes.ts:1168:6
+             ;;@ core/cpu/opcodes.ts:1167:6
              (set_global $core/cpu/cpu/Cpu.registerH
               (i32.and
-               ;;@ core/cpu/opcodes.ts:1168:22
+               ;;@ core/cpu/opcodes.ts:1167:22
                (call $core/cpu/opcodes/eightBitLoadSyncCycles
-                ;;@ core/cpu/opcodes.ts:1168:49
+                ;;@ core/cpu/opcodes.ts:1167:49
                 (call $core/helpers/index/concatenateBytes
-                 ;;@ core/cpu/opcodes.ts:1168:66
+                 ;;@ core/cpu/opcodes.ts:1167:66
                  (get_global $core/cpu/cpu/Cpu.registerH)
-                 ;;@ core/cpu/opcodes.ts:1168:81
+                 ;;@ core/cpu/opcodes.ts:1167:81
                  (get_global $core/cpu/cpu/Cpu.registerL)
                 )
                )
@@ -16072,60 +16072,60 @@
              )
              (br $folding-inner0)
             )
-            ;;@ core/cpu/opcodes.ts:1173:6
+            ;;@ core/cpu/opcodes.ts:1172:6
             (set_global $core/cpu/cpu/Cpu.registerH
-             ;;@ core/cpu/opcodes.ts:1173:22
+             ;;@ core/cpu/opcodes.ts:1172:22
              (get_global $core/cpu/cpu/Cpu.registerA)
             )
             (br $folding-inner0)
            )
-           ;;@ core/cpu/opcodes.ts:1178:6
+           ;;@ core/cpu/opcodes.ts:1177:6
            (set_global $core/cpu/cpu/Cpu.registerL
-            ;;@ core/cpu/opcodes.ts:1178:22
+            ;;@ core/cpu/opcodes.ts:1177:22
             (get_global $core/cpu/cpu/Cpu.registerB)
            )
            (br $folding-inner0)
           )
-          ;;@ core/cpu/opcodes.ts:1183:6
+          ;;@ core/cpu/opcodes.ts:1182:6
           (set_global $core/cpu/cpu/Cpu.registerL
-           ;;@ core/cpu/opcodes.ts:1183:22
+           ;;@ core/cpu/opcodes.ts:1182:22
            (get_global $core/cpu/cpu/Cpu.registerC)
           )
           (br $folding-inner0)
          )
-         ;;@ core/cpu/opcodes.ts:1188:6
+         ;;@ core/cpu/opcodes.ts:1187:6
          (set_global $core/cpu/cpu/Cpu.registerL
-          ;;@ core/cpu/opcodes.ts:1188:22
+          ;;@ core/cpu/opcodes.ts:1187:22
           (get_global $core/cpu/cpu/Cpu.registerD)
          )
          (br $folding-inner0)
         )
-        ;;@ core/cpu/opcodes.ts:1193:6
+        ;;@ core/cpu/opcodes.ts:1192:6
         (set_global $core/cpu/cpu/Cpu.registerL
-         ;;@ core/cpu/opcodes.ts:1193:22
+         ;;@ core/cpu/opcodes.ts:1192:22
          (get_global $core/cpu/cpu/Cpu.registerE)
         )
         (br $folding-inner0)
        )
-       ;;@ core/cpu/opcodes.ts:1198:6
+       ;;@ core/cpu/opcodes.ts:1197:6
        (set_global $core/cpu/cpu/Cpu.registerL
-        ;;@ core/cpu/opcodes.ts:1198:22
+        ;;@ core/cpu/opcodes.ts:1197:22
         (get_global $core/cpu/cpu/Cpu.registerH)
        )
        (br $folding-inner0)
       )
       (br $folding-inner0)
      )
-     ;;@ core/cpu/opcodes.ts:1209:6
+     ;;@ core/cpu/opcodes.ts:1208:6
      (set_global $core/cpu/cpu/Cpu.registerL
       (i32.and
-       ;;@ core/cpu/opcodes.ts:1209:22
+       ;;@ core/cpu/opcodes.ts:1208:22
        (call $core/cpu/opcodes/eightBitLoadSyncCycles
-        ;;@ core/cpu/opcodes.ts:1209:49
+        ;;@ core/cpu/opcodes.ts:1208:49
         (call $core/helpers/index/concatenateBytes
-         ;;@ core/cpu/opcodes.ts:1209:66
+         ;;@ core/cpu/opcodes.ts:1208:66
          (get_global $core/cpu/cpu/Cpu.registerH)
-         ;;@ core/cpu/opcodes.ts:1209:81
+         ;;@ core/cpu/opcodes.ts:1208:81
          (get_global $core/cpu/cpu/Cpu.registerL)
         )
        )
@@ -16134,9 +16134,9 @@
      )
      (br $folding-inner0)
     )
-    ;;@ core/cpu/opcodes.ts:1214:6
+    ;;@ core/cpu/opcodes.ts:1213:6
     (set_global $core/cpu/cpu/Cpu.registerL
-     ;;@ core/cpu/opcodes.ts:1214:22
+     ;;@ core/cpu/opcodes.ts:1213:22
      (get_global $core/cpu/cpu/Cpu.registerA)
     )
     (br $folding-inner0)
@@ -16145,7 +16145,7 @@
     (i32.const -1)
    )
   )
-  ;;@ core/cpu/opcodes.ts:1138:13
+  ;;@ core/cpu/opcodes.ts:1137:13
   (i32.const 4)
  )
  (func $core/cpu/cpu/Cpu.enableHalt (; 193 ;) (; has Stack IR ;) (type $v)
@@ -16164,34 +16164,34 @@
     (return)
    )
   )
-  ;;@ core/cpu/cpu.ts:83:4
+  ;;@ core/cpu/cpu.ts:81:4
   (if
    (i32.eqz
     ;;@ core/cpu/cpu.ts:79:29
     (i32.and
      (i32.and
       (get_global $core/interrupts/interrupts/Interrupts.interruptsEnabledValue)
-      ;;@ core/cpu/cpu.ts:80:4
+      ;;@ core/cpu/cpu.ts:79:65
       (get_global $core/interrupts/interrupts/Interrupts.interruptsRequestedValue)
      )
-     ;;@ core/cpu/cpu.ts:81:4
+     ;;@ core/cpu/cpu.ts:79:103
      (i32.const 31)
     )
    )
-   ;;@ core/cpu/cpu.ts:83:29
+   ;;@ core/cpu/cpu.ts:81:29
    (block
-    ;;@ core/cpu/cpu.ts:84:6
+    ;;@ core/cpu/cpu.ts:82:6
     (set_global $core/cpu/cpu/Cpu.isHaltNoJump
-     ;;@ core/cpu/cpu.ts:84:25
+     ;;@ core/cpu/cpu.ts:82:25
      (i32.const 1)
     )
-    ;;@ core/cpu/cpu.ts:85:6
+    ;;@ core/cpu/cpu.ts:83:6
     (return)
    )
   )
-  ;;@ core/cpu/cpu.ts:88:4
+  ;;@ core/cpu/cpu.ts:86:4
   (set_global $core/cpu/cpu/Cpu.isHaltBug
-   ;;@ core/cpu/cpu.ts:88:20
+   ;;@ core/cpu/cpu.ts:86:20
    (i32.const 1)
   )
  )
@@ -16217,7 +16217,7 @@
                    (if
                     (i32.ne
                      (get_local $0)
-                     ;;@ core/cpu/opcodes.ts:1222:9
+                     ;;@ core/cpu/opcodes.ts:1221:9
                      (i32.const 112)
                     )
                     (block
@@ -16226,7 +16226,7 @@
                        (tee_local $1
                         (get_local $0)
                        )
-                       ;;@ core/cpu/opcodes.ts:1228:9
+                       ;;@ core/cpu/opcodes.ts:1227:9
                        (i32.const 113)
                       )
                      )
@@ -16241,168 +16241,168 @@
                      (br $break|0)
                     )
                    )
-                   ;;@ core/cpu/opcodes.ts:1226:6
+                   ;;@ core/cpu/opcodes.ts:1225:6
                    (call $core/cpu/opcodes/eightBitStoreSyncCycles
-                    ;;@ core/cpu/opcodes.ts:1226:30
+                    ;;@ core/cpu/opcodes.ts:1225:30
                     (call $core/helpers/index/concatenateBytes
-                     ;;@ core/cpu/opcodes.ts:1226:47
+                     ;;@ core/cpu/opcodes.ts:1225:47
                      (get_global $core/cpu/cpu/Cpu.registerH)
-                     ;;@ core/cpu/opcodes.ts:1226:62
+                     ;;@ core/cpu/opcodes.ts:1225:62
                      (get_global $core/cpu/cpu/Cpu.registerL)
                     )
-                    ;;@ core/cpu/opcodes.ts:1226:78
+                    ;;@ core/cpu/opcodes.ts:1225:78
                     (get_global $core/cpu/cpu/Cpu.registerB)
                    )
                    (br $folding-inner0)
                   )
-                  ;;@ core/cpu/opcodes.ts:1232:6
+                  ;;@ core/cpu/opcodes.ts:1231:6
                   (call $core/cpu/opcodes/eightBitStoreSyncCycles
-                   ;;@ core/cpu/opcodes.ts:1232:30
+                   ;;@ core/cpu/opcodes.ts:1231:30
                    (call $core/helpers/index/concatenateBytes
-                    ;;@ core/cpu/opcodes.ts:1232:47
+                    ;;@ core/cpu/opcodes.ts:1231:47
                     (get_global $core/cpu/cpu/Cpu.registerH)
-                    ;;@ core/cpu/opcodes.ts:1232:62
+                    ;;@ core/cpu/opcodes.ts:1231:62
                     (get_global $core/cpu/cpu/Cpu.registerL)
                    )
-                   ;;@ core/cpu/opcodes.ts:1232:78
+                   ;;@ core/cpu/opcodes.ts:1231:78
                    (get_global $core/cpu/cpu/Cpu.registerC)
                   )
                   (br $folding-inner0)
                  )
-                 ;;@ core/cpu/opcodes.ts:1238:6
+                 ;;@ core/cpu/opcodes.ts:1237:6
                  (call $core/cpu/opcodes/eightBitStoreSyncCycles
-                  ;;@ core/cpu/opcodes.ts:1238:30
+                  ;;@ core/cpu/opcodes.ts:1237:30
                   (call $core/helpers/index/concatenateBytes
-                   ;;@ core/cpu/opcodes.ts:1238:47
+                   ;;@ core/cpu/opcodes.ts:1237:47
                    (get_global $core/cpu/cpu/Cpu.registerH)
-                   ;;@ core/cpu/opcodes.ts:1238:62
+                   ;;@ core/cpu/opcodes.ts:1237:62
                    (get_global $core/cpu/cpu/Cpu.registerL)
                   )
-                  ;;@ core/cpu/opcodes.ts:1238:78
+                  ;;@ core/cpu/opcodes.ts:1237:78
                   (get_global $core/cpu/cpu/Cpu.registerD)
                  )
                  (br $folding-inner0)
                 )
-                ;;@ core/cpu/opcodes.ts:1244:6
+                ;;@ core/cpu/opcodes.ts:1243:6
                 (call $core/cpu/opcodes/eightBitStoreSyncCycles
-                 ;;@ core/cpu/opcodes.ts:1244:30
+                 ;;@ core/cpu/opcodes.ts:1243:30
                  (call $core/helpers/index/concatenateBytes
-                  ;;@ core/cpu/opcodes.ts:1244:47
+                  ;;@ core/cpu/opcodes.ts:1243:47
                   (get_global $core/cpu/cpu/Cpu.registerH)
-                  ;;@ core/cpu/opcodes.ts:1244:62
+                  ;;@ core/cpu/opcodes.ts:1243:62
                   (get_global $core/cpu/cpu/Cpu.registerL)
                  )
-                 ;;@ core/cpu/opcodes.ts:1244:78
+                 ;;@ core/cpu/opcodes.ts:1243:78
                  (get_global $core/cpu/cpu/Cpu.registerE)
                 )
                 (br $folding-inner0)
                )
-               ;;@ core/cpu/opcodes.ts:1250:6
+               ;;@ core/cpu/opcodes.ts:1249:6
                (call $core/cpu/opcodes/eightBitStoreSyncCycles
-                ;;@ core/cpu/opcodes.ts:1250:30
+                ;;@ core/cpu/opcodes.ts:1249:30
                 (call $core/helpers/index/concatenateBytes
-                 ;;@ core/cpu/opcodes.ts:1250:47
+                 ;;@ core/cpu/opcodes.ts:1249:47
                  (get_global $core/cpu/cpu/Cpu.registerH)
-                 ;;@ core/cpu/opcodes.ts:1250:62
+                 ;;@ core/cpu/opcodes.ts:1249:62
                  (get_global $core/cpu/cpu/Cpu.registerL)
                 )
-                ;;@ core/cpu/opcodes.ts:1250:78
+                ;;@ core/cpu/opcodes.ts:1249:78
                 (get_global $core/cpu/cpu/Cpu.registerH)
                )
                (br $folding-inner0)
               )
-              ;;@ core/cpu/opcodes.ts:1256:6
+              ;;@ core/cpu/opcodes.ts:1255:6
               (call $core/cpu/opcodes/eightBitStoreSyncCycles
-               ;;@ core/cpu/opcodes.ts:1256:30
+               ;;@ core/cpu/opcodes.ts:1255:30
                (call $core/helpers/index/concatenateBytes
-                ;;@ core/cpu/opcodes.ts:1256:47
+                ;;@ core/cpu/opcodes.ts:1255:47
                 (get_global $core/cpu/cpu/Cpu.registerH)
-                ;;@ core/cpu/opcodes.ts:1256:62
+                ;;@ core/cpu/opcodes.ts:1255:62
                 (get_global $core/cpu/cpu/Cpu.registerL)
                )
-               ;;@ core/cpu/opcodes.ts:1256:78
+               ;;@ core/cpu/opcodes.ts:1255:78
                (get_global $core/cpu/cpu/Cpu.registerL)
               )
               (br $folding-inner0)
              )
-             ;;@ core/cpu/opcodes.ts:1267:6
+             ;;@ core/cpu/opcodes.ts:1266:6
              (if
-              ;;@ core/cpu/opcodes.ts:1267:10
+              ;;@ core/cpu/opcodes.ts:1266:10
               (i32.eqz
-               ;;@ core/cpu/opcodes.ts:1267:11
+               ;;@ core/cpu/opcodes.ts:1266:11
                (get_global $core/memory/memory/Memory.isHblankHdmaActive)
               )
-              ;;@ core/cpu/opcodes.ts:1267:38
+              ;;@ core/cpu/opcodes.ts:1266:38
               (call $core/cpu/cpu/Cpu.enableHalt)
              )
              (br $folding-inner0)
             )
-            ;;@ core/cpu/opcodes.ts:1275:6
+            ;;@ core/cpu/opcodes.ts:1274:6
             (call $core/cpu/opcodes/eightBitStoreSyncCycles
-             ;;@ core/cpu/opcodes.ts:1275:30
+             ;;@ core/cpu/opcodes.ts:1274:30
              (call $core/helpers/index/concatenateBytes
-              ;;@ core/cpu/opcodes.ts:1275:47
+              ;;@ core/cpu/opcodes.ts:1274:47
               (get_global $core/cpu/cpu/Cpu.registerH)
-              ;;@ core/cpu/opcodes.ts:1275:62
+              ;;@ core/cpu/opcodes.ts:1274:62
               (get_global $core/cpu/cpu/Cpu.registerL)
              )
-             ;;@ core/cpu/opcodes.ts:1275:78
+             ;;@ core/cpu/opcodes.ts:1274:78
              (get_global $core/cpu/cpu/Cpu.registerA)
             )
             (br $folding-inner0)
            )
-           ;;@ core/cpu/opcodes.ts:1280:6
+           ;;@ core/cpu/opcodes.ts:1279:6
            (set_global $core/cpu/cpu/Cpu.registerA
-            ;;@ core/cpu/opcodes.ts:1280:22
+            ;;@ core/cpu/opcodes.ts:1279:22
             (get_global $core/cpu/cpu/Cpu.registerB)
            )
            (br $folding-inner0)
           )
-          ;;@ core/cpu/opcodes.ts:1285:6
+          ;;@ core/cpu/opcodes.ts:1284:6
           (set_global $core/cpu/cpu/Cpu.registerA
-           ;;@ core/cpu/opcodes.ts:1285:22
+           ;;@ core/cpu/opcodes.ts:1284:22
            (get_global $core/cpu/cpu/Cpu.registerC)
           )
           (br $folding-inner0)
          )
-         ;;@ core/cpu/opcodes.ts:1290:6
+         ;;@ core/cpu/opcodes.ts:1289:6
          (set_global $core/cpu/cpu/Cpu.registerA
-          ;;@ core/cpu/opcodes.ts:1290:22
+          ;;@ core/cpu/opcodes.ts:1289:22
           (get_global $core/cpu/cpu/Cpu.registerD)
          )
          (br $folding-inner0)
         )
-        ;;@ core/cpu/opcodes.ts:1295:6
+        ;;@ core/cpu/opcodes.ts:1294:6
         (set_global $core/cpu/cpu/Cpu.registerA
-         ;;@ core/cpu/opcodes.ts:1295:22
+         ;;@ core/cpu/opcodes.ts:1294:22
          (get_global $core/cpu/cpu/Cpu.registerE)
         )
         (br $folding-inner0)
        )
-       ;;@ core/cpu/opcodes.ts:1300:6
+       ;;@ core/cpu/opcodes.ts:1299:6
        (set_global $core/cpu/cpu/Cpu.registerA
-        ;;@ core/cpu/opcodes.ts:1300:22
+        ;;@ core/cpu/opcodes.ts:1299:22
         (get_global $core/cpu/cpu/Cpu.registerH)
        )
        (br $folding-inner0)
       )
-      ;;@ core/cpu/opcodes.ts:1305:6
+      ;;@ core/cpu/opcodes.ts:1304:6
       (set_global $core/cpu/cpu/Cpu.registerA
-       ;;@ core/cpu/opcodes.ts:1305:22
+       ;;@ core/cpu/opcodes.ts:1304:22
        (get_global $core/cpu/cpu/Cpu.registerL)
       )
       (br $folding-inner0)
      )
-     ;;@ core/cpu/opcodes.ts:1312:6
+     ;;@ core/cpu/opcodes.ts:1311:6
      (set_global $core/cpu/cpu/Cpu.registerA
       (i32.and
-       ;;@ core/cpu/opcodes.ts:1312:22
+       ;;@ core/cpu/opcodes.ts:1311:22
        (call $core/cpu/opcodes/eightBitLoadSyncCycles
-        ;;@ core/cpu/opcodes.ts:1312:49
+        ;;@ core/cpu/opcodes.ts:1311:49
         (call $core/helpers/index/concatenateBytes
-         ;;@ core/cpu/opcodes.ts:1312:66
+         ;;@ core/cpu/opcodes.ts:1311:66
          (get_global $core/cpu/cpu/Cpu.registerH)
-         ;;@ core/cpu/opcodes.ts:1312:81
+         ;;@ core/cpu/opcodes.ts:1311:81
          (get_global $core/cpu/cpu/Cpu.registerL)
         )
        )
@@ -16417,7 +16417,7 @@
     (i32.const -1)
    )
   )
-  ;;@ core/cpu/opcodes.ts:1227:13
+  ;;@ core/cpu/opcodes.ts:1226:13
   (i32.const 4)
  )
  (func $core/cpu/flags/checkAndSetEightBitCarryFlag (; 195 ;) (; has Stack IR ;) (type $iiv) (param $0 i32) (param $1 i32)
@@ -16676,7 +16676,7 @@
                      (tee_local $1
                       (get_local $0)
                      )
-                     ;;@ core/cpu/opcodes.ts:1325:9
+                     ;;@ core/cpu/opcodes.ts:1324:9
                      (i32.const 128)
                     )
                     (block
@@ -16691,130 +16691,130 @@
                      (br $break|0)
                     )
                    )
-                   ;;@ core/cpu/opcodes.ts:1329:6
+                   ;;@ core/cpu/opcodes.ts:1328:6
                    (call $core/cpu/instructions/addARegister
-                    ;;@ core/cpu/opcodes.ts:1329:19
+                    ;;@ core/cpu/opcodes.ts:1328:19
                     (get_global $core/cpu/cpu/Cpu.registerB)
                    )
                    (br $folding-inner0)
                   )
-                  ;;@ core/cpu/opcodes.ts:1335:6
+                  ;;@ core/cpu/opcodes.ts:1334:6
                   (call $core/cpu/instructions/addARegister
-                   ;;@ core/cpu/opcodes.ts:1335:19
+                   ;;@ core/cpu/opcodes.ts:1334:19
                    (get_global $core/cpu/cpu/Cpu.registerC)
                   )
                   (br $folding-inner0)
                  )
-                 ;;@ core/cpu/opcodes.ts:1341:6
+                 ;;@ core/cpu/opcodes.ts:1340:6
                  (call $core/cpu/instructions/addARegister
-                  ;;@ core/cpu/opcodes.ts:1341:19
+                  ;;@ core/cpu/opcodes.ts:1340:19
                   (get_global $core/cpu/cpu/Cpu.registerD)
                  )
                  (br $folding-inner0)
                 )
-                ;;@ core/cpu/opcodes.ts:1347:6
+                ;;@ core/cpu/opcodes.ts:1346:6
                 (call $core/cpu/instructions/addARegister
-                 ;;@ core/cpu/opcodes.ts:1347:19
+                 ;;@ core/cpu/opcodes.ts:1346:19
                  (get_global $core/cpu/cpu/Cpu.registerE)
                 )
                 (br $folding-inner0)
                )
-               ;;@ core/cpu/opcodes.ts:1353:6
+               ;;@ core/cpu/opcodes.ts:1352:6
                (call $core/cpu/instructions/addARegister
-                ;;@ core/cpu/opcodes.ts:1353:19
+                ;;@ core/cpu/opcodes.ts:1352:19
                 (get_global $core/cpu/cpu/Cpu.registerH)
                )
                (br $folding-inner0)
               )
-              ;;@ core/cpu/opcodes.ts:1359:6
+              ;;@ core/cpu/opcodes.ts:1358:6
               (call $core/cpu/instructions/addARegister
-               ;;@ core/cpu/opcodes.ts:1359:19
+               ;;@ core/cpu/opcodes.ts:1358:19
                (get_global $core/cpu/cpu/Cpu.registerL)
               )
               (br $folding-inner0)
              )
-             ;;@ core/cpu/opcodes.ts:1367:6
+             ;;@ core/cpu/opcodes.ts:1366:6
              (call $core/cpu/instructions/addARegister
-              ;;@ core/cpu/opcodes.ts:1366:27
+              ;;@ core/cpu/opcodes.ts:1365:27
               (call $core/cpu/opcodes/eightBitLoadSyncCycles
-               ;;@ core/cpu/opcodes.ts:1366:54
+               ;;@ core/cpu/opcodes.ts:1365:54
                (call $core/helpers/index/concatenateBytes
-                ;;@ core/cpu/opcodes.ts:1366:71
+                ;;@ core/cpu/opcodes.ts:1365:71
                 (get_global $core/cpu/cpu/Cpu.registerH)
-                ;;@ core/cpu/opcodes.ts:1366:86
+                ;;@ core/cpu/opcodes.ts:1365:86
                 (get_global $core/cpu/cpu/Cpu.registerL)
                )
               )
              )
              (br $folding-inner0)
             )
-            ;;@ core/cpu/opcodes.ts:1373:6
+            ;;@ core/cpu/opcodes.ts:1372:6
             (call $core/cpu/instructions/addARegister
-             ;;@ core/cpu/opcodes.ts:1373:19
+             ;;@ core/cpu/opcodes.ts:1372:19
              (get_global $core/cpu/cpu/Cpu.registerA)
             )
             (br $folding-inner0)
            )
-           ;;@ core/cpu/opcodes.ts:1379:6
+           ;;@ core/cpu/opcodes.ts:1378:6
            (call $core/cpu/instructions/addAThroughCarryRegister
-            ;;@ core/cpu/opcodes.ts:1379:31
+            ;;@ core/cpu/opcodes.ts:1378:31
             (get_global $core/cpu/cpu/Cpu.registerB)
            )
            (br $folding-inner0)
           )
-          ;;@ core/cpu/opcodes.ts:1385:6
+          ;;@ core/cpu/opcodes.ts:1384:6
           (call $core/cpu/instructions/addAThroughCarryRegister
-           ;;@ core/cpu/opcodes.ts:1385:31
+           ;;@ core/cpu/opcodes.ts:1384:31
            (get_global $core/cpu/cpu/Cpu.registerC)
           )
           (br $folding-inner0)
          )
-         ;;@ core/cpu/opcodes.ts:1391:6
+         ;;@ core/cpu/opcodes.ts:1390:6
          (call $core/cpu/instructions/addAThroughCarryRegister
-          ;;@ core/cpu/opcodes.ts:1391:31
+          ;;@ core/cpu/opcodes.ts:1390:31
           (get_global $core/cpu/cpu/Cpu.registerD)
          )
          (br $folding-inner0)
         )
-        ;;@ core/cpu/opcodes.ts:1397:6
+        ;;@ core/cpu/opcodes.ts:1396:6
         (call $core/cpu/instructions/addAThroughCarryRegister
-         ;;@ core/cpu/opcodes.ts:1397:31
+         ;;@ core/cpu/opcodes.ts:1396:31
          (get_global $core/cpu/cpu/Cpu.registerE)
         )
         (br $folding-inner0)
        )
-       ;;@ core/cpu/opcodes.ts:1403:6
+       ;;@ core/cpu/opcodes.ts:1402:6
        (call $core/cpu/instructions/addAThroughCarryRegister
-        ;;@ core/cpu/opcodes.ts:1403:31
+        ;;@ core/cpu/opcodes.ts:1402:31
         (get_global $core/cpu/cpu/Cpu.registerH)
        )
        (br $folding-inner0)
       )
-      ;;@ core/cpu/opcodes.ts:1409:6
+      ;;@ core/cpu/opcodes.ts:1408:6
       (call $core/cpu/instructions/addAThroughCarryRegister
-       ;;@ core/cpu/opcodes.ts:1409:31
+       ;;@ core/cpu/opcodes.ts:1408:31
        (get_global $core/cpu/cpu/Cpu.registerL)
       )
       (br $folding-inner0)
      )
-     ;;@ core/cpu/opcodes.ts:1417:6
+     ;;@ core/cpu/opcodes.ts:1416:6
      (call $core/cpu/instructions/addAThroughCarryRegister
-      ;;@ core/cpu/opcodes.ts:1416:27
+      ;;@ core/cpu/opcodes.ts:1415:27
       (call $core/cpu/opcodes/eightBitLoadSyncCycles
-       ;;@ core/cpu/opcodes.ts:1416:54
+       ;;@ core/cpu/opcodes.ts:1415:54
        (call $core/helpers/index/concatenateBytes
-        ;;@ core/cpu/opcodes.ts:1416:71
+        ;;@ core/cpu/opcodes.ts:1415:71
         (get_global $core/cpu/cpu/Cpu.registerH)
-        ;;@ core/cpu/opcodes.ts:1416:86
+        ;;@ core/cpu/opcodes.ts:1415:86
         (get_global $core/cpu/cpu/Cpu.registerL)
        )
       )
      )
      (br $folding-inner0)
     )
-    ;;@ core/cpu/opcodes.ts:1423:6
+    ;;@ core/cpu/opcodes.ts:1422:6
     (call $core/cpu/instructions/addAThroughCarryRegister
-     ;;@ core/cpu/opcodes.ts:1423:31
+     ;;@ core/cpu/opcodes.ts:1422:31
      (get_global $core/cpu/cpu/Cpu.registerA)
     )
     (br $folding-inner0)
@@ -16823,7 +16823,7 @@
     (i32.const -1)
    )
   )
-  ;;@ core/cpu/opcodes.ts:1330:13
+  ;;@ core/cpu/opcodes.ts:1329:13
   (i32.const 4)
  )
  (func $core/cpu/instructions/subARegister (; 199 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
@@ -17017,7 +17017,7 @@
                      (tee_local $1
                       (get_local $0)
                      )
-                     ;;@ core/cpu/opcodes.ts:1431:9
+                     ;;@ core/cpu/opcodes.ts:1430:9
                      (i32.const 144)
                     )
                     (block
@@ -17032,130 +17032,130 @@
                      (br $break|0)
                     )
                    )
-                   ;;@ core/cpu/opcodes.ts:1435:6
+                   ;;@ core/cpu/opcodes.ts:1434:6
                    (call $core/cpu/instructions/subARegister
-                    ;;@ core/cpu/opcodes.ts:1435:19
+                    ;;@ core/cpu/opcodes.ts:1434:19
                     (get_global $core/cpu/cpu/Cpu.registerB)
                    )
                    (br $folding-inner0)
                   )
-                  ;;@ core/cpu/opcodes.ts:1441:6
+                  ;;@ core/cpu/opcodes.ts:1440:6
                   (call $core/cpu/instructions/subARegister
-                   ;;@ core/cpu/opcodes.ts:1441:19
+                   ;;@ core/cpu/opcodes.ts:1440:19
                    (get_global $core/cpu/cpu/Cpu.registerC)
                   )
                   (br $folding-inner0)
                  )
-                 ;;@ core/cpu/opcodes.ts:1447:6
+                 ;;@ core/cpu/opcodes.ts:1446:6
                  (call $core/cpu/instructions/subARegister
-                  ;;@ core/cpu/opcodes.ts:1447:19
+                  ;;@ core/cpu/opcodes.ts:1446:19
                   (get_global $core/cpu/cpu/Cpu.registerD)
                  )
                  (br $folding-inner0)
                 )
-                ;;@ core/cpu/opcodes.ts:1453:6
+                ;;@ core/cpu/opcodes.ts:1452:6
                 (call $core/cpu/instructions/subARegister
-                 ;;@ core/cpu/opcodes.ts:1453:19
+                 ;;@ core/cpu/opcodes.ts:1452:19
                  (get_global $core/cpu/cpu/Cpu.registerE)
                 )
                 (br $folding-inner0)
                )
-               ;;@ core/cpu/opcodes.ts:1459:6
+               ;;@ core/cpu/opcodes.ts:1458:6
                (call $core/cpu/instructions/subARegister
-                ;;@ core/cpu/opcodes.ts:1459:19
+                ;;@ core/cpu/opcodes.ts:1458:19
                 (get_global $core/cpu/cpu/Cpu.registerH)
                )
                (br $folding-inner0)
               )
-              ;;@ core/cpu/opcodes.ts:1465:6
+              ;;@ core/cpu/opcodes.ts:1464:6
               (call $core/cpu/instructions/subARegister
-               ;;@ core/cpu/opcodes.ts:1465:19
+               ;;@ core/cpu/opcodes.ts:1464:19
                (get_global $core/cpu/cpu/Cpu.registerL)
               )
               (br $folding-inner0)
              )
-             ;;@ core/cpu/opcodes.ts:1473:6
+             ;;@ core/cpu/opcodes.ts:1472:6
              (call $core/cpu/instructions/subARegister
-              ;;@ core/cpu/opcodes.ts:1472:27
+              ;;@ core/cpu/opcodes.ts:1471:27
               (call $core/cpu/opcodes/eightBitLoadSyncCycles
-               ;;@ core/cpu/opcodes.ts:1472:54
+               ;;@ core/cpu/opcodes.ts:1471:54
                (call $core/helpers/index/concatenateBytes
-                ;;@ core/cpu/opcodes.ts:1472:71
+                ;;@ core/cpu/opcodes.ts:1471:71
                 (get_global $core/cpu/cpu/Cpu.registerH)
-                ;;@ core/cpu/opcodes.ts:1472:86
+                ;;@ core/cpu/opcodes.ts:1471:86
                 (get_global $core/cpu/cpu/Cpu.registerL)
                )
               )
              )
              (br $folding-inner0)
             )
-            ;;@ core/cpu/opcodes.ts:1479:6
+            ;;@ core/cpu/opcodes.ts:1478:6
             (call $core/cpu/instructions/subARegister
-             ;;@ core/cpu/opcodes.ts:1479:19
+             ;;@ core/cpu/opcodes.ts:1478:19
              (get_global $core/cpu/cpu/Cpu.registerA)
             )
             (br $folding-inner0)
            )
-           ;;@ core/cpu/opcodes.ts:1485:6
+           ;;@ core/cpu/opcodes.ts:1484:6
            (call $core/cpu/instructions/subAThroughCarryRegister
-            ;;@ core/cpu/opcodes.ts:1485:31
+            ;;@ core/cpu/opcodes.ts:1484:31
             (get_global $core/cpu/cpu/Cpu.registerB)
            )
            (br $folding-inner0)
           )
-          ;;@ core/cpu/opcodes.ts:1491:6
+          ;;@ core/cpu/opcodes.ts:1490:6
           (call $core/cpu/instructions/subAThroughCarryRegister
-           ;;@ core/cpu/opcodes.ts:1491:31
+           ;;@ core/cpu/opcodes.ts:1490:31
            (get_global $core/cpu/cpu/Cpu.registerC)
           )
           (br $folding-inner0)
          )
-         ;;@ core/cpu/opcodes.ts:1497:6
+         ;;@ core/cpu/opcodes.ts:1496:6
          (call $core/cpu/instructions/subAThroughCarryRegister
-          ;;@ core/cpu/opcodes.ts:1497:31
+          ;;@ core/cpu/opcodes.ts:1496:31
           (get_global $core/cpu/cpu/Cpu.registerD)
          )
          (br $folding-inner0)
         )
-        ;;@ core/cpu/opcodes.ts:1503:6
+        ;;@ core/cpu/opcodes.ts:1502:6
         (call $core/cpu/instructions/subAThroughCarryRegister
-         ;;@ core/cpu/opcodes.ts:1503:31
+         ;;@ core/cpu/opcodes.ts:1502:31
          (get_global $core/cpu/cpu/Cpu.registerE)
         )
         (br $folding-inner0)
        )
-       ;;@ core/cpu/opcodes.ts:1509:6
+       ;;@ core/cpu/opcodes.ts:1508:6
        (call $core/cpu/instructions/subAThroughCarryRegister
-        ;;@ core/cpu/opcodes.ts:1509:31
+        ;;@ core/cpu/opcodes.ts:1508:31
         (get_global $core/cpu/cpu/Cpu.registerH)
        )
        (br $folding-inner0)
       )
-      ;;@ core/cpu/opcodes.ts:1515:6
+      ;;@ core/cpu/opcodes.ts:1514:6
       (call $core/cpu/instructions/subAThroughCarryRegister
-       ;;@ core/cpu/opcodes.ts:1515:31
+       ;;@ core/cpu/opcodes.ts:1514:31
        (get_global $core/cpu/cpu/Cpu.registerL)
       )
       (br $folding-inner0)
      )
-     ;;@ core/cpu/opcodes.ts:1523:6
+     ;;@ core/cpu/opcodes.ts:1522:6
      (call $core/cpu/instructions/subAThroughCarryRegister
-      ;;@ core/cpu/opcodes.ts:1522:27
+      ;;@ core/cpu/opcodes.ts:1521:27
       (call $core/cpu/opcodes/eightBitLoadSyncCycles
-       ;;@ core/cpu/opcodes.ts:1522:54
+       ;;@ core/cpu/opcodes.ts:1521:54
        (call $core/helpers/index/concatenateBytes
-        ;;@ core/cpu/opcodes.ts:1522:71
+        ;;@ core/cpu/opcodes.ts:1521:71
         (get_global $core/cpu/cpu/Cpu.registerH)
-        ;;@ core/cpu/opcodes.ts:1522:86
+        ;;@ core/cpu/opcodes.ts:1521:86
         (get_global $core/cpu/cpu/Cpu.registerL)
        )
       )
      )
      (br $folding-inner0)
     )
-    ;;@ core/cpu/opcodes.ts:1529:6
+    ;;@ core/cpu/opcodes.ts:1528:6
     (call $core/cpu/instructions/subAThroughCarryRegister
-     ;;@ core/cpu/opcodes.ts:1529:31
+     ;;@ core/cpu/opcodes.ts:1528:31
      (get_global $core/cpu/cpu/Cpu.registerA)
     )
     (br $folding-inner0)
@@ -17164,7 +17164,7 @@
     (i32.const -1)
    )
   )
-  ;;@ core/cpu/opcodes.ts:1436:13
+  ;;@ core/cpu/opcodes.ts:1435:13
   (i32.const 4)
  )
  (func $core/cpu/instructions/andARegister (; 202 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
@@ -17274,7 +17274,7 @@
                      (tee_local $1
                       (get_local $0)
                      )
-                     ;;@ core/cpu/opcodes.ts:1537:9
+                     ;;@ core/cpu/opcodes.ts:1536:9
                      (i32.const 160)
                     )
                     (block
@@ -17289,130 +17289,130 @@
                      (br $break|0)
                     )
                    )
-                   ;;@ core/cpu/opcodes.ts:1541:6
+                   ;;@ core/cpu/opcodes.ts:1540:6
                    (call $core/cpu/instructions/andARegister
-                    ;;@ core/cpu/opcodes.ts:1541:19
+                    ;;@ core/cpu/opcodes.ts:1540:19
                     (get_global $core/cpu/cpu/Cpu.registerB)
                    )
                    (br $folding-inner0)
                   )
-                  ;;@ core/cpu/opcodes.ts:1547:6
+                  ;;@ core/cpu/opcodes.ts:1546:6
                   (call $core/cpu/instructions/andARegister
-                   ;;@ core/cpu/opcodes.ts:1547:19
+                   ;;@ core/cpu/opcodes.ts:1546:19
                    (get_global $core/cpu/cpu/Cpu.registerC)
                   )
                   (br $folding-inner0)
                  )
-                 ;;@ core/cpu/opcodes.ts:1553:6
+                 ;;@ core/cpu/opcodes.ts:1552:6
                  (call $core/cpu/instructions/andARegister
-                  ;;@ core/cpu/opcodes.ts:1553:19
+                  ;;@ core/cpu/opcodes.ts:1552:19
                   (get_global $core/cpu/cpu/Cpu.registerD)
                  )
                  (br $folding-inner0)
                 )
-                ;;@ core/cpu/opcodes.ts:1559:6
+                ;;@ core/cpu/opcodes.ts:1558:6
                 (call $core/cpu/instructions/andARegister
-                 ;;@ core/cpu/opcodes.ts:1559:19
+                 ;;@ core/cpu/opcodes.ts:1558:19
                  (get_global $core/cpu/cpu/Cpu.registerE)
                 )
                 (br $folding-inner0)
                )
-               ;;@ core/cpu/opcodes.ts:1565:6
+               ;;@ core/cpu/opcodes.ts:1564:6
                (call $core/cpu/instructions/andARegister
-                ;;@ core/cpu/opcodes.ts:1565:19
+                ;;@ core/cpu/opcodes.ts:1564:19
                 (get_global $core/cpu/cpu/Cpu.registerH)
                )
                (br $folding-inner0)
               )
-              ;;@ core/cpu/opcodes.ts:1571:6
+              ;;@ core/cpu/opcodes.ts:1570:6
               (call $core/cpu/instructions/andARegister
-               ;;@ core/cpu/opcodes.ts:1571:19
+               ;;@ core/cpu/opcodes.ts:1570:19
                (get_global $core/cpu/cpu/Cpu.registerL)
               )
               (br $folding-inner0)
              )
-             ;;@ core/cpu/opcodes.ts:1579:6
+             ;;@ core/cpu/opcodes.ts:1578:6
              (call $core/cpu/instructions/andARegister
-              ;;@ core/cpu/opcodes.ts:1578:27
+              ;;@ core/cpu/opcodes.ts:1577:27
               (call $core/cpu/opcodes/eightBitLoadSyncCycles
-               ;;@ core/cpu/opcodes.ts:1578:54
+               ;;@ core/cpu/opcodes.ts:1577:54
                (call $core/helpers/index/concatenateBytes
-                ;;@ core/cpu/opcodes.ts:1578:71
+                ;;@ core/cpu/opcodes.ts:1577:71
                 (get_global $core/cpu/cpu/Cpu.registerH)
-                ;;@ core/cpu/opcodes.ts:1578:86
+                ;;@ core/cpu/opcodes.ts:1577:86
                 (get_global $core/cpu/cpu/Cpu.registerL)
                )
               )
              )
              (br $folding-inner0)
             )
-            ;;@ core/cpu/opcodes.ts:1586:6
+            ;;@ core/cpu/opcodes.ts:1585:6
             (call $core/cpu/instructions/andARegister
-             ;;@ core/cpu/opcodes.ts:1586:19
+             ;;@ core/cpu/opcodes.ts:1585:19
              (get_global $core/cpu/cpu/Cpu.registerA)
             )
             (br $folding-inner0)
            )
-           ;;@ core/cpu/opcodes.ts:1592:6
+           ;;@ core/cpu/opcodes.ts:1591:6
            (call $core/cpu/instructions/xorARegister
-            ;;@ core/cpu/opcodes.ts:1592:19
+            ;;@ core/cpu/opcodes.ts:1591:19
             (get_global $core/cpu/cpu/Cpu.registerB)
            )
            (br $folding-inner0)
           )
-          ;;@ core/cpu/opcodes.ts:1598:6
+          ;;@ core/cpu/opcodes.ts:1597:6
           (call $core/cpu/instructions/xorARegister
-           ;;@ core/cpu/opcodes.ts:1598:19
+           ;;@ core/cpu/opcodes.ts:1597:19
            (get_global $core/cpu/cpu/Cpu.registerC)
           )
           (br $folding-inner0)
          )
-         ;;@ core/cpu/opcodes.ts:1604:6
+         ;;@ core/cpu/opcodes.ts:1603:6
          (call $core/cpu/instructions/xorARegister
-          ;;@ core/cpu/opcodes.ts:1604:19
+          ;;@ core/cpu/opcodes.ts:1603:19
           (get_global $core/cpu/cpu/Cpu.registerD)
          )
          (br $folding-inner0)
         )
-        ;;@ core/cpu/opcodes.ts:1610:6
+        ;;@ core/cpu/opcodes.ts:1609:6
         (call $core/cpu/instructions/xorARegister
-         ;;@ core/cpu/opcodes.ts:1610:19
+         ;;@ core/cpu/opcodes.ts:1609:19
          (get_global $core/cpu/cpu/Cpu.registerE)
         )
         (br $folding-inner0)
        )
-       ;;@ core/cpu/opcodes.ts:1616:6
+       ;;@ core/cpu/opcodes.ts:1615:6
        (call $core/cpu/instructions/xorARegister
-        ;;@ core/cpu/opcodes.ts:1616:19
+        ;;@ core/cpu/opcodes.ts:1615:19
         (get_global $core/cpu/cpu/Cpu.registerH)
        )
        (br $folding-inner0)
       )
-      ;;@ core/cpu/opcodes.ts:1622:6
+      ;;@ core/cpu/opcodes.ts:1621:6
       (call $core/cpu/instructions/xorARegister
-       ;;@ core/cpu/opcodes.ts:1622:19
+       ;;@ core/cpu/opcodes.ts:1621:19
        (get_global $core/cpu/cpu/Cpu.registerL)
       )
       (br $folding-inner0)
      )
-     ;;@ core/cpu/opcodes.ts:1630:6
+     ;;@ core/cpu/opcodes.ts:1629:6
      (call $core/cpu/instructions/xorARegister
-      ;;@ core/cpu/opcodes.ts:1629:27
+      ;;@ core/cpu/opcodes.ts:1628:27
       (call $core/cpu/opcodes/eightBitLoadSyncCycles
-       ;;@ core/cpu/opcodes.ts:1629:54
+       ;;@ core/cpu/opcodes.ts:1628:54
        (call $core/helpers/index/concatenateBytes
-        ;;@ core/cpu/opcodes.ts:1629:71
+        ;;@ core/cpu/opcodes.ts:1628:71
         (get_global $core/cpu/cpu/Cpu.registerH)
-        ;;@ core/cpu/opcodes.ts:1629:86
+        ;;@ core/cpu/opcodes.ts:1628:86
         (get_global $core/cpu/cpu/Cpu.registerL)
        )
       )
      )
      (br $folding-inner0)
     )
-    ;;@ core/cpu/opcodes.ts:1636:6
+    ;;@ core/cpu/opcodes.ts:1635:6
     (call $core/cpu/instructions/xorARegister
-     ;;@ core/cpu/opcodes.ts:1636:19
+     ;;@ core/cpu/opcodes.ts:1635:19
      (get_global $core/cpu/cpu/Cpu.registerA)
     )
     (br $folding-inner0)
@@ -17421,7 +17421,7 @@
     (i32.const -1)
    )
   )
-  ;;@ core/cpu/opcodes.ts:1542:13
+  ;;@ core/cpu/opcodes.ts:1541:13
   (i32.const 4)
  )
  (func $core/cpu/instructions/orARegister (; 205 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
@@ -17541,7 +17541,7 @@
                      (tee_local $1
                       (get_local $0)
                      )
-                     ;;@ core/cpu/opcodes.ts:1644:9
+                     ;;@ core/cpu/opcodes.ts:1643:9
                      (i32.const 176)
                     )
                     (block
@@ -17556,130 +17556,130 @@
                      (br $break|0)
                     )
                    )
-                   ;;@ core/cpu/opcodes.ts:1648:6
+                   ;;@ core/cpu/opcodes.ts:1647:6
                    (call $core/cpu/instructions/orARegister
-                    ;;@ core/cpu/opcodes.ts:1648:18
+                    ;;@ core/cpu/opcodes.ts:1647:18
                     (get_global $core/cpu/cpu/Cpu.registerB)
                    )
                    (br $folding-inner0)
                   )
-                  ;;@ core/cpu/opcodes.ts:1654:6
+                  ;;@ core/cpu/opcodes.ts:1653:6
                   (call $core/cpu/instructions/orARegister
-                   ;;@ core/cpu/opcodes.ts:1654:18
+                   ;;@ core/cpu/opcodes.ts:1653:18
                    (get_global $core/cpu/cpu/Cpu.registerC)
                   )
                   (br $folding-inner0)
                  )
-                 ;;@ core/cpu/opcodes.ts:1660:6
+                 ;;@ core/cpu/opcodes.ts:1659:6
                  (call $core/cpu/instructions/orARegister
-                  ;;@ core/cpu/opcodes.ts:1660:18
+                  ;;@ core/cpu/opcodes.ts:1659:18
                   (get_global $core/cpu/cpu/Cpu.registerD)
                  )
                  (br $folding-inner0)
                 )
-                ;;@ core/cpu/opcodes.ts:1666:6
+                ;;@ core/cpu/opcodes.ts:1665:6
                 (call $core/cpu/instructions/orARegister
-                 ;;@ core/cpu/opcodes.ts:1666:18
+                 ;;@ core/cpu/opcodes.ts:1665:18
                  (get_global $core/cpu/cpu/Cpu.registerE)
                 )
                 (br $folding-inner0)
                )
-               ;;@ core/cpu/opcodes.ts:1672:6
+               ;;@ core/cpu/opcodes.ts:1671:6
                (call $core/cpu/instructions/orARegister
-                ;;@ core/cpu/opcodes.ts:1672:18
+                ;;@ core/cpu/opcodes.ts:1671:18
                 (get_global $core/cpu/cpu/Cpu.registerH)
                )
                (br $folding-inner0)
               )
-              ;;@ core/cpu/opcodes.ts:1678:6
+              ;;@ core/cpu/opcodes.ts:1677:6
               (call $core/cpu/instructions/orARegister
-               ;;@ core/cpu/opcodes.ts:1678:18
+               ;;@ core/cpu/opcodes.ts:1677:18
                (get_global $core/cpu/cpu/Cpu.registerL)
               )
               (br $folding-inner0)
              )
-             ;;@ core/cpu/opcodes.ts:1686:6
+             ;;@ core/cpu/opcodes.ts:1685:6
              (call $core/cpu/instructions/orARegister
-              ;;@ core/cpu/opcodes.ts:1685:27
+              ;;@ core/cpu/opcodes.ts:1684:27
               (call $core/cpu/opcodes/eightBitLoadSyncCycles
-               ;;@ core/cpu/opcodes.ts:1685:54
+               ;;@ core/cpu/opcodes.ts:1684:54
                (call $core/helpers/index/concatenateBytes
-                ;;@ core/cpu/opcodes.ts:1685:71
+                ;;@ core/cpu/opcodes.ts:1684:71
                 (get_global $core/cpu/cpu/Cpu.registerH)
-                ;;@ core/cpu/opcodes.ts:1685:86
+                ;;@ core/cpu/opcodes.ts:1684:86
                 (get_global $core/cpu/cpu/Cpu.registerL)
                )
               )
              )
              (br $folding-inner0)
             )
-            ;;@ core/cpu/opcodes.ts:1692:6
+            ;;@ core/cpu/opcodes.ts:1691:6
             (call $core/cpu/instructions/orARegister
-             ;;@ core/cpu/opcodes.ts:1692:18
+             ;;@ core/cpu/opcodes.ts:1691:18
              (get_global $core/cpu/cpu/Cpu.registerA)
             )
             (br $folding-inner0)
            )
-           ;;@ core/cpu/opcodes.ts:1698:6
+           ;;@ core/cpu/opcodes.ts:1697:6
            (call $core/cpu/instructions/cpARegister
-            ;;@ core/cpu/opcodes.ts:1698:18
+            ;;@ core/cpu/opcodes.ts:1697:18
             (get_global $core/cpu/cpu/Cpu.registerB)
            )
            (br $folding-inner0)
           )
-          ;;@ core/cpu/opcodes.ts:1704:6
+          ;;@ core/cpu/opcodes.ts:1703:6
           (call $core/cpu/instructions/cpARegister
-           ;;@ core/cpu/opcodes.ts:1704:18
+           ;;@ core/cpu/opcodes.ts:1703:18
            (get_global $core/cpu/cpu/Cpu.registerC)
           )
           (br $folding-inner0)
          )
-         ;;@ core/cpu/opcodes.ts:1710:6
+         ;;@ core/cpu/opcodes.ts:1709:6
          (call $core/cpu/instructions/cpARegister
-          ;;@ core/cpu/opcodes.ts:1710:18
+          ;;@ core/cpu/opcodes.ts:1709:18
           (get_global $core/cpu/cpu/Cpu.registerD)
          )
          (br $folding-inner0)
         )
-        ;;@ core/cpu/opcodes.ts:1716:6
+        ;;@ core/cpu/opcodes.ts:1715:6
         (call $core/cpu/instructions/cpARegister
-         ;;@ core/cpu/opcodes.ts:1716:18
+         ;;@ core/cpu/opcodes.ts:1715:18
          (get_global $core/cpu/cpu/Cpu.registerE)
         )
         (br $folding-inner0)
        )
-       ;;@ core/cpu/opcodes.ts:1722:6
+       ;;@ core/cpu/opcodes.ts:1721:6
        (call $core/cpu/instructions/cpARegister
-        ;;@ core/cpu/opcodes.ts:1722:18
+        ;;@ core/cpu/opcodes.ts:1721:18
         (get_global $core/cpu/cpu/Cpu.registerH)
        )
        (br $folding-inner0)
       )
-      ;;@ core/cpu/opcodes.ts:1728:6
+      ;;@ core/cpu/opcodes.ts:1727:6
       (call $core/cpu/instructions/cpARegister
-       ;;@ core/cpu/opcodes.ts:1728:18
+       ;;@ core/cpu/opcodes.ts:1727:18
        (get_global $core/cpu/cpu/Cpu.registerL)
       )
       (br $folding-inner0)
      )
-     ;;@ core/cpu/opcodes.ts:1736:6
+     ;;@ core/cpu/opcodes.ts:1735:6
      (call $core/cpu/instructions/cpARegister
-      ;;@ core/cpu/opcodes.ts:1735:27
+      ;;@ core/cpu/opcodes.ts:1734:27
       (call $core/cpu/opcodes/eightBitLoadSyncCycles
-       ;;@ core/cpu/opcodes.ts:1735:54
+       ;;@ core/cpu/opcodes.ts:1734:54
        (call $core/helpers/index/concatenateBytes
-        ;;@ core/cpu/opcodes.ts:1735:71
+        ;;@ core/cpu/opcodes.ts:1734:71
         (get_global $core/cpu/cpu/Cpu.registerH)
-        ;;@ core/cpu/opcodes.ts:1735:86
+        ;;@ core/cpu/opcodes.ts:1734:86
         (get_global $core/cpu/cpu/Cpu.registerL)
        )
       )
      )
      (br $folding-inner0)
     )
-    ;;@ core/cpu/opcodes.ts:1742:6
+    ;;@ core/cpu/opcodes.ts:1741:6
     (call $core/cpu/instructions/cpARegister
-     ;;@ core/cpu/opcodes.ts:1742:18
+     ;;@ core/cpu/opcodes.ts:1741:18
      (get_global $core/cpu/cpu/Cpu.registerA)
     )
     (br $folding-inner0)
@@ -17688,7 +17688,7 @@
     (i32.const -1)
    )
   )
-  ;;@ core/cpu/opcodes.ts:1649:13
+  ;;@ core/cpu/opcodes.ts:1648:13
   (i32.const 4)
  )
  (func $core/memory/load/sixteenBitLoadFromGBMemory (; 208 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
@@ -17760,12 +17760,12 @@
   )
  )
  (func $core/cpu/opcodes/sixteenBitLoadSyncCycles (; 209 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
-  ;;@ core/cpu/opcodes.ts:148:2
+  ;;@ core/cpu/opcodes.ts:147:2
   (call $core/core/syncCycles
-   ;;@ core/cpu/opcodes.ts:148:13
+   ;;@ core/cpu/opcodes.ts:147:13
    (i32.const 8)
   )
-  ;;@ core/cpu/opcodes.ts:150:54
+  ;;@ core/cpu/opcodes.ts:149:54
   (call $core/memory/load/sixteenBitLoadFromGBMemory
    (get_local $0)
   )
@@ -19616,7 +19616,7 @@
                           (tee_local $1
                            (get_local $0)
                           )
-                          ;;@ core/cpu/opcodes.ts:1750:9
+                          ;;@ core/cpu/opcodes.ts:1749:9
                           (i32.const 192)
                          )
                          (block
@@ -19632,62 +19632,62 @@
                          )
                         )
                         (br_if $folding-inner2
-                         ;;@ core/cpu/opcodes.ts:1753:10
+                         ;;@ core/cpu/opcodes.ts:1752:10
                          (call $core/cpu/flags/getZeroFlag)
                         )
                         (br $folding-inner3)
                        )
-                       ;;@ core/cpu/opcodes.ts:1765:6
+                       ;;@ core/cpu/opcodes.ts:1764:6
                        (set_local $1
-                        ;;@ core/cpu/opcodes.ts:1765:29
+                        ;;@ core/cpu/opcodes.ts:1764:29
                         (i32.and
                          (call $core/cpu/opcodes/sixteenBitLoadSyncCycles
-                          ;;@ core/cpu/opcodes.ts:1765:54
+                          ;;@ core/cpu/opcodes.ts:1764:54
                           (get_global $core/cpu/cpu/Cpu.stackPointer)
                          )
                          (i32.const 65535)
                         )
                        )
-                       ;;@ core/cpu/opcodes.ts:1766:6
+                       ;;@ core/cpu/opcodes.ts:1765:6
                        (set_global $core/cpu/cpu/Cpu.stackPointer
-                        ;;@ core/cpu/opcodes.ts:1766:25
+                        ;;@ core/cpu/opcodes.ts:1765:25
                         (call $core/portable/portable/u16Portable
-                         ;;@ core/cpu/opcodes.ts:1766:37
+                         ;;@ core/cpu/opcodes.ts:1765:37
                          (i32.add
                           (get_global $core/cpu/cpu/Cpu.stackPointer)
-                          ;;@ core/cpu/opcodes.ts:1766:56
+                          ;;@ core/cpu/opcodes.ts:1765:56
                           (i32.const 2)
                          )
                         )
                        )
-                       ;;@ core/cpu/opcodes.ts:1767:6
+                       ;;@ core/cpu/opcodes.ts:1766:6
                        (set_global $core/cpu/cpu/Cpu.registerB
                         (i32.and
-                         ;;@ core/cpu/opcodes.ts:1767:22
+                         ;;@ core/cpu/opcodes.ts:1766:22
                          (call $core/helpers/index/splitHighByte
                           (get_local $1)
                          )
                          (i32.const 255)
                         )
                        )
-                       ;;@ core/cpu/opcodes.ts:1768:6
+                       ;;@ core/cpu/opcodes.ts:1767:6
                        (set_global $core/cpu/cpu/Cpu.registerC
                         (i32.and
-                         ;;@ core/cpu/opcodes.ts:1768:22
+                         ;;@ core/cpu/opcodes.ts:1767:22
                          (call $core/helpers/index/splitLowByte
                           (get_local $1)
                          )
                          (i32.const 255)
                         )
                        )
-                       ;;@ core/cpu/opcodes.ts:1769:13
+                       ;;@ core/cpu/opcodes.ts:1768:13
                        (return
                         (i32.const 4)
                        )
                       )
-                      ;;@ core/cpu/opcodes.ts:1773:6
+                      ;;@ core/cpu/opcodes.ts:1772:6
                       (if
-                       ;;@ core/cpu/opcodes.ts:1773:10
+                       ;;@ core/cpu/opcodes.ts:1772:10
                        (call $core/cpu/flags/getZeroFlag)
                        (br $folding-inner4)
                        (br $folding-inner1)
@@ -19695,179 +19695,179 @@
                      )
                      (br $folding-inner1)
                     )
-                    ;;@ core/cpu/opcodes.ts:1790:6
+                    ;;@ core/cpu/opcodes.ts:1789:6
                     (if
-                     ;;@ core/cpu/opcodes.ts:1790:10
+                     ;;@ core/cpu/opcodes.ts:1789:10
                      (call $core/cpu/flags/getZeroFlag)
                      (br $folding-inner4)
                      (br $folding-inner0)
                     )
                    )
-                   ;;@ core/cpu/opcodes.ts:1804:6
+                   ;;@ core/cpu/opcodes.ts:1803:6
                    (set_global $core/cpu/cpu/Cpu.stackPointer
-                    ;;@ core/cpu/opcodes.ts:1804:25
+                    ;;@ core/cpu/opcodes.ts:1803:25
                     (call $core/portable/portable/u16Portable
-                     ;;@ core/cpu/opcodes.ts:1804:37
+                     ;;@ core/cpu/opcodes.ts:1803:37
                      (i32.sub
                       (get_global $core/cpu/cpu/Cpu.stackPointer)
-                      ;;@ core/cpu/opcodes.ts:1804:56
+                      ;;@ core/cpu/opcodes.ts:1803:56
                       (i32.const 2)
                      )
                     )
                    )
-                   ;;@ core/cpu/opcodes.ts:1806:6
+                   ;;@ core/cpu/opcodes.ts:1805:6
                    (call $core/cpu/opcodes/sixteenBitStoreSyncCycles
-                    ;;@ core/cpu/opcodes.ts:1806:32
+                    ;;@ core/cpu/opcodes.ts:1805:32
                     (get_global $core/cpu/cpu/Cpu.stackPointer)
-                    ;;@ core/cpu/opcodes.ts:1806:50
+                    ;;@ core/cpu/opcodes.ts:1805:50
                     (call $core/helpers/index/concatenateBytes
-                     ;;@ core/cpu/opcodes.ts:1806:67
+                     ;;@ core/cpu/opcodes.ts:1805:67
                      (get_global $core/cpu/cpu/Cpu.registerB)
-                     ;;@ core/cpu/opcodes.ts:1806:82
+                     ;;@ core/cpu/opcodes.ts:1805:82
                      (get_global $core/cpu/cpu/Cpu.registerC)
                     )
                    )
                    (br $folding-inner2)
                   )
-                  ;;@ core/cpu/opcodes.ts:1813:6
+                  ;;@ core/cpu/opcodes.ts:1812:6
                   (call $core/cpu/instructions/addARegister
-                   ;;@ core/cpu/opcodes.ts:1813:19
+                   ;;@ core/cpu/opcodes.ts:1812:19
                    (call $core/cpu/opcodes/getDataByteOne)
                   )
                   (br $folding-inner5)
                  )
-                 ;;@ core/cpu/opcodes.ts:1819:6
+                 ;;@ core/cpu/opcodes.ts:1818:6
                  (set_global $core/cpu/cpu/Cpu.stackPointer
-                  ;;@ core/cpu/opcodes.ts:1819:25
+                  ;;@ core/cpu/opcodes.ts:1818:25
                   (call $core/portable/portable/u16Portable
-                   ;;@ core/cpu/opcodes.ts:1819:37
+                   ;;@ core/cpu/opcodes.ts:1818:37
                    (i32.sub
                     (get_global $core/cpu/cpu/Cpu.stackPointer)
-                    ;;@ core/cpu/opcodes.ts:1819:56
+                    ;;@ core/cpu/opcodes.ts:1818:56
                     (i32.const 2)
                    )
                   )
                  )
-                 ;;@ core/cpu/opcodes.ts:1821:6
+                 ;;@ core/cpu/opcodes.ts:1820:6
                  (call $core/cpu/opcodes/sixteenBitStoreSyncCycles
-                  ;;@ core/cpu/opcodes.ts:1821:32
+                  ;;@ core/cpu/opcodes.ts:1820:32
                   (get_global $core/cpu/cpu/Cpu.stackPointer)
-                  ;;@ core/cpu/opcodes.ts:1821:50
+                  ;;@ core/cpu/opcodes.ts:1820:50
                   (get_global $core/cpu/cpu/Cpu.programCounter)
                  )
-                 ;;@ core/cpu/opcodes.ts:1822:6
+                 ;;@ core/cpu/opcodes.ts:1821:6
                  (set_global $core/cpu/cpu/Cpu.programCounter
-                  ;;@ core/cpu/opcodes.ts:1822:27
+                  ;;@ core/cpu/opcodes.ts:1821:27
                   (i32.const 0)
                  )
                  (br $folding-inner2)
                 )
                 (br_if $folding-inner2
-                 ;;@ core/cpu/opcodes.ts:1827:10
+                 ;;@ core/cpu/opcodes.ts:1826:10
                  (i32.ne
                   (call $core/cpu/flags/getZeroFlag)
-                  ;;@ core/cpu/opcodes.ts:1827:28
+                  ;;@ core/cpu/opcodes.ts:1826:28
                   (i32.const 1)
                  )
                 )
                 (br $folding-inner3)
                )
-               ;;@ core/cpu/opcodes.ts:1839:6
+               ;;@ core/cpu/opcodes.ts:1838:6
                (set_global $core/cpu/cpu/Cpu.programCounter
                 (i32.and
-                 ;;@ core/cpu/opcodes.ts:1839:27
+                 ;;@ core/cpu/opcodes.ts:1838:27
                  (call $core/cpu/opcodes/sixteenBitLoadSyncCycles
-                  ;;@ core/cpu/opcodes.ts:1839:57
+                  ;;@ core/cpu/opcodes.ts:1838:57
                   (get_global $core/cpu/cpu/Cpu.stackPointer)
                  )
                  (i32.const 65535)
                 )
                )
-               ;;@ core/cpu/opcodes.ts:1840:6
+               ;;@ core/cpu/opcodes.ts:1839:6
                (set_global $core/cpu/cpu/Cpu.stackPointer
-                ;;@ core/cpu/opcodes.ts:1840:25
+                ;;@ core/cpu/opcodes.ts:1839:25
                 (call $core/portable/portable/u16Portable
-                 ;;@ core/cpu/opcodes.ts:1840:37
+                 ;;@ core/cpu/opcodes.ts:1839:37
                  (i32.add
                   (get_global $core/cpu/cpu/Cpu.stackPointer)
-                  ;;@ core/cpu/opcodes.ts:1840:56
+                  ;;@ core/cpu/opcodes.ts:1839:56
                   (i32.const 2)
                  )
                 )
                )
                (br $folding-inner2)
               )
-              ;;@ core/cpu/opcodes.ts:1845:6
+              ;;@ core/cpu/opcodes.ts:1844:6
               (if
-               ;;@ core/cpu/opcodes.ts:1845:10
+               ;;@ core/cpu/opcodes.ts:1844:10
                (i32.eq
                 (call $core/cpu/flags/getZeroFlag)
-                ;;@ core/cpu/opcodes.ts:1845:28
+                ;;@ core/cpu/opcodes.ts:1844:28
                 (i32.const 1)
                )
                (br $folding-inner1)
                (br $folding-inner4)
               )
              )
-             ;;@ core/cpu/opcodes.ts:1857:6
+             ;;@ core/cpu/opcodes.ts:1856:6
              (set_local $1
-              ;;@ core/cpu/opcodes.ts:1857:26
+              ;;@ core/cpu/opcodes.ts:1856:26
               (call $core/cpu/cbOpcodes/handleCbOpcode
-               ;;@ core/cpu/opcodes.ts:1857:41
+               ;;@ core/cpu/opcodes.ts:1856:41
                (i32.and
                 (call $core/cpu/opcodes/getDataByteOne)
                 (i32.const 255)
                )
               )
              )
-             ;;@ core/cpu/opcodes.ts:1858:6
+             ;;@ core/cpu/opcodes.ts:1857:6
              (set_global $core/cpu/cpu/Cpu.programCounter
-              ;;@ core/cpu/opcodes.ts:1858:27
+              ;;@ core/cpu/opcodes.ts:1857:27
               (call $core/portable/portable/u16Portable
-               ;;@ core/cpu/opcodes.ts:1858:39
+               ;;@ core/cpu/opcodes.ts:1857:39
                (i32.add
                 (get_global $core/cpu/cpu/Cpu.programCounter)
-                ;;@ core/cpu/opcodes.ts:1858:60
+                ;;@ core/cpu/opcodes.ts:1857:60
                 (i32.const 1)
                )
               )
              )
-             ;;@ core/cpu/opcodes.ts:1859:13
+             ;;@ core/cpu/opcodes.ts:1858:13
              (return
               (get_local $1)
              )
             )
-            ;;@ core/cpu/opcodes.ts:1863:6
+            ;;@ core/cpu/opcodes.ts:1862:6
             (if
-             ;;@ core/cpu/opcodes.ts:1863:10
+             ;;@ core/cpu/opcodes.ts:1862:10
              (i32.eq
               (call $core/cpu/flags/getZeroFlag)
-              ;;@ core/cpu/opcodes.ts:1863:28
+              ;;@ core/cpu/opcodes.ts:1862:28
               (i32.const 1)
              )
-             ;;@ core/cpu/opcodes.ts:1863:31
+             ;;@ core/cpu/opcodes.ts:1862:31
              (block
-              ;;@ core/cpu/opcodes.ts:1864:8
+              ;;@ core/cpu/opcodes.ts:1863:8
               (set_global $core/cpu/cpu/Cpu.stackPointer
-               ;;@ core/cpu/opcodes.ts:1864:27
+               ;;@ core/cpu/opcodes.ts:1863:27
                (call $core/portable/portable/u16Portable
-                ;;@ core/cpu/opcodes.ts:1864:39
+                ;;@ core/cpu/opcodes.ts:1863:39
                 (i32.sub
                  (get_global $core/cpu/cpu/Cpu.stackPointer)
-                 ;;@ core/cpu/opcodes.ts:1864:58
+                 ;;@ core/cpu/opcodes.ts:1863:58
                  (i32.const 2)
                 )
                )
               )
-              ;;@ core/cpu/opcodes.ts:1866:8
+              ;;@ core/cpu/opcodes.ts:1865:8
               (call $core/cpu/opcodes/sixteenBitStoreSyncCycles
-               ;;@ core/cpu/opcodes.ts:1866:34
+               ;;@ core/cpu/opcodes.ts:1865:34
                (get_global $core/cpu/cpu/Cpu.stackPointer)
-               ;;@ core/cpu/opcodes.ts:1866:52
+               ;;@ core/cpu/opcodes.ts:1865:52
                (i32.and
                 (i32.add
                  (get_global $core/cpu/cpu/Cpu.programCounter)
-                 ;;@ core/cpu/opcodes.ts:1866:73
+                 ;;@ core/cpu/opcodes.ts:1865:73
                  (i32.const 2)
                 )
                 (i32.const 65535)
@@ -19880,35 +19880,35 @@
            )
            (br $folding-inner0)
           )
-          ;;@ core/cpu/opcodes.ts:1888:6
+          ;;@ core/cpu/opcodes.ts:1887:6
           (call $core/cpu/instructions/addAThroughCarryRegister
-           ;;@ core/cpu/opcodes.ts:1888:31
+           ;;@ core/cpu/opcodes.ts:1887:31
            (call $core/cpu/opcodes/getDataByteOne)
           )
           (br $folding-inner5)
          )
-         ;;@ core/cpu/opcodes.ts:1894:6
+         ;;@ core/cpu/opcodes.ts:1893:6
          (set_global $core/cpu/cpu/Cpu.stackPointer
-          ;;@ core/cpu/opcodes.ts:1894:25
+          ;;@ core/cpu/opcodes.ts:1893:25
           (call $core/portable/portable/u16Portable
-           ;;@ core/cpu/opcodes.ts:1894:37
+           ;;@ core/cpu/opcodes.ts:1893:37
            (i32.sub
             (get_global $core/cpu/cpu/Cpu.stackPointer)
-            ;;@ core/cpu/opcodes.ts:1894:56
+            ;;@ core/cpu/opcodes.ts:1893:56
             (i32.const 2)
            )
           )
          )
-         ;;@ core/cpu/opcodes.ts:1896:6
+         ;;@ core/cpu/opcodes.ts:1895:6
          (call $core/cpu/opcodes/sixteenBitStoreSyncCycles
-          ;;@ core/cpu/opcodes.ts:1896:32
+          ;;@ core/cpu/opcodes.ts:1895:32
           (get_global $core/cpu/cpu/Cpu.stackPointer)
-          ;;@ core/cpu/opcodes.ts:1896:50
+          ;;@ core/cpu/opcodes.ts:1895:50
           (get_global $core/cpu/cpu/Cpu.programCounter)
          )
-         ;;@ core/cpu/opcodes.ts:1897:6
+         ;;@ core/cpu/opcodes.ts:1896:6
          (set_global $core/cpu/cpu/Cpu.programCounter
-          ;;@ core/cpu/opcodes.ts:1897:27
+          ;;@ core/cpu/opcodes.ts:1896:27
           (i32.const 8)
          )
          (br $folding-inner2)
@@ -19917,37 +19917,37 @@
          (i32.const -1)
         )
        )
-       ;;@ core/cpu/opcodes.ts:1791:8
+       ;;@ core/cpu/opcodes.ts:1790:8
        (set_global $core/cpu/cpu/Cpu.stackPointer
-        ;;@ core/cpu/opcodes.ts:1791:27
+        ;;@ core/cpu/opcodes.ts:1790:27
         (call $core/portable/portable/u16Portable
-         ;;@ core/cpu/opcodes.ts:1791:39
+         ;;@ core/cpu/opcodes.ts:1790:39
          (i32.sub
           (get_global $core/cpu/cpu/Cpu.stackPointer)
-          ;;@ core/cpu/opcodes.ts:1791:58
+          ;;@ core/cpu/opcodes.ts:1790:58
           (i32.const 2)
          )
         )
        )
-       ;;@ core/cpu/opcodes.ts:1793:8
+       ;;@ core/cpu/opcodes.ts:1792:8
        (call $core/cpu/opcodes/sixteenBitStoreSyncCycles
-        ;;@ core/cpu/opcodes.ts:1793:34
+        ;;@ core/cpu/opcodes.ts:1792:34
         (get_global $core/cpu/cpu/Cpu.stackPointer)
-        ;;@ core/cpu/opcodes.ts:1793:52
+        ;;@ core/cpu/opcodes.ts:1792:52
         (call $core/portable/portable/u16Portable
-         ;;@ core/cpu/opcodes.ts:1793:64
+         ;;@ core/cpu/opcodes.ts:1792:64
          (i32.add
           (get_global $core/cpu/cpu/Cpu.programCounter)
-          ;;@ core/cpu/opcodes.ts:1793:85
+          ;;@ core/cpu/opcodes.ts:1792:85
           (i32.const 2)
          )
         )
        )
       )
-      ;;@ core/cpu/opcodes.ts:1775:8
+      ;;@ core/cpu/opcodes.ts:1774:8
       (set_global $core/cpu/cpu/Cpu.programCounter
        (i32.and
-        ;;@ core/cpu/opcodes.ts:1775:29
+        ;;@ core/cpu/opcodes.ts:1774:29
         (call $core/cpu/opcodes/getConcatenatedDataByte)
         (i32.const 65535)
        )
@@ -19957,64 +19957,64 @@
       (i32.const 8)
      )
     )
-    ;;@ core/cpu/opcodes.ts:1755:8
+    ;;@ core/cpu/opcodes.ts:1754:8
     (set_global $core/cpu/cpu/Cpu.programCounter
      (i32.and
-      ;;@ core/cpu/opcodes.ts:1755:29
+      ;;@ core/cpu/opcodes.ts:1754:29
       (call $core/cpu/opcodes/sixteenBitLoadSyncCycles
-       ;;@ core/cpu/opcodes.ts:1755:59
+       ;;@ core/cpu/opcodes.ts:1754:59
        (get_global $core/cpu/cpu/Cpu.stackPointer)
       )
       (i32.const 65535)
      )
     )
-    ;;@ core/cpu/opcodes.ts:1756:8
+    ;;@ core/cpu/opcodes.ts:1755:8
     (set_global $core/cpu/cpu/Cpu.stackPointer
-     ;;@ core/cpu/opcodes.ts:1756:27
+     ;;@ core/cpu/opcodes.ts:1755:27
      (call $core/portable/portable/u16Portable
-      ;;@ core/cpu/opcodes.ts:1756:39
+      ;;@ core/cpu/opcodes.ts:1755:39
       (i32.add
        (get_global $core/cpu/cpu/Cpu.stackPointer)
-       ;;@ core/cpu/opcodes.ts:1756:58
+       ;;@ core/cpu/opcodes.ts:1755:58
        (i32.const 2)
       )
      )
     )
-    ;;@ core/cpu/opcodes.ts:1757:15
+    ;;@ core/cpu/opcodes.ts:1756:15
     (return
      (i32.const 12)
     )
    )
-   ;;@ core/cpu/opcodes.ts:1778:8
+   ;;@ core/cpu/opcodes.ts:1777:8
    (set_global $core/cpu/cpu/Cpu.programCounter
-    ;;@ core/cpu/opcodes.ts:1778:29
+    ;;@ core/cpu/opcodes.ts:1777:29
     (call $core/portable/portable/u16Portable
-     ;;@ core/cpu/opcodes.ts:1778:41
+     ;;@ core/cpu/opcodes.ts:1777:41
      (i32.add
       (get_global $core/cpu/cpu/Cpu.programCounter)
-      ;;@ core/cpu/opcodes.ts:1778:62
+      ;;@ core/cpu/opcodes.ts:1777:62
       (i32.const 2)
      )
     )
    )
-   ;;@ core/cpu/opcodes.ts:1779:15
+   ;;@ core/cpu/opcodes.ts:1778:15
    (return
     (i32.const 12)
    )
   )
-  ;;@ core/cpu/opcodes.ts:1814:6
+  ;;@ core/cpu/opcodes.ts:1813:6
   (set_global $core/cpu/cpu/Cpu.programCounter
-   ;;@ core/cpu/opcodes.ts:1814:27
+   ;;@ core/cpu/opcodes.ts:1813:27
    (call $core/portable/portable/u16Portable
-    ;;@ core/cpu/opcodes.ts:1814:39
+    ;;@ core/cpu/opcodes.ts:1813:39
     (i32.add
      (get_global $core/cpu/cpu/Cpu.programCounter)
-     ;;@ core/cpu/opcodes.ts:1814:60
+     ;;@ core/cpu/opcodes.ts:1813:60
      (i32.const 1)
     )
    )
   )
-  ;;@ core/cpu/opcodes.ts:1815:13
+  ;;@ core/cpu/opcodes.ts:1814:13
   (i32.const 4)
  )
  (func $core/interrupts/interrupts/setInterrupts (; 222 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
@@ -20061,7 +20061,7 @@
                       (tee_local $1
                        (get_local $0)
                       )
-                      ;;@ core/cpu/opcodes.ts:1905:9
+                      ;;@ core/cpu/opcodes.ts:1904:9
                       (i32.const 208)
                      )
                      (block
@@ -20077,95 +20077,95 @@
                      )
                     )
                     (br_if $folding-inner1
-                     ;;@ core/cpu/opcodes.ts:1908:10
+                     ;;@ core/cpu/opcodes.ts:1907:10
                      (call $core/cpu/flags/getCarryFlag)
                     )
                     (br $folding-inner2)
                    )
-                   ;;@ core/cpu/opcodes.ts:1920:6
+                   ;;@ core/cpu/opcodes.ts:1919:6
                    (set_local $1
-                    ;;@ core/cpu/opcodes.ts:1920:29
+                    ;;@ core/cpu/opcodes.ts:1919:29
                     (i32.and
                      (call $core/cpu/opcodes/sixteenBitLoadSyncCycles
-                      ;;@ core/cpu/opcodes.ts:1920:54
+                      ;;@ core/cpu/opcodes.ts:1919:54
                       (get_global $core/cpu/cpu/Cpu.stackPointer)
                      )
                      (i32.const 65535)
                     )
                    )
-                   ;;@ core/cpu/opcodes.ts:1921:6
+                   ;;@ core/cpu/opcodes.ts:1920:6
                    (set_global $core/cpu/cpu/Cpu.stackPointer
-                    ;;@ core/cpu/opcodes.ts:1921:25
+                    ;;@ core/cpu/opcodes.ts:1920:25
                     (call $core/portable/portable/u16Portable
-                     ;;@ core/cpu/opcodes.ts:1921:37
+                     ;;@ core/cpu/opcodes.ts:1920:37
                      (i32.add
                       (get_global $core/cpu/cpu/Cpu.stackPointer)
-                      ;;@ core/cpu/opcodes.ts:1921:56
+                      ;;@ core/cpu/opcodes.ts:1920:56
                       (i32.const 2)
                      )
                     )
                    )
-                   ;;@ core/cpu/opcodes.ts:1922:6
+                   ;;@ core/cpu/opcodes.ts:1921:6
                    (set_global $core/cpu/cpu/Cpu.registerD
                     (i32.and
-                     ;;@ core/cpu/opcodes.ts:1922:22
+                     ;;@ core/cpu/opcodes.ts:1921:22
                      (call $core/helpers/index/splitHighByte
                       (get_local $1)
                      )
                      (i32.const 255)
                     )
                    )
-                   ;;@ core/cpu/opcodes.ts:1923:6
+                   ;;@ core/cpu/opcodes.ts:1922:6
                    (set_global $core/cpu/cpu/Cpu.registerE
                     (i32.and
-                     ;;@ core/cpu/opcodes.ts:1923:22
+                     ;;@ core/cpu/opcodes.ts:1922:22
                      (call $core/helpers/index/splitLowByte
                       (get_local $1)
                      )
                      (i32.const 255)
                     )
                    )
-                   ;;@ core/cpu/opcodes.ts:1924:13
+                   ;;@ core/cpu/opcodes.ts:1923:13
                    (return
                     (i32.const 4)
                    )
                   )
-                  ;;@ core/cpu/opcodes.ts:1928:6
+                  ;;@ core/cpu/opcodes.ts:1927:6
                   (if
-                   ;;@ core/cpu/opcodes.ts:1928:10
+                   ;;@ core/cpu/opcodes.ts:1927:10
                    (call $core/cpu/flags/getCarryFlag)
                    (br $folding-inner3)
                    (br $folding-inner0)
                   )
                  )
-                 ;;@ core/cpu/opcodes.ts:1940:6
+                 ;;@ core/cpu/opcodes.ts:1939:6
                  (if
-                  ;;@ core/cpu/opcodes.ts:1940:10
+                  ;;@ core/cpu/opcodes.ts:1939:10
                   (call $core/cpu/flags/getCarryFlag)
                   (br $folding-inner3)
-                  ;;@ core/cpu/opcodes.ts:1940:32
+                  ;;@ core/cpu/opcodes.ts:1939:32
                   (block
-                   ;;@ core/cpu/opcodes.ts:1941:8
+                   ;;@ core/cpu/opcodes.ts:1940:8
                    (set_global $core/cpu/cpu/Cpu.stackPointer
-                    ;;@ core/cpu/opcodes.ts:1941:27
+                    ;;@ core/cpu/opcodes.ts:1940:27
                     (call $core/portable/portable/u16Portable
-                     ;;@ core/cpu/opcodes.ts:1941:39
+                     ;;@ core/cpu/opcodes.ts:1940:39
                      (i32.sub
                       (get_global $core/cpu/cpu/Cpu.stackPointer)
-                      ;;@ core/cpu/opcodes.ts:1941:58
+                      ;;@ core/cpu/opcodes.ts:1940:58
                       (i32.const 2)
                      )
                     )
                    )
-                   ;;@ core/cpu/opcodes.ts:1943:8
+                   ;;@ core/cpu/opcodes.ts:1942:8
                    (call $core/cpu/opcodes/sixteenBitStoreSyncCycles
-                    ;;@ core/cpu/opcodes.ts:1943:34
+                    ;;@ core/cpu/opcodes.ts:1942:34
                     (get_global $core/cpu/cpu/Cpu.stackPointer)
-                    ;;@ core/cpu/opcodes.ts:1943:52
+                    ;;@ core/cpu/opcodes.ts:1942:52
                     (i32.and
                      (i32.add
                       (get_global $core/cpu/cpu/Cpu.programCounter)
-                      ;;@ core/cpu/opcodes.ts:1943:73
+                      ;;@ core/cpu/opcodes.ts:1942:73
                       (i32.const 2)
                      )
                      (i32.const 65535)
@@ -20175,149 +20175,149 @@
                   )
                  )
                 )
-                ;;@ core/cpu/opcodes.ts:1954:6
+                ;;@ core/cpu/opcodes.ts:1953:6
                 (set_global $core/cpu/cpu/Cpu.stackPointer
-                 ;;@ core/cpu/opcodes.ts:1954:25
+                 ;;@ core/cpu/opcodes.ts:1953:25
                  (call $core/portable/portable/u16Portable
-                  ;;@ core/cpu/opcodes.ts:1954:37
+                  ;;@ core/cpu/opcodes.ts:1953:37
                   (i32.sub
                    (get_global $core/cpu/cpu/Cpu.stackPointer)
-                   ;;@ core/cpu/opcodes.ts:1954:56
+                   ;;@ core/cpu/opcodes.ts:1953:56
                    (i32.const 2)
                   )
                  )
                 )
-                ;;@ core/cpu/opcodes.ts:1956:6
+                ;;@ core/cpu/opcodes.ts:1955:6
                 (call $core/cpu/opcodes/sixteenBitStoreSyncCycles
-                 ;;@ core/cpu/opcodes.ts:1956:32
+                 ;;@ core/cpu/opcodes.ts:1955:32
                  (get_global $core/cpu/cpu/Cpu.stackPointer)
-                 ;;@ core/cpu/opcodes.ts:1956:50
+                 ;;@ core/cpu/opcodes.ts:1955:50
                  (call $core/helpers/index/concatenateBytes
-                  ;;@ core/cpu/opcodes.ts:1956:67
+                  ;;@ core/cpu/opcodes.ts:1955:67
                   (get_global $core/cpu/cpu/Cpu.registerD)
-                  ;;@ core/cpu/opcodes.ts:1956:82
+                  ;;@ core/cpu/opcodes.ts:1955:82
                   (get_global $core/cpu/cpu/Cpu.registerE)
                  )
                 )
                 (br $folding-inner1)
                )
-               ;;@ core/cpu/opcodes.ts:1963:6
+               ;;@ core/cpu/opcodes.ts:1962:6
                (call $core/cpu/instructions/subARegister
-                ;;@ core/cpu/opcodes.ts:1963:19
+                ;;@ core/cpu/opcodes.ts:1962:19
                 (call $core/cpu/opcodes/getDataByteOne)
                )
                (br $folding-inner4)
               )
-              ;;@ core/cpu/opcodes.ts:1969:6
+              ;;@ core/cpu/opcodes.ts:1968:6
               (set_global $core/cpu/cpu/Cpu.stackPointer
-               ;;@ core/cpu/opcodes.ts:1969:25
+               ;;@ core/cpu/opcodes.ts:1968:25
                (call $core/portable/portable/u16Portable
-                ;;@ core/cpu/opcodes.ts:1969:37
+                ;;@ core/cpu/opcodes.ts:1968:37
                 (i32.sub
                  (get_global $core/cpu/cpu/Cpu.stackPointer)
-                 ;;@ core/cpu/opcodes.ts:1969:56
+                 ;;@ core/cpu/opcodes.ts:1968:56
                  (i32.const 2)
                 )
                )
               )
-              ;;@ core/cpu/opcodes.ts:1971:6
+              ;;@ core/cpu/opcodes.ts:1970:6
               (call $core/cpu/opcodes/sixteenBitStoreSyncCycles
-               ;;@ core/cpu/opcodes.ts:1971:32
+               ;;@ core/cpu/opcodes.ts:1970:32
                (get_global $core/cpu/cpu/Cpu.stackPointer)
-               ;;@ core/cpu/opcodes.ts:1971:50
+               ;;@ core/cpu/opcodes.ts:1970:50
                (get_global $core/cpu/cpu/Cpu.programCounter)
               )
-              ;;@ core/cpu/opcodes.ts:1972:6
+              ;;@ core/cpu/opcodes.ts:1971:6
               (set_global $core/cpu/cpu/Cpu.programCounter
-               ;;@ core/cpu/opcodes.ts:1972:27
+               ;;@ core/cpu/opcodes.ts:1971:27
                (i32.const 16)
               )
               (br $folding-inner1)
              )
              (br_if $folding-inner1
-              ;;@ core/cpu/opcodes.ts:1977:10
+              ;;@ core/cpu/opcodes.ts:1976:10
               (i32.ne
                (call $core/cpu/flags/getCarryFlag)
-               ;;@ core/cpu/opcodes.ts:1977:29
+               ;;@ core/cpu/opcodes.ts:1976:29
                (i32.const 1)
               )
              )
              (br $folding-inner2)
             )
-            ;;@ core/cpu/opcodes.ts:1990:6
+            ;;@ core/cpu/opcodes.ts:1989:6
             (set_global $core/cpu/cpu/Cpu.programCounter
              (i32.and
-              ;;@ core/cpu/opcodes.ts:1990:27
+              ;;@ core/cpu/opcodes.ts:1989:27
               (call $core/cpu/opcodes/sixteenBitLoadSyncCycles
-               ;;@ core/cpu/opcodes.ts:1990:57
+               ;;@ core/cpu/opcodes.ts:1989:57
                (get_global $core/cpu/cpu/Cpu.stackPointer)
               )
               (i32.const 65535)
              )
             )
-            ;;@ core/cpu/opcodes.ts:1992:6
+            ;;@ core/cpu/opcodes.ts:1991:6
             (call $core/interrupts/interrupts/setInterrupts
-             ;;@ core/cpu/opcodes.ts:1992:20
+             ;;@ core/cpu/opcodes.ts:1991:20
              (i32.const 1)
             )
-            ;;@ core/cpu/opcodes.ts:1993:6
+            ;;@ core/cpu/opcodes.ts:1992:6
             (set_global $core/cpu/cpu/Cpu.stackPointer
-             ;;@ core/cpu/opcodes.ts:1993:25
+             ;;@ core/cpu/opcodes.ts:1992:25
              (call $core/portable/portable/u16Portable
-              ;;@ core/cpu/opcodes.ts:1993:37
+              ;;@ core/cpu/opcodes.ts:1992:37
               (i32.add
                (get_global $core/cpu/cpu/Cpu.stackPointer)
-               ;;@ core/cpu/opcodes.ts:1993:56
+               ;;@ core/cpu/opcodes.ts:1992:56
                (i32.const 2)
               )
              )
             )
             (br $folding-inner1)
            )
-           ;;@ core/cpu/opcodes.ts:1998:6
+           ;;@ core/cpu/opcodes.ts:1997:6
            (if
-            ;;@ core/cpu/opcodes.ts:1998:10
+            ;;@ core/cpu/opcodes.ts:1997:10
             (i32.eq
              (call $core/cpu/flags/getCarryFlag)
-             ;;@ core/cpu/opcodes.ts:1998:29
+             ;;@ core/cpu/opcodes.ts:1997:29
              (i32.const 1)
             )
             (br $folding-inner0)
             (br $folding-inner3)
            )
           )
-          ;;@ core/cpu/opcodes.ts:2010:6
+          ;;@ core/cpu/opcodes.ts:2009:6
           (if
-           ;;@ core/cpu/opcodes.ts:2010:10
+           ;;@ core/cpu/opcodes.ts:2009:10
            (i32.eq
             (call $core/cpu/flags/getCarryFlag)
-            ;;@ core/cpu/opcodes.ts:2010:29
+            ;;@ core/cpu/opcodes.ts:2009:29
             (i32.const 1)
            )
-           ;;@ core/cpu/opcodes.ts:2010:32
+           ;;@ core/cpu/opcodes.ts:2009:32
            (block
-            ;;@ core/cpu/opcodes.ts:2011:8
+            ;;@ core/cpu/opcodes.ts:2010:8
             (set_global $core/cpu/cpu/Cpu.stackPointer
-             ;;@ core/cpu/opcodes.ts:2011:27
+             ;;@ core/cpu/opcodes.ts:2010:27
              (call $core/portable/portable/u16Portable
-              ;;@ core/cpu/opcodes.ts:2011:39
+              ;;@ core/cpu/opcodes.ts:2010:39
               (i32.sub
                (get_global $core/cpu/cpu/Cpu.stackPointer)
-               ;;@ core/cpu/opcodes.ts:2011:58
+               ;;@ core/cpu/opcodes.ts:2010:58
                (i32.const 2)
               )
              )
             )
-            ;;@ core/cpu/opcodes.ts:2013:8
+            ;;@ core/cpu/opcodes.ts:2012:8
             (call $core/cpu/opcodes/sixteenBitStoreSyncCycles
-             ;;@ core/cpu/opcodes.ts:2013:34
+             ;;@ core/cpu/opcodes.ts:2012:34
              (get_global $core/cpu/cpu/Cpu.stackPointer)
-             ;;@ core/cpu/opcodes.ts:2013:52
+             ;;@ core/cpu/opcodes.ts:2012:52
              (call $core/portable/portable/u16Portable
-              ;;@ core/cpu/opcodes.ts:2013:64
+              ;;@ core/cpu/opcodes.ts:2012:64
               (i32.add
                (get_global $core/cpu/cpu/Cpu.programCounter)
-               ;;@ core/cpu/opcodes.ts:2013:85
+               ;;@ core/cpu/opcodes.ts:2012:85
                (i32.const 2)
               )
              )
@@ -20327,35 +20327,35 @@
            (br $folding-inner3)
           )
          )
-         ;;@ core/cpu/opcodes.ts:2027:6
+         ;;@ core/cpu/opcodes.ts:2026:6
          (call $core/cpu/instructions/subAThroughCarryRegister
-          ;;@ core/cpu/opcodes.ts:2027:31
+          ;;@ core/cpu/opcodes.ts:2026:31
           (call $core/cpu/opcodes/getDataByteOne)
          )
          (br $folding-inner4)
         )
-        ;;@ core/cpu/opcodes.ts:2033:6
+        ;;@ core/cpu/opcodes.ts:2032:6
         (set_global $core/cpu/cpu/Cpu.stackPointer
-         ;;@ core/cpu/opcodes.ts:2033:25
+         ;;@ core/cpu/opcodes.ts:2032:25
          (call $core/portable/portable/u16Portable
-          ;;@ core/cpu/opcodes.ts:2033:37
+          ;;@ core/cpu/opcodes.ts:2032:37
           (i32.sub
            (get_global $core/cpu/cpu/Cpu.stackPointer)
-           ;;@ core/cpu/opcodes.ts:2033:56
+           ;;@ core/cpu/opcodes.ts:2032:56
            (i32.const 2)
           )
          )
         )
-        ;;@ core/cpu/opcodes.ts:2035:6
+        ;;@ core/cpu/opcodes.ts:2034:6
         (call $core/cpu/opcodes/sixteenBitStoreSyncCycles
-         ;;@ core/cpu/opcodes.ts:2035:32
+         ;;@ core/cpu/opcodes.ts:2034:32
          (get_global $core/cpu/cpu/Cpu.stackPointer)
-         ;;@ core/cpu/opcodes.ts:2035:50
+         ;;@ core/cpu/opcodes.ts:2034:50
          (get_global $core/cpu/cpu/Cpu.programCounter)
         )
-        ;;@ core/cpu/opcodes.ts:2036:6
+        ;;@ core/cpu/opcodes.ts:2035:6
         (set_global $core/cpu/cpu/Cpu.programCounter
-         ;;@ core/cpu/opcodes.ts:2036:27
+         ;;@ core/cpu/opcodes.ts:2035:27
          (i32.const 24)
         )
         (br $folding-inner1)
@@ -20364,10 +20364,10 @@
         (i32.const -1)
        )
       )
-      ;;@ core/cpu/opcodes.ts:1930:8
+      ;;@ core/cpu/opcodes.ts:1929:8
       (set_global $core/cpu/cpu/Cpu.programCounter
        (i32.and
-        ;;@ core/cpu/opcodes.ts:1930:29
+        ;;@ core/cpu/opcodes.ts:1929:29
         (call $core/cpu/opcodes/getConcatenatedDataByte)
         (i32.const 65535)
        )
@@ -20377,64 +20377,64 @@
       (i32.const 8)
      )
     )
-    ;;@ core/cpu/opcodes.ts:1910:8
+    ;;@ core/cpu/opcodes.ts:1909:8
     (set_global $core/cpu/cpu/Cpu.programCounter
      (i32.and
-      ;;@ core/cpu/opcodes.ts:1910:29
+      ;;@ core/cpu/opcodes.ts:1909:29
       (call $core/cpu/opcodes/sixteenBitLoadSyncCycles
-       ;;@ core/cpu/opcodes.ts:1910:59
+       ;;@ core/cpu/opcodes.ts:1909:59
        (get_global $core/cpu/cpu/Cpu.stackPointer)
       )
       (i32.const 65535)
      )
     )
-    ;;@ core/cpu/opcodes.ts:1911:8
+    ;;@ core/cpu/opcodes.ts:1910:8
     (set_global $core/cpu/cpu/Cpu.stackPointer
-     ;;@ core/cpu/opcodes.ts:1911:27
+     ;;@ core/cpu/opcodes.ts:1910:27
      (call $core/portable/portable/u16Portable
-      ;;@ core/cpu/opcodes.ts:1911:39
+      ;;@ core/cpu/opcodes.ts:1910:39
       (i32.add
        (get_global $core/cpu/cpu/Cpu.stackPointer)
-       ;;@ core/cpu/opcodes.ts:1911:58
+       ;;@ core/cpu/opcodes.ts:1910:58
        (i32.const 2)
       )
      )
     )
-    ;;@ core/cpu/opcodes.ts:1912:15
+    ;;@ core/cpu/opcodes.ts:1911:15
     (return
      (i32.const 12)
     )
    )
-   ;;@ core/cpu/opcodes.ts:1933:8
+   ;;@ core/cpu/opcodes.ts:1932:8
    (set_global $core/cpu/cpu/Cpu.programCounter
-    ;;@ core/cpu/opcodes.ts:1933:29
+    ;;@ core/cpu/opcodes.ts:1932:29
     (call $core/portable/portable/u16Portable
-     ;;@ core/cpu/opcodes.ts:1933:41
+     ;;@ core/cpu/opcodes.ts:1932:41
      (i32.add
       (get_global $core/cpu/cpu/Cpu.programCounter)
-      ;;@ core/cpu/opcodes.ts:1933:62
+      ;;@ core/cpu/opcodes.ts:1932:62
       (i32.const 2)
      )
     )
    )
-   ;;@ core/cpu/opcodes.ts:1934:15
+   ;;@ core/cpu/opcodes.ts:1933:15
    (return
     (i32.const 12)
    )
   )
-  ;;@ core/cpu/opcodes.ts:1964:6
+  ;;@ core/cpu/opcodes.ts:1963:6
   (set_global $core/cpu/cpu/Cpu.programCounter
-   ;;@ core/cpu/opcodes.ts:1964:27
+   ;;@ core/cpu/opcodes.ts:1963:27
    (call $core/portable/portable/u16Portable
-    ;;@ core/cpu/opcodes.ts:1964:39
+    ;;@ core/cpu/opcodes.ts:1963:39
     (i32.add
      (get_global $core/cpu/cpu/Cpu.programCounter)
-     ;;@ core/cpu/opcodes.ts:1964:60
+     ;;@ core/cpu/opcodes.ts:1963:60
      (i32.const 1)
     )
    )
   )
-  ;;@ core/cpu/opcodes.ts:1965:13
+  ;;@ core/cpu/opcodes.ts:1964:13
   (i32.const 4)
  )
  (func $core/cpu/opcodes/handleOpcodeEx (; 224 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
@@ -20453,7 +20453,7 @@
               (if
                (i32.ne
                 (get_local $0)
-                ;;@ core/cpu/opcodes.ts:2044:9
+                ;;@ core/cpu/opcodes.ts:2043:9
                 (i32.const 224)
                )
                (block
@@ -20468,167 +20468,167 @@
                 (br $break|0)
                )
               )
-              ;;@ core/cpu/opcodes.ts:2052:6
+              ;;@ core/cpu/opcodes.ts:2051:6
               (call $core/cpu/opcodes/eightBitStoreSyncCycles
-               ;;@ core/cpu/opcodes.ts:2052:30
+               ;;@ core/cpu/opcodes.ts:2051:30
                (i32.add
-                ;;@ core/cpu/opcodes.ts:2050:34
+                ;;@ core/cpu/opcodes.ts:2049:34
                 (i32.and
                  (call $core/cpu/opcodes/getDataByteOne)
                  (i32.const 255)
                 )
-                ;;@ core/cpu/opcodes.ts:2052:30
+                ;;@ core/cpu/opcodes.ts:2051:30
                 (i32.const 65280)
                )
-               ;;@ core/cpu/opcodes.ts:2052:57
+               ;;@ core/cpu/opcodes.ts:2051:57
                (get_global $core/cpu/cpu/Cpu.registerA)
               )
               (br $folding-inner0)
              )
-             ;;@ core/cpu/opcodes.ts:2059:6
+             ;;@ core/cpu/opcodes.ts:2058:6
              (set_local $0
-              ;;@ core/cpu/opcodes.ts:2059:29
+              ;;@ core/cpu/opcodes.ts:2058:29
               (i32.and
                (call $core/cpu/opcodes/sixteenBitLoadSyncCycles
-                ;;@ core/cpu/opcodes.ts:2059:54
+                ;;@ core/cpu/opcodes.ts:2058:54
                 (get_global $core/cpu/cpu/Cpu.stackPointer)
                )
                (i32.const 65535)
               )
              )
-             ;;@ core/cpu/opcodes.ts:2060:6
+             ;;@ core/cpu/opcodes.ts:2059:6
              (set_global $core/cpu/cpu/Cpu.stackPointer
-              ;;@ core/cpu/opcodes.ts:2060:25
+              ;;@ core/cpu/opcodes.ts:2059:25
               (call $core/portable/portable/u16Portable
-               ;;@ core/cpu/opcodes.ts:2060:37
+               ;;@ core/cpu/opcodes.ts:2059:37
                (i32.add
                 (get_global $core/cpu/cpu/Cpu.stackPointer)
-                ;;@ core/cpu/opcodes.ts:2060:56
+                ;;@ core/cpu/opcodes.ts:2059:56
                 (i32.const 2)
                )
               )
              )
-             ;;@ core/cpu/opcodes.ts:2061:6
+             ;;@ core/cpu/opcodes.ts:2060:6
              (set_global $core/cpu/cpu/Cpu.registerH
               (i32.and
-               ;;@ core/cpu/opcodes.ts:2061:22
+               ;;@ core/cpu/opcodes.ts:2060:22
                (call $core/helpers/index/splitHighByte
                 (get_local $0)
                )
                (i32.const 255)
               )
              )
-             ;;@ core/cpu/opcodes.ts:2062:6
+             ;;@ core/cpu/opcodes.ts:2061:6
              (set_global $core/cpu/cpu/Cpu.registerL
               (i32.and
-               ;;@ core/cpu/opcodes.ts:2062:22
+               ;;@ core/cpu/opcodes.ts:2061:22
                (call $core/helpers/index/splitLowByte
                 (get_local $0)
                )
                (i32.const 255)
               )
              )
-             ;;@ core/cpu/opcodes.ts:2063:13
+             ;;@ core/cpu/opcodes.ts:2062:13
              (return
               (i32.const 4)
              )
             )
-            ;;@ core/cpu/opcodes.ts:2073:6
+            ;;@ core/cpu/opcodes.ts:2072:6
             (call $core/cpu/opcodes/eightBitStoreSyncCycles
-             ;;@ core/cpu/opcodes.ts:2073:30
+             ;;@ core/cpu/opcodes.ts:2072:30
              (i32.add
-              ;;@ core/cpu/opcodes.ts:2073:39
+              ;;@ core/cpu/opcodes.ts:2072:39
               (get_global $core/cpu/cpu/Cpu.registerC)
-              ;;@ core/cpu/opcodes.ts:2073:30
+              ;;@ core/cpu/opcodes.ts:2072:30
               (i32.const 65280)
              )
-             ;;@ core/cpu/opcodes.ts:2073:59
+             ;;@ core/cpu/opcodes.ts:2072:59
              (get_global $core/cpu/cpu/Cpu.registerA)
             )
-            ;;@ core/cpu/opcodes.ts:2074:13
+            ;;@ core/cpu/opcodes.ts:2073:13
             (return
              (i32.const 4)
             )
            )
-           ;;@ core/cpu/opcodes.ts:2079:6
+           ;;@ core/cpu/opcodes.ts:2078:6
            (set_global $core/cpu/cpu/Cpu.stackPointer
-            ;;@ core/cpu/opcodes.ts:2079:25
+            ;;@ core/cpu/opcodes.ts:2078:25
             (call $core/portable/portable/u16Portable
-             ;;@ core/cpu/opcodes.ts:2079:37
+             ;;@ core/cpu/opcodes.ts:2078:37
              (i32.sub
               (get_global $core/cpu/cpu/Cpu.stackPointer)
-              ;;@ core/cpu/opcodes.ts:2079:56
+              ;;@ core/cpu/opcodes.ts:2078:56
               (i32.const 2)
              )
             )
            )
-           ;;@ core/cpu/opcodes.ts:2081:6
+           ;;@ core/cpu/opcodes.ts:2080:6
            (call $core/cpu/opcodes/sixteenBitStoreSyncCycles
-            ;;@ core/cpu/opcodes.ts:2081:32
+            ;;@ core/cpu/opcodes.ts:2080:32
             (get_global $core/cpu/cpu/Cpu.stackPointer)
-            ;;@ core/cpu/opcodes.ts:2081:50
+            ;;@ core/cpu/opcodes.ts:2080:50
             (call $core/helpers/index/concatenateBytes
-             ;;@ core/cpu/opcodes.ts:2081:67
+             ;;@ core/cpu/opcodes.ts:2080:67
              (get_global $core/cpu/cpu/Cpu.registerH)
-             ;;@ core/cpu/opcodes.ts:2081:82
+             ;;@ core/cpu/opcodes.ts:2080:82
              (get_global $core/cpu/cpu/Cpu.registerL)
             )
            )
-           ;;@ core/cpu/opcodes.ts:2082:13
+           ;;@ core/cpu/opcodes.ts:2081:13
            (return
             (i32.const 8)
            )
           )
-          ;;@ core/cpu/opcodes.ts:2088:6
+          ;;@ core/cpu/opcodes.ts:2087:6
           (call $core/cpu/instructions/andARegister
-           ;;@ core/cpu/opcodes.ts:2088:19
+           ;;@ core/cpu/opcodes.ts:2087:19
            (call $core/cpu/opcodes/getDataByteOne)
           )
           (br $folding-inner0)
          )
-         ;;@ core/cpu/opcodes.ts:2094:6
+         ;;@ core/cpu/opcodes.ts:2093:6
          (set_global $core/cpu/cpu/Cpu.stackPointer
-          ;;@ core/cpu/opcodes.ts:2094:25
+          ;;@ core/cpu/opcodes.ts:2093:25
           (call $core/portable/portable/u16Portable
-           ;;@ core/cpu/opcodes.ts:2094:37
+           ;;@ core/cpu/opcodes.ts:2093:37
            (i32.sub
             (get_global $core/cpu/cpu/Cpu.stackPointer)
-            ;;@ core/cpu/opcodes.ts:2094:56
+            ;;@ core/cpu/opcodes.ts:2093:56
             (i32.const 2)
            )
           )
          )
-         ;;@ core/cpu/opcodes.ts:2096:6
+         ;;@ core/cpu/opcodes.ts:2095:6
          (call $core/cpu/opcodes/sixteenBitStoreSyncCycles
-          ;;@ core/cpu/opcodes.ts:2096:32
+          ;;@ core/cpu/opcodes.ts:2095:32
           (get_global $core/cpu/cpu/Cpu.stackPointer)
-          ;;@ core/cpu/opcodes.ts:2096:50
+          ;;@ core/cpu/opcodes.ts:2095:50
           (get_global $core/cpu/cpu/Cpu.programCounter)
          )
-         ;;@ core/cpu/opcodes.ts:2097:6
+         ;;@ core/cpu/opcodes.ts:2096:6
          (set_global $core/cpu/cpu/Cpu.programCounter
-          ;;@ core/cpu/opcodes.ts:2097:27
+          ;;@ core/cpu/opcodes.ts:2096:27
           (i32.const 32)
          )
-         ;;@ core/cpu/opcodes.ts:2098:13
+         ;;@ core/cpu/opcodes.ts:2097:13
          (return
           (i32.const 8)
          )
         )
-        ;;@ core/cpu/opcodes.ts:2105:6
+        ;;@ core/cpu/opcodes.ts:2104:6
         (set_local $0
-         ;;@ core/cpu/opcodes.ts:2105:34
+         ;;@ core/cpu/opcodes.ts:2104:34
          (call $core/portable/portable/i8Portable
-          ;;@ core/cpu/opcodes.ts:2105:45
+          ;;@ core/cpu/opcodes.ts:2104:45
           (call $core/cpu/opcodes/getDataByteOne)
          )
         )
-        ;;@ core/cpu/opcodes.ts:2107:6
+        ;;@ core/cpu/opcodes.ts:2106:6
         (call $core/cpu/flags/checkAndSetSixteenBitFlagsAddOverflow
-         ;;@ core/cpu/opcodes.ts:2107:44
+         ;;@ core/cpu/opcodes.ts:2106:44
          (get_global $core/cpu/cpu/Cpu.stackPointer)
          (tee_local $0
-          ;;@ core/cpu/opcodes.ts:2107:62
+          ;;@ core/cpu/opcodes.ts:2106:62
           (i32.shr_s
            (i32.shl
             (get_local $0)
@@ -20637,124 +20637,124 @@
            (i32.const 24)
           )
          )
-         ;;@ core/cpu/opcodes.ts:2107:81
+         ;;@ core/cpu/opcodes.ts:2106:81
          (i32.const 1)
         )
-        ;;@ core/cpu/opcodes.ts:2108:6
+        ;;@ core/cpu/opcodes.ts:2107:6
         (set_global $core/cpu/cpu/Cpu.stackPointer
-         ;;@ core/cpu/opcodes.ts:2108:25
+         ;;@ core/cpu/opcodes.ts:2107:25
          (call $core/portable/portable/u16Portable
-          ;;@ core/cpu/opcodes.ts:2108:37
+          ;;@ core/cpu/opcodes.ts:2107:37
           (i32.add
            (get_global $core/cpu/cpu/Cpu.stackPointer)
            (get_local $0)
           )
          )
         )
-        ;;@ core/cpu/opcodes.ts:2109:6
+        ;;@ core/cpu/opcodes.ts:2108:6
         (call $core/cpu/flags/setZeroFlag
-         ;;@ core/cpu/opcodes.ts:2109:18
+         ;;@ core/cpu/opcodes.ts:2108:18
+         (i32.const 0)
+        )
+        ;;@ core/cpu/opcodes.ts:2109:6
+        (call $core/cpu/flags/setSubtractFlag
+         ;;@ core/cpu/opcodes.ts:2109:22
          (i32.const 0)
         )
         ;;@ core/cpu/opcodes.ts:2110:6
-        (call $core/cpu/flags/setSubtractFlag
-         ;;@ core/cpu/opcodes.ts:2110:22
-         (i32.const 0)
-        )
-        ;;@ core/cpu/opcodes.ts:2111:6
         (set_global $core/cpu/cpu/Cpu.programCounter
-         ;;@ core/cpu/opcodes.ts:2111:27
+         ;;@ core/cpu/opcodes.ts:2110:27
          (call $core/portable/portable/u16Portable
-          ;;@ core/cpu/opcodes.ts:2111:39
+          ;;@ core/cpu/opcodes.ts:2110:39
           (i32.add
            (get_global $core/cpu/cpu/Cpu.programCounter)
-           ;;@ core/cpu/opcodes.ts:2111:60
+           ;;@ core/cpu/opcodes.ts:2110:60
            (i32.const 1)
           )
          )
         )
-        ;;@ core/cpu/opcodes.ts:2112:13
+        ;;@ core/cpu/opcodes.ts:2111:13
         (return
          (i32.const 12)
         )
        )
-       ;;@ core/cpu/opcodes.ts:2116:6
+       ;;@ core/cpu/opcodes.ts:2115:6
        (set_global $core/cpu/cpu/Cpu.programCounter
         (i32.and
-         ;;@ core/cpu/opcodes.ts:2116:27
+         ;;@ core/cpu/opcodes.ts:2115:27
          (call $core/helpers/index/concatenateBytes
-          ;;@ core/cpu/opcodes.ts:2116:49
+          ;;@ core/cpu/opcodes.ts:2115:49
           (get_global $core/cpu/cpu/Cpu.registerH)
-          ;;@ core/cpu/opcodes.ts:2116:64
+          ;;@ core/cpu/opcodes.ts:2115:64
           (get_global $core/cpu/cpu/Cpu.registerL)
          )
          (i32.const 65535)
         )
        )
-       ;;@ core/cpu/opcodes.ts:2117:13
+       ;;@ core/cpu/opcodes.ts:2116:13
        (return
         (i32.const 4)
        )
       )
-      ;;@ core/cpu/opcodes.ts:2122:6
+      ;;@ core/cpu/opcodes.ts:2121:6
       (call $core/cpu/opcodes/eightBitStoreSyncCycles
-       ;;@ core/cpu/opcodes.ts:2122:30
+       ;;@ core/cpu/opcodes.ts:2121:30
        (i32.and
         (call $core/cpu/opcodes/getConcatenatedDataByte)
         (i32.const 65535)
        )
-       ;;@ core/cpu/opcodes.ts:2122:57
+       ;;@ core/cpu/opcodes.ts:2121:57
        (get_global $core/cpu/cpu/Cpu.registerA)
       )
-      ;;@ core/cpu/opcodes.ts:2123:6
+      ;;@ core/cpu/opcodes.ts:2122:6
       (set_global $core/cpu/cpu/Cpu.programCounter
-       ;;@ core/cpu/opcodes.ts:2123:27
+       ;;@ core/cpu/opcodes.ts:2122:27
        (call $core/portable/portable/u16Portable
-        ;;@ core/cpu/opcodes.ts:2123:39
+        ;;@ core/cpu/opcodes.ts:2122:39
         (i32.add
          (get_global $core/cpu/cpu/Cpu.programCounter)
-         ;;@ core/cpu/opcodes.ts:2123:60
+         ;;@ core/cpu/opcodes.ts:2122:60
          (i32.const 2)
         )
        )
       )
-      ;;@ core/cpu/opcodes.ts:2124:13
+      ;;@ core/cpu/opcodes.ts:2123:13
       (return
        (i32.const 4)
       )
      )
-     ;;@ core/cpu/opcodes.ts:2131:6
+     ;;@ core/cpu/opcodes.ts:2130:6
      (call $core/cpu/instructions/xorARegister
-      ;;@ core/cpu/opcodes.ts:2131:19
+      ;;@ core/cpu/opcodes.ts:2130:19
       (call $core/cpu/opcodes/getDataByteOne)
      )
      (br $folding-inner0)
     )
-    ;;@ core/cpu/opcodes.ts:2137:6
+    ;;@ core/cpu/opcodes.ts:2136:6
     (set_global $core/cpu/cpu/Cpu.stackPointer
-     ;;@ core/cpu/opcodes.ts:2137:25
+     ;;@ core/cpu/opcodes.ts:2136:25
      (call $core/portable/portable/u16Portable
-      ;;@ core/cpu/opcodes.ts:2137:37
+      ;;@ core/cpu/opcodes.ts:2136:37
       (i32.sub
        (get_global $core/cpu/cpu/Cpu.stackPointer)
-       ;;@ core/cpu/opcodes.ts:2137:56
+       ;;@ core/cpu/opcodes.ts:2136:56
        (i32.const 2)
       )
      )
     )
-    ;;@ core/cpu/opcodes.ts:2139:6
+    ;;@ core/cpu/opcodes.ts:2138:6
     (call $core/cpu/opcodes/sixteenBitStoreSyncCycles
-     ;;@ core/cpu/opcodes.ts:2139:32
+     ;;@ core/cpu/opcodes.ts:2138:32
      (get_global $core/cpu/cpu/Cpu.stackPointer)
-     ;;@ core/cpu/opcodes.ts:2139:50
+     ;;@ core/cpu/opcodes.ts:2138:50
      (get_global $core/cpu/cpu/Cpu.programCounter)
     )
-    ;;@ core/cpu/opcodes.ts:2140:6
+    ;;@ core/cpu/opcodes.ts:2139:6
     (set_global $core/cpu/cpu/Cpu.programCounter
-     ;;@ core/cpu/opcodes.ts:2140:27
+     ;;@ core/cpu/opcodes.ts:2139:27
      (i32.const 40)
     )
-    ;;@ core/cpu/opcodes.ts:2141:13
+    ;;@ core/cpu/opcodes.ts:2140:13
     (return
      (i32.const 8)
     )
@@ -20763,19 +20763,19 @@
     (i32.const -1)
    )
   )
-  ;;@ core/cpu/opcodes.ts:2053:6
+  ;;@ core/cpu/opcodes.ts:2052:6
   (set_global $core/cpu/cpu/Cpu.programCounter
-   ;;@ core/cpu/opcodes.ts:2053:27
+   ;;@ core/cpu/opcodes.ts:2052:27
    (call $core/portable/portable/u16Portable
-    ;;@ core/cpu/opcodes.ts:2053:39
+    ;;@ core/cpu/opcodes.ts:2052:39
     (i32.add
      (get_global $core/cpu/cpu/Cpu.programCounter)
-     ;;@ core/cpu/opcodes.ts:2053:60
+     ;;@ core/cpu/opcodes.ts:2052:60
      (i32.const 1)
     )
    )
   )
-  ;;@ core/cpu/opcodes.ts:2054:13
+  ;;@ core/cpu/opcodes.ts:2053:13
   (i32.const 4)
  )
  (func $core/cpu/opcodes/handleOpcodeFx (; 225 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
@@ -20797,7 +20797,7 @@
                  (if
                   (i32.ne
                    (get_local $0)
-                   ;;@ core/cpu/opcodes.ts:2148:9
+                   ;;@ core/cpu/opcodes.ts:2147:9
                    (i32.const 240)
                   )
                   (block
@@ -20812,20 +20812,20 @@
                    (br $break|0)
                   )
                  )
-                 ;;@ core/cpu/opcodes.ts:2154:6
+                 ;;@ core/cpu/opcodes.ts:2153:6
                  (set_global $core/cpu/cpu/Cpu.registerA
-                  ;;@ core/cpu/opcodes.ts:2154:22
+                  ;;@ core/cpu/opcodes.ts:2153:22
                   (call $core/helpers/index/splitLowByte
-                   ;;@ core/cpu/opcodes.ts:2154:33
+                   ;;@ core/cpu/opcodes.ts:2153:33
                    (call $core/cpu/opcodes/eightBitLoadSyncCycles
-                    ;;@ core/cpu/opcodes.ts:2154:60
+                    ;;@ core/cpu/opcodes.ts:2153:60
                     (i32.add
-                     ;;@ core/cpu/opcodes.ts:2152:34
+                     ;;@ core/cpu/opcodes.ts:2151:34
                      (i32.and
                       (call $core/cpu/opcodes/getDataByteOne)
                       (i32.const 255)
                      )
-                     ;;@ core/cpu/opcodes.ts:2154:60
+                     ;;@ core/cpu/opcodes.ts:2153:60
                      (i32.const 65280)
                     )
                    )
@@ -20833,44 +20833,44 @@
                  )
                  (br $folding-inner0)
                 )
-                ;;@ core/cpu/opcodes.ts:2162:6
+                ;;@ core/cpu/opcodes.ts:2161:6
                 (set_local $0
-                 ;;@ core/cpu/opcodes.ts:2162:29
+                 ;;@ core/cpu/opcodes.ts:2161:29
                  (i32.and
-                  ;;@ core/cpu/opcodes.ts:2162:34
+                  ;;@ core/cpu/opcodes.ts:2161:34
                   (call $core/cpu/opcodes/sixteenBitLoadSyncCycles
-                   ;;@ core/cpu/opcodes.ts:2162:59
+                   ;;@ core/cpu/opcodes.ts:2161:59
                    (get_global $core/cpu/cpu/Cpu.stackPointer)
                   )
                   (i32.const 65535)
                  )
                 )
-                ;;@ core/cpu/opcodes.ts:2163:6
+                ;;@ core/cpu/opcodes.ts:2162:6
                 (set_global $core/cpu/cpu/Cpu.stackPointer
-                 ;;@ core/cpu/opcodes.ts:2163:25
+                 ;;@ core/cpu/opcodes.ts:2162:25
                  (call $core/portable/portable/u16Portable
-                  ;;@ core/cpu/opcodes.ts:2163:37
+                  ;;@ core/cpu/opcodes.ts:2162:37
                   (i32.add
                    (get_global $core/cpu/cpu/Cpu.stackPointer)
-                   ;;@ core/cpu/opcodes.ts:2163:56
+                   ;;@ core/cpu/opcodes.ts:2162:56
                    (i32.const 2)
                   )
                  )
                 )
-                ;;@ core/cpu/opcodes.ts:2164:6
+                ;;@ core/cpu/opcodes.ts:2163:6
                 (set_global $core/cpu/cpu/Cpu.registerA
                  (i32.and
-                  ;;@ core/cpu/opcodes.ts:2164:22
+                  ;;@ core/cpu/opcodes.ts:2163:22
                   (call $core/helpers/index/splitHighByte
                    (get_local $0)
                   )
                   (i32.const 255)
                  )
                 )
-                ;;@ core/cpu/opcodes.ts:2165:6
+                ;;@ core/cpu/opcodes.ts:2164:6
                 (set_global $core/cpu/cpu/Cpu.registerF
                  (i32.and
-                  ;;@ core/cpu/opcodes.ts:2165:22
+                  ;;@ core/cpu/opcodes.ts:2164:22
                   (call $core/helpers/index/splitLowByte
                    (get_local $0)
                   )
@@ -20879,17 +20879,17 @@
                 )
                 (br $folding-inner1)
                )
-               ;;@ core/cpu/opcodes.ts:2171:6
+               ;;@ core/cpu/opcodes.ts:2170:6
                (set_global $core/cpu/cpu/Cpu.registerA
-                ;;@ core/cpu/opcodes.ts:2171:22
+                ;;@ core/cpu/opcodes.ts:2170:22
                 (call $core/helpers/index/splitLowByte
-                 ;;@ core/cpu/opcodes.ts:2171:33
+                 ;;@ core/cpu/opcodes.ts:2170:33
                  (call $core/cpu/opcodes/eightBitLoadSyncCycles
-                  ;;@ core/cpu/opcodes.ts:2171:60
+                  ;;@ core/cpu/opcodes.ts:2170:60
                   (i32.add
-                   ;;@ core/cpu/opcodes.ts:2171:69
+                   ;;@ core/cpu/opcodes.ts:2170:69
                    (get_global $core/cpu/cpu/Cpu.registerC)
-                   ;;@ core/cpu/opcodes.ts:2171:60
+                   ;;@ core/cpu/opcodes.ts:2170:60
                    (i32.const 65280)
                   )
                  )
@@ -20897,102 +20897,102 @@
                )
                (br $folding-inner1)
               )
-              ;;@ core/cpu/opcodes.ts:2176:6
+              ;;@ core/cpu/opcodes.ts:2175:6
               (call $core/interrupts/interrupts/setInterrupts
-               ;;@ core/cpu/opcodes.ts:2176:20
+               ;;@ core/cpu/opcodes.ts:2175:20
                (i32.const 0)
               )
               (br $folding-inner1)
              )
-             ;;@ core/cpu/opcodes.ts:2182:6
+             ;;@ core/cpu/opcodes.ts:2181:6
              (set_global $core/cpu/cpu/Cpu.stackPointer
-              ;;@ core/cpu/opcodes.ts:2182:25
+              ;;@ core/cpu/opcodes.ts:2181:25
               (call $core/portable/portable/u16Portable
-               ;;@ core/cpu/opcodes.ts:2182:37
+               ;;@ core/cpu/opcodes.ts:2181:37
                (i32.sub
                 (get_global $core/cpu/cpu/Cpu.stackPointer)
-                ;;@ core/cpu/opcodes.ts:2182:56
+                ;;@ core/cpu/opcodes.ts:2181:56
                 (i32.const 2)
                )
               )
              )
-             ;;@ core/cpu/opcodes.ts:2184:6
+             ;;@ core/cpu/opcodes.ts:2183:6
              (call $core/cpu/opcodes/sixteenBitStoreSyncCycles
-              ;;@ core/cpu/opcodes.ts:2184:32
+              ;;@ core/cpu/opcodes.ts:2183:32
               (get_global $core/cpu/cpu/Cpu.stackPointer)
-              ;;@ core/cpu/opcodes.ts:2184:50
+              ;;@ core/cpu/opcodes.ts:2183:50
               (call $core/helpers/index/concatenateBytes
-               ;;@ core/cpu/opcodes.ts:2184:67
+               ;;@ core/cpu/opcodes.ts:2183:67
                (get_global $core/cpu/cpu/Cpu.registerA)
-               ;;@ core/cpu/opcodes.ts:2184:82
+               ;;@ core/cpu/opcodes.ts:2183:82
                (get_global $core/cpu/cpu/Cpu.registerF)
               )
              )
-             ;;@ core/cpu/opcodes.ts:2185:13
+             ;;@ core/cpu/opcodes.ts:2184:13
              (return
               (i32.const 8)
              )
             )
-            ;;@ core/cpu/opcodes.ts:2191:6
+            ;;@ core/cpu/opcodes.ts:2190:6
             (call $core/cpu/instructions/orARegister
-             ;;@ core/cpu/opcodes.ts:2191:18
+             ;;@ core/cpu/opcodes.ts:2190:18
              (call $core/cpu/opcodes/getDataByteOne)
             )
             (br $folding-inner0)
            )
-           ;;@ core/cpu/opcodes.ts:2197:6
+           ;;@ core/cpu/opcodes.ts:2196:6
            (set_global $core/cpu/cpu/Cpu.stackPointer
-            ;;@ core/cpu/opcodes.ts:2197:25
+            ;;@ core/cpu/opcodes.ts:2196:25
             (call $core/portable/portable/u16Portable
-             ;;@ core/cpu/opcodes.ts:2197:37
+             ;;@ core/cpu/opcodes.ts:2196:37
              (i32.sub
               (get_global $core/cpu/cpu/Cpu.stackPointer)
-              ;;@ core/cpu/opcodes.ts:2197:56
+              ;;@ core/cpu/opcodes.ts:2196:56
               (i32.const 2)
              )
             )
            )
-           ;;@ core/cpu/opcodes.ts:2199:6
+           ;;@ core/cpu/opcodes.ts:2198:6
            (call $core/cpu/opcodes/sixteenBitStoreSyncCycles
-            ;;@ core/cpu/opcodes.ts:2199:32
+            ;;@ core/cpu/opcodes.ts:2198:32
             (get_global $core/cpu/cpu/Cpu.stackPointer)
-            ;;@ core/cpu/opcodes.ts:2199:50
+            ;;@ core/cpu/opcodes.ts:2198:50
             (get_global $core/cpu/cpu/Cpu.programCounter)
            )
-           ;;@ core/cpu/opcodes.ts:2200:6
+           ;;@ core/cpu/opcodes.ts:2199:6
            (set_global $core/cpu/cpu/Cpu.programCounter
-            ;;@ core/cpu/opcodes.ts:2200:27
+            ;;@ core/cpu/opcodes.ts:2199:27
             (i32.const 48)
            )
-           ;;@ core/cpu/opcodes.ts:2201:13
+           ;;@ core/cpu/opcodes.ts:2200:13
            (return
             (i32.const 8)
            )
           )
-          ;;@ core/cpu/opcodes.ts:2208:6
+          ;;@ core/cpu/opcodes.ts:2207:6
           (set_local $0
-           ;;@ core/cpu/opcodes.ts:2208:34
+           ;;@ core/cpu/opcodes.ts:2207:34
            (call $core/portable/portable/i8Portable
-            ;;@ core/cpu/opcodes.ts:2208:45
+            ;;@ core/cpu/opcodes.ts:2207:45
             (call $core/cpu/opcodes/getDataByteOne)
            )
           )
-          ;;@ core/cpu/opcodes.ts:2211:6
+          ;;@ core/cpu/opcodes.ts:2210:6
           (call $core/cpu/flags/setZeroFlag
-           ;;@ core/cpu/opcodes.ts:2211:18
+           ;;@ core/cpu/opcodes.ts:2210:18
+           (i32.const 0)
+          )
+          ;;@ core/cpu/opcodes.ts:2211:6
+          (call $core/cpu/flags/setSubtractFlag
+           ;;@ core/cpu/opcodes.ts:2211:22
            (i32.const 0)
           )
           ;;@ core/cpu/opcodes.ts:2212:6
-          (call $core/cpu/flags/setSubtractFlag
-           ;;@ core/cpu/opcodes.ts:2212:22
-           (i32.const 0)
-          )
-          ;;@ core/cpu/opcodes.ts:2213:6
           (call $core/cpu/flags/checkAndSetSixteenBitFlagsAddOverflow
-           ;;@ core/cpu/opcodes.ts:2213:44
+           ;;@ core/cpu/opcodes.ts:2212:44
            (get_global $core/cpu/cpu/Cpu.stackPointer)
            (tee_local $0
-            ;;@ core/cpu/opcodes.ts:2213:62
+            ;;@ core/cpu/opcodes.ts:2212:62
             (i32.shr_s
              (i32.shl
               (get_local $0)
@@ -21001,19 +21001,19 @@
              (i32.const 24)
             )
            )
-           ;;@ core/cpu/opcodes.ts:2213:81
+           ;;@ core/cpu/opcodes.ts:2212:81
            (i32.const 1)
           )
-          ;;@ core/cpu/opcodes.ts:2215:6
+          ;;@ core/cpu/opcodes.ts:2214:6
           (set_global $core/cpu/cpu/Cpu.registerH
            (i32.and
-            ;;@ core/cpu/opcodes.ts:2215:22
+            ;;@ core/cpu/opcodes.ts:2214:22
             (call $core/helpers/index/splitHighByte
-             ;;@ core/cpu/opcodes.ts:2214:6
+             ;;@ core/cpu/opcodes.ts:2213:6
              (tee_local $0
-              ;;@ core/cpu/opcodes.ts:2214:23
+              ;;@ core/cpu/opcodes.ts:2213:23
               (call $core/portable/portable/u16Portable
-               ;;@ core/cpu/opcodes.ts:2214:35
+               ;;@ core/cpu/opcodes.ts:2213:35
                (i32.add
                 (get_global $core/cpu/cpu/Cpu.stackPointer)
                 (get_local $0)
@@ -21024,57 +21024,57 @@
             (i32.const 255)
            )
           )
-          ;;@ core/cpu/opcodes.ts:2216:6
+          ;;@ core/cpu/opcodes.ts:2215:6
           (set_global $core/cpu/cpu/Cpu.registerL
            (i32.and
-            ;;@ core/cpu/opcodes.ts:2216:22
+            ;;@ core/cpu/opcodes.ts:2215:22
             (call $core/helpers/index/splitLowByte
              (get_local $0)
             )
             (i32.const 255)
            )
           )
-          ;;@ core/cpu/opcodes.ts:2217:6
+          ;;@ core/cpu/opcodes.ts:2216:6
           (set_global $core/cpu/cpu/Cpu.programCounter
-           ;;@ core/cpu/opcodes.ts:2217:27
+           ;;@ core/cpu/opcodes.ts:2216:27
            (call $core/portable/portable/u16Portable
-            ;;@ core/cpu/opcodes.ts:2217:39
+            ;;@ core/cpu/opcodes.ts:2216:39
             (i32.add
              (get_global $core/cpu/cpu/Cpu.programCounter)
-             ;;@ core/cpu/opcodes.ts:2217:60
+             ;;@ core/cpu/opcodes.ts:2216:60
              (i32.const 1)
             )
            )
           )
-          ;;@ core/cpu/opcodes.ts:2218:13
+          ;;@ core/cpu/opcodes.ts:2217:13
           (return
            (i32.const 8)
           )
          )
-         ;;@ core/cpu/opcodes.ts:2222:6
+         ;;@ core/cpu/opcodes.ts:2221:6
          (set_global $core/cpu/cpu/Cpu.stackPointer
           (i32.and
-           ;;@ core/cpu/opcodes.ts:2222:25
+           ;;@ core/cpu/opcodes.ts:2221:25
            (call $core/helpers/index/concatenateBytes
-            ;;@ core/cpu/opcodes.ts:2222:47
+            ;;@ core/cpu/opcodes.ts:2221:47
             (get_global $core/cpu/cpu/Cpu.registerH)
-            ;;@ core/cpu/opcodes.ts:2222:62
+            ;;@ core/cpu/opcodes.ts:2221:62
             (get_global $core/cpu/cpu/Cpu.registerL)
            )
            (i32.const 65535)
           )
          )
-         ;;@ core/cpu/opcodes.ts:2223:13
+         ;;@ core/cpu/opcodes.ts:2222:13
          (return
           (i32.const 8)
          )
         )
-        ;;@ core/cpu/opcodes.ts:2228:6
+        ;;@ core/cpu/opcodes.ts:2227:6
         (set_global $core/cpu/cpu/Cpu.registerA
          (i32.and
-          ;;@ core/cpu/opcodes.ts:2228:22
+          ;;@ core/cpu/opcodes.ts:2227:22
           (call $core/cpu/opcodes/eightBitLoadSyncCycles
-           ;;@ core/cpu/opcodes.ts:2228:49
+           ;;@ core/cpu/opcodes.ts:2227:49
            (i32.and
             (call $core/cpu/opcodes/getConcatenatedDataByte)
             (i32.const 65535)
@@ -21083,59 +21083,59 @@
           (i32.const 255)
          )
         )
-        ;;@ core/cpu/opcodes.ts:2229:6
+        ;;@ core/cpu/opcodes.ts:2228:6
         (set_global $core/cpu/cpu/Cpu.programCounter
-         ;;@ core/cpu/opcodes.ts:2229:27
+         ;;@ core/cpu/opcodes.ts:2228:27
          (call $core/portable/portable/u16Portable
-          ;;@ core/cpu/opcodes.ts:2229:39
+          ;;@ core/cpu/opcodes.ts:2228:39
           (i32.add
            (get_global $core/cpu/cpu/Cpu.programCounter)
-           ;;@ core/cpu/opcodes.ts:2229:60
+           ;;@ core/cpu/opcodes.ts:2228:60
            (i32.const 2)
           )
          )
         )
         (br $folding-inner1)
        )
-       ;;@ core/cpu/opcodes.ts:2234:6
+       ;;@ core/cpu/opcodes.ts:2233:6
        (call $core/interrupts/interrupts/setInterrupts
-        ;;@ core/cpu/opcodes.ts:2234:20
+        ;;@ core/cpu/opcodes.ts:2233:20
         (i32.const 1)
        )
        (br $folding-inner1)
       )
-      ;;@ core/cpu/opcodes.ts:2242:6
+      ;;@ core/cpu/opcodes.ts:2241:6
       (call $core/cpu/instructions/cpARegister
-       ;;@ core/cpu/opcodes.ts:2242:18
+       ;;@ core/cpu/opcodes.ts:2241:18
        (call $core/cpu/opcodes/getDataByteOne)
       )
       (br $folding-inner0)
      )
-     ;;@ core/cpu/opcodes.ts:2248:6
+     ;;@ core/cpu/opcodes.ts:2247:6
      (set_global $core/cpu/cpu/Cpu.stackPointer
-      ;;@ core/cpu/opcodes.ts:2248:25
+      ;;@ core/cpu/opcodes.ts:2247:25
       (call $core/portable/portable/u16Portable
-       ;;@ core/cpu/opcodes.ts:2248:37
+       ;;@ core/cpu/opcodes.ts:2247:37
        (i32.sub
         (get_global $core/cpu/cpu/Cpu.stackPointer)
-        ;;@ core/cpu/opcodes.ts:2248:56
+        ;;@ core/cpu/opcodes.ts:2247:56
         (i32.const 2)
        )
       )
      )
-     ;;@ core/cpu/opcodes.ts:2250:6
+     ;;@ core/cpu/opcodes.ts:2249:6
      (call $core/cpu/opcodes/sixteenBitStoreSyncCycles
-      ;;@ core/cpu/opcodes.ts:2250:32
+      ;;@ core/cpu/opcodes.ts:2249:32
       (get_global $core/cpu/cpu/Cpu.stackPointer)
-      ;;@ core/cpu/opcodes.ts:2250:50
+      ;;@ core/cpu/opcodes.ts:2249:50
       (get_global $core/cpu/cpu/Cpu.programCounter)
      )
-     ;;@ core/cpu/opcodes.ts:2251:6
+     ;;@ core/cpu/opcodes.ts:2250:6
      (set_global $core/cpu/cpu/Cpu.programCounter
-      ;;@ core/cpu/opcodes.ts:2251:27
+      ;;@ core/cpu/opcodes.ts:2250:27
       (i32.const 56)
      )
-     ;;@ core/cpu/opcodes.ts:2252:13
+     ;;@ core/cpu/opcodes.ts:2251:13
      (return
       (i32.const 8)
      )
@@ -21144,20 +21144,20 @@
      (i32.const -1)
     )
    )
-   ;;@ core/cpu/opcodes.ts:2155:6
+   ;;@ core/cpu/opcodes.ts:2154:6
    (set_global $core/cpu/cpu/Cpu.programCounter
-    ;;@ core/cpu/opcodes.ts:2155:27
+    ;;@ core/cpu/opcodes.ts:2154:27
     (call $core/portable/portable/u16Portable
-     ;;@ core/cpu/opcodes.ts:2155:39
+     ;;@ core/cpu/opcodes.ts:2154:39
      (i32.add
       (get_global $core/cpu/cpu/Cpu.programCounter)
-      ;;@ core/cpu/opcodes.ts:2155:60
+      ;;@ core/cpu/opcodes.ts:2154:60
       (i32.const 1)
      )
     )
    )
   )
-  ;;@ core/cpu/opcodes.ts:2166:13
+  ;;@ core/cpu/opcodes.ts:2165:13
   (i32.const 4)
  )
  (func $core/cpu/opcodes/executeOpcode (; 226 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
@@ -21207,17 +21207,17 @@
                (block $case2|0
                 (block $case1|0
                  (if
-                  ;;@ core/cpu/opcodes.ts:91:2
+                  ;;@ core/cpu/opcodes.ts:90:2
                   (tee_local $1
-                   ;;@ core/cpu/opcodes.ts:91:21
+                   ;;@ core/cpu/opcodes.ts:90:21
                    (i32.shr_s
-                    ;;@ core/cpu/opcodes.ts:90:30
+                    ;;@ core/cpu/opcodes.ts:89:30
                     (i32.and
                      (get_local $0)
-                     ;;@ core/cpu/opcodes.ts:90:39
+                     ;;@ core/cpu/opcodes.ts:89:39
                      (i32.const 240)
                     )
-                    ;;@ core/cpu/opcodes.ts:91:41
+                    ;;@ core/cpu/opcodes.ts:90:41
                     (i32.const 4)
                    )
                   )
@@ -21225,7 +21225,7 @@
                    (br_if $case1|0
                     (i32.eq
                      (get_local $1)
-                     ;;@ core/cpu/opcodes.ts:103:9
+                     ;;@ core/cpu/opcodes.ts:102:9
                      (i32.const 1)
                     )
                    )
@@ -21240,161 +21240,161 @@
                    (br $case15|0)
                   )
                  )
-                 ;;@ core/cpu/opcodes.ts:102:34
+                 ;;@ core/cpu/opcodes.ts:101:34
                  (return
-                  ;;@ core/cpu/opcodes.ts:102:13
+                  ;;@ core/cpu/opcodes.ts:101:13
                   (call $core/cpu/opcodes/handleOpcode0x
                    (get_local $0)
                   )
                  )
                 )
-                ;;@ core/cpu/opcodes.ts:104:34
+                ;;@ core/cpu/opcodes.ts:103:34
                 (return
-                 ;;@ core/cpu/opcodes.ts:104:13
+                 ;;@ core/cpu/opcodes.ts:103:13
                  (call $core/cpu/opcodes/handleOpcode1x
                   (get_local $0)
                  )
                 )
                )
-               ;;@ core/cpu/opcodes.ts:106:34
+               ;;@ core/cpu/opcodes.ts:105:34
                (return
-                ;;@ core/cpu/opcodes.ts:106:13
+                ;;@ core/cpu/opcodes.ts:105:13
                 (call $core/cpu/opcodes/handleOpcode2x
                  (get_local $0)
                 )
                )
               )
-              ;;@ core/cpu/opcodes.ts:108:34
+              ;;@ core/cpu/opcodes.ts:107:34
               (return
-               ;;@ core/cpu/opcodes.ts:108:13
+               ;;@ core/cpu/opcodes.ts:107:13
                (call $core/cpu/opcodes/handleOpcode3x
                 (get_local $0)
                )
               )
              )
-             ;;@ core/cpu/opcodes.ts:110:34
+             ;;@ core/cpu/opcodes.ts:109:34
              (return
-              ;;@ core/cpu/opcodes.ts:110:13
+              ;;@ core/cpu/opcodes.ts:109:13
               (call $core/cpu/opcodes/handleOpcode4x
                (get_local $0)
               )
              )
             )
-            ;;@ core/cpu/opcodes.ts:112:34
+            ;;@ core/cpu/opcodes.ts:111:34
             (return
-             ;;@ core/cpu/opcodes.ts:112:13
+             ;;@ core/cpu/opcodes.ts:111:13
              (call $core/cpu/opcodes/handleOpcode5x
               (get_local $0)
              )
             )
            )
-           ;;@ core/cpu/opcodes.ts:114:34
+           ;;@ core/cpu/opcodes.ts:113:34
            (return
-            ;;@ core/cpu/opcodes.ts:114:13
+            ;;@ core/cpu/opcodes.ts:113:13
             (call $core/cpu/opcodes/handleOpcode6x
              (get_local $0)
             )
            )
           )
-          ;;@ core/cpu/opcodes.ts:116:34
+          ;;@ core/cpu/opcodes.ts:115:34
           (return
-           ;;@ core/cpu/opcodes.ts:116:13
+           ;;@ core/cpu/opcodes.ts:115:13
            (call $core/cpu/opcodes/handleOpcode7x
             (get_local $0)
            )
           )
          )
-         ;;@ core/cpu/opcodes.ts:118:34
+         ;;@ core/cpu/opcodes.ts:117:34
          (return
-          ;;@ core/cpu/opcodes.ts:118:13
+          ;;@ core/cpu/opcodes.ts:117:13
           (call $core/cpu/opcodes/handleOpcode8x
            (get_local $0)
           )
          )
         )
-        ;;@ core/cpu/opcodes.ts:120:34
+        ;;@ core/cpu/opcodes.ts:119:34
         (return
-         ;;@ core/cpu/opcodes.ts:120:13
+         ;;@ core/cpu/opcodes.ts:119:13
          (call $core/cpu/opcodes/handleOpcode9x
           (get_local $0)
          )
         )
        )
-       ;;@ core/cpu/opcodes.ts:122:34
+       ;;@ core/cpu/opcodes.ts:121:34
        (return
-        ;;@ core/cpu/opcodes.ts:122:13
+        ;;@ core/cpu/opcodes.ts:121:13
         (call $core/cpu/opcodes/handleOpcodeAx
          (get_local $0)
         )
        )
       )
-      ;;@ core/cpu/opcodes.ts:124:34
+      ;;@ core/cpu/opcodes.ts:123:34
       (return
-       ;;@ core/cpu/opcodes.ts:124:13
+       ;;@ core/cpu/opcodes.ts:123:13
        (call $core/cpu/opcodes/handleOpcodeBx
         (get_local $0)
        )
       )
      )
-     ;;@ core/cpu/opcodes.ts:126:34
+     ;;@ core/cpu/opcodes.ts:125:34
      (return
-      ;;@ core/cpu/opcodes.ts:126:13
+      ;;@ core/cpu/opcodes.ts:125:13
       (call $core/cpu/opcodes/handleOpcodeCx
        (get_local $0)
       )
      )
     )
-    ;;@ core/cpu/opcodes.ts:128:34
+    ;;@ core/cpu/opcodes.ts:127:34
     (return
-     ;;@ core/cpu/opcodes.ts:128:13
+     ;;@ core/cpu/opcodes.ts:127:13
      (call $core/cpu/opcodes/handleOpcodeDx
       (get_local $0)
      )
     )
    )
-   ;;@ core/cpu/opcodes.ts:130:34
+   ;;@ core/cpu/opcodes.ts:129:34
    (return
-    ;;@ core/cpu/opcodes.ts:130:13
+    ;;@ core/cpu/opcodes.ts:129:13
     (call $core/cpu/opcodes/handleOpcodeEx
      (get_local $0)
     )
    )
   )
-  ;;@ core/cpu/opcodes.ts:132:13
+  ;;@ core/cpu/opcodes.ts:131:13
   (call $core/cpu/opcodes/handleOpcodeFx
    (get_local $0)
   )
  )
  (func $core/cpu/cpu/Cpu.exitHaltAndStop (; 227 ;) (; has Stack IR ;) (type $v)
-  ;;@ core/cpu/cpu.ts:92:4
+  ;;@ core/cpu/cpu.ts:90:4
   (set_global $core/cpu/cpu/Cpu.isHaltNoJump
-   ;;@ core/cpu/cpu.ts:92:23
+   ;;@ core/cpu/cpu.ts:90:23
+   (i32.const 0)
+  )
+  ;;@ core/cpu/cpu.ts:91:4
+  (set_global $core/cpu/cpu/Cpu.isHaltNormal
+   ;;@ core/cpu/cpu.ts:91:23
+   (i32.const 0)
+  )
+  ;;@ core/cpu/cpu.ts:92:4
+  (set_global $core/cpu/cpu/Cpu.isHaltBug
+   ;;@ core/cpu/cpu.ts:92:20
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:93:4
-  (set_global $core/cpu/cpu/Cpu.isHaltNormal
-   ;;@ core/cpu/cpu.ts:93:23
-   (i32.const 0)
-  )
-  ;;@ core/cpu/cpu.ts:94:4
-  (set_global $core/cpu/cpu/Cpu.isHaltBug
-   ;;@ core/cpu/cpu.ts:94:20
-   (i32.const 0)
-  )
-  ;;@ core/cpu/cpu.ts:95:4
   (set_global $core/cpu/cpu/Cpu.isStopped
-   ;;@ core/cpu/cpu.ts:95:20
+   ;;@ core/cpu/cpu.ts:93:20
    (i32.const 0)
   )
  )
  (func $core/cpu/cpu/Cpu.isHalted (; 228 ;) (; has Stack IR ;) (type $i) (result i32)
-  ;;@ core/cpu/cpu.ts:99:4
+  ;;@ core/cpu/cpu.ts:97:4
   (if
-   ;;@ core/cpu/cpu.ts:99:8
+   ;;@ core/cpu/cpu.ts:97:8
    (if (result i32)
     (get_global $core/cpu/cpu/Cpu.isHaltNormal)
     (get_global $core/cpu/cpu/Cpu.isHaltNormal)
-    ;;@ core/cpu/cpu.ts:99:28
+    ;;@ core/cpu/cpu.ts:97:28
     (get_global $core/cpu/cpu/Cpu.isHaltNoJump)
    )
    (return
@@ -22228,169 +22228,169 @@
   )
  )
  (func $core/cpu/cpu/Cpu.saveState (; 239 ;) (; has Stack IR ;) (type $v)
+  ;;@ core/cpu/cpu.ts:110:4
+  (i32.store8
+   ;;@ core/cpu/cpu.ts:110:14
+   (call $core/core/getSaveStateMemoryOffset
+    ;;@ core/cpu/cpu.ts:110:39
+    (i32.const 0)
+    (i32.const 0)
+   )
+   ;;@ core/cpu/cpu.ts:110:65
+   (get_global $core/cpu/cpu/Cpu.registerA)
+  )
+  ;;@ core/cpu/cpu.ts:111:4
+  (i32.store8
+   ;;@ core/cpu/cpu.ts:111:14
+   (call $core/core/getSaveStateMemoryOffset
+    ;;@ core/cpu/cpu.ts:111:39
+    (i32.const 1)
+    (i32.const 0)
+   )
+   ;;@ core/cpu/cpu.ts:111:65
+   (get_global $core/cpu/cpu/Cpu.registerB)
+  )
   ;;@ core/cpu/cpu.ts:112:4
   (i32.store8
    ;;@ core/cpu/cpu.ts:112:14
    (call $core/core/getSaveStateMemoryOffset
     ;;@ core/cpu/cpu.ts:112:39
-    (i32.const 0)
+    (i32.const 2)
     (i32.const 0)
    )
    ;;@ core/cpu/cpu.ts:112:65
-   (get_global $core/cpu/cpu/Cpu.registerA)
+   (get_global $core/cpu/cpu/Cpu.registerC)
   )
   ;;@ core/cpu/cpu.ts:113:4
   (i32.store8
    ;;@ core/cpu/cpu.ts:113:14
    (call $core/core/getSaveStateMemoryOffset
     ;;@ core/cpu/cpu.ts:113:39
-    (i32.const 1)
+    (i32.const 3)
     (i32.const 0)
    )
    ;;@ core/cpu/cpu.ts:113:65
-   (get_global $core/cpu/cpu/Cpu.registerB)
+   (get_global $core/cpu/cpu/Cpu.registerD)
   )
   ;;@ core/cpu/cpu.ts:114:4
   (i32.store8
    ;;@ core/cpu/cpu.ts:114:14
    (call $core/core/getSaveStateMemoryOffset
     ;;@ core/cpu/cpu.ts:114:39
-    (i32.const 2)
+    (i32.const 4)
     (i32.const 0)
    )
    ;;@ core/cpu/cpu.ts:114:65
-   (get_global $core/cpu/cpu/Cpu.registerC)
+   (get_global $core/cpu/cpu/Cpu.registerE)
   )
   ;;@ core/cpu/cpu.ts:115:4
   (i32.store8
    ;;@ core/cpu/cpu.ts:115:14
    (call $core/core/getSaveStateMemoryOffset
     ;;@ core/cpu/cpu.ts:115:39
-    (i32.const 3)
+    (i32.const 5)
     (i32.const 0)
    )
    ;;@ core/cpu/cpu.ts:115:65
-   (get_global $core/cpu/cpu/Cpu.registerD)
+   (get_global $core/cpu/cpu/Cpu.registerH)
   )
   ;;@ core/cpu/cpu.ts:116:4
   (i32.store8
    ;;@ core/cpu/cpu.ts:116:14
    (call $core/core/getSaveStateMemoryOffset
     ;;@ core/cpu/cpu.ts:116:39
-    (i32.const 4)
+    (i32.const 6)
     (i32.const 0)
    )
    ;;@ core/cpu/cpu.ts:116:65
-   (get_global $core/cpu/cpu/Cpu.registerE)
+   (get_global $core/cpu/cpu/Cpu.registerL)
   )
   ;;@ core/cpu/cpu.ts:117:4
   (i32.store8
    ;;@ core/cpu/cpu.ts:117:14
    (call $core/core/getSaveStateMemoryOffset
     ;;@ core/cpu/cpu.ts:117:39
-    (i32.const 5)
-    (i32.const 0)
-   )
-   ;;@ core/cpu/cpu.ts:117:65
-   (get_global $core/cpu/cpu/Cpu.registerH)
-  )
-  ;;@ core/cpu/cpu.ts:118:4
-  (i32.store8
-   ;;@ core/cpu/cpu.ts:118:14
-   (call $core/core/getSaveStateMemoryOffset
-    ;;@ core/cpu/cpu.ts:118:39
-    (i32.const 6)
-    (i32.const 0)
-   )
-   ;;@ core/cpu/cpu.ts:118:65
-   (get_global $core/cpu/cpu/Cpu.registerL)
-  )
-  ;;@ core/cpu/cpu.ts:119:4
-  (i32.store8
-   ;;@ core/cpu/cpu.ts:119:14
-   (call $core/core/getSaveStateMemoryOffset
-    ;;@ core/cpu/cpu.ts:119:39
     (i32.const 7)
     (i32.const 0)
    )
-   ;;@ core/cpu/cpu.ts:119:65
+   ;;@ core/cpu/cpu.ts:117:65
    (get_global $core/cpu/cpu/Cpu.registerF)
   )
-  ;;@ core/cpu/cpu.ts:121:4
+  ;;@ core/cpu/cpu.ts:119:4
   (i32.store16
-   ;;@ core/cpu/cpu.ts:121:15
+   ;;@ core/cpu/cpu.ts:119:15
    (call $core/core/getSaveStateMemoryOffset
-    ;;@ core/cpu/cpu.ts:121:40
+    ;;@ core/cpu/cpu.ts:119:40
     (i32.const 8)
     (i32.const 0)
    )
-   ;;@ core/cpu/cpu.ts:121:66
+   ;;@ core/cpu/cpu.ts:119:66
    (get_global $core/cpu/cpu/Cpu.stackPointer)
   )
-  ;;@ core/cpu/cpu.ts:122:4
+  ;;@ core/cpu/cpu.ts:120:4
   (i32.store16
-   ;;@ core/cpu/cpu.ts:122:15
+   ;;@ core/cpu/cpu.ts:120:15
    (call $core/core/getSaveStateMemoryOffset
-    ;;@ core/cpu/cpu.ts:122:40
+    ;;@ core/cpu/cpu.ts:120:40
     (i32.const 10)
     (i32.const 0)
    )
-   ;;@ core/cpu/cpu.ts:122:66
+   ;;@ core/cpu/cpu.ts:120:66
    (get_global $core/cpu/cpu/Cpu.programCounter)
   )
-  ;;@ core/cpu/cpu.ts:124:4
+  ;;@ core/cpu/cpu.ts:122:4
   (i32.store
-   ;;@ core/cpu/cpu.ts:124:15
+   ;;@ core/cpu/cpu.ts:122:15
    (call $core/core/getSaveStateMemoryOffset
-    ;;@ core/cpu/cpu.ts:124:40
+    ;;@ core/cpu/cpu.ts:122:40
     (i32.const 12)
     (i32.const 0)
    )
-   ;;@ core/cpu/cpu.ts:124:66
+   ;;@ core/cpu/cpu.ts:122:66
    (get_global $core/cpu/cpu/Cpu.currentCycles)
+  )
+  ;;@ core/cpu/cpu.ts:124:4
+  (call $core/memory/store/storeBooleanDirectlyToWasmMemory
+   ;;@ core/cpu/cpu.ts:124:37
+   (call $core/core/getSaveStateMemoryOffset
+    ;;@ core/cpu/cpu.ts:124:62
+    (i32.const 17)
+    (i32.const 0)
+   )
+   ;;@ core/cpu/cpu.ts:124:88
+   (get_global $core/cpu/cpu/Cpu.isHaltNormal)
+  )
+  ;;@ core/cpu/cpu.ts:125:4
+  (call $core/memory/store/storeBooleanDirectlyToWasmMemory
+   ;;@ core/cpu/cpu.ts:125:37
+   (call $core/core/getSaveStateMemoryOffset
+    ;;@ core/cpu/cpu.ts:125:62
+    (i32.const 18)
+    (i32.const 0)
+   )
+   ;;@ core/cpu/cpu.ts:125:88
+   (get_global $core/cpu/cpu/Cpu.isHaltNoJump)
   )
   ;;@ core/cpu/cpu.ts:126:4
   (call $core/memory/store/storeBooleanDirectlyToWasmMemory
    ;;@ core/cpu/cpu.ts:126:37
    (call $core/core/getSaveStateMemoryOffset
     ;;@ core/cpu/cpu.ts:126:62
-    (i32.const 17)
+    (i32.const 19)
     (i32.const 0)
    )
    ;;@ core/cpu/cpu.ts:126:88
-   (get_global $core/cpu/cpu/Cpu.isHaltNormal)
+   (get_global $core/cpu/cpu/Cpu.isHaltBug)
   )
   ;;@ core/cpu/cpu.ts:127:4
   (call $core/memory/store/storeBooleanDirectlyToWasmMemory
    ;;@ core/cpu/cpu.ts:127:37
    (call $core/core/getSaveStateMemoryOffset
     ;;@ core/cpu/cpu.ts:127:62
-    (i32.const 18)
-    (i32.const 0)
-   )
-   ;;@ core/cpu/cpu.ts:127:88
-   (get_global $core/cpu/cpu/Cpu.isHaltNoJump)
-  )
-  ;;@ core/cpu/cpu.ts:128:4
-  (call $core/memory/store/storeBooleanDirectlyToWasmMemory
-   ;;@ core/cpu/cpu.ts:128:37
-   (call $core/core/getSaveStateMemoryOffset
-    ;;@ core/cpu/cpu.ts:128:62
-    (i32.const 19)
-    (i32.const 0)
-   )
-   ;;@ core/cpu/cpu.ts:128:88
-   (get_global $core/cpu/cpu/Cpu.isHaltBug)
-  )
-  ;;@ core/cpu/cpu.ts:129:4
-  (call $core/memory/store/storeBooleanDirectlyToWasmMemory
-   ;;@ core/cpu/cpu.ts:129:37
-   (call $core/core/getSaveStateMemoryOffset
-    ;;@ core/cpu/cpu.ts:129:62
     (i32.const 20)
     (i32.const 0)
    )
-   ;;@ core/cpu/cpu.ts:129:88
+   ;;@ core/cpu/cpu.ts:127:88
    (get_global $core/cpu/cpu/Cpu.isStopped)
   )
  )
@@ -22992,181 +22992,181 @@
   (i32.const 0)
  )
  (func $core/cpu/cpu/Cpu.loadState (; 252 ;) (; has Stack IR ;) (type $v)
-  ;;@ core/cpu/cpu.ts:135:4
+  ;;@ core/cpu/cpu.ts:133:4
   (set_global $core/cpu/cpu/Cpu.registerA
-   ;;@ core/cpu/cpu.ts:135:20
+   ;;@ core/cpu/cpu.ts:133:20
    (i32.load8_u
-    ;;@ core/cpu/cpu.ts:135:29
+    ;;@ core/cpu/cpu.ts:133:29
     (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/cpu/cpu.ts:135:54
+     ;;@ core/cpu/cpu.ts:133:54
      (i32.const 0)
      (i32.const 0)
     )
    )
   )
-  ;;@ core/cpu/cpu.ts:136:4
+  ;;@ core/cpu/cpu.ts:134:4
   (set_global $core/cpu/cpu/Cpu.registerB
-   ;;@ core/cpu/cpu.ts:136:20
+   ;;@ core/cpu/cpu.ts:134:20
    (i32.load8_u
-    ;;@ core/cpu/cpu.ts:136:29
+    ;;@ core/cpu/cpu.ts:134:29
     (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/cpu/cpu.ts:136:54
+     ;;@ core/cpu/cpu.ts:134:54
      (i32.const 1)
      (i32.const 0)
     )
    )
   )
-  ;;@ core/cpu/cpu.ts:137:4
+  ;;@ core/cpu/cpu.ts:135:4
   (set_global $core/cpu/cpu/Cpu.registerC
-   ;;@ core/cpu/cpu.ts:137:20
+   ;;@ core/cpu/cpu.ts:135:20
    (i32.load8_u
-    ;;@ core/cpu/cpu.ts:137:29
+    ;;@ core/cpu/cpu.ts:135:29
     (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/cpu/cpu.ts:137:54
+     ;;@ core/cpu/cpu.ts:135:54
      (i32.const 2)
      (i32.const 0)
     )
    )
   )
-  ;;@ core/cpu/cpu.ts:138:4
+  ;;@ core/cpu/cpu.ts:136:4
   (set_global $core/cpu/cpu/Cpu.registerD
-   ;;@ core/cpu/cpu.ts:138:20
+   ;;@ core/cpu/cpu.ts:136:20
    (i32.load8_u
-    ;;@ core/cpu/cpu.ts:138:29
+    ;;@ core/cpu/cpu.ts:136:29
     (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/cpu/cpu.ts:138:54
+     ;;@ core/cpu/cpu.ts:136:54
      (i32.const 3)
      (i32.const 0)
     )
    )
   )
-  ;;@ core/cpu/cpu.ts:139:4
+  ;;@ core/cpu/cpu.ts:137:4
   (set_global $core/cpu/cpu/Cpu.registerE
-   ;;@ core/cpu/cpu.ts:139:20
+   ;;@ core/cpu/cpu.ts:137:20
    (i32.load8_u
-    ;;@ core/cpu/cpu.ts:139:29
+    ;;@ core/cpu/cpu.ts:137:29
     (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/cpu/cpu.ts:139:54
+     ;;@ core/cpu/cpu.ts:137:54
      (i32.const 4)
      (i32.const 0)
     )
    )
   )
-  ;;@ core/cpu/cpu.ts:140:4
+  ;;@ core/cpu/cpu.ts:138:4
   (set_global $core/cpu/cpu/Cpu.registerH
-   ;;@ core/cpu/cpu.ts:140:20
+   ;;@ core/cpu/cpu.ts:138:20
    (i32.load8_u
-    ;;@ core/cpu/cpu.ts:140:29
+    ;;@ core/cpu/cpu.ts:138:29
     (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/cpu/cpu.ts:140:54
+     ;;@ core/cpu/cpu.ts:138:54
      (i32.const 5)
      (i32.const 0)
     )
    )
   )
-  ;;@ core/cpu/cpu.ts:141:4
+  ;;@ core/cpu/cpu.ts:139:4
   (set_global $core/cpu/cpu/Cpu.registerL
-   ;;@ core/cpu/cpu.ts:141:20
+   ;;@ core/cpu/cpu.ts:139:20
    (i32.load8_u
-    ;;@ core/cpu/cpu.ts:141:29
+    ;;@ core/cpu/cpu.ts:139:29
     (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/cpu/cpu.ts:141:54
+     ;;@ core/cpu/cpu.ts:139:54
      (i32.const 6)
      (i32.const 0)
     )
    )
   )
-  ;;@ core/cpu/cpu.ts:142:4
+  ;;@ core/cpu/cpu.ts:140:4
   (set_global $core/cpu/cpu/Cpu.registerF
-   ;;@ core/cpu/cpu.ts:142:20
+   ;;@ core/cpu/cpu.ts:140:20
    (i32.load8_u
-    ;;@ core/cpu/cpu.ts:142:29
+    ;;@ core/cpu/cpu.ts:140:29
     (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/cpu/cpu.ts:142:54
+     ;;@ core/cpu/cpu.ts:140:54
      (i32.const 7)
      (i32.const 0)
     )
    )
   )
-  ;;@ core/cpu/cpu.ts:144:4
+  ;;@ core/cpu/cpu.ts:142:4
   (set_global $core/cpu/cpu/Cpu.stackPointer
-   ;;@ core/cpu/cpu.ts:144:23
+   ;;@ core/cpu/cpu.ts:142:23
    (i32.load16_u
-    ;;@ core/cpu/cpu.ts:144:33
+    ;;@ core/cpu/cpu.ts:142:33
     (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/cpu/cpu.ts:144:58
+     ;;@ core/cpu/cpu.ts:142:58
      (i32.const 8)
      (i32.const 0)
     )
    )
   )
-  ;;@ core/cpu/cpu.ts:145:4
+  ;;@ core/cpu/cpu.ts:143:4
   (set_global $core/cpu/cpu/Cpu.programCounter
-   ;;@ core/cpu/cpu.ts:145:25
+   ;;@ core/cpu/cpu.ts:143:25
    (i32.load16_u
-    ;;@ core/cpu/cpu.ts:145:35
+    ;;@ core/cpu/cpu.ts:143:35
     (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/cpu/cpu.ts:145:60
+     ;;@ core/cpu/cpu.ts:143:60
      (i32.const 10)
      (i32.const 0)
     )
    )
   )
-  ;;@ core/cpu/cpu.ts:147:4
+  ;;@ core/cpu/cpu.ts:145:4
   (set_global $core/cpu/cpu/Cpu.currentCycles
-   ;;@ core/cpu/cpu.ts:147:24
+   ;;@ core/cpu/cpu.ts:145:24
    (i32.load
-    ;;@ core/cpu/cpu.ts:147:34
+    ;;@ core/cpu/cpu.ts:145:34
     (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/cpu/cpu.ts:147:59
+     ;;@ core/cpu/cpu.ts:145:59
      (i32.const 12)
      (i32.const 0)
     )
    )
   )
-  ;;@ core/cpu/cpu.ts:149:4
+  ;;@ core/cpu/cpu.ts:147:4
   (set_global $core/cpu/cpu/Cpu.isHaltNormal
-   ;;@ core/cpu/cpu.ts:149:23
+   ;;@ core/cpu/cpu.ts:147:23
    (call $core/memory/load/loadBooleanDirectlyFromWasmMemory
-    ;;@ core/cpu/cpu.ts:149:57
+    ;;@ core/cpu/cpu.ts:147:57
     (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/cpu/cpu.ts:149:82
+     ;;@ core/cpu/cpu.ts:147:82
      (i32.const 17)
      (i32.const 0)
     )
    )
   )
-  ;;@ core/cpu/cpu.ts:150:4
+  ;;@ core/cpu/cpu.ts:148:4
   (set_global $core/cpu/cpu/Cpu.isHaltNoJump
-   ;;@ core/cpu/cpu.ts:150:23
+   ;;@ core/cpu/cpu.ts:148:23
    (call $core/memory/load/loadBooleanDirectlyFromWasmMemory
-    ;;@ core/cpu/cpu.ts:150:57
+    ;;@ core/cpu/cpu.ts:148:57
     (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/cpu/cpu.ts:150:82
+     ;;@ core/cpu/cpu.ts:148:82
      (i32.const 18)
      (i32.const 0)
     )
    )
   )
-  ;;@ core/cpu/cpu.ts:151:4
+  ;;@ core/cpu/cpu.ts:149:4
   (set_global $core/cpu/cpu/Cpu.isHaltBug
-   ;;@ core/cpu/cpu.ts:151:20
+   ;;@ core/cpu/cpu.ts:149:20
    (call $core/memory/load/loadBooleanDirectlyFromWasmMemory
-    ;;@ core/cpu/cpu.ts:151:54
+    ;;@ core/cpu/cpu.ts:149:54
     (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/cpu/cpu.ts:151:79
+     ;;@ core/cpu/cpu.ts:149:79
      (i32.const 19)
      (i32.const 0)
     )
    )
   )
-  ;;@ core/cpu/cpu.ts:152:4
+  ;;@ core/cpu/cpu.ts:150:4
   (set_global $core/cpu/cpu/Cpu.isStopped
-   ;;@ core/cpu/cpu.ts:152:20
+   ;;@ core/cpu/cpu.ts:150:20
    (call $core/memory/load/loadBooleanDirectlyFromWasmMemory
-    ;;@ core/cpu/cpu.ts:152:54
+    ;;@ core/cpu/cpu.ts:150:54
     (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/cpu/cpu.ts:152:79
+     ;;@ core/cpu/cpu.ts:150:79
      (i32.const 20)
      (i32.const 0)
     )
