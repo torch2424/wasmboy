@@ -599,185 +599,185 @@
   )
  )
  (func $core/cpu/cpu/initializeCpu (; 4 ;) (; has Stack IR ;) (type $v)
-  ;;@ core/cpu/cpu.ts:157:2
-  (set_global $core/cpu/cpu/Cpu.GBCDoubleSpeed
-   ;;@ core/cpu/cpu.ts:157:23
-   (i32.const 0)
-  )
   ;;@ core/cpu/cpu.ts:158:2
-  (set_global $core/cpu/cpu/Cpu.registerA
-   ;;@ core/cpu/cpu.ts:158:18
+  (set_global $core/cpu/cpu/Cpu.GBCDoubleSpeed
+   ;;@ core/cpu/cpu.ts:158:23
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:159:2
-  (set_global $core/cpu/cpu/Cpu.registerB
+  (set_global $core/cpu/cpu/Cpu.registerA
    ;;@ core/cpu/cpu.ts:159:18
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:160:2
-  (set_global $core/cpu/cpu/Cpu.registerC
+  (set_global $core/cpu/cpu/Cpu.registerB
    ;;@ core/cpu/cpu.ts:160:18
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:161:2
-  (set_global $core/cpu/cpu/Cpu.registerD
+  (set_global $core/cpu/cpu/Cpu.registerC
    ;;@ core/cpu/cpu.ts:161:18
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:162:2
-  (set_global $core/cpu/cpu/Cpu.registerE
+  (set_global $core/cpu/cpu/Cpu.registerD
    ;;@ core/cpu/cpu.ts:162:18
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:163:2
-  (set_global $core/cpu/cpu/Cpu.registerH
+  (set_global $core/cpu/cpu/Cpu.registerE
    ;;@ core/cpu/cpu.ts:163:18
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:164:2
-  (set_global $core/cpu/cpu/Cpu.registerL
+  (set_global $core/cpu/cpu/Cpu.registerH
    ;;@ core/cpu/cpu.ts:164:18
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:165:2
-  (set_global $core/cpu/cpu/Cpu.registerF
+  (set_global $core/cpu/cpu/Cpu.registerL
    ;;@ core/cpu/cpu.ts:165:18
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:166:2
-  (set_global $core/cpu/cpu/Cpu.stackPointer
-   ;;@ core/cpu/cpu.ts:166:21
+  (set_global $core/cpu/cpu/Cpu.registerF
+   ;;@ core/cpu/cpu.ts:166:18
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:167:2
-  (set_global $core/cpu/cpu/Cpu.programCounter
-   ;;@ core/cpu/cpu.ts:167:23
+  (set_global $core/cpu/cpu/Cpu.stackPointer
+   ;;@ core/cpu/cpu.ts:167:21
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:168:2
-  (set_global $core/cpu/cpu/Cpu.currentCycles
-   ;;@ core/cpu/cpu.ts:168:22
+  (set_global $core/cpu/cpu/Cpu.programCounter
+   ;;@ core/cpu/cpu.ts:168:23
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:169:2
-  (set_global $core/cpu/cpu/Cpu.isHaltNormal
-   ;;@ core/cpu/cpu.ts:169:21
+  (set_global $core/cpu/cpu/Cpu.currentCycles
+   ;;@ core/cpu/cpu.ts:169:22
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:170:2
-  (set_global $core/cpu/cpu/Cpu.isHaltNoJump
+  (set_global $core/cpu/cpu/Cpu.isHaltNormal
    ;;@ core/cpu/cpu.ts:170:21
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:171:2
-  (set_global $core/cpu/cpu/Cpu.isHaltBug
-   ;;@ core/cpu/cpu.ts:171:18
+  (set_global $core/cpu/cpu/Cpu.isHaltNoJump
+   ;;@ core/cpu/cpu.ts:171:21
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:172:2
-  (set_global $core/cpu/cpu/Cpu.isStopped
+  (set_global $core/cpu/cpu/Cpu.isHaltBug
    ;;@ core/cpu/cpu.ts:172:18
    (i32.const 0)
   )
-  ;;@ core/cpu/cpu.ts:174:2
+  ;;@ core/cpu/cpu.ts:173:2
+  (set_global $core/cpu/cpu/Cpu.isStopped
+   ;;@ core/cpu/cpu.ts:173:18
+   (i32.const 0)
+  )
+  ;;@ core/cpu/cpu.ts:175:2
   (if
-   ;;@ core/cpu/cpu.ts:174:6
+   ;;@ core/cpu/cpu.ts:175:6
    (get_global $core/cpu/cpu/Cpu.GBCEnabled)
-   ;;@ core/cpu/cpu.ts:174:22
+   ;;@ core/cpu/cpu.ts:175:22
    (block
-    ;;@ core/cpu/cpu.ts:176:4
+    ;;@ core/cpu/cpu.ts:177:4
     (set_global $core/cpu/cpu/Cpu.registerA
-     ;;@ core/cpu/cpu.ts:176:20
+     ;;@ core/cpu/cpu.ts:177:20
      (i32.const 17)
     )
-    ;;@ core/cpu/cpu.ts:177:4
+    ;;@ core/cpu/cpu.ts:178:4
     (set_global $core/cpu/cpu/Cpu.registerF
-     ;;@ core/cpu/cpu.ts:177:20
+     ;;@ core/cpu/cpu.ts:178:20
      (i32.const 128)
     )
-    ;;@ core/cpu/cpu.ts:178:4
-    (set_global $core/cpu/cpu/Cpu.registerB
-     ;;@ core/cpu/cpu.ts:178:20
-     (i32.const 0)
-    )
     ;;@ core/cpu/cpu.ts:179:4
-    (set_global $core/cpu/cpu/Cpu.registerC
+    (set_global $core/cpu/cpu/Cpu.registerB
      ;;@ core/cpu/cpu.ts:179:20
      (i32.const 0)
     )
     ;;@ core/cpu/cpu.ts:180:4
-    (set_global $core/cpu/cpu/Cpu.registerD
+    (set_global $core/cpu/cpu/Cpu.registerC
      ;;@ core/cpu/cpu.ts:180:20
-     (i32.const 255)
-    )
-    ;;@ core/cpu/cpu.ts:181:4
-    (set_global $core/cpu/cpu/Cpu.registerE
-     ;;@ core/cpu/cpu.ts:181:20
-     (i32.const 86)
-    )
-    ;;@ core/cpu/cpu.ts:182:4
-    (set_global $core/cpu/cpu/Cpu.registerH
-     ;;@ core/cpu/cpu.ts:182:20
      (i32.const 0)
     )
+    ;;@ core/cpu/cpu.ts:181:4
+    (set_global $core/cpu/cpu/Cpu.registerD
+     ;;@ core/cpu/cpu.ts:181:20
+     (i32.const 255)
+    )
+    ;;@ core/cpu/cpu.ts:182:4
+    (set_global $core/cpu/cpu/Cpu.registerE
+     ;;@ core/cpu/cpu.ts:182:20
+     (i32.const 86)
+    )
     ;;@ core/cpu/cpu.ts:183:4
-    (set_global $core/cpu/cpu/Cpu.registerL
+    (set_global $core/cpu/cpu/Cpu.registerH
      ;;@ core/cpu/cpu.ts:183:20
+     (i32.const 0)
+    )
+    ;;@ core/cpu/cpu.ts:184:4
+    (set_global $core/cpu/cpu/Cpu.registerL
+     ;;@ core/cpu/cpu.ts:184:20
      (i32.const 13)
     )
    )
-   ;;@ core/cpu/cpu.ts:188:9
+   ;;@ core/cpu/cpu.ts:189:9
    (block
-    ;;@ core/cpu/cpu.ts:190:4
-    (set_global $core/cpu/cpu/Cpu.registerA
-     ;;@ core/cpu/cpu.ts:190:20
-     (i32.const 1)
-    )
     ;;@ core/cpu/cpu.ts:191:4
-    (set_global $core/cpu/cpu/Cpu.registerF
+    (set_global $core/cpu/cpu/Cpu.registerA
      ;;@ core/cpu/cpu.ts:191:20
-     (i32.const 176)
+     (i32.const 1)
     )
     ;;@ core/cpu/cpu.ts:192:4
-    (set_global $core/cpu/cpu/Cpu.registerB
+    (set_global $core/cpu/cpu/Cpu.registerF
      ;;@ core/cpu/cpu.ts:192:20
-     (i32.const 0)
+     (i32.const 176)
     )
     ;;@ core/cpu/cpu.ts:193:4
-    (set_global $core/cpu/cpu/Cpu.registerC
+    (set_global $core/cpu/cpu/Cpu.registerB
      ;;@ core/cpu/cpu.ts:193:20
-     (i32.const 19)
-    )
-    ;;@ core/cpu/cpu.ts:194:4
-    (set_global $core/cpu/cpu/Cpu.registerD
-     ;;@ core/cpu/cpu.ts:194:20
      (i32.const 0)
     )
+    ;;@ core/cpu/cpu.ts:194:4
+    (set_global $core/cpu/cpu/Cpu.registerC
+     ;;@ core/cpu/cpu.ts:194:20
+     (i32.const 19)
+    )
     ;;@ core/cpu/cpu.ts:195:4
-    (set_global $core/cpu/cpu/Cpu.registerE
+    (set_global $core/cpu/cpu/Cpu.registerD
      ;;@ core/cpu/cpu.ts:195:20
-     (i32.const 216)
+     (i32.const 0)
     )
     ;;@ core/cpu/cpu.ts:196:4
-    (set_global $core/cpu/cpu/Cpu.registerH
+    (set_global $core/cpu/cpu/Cpu.registerE
      ;;@ core/cpu/cpu.ts:196:20
-     (i32.const 1)
+     (i32.const 216)
     )
     ;;@ core/cpu/cpu.ts:197:4
-    (set_global $core/cpu/cpu/Cpu.registerL
+    (set_global $core/cpu/cpu/Cpu.registerH
      ;;@ core/cpu/cpu.ts:197:20
+     (i32.const 1)
+    )
+    ;;@ core/cpu/cpu.ts:198:4
+    (set_global $core/cpu/cpu/Cpu.registerL
+     ;;@ core/cpu/cpu.ts:198:20
      (i32.const 77)
     )
    )
   )
-  ;;@ core/cpu/cpu.ts:186:4
+  ;;@ core/cpu/cpu.ts:187:4
   (set_global $core/cpu/cpu/Cpu.programCounter
-   ;;@ core/cpu/cpu.ts:186:25
+   ;;@ core/cpu/cpu.ts:187:25
    (i32.const 256)
   )
-  ;;@ core/cpu/cpu.ts:187:4
+  ;;@ core/cpu/cpu.ts:188:4
   (set_global $core/cpu/cpu/Cpu.stackPointer
-   ;;@ core/cpu/cpu.ts:187:23
+   ;;@ core/cpu/cpu.ts:188:23
    (i32.const 65534)
   )
  )
@@ -2094,9 +2094,9 @@
   (call $core/core/initialize)
  )
  (func $core/cpu/cpu/Cpu.MAX_CYCLES_PER_FRAME (; 23 ;) (; has Stack IR ;) (type $i) (result i32)
-  ;;@ core/cpu/cpu.ts:52:4
+  ;;@ core/cpu/cpu.ts:56:4
   (if
-   ;;@ core/cpu/cpu.ts:52:8
+   ;;@ core/cpu/cpu.ts:56:8
    (get_global $core/cpu/cpu/Cpu.GBCDoubleSpeed)
    (return
     (i32.const 140448)
@@ -6977,9 +6977,9 @@
   )
  )
  (func $core/cpu/cpu/Cpu.CLOCK_SPEED (; 91 ;) (; has Stack IR ;) (type $i) (result i32)
-  ;;@ core/cpu/cpu.ts:41:4
+  ;;@ core/cpu/cpu.ts:45:4
   (if
-   ;;@ core/cpu/cpu.ts:41:8
+   ;;@ core/cpu/cpu.ts:45:8
    (get_global $core/cpu/cpu/Cpu.GBCDoubleSpeed)
    (return
     (i32.const 8388608)
@@ -8068,9 +8068,9 @@
  )
  (func $core/memory/readTraps/checkReadTraps (; 105 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
-  ;;@ core/memory/readTraps.ts:18:2
+  ;;@ core/memory/readTraps.ts:19:2
   (if
-   ;;@ core/memory/readTraps.ts:18:6
+   ;;@ core/memory/readTraps.ts:19:6
    (i32.lt_s
     (get_local $0)
     (i32.const 32768)
@@ -8079,7 +8079,7 @@
     (i32.const -1)
    )
   )
-  ;;@ core/memory/readTraps.ts:24:6
+  ;;@ core/memory/readTraps.ts:25:6
   (if
    (tee_local $1
     (i32.ge_s
@@ -8088,21 +8088,21 @@
     )
    )
    (set_local $1
-    ;;@ core/memory/readTraps.ts:24:36
+    ;;@ core/memory/readTraps.ts:25:36
     (i32.lt_s
      (get_local $0)
      (i32.const 40960)
     )
    )
   )
-  ;;@ core/memory/readTraps.ts:24:2
+  ;;@ core/memory/readTraps.ts:25:2
   (if
    (get_local $1)
    (return
     (i32.const -1)
    )
   )
-  ;;@ core/memory/readTraps.ts:38:6
+  ;;@ core/memory/readTraps.ts:39:6
   (if
    (tee_local $1
     (i32.ge_s
@@ -8111,30 +8111,30 @@
     )
    )
    (set_local $1
-    ;;@ core/memory/readTraps.ts:38:42
+    ;;@ core/memory/readTraps.ts:39:42
     (i32.lt_s
      (get_local $0)
      (i32.const 65024)
     )
    )
   )
-  ;;@ core/memory/readTraps.ts:38:2
+  ;;@ core/memory/readTraps.ts:39:2
   (if
    (get_local $1)
-   ;;@ core/memory/readTraps.ts:38:90
+   ;;@ core/memory/readTraps.ts:39:90
    (return
-    ;;@ core/memory/readTraps.ts:40:11
+    ;;@ core/memory/readTraps.ts:41:11
     (call $core/memory/load/eightBitLoadFromGBMemory
-     ;;@ core/memory/readTraps.ts:40:36
+     ;;@ core/memory/readTraps.ts:41:36
      (i32.add
       (get_local $0)
-      ;;@ core/memory/readTraps.ts:40:45
+      ;;@ core/memory/readTraps.ts:41:45
       (i32.const -8192)
      )
     )
    )
   )
-  ;;@ core/memory/readTraps.ts:46:6
+  ;;@ core/memory/readTraps.ts:47:6
   (if
    (tee_local $1
     (i32.ge_s
@@ -8143,202 +8143,263 @@
     )
    )
    (set_local $1
-    ;;@ core/memory/readTraps.ts:46:57
+    ;;@ core/memory/readTraps.ts:47:57
     (i32.le_s
      (get_local $0)
      (i32.const 65183)
     )
    )
   )
-  ;;@ core/memory/readTraps.ts:46:2
+  ;;@ core/memory/readTraps.ts:47:2
   (if
    (get_local $1)
-   ;;@ core/memory/readTraps.ts:46:109
+   ;;@ core/memory/readTraps.ts:47:109
    (block
-    ;;@ core/memory/readTraps.ts:49:4
+    ;;@ core/memory/readTraps.ts:50:4
     (if
-     ;;@ core/memory/readTraps.ts:49:8
+     ;;@ core/memory/readTraps.ts:50:8
      (i32.lt_s
       (get_global $core/graphics/lcd/Lcd.currentLcdMode)
-      ;;@ core/memory/readTraps.ts:49:29
+      ;;@ core/memory/readTraps.ts:50:29
       (i32.const 2)
      )
      (return
       (i32.const 255)
      )
     )
-    ;;@ core/memory/readTraps.ts:56:12
+    ;;@ core/memory/readTraps.ts:57:12
     (return
-     ;;@ core/memory/readTraps.ts:56:11
+     ;;@ core/memory/readTraps.ts:57:11
      (i32.const -1)
     )
    )
   )
-  ;;@ core/memory/readTraps.ts:62:2
+  ;;@ core/memory/readTraps.ts:61:2
   (if
-   ;;@ core/memory/readTraps.ts:62:6
+   ;;@ core/memory/readTraps.ts:61:6
+   (i32.eq
+    (get_local $0)
+    (i32.const 65357)
+   )
+   ;;@ core/memory/readTraps.ts:61:48
+   (block
+    ;;@ core/memory/readTraps.ts:63:4
+    (set_local $1
+     ;;@ core/memory/readTraps.ts:63:24
+     (i32.const 255)
+    )
+    ;;@ core/memory/readTraps.ts:66:4
+    (if
+     ;;@ core/memory/readTraps.ts:66:8
+     (i32.eqz
+      ;;@ core/memory/readTraps.ts:66:9
+      (call $core/helpers/index/checkBitOnByte
+       ;;@ core/memory/readTraps.ts:66:24
+       (i32.const 0)
+       ;;@ core/memory/readTraps.ts:65:42
+       (call $core/memory/load/eightBitLoadFromGBMemory
+        (i32.const 65357)
+       )
+      )
+     )
+     ;;@ core/memory/readTraps.ts:66:56
+     (set_local $1
+      ;;@ core/memory/readTraps.ts:67:17
+      (call $core/helpers/index/resetBitOnByte
+       ;;@ core/memory/readTraps.ts:67:32
+       (i32.const 0)
+       (i32.const 255)
+      )
+     )
+    )
+    ;;@ core/memory/readTraps.ts:70:4
+    (if
+     ;;@ core/memory/readTraps.ts:70:8
+     (i32.eqz
+      ;;@ core/memory/readTraps.ts:70:9
+      (get_global $core/cpu/cpu/Cpu.GBCDoubleSpeed)
+     )
+     ;;@ core/memory/readTraps.ts:70:29
+     (set_local $1
+      ;;@ core/memory/readTraps.ts:71:17
+      (call $core/helpers/index/resetBitOnByte
+       ;;@ core/memory/readTraps.ts:71:32
+       (i32.const 7)
+       (get_local $1)
+      )
+     )
+    )
+    ;;@ core/memory/readTraps.ts:74:11
+    (return
+     (get_local $1)
+    )
+   )
+  )
+  ;;@ core/memory/readTraps.ts:80:2
+  (if
+   ;;@ core/memory/readTraps.ts:80:6
    (i32.eq
     (get_local $0)
     (i32.const 65348)
    )
-   ;;@ core/memory/readTraps.ts:62:58
+   ;;@ core/memory/readTraps.ts:80:58
    (block
-    ;;@ core/memory/readTraps.ts:63:4
+    ;;@ core/memory/readTraps.ts:81:4
     (call $core/memory/store/eightBitStoreIntoGBMemory
      (get_local $0)
-     ;;@ core/memory/readTraps.ts:63:38
+     ;;@ core/memory/readTraps.ts:81:38
      (get_global $core/graphics/graphics/Graphics.scanlineRegister)
     )
-    ;;@ core/memory/readTraps.ts:64:20
+    ;;@ core/memory/readTraps.ts:82:20
     (return
-     ;;@ core/memory/readTraps.ts:64:11
+     ;;@ core/memory/readTraps.ts:82:11
      (get_global $core/graphics/graphics/Graphics.scanlineRegister)
     )
    )
   )
-  ;;@ core/memory/readTraps.ts:70:6
+  ;;@ core/memory/readTraps.ts:88:6
   (if
    (tee_local $1
     (i32.ge_s
      (get_local $0)
-     ;;@ core/memory/readTraps.ts:70:16
+     ;;@ core/memory/readTraps.ts:88:16
      (i32.const 65296)
     )
    )
    (set_local $1
-    ;;@ core/memory/readTraps.ts:70:26
+    ;;@ core/memory/readTraps.ts:88:26
     (i32.le_s
      (get_local $0)
-     ;;@ core/memory/readTraps.ts:70:36
+     ;;@ core/memory/readTraps.ts:88:36
      (i32.const 65318)
     )
    )
   )
-  ;;@ core/memory/readTraps.ts:70:2
+  ;;@ core/memory/readTraps.ts:88:2
   (if
    (get_local $1)
-   ;;@ core/memory/readTraps.ts:70:44
+   ;;@ core/memory/readTraps.ts:88:44
    (block
-    ;;@ core/memory/readTraps.ts:71:4
+    ;;@ core/memory/readTraps.ts:89:4
     (call $core/sound/sound/batchProcessAudio)
-    ;;@ core/memory/readTraps.ts:72:40
+    ;;@ core/memory/readTraps.ts:90:40
     (return
-     ;;@ core/memory/readTraps.ts:72:11
+     ;;@ core/memory/readTraps.ts:90:11
      (call $core/sound/registers/SoundRegisterReadTraps
       (get_local $0)
      )
     )
    )
   )
-  ;;@ core/memory/readTraps.ts:76:6
+  ;;@ core/memory/readTraps.ts:94:6
   (if
    (tee_local $1
     (i32.ge_s
      (get_local $0)
-     ;;@ core/memory/readTraps.ts:76:16
+     ;;@ core/memory/readTraps.ts:94:16
      (i32.const 65328)
     )
    )
    (set_local $1
-    ;;@ core/memory/readTraps.ts:76:26
+    ;;@ core/memory/readTraps.ts:94:26
     (i32.le_s
      (get_local $0)
-     ;;@ core/memory/readTraps.ts:76:36
+     ;;@ core/memory/readTraps.ts:94:36
      (i32.const 65343)
     )
    )
   )
-  ;;@ core/memory/readTraps.ts:76:2
+  ;;@ core/memory/readTraps.ts:94:2
   (if
    (get_local $1)
-   ;;@ core/memory/readTraps.ts:76:44
+   ;;@ core/memory/readTraps.ts:94:44
    (block
-    ;;@ core/memory/readTraps.ts:77:4
+    ;;@ core/memory/readTraps.ts:95:4
     (call $core/sound/sound/batchProcessAudio)
-    ;;@ core/memory/readTraps.ts:78:12
+    ;;@ core/memory/readTraps.ts:96:12
     (return
-     ;;@ core/memory/readTraps.ts:78:11
+     ;;@ core/memory/readTraps.ts:96:11
      (i32.const -1)
     )
    )
   )
-  ;;@ core/memory/readTraps.ts:82:2
+  ;;@ core/memory/readTraps.ts:100:2
   (if
-   ;;@ core/memory/readTraps.ts:82:6
+   ;;@ core/memory/readTraps.ts:100:6
    (i32.eq
     (get_local $0)
     (i32.const 65284)
    )
-   ;;@ core/memory/readTraps.ts:82:55
+   ;;@ core/memory/readTraps.ts:100:55
    (block
-    ;;@ core/memory/readTraps.ts:86:4
+    ;;@ core/memory/readTraps.ts:104:4
     (call $core/memory/store/eightBitStoreIntoGBMemory
      (get_local $0)
-     ;;@ core/memory/readTraps.ts:85:4
+     ;;@ core/memory/readTraps.ts:103:4
      (tee_local $1
-      ;;@ core/memory/readTraps.ts:85:35
+      ;;@ core/memory/readTraps.ts:103:35
       (call $core/helpers/index/splitHighByte
-       ;;@ core/memory/readTraps.ts:85:49
+       ;;@ core/memory/readTraps.ts:103:49
        (get_global $core/timers/timers/Timers.dividerRegister)
       )
      )
     )
-    ;;@ core/memory/readTraps.ts:87:11
+    ;;@ core/memory/readTraps.ts:105:11
     (return
      (get_local $1)
     )
    )
   )
-  ;;@ core/memory/readTraps.ts:89:2
+  ;;@ core/memory/readTraps.ts:107:2
   (if
-   ;;@ core/memory/readTraps.ts:89:6
+   ;;@ core/memory/readTraps.ts:107:6
    (i32.eq
     (get_local $0)
     (i32.const 65285)
    )
-   ;;@ core/memory/readTraps.ts:89:52
+   ;;@ core/memory/readTraps.ts:107:52
    (block
-    ;;@ core/memory/readTraps.ts:90:4
+    ;;@ core/memory/readTraps.ts:108:4
     (call $core/memory/store/eightBitStoreIntoGBMemory
      (get_local $0)
-     ;;@ core/memory/readTraps.ts:90:38
+     ;;@ core/memory/readTraps.ts:108:38
      (get_global $core/timers/timers/Timers.timerCounter)
     )
-    ;;@ core/memory/readTraps.ts:91:18
+    ;;@ core/memory/readTraps.ts:109:18
     (return
-     ;;@ core/memory/readTraps.ts:91:11
+     ;;@ core/memory/readTraps.ts:109:11
      (get_global $core/timers/timers/Timers.timerCounter)
     )
    )
   )
-  ;;@ core/memory/readTraps.ts:95:2
+  ;;@ core/memory/readTraps.ts:113:2
   (if
-   ;;@ core/memory/readTraps.ts:95:6
+   ;;@ core/memory/readTraps.ts:113:6
    (i32.eq
     (get_local $0)
     (i32.const 65295)
    )
-   ;;@ core/memory/readTraps.ts:95:60
+   ;;@ core/memory/readTraps.ts:113:60
    (return
-    ;;@ core/memory/readTraps.ts:97:11
+    ;;@ core/memory/readTraps.ts:115:11
     (i32.or
-     ;;@ core/memory/readTraps.ts:97:18
+     ;;@ core/memory/readTraps.ts:115:18
      (get_global $core/interrupts/interrupts/Interrupts.interruptsRequestedValue)
-     ;;@ core/memory/readTraps.ts:97:11
+     ;;@ core/memory/readTraps.ts:115:11
      (i32.const 224)
     )
    )
   )
-  ;;@ core/memory/readTraps.ts:101:2
+  ;;@ core/memory/readTraps.ts:119:2
   (if
-   ;;@ core/memory/readTraps.ts:101:6
+   ;;@ core/memory/readTraps.ts:119:6
    (i32.eq
     (get_local $0)
     (i32.const 65280)
    )
-   ;;@ core/memory/readTraps.ts:101:54
+   ;;@ core/memory/readTraps.ts:119:54
    (return
-    ;;@ core/memory/readTraps.ts:102:11
+    ;;@ core/memory/readTraps.ts:120:11
     (call $core/joypad/joypad/getJoypadState)
    )
   )
@@ -10964,16 +11025,38 @@
   (local $2 i32)
   (block $folding-inner1
    (block $folding-inner0
-    ;;@ core/memory/writeTraps.ts:22:2
+    ;;@ core/memory/writeTraps.ts:20:2
     (if
-     ;;@ core/memory/writeTraps.ts:22:6
+     ;;@ core/memory/writeTraps.ts:20:6
+     (i32.eq
+      (get_local $0)
+      (i32.const 65357)
+     )
+     ;;@ core/memory/writeTraps.ts:20:48
+     (block
+      ;;@ core/memory/writeTraps.ts:22:4
+      (call $core/memory/store/eightBitStoreIntoGBMemory
+       (i32.const 65357)
+       ;;@ core/memory/writeTraps.ts:22:61
+       (i32.and
+        (get_local $1)
+        ;;@ core/memory/writeTraps.ts:22:69
+        (i32.const 1)
+       )
+      )
+      (br $folding-inner1)
+     )
+    )
+    ;;@ core/memory/writeTraps.ts:33:2
+    (if
+     ;;@ core/memory/writeTraps.ts:33:6
      (i32.lt_s
       (get_local $0)
       (i32.const 32768)
      )
-     ;;@ core/memory/writeTraps.ts:22:33
+     ;;@ core/memory/writeTraps.ts:33:33
      (block
-      ;;@ core/memory/writeTraps.ts:23:4
+      ;;@ core/memory/writeTraps.ts:34:4
       (call $core/memory/banking/handleBanking
        (get_local $0)
        (get_local $1)
@@ -10981,7 +11064,7 @@
       (br $folding-inner1)
      )
     )
-    ;;@ core/memory/writeTraps.ts:29:6
+    ;;@ core/memory/writeTraps.ts:40:6
     (if
      (tee_local $2
       (i32.ge_s
@@ -10990,7 +11073,7 @@
       )
      )
      (set_local $2
-      ;;@ core/memory/writeTraps.ts:29:36
+      ;;@ core/memory/writeTraps.ts:40:36
       (i32.lt_s
        (get_local $0)
        (i32.const 40960)
@@ -11000,7 +11083,7 @@
     (br_if $folding-inner0
      (get_local $2)
     )
-    ;;@ core/memory/writeTraps.ts:48:6
+    ;;@ core/memory/writeTraps.ts:59:6
     (if
      (tee_local $2
       (i32.ge_s
@@ -11009,24 +11092,24 @@
       )
      )
      (set_local $2
-      ;;@ core/memory/writeTraps.ts:48:42
+      ;;@ core/memory/writeTraps.ts:59:42
       (i32.lt_s
        (get_local $0)
        (i32.const 65024)
       )
      )
     )
-    ;;@ core/memory/writeTraps.ts:48:2
+    ;;@ core/memory/writeTraps.ts:59:2
     (if
      (get_local $2)
-     ;;@ core/memory/writeTraps.ts:48:83
+     ;;@ core/memory/writeTraps.ts:59:83
      (block
-      ;;@ core/memory/writeTraps.ts:50:4
+      ;;@ core/memory/writeTraps.ts:61:4
       (call $core/memory/store/eightBitStoreIntoGBMemory
-       ;;@ core/memory/writeTraps.ts:49:26
+       ;;@ core/memory/writeTraps.ts:60:26
        (i32.add
         (get_local $0)
-        ;;@ core/memory/writeTraps.ts:49:35
+        ;;@ core/memory/writeTraps.ts:60:35
         (i32.const -8192)
        )
        (get_local $1)
@@ -11034,7 +11117,7 @@
       (br $folding-inner0)
      )
     )
-    ;;@ core/memory/writeTraps.ts:59:6
+    ;;@ core/memory/writeTraps.ts:70:6
     (if
      (tee_local $2
       (i32.ge_s
@@ -11043,30 +11126,30 @@
       )
      )
      (set_local $2
-      ;;@ core/memory/writeTraps.ts:59:50
+      ;;@ core/memory/writeTraps.ts:70:50
       (i32.le_s
        (get_local $0)
        (i32.const 65183)
       )
      )
     )
-    ;;@ core/memory/writeTraps.ts:59:2
+    ;;@ core/memory/writeTraps.ts:70:2
     (if
      (get_local $2)
-     ;;@ core/memory/writeTraps.ts:59:102
+     ;;@ core/memory/writeTraps.ts:70:102
      (block
       (br_if $folding-inner1
-       ;;@ core/memory/writeTraps.ts:62:8
+       ;;@ core/memory/writeTraps.ts:73:8
        (i32.lt_s
         (get_global $core/graphics/lcd/Lcd.currentLcdMode)
-        ;;@ core/memory/writeTraps.ts:62:29
+        ;;@ core/memory/writeTraps.ts:73:29
         (i32.const 2)
        )
       )
       (br $folding-inner0)
      )
     )
-    ;;@ core/memory/writeTraps.ts:72:6
+    ;;@ core/memory/writeTraps.ts:83:6
     (if
      (tee_local $2
       (i32.ge_s
@@ -11075,7 +11158,7 @@
       )
      )
      (set_local $2
-      ;;@ core/memory/writeTraps.ts:72:49
+      ;;@ core/memory/writeTraps.ts:83:49
       (i32.le_s
        (get_local $0)
        (i32.const 65279)
@@ -11085,34 +11168,34 @@
     (br_if $folding-inner1
      (get_local $2)
     )
-    ;;@ core/memory/writeTraps.ts:78:6
+    ;;@ core/memory/writeTraps.ts:89:6
     (if
      (tee_local $2
       (i32.ge_s
        (get_local $0)
-       ;;@ core/memory/writeTraps.ts:78:16
+       ;;@ core/memory/writeTraps.ts:89:16
        (i32.const 65296)
       )
      )
      (set_local $2
-      ;;@ core/memory/writeTraps.ts:78:26
+      ;;@ core/memory/writeTraps.ts:89:26
       (i32.le_s
        (get_local $0)
-       ;;@ core/memory/writeTraps.ts:78:36
+       ;;@ core/memory/writeTraps.ts:89:36
        (i32.const 65318)
       )
      )
     )
-    ;;@ core/memory/writeTraps.ts:78:2
+    ;;@ core/memory/writeTraps.ts:89:2
     (if
      (get_local $2)
-     ;;@ core/memory/writeTraps.ts:78:44
+     ;;@ core/memory/writeTraps.ts:89:44
      (block
-      ;;@ core/memory/writeTraps.ts:79:4
+      ;;@ core/memory/writeTraps.ts:90:4
       (call $core/sound/sound/batchProcessAudio)
-      ;;@ core/memory/writeTraps.ts:80:48
+      ;;@ core/memory/writeTraps.ts:91:48
       (return
-       ;;@ core/memory/writeTraps.ts:80:11
+       ;;@ core/memory/writeTraps.ts:91:11
        (call $core/sound/registers/SoundRegisterWriteTraps
         (get_local $0)
         (get_local $1)
@@ -11120,31 +11203,31 @@
       )
      )
     )
-    ;;@ core/memory/writeTraps.ts:85:6
+    ;;@ core/memory/writeTraps.ts:96:6
     (if
      (tee_local $2
       (i32.ge_s
        (get_local $0)
-       ;;@ core/memory/writeTraps.ts:85:16
+       ;;@ core/memory/writeTraps.ts:96:16
        (i32.const 65328)
       )
      )
      (set_local $2
-      ;;@ core/memory/writeTraps.ts:85:26
+      ;;@ core/memory/writeTraps.ts:96:26
       (i32.le_s
        (get_local $0)
-       ;;@ core/memory/writeTraps.ts:85:36
+       ;;@ core/memory/writeTraps.ts:96:36
        (i32.const 65343)
       )
      )
     )
-    ;;@ core/memory/writeTraps.ts:85:2
+    ;;@ core/memory/writeTraps.ts:96:2
     (if
      (get_local $2)
-     ;;@ core/memory/writeTraps.ts:85:44
+     ;;@ core/memory/writeTraps.ts:96:44
      (call $core/sound/sound/batchProcessAudio)
     )
-    ;;@ core/memory/writeTraps.ts:90:6
+    ;;@ core/memory/writeTraps.ts:101:6
     (if
      (tee_local $2
       (i32.ge_s
@@ -11153,90 +11236,90 @@
       )
      )
      (set_local $2
-      ;;@ core/memory/writeTraps.ts:90:48
+      ;;@ core/memory/writeTraps.ts:101:48
       (i32.le_s
        (get_local $0)
        (i32.const 65355)
       )
      )
     )
-    ;;@ core/memory/writeTraps.ts:90:2
+    ;;@ core/memory/writeTraps.ts:101:2
     (if
      (get_local $2)
-     ;;@ core/memory/writeTraps.ts:90:90
+     ;;@ core/memory/writeTraps.ts:101:90
      (block
-      ;;@ core/memory/writeTraps.ts:94:4
+      ;;@ core/memory/writeTraps.ts:105:4
       (if
-       ;;@ core/memory/writeTraps.ts:94:8
+       ;;@ core/memory/writeTraps.ts:105:8
        (i32.eq
         (get_local $0)
         (i32.const 65344)
        )
-       ;;@ core/memory/writeTraps.ts:94:49
+       ;;@ core/memory/writeTraps.ts:105:49
        (block
-        ;;@ core/memory/writeTraps.ts:96:10
+        ;;@ core/memory/writeTraps.ts:107:10
         (call $core/graphics/lcd/Lcd.updateLcdControl
          (get_local $1)
         )
         (br $folding-inner0)
        )
       )
-      ;;@ core/memory/writeTraps.ts:101:4
+      ;;@ core/memory/writeTraps.ts:112:4
       (if
-       ;;@ core/memory/writeTraps.ts:101:8
+       ;;@ core/memory/writeTraps.ts:112:8
        (i32.eq
         (get_local $0)
         (i32.const 65348)
        )
-       ;;@ core/memory/writeTraps.ts:101:60
+       ;;@ core/memory/writeTraps.ts:112:60
        (block
-        ;;@ core/memory/writeTraps.ts:102:6
+        ;;@ core/memory/writeTraps.ts:113:6
         (set_global $core/graphics/graphics/Graphics.scanlineRegister
-         ;;@ core/memory/writeTraps.ts:102:34
+         ;;@ core/memory/writeTraps.ts:113:34
          (i32.const 0)
         )
-        ;;@ core/memory/writeTraps.ts:103:6
+        ;;@ core/memory/writeTraps.ts:114:6
         (call $core/memory/store/eightBitStoreIntoGBMemory
          (get_local $0)
-         ;;@ core/memory/writeTraps.ts:103:40
+         ;;@ core/memory/writeTraps.ts:114:40
          (i32.const 0)
         )
         (br $folding-inner1)
        )
       )
-      ;;@ core/memory/writeTraps.ts:108:4
+      ;;@ core/memory/writeTraps.ts:119:4
       (if
-       ;;@ core/memory/writeTraps.ts:108:8
+       ;;@ core/memory/writeTraps.ts:119:8
        (i32.eq
         (get_local $0)
         (i32.const 65349)
        )
-       ;;@ core/memory/writeTraps.ts:108:57
+       ;;@ core/memory/writeTraps.ts:119:57
        (block
-        ;;@ core/memory/writeTraps.ts:109:6
+        ;;@ core/memory/writeTraps.ts:120:6
         (set_global $core/graphics/lcd/Lcd.coincidenceCompare
          (get_local $1)
         )
         (br $folding-inner0)
        )
       )
-      ;;@ core/memory/writeTraps.ts:116:4
+      ;;@ core/memory/writeTraps.ts:127:4
       (if
-       ;;@ core/memory/writeTraps.ts:116:8
+       ;;@ core/memory/writeTraps.ts:127:8
        (i32.eq
         (get_local $0)
         (i32.const 65350)
        )
-       ;;@ core/memory/writeTraps.ts:116:55
+       ;;@ core/memory/writeTraps.ts:127:55
        (block
-        ;;@ core/memory/writeTraps.ts:119:6
+        ;;@ core/memory/writeTraps.ts:130:6
         (call $core/memory/dma/startDmaTransfer
          (get_local $1)
         )
         (br $folding-inner0)
        )
       )
-      ;;@ core/memory/writeTraps.ts:124:4
+      ;;@ core/memory/writeTraps.ts:135:4
       (block $break|0
        (block $case3|0
         (block $case2|0
@@ -11260,25 +11343,25 @@
             (br $break|0)
            )
           )
-          ;;@ core/memory/writeTraps.ts:126:8
+          ;;@ core/memory/writeTraps.ts:137:8
           (set_global $core/graphics/graphics/Graphics.scrollX
            (get_local $1)
           )
           (br $folding-inner0)
          )
-         ;;@ core/memory/writeTraps.ts:129:8
+         ;;@ core/memory/writeTraps.ts:140:8
          (set_global $core/graphics/graphics/Graphics.scrollY
           (get_local $1)
          )
          (br $folding-inner0)
         )
-        ;;@ core/memory/writeTraps.ts:132:8
+        ;;@ core/memory/writeTraps.ts:143:8
         (set_global $core/graphics/graphics/Graphics.windowX
          (get_local $1)
         )
         (br $folding-inner0)
        )
-       ;;@ core/memory/writeTraps.ts:135:8
+       ;;@ core/memory/writeTraps.ts:146:8
        (set_global $core/graphics/graphics/Graphics.windowY
         (get_local $1)
        )
@@ -11287,90 +11370,90 @@
       (br $folding-inner0)
      )
     )
-    ;;@ core/memory/writeTraps.ts:144:2
+    ;;@ core/memory/writeTraps.ts:155:2
     (if
-     ;;@ core/memory/writeTraps.ts:144:6
+     ;;@ core/memory/writeTraps.ts:155:6
      (i32.eq
       (get_local $0)
-      ;;@ core/memory/writeTraps.ts:144:17
+      ;;@ core/memory/writeTraps.ts:155:17
       (get_global $core/memory/memory/Memory.memoryLocationHdmaTrigger)
      )
-     ;;@ core/memory/writeTraps.ts:144:51
+     ;;@ core/memory/writeTraps.ts:155:51
      (block
-      ;;@ core/memory/writeTraps.ts:145:4
+      ;;@ core/memory/writeTraps.ts:156:4
       (call $core/memory/dma/startHdmaTransfer
        (get_local $1)
       )
       (br $folding-inner1)
      )
     )
-    ;;@ core/memory/writeTraps.ts:151:6
+    ;;@ core/memory/writeTraps.ts:162:6
     (if
      (i32.eqz
       (tee_local $2
        (i32.eq
         (get_local $0)
-        ;;@ core/memory/writeTraps.ts:151:17
+        ;;@ core/memory/writeTraps.ts:162:17
         (get_global $core/memory/memory/Memory.memoryLocationGBCWRAMBank)
        )
       )
      )
      (set_local $2
-      ;;@ core/memory/writeTraps.ts:151:53
+      ;;@ core/memory/writeTraps.ts:162:53
       (i32.eq
        (get_local $0)
-       ;;@ core/memory/writeTraps.ts:151:64
+       ;;@ core/memory/writeTraps.ts:162:64
        (get_global $core/memory/memory/Memory.memoryLocationGBCVRAMBank)
       )
      )
     )
-    ;;@ core/memory/writeTraps.ts:151:2
+    ;;@ core/memory/writeTraps.ts:162:2
     (if
      (get_local $2)
-     ;;@ core/memory/writeTraps.ts:151:98
+     ;;@ core/memory/writeTraps.ts:162:98
      (if
-      ;;@ core/memory/writeTraps.ts:152:8
+      ;;@ core/memory/writeTraps.ts:163:8
       (get_global $core/memory/memory/Memory.isHblankHdmaActive)
       (block
-       ;;@ core/memory/writeTraps.ts:154:8
+       ;;@ core/memory/writeTraps.ts:165:8
        (if
         (tee_local $2
-         ;;@ core/memory/writeTraps.ts:154:9
+         ;;@ core/memory/writeTraps.ts:165:9
          (i32.ge_s
           (get_global $core/memory/memory/Memory.hblankHdmaSource)
-          ;;@ core/memory/writeTraps.ts:154:36
+          ;;@ core/memory/writeTraps.ts:165:36
           (i32.const 16384)
          )
         )
         (set_local $2
-         ;;@ core/memory/writeTraps.ts:154:46
+         ;;@ core/memory/writeTraps.ts:165:46
          (i32.le_s
           (get_global $core/memory/memory/Memory.hblankHdmaSource)
-          ;;@ core/memory/writeTraps.ts:154:73
+          ;;@ core/memory/writeTraps.ts:165:73
           (i32.const 32767)
          )
         )
        )
-       ;;@ core/memory/writeTraps.ts:154:8
+       ;;@ core/memory/writeTraps.ts:165:8
        (if
         (i32.eqz
          (get_local $2)
         )
-        ;;@ core/memory/writeTraps.ts:155:8
+        ;;@ core/memory/writeTraps.ts:166:8
         (if
          (tee_local $2
-          ;;@ core/memory/writeTraps.ts:155:9
+          ;;@ core/memory/writeTraps.ts:166:9
           (i32.ge_s
            (get_global $core/memory/memory/Memory.hblankHdmaSource)
-           ;;@ core/memory/writeTraps.ts:155:36
+           ;;@ core/memory/writeTraps.ts:166:36
            (i32.const 53248)
           )
          )
          (set_local $2
-          ;;@ core/memory/writeTraps.ts:155:46
+          ;;@ core/memory/writeTraps.ts:166:46
           (i32.le_s
            (get_global $core/memory/memory/Memory.hblankHdmaSource)
-           ;;@ core/memory/writeTraps.ts:155:73
+           ;;@ core/memory/writeTraps.ts:166:73
            (i32.const 57343)
           )
          )
@@ -11382,30 +11465,30 @@
       )
      )
     )
-    ;;@ core/memory/writeTraps.ts:163:6
+    ;;@ core/memory/writeTraps.ts:174:6
     (if
      (tee_local $2
       (i32.ge_s
        (get_local $0)
-       ;;@ core/memory/writeTraps.ts:163:16
+       ;;@ core/memory/writeTraps.ts:174:16
        (get_global $core/graphics/palette/Palette.memoryLocationBackgroundPaletteIndex)
       )
      )
      (set_local $2
-      ;;@ core/memory/writeTraps.ts:163:64
+      ;;@ core/memory/writeTraps.ts:174:64
       (i32.le_s
        (get_local $0)
-       ;;@ core/memory/writeTraps.ts:163:74
+       ;;@ core/memory/writeTraps.ts:174:74
        (get_global $core/graphics/palette/Palette.memoryLocationSpritePaletteData)
       )
      )
     )
-    ;;@ core/memory/writeTraps.ts:163:2
+    ;;@ core/memory/writeTraps.ts:174:2
     (if
      (get_local $2)
-     ;;@ core/memory/writeTraps.ts:163:115
+     ;;@ core/memory/writeTraps.ts:174:115
      (block
-      ;;@ core/memory/writeTraps.ts:165:4
+      ;;@ core/memory/writeTraps.ts:176:4
       (call $core/graphics/palette/writeColorPaletteToMemory
        (get_local $0)
        (get_local $1)
@@ -11413,7 +11496,7 @@
       (br $folding-inner0)
      )
     )
-    ;;@ core/memory/writeTraps.ts:170:6
+    ;;@ core/memory/writeTraps.ts:181:6
     (if
      (tee_local $2
       (i32.ge_s
@@ -11422,21 +11505,21 @@
       )
      )
      (set_local $2
-      ;;@ core/memory/writeTraps.ts:170:56
+      ;;@ core/memory/writeTraps.ts:181:56
       (i32.le_s
        (get_local $0)
        (i32.const 65287)
       )
      )
     )
-    ;;@ core/memory/writeTraps.ts:170:2
+    ;;@ core/memory/writeTraps.ts:181:2
     (if
      (get_local $2)
-     ;;@ core/memory/writeTraps.ts:170:101
+     ;;@ core/memory/writeTraps.ts:181:101
      (block
-      ;;@ core/memory/writeTraps.ts:172:4
+      ;;@ core/memory/writeTraps.ts:183:4
       (call $core/timers/timers/batchProcessTimers)
-      ;;@ core/memory/writeTraps.ts:174:4
+      ;;@ core/memory/writeTraps.ts:185:4
       (block $break|1
        (block $case3|1
         (block $case2|1
@@ -11460,25 +11543,25 @@
             (br $break|1)
            )
           )
-          ;;@ core/memory/writeTraps.ts:176:15
+          ;;@ core/memory/writeTraps.ts:187:15
           (call $core/timers/timers/Timers.updateDividerRegister
            (get_local $1)
           )
           (br $folding-inner1)
          )
-         ;;@ core/memory/writeTraps.ts:179:15
+         ;;@ core/memory/writeTraps.ts:190:15
          (call $core/timers/timers/Timers.updateTimerCounter
           (get_local $1)
          )
          (br $folding-inner0)
         )
-        ;;@ core/memory/writeTraps.ts:182:15
+        ;;@ core/memory/writeTraps.ts:193:15
         (call $core/timers/timers/Timers.updateTimerModulo
          (get_local $1)
         )
         (br $folding-inner0)
        )
-       ;;@ core/memory/writeTraps.ts:185:15
+       ;;@ core/memory/writeTraps.ts:196:15
        (call $core/timers/timers/Timers.updateTimerControl
         (get_local $1)
        )
@@ -11487,44 +11570,44 @@
       (br $folding-inner0)
      )
     )
-    ;;@ core/memory/writeTraps.ts:193:2
+    ;;@ core/memory/writeTraps.ts:204:2
     (if
-     ;;@ core/memory/writeTraps.ts:193:6
+     ;;@ core/memory/writeTraps.ts:204:6
      (i32.eq
       (get_local $0)
       (i32.const 65280)
      )
-     ;;@ core/memory/writeTraps.ts:193:54
+     ;;@ core/memory/writeTraps.ts:204:54
      (call $core/joypad/joypad/Joypad.updateJoypad
       (get_local $1)
      )
     )
-    ;;@ core/memory/writeTraps.ts:198:2
+    ;;@ core/memory/writeTraps.ts:209:2
     (if
-     ;;@ core/memory/writeTraps.ts:198:6
+     ;;@ core/memory/writeTraps.ts:209:6
      (i32.eq
       (get_local $0)
       (i32.const 65295)
      )
-     ;;@ core/memory/writeTraps.ts:198:60
+     ;;@ core/memory/writeTraps.ts:209:60
      (block
-      ;;@ core/memory/writeTraps.ts:199:15
+      ;;@ core/memory/writeTraps.ts:210:15
       (call $core/interrupts/interrupts/Interrupts.updateInterruptRequested
        (get_local $1)
       )
       (br $folding-inner0)
      )
     )
-    ;;@ core/memory/writeTraps.ts:202:2
+    ;;@ core/memory/writeTraps.ts:213:2
     (if
-     ;;@ core/memory/writeTraps.ts:202:6
+     ;;@ core/memory/writeTraps.ts:213:6
      (i32.eq
       (get_local $0)
       (i32.const 65535)
      )
-     ;;@ core/memory/writeTraps.ts:202:60
+     ;;@ core/memory/writeTraps.ts:213:60
      (block
-      ;;@ core/memory/writeTraps.ts:203:15
+      ;;@ core/memory/writeTraps.ts:214:15
       (call $core/interrupts/interrupts/Interrupts.updateInterruptEnabled
        (get_local $1)
       )
@@ -16149,49 +16232,49 @@
   (i32.const 4)
  )
  (func $core/cpu/cpu/Cpu.enableHalt (; 193 ;) (; has Stack IR ;) (type $v)
-  ;;@ core/cpu/cpu.ts:74:4
+  ;;@ core/cpu/cpu.ts:75:4
   (if
-   ;;@ core/cpu/cpu.ts:74:8
+   ;;@ core/cpu/cpu.ts:75:8
    (get_global $core/interrupts/interrupts/Interrupts.masterInterruptSwitch)
-   ;;@ core/cpu/cpu.ts:74:42
+   ;;@ core/cpu/cpu.ts:75:42
    (block
-    ;;@ core/cpu/cpu.ts:75:6
+    ;;@ core/cpu/cpu.ts:76:6
     (set_global $core/cpu/cpu/Cpu.isHaltNormal
-     ;;@ core/cpu/cpu.ts:75:25
+     ;;@ core/cpu/cpu.ts:76:25
      (i32.const 1)
     )
-    ;;@ core/cpu/cpu.ts:76:6
+    ;;@ core/cpu/cpu.ts:77:6
     (return)
    )
   )
-  ;;@ core/cpu/cpu.ts:81:4
+  ;;@ core/cpu/cpu.ts:82:4
   (if
    (i32.eqz
-    ;;@ core/cpu/cpu.ts:79:29
+    ;;@ core/cpu/cpu.ts:80:29
     (i32.and
      (i32.and
       (get_global $core/interrupts/interrupts/Interrupts.interruptsEnabledValue)
-      ;;@ core/cpu/cpu.ts:79:65
+      ;;@ core/cpu/cpu.ts:80:65
       (get_global $core/interrupts/interrupts/Interrupts.interruptsRequestedValue)
      )
-     ;;@ core/cpu/cpu.ts:79:103
+     ;;@ core/cpu/cpu.ts:80:103
      (i32.const 31)
     )
    )
-   ;;@ core/cpu/cpu.ts:81:29
+   ;;@ core/cpu/cpu.ts:82:29
    (block
-    ;;@ core/cpu/cpu.ts:82:6
+    ;;@ core/cpu/cpu.ts:83:6
     (set_global $core/cpu/cpu/Cpu.isHaltNoJump
-     ;;@ core/cpu/cpu.ts:82:25
+     ;;@ core/cpu/cpu.ts:83:25
      (i32.const 1)
     )
-    ;;@ core/cpu/cpu.ts:83:6
+    ;;@ core/cpu/cpu.ts:84:6
     (return)
    )
   )
-  ;;@ core/cpu/cpu.ts:86:4
+  ;;@ core/cpu/cpu.ts:87:4
   (set_global $core/cpu/cpu/Cpu.isHaltBug
-   ;;@ core/cpu/cpu.ts:86:20
+   ;;@ core/cpu/cpu.ts:87:20
    (i32.const 1)
   )
  )
@@ -21366,35 +21449,35 @@
   )
  )
  (func $core/cpu/cpu/Cpu.exitHaltAndStop (; 227 ;) (; has Stack IR ;) (type $v)
-  ;;@ core/cpu/cpu.ts:90:4
-  (set_global $core/cpu/cpu/Cpu.isHaltNoJump
-   ;;@ core/cpu/cpu.ts:90:23
-   (i32.const 0)
-  )
   ;;@ core/cpu/cpu.ts:91:4
-  (set_global $core/cpu/cpu/Cpu.isHaltNormal
+  (set_global $core/cpu/cpu/Cpu.isHaltNoJump
    ;;@ core/cpu/cpu.ts:91:23
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:92:4
-  (set_global $core/cpu/cpu/Cpu.isHaltBug
-   ;;@ core/cpu/cpu.ts:92:20
+  (set_global $core/cpu/cpu/Cpu.isHaltNormal
+   ;;@ core/cpu/cpu.ts:92:23
    (i32.const 0)
   )
   ;;@ core/cpu/cpu.ts:93:4
-  (set_global $core/cpu/cpu/Cpu.isStopped
+  (set_global $core/cpu/cpu/Cpu.isHaltBug
    ;;@ core/cpu/cpu.ts:93:20
+   (i32.const 0)
+  )
+  ;;@ core/cpu/cpu.ts:94:4
+  (set_global $core/cpu/cpu/Cpu.isStopped
+   ;;@ core/cpu/cpu.ts:94:20
    (i32.const 0)
   )
  )
  (func $core/cpu/cpu/Cpu.isHalted (; 228 ;) (; has Stack IR ;) (type $i) (result i32)
-  ;;@ core/cpu/cpu.ts:97:4
+  ;;@ core/cpu/cpu.ts:98:4
   (if
-   ;;@ core/cpu/cpu.ts:97:8
+   ;;@ core/cpu/cpu.ts:98:8
    (if (result i32)
     (get_global $core/cpu/cpu/Cpu.isHaltNormal)
     (get_global $core/cpu/cpu/Cpu.isHaltNormal)
-    ;;@ core/cpu/cpu.ts:97:28
+    ;;@ core/cpu/cpu.ts:98:28
     (get_global $core/cpu/cpu/Cpu.isHaltNoJump)
    )
    (return
@@ -22228,169 +22311,169 @@
   )
  )
  (func $core/cpu/cpu/Cpu.saveState (; 239 ;) (; has Stack IR ;) (type $v)
-  ;;@ core/cpu/cpu.ts:110:4
-  (i32.store8
-   ;;@ core/cpu/cpu.ts:110:14
-   (call $core/core/getSaveStateMemoryOffset
-    ;;@ core/cpu/cpu.ts:110:39
-    (i32.const 0)
-    (i32.const 0)
-   )
-   ;;@ core/cpu/cpu.ts:110:65
-   (get_global $core/cpu/cpu/Cpu.registerA)
-  )
   ;;@ core/cpu/cpu.ts:111:4
   (i32.store8
    ;;@ core/cpu/cpu.ts:111:14
    (call $core/core/getSaveStateMemoryOffset
     ;;@ core/cpu/cpu.ts:111:39
-    (i32.const 1)
+    (i32.const 0)
     (i32.const 0)
    )
    ;;@ core/cpu/cpu.ts:111:65
-   (get_global $core/cpu/cpu/Cpu.registerB)
+   (get_global $core/cpu/cpu/Cpu.registerA)
   )
   ;;@ core/cpu/cpu.ts:112:4
   (i32.store8
    ;;@ core/cpu/cpu.ts:112:14
    (call $core/core/getSaveStateMemoryOffset
     ;;@ core/cpu/cpu.ts:112:39
-    (i32.const 2)
+    (i32.const 1)
     (i32.const 0)
    )
    ;;@ core/cpu/cpu.ts:112:65
-   (get_global $core/cpu/cpu/Cpu.registerC)
+   (get_global $core/cpu/cpu/Cpu.registerB)
   )
   ;;@ core/cpu/cpu.ts:113:4
   (i32.store8
    ;;@ core/cpu/cpu.ts:113:14
    (call $core/core/getSaveStateMemoryOffset
     ;;@ core/cpu/cpu.ts:113:39
-    (i32.const 3)
+    (i32.const 2)
     (i32.const 0)
    )
    ;;@ core/cpu/cpu.ts:113:65
-   (get_global $core/cpu/cpu/Cpu.registerD)
+   (get_global $core/cpu/cpu/Cpu.registerC)
   )
   ;;@ core/cpu/cpu.ts:114:4
   (i32.store8
    ;;@ core/cpu/cpu.ts:114:14
    (call $core/core/getSaveStateMemoryOffset
     ;;@ core/cpu/cpu.ts:114:39
-    (i32.const 4)
+    (i32.const 3)
     (i32.const 0)
    )
    ;;@ core/cpu/cpu.ts:114:65
-   (get_global $core/cpu/cpu/Cpu.registerE)
+   (get_global $core/cpu/cpu/Cpu.registerD)
   )
   ;;@ core/cpu/cpu.ts:115:4
   (i32.store8
    ;;@ core/cpu/cpu.ts:115:14
    (call $core/core/getSaveStateMemoryOffset
     ;;@ core/cpu/cpu.ts:115:39
-    (i32.const 5)
+    (i32.const 4)
     (i32.const 0)
    )
    ;;@ core/cpu/cpu.ts:115:65
-   (get_global $core/cpu/cpu/Cpu.registerH)
+   (get_global $core/cpu/cpu/Cpu.registerE)
   )
   ;;@ core/cpu/cpu.ts:116:4
   (i32.store8
    ;;@ core/cpu/cpu.ts:116:14
    (call $core/core/getSaveStateMemoryOffset
     ;;@ core/cpu/cpu.ts:116:39
-    (i32.const 6)
+    (i32.const 5)
     (i32.const 0)
    )
    ;;@ core/cpu/cpu.ts:116:65
-   (get_global $core/cpu/cpu/Cpu.registerL)
+   (get_global $core/cpu/cpu/Cpu.registerH)
   )
   ;;@ core/cpu/cpu.ts:117:4
   (i32.store8
    ;;@ core/cpu/cpu.ts:117:14
    (call $core/core/getSaveStateMemoryOffset
     ;;@ core/cpu/cpu.ts:117:39
-    (i32.const 7)
+    (i32.const 6)
     (i32.const 0)
    )
    ;;@ core/cpu/cpu.ts:117:65
-   (get_global $core/cpu/cpu/Cpu.registerF)
+   (get_global $core/cpu/cpu/Cpu.registerL)
   )
-  ;;@ core/cpu/cpu.ts:119:4
-  (i32.store16
-   ;;@ core/cpu/cpu.ts:119:15
+  ;;@ core/cpu/cpu.ts:118:4
+  (i32.store8
+   ;;@ core/cpu/cpu.ts:118:14
    (call $core/core/getSaveStateMemoryOffset
-    ;;@ core/cpu/cpu.ts:119:40
-    (i32.const 8)
+    ;;@ core/cpu/cpu.ts:118:39
+    (i32.const 7)
     (i32.const 0)
    )
-   ;;@ core/cpu/cpu.ts:119:66
-   (get_global $core/cpu/cpu/Cpu.stackPointer)
+   ;;@ core/cpu/cpu.ts:118:65
+   (get_global $core/cpu/cpu/Cpu.registerF)
   )
   ;;@ core/cpu/cpu.ts:120:4
   (i32.store16
    ;;@ core/cpu/cpu.ts:120:15
    (call $core/core/getSaveStateMemoryOffset
     ;;@ core/cpu/cpu.ts:120:40
-    (i32.const 10)
+    (i32.const 8)
     (i32.const 0)
    )
    ;;@ core/cpu/cpu.ts:120:66
+   (get_global $core/cpu/cpu/Cpu.stackPointer)
+  )
+  ;;@ core/cpu/cpu.ts:121:4
+  (i32.store16
+   ;;@ core/cpu/cpu.ts:121:15
+   (call $core/core/getSaveStateMemoryOffset
+    ;;@ core/cpu/cpu.ts:121:40
+    (i32.const 10)
+    (i32.const 0)
+   )
+   ;;@ core/cpu/cpu.ts:121:66
    (get_global $core/cpu/cpu/Cpu.programCounter)
   )
-  ;;@ core/cpu/cpu.ts:122:4
+  ;;@ core/cpu/cpu.ts:123:4
   (i32.store
-   ;;@ core/cpu/cpu.ts:122:15
+   ;;@ core/cpu/cpu.ts:123:15
    (call $core/core/getSaveStateMemoryOffset
-    ;;@ core/cpu/cpu.ts:122:40
+    ;;@ core/cpu/cpu.ts:123:40
     (i32.const 12)
     (i32.const 0)
    )
-   ;;@ core/cpu/cpu.ts:122:66
+   ;;@ core/cpu/cpu.ts:123:66
    (get_global $core/cpu/cpu/Cpu.currentCycles)
-  )
-  ;;@ core/cpu/cpu.ts:124:4
-  (call $core/memory/store/storeBooleanDirectlyToWasmMemory
-   ;;@ core/cpu/cpu.ts:124:37
-   (call $core/core/getSaveStateMemoryOffset
-    ;;@ core/cpu/cpu.ts:124:62
-    (i32.const 17)
-    (i32.const 0)
-   )
-   ;;@ core/cpu/cpu.ts:124:88
-   (get_global $core/cpu/cpu/Cpu.isHaltNormal)
   )
   ;;@ core/cpu/cpu.ts:125:4
   (call $core/memory/store/storeBooleanDirectlyToWasmMemory
    ;;@ core/cpu/cpu.ts:125:37
    (call $core/core/getSaveStateMemoryOffset
     ;;@ core/cpu/cpu.ts:125:62
-    (i32.const 18)
+    (i32.const 17)
     (i32.const 0)
    )
    ;;@ core/cpu/cpu.ts:125:88
-   (get_global $core/cpu/cpu/Cpu.isHaltNoJump)
+   (get_global $core/cpu/cpu/Cpu.isHaltNormal)
   )
   ;;@ core/cpu/cpu.ts:126:4
   (call $core/memory/store/storeBooleanDirectlyToWasmMemory
    ;;@ core/cpu/cpu.ts:126:37
    (call $core/core/getSaveStateMemoryOffset
     ;;@ core/cpu/cpu.ts:126:62
-    (i32.const 19)
+    (i32.const 18)
     (i32.const 0)
    )
    ;;@ core/cpu/cpu.ts:126:88
-   (get_global $core/cpu/cpu/Cpu.isHaltBug)
+   (get_global $core/cpu/cpu/Cpu.isHaltNoJump)
   )
   ;;@ core/cpu/cpu.ts:127:4
   (call $core/memory/store/storeBooleanDirectlyToWasmMemory
    ;;@ core/cpu/cpu.ts:127:37
    (call $core/core/getSaveStateMemoryOffset
     ;;@ core/cpu/cpu.ts:127:62
-    (i32.const 20)
+    (i32.const 19)
     (i32.const 0)
    )
    ;;@ core/cpu/cpu.ts:127:88
+   (get_global $core/cpu/cpu/Cpu.isHaltBug)
+  )
+  ;;@ core/cpu/cpu.ts:128:4
+  (call $core/memory/store/storeBooleanDirectlyToWasmMemory
+   ;;@ core/cpu/cpu.ts:128:37
+   (call $core/core/getSaveStateMemoryOffset
+    ;;@ core/cpu/cpu.ts:128:62
+    (i32.const 20)
+    (i32.const 0)
+   )
+   ;;@ core/cpu/cpu.ts:128:88
    (get_global $core/cpu/cpu/Cpu.isStopped)
   )
  )
@@ -22992,181 +23075,181 @@
   (i32.const 0)
  )
  (func $core/cpu/cpu/Cpu.loadState (; 252 ;) (; has Stack IR ;) (type $v)
-  ;;@ core/cpu/cpu.ts:133:4
-  (set_global $core/cpu/cpu/Cpu.registerA
-   ;;@ core/cpu/cpu.ts:133:20
-   (i32.load8_u
-    ;;@ core/cpu/cpu.ts:133:29
-    (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/cpu/cpu.ts:133:54
-     (i32.const 0)
-     (i32.const 0)
-    )
-   )
-  )
   ;;@ core/cpu/cpu.ts:134:4
-  (set_global $core/cpu/cpu/Cpu.registerB
+  (set_global $core/cpu/cpu/Cpu.registerA
    ;;@ core/cpu/cpu.ts:134:20
    (i32.load8_u
     ;;@ core/cpu/cpu.ts:134:29
     (call $core/core/getSaveStateMemoryOffset
      ;;@ core/cpu/cpu.ts:134:54
-     (i32.const 1)
+     (i32.const 0)
      (i32.const 0)
     )
    )
   )
   ;;@ core/cpu/cpu.ts:135:4
-  (set_global $core/cpu/cpu/Cpu.registerC
+  (set_global $core/cpu/cpu/Cpu.registerB
    ;;@ core/cpu/cpu.ts:135:20
    (i32.load8_u
     ;;@ core/cpu/cpu.ts:135:29
     (call $core/core/getSaveStateMemoryOffset
      ;;@ core/cpu/cpu.ts:135:54
-     (i32.const 2)
+     (i32.const 1)
      (i32.const 0)
     )
    )
   )
   ;;@ core/cpu/cpu.ts:136:4
-  (set_global $core/cpu/cpu/Cpu.registerD
+  (set_global $core/cpu/cpu/Cpu.registerC
    ;;@ core/cpu/cpu.ts:136:20
    (i32.load8_u
     ;;@ core/cpu/cpu.ts:136:29
     (call $core/core/getSaveStateMemoryOffset
      ;;@ core/cpu/cpu.ts:136:54
-     (i32.const 3)
+     (i32.const 2)
      (i32.const 0)
     )
    )
   )
   ;;@ core/cpu/cpu.ts:137:4
-  (set_global $core/cpu/cpu/Cpu.registerE
+  (set_global $core/cpu/cpu/Cpu.registerD
    ;;@ core/cpu/cpu.ts:137:20
    (i32.load8_u
     ;;@ core/cpu/cpu.ts:137:29
     (call $core/core/getSaveStateMemoryOffset
      ;;@ core/cpu/cpu.ts:137:54
-     (i32.const 4)
+     (i32.const 3)
      (i32.const 0)
     )
    )
   )
   ;;@ core/cpu/cpu.ts:138:4
-  (set_global $core/cpu/cpu/Cpu.registerH
+  (set_global $core/cpu/cpu/Cpu.registerE
    ;;@ core/cpu/cpu.ts:138:20
    (i32.load8_u
     ;;@ core/cpu/cpu.ts:138:29
     (call $core/core/getSaveStateMemoryOffset
      ;;@ core/cpu/cpu.ts:138:54
-     (i32.const 5)
+     (i32.const 4)
      (i32.const 0)
     )
    )
   )
   ;;@ core/cpu/cpu.ts:139:4
-  (set_global $core/cpu/cpu/Cpu.registerL
+  (set_global $core/cpu/cpu/Cpu.registerH
    ;;@ core/cpu/cpu.ts:139:20
    (i32.load8_u
     ;;@ core/cpu/cpu.ts:139:29
     (call $core/core/getSaveStateMemoryOffset
      ;;@ core/cpu/cpu.ts:139:54
-     (i32.const 6)
+     (i32.const 5)
      (i32.const 0)
     )
    )
   )
   ;;@ core/cpu/cpu.ts:140:4
-  (set_global $core/cpu/cpu/Cpu.registerF
+  (set_global $core/cpu/cpu/Cpu.registerL
    ;;@ core/cpu/cpu.ts:140:20
    (i32.load8_u
     ;;@ core/cpu/cpu.ts:140:29
     (call $core/core/getSaveStateMemoryOffset
      ;;@ core/cpu/cpu.ts:140:54
+     (i32.const 6)
+     (i32.const 0)
+    )
+   )
+  )
+  ;;@ core/cpu/cpu.ts:141:4
+  (set_global $core/cpu/cpu/Cpu.registerF
+   ;;@ core/cpu/cpu.ts:141:20
+   (i32.load8_u
+    ;;@ core/cpu/cpu.ts:141:29
+    (call $core/core/getSaveStateMemoryOffset
+     ;;@ core/cpu/cpu.ts:141:54
      (i32.const 7)
      (i32.const 0)
     )
    )
   )
-  ;;@ core/cpu/cpu.ts:142:4
+  ;;@ core/cpu/cpu.ts:143:4
   (set_global $core/cpu/cpu/Cpu.stackPointer
-   ;;@ core/cpu/cpu.ts:142:23
+   ;;@ core/cpu/cpu.ts:143:23
    (i32.load16_u
-    ;;@ core/cpu/cpu.ts:142:33
+    ;;@ core/cpu/cpu.ts:143:33
     (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/cpu/cpu.ts:142:58
+     ;;@ core/cpu/cpu.ts:143:58
      (i32.const 8)
      (i32.const 0)
     )
    )
   )
-  ;;@ core/cpu/cpu.ts:143:4
+  ;;@ core/cpu/cpu.ts:144:4
   (set_global $core/cpu/cpu/Cpu.programCounter
-   ;;@ core/cpu/cpu.ts:143:25
+   ;;@ core/cpu/cpu.ts:144:25
    (i32.load16_u
-    ;;@ core/cpu/cpu.ts:143:35
+    ;;@ core/cpu/cpu.ts:144:35
     (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/cpu/cpu.ts:143:60
+     ;;@ core/cpu/cpu.ts:144:60
      (i32.const 10)
      (i32.const 0)
     )
    )
   )
-  ;;@ core/cpu/cpu.ts:145:4
+  ;;@ core/cpu/cpu.ts:146:4
   (set_global $core/cpu/cpu/Cpu.currentCycles
-   ;;@ core/cpu/cpu.ts:145:24
+   ;;@ core/cpu/cpu.ts:146:24
    (i32.load
-    ;;@ core/cpu/cpu.ts:145:34
+    ;;@ core/cpu/cpu.ts:146:34
     (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/cpu/cpu.ts:145:59
+     ;;@ core/cpu/cpu.ts:146:59
      (i32.const 12)
      (i32.const 0)
     )
    )
   )
-  ;;@ core/cpu/cpu.ts:147:4
-  (set_global $core/cpu/cpu/Cpu.isHaltNormal
-   ;;@ core/cpu/cpu.ts:147:23
-   (call $core/memory/load/loadBooleanDirectlyFromWasmMemory
-    ;;@ core/cpu/cpu.ts:147:57
-    (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/cpu/cpu.ts:147:82
-     (i32.const 17)
-     (i32.const 0)
-    )
-   )
-  )
   ;;@ core/cpu/cpu.ts:148:4
-  (set_global $core/cpu/cpu/Cpu.isHaltNoJump
+  (set_global $core/cpu/cpu/Cpu.isHaltNormal
    ;;@ core/cpu/cpu.ts:148:23
    (call $core/memory/load/loadBooleanDirectlyFromWasmMemory
     ;;@ core/cpu/cpu.ts:148:57
     (call $core/core/getSaveStateMemoryOffset
      ;;@ core/cpu/cpu.ts:148:82
-     (i32.const 18)
+     (i32.const 17)
      (i32.const 0)
     )
    )
   )
   ;;@ core/cpu/cpu.ts:149:4
-  (set_global $core/cpu/cpu/Cpu.isHaltBug
-   ;;@ core/cpu/cpu.ts:149:20
+  (set_global $core/cpu/cpu/Cpu.isHaltNoJump
+   ;;@ core/cpu/cpu.ts:149:23
    (call $core/memory/load/loadBooleanDirectlyFromWasmMemory
-    ;;@ core/cpu/cpu.ts:149:54
+    ;;@ core/cpu/cpu.ts:149:57
     (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/cpu/cpu.ts:149:79
-     (i32.const 19)
+     ;;@ core/cpu/cpu.ts:149:82
+     (i32.const 18)
      (i32.const 0)
     )
    )
   )
   ;;@ core/cpu/cpu.ts:150:4
-  (set_global $core/cpu/cpu/Cpu.isStopped
+  (set_global $core/cpu/cpu/Cpu.isHaltBug
    ;;@ core/cpu/cpu.ts:150:20
    (call $core/memory/load/loadBooleanDirectlyFromWasmMemory
     ;;@ core/cpu/cpu.ts:150:54
     (call $core/core/getSaveStateMemoryOffset
      ;;@ core/cpu/cpu.ts:150:79
+     (i32.const 19)
+     (i32.const 0)
+    )
+   )
+  )
+  ;;@ core/cpu/cpu.ts:151:4
+  (set_global $core/cpu/cpu/Cpu.isStopped
+   ;;@ core/cpu/cpu.ts:151:20
+   (call $core/memory/load/loadBooleanDirectlyFromWasmMemory
+    ;;@ core/cpu/cpu.ts:151:54
+    (call $core/core/getSaveStateMemoryOffset
+     ;;@ core/cpu/cpu.ts:151:79
      (i32.const 20)
      (i32.const 0)
     )

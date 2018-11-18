@@ -18,6 +18,10 @@ import { log, hexLog } from '../helpers/index';
 export class Cpu {
   // Status to track if we are in Gameboy Color Mode, and GBC State
   static GBCEnabled: boolean = false;
+
+  // Memory Location for the GBC Speed switch
+  // And the current status
+  static readonly memoryLocationSpeedSwitch: u16 = 0xff4d;
   static GBCDoubleSpeed: boolean = false;
 
   // 8-bit Cpu.registers
@@ -55,9 +59,6 @@ export class Cpu {
 
     return 70224;
   }
-
-  // Memory Location for the GBC Speed switch
-  static readonly memoryLocationSpeedSwitch: u16 = 0xff4d;
 
   // HALT and STOP instructions need to stop running opcodes, but simply check timers
   // https://github.com/nakardo/node-gameboy/blob/master/lib/cpu/opcodes.js
