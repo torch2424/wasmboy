@@ -164,7 +164,9 @@ function _handleInterrupt(bitPosition: i32): void {
   // Push the next instruction, not the halt itself (TCAGBD).
   Cpu.stackPointer = Cpu.stackPointer - 2;
   if (Cpu.isHalted()) {
-    sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 1);
+    // TODO: This breaks Pokemon Yellow, And OG Link's awakening. Find out why...
+    // sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 1);
+    sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
   } else {
     sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
   }

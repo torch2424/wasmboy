@@ -4955,33 +4955,33 @@
  )
  (func $core/interrupts/interrupts/_requestInterrupt (; 57 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   (local $1 i32)
-  ;;@ core/interrupts/interrupts.ts:201:2
+  ;;@ core/interrupts/interrupts.ts:203:2
   (set_global $core/interrupts/interrupts/Interrupts.interruptsRequestedValue
-   ;;@ core/interrupts/interrupts.ts:199:2
+   ;;@ core/interrupts/interrupts.ts:201:2
    (tee_local $1
-    ;;@ core/interrupts/interrupts.ts:199:21
+    ;;@ core/interrupts/interrupts.ts:201:21
     (call $core/helpers/index/setBitOnByte
      (get_local $0)
-     ;;@ core/interrupts/interrupts.ts:196:25
+     ;;@ core/interrupts/interrupts.ts:198:25
      (call $core/memory/load/eightBitLoadFromGBMemory
       (i32.const 65295)
      )
     )
    )
   )
-  ;;@ core/interrupts/interrupts.ts:203:2
+  ;;@ core/interrupts/interrupts.ts:205:2
   (call $core/memory/store/eightBitStoreIntoGBMemory
    (i32.const 65295)
    (get_local $1)
   )
  )
  (func $core/interrupts/interrupts/requestLcdInterrupt (; 58 ;) (; has Stack IR ;) (type $v)
-  ;;@ core/interrupts/interrupts.ts:222:2
+  ;;@ core/interrupts/interrupts.ts:224:2
   (set_global $core/interrupts/interrupts/Interrupts.isLcdInterruptRequested
-   ;;@ core/interrupts/interrupts.ts:222:39
+   ;;@ core/interrupts/interrupts.ts:224:39
    (i32.const 1)
   )
-  ;;@ core/interrupts/interrupts.ts:223:2
+  ;;@ core/interrupts/interrupts.ts:225:2
   (call $core/interrupts/interrupts/_requestInterrupt
    (i32.const 1)
   )
@@ -10082,102 +10082,102 @@
   (i32.const 1)
  )
  (func $core/graphics/lcd/Lcd.updateLcdControl (; 134 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
-  ;;@ core/graphics/lcd.ts:65:4
+  ;;@ core/graphics/lcd.ts:63:4
   (set_global $core/graphics/lcd/Lcd.enabled
-   ;;@ core/graphics/lcd.ts:65:18
+   ;;@ core/graphics/lcd.ts:63:18
    (call $core/helpers/index/checkBitOnByte
-    ;;@ core/graphics/lcd.ts:65:33
+    ;;@ core/graphics/lcd.ts:63:33
     (i32.const 7)
     (get_local $0)
    )
   )
-  ;;@ core/graphics/lcd.ts:66:4
+  ;;@ core/graphics/lcd.ts:64:4
   (set_global $core/graphics/lcd/Lcd.windowTileMapDisplaySelect
-   ;;@ core/graphics/lcd.ts:66:37
+   ;;@ core/graphics/lcd.ts:64:37
    (call $core/helpers/index/checkBitOnByte
-    ;;@ core/graphics/lcd.ts:66:52
+    ;;@ core/graphics/lcd.ts:64:52
     (i32.const 6)
     (get_local $0)
    )
   )
-  ;;@ core/graphics/lcd.ts:67:4
+  ;;@ core/graphics/lcd.ts:65:4
   (set_global $core/graphics/lcd/Lcd.windowDisplayEnabled
-   ;;@ core/graphics/lcd.ts:67:31
+   ;;@ core/graphics/lcd.ts:65:31
    (call $core/helpers/index/checkBitOnByte
-    ;;@ core/graphics/lcd.ts:67:46
+    ;;@ core/graphics/lcd.ts:65:46
     (i32.const 5)
     (get_local $0)
    )
   )
-  ;;@ core/graphics/lcd.ts:68:4
+  ;;@ core/graphics/lcd.ts:66:4
   (set_global $core/graphics/lcd/Lcd.bgWindowTileDataSelect
-   ;;@ core/graphics/lcd.ts:68:33
+   ;;@ core/graphics/lcd.ts:66:33
    (call $core/helpers/index/checkBitOnByte
-    ;;@ core/graphics/lcd.ts:68:48
+    ;;@ core/graphics/lcd.ts:66:48
     (i32.const 4)
     (get_local $0)
    )
   )
-  ;;@ core/graphics/lcd.ts:69:4
+  ;;@ core/graphics/lcd.ts:67:4
   (set_global $core/graphics/lcd/Lcd.bgTileMapDisplaySelect
-   ;;@ core/graphics/lcd.ts:69:33
+   ;;@ core/graphics/lcd.ts:67:33
    (call $core/helpers/index/checkBitOnByte
-    ;;@ core/graphics/lcd.ts:69:48
+    ;;@ core/graphics/lcd.ts:67:48
     (i32.const 3)
     (get_local $0)
    )
   )
-  ;;@ core/graphics/lcd.ts:70:4
+  ;;@ core/graphics/lcd.ts:68:4
   (set_global $core/graphics/lcd/Lcd.tallSpriteSize
-   ;;@ core/graphics/lcd.ts:70:25
+   ;;@ core/graphics/lcd.ts:68:25
    (call $core/helpers/index/checkBitOnByte
-    ;;@ core/graphics/lcd.ts:70:40
+    ;;@ core/graphics/lcd.ts:68:40
     (i32.const 2)
     (get_local $0)
    )
   )
-  ;;@ core/graphics/lcd.ts:71:4
+  ;;@ core/graphics/lcd.ts:69:4
   (set_global $core/graphics/lcd/Lcd.spriteDisplayEnable
-   ;;@ core/graphics/lcd.ts:71:30
+   ;;@ core/graphics/lcd.ts:69:30
    (call $core/helpers/index/checkBitOnByte
-    ;;@ core/graphics/lcd.ts:71:45
+    ;;@ core/graphics/lcd.ts:69:45
     (i32.const 1)
     (get_local $0)
    )
   )
-  ;;@ core/graphics/lcd.ts:72:4
+  ;;@ core/graphics/lcd.ts:70:4
   (set_global $core/graphics/lcd/Lcd.bgDisplayEnabled
-   ;;@ core/graphics/lcd.ts:72:27
+   ;;@ core/graphics/lcd.ts:70:27
    (call $core/helpers/index/checkBitOnByte
-    ;;@ core/graphics/lcd.ts:72:42
+    ;;@ core/graphics/lcd.ts:70:42
     (i32.const 0)
     (get_local $0)
    )
   )
  )
  (func $core/graphics/lcd/Lcd.updateLcdStatus (; 135 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
-  ;;@ core/graphics/lcd.ts:35:4
+  ;;@ core/graphics/lcd.ts:34:4
   (call $core/memory/store/eightBitStoreIntoGBMemory
    (i32.const 65345)
-   ;;@ core/graphics/lcd.ts:33:12
+   ;;@ core/graphics/lcd.ts:32:12
    (call $core/helpers/index/setBitOnByte
-    ;;@ core/graphics/lcd.ts:33:25
+    ;;@ core/graphics/lcd.ts:32:25
     (i32.const 7)
-    ;;@ core/graphics/lcd.ts:30:12
+    ;;@ core/graphics/lcd.ts:29:12
     (i32.or
-     ;;@ core/graphics/lcd.ts:28:33
+     ;;@ core/graphics/lcd.ts:27:33
      (i32.and
       (get_local $0)
-      ;;@ core/graphics/lcd.ts:28:41
+      ;;@ core/graphics/lcd.ts:27:41
       (i32.const 248)
      )
-     ;;@ core/graphics/lcd.ts:29:39
+     ;;@ core/graphics/lcd.ts:28:39
      (i32.and
-      ;;@ core/graphics/lcd.ts:27:32
+      ;;@ core/graphics/lcd.ts:26:32
       (call $core/memory/load/eightBitLoadFromGBMemory
        (i32.const 65345)
       )
-      ;;@ core/graphics/lcd.ts:29:58
+      ;;@ core/graphics/lcd.ts:28:58
       (i32.const 7)
      )
     )
@@ -10572,12 +10572,12 @@
   )
  )
  (func $core/interrupts/interrupts/requestTimerInterrupt (; 143 ;) (; has Stack IR ;) (type $v)
-  ;;@ core/interrupts/interrupts.ts:227:2
+  ;;@ core/interrupts/interrupts.ts:229:2
   (set_global $core/interrupts/interrupts/Interrupts.isTimerInterruptRequested
-   ;;@ core/interrupts/interrupts.ts:227:41
+   ;;@ core/interrupts/interrupts.ts:229:41
    (i32.const 1)
   )
-  ;;@ core/interrupts/interrupts.ts:228:2
+  ;;@ core/interrupts/interrupts.ts:230:2
   (call $core/interrupts/interrupts/_requestInterrupt
    (i32.const 2)
   )
@@ -11054,38 +11054,38 @@
   (local $2 i32)
   (block $folding-inner1
    (block $folding-inner0
-    ;;@ core/memory/writeTraps.ts:21:2
+    ;;@ core/memory/writeTraps.ts:20:2
     (if
-     ;;@ core/memory/writeTraps.ts:21:6
+     ;;@ core/memory/writeTraps.ts:20:6
      (i32.eq
       (get_local $0)
       (i32.const 65357)
      )
-     ;;@ core/memory/writeTraps.ts:21:48
+     ;;@ core/memory/writeTraps.ts:20:48
      (block
-      ;;@ core/memory/writeTraps.ts:23:4
+      ;;@ core/memory/writeTraps.ts:22:4
       (call $core/memory/store/eightBitStoreIntoGBMemory
        (i32.const 65357)
-       ;;@ core/memory/writeTraps.ts:23:61
+       ;;@ core/memory/writeTraps.ts:22:61
        (i32.and
         (get_local $1)
-        ;;@ core/memory/writeTraps.ts:23:69
+        ;;@ core/memory/writeTraps.ts:22:69
         (i32.const 1)
        )
       )
       (br $folding-inner1)
      )
     )
-    ;;@ core/memory/writeTraps.ts:34:2
+    ;;@ core/memory/writeTraps.ts:33:2
     (if
-     ;;@ core/memory/writeTraps.ts:34:6
+     ;;@ core/memory/writeTraps.ts:33:6
      (i32.lt_s
       (get_local $0)
       (i32.const 32768)
      )
-     ;;@ core/memory/writeTraps.ts:34:33
+     ;;@ core/memory/writeTraps.ts:33:33
      (block
-      ;;@ core/memory/writeTraps.ts:35:4
+      ;;@ core/memory/writeTraps.ts:34:4
       (call $core/memory/banking/handleBanking
        (get_local $0)
        (get_local $1)
@@ -11093,7 +11093,7 @@
       (br $folding-inner1)
      )
     )
-    ;;@ core/memory/writeTraps.ts:41:6
+    ;;@ core/memory/writeTraps.ts:40:6
     (if
      (tee_local $2
       (i32.ge_s
@@ -11102,7 +11102,7 @@
       )
      )
      (set_local $2
-      ;;@ core/memory/writeTraps.ts:41:36
+      ;;@ core/memory/writeTraps.ts:40:36
       (i32.lt_s
        (get_local $0)
        (i32.const 40960)
@@ -11112,7 +11112,7 @@
     (br_if $folding-inner0
      (get_local $2)
     )
-    ;;@ core/memory/writeTraps.ts:60:6
+    ;;@ core/memory/writeTraps.ts:59:6
     (if
      (tee_local $2
       (i32.ge_s
@@ -11121,24 +11121,24 @@
       )
      )
      (set_local $2
-      ;;@ core/memory/writeTraps.ts:60:42
+      ;;@ core/memory/writeTraps.ts:59:42
       (i32.lt_s
        (get_local $0)
        (i32.const 65024)
       )
      )
     )
-    ;;@ core/memory/writeTraps.ts:60:2
+    ;;@ core/memory/writeTraps.ts:59:2
     (if
      (get_local $2)
-     ;;@ core/memory/writeTraps.ts:60:83
+     ;;@ core/memory/writeTraps.ts:59:83
      (block
-      ;;@ core/memory/writeTraps.ts:62:4
+      ;;@ core/memory/writeTraps.ts:61:4
       (call $core/memory/store/eightBitStoreIntoGBMemory
-       ;;@ core/memory/writeTraps.ts:61:26
+       ;;@ core/memory/writeTraps.ts:60:26
        (i32.add
         (get_local $0)
-        ;;@ core/memory/writeTraps.ts:61:35
+        ;;@ core/memory/writeTraps.ts:60:35
         (i32.const -8192)
        )
        (get_local $1)
@@ -11146,7 +11146,7 @@
       (br $folding-inner0)
      )
     )
-    ;;@ core/memory/writeTraps.ts:71:6
+    ;;@ core/memory/writeTraps.ts:70:6
     (if
      (tee_local $2
       (i32.ge_s
@@ -11155,30 +11155,30 @@
       )
      )
      (set_local $2
-      ;;@ core/memory/writeTraps.ts:71:50
+      ;;@ core/memory/writeTraps.ts:70:50
       (i32.le_s
        (get_local $0)
        (i32.const 65183)
       )
      )
     )
-    ;;@ core/memory/writeTraps.ts:71:2
+    ;;@ core/memory/writeTraps.ts:70:2
     (if
      (get_local $2)
-     ;;@ core/memory/writeTraps.ts:71:102
+     ;;@ core/memory/writeTraps.ts:70:102
      (block
       (br_if $folding-inner1
-       ;;@ core/memory/writeTraps.ts:74:8
+       ;;@ core/memory/writeTraps.ts:73:8
        (i32.lt_s
         (get_global $core/graphics/lcd/Lcd.currentLcdMode)
-        ;;@ core/memory/writeTraps.ts:74:29
+        ;;@ core/memory/writeTraps.ts:73:29
         (i32.const 2)
        )
       )
       (br $folding-inner0)
      )
     )
-    ;;@ core/memory/writeTraps.ts:84:6
+    ;;@ core/memory/writeTraps.ts:83:6
     (if
      (tee_local $2
       (i32.ge_s
@@ -11187,7 +11187,7 @@
       )
      )
      (set_local $2
-      ;;@ core/memory/writeTraps.ts:84:49
+      ;;@ core/memory/writeTraps.ts:83:49
       (i32.le_s
        (get_local $0)
        (i32.const 65279)
@@ -11197,34 +11197,34 @@
     (br_if $folding-inner1
      (get_local $2)
     )
-    ;;@ core/memory/writeTraps.ts:90:6
+    ;;@ core/memory/writeTraps.ts:89:6
     (if
      (tee_local $2
       (i32.ge_s
        (get_local $0)
-       ;;@ core/memory/writeTraps.ts:90:16
+       ;;@ core/memory/writeTraps.ts:89:16
        (i32.const 65296)
       )
      )
      (set_local $2
-      ;;@ core/memory/writeTraps.ts:90:26
+      ;;@ core/memory/writeTraps.ts:89:26
       (i32.le_s
        (get_local $0)
-       ;;@ core/memory/writeTraps.ts:90:36
+       ;;@ core/memory/writeTraps.ts:89:36
        (i32.const 65318)
       )
      )
     )
-    ;;@ core/memory/writeTraps.ts:90:2
+    ;;@ core/memory/writeTraps.ts:89:2
     (if
      (get_local $2)
-     ;;@ core/memory/writeTraps.ts:90:44
+     ;;@ core/memory/writeTraps.ts:89:44
      (block
-      ;;@ core/memory/writeTraps.ts:91:4
+      ;;@ core/memory/writeTraps.ts:90:4
       (call $core/sound/sound/batchProcessAudio)
-      ;;@ core/memory/writeTraps.ts:92:48
+      ;;@ core/memory/writeTraps.ts:91:48
       (return
-       ;;@ core/memory/writeTraps.ts:92:11
+       ;;@ core/memory/writeTraps.ts:91:11
        (call $core/sound/registers/SoundRegisterWriteTraps
         (get_local $0)
         (get_local $1)
@@ -11232,31 +11232,31 @@
       )
      )
     )
-    ;;@ core/memory/writeTraps.ts:97:6
+    ;;@ core/memory/writeTraps.ts:96:6
     (if
      (tee_local $2
       (i32.ge_s
        (get_local $0)
-       ;;@ core/memory/writeTraps.ts:97:16
+       ;;@ core/memory/writeTraps.ts:96:16
        (i32.const 65328)
       )
      )
      (set_local $2
-      ;;@ core/memory/writeTraps.ts:97:26
+      ;;@ core/memory/writeTraps.ts:96:26
       (i32.le_s
        (get_local $0)
-       ;;@ core/memory/writeTraps.ts:97:36
+       ;;@ core/memory/writeTraps.ts:96:36
        (i32.const 65343)
       )
      )
     )
-    ;;@ core/memory/writeTraps.ts:97:2
+    ;;@ core/memory/writeTraps.ts:96:2
     (if
      (get_local $2)
-     ;;@ core/memory/writeTraps.ts:97:44
+     ;;@ core/memory/writeTraps.ts:96:44
      (call $core/sound/sound/batchProcessAudio)
     )
-    ;;@ core/memory/writeTraps.ts:102:6
+    ;;@ core/memory/writeTraps.ts:101:6
     (if
      (tee_local $2
       (i32.ge_s
@@ -11265,106 +11265,106 @@
       )
      )
      (set_local $2
-      ;;@ core/memory/writeTraps.ts:102:48
+      ;;@ core/memory/writeTraps.ts:101:48
       (i32.le_s
        (get_local $0)
        (i32.const 65355)
       )
      )
     )
-    ;;@ core/memory/writeTraps.ts:102:2
+    ;;@ core/memory/writeTraps.ts:101:2
     (if
      (get_local $2)
-     ;;@ core/memory/writeTraps.ts:102:90
+     ;;@ core/memory/writeTraps.ts:101:90
      (block
-      ;;@ core/memory/writeTraps.ts:106:4
+      ;;@ core/memory/writeTraps.ts:105:4
       (if
-       ;;@ core/memory/writeTraps.ts:106:8
+       ;;@ core/memory/writeTraps.ts:105:8
        (i32.eq
         (get_local $0)
         (i32.const 65344)
        )
-       ;;@ core/memory/writeTraps.ts:106:49
+       ;;@ core/memory/writeTraps.ts:105:49
        (block
-        ;;@ core/memory/writeTraps.ts:108:10
+        ;;@ core/memory/writeTraps.ts:107:10
         (call $core/graphics/lcd/Lcd.updateLcdControl
          (get_local $1)
         )
         (br $folding-inner0)
        )
       )
-      ;;@ core/memory/writeTraps.ts:112:4
+      ;;@ core/memory/writeTraps.ts:111:4
       (if
-       ;;@ core/memory/writeTraps.ts:112:8
+       ;;@ core/memory/writeTraps.ts:111:8
        (i32.eq
         (get_local $0)
         (i32.const 65345)
        )
-       ;;@ core/memory/writeTraps.ts:112:48
+       ;;@ core/memory/writeTraps.ts:111:48
        (block
-        ;;@ core/memory/writeTraps.ts:114:10
+        ;;@ core/memory/writeTraps.ts:113:10
         (call $core/graphics/lcd/Lcd.updateLcdStatus
          (get_local $1)
         )
         (br $folding-inner1)
        )
       )
-      ;;@ core/memory/writeTraps.ts:119:4
+      ;;@ core/memory/writeTraps.ts:118:4
       (if
-       ;;@ core/memory/writeTraps.ts:119:8
+       ;;@ core/memory/writeTraps.ts:118:8
        (i32.eq
         (get_local $0)
         (i32.const 65348)
        )
-       ;;@ core/memory/writeTraps.ts:119:60
+       ;;@ core/memory/writeTraps.ts:118:60
        (block
-        ;;@ core/memory/writeTraps.ts:120:6
+        ;;@ core/memory/writeTraps.ts:119:6
         (set_global $core/graphics/graphics/Graphics.scanlineRegister
-         ;;@ core/memory/writeTraps.ts:120:34
+         ;;@ core/memory/writeTraps.ts:119:34
          (i32.const 0)
         )
-        ;;@ core/memory/writeTraps.ts:121:6
+        ;;@ core/memory/writeTraps.ts:120:6
         (call $core/memory/store/eightBitStoreIntoGBMemory
          (get_local $0)
-         ;;@ core/memory/writeTraps.ts:121:40
+         ;;@ core/memory/writeTraps.ts:120:40
          (i32.const 0)
         )
         (br $folding-inner1)
        )
       )
-      ;;@ core/memory/writeTraps.ts:126:4
+      ;;@ core/memory/writeTraps.ts:125:4
       (if
-       ;;@ core/memory/writeTraps.ts:126:8
+       ;;@ core/memory/writeTraps.ts:125:8
        (i32.eq
         (get_local $0)
         (i32.const 65349)
        )
-       ;;@ core/memory/writeTraps.ts:126:57
+       ;;@ core/memory/writeTraps.ts:125:57
        (block
-        ;;@ core/memory/writeTraps.ts:127:6
+        ;;@ core/memory/writeTraps.ts:126:6
         (set_global $core/graphics/lcd/Lcd.coincidenceCompare
          (get_local $1)
         )
         (br $folding-inner0)
        )
       )
-      ;;@ core/memory/writeTraps.ts:134:4
+      ;;@ core/memory/writeTraps.ts:133:4
       (if
-       ;;@ core/memory/writeTraps.ts:134:8
+       ;;@ core/memory/writeTraps.ts:133:8
        (i32.eq
         (get_local $0)
         (i32.const 65350)
        )
-       ;;@ core/memory/writeTraps.ts:134:55
+       ;;@ core/memory/writeTraps.ts:133:55
        (block
-        ;;@ core/memory/writeTraps.ts:137:6
+        ;;@ core/memory/writeTraps.ts:136:6
         (call $core/memory/dma/startDmaTransfer
          (get_local $1)
         )
         (br $folding-inner0)
        )
       )
-      ;;@ core/memory/writeTraps.ts:142:4
+      ;;@ core/memory/writeTraps.ts:141:4
       (block $break|0
        (block $case3|0
         (block $case2|0
@@ -11388,25 +11388,25 @@
             (br $break|0)
            )
           )
-          ;;@ core/memory/writeTraps.ts:144:8
+          ;;@ core/memory/writeTraps.ts:143:8
           (set_global $core/graphics/graphics/Graphics.scrollX
            (get_local $1)
           )
           (br $folding-inner0)
          )
-         ;;@ core/memory/writeTraps.ts:147:8
+         ;;@ core/memory/writeTraps.ts:146:8
          (set_global $core/graphics/graphics/Graphics.scrollY
           (get_local $1)
          )
          (br $folding-inner0)
         )
-        ;;@ core/memory/writeTraps.ts:150:8
+        ;;@ core/memory/writeTraps.ts:149:8
         (set_global $core/graphics/graphics/Graphics.windowX
          (get_local $1)
         )
         (br $folding-inner0)
        )
-       ;;@ core/memory/writeTraps.ts:153:8
+       ;;@ core/memory/writeTraps.ts:152:8
        (set_global $core/graphics/graphics/Graphics.windowY
         (get_local $1)
        )
@@ -11415,90 +11415,90 @@
       (br $folding-inner0)
      )
     )
-    ;;@ core/memory/writeTraps.ts:162:2
+    ;;@ core/memory/writeTraps.ts:161:2
     (if
-     ;;@ core/memory/writeTraps.ts:162:6
+     ;;@ core/memory/writeTraps.ts:161:6
      (i32.eq
       (get_local $0)
-      ;;@ core/memory/writeTraps.ts:162:17
+      ;;@ core/memory/writeTraps.ts:161:17
       (get_global $core/memory/memory/Memory.memoryLocationHdmaTrigger)
      )
-     ;;@ core/memory/writeTraps.ts:162:51
+     ;;@ core/memory/writeTraps.ts:161:51
      (block
-      ;;@ core/memory/writeTraps.ts:163:4
+      ;;@ core/memory/writeTraps.ts:162:4
       (call $core/memory/dma/startHdmaTransfer
        (get_local $1)
       )
       (br $folding-inner1)
      )
     )
-    ;;@ core/memory/writeTraps.ts:169:6
+    ;;@ core/memory/writeTraps.ts:168:6
     (if
      (i32.eqz
       (tee_local $2
        (i32.eq
         (get_local $0)
-        ;;@ core/memory/writeTraps.ts:169:17
+        ;;@ core/memory/writeTraps.ts:168:17
         (get_global $core/memory/memory/Memory.memoryLocationGBCWRAMBank)
        )
       )
      )
      (set_local $2
-      ;;@ core/memory/writeTraps.ts:169:53
+      ;;@ core/memory/writeTraps.ts:168:53
       (i32.eq
        (get_local $0)
-       ;;@ core/memory/writeTraps.ts:169:64
+       ;;@ core/memory/writeTraps.ts:168:64
        (get_global $core/memory/memory/Memory.memoryLocationGBCVRAMBank)
       )
      )
     )
-    ;;@ core/memory/writeTraps.ts:169:2
+    ;;@ core/memory/writeTraps.ts:168:2
     (if
      (get_local $2)
-     ;;@ core/memory/writeTraps.ts:169:98
+     ;;@ core/memory/writeTraps.ts:168:98
      (if
-      ;;@ core/memory/writeTraps.ts:170:8
+      ;;@ core/memory/writeTraps.ts:169:8
       (get_global $core/memory/memory/Memory.isHblankHdmaActive)
       (block
-       ;;@ core/memory/writeTraps.ts:172:8
+       ;;@ core/memory/writeTraps.ts:171:8
        (if
         (tee_local $2
-         ;;@ core/memory/writeTraps.ts:172:9
+         ;;@ core/memory/writeTraps.ts:171:9
          (i32.ge_s
           (get_global $core/memory/memory/Memory.hblankHdmaSource)
-          ;;@ core/memory/writeTraps.ts:172:36
+          ;;@ core/memory/writeTraps.ts:171:36
           (i32.const 16384)
          )
         )
         (set_local $2
-         ;;@ core/memory/writeTraps.ts:172:46
+         ;;@ core/memory/writeTraps.ts:171:46
          (i32.le_s
           (get_global $core/memory/memory/Memory.hblankHdmaSource)
-          ;;@ core/memory/writeTraps.ts:172:73
+          ;;@ core/memory/writeTraps.ts:171:73
           (i32.const 32767)
          )
         )
        )
-       ;;@ core/memory/writeTraps.ts:172:8
+       ;;@ core/memory/writeTraps.ts:171:8
        (if
         (i32.eqz
          (get_local $2)
         )
-        ;;@ core/memory/writeTraps.ts:173:8
+        ;;@ core/memory/writeTraps.ts:172:8
         (if
          (tee_local $2
-          ;;@ core/memory/writeTraps.ts:173:9
+          ;;@ core/memory/writeTraps.ts:172:9
           (i32.ge_s
            (get_global $core/memory/memory/Memory.hblankHdmaSource)
-           ;;@ core/memory/writeTraps.ts:173:36
+           ;;@ core/memory/writeTraps.ts:172:36
            (i32.const 53248)
           )
          )
          (set_local $2
-          ;;@ core/memory/writeTraps.ts:173:46
+          ;;@ core/memory/writeTraps.ts:172:46
           (i32.le_s
            (get_global $core/memory/memory/Memory.hblankHdmaSource)
-           ;;@ core/memory/writeTraps.ts:173:73
+           ;;@ core/memory/writeTraps.ts:172:73
            (i32.const 57343)
           )
          )
@@ -11510,30 +11510,30 @@
       )
      )
     )
-    ;;@ core/memory/writeTraps.ts:181:6
+    ;;@ core/memory/writeTraps.ts:180:6
     (if
      (tee_local $2
       (i32.ge_s
        (get_local $0)
-       ;;@ core/memory/writeTraps.ts:181:16
+       ;;@ core/memory/writeTraps.ts:180:16
        (get_global $core/graphics/palette/Palette.memoryLocationBackgroundPaletteIndex)
       )
      )
      (set_local $2
-      ;;@ core/memory/writeTraps.ts:181:64
+      ;;@ core/memory/writeTraps.ts:180:64
       (i32.le_s
        (get_local $0)
-       ;;@ core/memory/writeTraps.ts:181:74
+       ;;@ core/memory/writeTraps.ts:180:74
        (get_global $core/graphics/palette/Palette.memoryLocationSpritePaletteData)
       )
      )
     )
-    ;;@ core/memory/writeTraps.ts:181:2
+    ;;@ core/memory/writeTraps.ts:180:2
     (if
      (get_local $2)
-     ;;@ core/memory/writeTraps.ts:181:115
+     ;;@ core/memory/writeTraps.ts:180:115
      (block
-      ;;@ core/memory/writeTraps.ts:183:4
+      ;;@ core/memory/writeTraps.ts:182:4
       (call $core/graphics/palette/writeColorPaletteToMemory
        (get_local $0)
        (get_local $1)
@@ -11541,7 +11541,7 @@
       (br $folding-inner0)
      )
     )
-    ;;@ core/memory/writeTraps.ts:188:6
+    ;;@ core/memory/writeTraps.ts:187:6
     (if
      (tee_local $2
       (i32.ge_s
@@ -11550,21 +11550,21 @@
       )
      )
      (set_local $2
-      ;;@ core/memory/writeTraps.ts:188:56
+      ;;@ core/memory/writeTraps.ts:187:56
       (i32.le_s
        (get_local $0)
        (i32.const 65287)
       )
      )
     )
-    ;;@ core/memory/writeTraps.ts:188:2
+    ;;@ core/memory/writeTraps.ts:187:2
     (if
      (get_local $2)
-     ;;@ core/memory/writeTraps.ts:188:101
+     ;;@ core/memory/writeTraps.ts:187:101
      (block
-      ;;@ core/memory/writeTraps.ts:190:4
+      ;;@ core/memory/writeTraps.ts:189:4
       (call $core/timers/timers/batchProcessTimers)
-      ;;@ core/memory/writeTraps.ts:192:4
+      ;;@ core/memory/writeTraps.ts:191:4
       (block $break|1
        (block $case3|1
         (block $case2|1
@@ -11588,25 +11588,25 @@
             (br $break|1)
            )
           )
-          ;;@ core/memory/writeTraps.ts:194:15
+          ;;@ core/memory/writeTraps.ts:193:15
           (call $core/timers/timers/Timers.updateDividerRegister
            (get_local $1)
           )
           (br $folding-inner1)
          )
-         ;;@ core/memory/writeTraps.ts:197:15
+         ;;@ core/memory/writeTraps.ts:196:15
          (call $core/timers/timers/Timers.updateTimerCounter
           (get_local $1)
          )
          (br $folding-inner0)
         )
-        ;;@ core/memory/writeTraps.ts:200:15
+        ;;@ core/memory/writeTraps.ts:199:15
         (call $core/timers/timers/Timers.updateTimerModulo
          (get_local $1)
         )
         (br $folding-inner0)
        )
-       ;;@ core/memory/writeTraps.ts:203:15
+       ;;@ core/memory/writeTraps.ts:202:15
        (call $core/timers/timers/Timers.updateTimerControl
         (get_local $1)
        )
@@ -11615,44 +11615,44 @@
       (br $folding-inner0)
      )
     )
-    ;;@ core/memory/writeTraps.ts:211:2
+    ;;@ core/memory/writeTraps.ts:210:2
     (if
-     ;;@ core/memory/writeTraps.ts:211:6
+     ;;@ core/memory/writeTraps.ts:210:6
      (i32.eq
       (get_local $0)
       (i32.const 65280)
      )
-     ;;@ core/memory/writeTraps.ts:211:54
+     ;;@ core/memory/writeTraps.ts:210:54
      (call $core/joypad/joypad/Joypad.updateJoypad
       (get_local $1)
      )
     )
-    ;;@ core/memory/writeTraps.ts:216:2
+    ;;@ core/memory/writeTraps.ts:215:2
     (if
-     ;;@ core/memory/writeTraps.ts:216:6
+     ;;@ core/memory/writeTraps.ts:215:6
      (i32.eq
       (get_local $0)
       (i32.const 65295)
      )
-     ;;@ core/memory/writeTraps.ts:216:60
+     ;;@ core/memory/writeTraps.ts:215:60
      (block
-      ;;@ core/memory/writeTraps.ts:217:15
+      ;;@ core/memory/writeTraps.ts:216:15
       (call $core/interrupts/interrupts/Interrupts.updateInterruptRequested
        (get_local $1)
       )
       (br $folding-inner0)
      )
     )
-    ;;@ core/memory/writeTraps.ts:220:2
+    ;;@ core/memory/writeTraps.ts:219:2
     (if
-     ;;@ core/memory/writeTraps.ts:220:6
+     ;;@ core/memory/writeTraps.ts:219:6
      (i32.eq
       (get_local $0)
       (i32.const 65535)
      )
-     ;;@ core/memory/writeTraps.ts:220:60
+     ;;@ core/memory/writeTraps.ts:219:60
      (block
-      ;;@ core/memory/writeTraps.ts:221:15
+      ;;@ core/memory/writeTraps.ts:220:15
       (call $core/interrupts/interrupts/Interrupts.updateInterruptEnabled
        (get_local $1)
       )
@@ -11667,7 +11667,7 @@
     (i32.const 1)
    )
   )
-  ;;@ core/memory/writeTraps.ts:25:11
+  ;;@ core/memory/writeTraps.ts:24:11
   (i32.const 0)
  )
  (func $core/memory/store/eightBitStoreIntoGBMemoryWithTraps (; 155 ;) (; has Stack IR ;) (type $iiv) (param $0 i32) (param $1 i32)
@@ -11892,12 +11892,12 @@
   )
  )
  (func $core/interrupts/interrupts/requestVBlankInterrupt (; 158 ;) (; has Stack IR ;) (type $v)
-  ;;@ core/interrupts/interrupts.ts:217:2
+  ;;@ core/interrupts/interrupts.ts:219:2
   (set_global $core/interrupts/interrupts/Interrupts.isVBlankInterruptRequested
-   ;;@ core/interrupts/interrupts.ts:217:42
+   ;;@ core/interrupts/interrupts.ts:219:42
    (i32.const 1)
   )
-  ;;@ core/interrupts/interrupts.ts:218:2
+  ;;@ core/interrupts/interrupts.ts:220:2
   (call $core/interrupts/interrupts/_requestInterrupt
    (i32.const 0)
   )
@@ -11908,139 +11908,139 @@
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
-  ;;@ core/graphics/lcd.ts:79:2
+  ;;@ core/graphics/lcd.ts:77:2
   (if
-   ;;@ core/graphics/lcd.ts:79:6
+   ;;@ core/graphics/lcd.ts:77:6
    (i32.eqz
-    ;;@ core/graphics/lcd.ts:79:7
+    ;;@ core/graphics/lcd.ts:77:7
     (get_global $core/graphics/lcd/Lcd.enabled)
    )
-   ;;@ core/graphics/lcd.ts:79:20
+   ;;@ core/graphics/lcd.ts:77:20
    (block
-    ;;@ core/graphics/lcd.ts:81:4
+    ;;@ core/graphics/lcd.ts:79:4
     (set_global $core/graphics/graphics/Graphics.scanlineCycleCounter
-     ;;@ core/graphics/lcd.ts:81:36
+     ;;@ core/graphics/lcd.ts:79:36
      (i32.const 0)
     )
-    ;;@ core/graphics/lcd.ts:82:4
+    ;;@ core/graphics/lcd.ts:80:4
     (set_global $core/graphics/graphics/Graphics.scanlineRegister
-     ;;@ core/graphics/lcd.ts:82:32
+     ;;@ core/graphics/lcd.ts:80:32
      (i32.const 0)
     )
-    ;;@ core/graphics/lcd.ts:83:4
+    ;;@ core/graphics/lcd.ts:81:4
     (call $core/memory/store/eightBitStoreIntoGBMemory
      (i32.const 65348)
-     ;;@ core/graphics/lcd.ts:83:71
+     ;;@ core/graphics/lcd.ts:81:71
      (i32.const 0)
     )
-    ;;@ core/graphics/lcd.ts:89:4
+    ;;@ core/graphics/lcd.ts:87:4
     (set_local $3
-     ;;@ core/graphics/lcd.ts:89:16
+     ;;@ core/graphics/lcd.ts:87:16
      (call $core/helpers/index/resetBitOnByte
-      ;;@ core/graphics/lcd.ts:89:31
+      ;;@ core/graphics/lcd.ts:87:31
       (i32.const 0)
-      ;;@ core/graphics/lcd.ts:88:16
+      ;;@ core/graphics/lcd.ts:86:16
       (call $core/helpers/index/resetBitOnByte
-       ;;@ core/graphics/lcd.ts:88:31
+       ;;@ core/graphics/lcd.ts:86:31
        (i32.const 1)
-       ;;@ core/graphics/lcd.ts:87:25
+       ;;@ core/graphics/lcd.ts:85:25
        (call $core/memory/load/eightBitLoadFromGBMemory
         (i32.const 65345)
        )
       )
      )
     )
-    ;;@ core/graphics/lcd.ts:90:4
+    ;;@ core/graphics/lcd.ts:88:4
     (set_global $core/graphics/lcd/Lcd.currentLcdMode
-     ;;@ core/graphics/lcd.ts:90:25
+     ;;@ core/graphics/lcd.ts:88:25
      (i32.const 0)
     )
-    ;;@ core/graphics/lcd.ts:93:4
+    ;;@ core/graphics/lcd.ts:91:4
     (call $core/memory/store/eightBitStoreIntoGBMemory
      (i32.const 65345)
      (get_local $3)
     )
-    ;;@ core/graphics/lcd.ts:94:4
+    ;;@ core/graphics/lcd.ts:92:4
     (return)
    )
   )
-  ;;@ core/graphics/lcd.ts:99:2
+  ;;@ core/graphics/lcd.ts:97:2
   (set_local $1
-   ;;@ core/graphics/lcd.ts:99:21
+   ;;@ core/graphics/lcd.ts:97:21
    (get_global $core/graphics/lcd/Lcd.currentLcdMode)
   )
-  ;;@ core/graphics/lcd.ts:105:2
+  ;;@ core/graphics/lcd.ts:103:2
   (if
-   ;;@ core/graphics/lcd.ts:105:6
+   ;;@ core/graphics/lcd.ts:103:6
    (i32.ge_s
-    ;;@ core/graphics/lcd.ts:98:2
+    ;;@ core/graphics/lcd.ts:96:2
     (tee_local $3
-     ;;@ core/graphics/lcd.ts:98:30
+     ;;@ core/graphics/lcd.ts:96:30
      (get_global $core/graphics/graphics/Graphics.scanlineRegister)
     )
-    ;;@ core/graphics/lcd.ts:105:26
+    ;;@ core/graphics/lcd.ts:103:26
     (i32.const 144)
    )
-   ;;@ core/graphics/lcd.ts:105:31
+   ;;@ core/graphics/lcd.ts:103:31
    (set_local $2
-    ;;@ core/graphics/lcd.ts:107:17
+    ;;@ core/graphics/lcd.ts:105:17
     (i32.const 1)
    )
-   ;;@ core/graphics/lcd.ts:108:9
+   ;;@ core/graphics/lcd.ts:106:9
    (if
-    ;;@ core/graphics/lcd.ts:109:8
+    ;;@ core/graphics/lcd.ts:107:8
     (i32.ge_s
      (get_global $core/graphics/graphics/Graphics.scanlineCycleCounter)
-     ;;@ core/graphics/lcd.ts:109:50
+     ;;@ core/graphics/lcd.ts:107:50
      (call $core/graphics/graphics/Graphics.MIN_CYCLES_SPRITES_LCD_MODE)
     )
-    ;;@ core/graphics/lcd.ts:109:81
+    ;;@ core/graphics/lcd.ts:107:81
     (set_local $2
-     ;;@ core/graphics/lcd.ts:111:19
+     ;;@ core/graphics/lcd.ts:109:19
      (i32.const 2)
     )
-    ;;@ core/graphics/lcd.ts:112:11
+    ;;@ core/graphics/lcd.ts:110:11
     (if
-     ;;@ core/graphics/lcd.ts:112:15
+     ;;@ core/graphics/lcd.ts:110:15
      (i32.ge_s
       (get_global $core/graphics/graphics/Graphics.scanlineCycleCounter)
-      ;;@ core/graphics/lcd.ts:112:57
+      ;;@ core/graphics/lcd.ts:110:57
       (call $core/graphics/graphics/Graphics.MIN_CYCLES_TRANSFER_DATA_LCD_MODE)
      )
-     ;;@ core/graphics/lcd.ts:112:94
+     ;;@ core/graphics/lcd.ts:110:94
      (set_local $2
-      ;;@ core/graphics/lcd.ts:114:19
+      ;;@ core/graphics/lcd.ts:112:19
       (i32.const 3)
      )
     )
    )
   )
-  ;;@ core/graphics/lcd.ts:118:2
+  ;;@ core/graphics/lcd.ts:116:2
   (if
-   ;;@ core/graphics/lcd.ts:118:6
+   ;;@ core/graphics/lcd.ts:116:6
    (i32.ne
     (get_local $1)
     (get_local $2)
    )
-   ;;@ core/graphics/lcd.ts:118:30
+   ;;@ core/graphics/lcd.ts:116:30
    (block
-    ;;@ core/graphics/lcd.ts:120:4
+    ;;@ core/graphics/lcd.ts:118:4
     (set_local $0
-     ;;@ core/graphics/lcd.ts:120:25
+     ;;@ core/graphics/lcd.ts:118:25
      (call $core/memory/load/eightBitLoadFromGBMemory
       (i32.const 65345)
      )
     )
-    ;;@ core/graphics/lcd.ts:123:4
+    ;;@ core/graphics/lcd.ts:121:4
     (set_global $core/graphics/lcd/Lcd.currentLcdMode
      (get_local $2)
     )
-    ;;@ core/graphics/lcd.ts:125:4
+    ;;@ core/graphics/lcd.ts:123:4
     (set_local $1
-     ;;@ core/graphics/lcd.ts:125:42
+     ;;@ core/graphics/lcd.ts:123:42
      (i32.const 0)
     )
-    ;;@ core/graphics/lcd.ts:128:4
+    ;;@ core/graphics/lcd.ts:126:4
     (block $break|0
      (block $case3|0
       (block $case2|0
@@ -12064,21 +12064,21 @@
          )
          (br $break|0)
         )
-        ;;@ core/graphics/lcd.ts:132:8
+        ;;@ core/graphics/lcd.ts:130:8
         (set_local $1
-         ;;@ core/graphics/lcd.ts:132:33
+         ;;@ core/graphics/lcd.ts:130:33
          (call $core/helpers/index/checkBitOnByte
-          ;;@ core/graphics/lcd.ts:132:48
+          ;;@ core/graphics/lcd.ts:130:48
           (i32.const 3)
-          ;;@ core/graphics/lcd.ts:131:8
+          ;;@ core/graphics/lcd.ts:129:8
           (tee_local $0
-           ;;@ core/graphics/lcd.ts:131:20
+           ;;@ core/graphics/lcd.ts:129:20
            (call $core/helpers/index/resetBitOnByte
-            ;;@ core/graphics/lcd.ts:131:35
+            ;;@ core/graphics/lcd.ts:129:35
             (i32.const 1)
-            ;;@ core/graphics/lcd.ts:130:20
+            ;;@ core/graphics/lcd.ts:128:20
             (call $core/helpers/index/resetBitOnByte
-             ;;@ core/graphics/lcd.ts:130:35
+             ;;@ core/graphics/lcd.ts:128:35
              (i32.const 0)
              (get_local $0)
             )
@@ -12086,24 +12086,24 @@
           )
          )
         )
-        ;;@ core/graphics/lcd.ts:133:8
+        ;;@ core/graphics/lcd.ts:131:8
         (br $break|0)
        )
-       ;;@ core/graphics/lcd.ts:137:8
+       ;;@ core/graphics/lcd.ts:135:8
        (set_local $1
-        ;;@ core/graphics/lcd.ts:137:33
+        ;;@ core/graphics/lcd.ts:135:33
         (call $core/helpers/index/checkBitOnByte
-         ;;@ core/graphics/lcd.ts:137:48
+         ;;@ core/graphics/lcd.ts:135:48
          (i32.const 4)
-         ;;@ core/graphics/lcd.ts:136:8
+         ;;@ core/graphics/lcd.ts:134:8
          (tee_local $0
-          ;;@ core/graphics/lcd.ts:136:20
+          ;;@ core/graphics/lcd.ts:134:20
           (call $core/helpers/index/setBitOnByte
-           ;;@ core/graphics/lcd.ts:136:33
+           ;;@ core/graphics/lcd.ts:134:33
            (i32.const 0)
-           ;;@ core/graphics/lcd.ts:135:20
+           ;;@ core/graphics/lcd.ts:133:20
            (call $core/helpers/index/resetBitOnByte
-            ;;@ core/graphics/lcd.ts:135:35
+            ;;@ core/graphics/lcd.ts:133:35
             (i32.const 1)
             (get_local $0)
            )
@@ -12111,24 +12111,24 @@
          )
         )
        )
-       ;;@ core/graphics/lcd.ts:138:8
+       ;;@ core/graphics/lcd.ts:136:8
        (br $break|0)
       )
-      ;;@ core/graphics/lcd.ts:142:8
+      ;;@ core/graphics/lcd.ts:140:8
       (set_local $1
-       ;;@ core/graphics/lcd.ts:142:33
+       ;;@ core/graphics/lcd.ts:140:33
        (call $core/helpers/index/checkBitOnByte
-        ;;@ core/graphics/lcd.ts:142:48
+        ;;@ core/graphics/lcd.ts:140:48
         (i32.const 5)
-        ;;@ core/graphics/lcd.ts:141:8
+        ;;@ core/graphics/lcd.ts:139:8
         (tee_local $0
-         ;;@ core/graphics/lcd.ts:141:20
+         ;;@ core/graphics/lcd.ts:139:20
          (call $core/helpers/index/setBitOnByte
-          ;;@ core/graphics/lcd.ts:141:33
+          ;;@ core/graphics/lcd.ts:139:33
           (i32.const 1)
-          ;;@ core/graphics/lcd.ts:140:20
+          ;;@ core/graphics/lcd.ts:138:20
           (call $core/helpers/index/resetBitOnByte
-           ;;@ core/graphics/lcd.ts:140:35
+           ;;@ core/graphics/lcd.ts:138:35
            (i32.const 0)
            (get_local $0)
           )
@@ -12136,55 +12136,55 @@
         )
        )
       )
-      ;;@ core/graphics/lcd.ts:143:8
+      ;;@ core/graphics/lcd.ts:141:8
       (br $break|0)
      )
-     ;;@ core/graphics/lcd.ts:146:8
+     ;;@ core/graphics/lcd.ts:144:8
      (set_local $0
-      ;;@ core/graphics/lcd.ts:146:20
+      ;;@ core/graphics/lcd.ts:144:20
       (call $core/helpers/index/setBitOnByte
-       ;;@ core/graphics/lcd.ts:146:33
+       ;;@ core/graphics/lcd.ts:144:33
        (i32.const 1)
-       ;;@ core/graphics/lcd.ts:145:20
+       ;;@ core/graphics/lcd.ts:143:20
        (call $core/helpers/index/setBitOnByte
-        ;;@ core/graphics/lcd.ts:145:33
+        ;;@ core/graphics/lcd.ts:143:33
         (i32.const 0)
         (get_local $0)
        )
       )
      )
     )
-    ;;@ core/graphics/lcd.ts:151:4
+    ;;@ core/graphics/lcd.ts:149:4
     (if
      (get_local $1)
-     ;;@ core/graphics/lcd.ts:151:32
+     ;;@ core/graphics/lcd.ts:149:32
      (call $core/interrupts/interrupts/requestLcdInterrupt)
     )
-    ;;@ core/graphics/lcd.ts:156:4
+    ;;@ core/graphics/lcd.ts:154:4
     (if
      (i32.eqz
       (get_local $2)
      )
-     ;;@ core/graphics/lcd.ts:156:26
+     ;;@ core/graphics/lcd.ts:154:26
      (call $core/memory/dma/updateHblankHdma)
     )
-    ;;@ core/graphics/lcd.ts:162:4
+    ;;@ core/graphics/lcd.ts:160:4
     (if
-     ;;@ core/graphics/lcd.ts:162:8
+     ;;@ core/graphics/lcd.ts:160:8
      (i32.eq
       (get_local $2)
-      ;;@ core/graphics/lcd.ts:162:23
+      ;;@ core/graphics/lcd.ts:160:23
       (i32.const 1)
      )
-     ;;@ core/graphics/lcd.ts:162:26
+     ;;@ core/graphics/lcd.ts:160:26
      (call $core/interrupts/interrupts/requestVBlankInterrupt)
     )
-    ;;@ core/graphics/lcd.ts:168:4
+    ;;@ core/graphics/lcd.ts:166:4
     (set_local $4
-     ;;@ core/graphics/lcd.ts:168:34
+     ;;@ core/graphics/lcd.ts:166:34
      (get_global $core/graphics/lcd/Lcd.coincidenceCompare)
     )
-    ;;@ core/graphics/lcd.ts:169:8
+    ;;@ core/graphics/lcd.ts:167:8
     (if
      (i32.eqz
       (tee_local $1
@@ -12194,58 +12194,58 @@
       )
      )
      (set_local $1
-      ;;@ core/graphics/lcd.ts:169:29
+      ;;@ core/graphics/lcd.ts:167:29
       (i32.eq
        (get_local $2)
-       ;;@ core/graphics/lcd.ts:169:44
+       ;;@ core/graphics/lcd.ts:167:44
        (i32.const 1)
       )
      )
     )
-    ;;@ core/graphics/lcd.ts:169:8
+    ;;@ core/graphics/lcd.ts:167:8
     (if
      (get_local $1)
      (set_local $1
-      ;;@ core/graphics/lcd.ts:169:50
+      ;;@ core/graphics/lcd.ts:167:50
       (i32.eq
        (get_local $3)
        (get_local $4)
       )
      )
     )
-    ;;@ core/graphics/lcd.ts:169:4
+    ;;@ core/graphics/lcd.ts:167:4
     (if
      (get_local $1)
-     ;;@ core/graphics/lcd.ts:171:6
+     ;;@ core/graphics/lcd.ts:169:6
      (if
-      ;;@ core/graphics/lcd.ts:171:10
+      ;;@ core/graphics/lcd.ts:169:10
       (call $core/helpers/index/checkBitOnByte
-       ;;@ core/graphics/lcd.ts:171:25
+       ;;@ core/graphics/lcd.ts:169:25
        (i32.const 6)
-       ;;@ core/graphics/lcd.ts:170:6
+       ;;@ core/graphics/lcd.ts:168:6
        (tee_local $0
-        ;;@ core/graphics/lcd.ts:170:18
+        ;;@ core/graphics/lcd.ts:168:18
         (call $core/helpers/index/setBitOnByte
-         ;;@ core/graphics/lcd.ts:170:31
+         ;;@ core/graphics/lcd.ts:168:31
          (i32.const 2)
          (get_local $0)
         )
        )
       )
-      ;;@ core/graphics/lcd.ts:171:40
+      ;;@ core/graphics/lcd.ts:169:40
       (call $core/interrupts/interrupts/requestLcdInterrupt)
      )
-     ;;@ core/graphics/lcd.ts:174:11
+     ;;@ core/graphics/lcd.ts:172:11
      (set_local $0
-      ;;@ core/graphics/lcd.ts:175:18
+      ;;@ core/graphics/lcd.ts:173:18
       (call $core/helpers/index/resetBitOnByte
-       ;;@ core/graphics/lcd.ts:175:33
+       ;;@ core/graphics/lcd.ts:173:33
        (i32.const 2)
        (get_local $0)
       )
      )
     )
-    ;;@ core/graphics/lcd.ts:179:4
+    ;;@ core/graphics/lcd.ts:177:4
     (call $core/memory/store/eightBitStoreIntoGBMemory
      (i32.const 65345)
      (get_local $0)
@@ -20146,20 +20146,20 @@
   (i32.const 4)
  )
  (func $core/interrupts/interrupts/setInterrupts (; 223 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
-  ;;@ core/interrupts/interrupts.ts:209:2
+  ;;@ core/interrupts/interrupts.ts:211:2
   (if
    (i32.and
     (get_local $0)
     (i32.const 1)
    )
-   ;;@ core/interrupts/interrupts.ts:209:13
+   ;;@ core/interrupts/interrupts.ts:211:13
    (set_global $core/interrupts/interrupts/Interrupts.masterInterruptSwitchDelay
-    ;;@ core/interrupts/interrupts.ts:210:44
+    ;;@ core/interrupts/interrupts.ts:212:44
     (i32.const 1)
    )
-   ;;@ core/interrupts/interrupts.ts:211:9
+   ;;@ core/interrupts/interrupts.ts:213:9
    (set_global $core/interrupts/interrupts/Interrupts.masterInterruptSwitch
-    ;;@ core/interrupts/interrupts.ts:212:39
+    ;;@ core/interrupts/interrupts.ts:214:39
     (i32.const 0)
    )
   )
@@ -21597,33 +21597,18 @@
     (i32.const 65535)
    )
   )
-  ;;@ core/interrupts/interrupts.ts:166:2
-  (if
+  (drop
    ;;@ core/interrupts/interrupts.ts:166:10
    (call $core/cpu/cpu/Cpu.isHalted)
-   ;;@ core/interrupts/interrupts.ts:166:22
-   (call $core/memory/store/sixteenBitStoreIntoGBMemory
-    ;;@ core/interrupts/interrupts.ts:167:32
-    (get_global $core/cpu/cpu/Cpu.stackPointer)
-    ;;@ core/interrupts/interrupts.ts:167:50
-    (i32.and
-     (i32.add
-      (get_global $core/cpu/cpu/Cpu.programCounter)
-      ;;@ core/interrupts/interrupts.ts:167:71
-      (i32.const 1)
-     )
-     (i32.const 65535)
-    )
-   )
-   ;;@ core/interrupts/interrupts.ts:168:9
-   (call $core/memory/store/sixteenBitStoreIntoGBMemory
-    ;;@ core/interrupts/interrupts.ts:169:32
-    (get_global $core/cpu/cpu/Cpu.stackPointer)
-    ;;@ core/interrupts/interrupts.ts:169:50
-    (get_global $core/cpu/cpu/Cpu.programCounter)
-   )
   )
-  ;;@ core/interrupts/interrupts.ts:175:2
+  ;;@ core/interrupts/interrupts.ts:166:22
+  (call $core/memory/store/sixteenBitStoreIntoGBMemory
+   ;;@ core/interrupts/interrupts.ts:169:32
+   (get_global $core/cpu/cpu/Cpu.stackPointer)
+   ;;@ core/interrupts/interrupts.ts:169:50
+   (get_global $core/cpu/cpu/Cpu.programCounter)
+  )
+  ;;@ core/interrupts/interrupts.ts:177:2
   (block $break|0
    (block $case3|0
     (block $case2|0
@@ -21642,53 +21627,53 @@
         (br $break|0)
        )
       )
-      ;;@ core/interrupts/interrupts.ts:177:6
+      ;;@ core/interrupts/interrupts.ts:179:6
       (set_global $core/interrupts/interrupts/Interrupts.isVBlankInterruptRequested
-       ;;@ core/interrupts/interrupts.ts:177:46
+       ;;@ core/interrupts/interrupts.ts:179:46
        (i32.const 0)
       )
-      ;;@ core/interrupts/interrupts.ts:178:6
+      ;;@ core/interrupts/interrupts.ts:180:6
       (set_global $core/cpu/cpu/Cpu.programCounter
-       ;;@ core/interrupts/interrupts.ts:178:27
+       ;;@ core/interrupts/interrupts.ts:180:27
        (i32.const 64)
       )
-      ;;@ core/interrupts/interrupts.ts:179:6
+      ;;@ core/interrupts/interrupts.ts:181:6
       (br $break|0)
      )
-     ;;@ core/interrupts/interrupts.ts:181:6
+     ;;@ core/interrupts/interrupts.ts:183:6
      (set_global $core/interrupts/interrupts/Interrupts.isLcdInterruptRequested
-      ;;@ core/interrupts/interrupts.ts:181:43
+      ;;@ core/interrupts/interrupts.ts:183:43
       (i32.const 0)
      )
-     ;;@ core/interrupts/interrupts.ts:182:6
+     ;;@ core/interrupts/interrupts.ts:184:6
      (set_global $core/cpu/cpu/Cpu.programCounter
-      ;;@ core/interrupts/interrupts.ts:182:27
+      ;;@ core/interrupts/interrupts.ts:184:27
       (i32.const 72)
      )
-     ;;@ core/interrupts/interrupts.ts:183:6
+     ;;@ core/interrupts/interrupts.ts:185:6
      (br $break|0)
     )
-    ;;@ core/interrupts/interrupts.ts:185:6
+    ;;@ core/interrupts/interrupts.ts:187:6
     (set_global $core/interrupts/interrupts/Interrupts.isTimerInterruptRequested
-     ;;@ core/interrupts/interrupts.ts:185:45
+     ;;@ core/interrupts/interrupts.ts:187:45
      (i32.const 0)
     )
-    ;;@ core/interrupts/interrupts.ts:186:6
+    ;;@ core/interrupts/interrupts.ts:188:6
     (set_global $core/cpu/cpu/Cpu.programCounter
-     ;;@ core/interrupts/interrupts.ts:186:27
+     ;;@ core/interrupts/interrupts.ts:188:27
      (i32.const 80)
     )
-    ;;@ core/interrupts/interrupts.ts:187:6
+    ;;@ core/interrupts/interrupts.ts:189:6
     (br $break|0)
    )
-   ;;@ core/interrupts/interrupts.ts:189:6
+   ;;@ core/interrupts/interrupts.ts:191:6
    (set_global $core/interrupts/interrupts/Interrupts.isJoypadInterruptRequested
-    ;;@ core/interrupts/interrupts.ts:189:46
+    ;;@ core/interrupts/interrupts.ts:191:46
     (i32.const 0)
    )
-   ;;@ core/interrupts/interrupts.ts:190:6
+   ;;@ core/interrupts/interrupts.ts:192:6
    (set_global $core/cpu/cpu/Cpu.programCounter
-    ;;@ core/interrupts/interrupts.ts:190:27
+    ;;@ core/interrupts/interrupts.ts:192:27
     (i32.const 96)
    )
   )
@@ -24188,12 +24173,12 @@
   )
  )
  (func $core/interrupts/interrupts/requestJoypadInterrupt (; 269 ;) (; has Stack IR ;) (type $v)
-  ;;@ core/interrupts/interrupts.ts:232:2
+  ;;@ core/interrupts/interrupts.ts:234:2
   (set_global $core/interrupts/interrupts/Interrupts.isJoypadInterruptRequested
-   ;;@ core/interrupts/interrupts.ts:232:42
+   ;;@ core/interrupts/interrupts.ts:234:42
    (i32.const 1)
   )
-  ;;@ core/interrupts/interrupts.ts:233:2
+  ;;@ core/interrupts/interrupts.ts:235:2
   (call $core/interrupts/interrupts/_requestInterrupt
    (i32.const 4)
   )
