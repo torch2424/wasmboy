@@ -386,7 +386,7 @@ function handleOpcode1x(opcode: i32): i32 {
         }
       }
 
-      // NOTE: This breaks Blarggs CPU testsif CGB Stop is not implemented
+      // NOTE: This breaks Blarggs CPU tests if CGB Stop is not implemented
       Cpu.isStopped = true;
       Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
       return 4;

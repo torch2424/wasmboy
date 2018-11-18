@@ -56,7 +56,7 @@ export class Interrupts {
 
   // Function to return if we have any pending interrupts
   static areInterruptsPending(): boolean {
-    return (Interrupts.interruptsRequestedValue & Interrupts.interruptsEnabledValue) > 0;
+    return (Interrupts.interruptsRequestedValue & Interrupts.interruptsEnabledValue & 0x1f) > 0;
   }
 
   // Save States
@@ -89,7 +89,7 @@ export function initializeInterrupts(): void {
 
   // IF
   Interrupts.updateInterruptRequested(0xe1);
-  eightBitStoreIntoGBMemory(Interrupts.memoryLocationInterruptEnabled, Interrupts.interruptsRequestedValue);
+  eightBitStoreIntoGBMemory(Interrupts.memoryLocationInterruptRequest, Interrupts.interruptsRequestedValue);
 }
 
 // NOTE: Interrupts should be handled before reading an opcode

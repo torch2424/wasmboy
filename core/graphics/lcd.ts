@@ -20,6 +20,19 @@ export class Lcd {
   // 3 or 11: Transfering Data to LCD Driver
   static readonly memoryLocationLcdStatus: i32 = 0xff41;
   static currentLcdMode: i32 = 0;
+  // Function called in write traps to update our hardware registers
+  static updateLcdStatus(value: i32): void {
+    // Bottom three bits are read only
+    let currentLcdStatus: i32 = eightBitLoadFromGBMemory(Lcd.memoryLocationLcdStatus);
+    let valueNoBottomBits: i32 = value & 0xf8;
+    let lcdStatusOnlyBottomBits: i32 = currentLcdStatus & 0x07;
+    value = valueNoBottomBits | lcdStatusOnlyBottomBits;
+
+    // Top bit is always 1
+    value = setBitOnByte(7, value);
+
+    eightBitStoreIntoGBMemory(Lcd.memoryLocationLcdStatus, value);
+  }
 
   static readonly memoryLocationCoincidenceCompare: i32 = 0xff45;
   static coincidenceCompare: i32 = 0;
@@ -45,7 +58,7 @@ export class Lcd {
   static spriteDisplayEnable: boolean = false;
   static bgDisplayEnabled: boolean = false;
 
-  // Functions called in write traps to update our hardware registers
+  // Function called in write traps to update our hardware registers
   static updateLcdControl(value: i32): void {
     Lcd.enabled = checkBitOnByte(7, value);
     Lcd.windowTileMapDisplaySelect = checkBitOnByte(6, value);

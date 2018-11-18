@@ -153,8 +153,18 @@ export class WasmBoyDebugger extends Component {
 
   logWasmBoyMemory() {
     WasmBoy._getWasmMemorySection().then(wasmByteMemory => {
-      console.log(`[WasmBoy Debugger] Memory:`, wasmByteMemory);
+      console.log(`[WasmBoy Debugger] Entire WasmBoy Memory:`, wasmByteMemory);
     });
+  }
+
+  logGameBoyMemory() {
+    const asyncTask = async () => {
+      const location = await WasmBoy._getWasmConstant('GAMEBOY_INTERNAL_MEMORY_LOCATION');
+      const size = await WasmBoy._getWasmConstant('GAMEBOY_INTERNAL_MEMORY_SIZE');
+      const memory = await WasmBoy._getWasmMemorySection(location, location + size + 1);
+      console.log(`[WasmBoy Debugger] Gameboy Memory:`, memory);
+    };
+    asyncTask();
   }
 
   updateValueTable() {
@@ -302,7 +312,18 @@ export class WasmBoyDebugger extends Component {
               this.logWasmBoyMemory();
             }}
           >
-            Log Memory to console
+            Log Entire WasmBoy Memory to console
+          </button>
+        </div>
+
+        <div class="debuggerAction">
+          <button
+            class="button"
+            onclick={() => {
+              this.logGameBoyMemory();
+            }}
+          >
+            Log Gameboy Memory to console
           </button>
         </div>
 
