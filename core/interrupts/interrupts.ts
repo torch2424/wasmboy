@@ -66,6 +66,8 @@ export class Interrupts {
   static saveState(): void {
     storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x00, Interrupts.saveStateSlot), Interrupts.masterInterruptSwitch);
     storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x01, Interrupts.saveStateSlot), Interrupts.masterInterruptSwitchDelay);
+
+    // Interrupts enabled and requested are stored in actual GB memory, thus, don't need to be saved
   }
 
   // Function to load the save state from memory
@@ -76,6 +78,18 @@ export class Interrupts {
     Interrupts.updateInterruptEnabled(eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptEnabled));
     Interrupts.updateInterruptRequested(eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptRequest));
   }
+}
+
+export function initializeInterrupts(): void {
+  // Values from BGB
+
+  // IE
+  Interrupts.updateInterruptEnabled(0x00);
+  eightBitStoreIntoGBMemory(Interrupts.memoryLocationInterruptEnabled, Interrupts.interruptsEnabledValue);
+
+  // IF
+  Interrupts.updateInterruptRequested(0xe1);
+  eightBitStoreIntoGBMemory(Interrupts.memoryLocationInterruptEnabled, Interrupts.interruptsRequestedValue);
 }
 
 // NOTE: Interrupts should be handled before reading an opcode

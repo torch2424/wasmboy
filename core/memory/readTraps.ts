@@ -6,6 +6,7 @@ import { eightBitStoreIntoGBMemory } from './store';
 import { eightBitLoadFromGBMemory } from './load';
 import { Joypad, getJoypadState } from '../joypad/index';
 import { Timers } from '../timers/index';
+import { Interrupts } from '../interrupts/index';
 import { splitHighByte, hexLog } from '../helpers/index';
 
 // Returns -1 if no trap found, otherwise returns a value that should be fed for the address
@@ -88,6 +89,12 @@ export function checkReadTraps(offset: i32): i32 {
   if (offset === Timers.memoryLocationTimerCounter) {
     eightBitStoreIntoGBMemory(offset, Timers.timerCounter);
     return Timers.timerCounter;
+  }
+
+  // Interrupts
+  if (offset === Interrupts.memoryLocationInterruptRequest) {
+    // TCAGB and BGB say the top 5 bits are always 1.
+    return 0xe0 | Interrupts.interruptsRequestedValue;
   }
 
   // Joypad

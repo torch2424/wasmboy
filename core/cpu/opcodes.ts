@@ -70,6 +70,20 @@ export function executeOpcode(opcode: i32): i32 {
   // Any other value can just subtract or add however much offset before reaching this line
   Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
 
+  // Check if we are in the halt bug
+  if (Cpu.isHaltBug) {
+    // Need to not increment program counter,
+    // thus, running the next opcode twice
+
+    // E.g
+    // 0x76 - halt
+    // FA 34 12 - ld a,(1234)
+    // Becomes
+    // FA FA 34 ld a,(34FA)
+    // 12 ld (de),a
+    Cpu.programCounter = u16Portable(Cpu.programCounter - 1);
+  }
+
   // Split our opcode into a high nibble to speed up performance
   // Running 255 if statements is slow, even in wasm haha!
   let opcodeHighNibble: i32 = opcode & 0xf0;

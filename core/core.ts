@@ -2,7 +2,7 @@
 import { WASMBOY_STATE_LOCATION } from './constants';
 import { Cpu, initializeCpu, executeOpcode } from './cpu/index';
 import { Graphics, initializeGraphics, initializePalette, updateGraphics, batchProcessGraphics } from './graphics/index';
-import { Interrupts, checkInterrupts } from './interrupts/index';
+import { Interrupts, initializeInterrupts, checkInterrupts } from './interrupts/index';
 import { Joypad } from './joypad/index';
 import { Memory, initializeCartridge, initializeDma, eightBitStoreIntoGBMemory, eightBitLoadFromGBMemory } from './memory/index';
 import { Timers, initializeTimers, updateTimers, batchProcessTimers } from './timers/index';
@@ -133,6 +133,7 @@ function initialize(): void {
   initializeGraphics();
   initializePalette();
   initializeSound();
+  initializeInterrupts();
   initializeTimers();
 
   // Various Other Registers
@@ -286,7 +287,8 @@ export function executeStep(): i32 {
 
   // Check if we are in the halt bug
   if (Cpu.isHaltBug) {
-    // Need to run the next opcode twice
+    // Need to not increment program counter,
+    // thus, running the next opcode twice
 
     // E.g
     // 0x76 - halt
@@ -296,9 +298,9 @@ export function executeStep(): i32 {
     // 12 ld (de),a
 
     let haltBugOpcode: i32 = <u8>eightBitLoadFromGBMemory(Cpu.programCounter);
+    // Execute opcode will handle the actual PC behavior
     let haltBugCycles: i32 = executeOpcode(haltBugOpcode);
     syncCycles(haltBugCycles);
-    Cpu.programCounter = u16Portable(Cpu.programCounter - 1);
     Cpu.exitHaltAndStop();
   }
 
