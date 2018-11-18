@@ -1970,6 +1970,7 @@ function handleOpcodeDx(opcode: i32): i32 {
     case 0xd9:
       // RETI
       // 1  16
+
       // 8 cycles
       Cpu.programCounter = <u16>sixteenBitLoadSyncCycles(Cpu.stackPointer);
       // Enable interrupts

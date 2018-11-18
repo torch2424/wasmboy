@@ -100,7 +100,6 @@ export function checkInterrupts(): i32 {
     if (Interrupts.masterInterruptSwitch && !Cpu.isHaltNoJump) {
       if (Interrupts.isVBlankInterruptEnabled && Interrupts.isVBlankInterruptRequested) {
         _handleInterrupt(Interrupts.bitPositionVBlankInterrupt);
-        hexLog(0x05, 0x01);
         wasInterruptHandled = true;
       } else if (Interrupts.isLcdInterruptEnabled && Interrupts.isLcdInterruptRequested) {
         _handleInterrupt(Interrupts.bitPositionLcdInterrupt);
