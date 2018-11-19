@@ -25,7 +25,7 @@ import {
   cpARegister,
   relativeJump
 } from './instructions';
-import { syncCycles } from '../core';
+import { syncCycles } from '../cycles';
 import { Config } from '../config';
 import {
   log,
@@ -69,6 +69,20 @@ export function executeOpcode(opcode: i32): i32 {
   // Always implement the program counter by one
   // Any other value can just subtract or add however much offset before reaching this line
   Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
+
+  // Check if we are in the halt bug
+  if (Cpu.isHaltBug) {
+    // Need to not increment program counter,
+    // thus, running the next opcode twice
+
+    // E.g
+    // 0x76 - halt
+    // FA 34 12 - ld a,(1234)
+    // Becomes
+    // FA FA 34 ld a,(34FA)
+    // 12 ld (de),a
+    Cpu.programCounter = u16Portable(Cpu.programCounter - 1);
+  }
 
   // Split our opcode into a high nibble to speed up performance
   // Running 255 if statements is slow, even in wasm haha!
@@ -372,7 +386,7 @@ function handleOpcode1x(opcode: i32): i32 {
         }
       }
 
-      // NOTE: This breaks Blarggs CPU testsif CGB Stop is not implemented
+      // NOTE: This breaks Blarggs CPU tests if CGB Stop is not implemented
       Cpu.isStopped = true;
       Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
       return 4;
@@ -1250,7 +1264,7 @@ function handleOpcode7x(opcode: i32): i32 {
       // Can't Halt during an HDMA
       // https://gist.github.com/drhelius/3394856
       if (!Memory.isHblankHdmaActive) {
-        Cpu.isHalted = true;
+        Cpu.enableHalt();
       }
       return 4;
     case 0x77:
@@ -1970,6 +1984,7 @@ function handleOpcodeDx(opcode: i32): i32 {
     case 0xd9:
       // RETI
       // 1  16
+
       // 8 cycles
       Cpu.programCounter = <u16>sixteenBitLoadSyncCycles(Cpu.stackPointer);
       // Enable interrupts

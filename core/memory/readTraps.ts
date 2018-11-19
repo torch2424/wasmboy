@@ -1,4 +1,5 @@
 import { Memory } from './memory';
+import { Cpu } from '../cpu/index';
 import { Graphics, batchProcessGraphics } from '../graphics/graphics';
 import { Palette, Lcd } from '../graphics/index';
 import { batchProcessAudio, SoundRegisterReadTraps } from '../sound/index';
@@ -6,7 +7,8 @@ import { eightBitStoreIntoGBMemory } from './store';
 import { eightBitLoadFromGBMemory } from './load';
 import { Joypad, getJoypadState } from '../joypad/index';
 import { Timers } from '../timers/index';
-import { splitHighByte, hexLog } from '../helpers/index';
+import { Interrupts } from '../interrupts/index';
+import { checkBitOnByte, resetBitOnByte, splitHighByte, hexLog } from '../helpers/index';
 
 // Returns -1 if no trap found, otherwise returns a value that should be fed for the address
 export function checkReadTraps(offset: i32): i32 {
@@ -55,6 +57,23 @@ export function checkReadTraps(offset: i32): i32 {
     return -1;
   }
 
+  // CPU
+  if (offset === Cpu.memoryLocationSpeedSwitch) {
+    // TCAGBD, only Bit 7 and 0 are readable, all others are 1
+    let response: i32 = 0xff;
+
+    let currentSpeedSwitchRegister: i32 = eightBitLoadFromGBMemory(Cpu.memoryLocationSpeedSwitch);
+    if (!checkBitOnByte(0, currentSpeedSwitchRegister)) {
+      response = resetBitOnByte(0, response);
+    }
+
+    if (!Cpu.GBCDoubleSpeed) {
+      response = resetBitOnByte(7, response);
+    }
+
+    return response;
+  }
+
   // Graphics
   // Not batch processing here for performance
   // batchProcessGraphics();
@@ -88,6 +107,12 @@ export function checkReadTraps(offset: i32): i32 {
   if (offset === Timers.memoryLocationTimerCounter) {
     eightBitStoreIntoGBMemory(offset, Timers.timerCounter);
     return Timers.timerCounter;
+  }
+
+  // Interrupts
+  if (offset === Interrupts.memoryLocationInterruptRequest) {
+    // TCAGB and BGB say the top 5 bits are always 1.
+    return 0xe0 | Interrupts.interruptsRequestedValue;
   }
 
   // Joypad

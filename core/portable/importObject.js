@@ -35,11 +35,11 @@ const wasmImportObject = {
         console.log(logString);
 
         // Comment the lines below to disable throttle
-        logRequest[arg0] = true;
+        /*logRequest[arg0] = true;
         setTimeout(() => {
-          // console.log(logString);
+          console.log(logString);
           logRequest[arg0] = false;
-        }, logThrottleLength);
+        }, logThrottleLength);*/
       }
     }
   }

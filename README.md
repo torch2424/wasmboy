@@ -93,18 +93,19 @@ Try to test and aim for support on all major browsers (Chrome, Firefox, and Safa
 
 # Tests
 
-These are all currently known passing tests (by me), there may be more test roms out there that pass. Feel free to open an issue or PR to add the tests to this list 😄 . **The test names are listed from left to right, top to bottom**.
+These are all currently known passing tests (by me), there may be more test roms out there that pass. Some tests may not pass, and that can either be because of the component it is testing is actually incorrect, or another component that the test is testing is not yet implemented, or is incorrect (e.g a lot of mooneye tests rely on Serial Interrupts, which this emulator has yet to implement). Feel free to open an issue or PR to add any more passing tests to this list 😄 . **The test names are listed from left to right, top to bottom**.
 
 ### Blarrg
 
 [Repo with all blargg's tests and source](https://github.com/retrio/gb-test-roms)
 
-cpu_instrs, instr_timing, mem_timing, mem_timing-2
+cpu_instrs, instr_timing, mem_timing, mem_timing-2, halt_bug
 
 ![Cpu Instructions all tests passing](./test/accuracy/testroms/blargg/cpu_instrs/cpu_instrs.golden.png)
 ![Instruction timing all tests passing](./test/accuracy/testroms/blargg/instr_timing/instr_timing.golden.png)
 ![Memory timing all tests passing](./test/accuracy/testroms/blargg/mem_timing/mem_timing.golden.png)
 ![Memory timing 2 all tests passing](./test/accuracy/testroms/blargg/mem_timing-2/mem_timing-2.golden.png)
+![halt bug all tests passing](./test/accuracy/testroms/blargg/halt_bug/halt_bug.golden.png)
 
 ### Mooneye
 
@@ -127,6 +128,14 @@ div_write, rapid_toggle, tim00, tim00_div_trigger, tim01, tim01_div_trigger, tim
 ![tima reload test passing](./test/accuracy/testroms/mooneye/timer/tima_reload/tima_reload.golden.png)
 ![tima write reloading test passing](./test/accuracy/testroms/mooneye/timer/tima_write_reloading/tima_write_reloading.golden.png)
 ![tma write reloading test passing](./test/accuracy/testroms/mooneye/timer/tma_write_reloading/tma_write_reloading.golden.png)
+
+#### Halt
+
+halt_ime0_ei, halt_ime0_nointr_timing, halt_ime1_timing
+
+![halt_ime0_ei test passing](./test/accuracy/testroms/mooneye/halt/halt_ime0_ei/halt_ime0_ei.golden.png)
+![halt_ime0_nointr_timing test passing](./test/accuracy/testroms/mooneye/halt/halt_ime0_nointr_timing/halt_ime0_nointr_timing.golden.png)
+![halt_ime1_timing test passing](./test/accuracy/testroms/mooneye/halt/halt_ime1_timing/halt_ime1_timing.golden.png)
 
 # Contributing
 

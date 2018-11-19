@@ -1,4 +1,5 @@
 import { Memory } from './memory';
+import { Cpu } from '../cpu/index';
 import { Graphics, batchProcessGraphics } from '../graphics/graphics';
 import { Palette, writeColorPaletteToMemory, Lcd } from '../graphics/index';
 import { batchProcessAudio, SoundRegisterWriteTraps } from '../sound/index';
@@ -13,7 +14,17 @@ import { checkBitOnByte, hexLog } from '../helpers/index';
 
 // Internal function to trap any modify data trying to be written to Gameboy memory
 // Follows the Gameboy memory map
+// Return true if you want to continue the write, return false to end it here
 export function checkWriteTraps(offset: i32, value: i32): boolean {
+  // Cpu
+  if (offset === Cpu.memoryLocationSpeedSwitch) {
+    // TCAGBD, only Bit 0 is writable
+    eightBitStoreIntoGBMemory(Cpu.memoryLocationSpeedSwitch, value & 0x01);
+    // We did the write, dont need to
+    return false;
+  }
+
+  // Graphics
   // Cache globals used multiple times for performance
   let videoRamLocation: i32 = Memory.videoRamLocation;
   let spriteInformationTableLocation: i32 = Memory.spriteInformationTableLocation;
@@ -95,6 +106,12 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
       // Shorcut for isLCD Enabled since it gets "hot"
       Lcd.updateLcdControl(value);
       return true;
+    }
+
+    if (offset === Lcd.memoryLocationLcdStatus) {
+      // We are handling the write here
+      Lcd.updateLcdStatus(value);
+      return false;
     }
 
     // reset the current scanline if the game tries to write to it

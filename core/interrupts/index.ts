@@ -1,5 +1,6 @@
 export {
   Interrupts,
+  initializeInterrupts,
   checkInterrupts,
   setInterrupts,
   requestLcdInterrupt,

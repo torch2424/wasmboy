@@ -10,7 +10,7 @@ import {
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
-
+import { Interrupts } from '../interrupts/index';
 import { log, hexLog } from '../helpers/index';
 
 // Everything Static as class instances just aren't quite there yet
@@ -18,6 +18,10 @@ import { log, hexLog } from '../helpers/index';
 export class Cpu {
   // Status to track if we are in Gameboy Color Mode, and GBC State
   static GBCEnabled: boolean = false;
+
+  // Memory Location for the GBC Speed switch
+  // And the current status
+  static readonly memoryLocationSpeedSwitch: u16 = 0xff4d;
   static GBCDoubleSpeed: boolean = false;
 
   // 8-bit Cpu.registers
@@ -59,11 +63,44 @@ export class Cpu {
   // HALT and STOP instructions need to stop running opcodes, but simply check timers
   // https://github.com/nakardo/node-gameboy/blob/master/lib/cpu/opcodes.js
   // Matt said is should work to, so it must work!
-  static isHalted: boolean = false;
+  // TCAGBD shows three different HALT states. Therefore, we need to handle each
+  static isHaltNormal: boolean = false;
+  static isHaltNoJump: boolean = false;
+  static isHaltBug: boolean = false;
   static isStopped: boolean = false;
 
-  // Memory Location for the GBC Speed switch
-  static readonly memoryLocationSpeedSwitch: u16 = 0xff4d;
+  // See section 4.10 of TCAGBD
+  // Cpu Halting explained: https://www.reddit.com/r/EmuDev/comments/5ie3k7/infinite_loop_trying_to_pass_blarggs_interrupt/db7xnbe/
+  static enableHalt(): void {
+    if (Interrupts.masterInterruptSwitch) {
+      Cpu.isHaltNormal = true;
+      return;
+    }
+
+    let haltTypeValue: i32 = Interrupts.interruptsEnabledValue & Interrupts.interruptsRequestedValue & 0x1f;
+
+    if (haltTypeValue === 0) {
+      Cpu.isHaltNoJump = true;
+      return;
+    }
+
+    Cpu.isHaltBug = true;
+  }
+
+  static exitHaltAndStop(): void {
+    Cpu.isHaltNoJump = false;
+    Cpu.isHaltNormal = false;
+    Cpu.isHaltBug = false;
+    Cpu.isStopped = false;
+  }
+
+  static isHalted(): boolean {
+    if (Cpu.isHaltNormal || Cpu.isHaltNoJump) {
+      return true;
+    }
+
+    return false;
+  }
 
   // Save States
   static readonly saveStateSlot: u16 = 0;
@@ -85,8 +122,10 @@ export class Cpu {
 
     store<i32>(getSaveStateMemoryOffset(0x0c, Cpu.saveStateSlot), Cpu.currentCycles);
 
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x11, Cpu.saveStateSlot), Cpu.isHalted);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x12, Cpu.saveStateSlot), Cpu.isStopped);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x11, Cpu.saveStateSlot), Cpu.isHaltNormal);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x12, Cpu.saveStateSlot), Cpu.isHaltNoJump);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x13, Cpu.saveStateSlot), Cpu.isHaltBug);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x14, Cpu.saveStateSlot), Cpu.isStopped);
   }
 
   // Function to load the save state from memory
@@ -106,8 +145,10 @@ export class Cpu {
 
     Cpu.currentCycles = load<i32>(getSaveStateMemoryOffset(0x0c, Cpu.saveStateSlot));
 
-    Cpu.isHalted = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x11, Cpu.saveStateSlot));
-    Cpu.isStopped = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x12, Cpu.saveStateSlot));
+    Cpu.isHaltNormal = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x11, Cpu.saveStateSlot));
+    Cpu.isHaltNoJump = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x12, Cpu.saveStateSlot));
+    Cpu.isHaltBug = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x13, Cpu.saveStateSlot));
+    Cpu.isStopped = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x14, Cpu.saveStateSlot));
   }
 }
 
@@ -126,7 +167,9 @@ export function initializeCpu(): void {
   Cpu.stackPointer = 0;
   Cpu.programCounter = 0x00;
   Cpu.currentCycles = 0;
-  Cpu.isHalted = false;
+  Cpu.isHaltNormal = false;
+  Cpu.isHaltNoJump = false;
+  Cpu.isHaltBug = false;
   Cpu.isStopped = false;
 
   if (Cpu.GBCEnabled) {

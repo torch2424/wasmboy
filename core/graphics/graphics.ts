@@ -35,9 +35,18 @@ export class Graphics {
   // See TCAGBD For cycles
   static scanlineCycleCounter: i32 = 0x00;
 
+  // TCAGBD says 456 per scanline, but 153 only a handful
   static MAX_CYCLES_PER_SCANLINE(): i32 {
     if (Cpu.GBCDoubleSpeed) {
+      if (Graphics.scanlineRegister === 153) {
+        return 8;
+      }
+
       return 912;
+    }
+
+    if (Graphics.scanlineRegister === 153) {
+      return 4;
     }
 
     return 456;
@@ -206,6 +215,7 @@ export function updateGraphics(numberOfCycles: i32): void {
       }
 
       // Post increment the scanline register after drawing
+      // TODO: Need to fix graphics timing
       if (scanlineRegister > 153) {
         // Check if we overflowed scanlines
         // if so, reset our scanline number
