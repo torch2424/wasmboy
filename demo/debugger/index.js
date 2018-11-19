@@ -210,6 +210,14 @@ export default class App extends Component {
           </a>
         </div>
         <div style="text-align: center">
+          Try{' '}
+          <a href="https://vaporboy.net/" target="_blank">
+            VaporBoy
+          </a>{' '}
+          for a full featured, GB / GBC Emulator Progressive Web App.
+        </div>
+
+        <div style="text-align: center;margin-top: 10px">
           <label class="checkbox">
             Show Options
             <input

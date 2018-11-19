@@ -1,14 +1,7 @@
 // Public Exports
-export {
-  config,
-  executeFrame,
-  executeFrameAndCheckAudio,
-  executeFrameUntilBreakpoint,
-  executeStep,
-  saveState,
-  loadState,
-  hasCoreStarted
-} from './core';
+export { config, hasCoreStarted, saveState, loadState } from './core';
+export { executeFrame, executeFrameAndCheckAudio, executeFrameUntilBreakpoint, executeStep } from './execute';
+export { getCyclesPerCycleSet, getCycleSets, getCycles, trackCyclesRan } from './cycles';
 export { setJoypadState } from './joypad/joypad';
 export { getNumberOfSamplesInAudioBuffer, clearAudioBuffer } from './sound/sound';
 export {

@@ -25,7 +25,7 @@ import {
   cpARegister,
   relativeJump
 } from './instructions';
-import { syncCycles } from '../core';
+import { syncCycles } from '../cycles';
 import { Config } from '../config';
 import {
   log,
