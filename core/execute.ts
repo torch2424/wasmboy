@@ -5,9 +5,29 @@ import { syncCycles } from './cycles';
 import { Cpu, executeOpcode } from './cpu/index';
 import { Interrupts, checkInterrupts } from './interrupts/index';
 import { eightBitStoreIntoGBMemory, eightBitLoadFromGBMemory } from './memory/index';
-import { Sound, getNumberOfSamplesInAudioBuffer } from './sound/index';
+import { Sound, getNumberOfSamplesInAudioBuffer, clearAudioBuffer } from './sound/index';
 import { hexLog, log } from './helpers/index';
 import { u16Portable } from './portable/portable';
+
+// // Public funciton to run frames until,
+// the specified number of frames have run or error.
+// Return values:
+// -1 = error
+// 0 = render a frame
+export function executeMultipleFrames(numberOfFrames: i32): i32 {
+  let frameResponse: i32 = 0;
+  let framesRun: i32 = 0;
+  while (framesRun < numberOfFrames && frameResponse >= 0) {
+    frameResponse = executeFrame();
+    framesRun += 1;
+  }
+
+  if (frameResponse < 0) {
+    return frameResponse;
+  }
+
+  return 0;
+}
 
 // Public funciton to run opcodes until,
 // a frame is ready, or error.
@@ -15,17 +35,7 @@ import { u16Portable } from './portable/portable';
 // -1 = error
 // 0 = render a frame
 export function executeFrame(): i32 {
-  let response: i32 = executeFrameAndCheckAudio();
-
-  // Find our exit reason
-  if (response === -1) {
-    return -1;
-  } else if (response === 0) {
-    return 0;
-  }
-
-  // We left because of audio, simply keep running
-  return executeFrame();
+  return executeUntilCondition(true, -1, -1);
 }
 
 // Public Function to run opcodes until,
@@ -34,40 +44,7 @@ export function executeFrame(): i32 {
 // 0 = render a frame
 // 1 = output audio
 export function executeFrameAndCheckAudio(maxAudioBuffer: i32 = 0): i32 {
-  let error: boolean = false;
-  let numberOfCycles: i32 = -1;
-  let audioBufferSize: i32 = 1024;
-
-  if (maxAudioBuffer && maxAudioBuffer > 0) {
-    audioBufferSize = maxAudioBuffer;
-  }
-
-  while (!error && Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME() && getNumberOfSamplesInAudioBuffer() < audioBufferSize) {
-    numberOfCycles = executeStep();
-    if (numberOfCycles < 0) {
-      error = true;
-    }
-  }
-
-  // Find our exit reason
-  if (Cpu.currentCycles >= Cpu.MAX_CYCLES_PER_FRAME()) {
-    // Render a frame
-
-    // Reset our currentCycles
-    Cpu.currentCycles -= Cpu.MAX_CYCLES_PER_FRAME();
-
-    return 0;
-  }
-  if (getNumberOfSamplesInAudioBuffer() >= audioBufferSize) {
-    // Output Audio
-    return 1;
-  }
-
-  // TODO: Boot ROM handling
-
-  // There was an error, return -1, and push the program counter back to grab the error opcode
-  Cpu.programCounter = u16Portable(Cpu.programCounter - 1);
-  return -1;
+  return executeUntilCondition(true, maxAudioBuffer, -1);
 }
 
 // Public function to run opcodes until,
@@ -76,18 +53,55 @@ export function executeFrameAndCheckAudio(maxAudioBuffer: i32 = 0): i32 {
 // 0 = frame executed
 // 1 = reached breakpoint
 export function executeFrameUntilBreakpoint(breakpoint: i32): i32 {
-  let error: boolean = false;
-  let numberOfCycles: i32 = -1;
+  let response: i32 = executeUntilCondition(true, -1, breakpoint);
 
-  while (!error && Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME() && Cpu.programCounter !== breakpoint) {
+  // Break point response will be 1 in our case
+  if (response === 2) {
+    return 1;
+  }
+
+  return response;
+}
+
+// Base function that executes steps, and checks conditions
+// Return values:
+// -1 = error
+// 0 = render a frame
+// 1 = audio buffer reached
+// 2 = reached breakpoint
+export function executeUntilCondition(checkMaxCyclesPerFrame: boolean = true, maxAudioBuffer: i32 = -1, breakpoint: i32 = -1): i32 {
+  // Common tracking variables
+  let numberOfCycles: i32 = -1;
+  let audioBufferSize: i32 = 1024;
+
+  if (maxAudioBuffer > 0) {
+    audioBufferSize = maxAudioBuffer;
+  } else if (maxAudioBuffer < 0) {
+    audioBufferSize = -1;
+  }
+
+  let errorCondition: boolean = false;
+  let frameCondition: boolean = false;
+  let audioBufferCondition: boolean = false;
+  let breakpointCondition: boolean = false;
+
+  while (!errorCondition && !frameCondition && !audioBufferCondition && !breakpointCondition) {
     numberOfCycles = executeStep();
+
+    // Error Condition
     if (numberOfCycles < 0) {
-      error = true;
+      errorCondition = true;
+    } else if (Cpu.currentCycles >= Cpu.MAX_CYCLES_PER_FRAME()) {
+      frameCondition = true;
+    } else if (audioBufferSize > -1 && getNumberOfSamplesInAudioBuffer() >= audioBufferSize) {
+      audioBufferCondition = true;
+    } else if (breakpoint > -1 && Cpu.programCounter === breakpoint) {
+      breakpointCondition = true;
     }
   }
 
   // Find our exit reason
-  if (Cpu.currentCycles >= Cpu.MAX_CYCLES_PER_FRAME()) {
+  if (frameCondition) {
     // Render a frame
 
     // Reset our currentCycles
@@ -95,9 +109,14 @@ export function executeFrameUntilBreakpoint(breakpoint: i32): i32 {
 
     return 0;
   }
-  if (Cpu.programCounter === breakpoint) {
-    // breakpoint
+
+  if (audioBufferCondition) {
     return 1;
+  }
+
+  if (breakpointCondition) {
+    // breakpoint
+    return 2;
   }
 
   // TODO: Boot ROM handling
