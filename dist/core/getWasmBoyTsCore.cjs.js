@@ -73,9 +73,33 @@ var AUDIO_BUFFER_SIZE = 0x020000; // Catridge Memory
 var CARTRIDGE_RAM_LOCATION = 0x0afc00;
 var CARTRIDGE_RAM_SIZE = 0x020000;
 var CARTRIDGE_ROM_LOCATION = 0x0cfc00;
-var CARTRIDGE_ROM_SIZE = 0x7e0400; // Grouped registers
+var CARTRIDGE_ROM_SIZE = 0x7e0400;
+
+var Config =
+/** @class */
+function () {
+  function Config() {} // Boot Rom
+
+
+  Config.enableBootRom = false; // GBC Preference
+
+  Config.useGbcWhenAvailable = true; // Batch Processing
+
+  Config.audioBatchProcessing = false;
+  Config.graphicsBatchProcessing = false;
+  Config.timersBatchProcessing = false; // Scanline Rendering
+
+  Config.graphicsDisableScanlineRendering = false; // Acumulate Sound Samples
+
+  Config.audioAccumulateSamples = false; // Tile Rednering
+
+  Config.tileRendering = false;
+  Config.tileCaching = false;
+  return Config;
+}(); // Grouped registers
 // possible overload these later to performace actions
 // AF, BC, DE, HL
+
 
 function concatenateBytes(highByte, lowByte) {
   //https://stackoverflow.com/questions/38298412/convert-two-bytes-into-signed-16-bit-integer-in-javascript
@@ -1926,30 +1950,7 @@ function didChannelDacChange(channelNumber) {
   }
 
   return false;
-}
-
-var Config =
-/** @class */
-function () {
-  function Config() {} // Boot Rom
-
-
-  Config.enableBootRom = false; // GBC Preference
-
-  Config.useGbcWhenAvailable = true; // Batch Processing
-
-  Config.audioBatchProcessing = false;
-  Config.graphicsBatchProcessing = false;
-  Config.timersBatchProcessing = false; // Scanline Rendering
-
-  Config.graphicsDisableScanlineRendering = false; // Acumulate Sound Samples
-
-  Config.audioAccumulateSamples = false; // Tile Rednering
-
-  Config.tileRendering = false;
-  Config.tileCaching = false;
-  return Config;
-}(); // https://emu-docs.org/Game%20Boy/gb_sound.txt
+} // https://emu-docs.org/Game%20Boy/gb_sound.txt
 
 
 var Sound =
@@ -2567,13 +2568,13 @@ function () {
 
 
   Interrupts.areInterruptsPending = function () {
-    return (Interrupts.interruptsRequestedValue & Interrupts.interruptsEnabledValue) > 0;
+    return (Interrupts.interruptsRequestedValue & Interrupts.interruptsEnabledValue & 0x1f) > 0;
   }; // Function to save the state of the class
 
 
   Interrupts.saveState = function () {
     storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x00, Interrupts.saveStateSlot), Interrupts.masterInterruptSwitch);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x01, Interrupts.saveStateSlot), Interrupts.masterInterruptSwitchDelay);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x01, Interrupts.saveStateSlot), Interrupts.masterInterruptSwitchDelay); // Interrupts enabled and requested are stored in actual GB memory, thus, don't need to be saved
   }; // Function to load the save state from memory
 
 
@@ -2594,7 +2595,8 @@ function () {
   Interrupts.bitPositionLcdInterrupt = 1;
   Interrupts.bitPositionTimerInterrupt = 2;
   Interrupts.bitPositionJoypadInterrupt = 4;
-  Interrupts.memoryLocationInterruptEnabled = 0xffff; // Cache which Interrupts are enabled
+  Interrupts.memoryLocationInterruptEnabled = 0xffff; // A.K.A interrupt Flag (IE)
+  // Cache which Interrupts are enabled
 
   Interrupts.interruptsEnabledValue = 0;
   Interrupts.isVBlankInterruptEnabled = false;
@@ -2614,45 +2616,74 @@ function () {
   return Interrupts;
 }();
 
+function initializeInterrupts() {
+  // Values from BGB
+  // IE
+  Interrupts.updateInterruptEnabled(0x00);
+  eightBitStoreIntoGBMemory(Interrupts.memoryLocationInterruptEnabled, Interrupts.interruptsEnabledValue); // IF
+
+  Interrupts.updateInterruptRequested(0xe1);
+  eightBitStoreIntoGBMemory(Interrupts.memoryLocationInterruptRequest, Interrupts.interruptsRequestedValue);
+} // NOTE: Interrupts should be handled before reading an opcode
+
+
 function checkInterrupts() {
-  if (Interrupts.masterInterruptSwitch && Interrupts.interruptsEnabledValue > 0 && Interrupts.interruptsRequestedValue > 0) {
+  // First check for our delay was enabled
+  if (Interrupts.masterInterruptSwitchDelay) {
+    Interrupts.masterInterruptSwitch = true;
+    Interrupts.masterInterruptSwitchDelay = false;
+  } // Check if we have an enabled and requested interrupt
+
+
+  var isAnInterruptRequestedAndEnabledValue = Interrupts.interruptsEnabledValue & Interrupts.interruptsRequestedValue & 0x1f;
+
+  if (isAnInterruptRequestedAndEnabledValue > 0) {
     // Boolean to track if interrupts were handled
     // Interrupt handling requires 20 cycles
     // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
-    var wasInterruptHandled = false; // Check our interrupts
+    var wasInterruptHandled = false; // Service our interrupts, if we have the master switch enabled
+    // https://www.reddit.com/r/EmuDev/comments/5ie3k7/infinite_loop_trying_to_pass_blarggs_interrupt/
 
-    if (Interrupts.isVBlankInterruptEnabled && Interrupts.isVBlankInterruptRequested) {
-      _handleInterrupt(Interrupts.bitPositionVBlankInterrupt);
+    if (Interrupts.masterInterruptSwitch && !Cpu.isHaltNoJump) {
+      if (Interrupts.isVBlankInterruptEnabled && Interrupts.isVBlankInterruptRequested) {
+        _handleInterrupt(Interrupts.bitPositionVBlankInterrupt);
 
-      wasInterruptHandled = true;
-    } else if (Interrupts.isLcdInterruptEnabled && Interrupts.isLcdInterruptRequested) {
-      _handleInterrupt(Interrupts.bitPositionLcdInterrupt);
+        wasInterruptHandled = true;
+      } else if (Interrupts.isLcdInterruptEnabled && Interrupts.isLcdInterruptRequested) {
+        _handleInterrupt(Interrupts.bitPositionLcdInterrupt);
 
-      wasInterruptHandled = true;
-    } else if (Interrupts.isTimerInterruptEnabled && Interrupts.isTimerInterruptRequested) {
-      _handleInterrupt(Interrupts.bitPositionTimerInterrupt);
+        wasInterruptHandled = true;
+      } else if (Interrupts.isTimerInterruptEnabled && Interrupts.isTimerInterruptRequested) {
+        _handleInterrupt(Interrupts.bitPositionTimerInterrupt);
 
-      wasInterruptHandled = true;
-    } else if (Interrupts.isJoypadInterruptEnabled && Interrupts.isJoypadInterruptRequested) {
-      _handleInterrupt(Interrupts.bitPositionJoypadInterrupt);
+        wasInterruptHandled = true;
+      } else if (Interrupts.isJoypadInterruptEnabled && Interrupts.isJoypadInterruptRequested) {
+        _handleInterrupt(Interrupts.bitPositionJoypadInterrupt);
 
-      wasInterruptHandled = true;
-    } // Interrupt handling requires 20 cycles, TCAGBD
+        wasInterruptHandled = true;
+      }
+    }
 
+    var interuptHandlerCycles = 0;
 
     if (wasInterruptHandled) {
-      var intteruptHandlerCycles = 20;
+      // Interrupt handling requires 20 cycles, TCAGBD
+      interuptHandlerCycles = 20;
 
-      if (Cpu.isHalted) {
+      if (Cpu.isHalted()) {
         // If the CPU was halted, now is the time to un-halt
         // Should be done here when the jump occurs according to:
         // https://www.reddit.com/r/EmuDev/comments/6fmjch/gb_glitches_in_links_awakening_and_pok%C3%A9mon_gold/
-        Cpu.isHalted = false;
-        intteruptHandlerCycles += 4;
+        Cpu.exitHaltAndStop();
+        interuptHandlerCycles += 4;
       }
-
-      return intteruptHandlerCycles;
     }
+
+    if (Cpu.isHalted()) {
+      Cpu.exitHaltAndStop();
+    }
+
+    return interuptHandlerCycles;
   }
 
   return 0;
@@ -2666,11 +2697,20 @@ function _handleInterrupt(bitPosition) {
   interruptRequest = resetBitOnByte(bitPosition, interruptRequest);
   Interrupts.interruptsRequestedValue = interruptRequest;
   eightBitStoreIntoGBMemory(Interrupts.memoryLocationInterruptRequest, interruptRequest); // Push the programCounter onto the stacks
+  // Push the next instruction, not the halt itself (TCAGBD).
 
   Cpu.stackPointer = Cpu.stackPointer - 2;
-  sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter); // Jump to the correct interrupt location
+
+  if (Cpu.isHalted()) {
+    // TODO: This breaks Pokemon Yellow, And OG Link's awakening. Find out why...
+    // sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter + 1);
+    sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
+  } else {
+    sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
+  } // Jump to the correct interrupt location
   // Also puiggyback off of the switch to reset our HW Register caching
   // http://www.codeslinger.co.uk/pages/projects/gameboy/interupts.html
+
 
   switch (bitPosition) {
     case Interrupts.bitPositionVBlankInterrupt:
@@ -2704,7 +2744,13 @@ function _requestInterrupt(bitPosition) {
 }
 
 function setInterrupts(value) {
-  Interrupts.masterInterruptSwitch = value;
+  // If we are enabling interrupts,
+  // we want to wait 4 cycles before enabling
+  if (value) {
+    Interrupts.masterInterruptSwitchDelay = true;
+  } else {
+    Interrupts.masterInterruptSwitch = false;
+  }
 }
 
 function requestVBlankInterrupt() {
@@ -3570,10 +3616,20 @@ function getHdmaDestinationFromMemory() {
   return hdmaDestination;
 } // Internal function to trap any modify data trying to be written to Gameboy memory
 // Follows the Gameboy memory map
+// Return true if you want to continue the write, return false to end it here
 
 
 function checkWriteTraps(offset, value) {
+  // Cpu
+  if (offset === Cpu.memoryLocationSpeedSwitch) {
+    // TCAGBD, only Bit 0 is writable
+    eightBitStoreIntoGBMemory(Cpu.memoryLocationSpeedSwitch, value & 0x01); // We did the write, dont need to
+
+    return false;
+  } // Graphics
   // Cache globals used multiple times for performance
+
+
   var videoRamLocation = Memory.videoRamLocation;
   var spriteInformationTableLocation = Memory.spriteInformationTableLocation; // Handle banking
 
@@ -3649,6 +3705,12 @@ function checkWriteTraps(offset, value) {
       // Shorcut for isLCD Enabled since it gets "hot"
       Lcd.updateLcdControl(value);
       return true;
+    }
+
+    if (offset === Lcd.memoryLocationLcdStatus) {
+      // We are handling the write here
+      Lcd.updateLcdStatus(value);
+      return false;
     } // reset the current scanline if the game tries to write to it
 
 
@@ -3900,7 +3962,19 @@ function storeBooleanDirectlyToWasmMemory(offset, value) {
 var Lcd =
 /** @class */
 function () {
-  function Lcd() {} // Functions called in write traps to update our hardware registers
+  function Lcd() {} // Function called in write traps to update our hardware registers
+
+
+  Lcd.updateLcdStatus = function (value) {
+    // Bottom three bits are read only
+    var currentLcdStatus = eightBitLoadFromGBMemory(Lcd.memoryLocationLcdStatus);
+    var valueNoBottomBits = value & 0xf8;
+    var lcdStatusOnlyBottomBits = currentLcdStatus & 0x07;
+    value = valueNoBottomBits | lcdStatusOnlyBottomBits; // Top bit is always 1
+
+    value = setBitOnByte(7, value);
+    eightBitStoreIntoGBMemory(Lcd.memoryLocationLcdStatus, value);
+  }; // Function called in write traps to update our hardware registers
 
 
   Lcd.updateLcdControl = function (value) {
@@ -4603,11 +4677,20 @@ function () {
 
   Graphics.batchProcessCycles = function () {
     return Graphics.MAX_CYCLES_PER_SCANLINE();
-  };
+  }; // TCAGBD says 456 per scanline, but 153 only a handful
+
 
   Graphics.MAX_CYCLES_PER_SCANLINE = function () {
     if (Cpu.GBCDoubleSpeed) {
+      if (Graphics.scanlineRegister === 153) {
+        return 8;
+      }
+
       return 912;
+    }
+
+    if (Graphics.scanlineRegister === 153) {
+      return 4;
     }
 
     return 456;
@@ -4769,6 +4852,7 @@ function updateGraphics(numberOfCycles) {
           _drawScanline(scanlineRegister);
         }
       } // Post increment the scanline register after drawing
+      // TODO: Need to fix graphics timing
 
 
       if (scanlineRegister > 153) {
@@ -4912,6 +4996,23 @@ function checkReadTraps(offset) {
 
 
     return -1;
+  } // CPU
+
+
+  if (offset === Cpu.memoryLocationSpeedSwitch) {
+    // TCAGBD, only Bit 7 and 0 are readable, all others are 1
+    var response = 0xff;
+    var currentSpeedSwitchRegister = eightBitLoadFromGBMemory(Cpu.memoryLocationSpeedSwitch);
+
+    if (!checkBitOnByte(0, currentSpeedSwitchRegister)) {
+      response = resetBitOnByte(0, response);
+    }
+
+    if (!Cpu.GBCDoubleSpeed) {
+      response = resetBitOnByte(7, response);
+    }
+
+    return response;
   } // Graphics
   // Not batch processing here for performance
   // batchProcessGraphics();
@@ -4949,6 +5050,12 @@ function checkReadTraps(offset) {
   if (offset === Timers.memoryLocationTimerCounter) {
     eightBitStoreIntoGBMemory(offset, Timers.timerCounter);
     return Timers.timerCounter;
+  } // Interrupts
+
+
+  if (offset === Interrupts.memoryLocationInterruptRequest) {
+    // TCAGB and BGB say the top 5 bits are always 1.
+    return 0xe0 | Interrupts.interruptsRequestedValue;
   } // Joypad
 
 
@@ -5167,6 +5274,39 @@ function () {
     }
 
     return 70224;
+  }; // See section 4.10 of TCAGBD
+  // Cpu Halting explained: https://www.reddit.com/r/EmuDev/comments/5ie3k7/infinite_loop_trying_to_pass_blarggs_interrupt/db7xnbe/
+
+
+  Cpu.enableHalt = function () {
+    if (Interrupts.masterInterruptSwitch) {
+      Cpu.isHaltNormal = true;
+      return;
+    }
+
+    var haltTypeValue = Interrupts.interruptsEnabledValue & Interrupts.interruptsRequestedValue & 0x1f;
+
+    if (haltTypeValue === 0) {
+      Cpu.isHaltNoJump = true;
+      return;
+    }
+
+    Cpu.isHaltBug = true;
+  };
+
+  Cpu.exitHaltAndStop = function () {
+    Cpu.isHaltNoJump = false;
+    Cpu.isHaltNormal = false;
+    Cpu.isHaltBug = false;
+    Cpu.isStopped = false;
+  };
+
+  Cpu.isHalted = function () {
+    if (Cpu.isHaltNormal || Cpu.isHaltNoJump) {
+      return true;
+    }
+
+    return false;
   }; // Function to save the state of the class
 
 
@@ -5183,8 +5323,10 @@ function () {
     store(getSaveStateMemoryOffset(0x08, Cpu.saveStateSlot), Cpu.stackPointer);
     store(getSaveStateMemoryOffset(0x0a, Cpu.saveStateSlot), Cpu.programCounter);
     store(getSaveStateMemoryOffset(0x0c, Cpu.saveStateSlot), Cpu.currentCycles);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x11, Cpu.saveStateSlot), Cpu.isHalted);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x12, Cpu.saveStateSlot), Cpu.isStopped);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x11, Cpu.saveStateSlot), Cpu.isHaltNormal);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x12, Cpu.saveStateSlot), Cpu.isHaltNoJump);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x13, Cpu.saveStateSlot), Cpu.isHaltBug);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x14, Cpu.saveStateSlot), Cpu.isStopped);
   }; // Function to load the save state from memory
 
 
@@ -5201,12 +5343,17 @@ function () {
     Cpu.stackPointer = load(getSaveStateMemoryOffset(0x08, Cpu.saveStateSlot));
     Cpu.programCounter = load(getSaveStateMemoryOffset(0x0a, Cpu.saveStateSlot));
     Cpu.currentCycles = load(getSaveStateMemoryOffset(0x0c, Cpu.saveStateSlot));
-    Cpu.isHalted = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x11, Cpu.saveStateSlot));
-    Cpu.isStopped = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x12, Cpu.saveStateSlot));
+    Cpu.isHaltNormal = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x11, Cpu.saveStateSlot));
+    Cpu.isHaltNoJump = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x12, Cpu.saveStateSlot));
+    Cpu.isHaltBug = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x13, Cpu.saveStateSlot));
+    Cpu.isStopped = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x14, Cpu.saveStateSlot));
   }; // Status to track if we are in Gameboy Color Mode, and GBC State
 
 
-  Cpu.GBCEnabled = false;
+  Cpu.GBCEnabled = false; // Memory Location for the GBC Speed switch
+  // And the current status
+
+  Cpu.memoryLocationSpeedSwitch = 0xff4d;
   Cpu.GBCDoubleSpeed = false; // 8-bit Cpu.registers
 
   Cpu.registerA = 0;
@@ -5225,11 +5372,12 @@ function () {
   Cpu.currentCycles = 0; // HALT and STOP instructions need to stop running opcodes, but simply check timers
   // https://github.com/nakardo/node-gameboy/blob/master/lib/cpu/opcodes.js
   // Matt said is should work to, so it must work!
+  // TCAGBD shows three different HALT states. Therefore, we need to handle each
 
-  Cpu.isHalted = false;
-  Cpu.isStopped = false; // Memory Location for the GBC Speed switch
-
-  Cpu.memoryLocationSpeedSwitch = 0xff4d; // Save States
+  Cpu.isHaltNormal = false;
+  Cpu.isHaltNoJump = false;
+  Cpu.isHaltBug = false;
+  Cpu.isStopped = false; // Save States
 
   Cpu.saveStateSlot = 0;
   return Cpu;
@@ -5250,7 +5398,9 @@ function initializeCpu() {
   Cpu.stackPointer = 0;
   Cpu.programCounter = 0x00;
   Cpu.currentCycles = 0;
-  Cpu.isHalted = false;
+  Cpu.isHaltNormal = false;
+  Cpu.isHaltNoJump = false;
+  Cpu.isHaltBug = false;
   Cpu.isStopped = false;
 
   if (Cpu.GBCEnabled) {
@@ -6071,8 +6221,21 @@ function handleCbOpcode(cbOpcode) {
 function executeOpcode$$1(opcode) {
   // Always implement the program counter by one
   // Any other value can just subtract or add however much offset before reaching this line
-  Cpu.programCounter = u16Portable(Cpu.programCounter + 1); // Split our opcode into a high nibble to speed up performance
+  Cpu.programCounter = u16Portable(Cpu.programCounter + 1); // Check if we are in the halt bug
+
+  if (Cpu.isHaltBug) {
+    // Need to not increment program counter,
+    // thus, running the next opcode twice
+    // E.g
+    // 0x76 - halt
+    // FA 34 12 - ld a,(1234)
+    // Becomes
+    // FA FA 34 ld a,(34FA)
+    // 12 ld (de),a
+    Cpu.programCounter = u16Portable(Cpu.programCounter - 1);
+  } // Split our opcode into a high nibble to speed up performance
   // Running 255 if statements is slow, even in wasm haha!
+
 
   var opcodeHighNibble = opcode & 0xf0;
   opcodeHighNibble = opcodeHighNibble >> 4; // NOTE: @binji rule of thumb: it takes 4 cpu cycles to read one byte
@@ -6396,7 +6559,7 @@ function handleOpcode1x(opcode) {
 
           return 68;
         }
-      } // NOTE: This breaks Blarggs CPU testsif CGB Stop is not implemented
+      } // NOTE: This breaks Blarggs CPU tests if CGB Stop is not implemented
 
 
       Cpu.isStopped = true;
@@ -7404,7 +7567,7 @@ function handleOpcode7x(opcode) {
       // Can't Halt during an HDMA
       // https://gist.github.com/drhelius/3394856
       if (!Memory.isHblankHdmaActive) {
-        Cpu.isHalted = true;
+        Cpu.enableHalt();
       }
 
       return 4;
@@ -8522,7 +8685,310 @@ function handleOpcodeFx(opcode) {
 
   return -1;
 } // NOTE: Code is very verbose, and will have some copy pasta'd lines.
-// Imports
+// Syncing and Tracking executed cycles
+
+
+var Cycles =
+/** @class */
+function () {
+  function Cycles() {} // An even number below the max 32 bit integer
+
+
+  Cycles.cyclesPerCycleSet = 2000000000;
+  Cycles.cycleSets = 0;
+  Cycles.cycles = 0;
+  return Cycles;
+}();
+
+function getCyclesPerCycleSet() {
+  return Cycles.cyclesPerCycleSet;
+}
+
+function getCycleSets() {
+  return Cycles.cycleSets;
+}
+
+function getCycles() {
+  return Cycles.cycles;
+}
+
+function trackCyclesRan(numberOfCycles) {
+  Cycles.cycles += numberOfCycles;
+
+  if (Cycles.cycles >= Cycles.cyclesPerCycleSet) {
+    Cycles.cycleSets += 1;
+    Cycles.cycles -= Cycles.cyclesPerCycleSet;
+  }
+}
+
+function resetCycles() {
+  Cycles.cyclesPerCycleSet = 2000000000;
+  Cycles.cycleSets = 0;
+  Cycles.cycles = 0;
+} // Sync other GB Components with the number of cycles
+
+
+function syncCycles(numberOfCycles) {
+  // Check if we did a DMA TRansfer, if we did add the cycles
+  if (Memory.DMACycles > 0) {
+    numberOfCycles += Memory.DMACycles;
+    Memory.DMACycles = 0;
+  } // Finally, Add our number of cycles to the CPU Cycles
+
+
+  Cpu.currentCycles += numberOfCycles; // Check other Gameboy components
+
+  if (!Cpu.isStopped) {
+    if (Config.graphicsBatchProcessing) {
+      // Need to do this, since a lot of things depend on the scanline
+      // Batch processing will simply return if the number of cycles is too low
+      Graphics.currentCycles += numberOfCycles;
+      batchProcessGraphics();
+    } else {
+      updateGraphics(numberOfCycles);
+    }
+
+    if (Config.audioBatchProcessing) {
+      Sound.currentCycles += numberOfCycles;
+    } else {
+      updateSound(numberOfCycles);
+    }
+  }
+
+  if (Config.timersBatchProcessing) {
+    // Batch processing will simply return if the number of cycles is too low
+    Timers.currentCycles += numberOfCycles;
+    batchProcessTimers();
+  } else {
+    updateTimers(numberOfCycles);
+  }
+
+  trackCyclesRan(numberOfCycles);
+} // Functions involving executing/running the emulator after initializtion
+
+
+var Execute =
+/** @class */
+function () {
+  function Execute() {} // An even number bewlow the max 32 bit integer
+
+
+  Execute.stepsPerStepSet = 2000000000;
+  Execute.stepSets = 0;
+  Execute.steps = 0;
+  return Execute;
+}();
+
+function getStepsPerStepSet() {
+  return Execute.stepsPerStepSet;
+}
+
+function getStepSets() {
+  return Execute.stepSets;
+}
+
+function getSteps() {
+  return Execute.steps;
+}
+
+function trackStepsRan(steps) {
+  Execute.steps += steps;
+
+  if (Execute.steps >= Execute.stepsPerStepSet) {
+    Execute.stepSets += 1;
+    Execute.steps -= Execute.stepsPerStepSet;
+  }
+}
+
+function resetSteps() {
+  Execute.stepsPerStepSet = 2000000000;
+  Execute.stepSets = 0;
+  Execute.steps = 0;
+} // // Public funciton to run frames until,
+// the specified number of frames have run or error.
+// Return values:
+// -1 = error
+// 0 = render a frame
+
+
+function executeMultipleFrames(numberOfFrames) {
+  var frameResponse = 0;
+  var framesRun = 0;
+
+  while (framesRun < numberOfFrames && frameResponse >= 0) {
+    frameResponse = executeFrame();
+    framesRun += 1;
+  }
+
+  if (frameResponse < 0) {
+    return frameResponse;
+  }
+
+  return 0;
+} // Public funciton to run opcodes until,
+// a frame is ready, or error.
+// Return values:
+// -1 = error
+// 0 = render a frame
+
+
+function executeFrame() {
+  return executeUntilCondition(true, -1, -1);
+} // Public Function to run opcodes until,
+// a frame is ready, audio bufer is filled, or error
+// -1 = error
+// 0 = render a frame
+// 1 = output audio
+
+
+function executeFrameAndCheckAudio(maxAudioBuffer) {
+  if (maxAudioBuffer === void 0) {
+    maxAudioBuffer = 0;
+  }
+
+  return executeUntilCondition(true, maxAudioBuffer, -1);
+} // Public function to run opcodes until,
+// a breakpoint is reached
+// -1 = error
+// 0 = frame executed
+// 1 = reached breakpoint
+
+
+function executeFrameUntilBreakpoint(breakpoint) {
+  var response = executeUntilCondition(true, -1, breakpoint); // Break point response will be 1 in our case
+
+  if (response === 2) {
+    return 1;
+  }
+
+  return response;
+} // Base function that executes steps, and checks conditions
+// Return values:
+// -1 = error
+// 0 = render a frame
+// 1 = audio buffer reached
+// 2 = reached breakpoint
+
+
+function executeUntilCondition(checkMaxCyclesPerFrame, maxAudioBuffer, breakpoint) {
+  if (checkMaxCyclesPerFrame === void 0) {
+    checkMaxCyclesPerFrame = true;
+  }
+
+  if (maxAudioBuffer === void 0) {
+    maxAudioBuffer = -1;
+  }
+
+  if (breakpoint === void 0) {
+    breakpoint = -1;
+  } // Common tracking variables
+
+
+  var numberOfCycles = -1;
+  var audioBufferSize = 1024;
+
+  if (maxAudioBuffer > 0) {
+    audioBufferSize = maxAudioBuffer;
+  } else if (maxAudioBuffer < 0) {
+    audioBufferSize = -1;
+  }
+
+  var errorCondition = false;
+  var frameCondition = false;
+  var audioBufferCondition = false;
+  var breakpointCondition = false;
+
+  while (!errorCondition && !frameCondition && !audioBufferCondition && !breakpointCondition) {
+    numberOfCycles = executeStep(); // Error Condition
+
+    if (numberOfCycles < 0) {
+      errorCondition = true;
+    } else if (Cpu.currentCycles >= Cpu.MAX_CYCLES_PER_FRAME()) {
+      frameCondition = true;
+    } else if (audioBufferSize > -1 && getNumberOfSamplesInAudioBuffer() >= audioBufferSize) {
+      audioBufferCondition = true;
+    } else if (breakpoint > -1 && Cpu.programCounter === breakpoint) {
+      breakpointCondition = true;
+    }
+  } // Find our exit reason
+
+
+  if (frameCondition) {
+    // Render a frame
+    // Reset our currentCycles
+    Cpu.currentCycles -= Cpu.MAX_CYCLES_PER_FRAME();
+    return 0;
+  }
+
+  if (audioBufferCondition) {
+    return 1;
+  }
+
+  if (breakpointCondition) {
+    // breakpoint
+    return 2;
+  } // TODO: Boot ROM handling
+  // There was an error, return -1, and push the program counter back to grab the error opcode
+
+
+  Cpu.programCounter = u16Portable(Cpu.programCounter - 1);
+  return -1;
+} // Function to execute an opcode, and update other gameboy hardware.
+// http://www.codeslinger.co.uk/pages/projects/gameboy/beginning.html
+
+
+function executeStep() {
+  // Set has started to 1 since we ran a emulation step
+  setHasCoreStarted(true); // Check if we are in the halt bug
+
+  if (Cpu.isHaltBug) {
+    // Need to not increment program counter,
+    // thus, running the next opcode twice
+    // E.g
+    // 0x76 - halt
+    // FA 34 12 - ld a,(1234)
+    // Becomes
+    // FA FA 34 ld a,(34FA)
+    // 12 ld (de),a
+    var haltBugOpcode = eightBitLoadFromGBMemory(Cpu.programCounter); // Execute opcode will handle the actual PC behavior
+
+    var haltBugCycles = executeOpcode$$1(haltBugOpcode);
+    syncCycles(haltBugCycles);
+    Cpu.exitHaltAndStop();
+  } // Interrupts should be handled before reading an opcode
+  // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
+
+
+  var interruptCycles = checkInterrupts();
+
+  if (interruptCycles > 0) {
+    syncCycles(interruptCycles);
+  } // Get the opcode, and additional bytes to be handled
+  // Number of cycles defaults to 4, because while we're halted, we run 4 cycles (according to matt :))
+
+
+  var numberOfCycles = 4;
+  var opcode = 0; // If we are not halted or stopped, run instructions
+  // If we are halted, this will be skipped and just sync the 4 cycles
+
+  if (!Cpu.isHalted() && !Cpu.isStopped) {
+    opcode = eightBitLoadFromGBMemory(Cpu.programCounter);
+    numberOfCycles = executeOpcode$$1(opcode);
+  } // blarggFixes, don't allow register F to have the bottom nibble
+
+
+  Cpu.registerF = Cpu.registerF & 0xf0; // Check if there was an error decoding the opcode
+
+  if (numberOfCycles <= 0) {
+    return numberOfCycles;
+  } // Sync other GB Components with the number of cycles
+
+
+  syncCycles(numberOfCycles); // Update our steps
+
+  trackStepsRan(1);
+  return numberOfCycles;
+} // Imports
 // Grow our memory to the specified size
 
 
@@ -8532,6 +8998,10 @@ if (memory.size() < WASMBOY_WASM_PAGES) {
 
 
 var hasStarted = false;
+
+function setHasCoreStarted(value) {
+  hasStarted = value;
+}
 
 function hasCoreStarted() {
   if (hasStarted) {
@@ -8625,6 +9095,7 @@ function initialize() {
   initializeGraphics();
   initializePalette();
   initializeSound();
+  initializeInterrupts();
   initializeTimers(); // Various Other Registers
 
   if (Cpu.GBCEnabled) {
@@ -8651,203 +9122,10 @@ function initialize() {
   } // Reset hasStarted, since we are now reset
 
 
-  hasStarted = false;
-} // Public funciton to run opcodes until,
-// a frame is ready, or error.
-// Return values:
-// -1 = error
-// 0 = render a frame
+  setHasCoreStarted(false); // Reset our cycles ran
 
-
-function executeFrame() {
-  var error = false;
-  var numberOfCycles = -1;
-
-  while (!error && Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME()) {
-    numberOfCycles = executeStep();
-
-    if (numberOfCycles < 0) {
-      error = true;
-    }
-  } // Find our exit reason
-
-
-  if (Cpu.currentCycles >= Cpu.MAX_CYCLES_PER_FRAME()) {
-    // Render a frame
-    // Reset our currentCycles
-    Cpu.currentCycles -= Cpu.MAX_CYCLES_PER_FRAME();
-    return 0;
-  } // TODO: Boot ROM handling
-  // There was an error, return -1, and push the program counter back to grab the error opcode
-
-
-  Cpu.programCounter = u16Portable(Cpu.programCounter - 1);
-  return -1;
-} // Public Function to run opcodes until,
-// a frame is ready, audio bufer is filled, or error
-// -1 = error
-// 0 = render a frame
-// 1 = output audio
-
-
-function executeFrameAndCheckAudio(maxAudioBuffer) {
-  var error = false;
-  var numberOfCycles = -1;
-  var audioBufferSize = 1024;
-
-  if (maxAudioBuffer && maxAudioBuffer > 0) {
-    audioBufferSize = maxAudioBuffer;
-  }
-
-  while (!error && Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME() && getNumberOfSamplesInAudioBuffer() < audioBufferSize) {
-    numberOfCycles = executeStep();
-
-    if (numberOfCycles < 0) {
-      error = true;
-    }
-  } // Find our exit reason
-
-
-  if (Cpu.currentCycles >= Cpu.MAX_CYCLES_PER_FRAME()) {
-    // Render a frame
-    // Reset our currentCycles
-    Cpu.currentCycles -= Cpu.MAX_CYCLES_PER_FRAME();
-    return 0;
-  }
-
-  if (getNumberOfSamplesInAudioBuffer() >= audioBufferSize) {
-    // Output Audio
-    return 1;
-  } // TODO: Boot ROM handling
-  // There was an error, return -1, and push the program counter back to grab the error opcode
-
-
-  Cpu.programCounter = u16Portable(Cpu.programCounter - 1);
-  return -1;
-} // Public function to run opcodes until,
-// a breakpoint is reached
-// -1 = error
-// 0 = frame executed
-// 1 = reached breakpoint
-
-
-function executeFrameUntilBreakpoint(breakpoint) {
-  var error = false;
-  var numberOfCycles = -1;
-
-  while (!error && Cpu.currentCycles < Cpu.MAX_CYCLES_PER_FRAME() && Cpu.programCounter !== breakpoint) {
-    numberOfCycles = executeStep();
-
-    if (numberOfCycles < 0) {
-      error = true;
-    }
-  } // Find our exit reason
-
-
-  if (Cpu.currentCycles >= Cpu.MAX_CYCLES_PER_FRAME()) {
-    // Render a frame
-    // Reset our currentCycles
-    Cpu.currentCycles -= Cpu.MAX_CYCLES_PER_FRAME();
-    return 0;
-  }
-
-  if (Cpu.programCounter === breakpoint) {
-    // breakpoint
-    return 1;
-  } // TODO: Boot ROM handling
-  // There was an error, return -1, and push the program counter back to grab the error opcode
-
-
-  Cpu.programCounter = u16Portable(Cpu.programCounter - 1);
-  return -1;
-} // Function to execute an opcode, and update other gameboy hardware.
-// http://www.codeslinger.co.uk/pages/projects/gameboy/beginning.html
-
-
-function executeStep() {
-  // Set has started to 1 since we ran a emulation step
-  hasStarted = true; // Get the opcode, and additional bytes to be handled
-  // Number of cycles defaults to 4, because while we're halted, we run 4 cycles (according to matt :))
-
-  var numberOfCycles = 4;
-  var opcode = 0; // Cpu Halting best explained: https://www.reddit.com/r/EmuDev/comments/5ie3k7/infinite_loop_trying_to_pass_blarggs_interrupt/db7xnbe/
-
-  if (!Cpu.isHalted && !Cpu.isStopped) {
-    opcode = eightBitLoadFromGBMemory(Cpu.programCounter);
-    numberOfCycles = executeOpcode$$1(opcode);
-  } else {
-    // if we were halted, and interrupts were disabled but interrupts are pending, stop waiting
-    if (Cpu.isHalted && !Interrupts.masterInterruptSwitch && Interrupts.areInterruptsPending()) {
-      Cpu.isHalted = false;
-      Cpu.isStopped = false; // Need to run the next opcode twice, it's a bug menitoned in
-      // The reddit comment mentioned above
-      // CTRL+F "low-power" on gameboy cpu manual
-      // http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf
-      // E.g
-      // 0x76 - halt
-      // FA 34 12 - ld a,(1234)
-      // Becomes
-      // FA FA 34 ld a,(34FA)
-      // 12 ld (de),a
-
-      opcode = eightBitLoadFromGBMemory(Cpu.programCounter);
-      numberOfCycles = executeOpcode$$1(opcode);
-      Cpu.programCounter = u16Portable(Cpu.programCounter - 1);
-    }
-  } // blarggFixes, don't allow register F to have the bottom nibble
-
-
-  Cpu.registerF = Cpu.registerF & 0xf0; // Check if there was an error decoding the opcode
-
-  if (numberOfCycles <= 0) {
-    return numberOfCycles;
-  } // Interrupt Handling requires 20 cycles
-  // https://github.com/Gekkio/mooneye-gb/blob/master/docs/accuracy.markdown#what-is-the-exact-timing-of-cpu-servicing-an-interrupt
-  // Only check interrupts after an opcode is executed
-  // Since we don't want to mess up our PC as we are executing
-
-
-  numberOfCycles += checkInterrupts(); // Sync other GB Components with the number of cycles
-
-  syncCycles(numberOfCycles);
-  return numberOfCycles;
-} // Sync other GB Components with the number of cycles
-
-
-function syncCycles(numberOfCycles) {
-  // Check if we did a DMA TRansfer, if we did add the cycles
-  if (Memory.DMACycles > 0) {
-    numberOfCycles += Memory.DMACycles;
-    Memory.DMACycles = 0;
-  } // Finally, Add our number of cycles to the CPU Cycles
-
-
-  Cpu.currentCycles += numberOfCycles; // Check other Gameboy components
-
-  if (!Cpu.isStopped) {
-    if (Config.graphicsBatchProcessing) {
-      // Need to do this, since a lot of things depend on the scanline
-      // Batch processing will simply return if the number of cycles is too low
-      Graphics.currentCycles += numberOfCycles;
-      batchProcessGraphics();
-    } else {
-      updateGraphics(numberOfCycles);
-    }
-
-    if (Config.audioBatchProcessing) {
-      Sound.currentCycles += numberOfCycles;
-    } else {
-      updateSound(numberOfCycles);
-    }
-  }
-
-  if (Config.timersBatchProcessing) {
-    // Batch processing will simply return if the number of cycles is too low
-    Timers.currentCycles += numberOfCycles;
-    batchProcessTimers();
-  } else {
-    updateTimers(numberOfCycles);
-  }
+  resetCycles();
+  resetSteps();
 } // Function to return an address to store into save state memory
 // this is to regulate our 20 slots
 // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
@@ -8872,7 +9150,7 @@ function saveState() {
   Channel3.saveState();
   Channel4.saveState(); // Reset hasStarted, since we are now reset
 
-  hasStarted = false;
+  setHasCoreStarted(false); // Don't want to reset cycles here, as this does not reset the emulator
 } // Function to load state from memory for all of our classes
 
 
@@ -8889,7 +9167,10 @@ function loadState() {
   Channel3.loadState();
   Channel4.loadState(); // Reset hasStarted, since we are now reset
 
-  hasStarted = false;
+  setHasCoreStarted(false); // Reset our cycles ran
+
+  resetCycles();
+  resetSteps();
 } // Functions to get information about the emulator for debugging purposes
 
 
@@ -9188,13 +9469,21 @@ var gameBytesLocation = CARTRIDGE_ROM_LOCATION; // Public Exports
 var WasmBoyCore = /*#__PURE__*/Object.freeze({
   memory: memory,
   config: config,
+  hasCoreStarted: hasCoreStarted,
+  saveState: saveState,
+  loadState: loadState,
+  getStepsPerStepSet: getStepsPerStepSet,
+  getStepSets: getStepSets,
+  getSteps: getSteps,
+  executeMultipleFrames: executeMultipleFrames,
   executeFrame: executeFrame,
   executeFrameAndCheckAudio: executeFrameAndCheckAudio,
   executeFrameUntilBreakpoint: executeFrameUntilBreakpoint,
+  executeUntilCondition: executeUntilCondition,
   executeStep: executeStep,
-  saveState: saveState,
-  loadState: loadState,
-  hasCoreStarted: hasCoreStarted,
+  getCyclesPerCycleSet: getCyclesPerCycleSet,
+  getCycleSets: getCycleSets,
+  getCycles: getCycles,
   setJoypadState: setJoypadState,
   getNumberOfSamplesInAudioBuffer: getNumberOfSamplesInAudioBuffer,
   clearAudioBuffer: clearAudioBuffer,
