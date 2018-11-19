@@ -2,6 +2,7 @@
 import { WASMBOY_WASM_PAGES, WASMBOY_STATE_LOCATION } from './constants';
 import { Config } from './config';
 import { resetCycles } from './cycles';
+import { resetSteps } from './execute';
 import { Cpu, initializeCpu } from './cpu/index';
 import { Graphics, initializeGraphics, initializePalette } from './graphics/index';
 import { Interrupts, initializeInterrupts } from './interrupts/index';
@@ -163,6 +164,7 @@ function initialize(): void {
 
   // Reset our cycles ran
   resetCycles();
+  resetSteps();
 }
 
 // Function to return an address to store into save state memory
@@ -190,8 +192,7 @@ export function saveState(): void {
   // Reset hasStarted, since we are now reset
   setHasCoreStarted(false);
 
-  // Reset our cycles ran
-  resetCycles();
+  // Don't want to reset cycles here, as this does not reset the emulator
 }
 
 // Function to load state from memory for all of our classes
@@ -213,4 +214,5 @@ export function loadState(): void {
 
   // Reset our cycles ran
   resetCycles();
+  resetSteps();
 }

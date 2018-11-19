@@ -9,6 +9,39 @@ import { Sound, getNumberOfSamplesInAudioBuffer, clearAudioBuffer } from './soun
 import { hexLog, log } from './helpers/index';
 import { u16Portable } from './portable/portable';
 
+export class Execute {
+  // An even number bewlow the max 32 bit integer
+  static stepsPerStepSet: i32 = 2000000000;
+  static stepSets: i32 = 0;
+  static steps: i32 = 0;
+}
+
+export function getStepsPerStepSet(): i32 {
+  return Execute.stepsPerStepSet;
+}
+
+export function getStepSets(): i32 {
+  return Execute.stepSets;
+}
+
+export function getSteps(): i32 {
+  return Execute.steps;
+}
+
+function trackStepsRan(steps: i32): void {
+  Execute.steps += steps;
+  if (Execute.steps >= Execute.stepsPerStepSet) {
+    Execute.stepSets += 1;
+    Execute.steps -= Execute.stepsPerStepSet;
+  }
+}
+
+export function resetSteps(): void {
+  Execute.stepsPerStepSet = 2000000000;
+  Execute.stepSets = 0;
+  Execute.steps = 0;
+}
+
 // // Public funciton to run frames until,
 // the specified number of frames have run or error.
 // Return values:
@@ -180,6 +213,9 @@ export function executeStep(): i32 {
 
   // Sync other GB Components with the number of cycles
   syncCycles(numberOfCycles);
+
+  // Update our steps
+  trackStepsRan(1);
 
   return numberOfCycles;
 }

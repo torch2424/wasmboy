@@ -12,7 +12,7 @@ import { hexLog, log } from './helpers/index';
 import { u16Portable } from './portable/portable';
 
 export class Cycles {
-  // An even number bewlow the max 32 bit integer
+  // An even number below the max 32 bit integer
   static cyclesPerCycleSet: i32 = 2000000000;
   static cycleSets: i32 = 0;
   static cycles: i32 = 0;
@@ -30,7 +30,7 @@ export function getCycles(): i32 {
   return Cycles.cycles;
 }
 
-export function trackCyclesRan(numberOfCycles: i32): void {
+function trackCyclesRan(numberOfCycles: i32): void {
   Cycles.cycles += numberOfCycles;
   if (Cycles.cycles >= Cycles.cyclesPerCycleSet) {
     Cycles.cycleSets += 1;

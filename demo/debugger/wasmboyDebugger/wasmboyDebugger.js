@@ -23,7 +23,8 @@ export class WasmBoyDebugger extends Component {
       showTileData: false,
       breakPoint: '40',
       opcodesToRun: 2000,
-      opcodesStepped: 0,
+      opcodesStepped: '0',
+      cyclesRan: '0',
       valueTable: {
         cpu: {},
         ppu: {},
@@ -76,10 +77,7 @@ export class WasmBoyDebugger extends Component {
         throw new Error();
       }
 
-      this.setState({
-        ...this.state,
-        opcodesStepped: this.state.opcodesStepped + 1
-      });
+      this.updateExecutionProgress();
 
       if (skipDebugOutput) {
         return;
@@ -138,6 +136,7 @@ export class WasmBoyDebugger extends Component {
       const response = await WasmBoy._runWasmExport('executeFrameUntilBreakpoint', [breakPoint]);
       if (response === 0) {
         requestAnimationFrame(() => {
+          this.updateExecutionProgress();
           this.updateValueTable();
           this.breakPoint(true);
         });
@@ -145,6 +144,7 @@ export class WasmBoyDebugger extends Component {
         throw new Error('WasmBoy Crashed while trying to reach the breakpoint');
       } else {
         console.log('Reached Breakpoint, that satisfies test inside runNumberOfOpcodes');
+        this.updateExecutionProgress();
         this.updateValueTable();
       }
     };
@@ -163,6 +163,22 @@ export class WasmBoyDebugger extends Component {
       const size = await WasmBoy._getWasmConstant('GAMEBOY_INTERNAL_MEMORY_SIZE');
       const memory = await WasmBoy._getWasmMemorySection(location, location + size + 1);
       console.log(`[WasmBoy Debugger] Gameboy Memory:`, memory);
+    };
+    asyncTask();
+  }
+
+  updateExecutionProgress() {
+    // Async task to get the
+    // opcodes stepped, cycles ran, etc...
+
+    const asyncTask = async () => {
+      const opcodesStepped = await WasmBoy._getStepsAsString();
+      const cyclesRan = await WasmBoy._getCyclesAsString();
+      this.setState({
+        ...this.state,
+        opcodesStepped,
+        cyclesRan
+      });
     };
     asyncTask();
   }
@@ -426,6 +442,7 @@ export class WasmBoyDebugger extends Component {
 
         <div>
           <h2>Opcodes Stepped: {this.state.opcodesStepped}</h2>
+          <h2>Cycles Ran: {this.state.cyclesRan}</h2>
         </div>
 
         <div className={this.getStateClass('showValueTable') + ' animated fadeIn'}>
