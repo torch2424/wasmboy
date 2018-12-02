@@ -40,7 +40,7 @@ let plugins = [
 ];
 
 let sourcemap = false;
-if (process.env.SERVE) {
+if (process.env.BENCHMARK && process.env.SERVE) {
   plugins = [
     ...plugins,
     serve({
