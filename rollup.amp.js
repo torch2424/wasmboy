@@ -17,11 +17,11 @@ const plugins = [
 ];
 
 // If we are watching, also host a dev serve
-if (process.env.SERVE) {
+if (process.env.AMP && process.env.SERVE) {
   plugins.push(
     serve({
       port: 8080,
-      contentBase: ['src', 'dist']
+      contentBase: ['dist/', 'build/amp/', 'demo/amp/', 'demo/debugger/']
     })
   );
 } else {

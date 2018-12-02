@@ -1,10 +1,10 @@
-import getWasmBoyTsCore from '../node_modules/wasmboy/dist/core/getWasmBoyTsCore.esm.js';
+import getWasmBoyTsCore from '../../dist/core/getWasmBoyTsCore.esm.js';
 
 import stringToArrayBuffer from 'string-to-arraybuffer';
 
 import dataUriToArray from './dataUriToArray.js';
 import rgbaArrayBufferToSvg from './pixelToSvg.js';
-import romUrl from '../roms/pokemonred.gb';
+import romUrl from '../../test/performance/testroms/tobutobugirl/tobutobugirl.gb';
 
 let imageDataArray;
 
