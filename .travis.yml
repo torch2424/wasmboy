@@ -8,5 +8,5 @@ install:
   - npm install
 script:
   - npm run prettier:lint
-  - npm test
   - npm run demo:build
+  - npm test
