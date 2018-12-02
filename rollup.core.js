@@ -12,18 +12,29 @@ import bundleSize from 'rollup-plugin-bundle-size';
 // Fs for some extra needed files
 const fs = require('fs');
 
-const plugins = [
-  typescript({
-    tsconfig: './core/tsconfig.json'
-  }),
-  babel(),
-  bundleSize()
-];
+let typescriptPluginOptions = {
+  tsconfig: './core/tsconfig.json'
+};
+
+if (process.env.ES_NEXT) {
+  typescriptPluginOptions = {
+    ...typescriptPluginOptions,
+    target: 'ESNext'
+  };
+}
+
+let plugins = [typescript(typescriptPluginOptions)];
 
 let sourcemap = 'inline';
 if (process.env.PROD) {
   sourcemap = false;
 }
+
+if (!process.env.ES_NEXT) {
+  plugins = [...plugins, babel()];
+}
+
+plugins = [...plugins, bundleSize()];
 
 const coreTsBundles = [
   {

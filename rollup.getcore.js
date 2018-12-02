@@ -14,7 +14,7 @@ import bundleSize from 'rollup-plugin-bundle-size';
 import pkg from './package.json';
 
 // Our base plugins needed by every bundle type
-const plugins = [
+let plugins = [
   resolve(), // so Rollup can find node modules
   commonjs(),
   json(),
@@ -23,32 +23,51 @@ const plugins = [
     include: ['**/*.wasm'],
     // Don't emit files, this will replace the worker build output
     emitFiles: false
-  }),
-  babel({
-    // so Rollup can convert unsupported es6 code to es5
-    exclude: ['node_modules/**'],
-    plugins: [['@babel/plugin-proposal-class-properties'], ['@babel/plugin-proposal-object-rest-spread']]
-  }),
-  bundleSize()
+  })
 ];
+
+if (!process.env.ES_NEXT) {
+  plugins = [
+    ...plugins,
+    babel({
+      // so Rollup can convert unsupported es6 code to es5
+      exclude: ['node_modules/**'],
+      plugins: [['@babel/plugin-proposal-class-properties'], ['@babel/plugin-proposal-object-rest-spread']]
+    })
+  ];
+}
+
+plugins = [...plugins, bundleSize()];
 
 // Array of bundles to make
 const bundleMap = [];
 
 if (process.env.WASM) {
-  bundleMap.push({
+  let bundleMapObject = {
     name: 'WasmBoyWasmCore',
     input: 'core/portable/getWasmCore.js',
     output: 'dist/core/getWasmBoyWasmCore'
-  });
+  };
+
+  if (process.env.ES_NEXT) {
+    bundleMapObject.output = 'dist/core/getWasmBoyWasmCore.esnext';
+  }
+
+  bundleMap.push(bundleMapObject);
 }
 
 if (process.env.TS) {
-  bundleMap.push({
+  let bundleMapObject = {
     name: 'WasmBoyTsCore',
     input: 'core/portable/getTsCore.js',
     output: 'dist/core/getWasmBoyTsCore'
-  });
+  };
+
+  if (process.env.ES_NEXT) {
+    bundleMapObject.output = 'dist/core/getWasmBoyTsCore.esnext';
+  }
+
+  bundleMap.push(bundleMapObject);
 }
 
 const getCoreBundles = [];
