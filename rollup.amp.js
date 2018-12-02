@@ -6,7 +6,7 @@ import serve from 'rollup-plugin-serve';
 import copy from 'rollup-plugin-copy-glob';
 import pkg from './package.json';
 
-const plugins = [
+let plugins = [
   resolve(),
   commonjs(),
   json(),
@@ -18,12 +18,13 @@ const plugins = [
 
 // If we are watching, also host a dev serve
 if (process.env.AMP && process.env.SERVE) {
-  plugins.push(
+  plugins = [
+    ...plugins,
     serve({
       port: 8080,
       contentBase: ['dist/', 'build/amp/', 'demo/amp/', 'demo/debugger/']
     })
-  );
+  ];
 } else {
   plugins = [
     ...plugins,
