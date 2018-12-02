@@ -42,29 +42,28 @@ export default class LoadROMSelector extends Component {
       loading: true
     });
 
-    const wasmboyWasmCore = this.props.WasmBoyWasmCore;
-    const wasmboyTsCore = this.props.WasmBoyTsCore;
+    const coreObjects = this.props.WasmBoyCoreObjects;
 
     const loadROMTask = async () => {
-      // Clear Wasm memory
-      // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
-      for (let i = 0; i <= wasmboyTsCore.byteMemory.length; i++) {
-        wasmboyTsCore.byteMemory[i] = 0;
-        wasmboyWasmCore.byteMemory[i] = 0;
-      }
-
       // Fetch the rom
       const ROM = await fetchROMAsByteArray(ROMUrl);
-
-      // Set the ROM in byte memory
-      wasmboyTsCore.byteMemory.set(ROM, wasmboyTsCore.instance.exports.CARTRIDGE_ROM_LOCATION);
-      wasmboyWasmCore.byteMemory.set(ROM, wasmboyTsCore.instance.exports.CARTRIDGE_ROM_LOCATION);
 
       // Our config params
       const configParams = [0, 1, 0, 0, 0, 0, 0, 0, 0];
 
-      wasmboyWasmCore.instance.exports.config.apply(this, configParams);
-      wasmboyTsCore.instance.exports.config.apply(this, configParams);
+      // Clear Wasm memory
+      // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
+      coreObjects.forEach(coreObject => {
+        for (let i = 0; i <= coreObject.core.byteMemory.length; i++) {
+          coreObject.core.byteMemory[i] = 0;
+        }
+
+        // Set the ROM in byte memory
+        coreObject.core.byteMemory.set(ROM, coreObject.core.instance.exports.CARTRIDGE_ROM_LOCATION);
+
+        // Config the core
+        coreObject.core.instance.exports.config.apply(this, configParams);
+      });
 
       this.props.ROMLoaded();
 

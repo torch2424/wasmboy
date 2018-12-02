@@ -12,13 +12,16 @@ import packageJson from '../../package.json';
 // Import our cores
 import getWasmBoyWasmCore from '../../dist/core/getWasmBoyWasmCore.esm';
 import getWasmBoyTsCore from '../../dist/core/getWasmBoyTsCore.esm';
+import getWasmBoyTsClosureCore from '../../dist/core/getWasmBoyTsCore.closure.esm';
 
 import LoadROMSelector from './loadrom';
 import BenchmarkRunner from './benchmarkRunner';
 import BenchmarkResults from './benchmarkResults';
 
-let wasmboyWasmCore = undefined;
-let wasmboyTsCore = undefined;
+let wasmboyCoreObjects = [];
+
+// Create our valoo variables with dummy callbacks so they update
+const dummyCallback = v => {};
 
 class WasmBoyBenchmarkApp extends Component {
   constructor() {
@@ -26,15 +29,8 @@ class WasmBoyBenchmarkApp extends Component {
 
     const browserInfo = browserDetect();
 
-    // Create ur valoo variables with dummy callbacks so they update
-    const dummyCallback = v => {};
-
     const running = valoo(false);
-    const wasmTimes = valoo([]);
-    const tsTimes = valoo([]);
     running.on(() => this.setState({ ...this.state }));
-    wasmTimes.on(dummyCallback);
-    tsTimes.on(dummyCallback);
 
     this.state = {
       ready: false,
@@ -42,10 +38,6 @@ class WasmBoyBenchmarkApp extends Component {
       running,
       browserInfo: {
         ...browserInfo
-      },
-      results: {
-        wasmTimes,
-        tsTimes
       }
     };
   }
@@ -53,11 +45,50 @@ class WasmBoyBenchmarkApp extends Component {
   componentDidMount() {
     // Instantiate our cores
     const instantiateCoresTask = async () => {
-      wasmboyWasmCore = await getWasmBoyWasmCore();
-      wasmboyTsCore = await getWasmBoyTsCore();
+      // Get our cores
+      let wasmboyWasmCore = await getWasmBoyWasmCore();
+      let wasmboyTsCore = await getWasmBoyTsCore();
+      let wasmboyTsClosureCore = await getWasmBoyTsClosureCore();
 
       console.log('WasmBoy Wasm Core:', wasmboyWasmCore);
       console.log('WasmBoy TS Core:', wasmboyTsCore);
+      console.log('WasmBoy TS Closure Core:', wasmboyTsClosureCore);
+
+      // Set up our times
+      const wasmTimes = valoo([]);
+      const tsTimes = valoo([]);
+      const tsClosureTimes = valoo([]);
+
+      wasmTimes.on(dummyCallback);
+      tsTimes.on(dummyCallback);
+      tsClosureTimes.on(dummyCallback);
+
+      wasmboyCoreObjects = [
+        {
+          label: 'AssemblyScript',
+          subLabel: 'Web Assembly',
+          canvasId: 'wasm-canvas',
+          color: '#6447f4',
+          core: wasmboyWasmCore,
+          times: wasmTimes
+        },
+        {
+          label: 'Javascript',
+          subLabel: 'Typescript',
+          canvasId: 'ts-canvas',
+          color: '#f7a800',
+          core: wasmboyTsCore,
+          times: tsTimes
+        },
+        {
+          label: 'Javascript',
+          subLabel: 'Typescript, Closure Compiled',
+          canvasId: 'closure-canvas',
+          color: '#009588',
+          core: wasmboyTsClosureCore,
+          times: tsClosureTimes
+        }
+      ];
 
       this.setState({
         ...this.state,
@@ -119,30 +150,23 @@ class WasmBoyBenchmarkApp extends Component {
             <h1>Setup</h1>
             <hr />
 
-            <LoadROMSelector
-              WasmBoyWasmCore={wasmboyWasmCore}
-              WasmBoyTsCore={wasmboyTsCore}
-              ROMLoaded={() => this.setState({ ...this.state, ready: true })}
-            />
+            <LoadROMSelector WasmBoyCoreObjects={wasmboyCoreObjects} ROMLoaded={() => this.setState({ ...this.state, ready: true })} />
 
             <hr />
             <h1>Runner</h1>
             <hr />
 
-            <BenchmarkRunner
-              WasmBoyWasmCore={wasmboyWasmCore}
-              WasmBoyTsCore={wasmboyTsCore}
-              WasmTimes={this.state.results.wasmTimes}
-              TsTimes={this.state.results.tsTimes}
-              ready={this.state.ready}
-              running={this.state.running}
-            />
+            <BenchmarkRunner WasmBoyCoreObjects={wasmboyCoreObjects} ready={this.state.ready} running={this.state.running} />
 
             <hr />
             <h1>Results</h1>
             <hr />
 
-            <BenchmarkResults WasmTimes={this.state.results.wasmTimes} TsTimes={this.state.results.tsTimes} running={this.state.running} />
+            {/*
+            <BenchmarkResults 
+              WasmBoyCoreObjects={wasmboyCoreObjects}
+              running={this.state.running} />
+            */}
           </main>
         )}
       </div>

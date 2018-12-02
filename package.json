@@ -56,6 +56,7 @@
     "lib:watch:ts": "npx rollup -c -w --environment TS",
     "lib:build:ts": "npx rollup -c --environment PROD,TS",
     "lib:build:ts:esnext": "npx rollup -c --environment PROD,TS,ES_NEXT",
+    "lib:build:ts:getcoreclosure": "npx rollup -c --environment PROD,TS,GET_CORE_CLOSURE",
     "lib:deploy": "npx run-s core:build lib:build:wasm lib:build:ts lib:deploy:np",
     "lib:deploy:np": "npx np",
     "test": "npm run test:accuracy",
