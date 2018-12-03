@@ -3,6 +3,7 @@ import { h, Component } from 'preact';
 import microseconds from 'microseconds';
 import stats from 'stats-lite';
 
+import { sendAnalyticsEvent } from './analytics';
 import { WasmBoyGraphics } from '../../lib/graphics/graphics';
 import { getImageDataFromGraphicsFrameBuffer } from '../../lib/graphics/worker/imageData';
 
@@ -70,6 +71,10 @@ export default class BenchmarkRunner extends Component {
   runBenchmark() {
     this.props.running(true);
 
+    sendAnalyticsEvent('ran_benchmark', {
+      cycles: `${this.state.cyclesToRun}`
+    });
+
     const asyncLoopCallback = async Core => {
       outputFrame(Core);
 
@@ -135,12 +140,8 @@ export default class BenchmarkRunner extends Component {
           <h1>
             {coreObject.label} ({coreObject.subLabel})
           </h1>
-          <h1>
-            {coreObject.label} Frames Run: {coreObject.times().length}
-          </h1>
-          <h1>
-            Current {coreObject.label} FPS Average: {coreObject.times().length > 0 ? averageFpsFromTimes(coreObject.times()) : 0}
-          </h1>
+          <h1>Frames Run: {coreObject.times().length}</h1>
+          <h1>Current FPS Average: {coreObject.times().length > 0 ? averageFpsFromTimes(coreObject.times()) : 0}</h1>
           <canvas id={coreObject.canvasId} />
         </div>
       );

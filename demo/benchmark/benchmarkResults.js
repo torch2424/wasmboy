@@ -3,6 +3,7 @@ import { h, Component } from 'preact';
 import Chart from 'chart.js';
 import stats from 'stats-lite';
 
+import { sendAnalyticsEvent } from './analytics';
 import { getChartConfig } from './benchmarkChart';
 
 let timesVsFramesChart = undefined;
@@ -22,6 +23,14 @@ export default class BenchmarkRunner extends Component {
   componentWillReceiveProps(newProps) {
     if (newProps.running()) {
       return;
+    }
+
+    if (
+      newProps.WasmBoyCoreObjects &&
+      newProps.WasmBoyCoreObjects[0].resultTimes &&
+      newProps.WasmBoyCoreObjects[0].resultTimes.length > 0
+    ) {
+      sendAnalyticsEvent('render_results');
     }
 
     this.generateTable(newProps.WasmBoyCoreObjects);

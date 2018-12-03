@@ -4,6 +4,7 @@ import Portal from 'preact-portal';
 import '../debugger/wasmboyFilePicker/wasmboyFilePicker.css';
 
 // Import some functions from our lib
+import { sendAnalyticsEvent } from './analytics';
 import { fetchROMAsByteArray } from '../../lib/wasmboy/fetchrom.js';
 
 // Import our open source roms from the debugger
@@ -28,10 +29,12 @@ export default class LoadROMSelector extends Component {
   // https://gist.github.com/AshikNesin/e44b1950f6a24cfcd85330ffc1713513
   loadLocalFile(event) {
     this.loadROMIntoCores(event.target.files[0], event.target.files[0].name);
+    sendAnalyticsEvent('load_local_rom');
   }
 
   loadOpenSourceROM(openSourceROM) {
     this.loadROMIntoCores(openSourceROM.url, openSourceROM.title);
+    sendAnalyticsEvent('load_open_source_rom');
   }
 
   loadROMIntoCores(ROMUrl, title) {
