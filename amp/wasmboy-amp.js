@@ -9573,49 +9573,6 @@
     return response;
   };
 
-  var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
-
-  function createCommonjsModule(fn, module) {
-  	return module = { exports: {} }, fn(module, module.exports), module.exports;
-  }
-
-  var isBase64 = createCommonjsModule(function (module, exports) {
-  (function(root) {
-
-    function isBase64(v, opts) {
-      if (v instanceof Boolean || typeof v === 'boolean') {
-        return false
-      }
-      if (!(opts instanceof Object)) {
-        opts = {};
-      }
-      if (opts.hasOwnProperty('allowBlank') && !opts.allowBlank && v === '') {
-        return false
-      }
-
-      var regex = '(?:[A-Za-z0-9+\\/]{4})*(?:[A-Za-z0-9+\\/]{2}==|[A-Za-z0-9+\/]{3}=)?';
-
-      if (opts.mime) {
-        regex = '(data:\\w+\\/[a-zA-Z\\+\\-\\.]+;base64,)?' + regex;
-      }
-
-      if (opts.paddingRequired === false) {
-        regex = '(?:[A-Za-z0-9+\\/]{4})*(?:[A-Za-z0-9+\\/]{2}(==)?|[A-Za-z0-9+\\/]{3}=?)?';
-      }
-
-      return (new RegExp('^' + regex + '$', 'gi')).test(v);
-    }
-
-    {
-      if (module.exports) {
-        exports = module.exports = isBase64;
-      }
-      exports.isBase64 = isBase64;
-    }
-  })(commonjsGlobal);
-  });
-  var isBase64_1 = isBase64.isBase64;
-
   // https://stackoverflow.com/questions/6850276/how-to-convert-dataurl-to-file-object-in-javascript
   function dataUriToArray(dataURI) {
     const byteString = atob(dataURI.split(',')[1]);
