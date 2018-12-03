@@ -5938,7 +5938,7 @@ var scripts = {
 	"amp:dev": "npm run amp:watch",
 	"amp:watch": "npx rollup -c -w --environment TS,AMP,SERVE",
 	"demo:cname": "echo 'wasmboy.app' > build/CNAME",
-	"demo:build": "npx run-s core:build lib:build debugger:build benchmark:build amp:build",
+	"demo:build": "npx run-s core:build lib:build lib:build:ts:getcoreclosure debugger:build benchmark:build amp:build",
 	"demo:dist": "cp -r dist/ build/dist",
 	"demo:gh-pages": "npx gh-pages -d build",
 	"demo:deploy": "npx run-s demo:build demo:dist demo:cname demo:gh-pages"
