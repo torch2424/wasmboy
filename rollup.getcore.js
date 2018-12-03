@@ -37,6 +37,10 @@ if (!process.env.ES_NEXT) {
   ];
 }
 
+if (process.env.GET_CORE_CLOSURE) {
+  plugins = [...plugins, compiler()];
+}
+
 plugins = [...plugins, bundleSize()];
 
 // Array of bundles to make
@@ -50,7 +54,11 @@ if (process.env.WASM) {
   };
 
   if (process.env.ES_NEXT) {
-    bundleMapObject.output = 'dist/core/getWasmBoyWasmCore.esnext';
+    bundleMapObject.output += '.esnext';
+  }
+
+  if (process.env.GET_CORE_CLOSURE) {
+    bundleMapObject.output += '.closure';
   }
 
   bundleMap.push(bundleMapObject);
@@ -65,6 +73,10 @@ if (process.env.TS) {
 
   if (process.env.ES_NEXT) {
     bundleMapObject.output = 'dist/core/getWasmBoyTsCore.esnext';
+  }
+
+  if (process.env.GET_CORE_CLOSURE) {
+    bundleMapObject.output += '.closure';
   }
 
   bundleMap.push(bundleMapObject);

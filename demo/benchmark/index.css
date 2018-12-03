@@ -19,6 +19,11 @@ html {
   margin-bottom: 10px;
 }
 
+.wasmboy-benchmark__notices {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
 .donut-center {
   width: 100%;
   height: 100px;

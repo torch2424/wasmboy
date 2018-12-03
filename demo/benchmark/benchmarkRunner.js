@@ -3,6 +3,7 @@ import { h, Component } from 'preact';
 import microseconds from 'microseconds';
 import stats from 'stats-lite';
 
+import { sendAnalyticsEvent } from './analytics';
 import { WasmBoyGraphics } from '../../lib/graphics/graphics';
 import { getImageDataFromGraphicsFrameBuffer } from '../../lib/graphics/worker/imageData';
 
@@ -47,10 +48,10 @@ const coreBenchmark = async (Core, times, cyclesToRun, asyncLoopCallback) => {
   });
 };
 
-const outputFrame = (Core, WasmBoyTsCore) => {
+const outputFrame = Core => {
   // Get the graphics frame output
-  const graphicsFrameEndIndex = WasmBoyTsCore.instance.exports.FRAME_LOCATION + WasmBoyTsCore.instance.exports.FRAME_SIZE;
-  const graphicsFrameBuffer = Core.byteMemory.slice(WasmBoyTsCore.instance.exports.FRAME_LOCATION, graphicsFrameEndIndex);
+  const graphicsFrameEndIndex = Core.instance.exports.FRAME_LOCATION + Core.instance.exports.FRAME_SIZE;
+  const graphicsFrameBuffer = Core.byteMemory.slice(Core.instance.exports.FRAME_LOCATION, graphicsFrameEndIndex);
 
   WasmBoyGraphics.imageDataArray = getImageDataFromGraphicsFrameBuffer(graphicsFrameBuffer);
   WasmBoyGraphics.imageDataArrayChanged = true;
@@ -70,8 +71,12 @@ export default class BenchmarkRunner extends Component {
   runBenchmark() {
     this.props.running(true);
 
+    sendAnalyticsEvent('ran_benchmark', {
+      cycles: `${this.state.cyclesToRun}`
+    });
+
     const asyncLoopCallback = async Core => {
-      outputFrame(Core, this.props.WasmBoyTsCore);
+      outputFrame(Core);
 
       await new Promise(resolve => {
         this.setState(
@@ -84,11 +89,34 @@ export default class BenchmarkRunner extends Component {
     };
 
     const benchmarkTask = async () => {
-      WasmBoyGraphics.initialize(document.getElementById('wasm-canvas'));
-      await coreBenchmark(this.props.WasmBoyWasmCore, this.props.WasmTimes, this.state.cyclesToRun, asyncLoopCallback);
+      for (let i = 0; i < this.props.WasmBoyCoreObjects.length; i++) {
+        let coreObject = this.props.WasmBoyCoreObjects[i];
+        WasmBoyGraphics.initialize(document.getElementById(coreObject.canvasId));
+        await coreBenchmark(coreObject.core, coreObject.times, this.state.cyclesToRun, asyncLoopCallback);
 
-      WasmBoyGraphics.initialize(document.getElementById('ts-canvas'));
-      await coreBenchmark(this.props.WasmBoyTsCore, this.props.TsTimes, this.state.cyclesToRun, asyncLoopCallback);
+        // Generate our result times
+        // Which drops the first 15% of frames per run
+        // Since that should stable out then
+
+        // Add the times index to our times start index
+        if (coreObject.timesStartIndexes.length < 1) {
+          coreObject.timesStartIndexes.push(0);
+        }
+        coreObject.timesStartIndexes.push(coreObject.times().length - 1);
+
+        // Get our result times by slicing our total times
+        coreObject.resultTimes = [];
+        coreObject.timesStartIndexes.forEach((timeStartIndex, index) => {
+          if (index === coreObject.timesStartIndexes.length - 1) {
+            return;
+          }
+
+          const nextIndex = coreObject.timesStartIndexes[index + 1];
+          let times = coreObject.times().slice(timeStartIndex, nextIndex + 1);
+          times = times.slice(times.length * 0.15);
+          coreObject.resultTimes = coreObject.resultTimes.concat(times);
+        });
+      }
 
       this.benchmarkComplete();
     };
@@ -103,6 +131,21 @@ export default class BenchmarkRunner extends Component {
     if (!this.props) {
       return <div />;
     }
+
+    // Get our runner output element for each core
+    const wasmboyCoreOutputElements = [];
+    this.props.WasmBoyCoreObjects.forEach(coreObject => {
+      wasmboyCoreOutputElements.push(
+        <div>
+          <h1>
+            {coreObject.label} ({coreObject.subLabel})
+          </h1>
+          <h1>Frames Run: {coreObject.times().length}</h1>
+          <h1>Current FPS Average: {coreObject.times().length > 0 ? averageFpsFromTimes(coreObject.times()) : 0}</h1>
+          <canvas id={coreObject.canvasId} />
+        </div>
+      );
+    });
 
     return (
       <section class="runner">
@@ -125,23 +168,7 @@ export default class BenchmarkRunner extends Component {
           </label>
         </div>
 
-        <div class="runner__output">
-          <div>
-            <h1>AssemblyScript (Web Assembly)</h1>
-            <h1>AssemblyScript Frames Run: {this.props.WasmTimes().length}</h1>
-            <h1>
-              Current AssemblyScript FPS Average: {this.props.WasmTimes().length > 0 ? averageFpsFromTimes(this.props.WasmTimes()) : 0}
-            </h1>
-            <canvas id="wasm-canvas" />
-          </div>
-
-          <div>
-            <h1>Javascript (TypeScript)</h1>
-            <h1>Javascript Frames Run: {this.props.TsTimes().length}</h1>
-            <h1>Current Javascript FPS Average: {this.props.TsTimes().length > 0 ? averageFpsFromTimes(this.props.TsTimes()) : 0}</h1>
-            <canvas id="ts-canvas" />
-          </div>
-        </div>
+        <div class="runner__output">{wasmboyCoreOutputElements}</div>
       </section>
     );
   }

@@ -6,7 +6,6 @@ import babel from 'rollup-plugin-babel';
 import url from 'rollup-plugin-url';
 import json from 'rollup-plugin-json';
 import serve from 'rollup-plugin-serve';
-import compiler from '@ampproject/rollup-plugin-closure-compiler';
 import bundleSize from 'rollup-plugin-bundle-size';
 import postcss from 'rollup-plugin-postcss';
 import copy from 'rollup-plugin-copy-glob';
@@ -50,9 +49,10 @@ if (process.env.BENCHMARK && process.env.SERVE) {
   ];
   sourcemap = 'inline';
 } else {
+  // Not running through closure to show difference between
+  // Closure and non closure.
   plugins = [
     ...plugins,
-    compiler(),
     copy([
       {
         files: 'demo/debugger/assets/**/*',

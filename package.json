@@ -56,6 +56,7 @@
     "lib:watch:ts": "npx rollup -c -w --environment TS",
     "lib:build:ts": "npx rollup -c --environment PROD,TS",
     "lib:build:ts:esnext": "npx rollup -c --environment PROD,TS,ES_NEXT",
+    "lib:build:ts:getcoreclosure": "npx rollup -c --environment PROD,TS,GET_CORE_CLOSURE",
     "lib:deploy": "npx run-s core:build lib:build:wasm lib:build:ts lib:deploy:np",
     "lib:deploy:np": "npx np",
     "test": "npm run test:accuracy",
@@ -100,7 +101,7 @@
     "assemblyscript": "github:AssemblyScript/assemblyscript#c769f65bacd5392e5c9efab112b33244fc0a0c8f",
     "babel-plugin-filter-imports": "^2.0.3",
     "babel-preset-env": "^1.6.1",
-    "big-integer": "^1.6.36",
+    "big-integer": "^1.6.38",
     "browser-detect": "^0.2.28",
     "bulma": "^0.7.1",
     "chart.js": "^2.7.3",
@@ -137,12 +138,12 @@
     "rollup-plugin-url": "^1.4.0",
     "source-map-loader": "^0.2.4",
     "stats-lite": "^2.2.0",
-    "string-to-arraybuffer": "^1.0.2",
     "tslib": "^1.9.3",
     "typescript": "^3.1.3",
     "uglifyjs-webpack-plugin": "^1.2.3",
     "url-loader": "^1.0.1",
     "valoo": "^2.1.0",
-    "watch": "^1.0.2"
+    "watch": "^1.0.2",
+    "webpack-dev-server": "^3.1.10"
   }
 }
