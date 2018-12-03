@@ -61,63 +61,63 @@ export default class BenchmarkRunner extends Component {
           <tr>
             <th>Statistic</th>
             {this.getInfoFromCoreObjects(WasmBoyCoreObjects, coreObject => {
-              return `${coreObject.label} (${coreObject.subLabel})`;
+              return <th>{`${coreObject.label} (${coreObject.subLabel})`}</th>;
             })}
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>Total Frame Times</td>
+            <td>Total Used Frame Times</td>
             {this.getInfoFromCoreObjects(WasmBoyCoreObjects, coreObject => {
-              return coreObject.resultTimes.length;
+              return <td>{coreObject.resultTimes.length}</td>;
             })}
           </tr>
           <tr>
             <td>Sum</td>
             {this.getInfoFromCoreObjects(WasmBoyCoreObjects, coreObject => {
-              return stats.sum(coreObject.resultTimes);
+              return <td>{stats.sum(coreObject.resultTimes)}</td>;
             })}
           </tr>
           <tr>
             <td>Mean</td>
             {this.getInfoFromCoreObjects(WasmBoyCoreObjects, coreObject => {
-              return stats.mean(coreObject.resultTimes);
+              return <td>{stats.mean(coreObject.resultTimes)}</td>;
             })}
           </tr>
           <tr>
             <td>Median</td>
             {this.getInfoFromCoreObjects(WasmBoyCoreObjects, coreObject => {
-              return stats.median(coreObject.resultTimes);
+              return <td>{stats.median(coreObject.resultTimes)}</td>;
             })}
           </tr>
           <tr>
             <td>Mode</td>
             {this.getInfoFromCoreObjects(WasmBoyCoreObjects, coreObject => {
-              return stats.mode(coreObject.resultTimes);
+              return <td>{stats.mode(coreObject.resultTimes)}</td>;
             })}
           </tr>
           <tr>
             <td>Variance</td>
             {this.getInfoFromCoreObjects(WasmBoyCoreObjects, coreObject => {
-              return stats.variance(coreObject.resultTimes);
+              return <td>{stats.variance(coreObject.resultTimes)}</td>;
             })}
           </tr>
           <tr>
             <td>Standard Deviation</td>
             {this.getInfoFromCoreObjects(WasmBoyCoreObjects, coreObject => {
-              return stats.stdev(coreObject.resultTimes);
+              return <td>{stats.stdev(coreObject.resultTimes)}</td>;
             })}
           </tr>
           <tr>
             <td>Sample Variance</td>
             {this.getInfoFromCoreObjects(WasmBoyCoreObjects, coreObject => {
-              return stats.sampleVariance(coreObject.resultTimes);
+              return <td>{stats.sampleVariance(coreObject.resultTimes)}</td>;
             })}
           </tr>
           <tr>
             <td>Sample Standard Deviation</td>
             {this.getInfoFromCoreObjects(WasmBoyCoreObjects, coreObject => {
-              return stats.sampleStdev(coreObject.resultTimes);
+              return <td>{stats.sampleStdev(coreObject.resultTimes)}</td>;
             })}
           </tr>
         </tbody>
