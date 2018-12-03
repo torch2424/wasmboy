@@ -70,7 +70,10 @@ class WasmBoyBenchmarkApp extends Component {
           canvasId: 'wasm-canvas',
           color: '#6447f4',
           core: wasmboyWasmCore,
-          times: wasmTimes
+          times: wasmTimes,
+          resultTimes: [],
+          timesStartIndexes: [],
+          data: []
         },
         {
           label: 'Javascript',
@@ -78,7 +81,10 @@ class WasmBoyBenchmarkApp extends Component {
           canvasId: 'ts-canvas',
           color: '#f7a800',
           core: wasmboyTsCore,
-          times: tsTimes
+          times: tsTimes,
+          resultTimes: [],
+          timesStartIndexes: [],
+          data: []
         },
         {
           label: 'Javascript',
@@ -86,7 +92,10 @@ class WasmBoyBenchmarkApp extends Component {
           canvasId: 'closure-canvas',
           color: '#009588',
           core: wasmboyTsClosureCore,
-          times: tsClosureTimes
+          times: tsClosureTimes,
+          resultTimes: [],
+          timesStartIndexes: [],
+          data: []
         }
       ];
 

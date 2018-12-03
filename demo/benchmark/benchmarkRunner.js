@@ -88,6 +88,29 @@ export default class BenchmarkRunner extends Component {
         let coreObject = this.props.WasmBoyCoreObjects[i];
         WasmBoyGraphics.initialize(document.getElementById(coreObject.canvasId));
         await coreBenchmark(coreObject.core, coreObject.times, this.state.cyclesToRun, asyncLoopCallback);
+
+        // Generate our result times
+        // Which drops the first 15% of frames per run
+        // Since that should stable out then
+
+        // Add the times index to our times start index
+        if (coreObject.timesStartIndexes.length < 1) {
+          coreObject.timesStartIndexes.push(0);
+        }
+        coreObject.timesStartIndexes.push(coreObject.times().length - 1);
+
+        // Get our result times by slicing our total times
+        coreObject.resultTimes = [];
+        coreObject.timesStartIndexes.forEach((timeStartIndex, index) => {
+          if (index === coreObject.timesStartIndexes.length - 1) {
+            return;
+          }
+
+          const nextIndex = coreObject.timesStartIndexes[index + 1];
+          let times = coreObject.times().slice(timeStartIndex, nextIndex + 1);
+          times = times.slice(times.length * 0.15);
+          coreObject.resultTimes = coreObject.resultTimes.concat(times);
+        });
       }
 
       this.benchmarkComplete();

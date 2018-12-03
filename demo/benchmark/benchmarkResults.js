@@ -44,7 +44,7 @@ export default class BenchmarkRunner extends Component {
     }
 
     const shouldReturnEmptyTable = WasmBoyCoreObjects.some(wasmboyCoreObject => {
-      if (!wasmboyCoreObject.times || wasmboyCoreObject.times().length <= 0) {
+      if (!wasmboyCoreObject.resultTimes || wasmboyCoreObject.resultTimes.length <= 0) {
         return true;
       }
 
@@ -69,55 +69,55 @@ export default class BenchmarkRunner extends Component {
           <tr>
             <td>Total Frame Times</td>
             {this.getInfoFromCoreObjects(WasmBoyCoreObjects, coreObject => {
-              return coreObject.times().length;
+              return coreObject.resultTimes.length;
             })}
           </tr>
           <tr>
             <td>Sum</td>
             {this.getInfoFromCoreObjects(WasmBoyCoreObjects, coreObject => {
-              return stats.sum(coreObject.times());
+              return stats.sum(coreObject.resultTimes);
             })}
           </tr>
           <tr>
             <td>Mean</td>
             {this.getInfoFromCoreObjects(WasmBoyCoreObjects, coreObject => {
-              return stats.mean(coreObject.times());
+              return stats.mean(coreObject.resultTimes);
             })}
           </tr>
           <tr>
             <td>Median</td>
             {this.getInfoFromCoreObjects(WasmBoyCoreObjects, coreObject => {
-              return stats.median(coreObject.times());
+              return stats.median(coreObject.resultTimes);
             })}
           </tr>
           <tr>
             <td>Mode</td>
             {this.getInfoFromCoreObjects(WasmBoyCoreObjects, coreObject => {
-              return stats.mode(coreObject.times());
+              return stats.mode(coreObject.resultTimes);
             })}
           </tr>
           <tr>
             <td>Variance</td>
             {this.getInfoFromCoreObjects(WasmBoyCoreObjects, coreObject => {
-              return stats.variance(coreObject.times());
+              return stats.variance(coreObject.resultTimes);
             })}
           </tr>
           <tr>
             <td>Standard Deviation</td>
             {this.getInfoFromCoreObjects(WasmBoyCoreObjects, coreObject => {
-              return stats.stdev(coreObject.times());
+              return stats.stdev(coreObject.resultTimes);
             })}
           </tr>
           <tr>
             <td>Sample Variance</td>
             {this.getInfoFromCoreObjects(WasmBoyCoreObjects, coreObject => {
-              return stats.sampleVariance(coreObject.times());
+              return stats.sampleVariance(coreObject.resultTimes);
             })}
           </tr>
           <tr>
             <td>Sample Standard Deviation</td>
             {this.getInfoFromCoreObjects(WasmBoyCoreObjects, coreObject => {
-              return stats.sampleStdev(coreObject.times());
+              return stats.sampleStdev(coreObject.resultTimes);
             })}
           </tr>
         </tbody>
@@ -151,7 +151,7 @@ export default class BenchmarkRunner extends Component {
     }
 
     const timesNumberLabels = [];
-    for (let i = 0; i < WasmBoyCoreObjects[0].times().length; i++) {
+    for (let i = 0; i < WasmBoyCoreObjects[0].resultTimes.length; i++) {
       timesNumberLabels.push(i + 1);
     }
 
@@ -161,7 +161,7 @@ export default class BenchmarkRunner extends Component {
 
     // Get our times as points
     timesVsFramesCoreObjects.forEach(coreObject => {
-      coreObject.times().forEach((time, index) => {
+      coreObject.resultTimes.forEach((time, index) => {
         coreObject.data.push({
           x: index + 1,
           y: time
@@ -192,11 +192,8 @@ export default class BenchmarkRunner extends Component {
     // Get an FPs By averaging every 60 frames.
     framesPerSetCoreObjects.forEach(coreObject => {
       let counter = 0;
-      while (counter + framesPerSet < coreObject.times().length) {
-        const timesAsFps = coreObject
-          .times()
-          .slice(counter, counter + framesPerSet)
-          .map(x => Math.floor(1000000 / x));
+      while (counter + framesPerSet < coreObject.resultTimes.length) {
+        const timesAsFps = coreObject.resultTimes.slice(counter, counter + framesPerSet).map(x => Math.floor(1000000 / x));
 
         let mode = stats.mode(timesAsFps);
 
@@ -247,7 +244,7 @@ export default class BenchmarkRunner extends Component {
 
   render() {
     const shouldDisable = this.props.WasmBoyCoreObjects.some(coreObject => {
-      if (!coreObject.times || coreObject.times().length <= 0) {
+      if (!coreObject.resultTimes || coreObject.resultTimes.length <= 0) {
         return true;
       }
 
@@ -261,7 +258,7 @@ export default class BenchmarkRunner extends Component {
             class="button"
             onClick={() => {
               this.props.WasmBoyCoreObjects.forEach(coreObject => {
-                console.log(`${coreObject.label} (${coreObject.subLabel}) times:`, coreObject.times());
+                console.log(`${coreObject.label} (${coreObject.subLabel}) times:`, coreObject.resultTimes);
               });
             }}
             disabled={!this.props || this.props.running() || shouldDisable}
