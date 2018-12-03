@@ -3,7 +3,7 @@ notifications:
 language: node_js
 sudo: false
 node_js:
-  - 'lts/*'
+  - 'node'
 install:
   - npm install
 script:
