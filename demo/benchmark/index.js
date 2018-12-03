@@ -162,11 +162,7 @@ class WasmBoyBenchmarkApp extends Component {
             <h1>Results</h1>
             <hr />
 
-            {/*
-            <BenchmarkResults 
-              WasmBoyCoreObjects={wasmboyCoreObjects}
-              running={this.state.running} />
-            */}
+            <BenchmarkResults WasmBoyCoreObjects={wasmboyCoreObjects} running={this.state.running} />
           </main>
         )}
       </div>

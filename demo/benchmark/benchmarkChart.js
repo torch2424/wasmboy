@@ -1,26 +1,22 @@
 import ChartJsPluginDownsample from 'chartjs-plugin-downsample';
 
-export const getChartConfig = (title, xAxisTitle, yAxisTitle, isHigherBetter, threshold, cycleNumberLabels, wasmData, tsData) => {
+export const getChartConfig = (title, xAxisTitle, yAxisTitle, isHigherBetter, threshold, cycleNumberLabels, WasmBoyCoreObjectsWithData) => {
+  const datasets = [];
+  WasmBoyCoreObjectsWithData.forEach(coreObjectWithData => {
+    datasets.push({
+      label: `${coreObjectWithData.label} (${coreObjectWithData.subLabel})`,
+      backgroundColor: coreObjectWithData.color,
+      borderColor: coreObjectWithData.color,
+      fill: false,
+      data: coreObjectWithData.data
+    });
+  });
+
   return {
     type: 'line',
     data: {
       labels: cycleNumberLabels,
-      datasets: [
-        {
-          label: 'AssemblyScript (Web Assembly)',
-          backgroundColor: '#6447f4',
-          borderColor: '#6447f4',
-          fill: false,
-          data: wasmData
-        },
-        {
-          label: 'Javascript (TypeScript)',
-          backgroundColor: '#f7a800',
-          borderColor: '#f7a800',
-          fill: false,
-          data: tsData
-        }
-      ]
+      datasets
     },
     plugins: [ChartJsPluginDownsample],
     options: {
@@ -78,7 +74,7 @@ export const getChartConfig = (title, xAxisTitle, yAxisTitle, isHigherBetter, th
             ticks: {
               suggestedMin: 0,
               callback: (dataLabel, index) => {
-                if (index % 10 === 0 || index === wasmData.length) {
+                if (index % 10 === 0 || index === WasmBoyCoreObjectsWithData[0].data.length) {
                   return dataLabel;
                 }
                 return null;
