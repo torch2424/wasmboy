@@ -1,7 +1,5 @@
 import getWasmBoyTsCore from '../../dist/core/getWasmBoyTsCore.esm.js';
 
-import stringToArrayBuffer from 'string-to-arraybuffer';
-
 import dataUriToArray from './dataUriToArray.js';
 import rgbaArrayBufferToSvg from './pixelToSvg.js';
 import romUrl from '../../test/performance/testroms/tobutobugirl/tobutobugirl.gb';
