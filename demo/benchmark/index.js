@@ -123,6 +123,8 @@ class WasmBoyBenchmarkApp extends Component {
           </a>
         </div>
 
+        <div class="wasmboy-benchmark__notices">Source is not minified, to allow easy analysis of the bundle.</div>
+
         <table class="table is-bordered is-striped is-narrow is-fullwidth">
           <thead>
             <tr>
