@@ -791,7 +791,7 @@
   var css$1 = "/* General styles for the debugger, and the index component */\n\nhtml,\nbody {\n  font: 14px/1.21 'Helvetica Neue', arial, sans-serif;\n  font-weight: 400;\n  /* For mobile phones to be able to scroll the view into place */\n  min-height: 600px;\n}\n\nh1 {\n  text-align: center;\n  font-weight: bold !important;\n}\n\np {\n  text-align: center;\n  max-width: 640px;\n  margin-left: auto;\n  margin-right: auto;\n}\n\nbutton {\n  margin-left: 5px;\n  margin-right: 5px;\n}\n\ninput[type='checkbox'] {\n  margin-left: 5px;\n}\n\n.hide {\n  display: none;\n}\n\n.notification {\n  width: 50vw;\n  max-width: 400px;\n  color: #fafafa;\n  background-color: rgba(0, 0, 0, 0.65) !important;\n  position: fixed !important;\n  bottom: 10px;\n  right: 20px;\n  text-overflow: wrap !important;\n  z-index: 100000;\n}\n\n.wasmboy {\n  max-width: 700px;\n  margin-left: auto;\n  margin-right: auto;\n}\n\n.wasmboy__title {\n  margin-top: 10px;\n  margin-bottom: 10px;\n  font-size: 1rem;\n}\n\n.wasmboy__canvas-container {\n  text-align: center;\n}\n\n.wasmboy__canvas-container__canvas {\n  border: 1px solid black;\n\n  /* Width and height are 160x144 pixel aspect ratio in vw */\n  width: 50vw;\n  height: 45vw;\n  min-width: 160px;\n  min-height: 144px;\n  max-width: 640px;\n  max-height: 576px;\n}\n\n/* https://atomiks.github.io/30-seconds-of-css/ */\n@keyframes donut-spin {\n  0% {\n    transform: rotate(0deg);\n  }\n  100% {\n    transform: rotate(360deg);\n  }\n}\n.donut {\n  display: inline-block;\n  border: 4px solid rgba(0, 0, 0, 0.1);\n  border-left-color: #7983ff;\n  border-radius: 50%;\n  width: 30px;\n  height: 30px;\n  animation: donut-spin 1.2s linear infinite;\n}\n\n/* animate.css https://github.com/daneden/animate.css/blob/master/animate.css */\n.animated {\n  -webkit-animation-duration: 0.5s;\n  animation-duration: 0.5s;\n  -webkit-animation-fill-mode: both;\n  animation-fill-mode: both;\n}\n\n@-webkit-keyframes fadeIn {\n  from {\n    opacity: 0;\n  }\n\n  to {\n    opacity: 1;\n  }\n}\n\n@keyframes fadeIn {\n  from {\n    opacity: 0;\n  }\n\n  to {\n    opacity: 1;\n  }\n}\n\n.fadeIn {\n  -webkit-animation-name: fadeIn;\n  animation-name: fadeIn;\n}\n\n.modal-background {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n}\n\n.modal-content {\n  border: 5px solid rgba(0, 0, 0, 0.75);\n  border-radius: 5px;\n  background-color: #f5f5f5;\n  color: #020202;\n  padding: 10px;\n\n  width: 80vw;\n  height: 80vh;\n  max-width: 800px;\n  max-height: 800px;\n  min-width: 250px;\n  min-height: 300px;\n\n  overflow: auto;\n  z-index: 101;\n}\n";
   styleInject(css$1);
 
-  var css$2 = "html {\n  background-color: #fcfcfc;\n}\n\n.wasmboy-benchmark {\n  padding: 10px;\n  max-width: 800px;\n  margin-left: auto;\n  margin-right: auto;\n}\n\n.wasmboy-benchmark__title {\n  margin-bottom: 20px;\n}\n\n.wasmboy-benchmark__link {\n  text-align: center;\n  font-weight: bold;\n  margin-bottom: 10px;\n}\n\n.wasmboy-benchmark__notices {\n  text-align: center;\n  margin-bottom: 10px;\n}\n\n.donut-center {\n  width: 100%;\n  height: 100px;\n  text-align: center;\n  margin-left: auto;\n  margin-right: auto;\n}\n\n.load-rom__load-buttons {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: flex-start;\n  align-items: center;\n  margin-top: 10px;\n  margin-bottom: 10px;\n}\n\n.load-rom__load-buttons > * {\n  margin-right: 10px;\n}\n\n.load-rom__load-buttons .file-button {\n  border-color: #dbdbdb !important;\n}\n\n.runner__frames-to-run > label {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: flex-start;\n  align-items: center;\n  margin-top: 10px;\n  margin-bottom: 10px;\n}\n\n.runner__frames-to-run > label > * {\n  margin-right: 10px;\n  width: initial;\n}\n\n.runner__frames-to-run > label > button {\n  flex-grow: 1;\n}\n\n.runner__output {\n  width: 100%;\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: space-around;\n  align-items: center;\n}\n\n.runner__output > div {\n  text-align: center;\n}\n\n.runner__output > div > canvas {\n  min-width: 160px;\n  min-height: 144px;\n}\n\n.results {\n  text-align: center;\n}\n\n.results button {\n  word-wrap: break-word;\n  margin-bottom: 10px;\n}\n\n.results table {\n  margin-top: 10px;\n  min-height: 100px;\n  margin-bottom: 10px;\n}\n";
+  var css$2 = "html {\n  background-color: #fcfcfc;\n}\n\n.wasmboy-benchmark {\n  padding: 10px;\n  max-width: 800px;\n  margin-left: auto;\n  margin-right: auto;\n}\n\n.wasmboy-benchmark__title {\n  margin-bottom: 20px;\n}\n\n.wasmboy-benchmark__link {\n  text-align: center;\n  font-weight: bold;\n  margin-bottom: 10px;\n}\n\n.wasmboy-benchmark__notices {\n  text-align: center;\n  margin-bottom: 10px;\n}\n\n.donut-center {\n  width: 100%;\n  height: 100px;\n  text-align: center;\n  margin-left: auto;\n  margin-right: auto;\n}\n\n.load-rom__load-buttons {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: flex-start;\n  align-items: center;\n  margin-top: 10px;\n  margin-bottom: 10px;\n}\n\n.load-rom__load-buttons > * {\n  margin-right: 10px;\n}\n\n.load-rom__load-buttons .file-button {\n  border-color: #dbdbdb !important;\n}\n\n.runner__frames-to-run > label {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: flex-start;\n  align-items: center;\n  margin-top: 10px;\n  margin-bottom: 10px;\n}\n\n.runner__frames-to-run > label > * {\n  margin-right: 10px;\n  width: initial;\n}\n\n.runner__frames-to-run > label > button {\n  flex-grow: 1;\n}\n\n.runner__output {\n  width: 100%;\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: space-around;\n  align-items: center;\n}\n\n.runner__output > div {\n  text-align: center;\n}\n\n.runner__output > div > canvas {\n  min-width: 160px;\n  min-height: 144px;\n}\n\n.results {\n  text-align: center;\n}\n\n.results button {\n  word-wrap: break-word;\n  margin-bottom: 10px;\n}\n\n.wasmboy-benchmark__stats-table {\n  width: 100%;\n  overflow: auto;\n}\n\n.results table {\n  margin-top: 10px;\n  min-height: 100px;\n  margin-bottom: 10px;\n}\n\n.wasmboy-benchmark__chart-container {\n  position: relative;\n  width: 100%;\n  height: 50vh;\n  max-height: 800px;\n}\n";
   styleInject(css$2);
 
   function valoo(v) {
@@ -36176,6 +36176,7 @@
       plugins: [chartjsPluginDownsample],
       options: {
         responsive: true,
+        maintainAspectRatio: false,
         title: {
           display: true,
           text: title
@@ -36434,11 +36435,17 @@
           });
         },
         disabled: !this.props || this.props.running() || shouldDisable
-      }, "Log Frame Execution Times to Console")), h("div", null, h("h1", null, "General Statistics of Times (In Microseconds)"), generalStatsTable), h("div", null, h("h1", null, "Frame Times Visualization"), h("canvas", {
+      }, "Log Frame Execution Times to Console")), h("div", null, h("h1", null, "General Statistics of Times (In Microseconds)"), h("div", {
+        class: "wasmboy-benchmark__stats-table"
+      }, generalStatsTable)), h("div", null, h("h1", null, "Frame Times Visualization"), h("div", {
+        class: "wasmboy-benchmark__chart-container"
+      }, h("canvas", {
         id: "times-vs-frames-chart"
-      }), h("canvas", {
+      })), h("div", {
+        class: "wasmboy-benchmark__chart-container"
+      }, h("canvas", {
         id: "fps-vs-frames-chart"
-      })));
+      }))));
     }
 
   }
