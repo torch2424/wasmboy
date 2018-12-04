@@ -21,6 +21,7 @@ export const getChartConfig = (title, xAxisTitle, yAxisTitle, isHigherBetter, th
     plugins: [ChartJsPluginDownsample],
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       title: {
         display: true,
         text: title

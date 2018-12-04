@@ -278,13 +278,17 @@ export default class BenchmarkRunner extends Component {
 
         <div>
           <h1>General Statistics of Times (In Microseconds)</h1>
-          {generalStatsTable}
+          <div class="wasmboy-benchmark__stats-table">{generalStatsTable}</div>
         </div>
 
         <div>
           <h1>Frame Times Visualization</h1>
-          <canvas id="times-vs-frames-chart" />
-          <canvas id="fps-vs-frames-chart" />
+          <div class="wasmboy-benchmark__chart-container">
+            <canvas id="times-vs-frames-chart" />
+          </div>
+          <div class="wasmboy-benchmark__chart-container">
+            <canvas id="fps-vs-frames-chart" />
+          </div>
         </div>
       </section>
     );

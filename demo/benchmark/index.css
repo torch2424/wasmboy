@@ -93,8 +93,20 @@ html {
   margin-bottom: 10px;
 }
 
+.wasmboy-benchmark__stats-table {
+  width: 100%;
+  overflow: auto;
+}
+
 .results table {
   margin-top: 10px;
   min-height: 100px;
   margin-bottom: 10px;
+}
+
+.wasmboy-benchmark__chart-container {
+  position: relative;
+  width: 100%;
+  height: 50vh;
+  max-height: 800px;
 }
