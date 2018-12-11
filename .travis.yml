@@ -5,7 +5,7 @@ sudo: false
 node_js:
   - 'node'
 install:
-  - npm install
+  - npm ci
 script:
   - npm run prettier:lint
   - npm run demo:build
