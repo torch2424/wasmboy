@@ -1,7 +1,7 @@
 import { Component } from 'preact';
 import Portal from 'preact-portal';
 import { WasmBoy } from '../../../dist/wasmboy.wasm.esm';
-import './wasmBoySystemControls.css';
+import './wasmboySystemControls.css';
 
 export class WasmBoySystemControls extends Component {
   constructor(props) {
