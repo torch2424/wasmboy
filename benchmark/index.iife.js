@@ -97,6 +97,12 @@
     }return obj;
   }
 
+  function applyRef(ref, value) {
+    if (ref != null) {
+      if (typeof ref == 'function') ref(value);else ref.current = value;
+    }
+  }
+
   var defer = typeof Promise == 'function' ? Promise.resolve().then.bind(Promise.resolve()) : setTimeout;
 
   function cloneElement(vnode, props) {
@@ -114,10 +120,8 @@
   }
 
   function rerender() {
-  	var p,
-  	    list = items;
-  	items = [];
-  	while (p = list.pop()) {
+  	var p;
+  	while (p = items.pop()) {
   		if (p._dirty) renderComponent(p);
   	}
   }
@@ -167,8 +171,8 @@
   	if (name === 'className') name = 'class';
 
   	if (name === 'key') ; else if (name === 'ref') {
-  		if (old) old(null);
-  		if (value) value(node);
+  		applyRef(old, null);
+  		applyRef(value, node);
   	} else if (name === 'class' && !isSvg) {
   		node.className = value || '';
   	} else if (name === 'style') {
@@ -226,7 +230,7 @@
 
   function flushMounts() {
   	var c;
-  	while (c = mounts.pop()) {
+  	while (c = mounts.shift()) {
   		if (options.afterMount) options.afterMount(c);
   		if (c.componentDidMount) c.componentDidMount();
   	}
@@ -407,7 +411,7 @@
   	if (component) {
   		unmountComponent(component);
   	} else {
-  		if (node['__preactattr_'] != null && node['__preactattr_'].ref) node['__preactattr_'].ref(null);
+  		if (node['__preactattr_'] != null) applyRef(node['__preactattr_'].ref, null);
 
   		if (unmountOnly === false || node['__preactattr_'] == null) {
   			removeNode(node);
@@ -507,7 +511,7 @@
   		}
   	}
 
-  	if (component.__ref) component.__ref(component);
+  	applyRef(component.__ref, component);
   }
 
   function renderComponent(component, renderMode, mountAll, isChild) {
@@ -627,7 +631,7 @@
   	}
 
   	if (!isUpdate || mountAll) {
-  		mounts.unshift(component);
+  		mounts.push(component);
   	} else if (!skip) {
 
   		if (component.componentDidUpdate) {
@@ -694,7 +698,7 @@
   	if (inner) {
   		unmountComponent(inner);
   	} else if (base) {
-  		if (base['__preactattr_'] && base['__preactattr_'].ref) base['__preactattr_'].ref(null);
+  		if (base['__preactattr_'] != null) applyRef(base['__preactattr_'].ref, null);
 
   		component.nextBase = base;
 
@@ -704,7 +708,7 @@
   		removeChildren(base);
   	}
 
-  	if (component.__ref) component.__ref(null);
+  	applyRef(component.__ref, null);
   }
 
   function Component(props, context) {
@@ -737,10 +741,15 @@
     return diff(merge, vnode, {}, false, parent, false);
   }
 
+  function createRef() {
+  	return {};
+  }
+
   var preact = {
   	h: h,
   	createElement: h,
   	cloneElement: cloneElement,
+  	createRef: createRef,
   	Component: Component,
   	render: render,
   	rerender: rerender,
@@ -752,6 +761,7 @@
     h: h,
     createElement: h,
     cloneElement: cloneElement,
+    createRef: createRef,
     Component: Component,
     render: render,
     rerender: rerender,
@@ -1515,10 +1525,10 @@
   	"test:perf": "npm run test:performance",
   	"test:performance": "npx run-s build test:performance:nobuild",
   	"test:performance:nobuild": "node --experimental-worker node_modules/mocha/bin/_mocha test/performance/performance-test.js --exit",
-  	"debugger:watch": "preact watch --src demo/debugger",
+  	"debugger:watch": "npx preact watch --src demo/debugger",
   	"debugger:serve": "npx run-s debugger:build debugger:serve:nobuild",
-  	"debugger:serve:nobuild": "preact serve",
-  	"debugger:build": "preact build -p --src demo/debugger --no-prerender --service-worker false",
+  	"debugger:serve:nobuild": "npx preact serve",
+  	"debugger:build": "npx preact build -p --src demo/debugger --no-prerender --service-worker=false",
   	"benchmark:build": "npx rollup -c --environment PROD,TS,BENCHMARK",
   	"benchmark:dev": "npm run benchmark:watch",
   	"benchmark:watch": "npx rollup -c -w --environment TS,BENCHMARK,SERVE",
@@ -1526,7 +1536,8 @@
   	"amp:dev": "npm run amp:watch",
   	"amp:watch": "npx rollup -c -w --environment TS,AMP,SERVE",
   	"demo:cname": "echo 'wasmboy.app' > build/CNAME",
-  	"demo:build": "npx run-s core:build lib:build lib:build:ts:getcoreclosure debugger:build benchmark:build amp:build",
+  	"demo:build": "npx run-s core:build lib:build lib:build:ts:getcoreclosure debugger:build benchmark:build amp:build demo:build:serviceworker",
+  	"demo:build:serviceworker": "rm build/sw.js && cp demo/sw.js build",
   	"demo:dist": "cp -r dist/ build/dist",
   	"demo:gh-pages": "npx gh-pages -d build",
   	"demo:deploy": "npx run-s demo:build demo:dist demo:cname demo:gh-pages"
@@ -1563,7 +1574,7 @@
   	"markdown-table": "^1.1.1",
   	microseconds: "^0.1.0",
   	mocha: "^5.0.1",
-  	np: "^3.0.0",
+  	np: "^3.0.4",
   	"npm-run-all": "^4.1.5",
   	"performance-now": "^2.1.0",
   	"pngjs-image": "^0.11.7",

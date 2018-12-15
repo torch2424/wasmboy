@@ -4667,6 +4667,13 @@ var WasmBoy = (function (exports) {
           return y;
       };
       SmallInteger.prototype.pow = BigInteger.prototype.pow;
+
+      var pow;
+      if (supportsNativeBigInt) {
+          // forced to use eval because ** is a syntax error on pre-ECMAScript2017 environments.
+          pow = eval("(a,b)=>a**b");
+      }
+
       NativeBigInt.prototype.pow = function (v) {
           var n = parseValue(v);
           var a = this.value, b = n.value;
@@ -4675,9 +4682,7 @@ var WasmBoy = (function (exports) {
           if (a === BigInt(1)) return Integer[1];
           if (a === BigInt(-1)) return n.isEven() ? Integer[1] : Integer[-1];
           if (n.isNegative()) return new NativeBigInt(BigInt(0));
-          // forced to use eval because ** is a syntax error on pre-ECMAScript2017 environments.
-          // should be fine w.r.t. security because parseValue(v) will throw an error if v is a malicious string.
-          return new NativeBigInt(eval("BigInt('" + a + "') ** BigInt('" + b + "')"));
+          return new NativeBigInt(pow(a, b));
       };
 
       BigInteger.prototype.modPow = function (exp, mod) {
@@ -5001,15 +5006,14 @@ var WasmBoy = (function (exports) {
       var powers2Length = powersOfTwo.length, highestPower2 = powersOfTwo[powers2Length - 1];
 
       function shift_isSmall(n) {
-          return ((typeof n === "number" || typeof n === "string") && +Math.abs(n) <= BASE) ||
-              (n instanceof BigInteger && n.value.length <= 1);
+          return Math.abs(n) <= BASE;
       }
 
-      BigInteger.prototype.shiftLeft = function (n) {
+      BigInteger.prototype.shiftLeft = function (v) {
+          var n = parseValue(v).toJSNumber();
           if (!shift_isSmall(n)) {
               throw new Error(String(n) + " is too large for shifting.");
           }
-          n = +n;
           if (n < 0) return this.shiftRight(-n);
           var result = this;
           if (result.isZero()) return result;
@@ -5021,12 +5025,12 @@ var WasmBoy = (function (exports) {
       };
       NativeBigInt.prototype.shiftLeft = SmallInteger.prototype.shiftLeft = BigInteger.prototype.shiftLeft;
 
-      BigInteger.prototype.shiftRight = function (n) {
+      BigInteger.prototype.shiftRight = function (v) {
           var remQuo;
+          var n = parseValue(v).toJSNumber();
           if (!shift_isSmall(n)) {
               throw new Error(String(n) + " is too large for shifting.");
           }
-          n = +n;
           if (n < 0) return this.shiftLeft(-n);
           var result = this;
           while (n >= powers2Length) {
@@ -5930,10 +5934,10 @@ var WasmBoy = (function (exports) {
   	"test:perf": "npm run test:performance",
   	"test:performance": "npx run-s build test:performance:nobuild",
   	"test:performance:nobuild": "node --experimental-worker node_modules/mocha/bin/_mocha test/performance/performance-test.js --exit",
-  	"debugger:watch": "preact watch --src demo/debugger",
+  	"debugger:watch": "npx preact watch --src demo/debugger",
   	"debugger:serve": "npx run-s debugger:build debugger:serve:nobuild",
-  	"debugger:serve:nobuild": "preact serve",
-  	"debugger:build": "preact build -p --src demo/debugger --no-prerender --service-worker false",
+  	"debugger:serve:nobuild": "npx preact serve",
+  	"debugger:build": "npx preact build -p --src demo/debugger --no-prerender --service-worker=false",
   	"benchmark:build": "npx rollup -c --environment PROD,TS,BENCHMARK",
   	"benchmark:dev": "npm run benchmark:watch",
   	"benchmark:watch": "npx rollup -c -w --environment TS,BENCHMARK,SERVE",
@@ -5941,7 +5945,8 @@ var WasmBoy = (function (exports) {
   	"amp:dev": "npm run amp:watch",
   	"amp:watch": "npx rollup -c -w --environment TS,AMP,SERVE",
   	"demo:cname": "echo 'wasmboy.app' > build/CNAME",
-  	"demo:build": "npx run-s core:build lib:build lib:build:ts:getcoreclosure debugger:build benchmark:build amp:build",
+  	"demo:build": "npx run-s core:build lib:build lib:build:ts:getcoreclosure debugger:build benchmark:build amp:build demo:build:serviceworker",
+  	"demo:build:serviceworker": "rm build/sw.js && cp demo/sw.js build",
   	"demo:dist": "cp -r dist/ build/dist",
   	"demo:gh-pages": "npx gh-pages -d build",
   	"demo:deploy": "npx run-s demo:build demo:dist demo:cname demo:gh-pages"
@@ -5978,7 +5983,7 @@ var WasmBoy = (function (exports) {
   	"markdown-table": "^1.1.1",
   	microseconds: "^0.1.0",
   	mocha: "^5.0.1",
-  	np: "^3.0.0",
+  	np: "^3.0.4",
   	"npm-run-all": "^4.1.5",
   	"performance-now": "^2.1.0",
   	"pngjs-image": "^0.11.7",
