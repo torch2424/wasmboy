@@ -36549,6 +36549,11 @@
         href: "https://github.com/torch2424/wasmBoy",
         target: "_blank"
       }, "Fork Me on Github")), h("div", {
+        class: "wasmboy-benchmark__link"
+      }, h("a", {
+        href: "https://medium.com/@torch2424/webassembly-is-fast-a-real-world-benchmark-of-webassembly-vs-es6-d85a23f8e193",
+        target: "_blank"
+      }, "In-Depth Article and Results")), h("div", {
         class: "wasmboy-benchmark__notices"
       }, "Source is not minified, to allow easy analysis of the bundle."), h("table", {
         class: "table is-bordered is-striped is-narrow is-fullwidth"
