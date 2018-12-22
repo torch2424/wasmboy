@@ -1,12 +1,16 @@
 {
-  "name": "preact-cli app",
+  "name": "WasmBoy",
+  "short_name": "WasmBoy",
   "start_url": "/",
-  "display": "standalone",
+  "display": "fullscreen",
+  "orientation": "landscape",
   "background_color": "#fff",
   "theme_color": "#673ab8",
-  "icons": [{
-    "src": "/assets/icon.png",
-    "type": "image/png",
-    "sizes": "512x512"
-  }]
+  "icons": [
+    {
+      "src": "/assets/icon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
 }

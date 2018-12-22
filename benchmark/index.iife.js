@@ -1529,7 +1529,7 @@
   	"debugger:watch": "npx preact watch --src demo/debugger",
   	"debugger:serve": "npx run-s debugger:build debugger:serve:nobuild",
   	"debugger:serve:nobuild": "npx preact serve",
-  	"debugger:build": "npx preact build -p --src demo/debugger --no-prerender --service-worker=false",
+  	"debugger:build": "npx preact build -p --src demo/debugger --template demo/template.html --no-prerender",
   	"benchmark:build": "npx rollup -c --environment PROD,TS,BENCHMARK",
   	"benchmark:build:skiplib": "npx rollup -c --environment PROD,TS,BENCHMARK,SKIP_LIB",
   	"benchmark:dev": "npm run benchmark:watch",
@@ -1538,10 +1538,10 @@
   	"amp:build:skiplib": "npx rollup -c --environment PROD,TS,AMP,SKIP_LIB",
   	"amp:dev": "npm run amp:watch",
   	"amp:watch": "npx rollup -c -w --environment TS,AMP,SERVE",
-  	"demo:cname": "echo 'wasmboy.app' > build/CNAME",
   	"demo:build": "npx run-s core:build lib:build demo:build:apps",
-  	"demo:build:apps": "npx run-s debugger:build benchmark:build:skiplib amp:build:skiplib demo:build:serviceworker",
-  	"demo:build:serviceworker": "rm build/sw.js && cp demo/sw.js build",
+  	"demo:build:apps": "npx run-s debugger:build benchmark:build:skiplib amp:build:skiplib demo:build:manifest",
+  	"demo:build:manifest": "cp demo/manifest.json build/",
+  	"demo:cname": "echo 'wasmboy.app' > build/CNAME",
   	"demo:dist": "cp -r dist/ build/dist",
   	"demo:gh-pages": "npx gh-pages -d build",
   	"demo:deploy": "npx run-s demo:build demo:dist demo:cname demo:gh-pages"
@@ -1584,6 +1584,7 @@
   	"pngjs-image": "^0.11.7",
   	preact: "^8.2.1",
   	"preact-cli": "^2.2.1",
+  	"preact-cli-sw-precache": "^1.0.3",
   	"preact-compat": "^3.17.0",
   	"preact-portal": "^1.1.3",
   	prettier: "^1.12.1",
@@ -28936,7 +28937,7 @@
 
       var defaultLocaleWeek = {
           dow : 0, // Sunday is the first day of the week.
-          doy : 6  // The week that contains Jan 6th is the first week of the year.
+          doy : 6  // The week that contains Jan 1st is the first week of the year.
       };
 
       function localeFirstDayOfWeek () {
@@ -29812,13 +29813,13 @@
                       weekdayOverflow = true;
                   }
               } else if (w.e != null) {
-                  // local weekday -- counting starts from beginning of week
+                  // local weekday -- counting starts from begining of week
                   weekday = w.e + dow;
                   if (w.e < 0 || w.e > 6) {
                       weekdayOverflow = true;
                   }
               } else {
-                  // default to beginning of week
+                  // default to begining of week
                   weekday = dow;
               }
           }
@@ -30412,7 +30413,7 @@
               years = normalizedInput.year || 0,
               quarters = normalizedInput.quarter || 0,
               months = normalizedInput.month || 0,
-              weeks = normalizedInput.week || normalizedInput.isoWeek || 0,
+              weeks = normalizedInput.week || 0,
               days = normalizedInput.day || 0,
               hours = normalizedInput.hour || 0,
               minutes = normalizedInput.minute || 0,
@@ -30716,7 +30717,7 @@
                   ms : toInt(absRound(match[MILLISECOND] * 1000)) * sign // the millisecond decimal point is included in the match
               };
           } else if (!!(match = isoRegex.exec(input))) {
-              sign = (match[1] === '-') ? -1 : 1;
+              sign = (match[1] === '-') ? -1 : (match[1] === '+') ? 1 : 1;
               duration = {
                   y : parseIso(match[2], sign),
                   M : parseIso(match[3], sign),
@@ -30867,7 +30868,7 @@
           if (!(this.isValid() && localInput.isValid())) {
               return false;
           }
-          units = normalizeUnits(units) || 'millisecond';
+          units = normalizeUnits(!isUndefined(units) ? units : 'millisecond');
           if (units === 'millisecond') {
               return this.valueOf() > localInput.valueOf();
           } else {
@@ -30880,7 +30881,7 @@
           if (!(this.isValid() && localInput.isValid())) {
               return false;
           }
-          units = normalizeUnits(units) || 'millisecond';
+          units = normalizeUnits(!isUndefined(units) ? units : 'millisecond');
           if (units === 'millisecond') {
               return this.valueOf() < localInput.valueOf();
           } else {
@@ -30889,14 +30890,9 @@
       }
 
       function isBetween (from, to, units, inclusivity) {
-          var localFrom = isMoment(from) ? from : createLocal(from),
-              localTo = isMoment(to) ? to : createLocal(to);
-          if (!(this.isValid() && localFrom.isValid() && localTo.isValid())) {
-              return false;
-          }
           inclusivity = inclusivity || '()';
-          return (inclusivity[0] === '(' ? this.isAfter(localFrom, units) : !this.isBefore(localFrom, units)) &&
-              (inclusivity[1] === ')' ? this.isBefore(localTo, units) : !this.isAfter(localTo, units));
+          return (inclusivity[0] === '(' ? this.isAfter(from, units) : !this.isBefore(from, units)) &&
+              (inclusivity[1] === ')' ? this.isBefore(to, units) : !this.isAfter(to, units));
       }
 
       function isSame (input, units) {
@@ -30905,7 +30901,7 @@
           if (!(this.isValid() && localInput.isValid())) {
               return false;
           }
-          units = normalizeUnits(units) || 'millisecond';
+          units = normalizeUnits(units || 'millisecond');
           if (units === 'millisecond') {
               return this.valueOf() === localInput.valueOf();
           } else {
@@ -30915,11 +30911,11 @@
       }
 
       function isSameOrAfter (input, units) {
-          return this.isSame(input, units) || this.isAfter(input, units);
+          return this.isSame(input, units) || this.isAfter(input,units);
       }
 
       function isSameOrBefore (input, units) {
-          return this.isSame(input, units) || this.isBefore(input, units);
+          return this.isSame(input, units) || this.isBefore(input,units);
       }
 
       function diff (input, units, asFloat) {
@@ -32138,7 +32134,7 @@
       // Side effect imports
 
 
-      hooks.version = '2.23.0';
+      hooks.version = '2.22.2';
 
       setHookCallback(createLocal);
 
@@ -32179,7 +32175,7 @@
           TIME: 'HH:mm',                                  // <input type="time" />
           TIME_SECONDS: 'HH:mm:ss',                       // <input type="time" step="1" />
           TIME_MS: 'HH:mm:ss.SSS',                        // <input type="time" step="0.001" />
-          WEEK: 'GGGG-[W]WW',                             // <input type="week" />
+          WEEK: 'YYYY-[W]WW',                             // <input type="week" />
           MONTH: 'YYYY-MM'                                // <input type="month" />
       };
 
