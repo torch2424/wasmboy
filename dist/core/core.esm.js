@@ -1255,7 +1255,7 @@ var Channel3 = /** @class */ (function () {
         // Get the current sample
         var sample = 0;
         // Will Find the position, and knock off any remainder
-        var positionIndexToAdd = Channel3.waveTablePosition / 2;
+        var positionIndexToAdd = i32Portable(Channel3.waveTablePosition / 2);
         var memoryLocationWaveSample = Channel3.memoryLocationWaveTable + positionIndexToAdd;
         sample = eightBitLoadFromGBMemory(memoryLocationWaveSample);
         // Need to grab the top or lower half for the correct sample
@@ -1690,7 +1690,8 @@ function accumulateSound(numberOfCycles) {
         // Don't allow our audioQueueIndex to overflow into other parts of the wasmBoy memory map
         // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit#gid=0
         // Not 0xFFFF because we need half of 64kb since we store left and right channel
-        if (Sound.audioQueueIndex >= Sound.wasmBoyMemoryMaxBufferSize / 2 - 1) {
+        var maxIndex = i32Portable(Sound.wasmBoyMemoryMaxBufferSize / 2) - 1;
+        if (Sound.audioQueueIndex >= maxIndex) {
             Sound.audioQueueIndex -= 1;
         }
     }
@@ -1891,10 +1892,10 @@ function calculateSound(numberOfCycles) {
     // All samples will be returned as 0 to 30
     // 0 being -1.0, and 30 being 1.0
     // (see blurb at top)
-    var channel1Sample = Channel1.getSample(numberOfCycles);
-    var channel2Sample = Channel2.getSample(numberOfCycles);
-    var channel3Sample = Channel3.getSample(numberOfCycles);
-    var channel4Sample = Channel4.getSample(numberOfCycles);
+    var channel1Sample = i32Portable(Channel1.getSample(numberOfCycles));
+    var channel2Sample = i32Portable(Channel2.getSample(numberOfCycles));
+    var channel3Sample = i32Portable(Channel3.getSample(numberOfCycles));
+    var channel4Sample = i32Portable(Channel4.getSample(numberOfCycles));
     // TODO: Allow individual channels to be muted
     // let channel1Sample: i32 = 15;
     // let channel2Sample: i32 = 15;
@@ -1922,7 +1923,8 @@ function calculateSound(numberOfCycles) {
         // Don't allow our audioQueueIndex to overflow into other parts of the wasmBoy memory map
         // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit#gid=0
         // Not 0xFFFF because we need half of 64kb since we store left and right channel
-        if (Sound.audioQueueIndex >= Sound.wasmBoyMemoryMaxBufferSize / 2 - 1) {
+        var maxIndex = i32Portable(Sound.wasmBoyMemoryMaxBufferSize / 2) - 1;
+        if (Sound.audioQueueIndex >= maxIndex) {
             Sound.audioQueueIndex -= 1;
         }
     }
@@ -2088,9 +2090,9 @@ function getSampleAsUnsignedByte(sample, mixerVolume) {
     var convertedSample = sample - 60;
     convertedSample = convertedSample * precision;
     // Multiply by the mixer volume fraction (to find the actual volume)
-    convertedSample = (convertedSample * mixerVolume) / 8;
+    convertedSample = i32Portable((convertedSample * mixerVolume) / 8);
     // Convert back to scale of 0 to 120
-    convertedSample = convertedSample / precision;
+    convertedSample = i32Portable(convertedSample / precision);
     convertedSample = convertedSample + 60;
     // Finally, convert to an unsigned byte scale
     // With Four Channels (0 to 30) and no global volume. Max is 120
@@ -2099,8 +2101,8 @@ function getSampleAsUnsignedByte(sample, mixerVolume) {
     // For example, 120 / 254 = 0.47244094488188976
     // Multiply by 1000 to increase the float into an int
     // so, 120 * 1000 / (0.47244094488188976 * 1000) should give approximate answer for max mixer volume
-    var maxDivider = (120 * precision) / 254;
-    convertedSample = (convertedSample * precision) / maxDivider;
+    var maxDivider = i32Portable((120 * precision) / 254);
+    convertedSample = i32Portable((convertedSample * precision) / maxDivider);
     // Ensure we have an i32 and not a float for JS builds
     convertedSample = i32Portable(convertedSample);
     return convertedSample;
