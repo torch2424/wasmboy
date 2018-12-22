@@ -1,3 +1,5 @@
+const preactCliSwPrecachePlugin = require('preact-cli-sw-precache');
+
 /**
  * Function that mutates original webpack config.
  * Supports asynchronous changes when promise is returned.
@@ -69,4 +71,15 @@ export default function(config, env, helpers) {
     }
   });
   config.resolve.extensions.push('.png');
+
+  // Fix our manifest.json
+  let { plugin } = helpers.getPluginsByName(config, 'HtmlWebpackPlugin')[0] || {};
+  if (plugin) {
+    plugin.options.title = 'WasmBoy';
+    plugin.options.manifest = require('./demo/manifest.json');
+  }
+
+  return preactCliSwPrecachePlugin(config, {
+    navigateFallback: ''
+  });
 }

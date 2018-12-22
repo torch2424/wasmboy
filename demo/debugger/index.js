@@ -205,13 +205,13 @@ export default class App extends Component {
           ''
         )}
         <div style="text-align: center">
-          <a href="https://github.com/torch2424/wasmBoy" target="_blank">
+          <a href="https://github.com/torch2424/wasmBoy" target="_blank" rel="noopener">
             Fork me on Github
           </a>
         </div>
         <div style="text-align: center">
           Try{' '}
-          <a href="https://vaporboy.net/" target="_blank">
+          <a href="https://vaporboy.net/" target="_blank" rel="noopener">
             VaporBoy
           </a>{' '}
           for a full featured, GB / GBC Emulator Progressive Web App.

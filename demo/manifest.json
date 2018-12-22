@@ -1,6 +1,6 @@
 {
-  "name": "wasmBoy",
-  "short_name": "wasmBoy",
+  "name": "WasmBoy",
+  "short_name": "WasmBoy",
   "start_url": "/",
   "display": "fullscreen",
   "orientation": "landscape",
