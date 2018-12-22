@@ -3,6 +3,7 @@ import libBundles from './rollup.lib';
 import workerBundles from './rollup.worker';
 import coreTsBundles from './rollup.core';
 import getCoreBundles from './rollup.getcore';
+import debuggerBundles from './rollup.debugger';
 import benchmarkBundles from './rollup.benchmark';
 import ampBundles from './rollup.amp';
 
@@ -15,6 +16,10 @@ if (!process.env.SKIP_LIB) {
   if (process.env.TS) {
     exports = [...coreTsBundles, ...exports];
   }
+}
+
+if (process.env.DEBUGGER) {
+  exports = [...exports, ...debuggerBundles];
 }
 
 if (process.env.BENCHMARK) {
