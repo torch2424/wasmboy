@@ -1300,39 +1300,39 @@
   )
  )
  (func $core/sound/channel3/Channel3.initialize (; 12 ;) (; has Stack IR ;) (type $v)
-  ;;@ core/sound/channel3.ts:112:4
-  (call $core/memory/store/eightBitStoreIntoGBMemory
-   (i32.const 65306)
-   ;;@ core/sound/channel3.ts:112:59
-   (i32.const 127)
-  )
   ;;@ core/sound/channel3.ts:113:4
   (call $core/memory/store/eightBitStoreIntoGBMemory
-   (i32.const 65307)
+   (i32.const 65306)
    ;;@ core/sound/channel3.ts:113:59
-   (i32.const 255)
+   (i32.const 127)
   )
   ;;@ core/sound/channel3.ts:114:4
   (call $core/memory/store/eightBitStoreIntoGBMemory
-   (i32.const 65308)
+   (i32.const 65307)
    ;;@ core/sound/channel3.ts:114:59
-   (i32.const 159)
+   (i32.const 255)
   )
   ;;@ core/sound/channel3.ts:115:4
   (call $core/memory/store/eightBitStoreIntoGBMemory
-   (i32.const 65309)
+   (i32.const 65308)
    ;;@ core/sound/channel3.ts:115:59
-   (i32.const 0)
+   (i32.const 159)
   )
   ;;@ core/sound/channel3.ts:116:4
   (call $core/memory/store/eightBitStoreIntoGBMemory
-   (i32.const 65310)
+   (i32.const 65309)
    ;;@ core/sound/channel3.ts:116:59
+   (i32.const 0)
+  )
+  ;;@ core/sound/channel3.ts:117:4
+  (call $core/memory/store/eightBitStoreIntoGBMemory
+   (i32.const 65310)
+   ;;@ core/sound/channel3.ts:117:59
    (i32.const 184)
   )
-  ;;@ core/sound/channel3.ts:119:4
+  ;;@ core/sound/channel3.ts:120:4
   (set_global $core/sound/channel3/Channel3.volumeCodeChanged
-   ;;@ core/sound/channel3.ts:119:33
+   ;;@ core/sound/channel3.ts:120:33
    (i32.const 1)
   )
  )
@@ -1369,69 +1369,69 @@
   )
  )
  (func $core/sound/accumulator/initializeSoundAccumulator (; 14 ;) (; has Stack IR ;) (type $v)
-  ;;@ core/sound/accumulator.ts:28:2
-  (set_global $core/sound/accumulator/SoundAccumulator.channel1Sample
-   ;;@ core/sound/accumulator.ts:28:36
-   (i32.const 15)
-  )
   ;;@ core/sound/accumulator.ts:29:2
-  (set_global $core/sound/accumulator/SoundAccumulator.channel2Sample
+  (set_global $core/sound/accumulator/SoundAccumulator.channel1Sample
    ;;@ core/sound/accumulator.ts:29:36
    (i32.const 15)
   )
   ;;@ core/sound/accumulator.ts:30:2
-  (set_global $core/sound/accumulator/SoundAccumulator.channel3Sample
+  (set_global $core/sound/accumulator/SoundAccumulator.channel2Sample
    ;;@ core/sound/accumulator.ts:30:36
    (i32.const 15)
   )
   ;;@ core/sound/accumulator.ts:31:2
-  (set_global $core/sound/accumulator/SoundAccumulator.channel4Sample
+  (set_global $core/sound/accumulator/SoundAccumulator.channel3Sample
    ;;@ core/sound/accumulator.ts:31:36
    (i32.const 15)
   )
   ;;@ core/sound/accumulator.ts:32:2
-  (set_global $core/sound/accumulator/SoundAccumulator.channel1DacEnabled
-   ;;@ core/sound/accumulator.ts:32:40
-   (i32.const 0)
+  (set_global $core/sound/accumulator/SoundAccumulator.channel4Sample
+   ;;@ core/sound/accumulator.ts:32:36
+   (i32.const 15)
   )
   ;;@ core/sound/accumulator.ts:33:2
-  (set_global $core/sound/accumulator/SoundAccumulator.channel2DacEnabled
+  (set_global $core/sound/accumulator/SoundAccumulator.channel1DacEnabled
    ;;@ core/sound/accumulator.ts:33:40
    (i32.const 0)
   )
   ;;@ core/sound/accumulator.ts:34:2
-  (set_global $core/sound/accumulator/SoundAccumulator.channel3DacEnabled
+  (set_global $core/sound/accumulator/SoundAccumulator.channel2DacEnabled
    ;;@ core/sound/accumulator.ts:34:40
    (i32.const 0)
   )
   ;;@ core/sound/accumulator.ts:35:2
-  (set_global $core/sound/accumulator/SoundAccumulator.channel4DacEnabled
+  (set_global $core/sound/accumulator/SoundAccumulator.channel3DacEnabled
    ;;@ core/sound/accumulator.ts:35:40
    (i32.const 0)
   )
   ;;@ core/sound/accumulator.ts:36:2
-  (set_global $core/sound/accumulator/SoundAccumulator.leftChannelSampleUnsignedByte
-   ;;@ core/sound/accumulator.ts:36:51
-   (i32.const 127)
+  (set_global $core/sound/accumulator/SoundAccumulator.channel4DacEnabled
+   ;;@ core/sound/accumulator.ts:36:40
+   (i32.const 0)
   )
   ;;@ core/sound/accumulator.ts:37:2
-  (set_global $core/sound/accumulator/SoundAccumulator.rightChannelSampleUnsignedByte
-   ;;@ core/sound/accumulator.ts:37:52
+  (set_global $core/sound/accumulator/SoundAccumulator.leftChannelSampleUnsignedByte
+   ;;@ core/sound/accumulator.ts:37:51
    (i32.const 127)
   )
   ;;@ core/sound/accumulator.ts:38:2
-  (set_global $core/sound/accumulator/SoundAccumulator.mixerVolumeChanged
-   ;;@ core/sound/accumulator.ts:38:40
-   (i32.const 1)
+  (set_global $core/sound/accumulator/SoundAccumulator.rightChannelSampleUnsignedByte
+   ;;@ core/sound/accumulator.ts:38:52
+   (i32.const 127)
   )
   ;;@ core/sound/accumulator.ts:39:2
-  (set_global $core/sound/accumulator/SoundAccumulator.mixerEnabledChanged
-   ;;@ core/sound/accumulator.ts:39:41
+  (set_global $core/sound/accumulator/SoundAccumulator.mixerVolumeChanged
+   ;;@ core/sound/accumulator.ts:39:40
    (i32.const 1)
   )
   ;;@ core/sound/accumulator.ts:40:2
+  (set_global $core/sound/accumulator/SoundAccumulator.mixerEnabledChanged
+   ;;@ core/sound/accumulator.ts:40:41
+   (i32.const 1)
+  )
+  ;;@ core/sound/accumulator.ts:41:2
   (set_global $core/sound/accumulator/SoundAccumulator.needToRemixSamples
-   ;;@ core/sound/accumulator.ts:40:40
+   ;;@ core/sound/accumulator.ts:41:40
    (i32.const 0)
   )
  )
@@ -2805,48 +2805,48 @@
   )
  )
  (func $core/sound/channel3/Channel3.saveState (; 38 ;) (; has Stack IR ;) (type $v)
-  ;;@ core/sound/channel3.ts:97:4
+  ;;@ core/sound/channel3.ts:98:4
   (call $core/memory/store/storeBooleanDirectlyToWasmMemory
-   ;;@ core/sound/channel3.ts:97:37
+   ;;@ core/sound/channel3.ts:98:37
    (call $core/core/getSaveStateMemoryOffset
-    ;;@ core/sound/channel3.ts:97:62
+    ;;@ core/sound/channel3.ts:98:62
     (i32.const 0)
     (i32.const 9)
    )
-   ;;@ core/sound/channel3.ts:97:93
+   ;;@ core/sound/channel3.ts:98:93
    (get_global $core/sound/channel3/Channel3.isEnabled)
-  )
-  ;;@ core/sound/channel3.ts:98:4
-  (i32.store
-   ;;@ core/sound/channel3.ts:98:15
-   (call $core/core/getSaveStateMemoryOffset
-    ;;@ core/sound/channel3.ts:98:40
-    (i32.const 1)
-    (i32.const 9)
-   )
-   ;;@ core/sound/channel3.ts:98:71
-   (get_global $core/sound/channel3/Channel3.frequencyTimer)
   )
   ;;@ core/sound/channel3.ts:99:4
   (i32.store
    ;;@ core/sound/channel3.ts:99:15
    (call $core/core/getSaveStateMemoryOffset
     ;;@ core/sound/channel3.ts:99:40
-    (i32.const 5)
+    (i32.const 1)
     (i32.const 9)
    )
    ;;@ core/sound/channel3.ts:99:71
-   (get_global $core/sound/channel3/Channel3.lengthCounter)
+   (get_global $core/sound/channel3/Channel3.frequencyTimer)
   )
   ;;@ core/sound/channel3.ts:100:4
-  (i32.store16
+  (i32.store
    ;;@ core/sound/channel3.ts:100:15
    (call $core/core/getSaveStateMemoryOffset
     ;;@ core/sound/channel3.ts:100:40
-    (i32.const 9)
+    (i32.const 5)
     (i32.const 9)
    )
    ;;@ core/sound/channel3.ts:100:71
+   (get_global $core/sound/channel3/Channel3.lengthCounter)
+  )
+  ;;@ core/sound/channel3.ts:101:4
+  (i32.store16
+   ;;@ core/sound/channel3.ts:101:15
+   (call $core/core/getSaveStateMemoryOffset
+    ;;@ core/sound/channel3.ts:101:40
+    (i32.const 9)
+    (i32.const 9)
+   )
+   ;;@ core/sound/channel3.ts:101:71
    (get_global $core/sound/channel3/Channel3.waveTablePosition)
   )
  )
@@ -3778,49 +3778,49 @@
   )
  )
  (func $core/sound/channel3/Channel3.loadState (; 54 ;) (; has Stack IR ;) (type $v)
-  ;;@ core/sound/channel3.ts:105:4
+  ;;@ core/sound/channel3.ts:106:4
   (set_global $core/sound/channel3/Channel3.isEnabled
-   ;;@ core/sound/channel3.ts:105:25
+   ;;@ core/sound/channel3.ts:106:25
    (call $core/memory/load/loadBooleanDirectlyFromWasmMemory
-    ;;@ core/sound/channel3.ts:105:59
+    ;;@ core/sound/channel3.ts:106:59
     (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/sound/channel3.ts:105:84
+     ;;@ core/sound/channel3.ts:106:84
      (i32.const 0)
      (i32.const 9)
     )
    )
   )
-  ;;@ core/sound/channel3.ts:106:4
+  ;;@ core/sound/channel3.ts:107:4
   (set_global $core/sound/channel3/Channel3.frequencyTimer
-   ;;@ core/sound/channel3.ts:106:30
+   ;;@ core/sound/channel3.ts:107:30
    (i32.load
-    ;;@ core/sound/channel3.ts:106:40
+    ;;@ core/sound/channel3.ts:107:40
     (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/sound/channel3.ts:106:65
+     ;;@ core/sound/channel3.ts:107:65
      (i32.const 1)
      (i32.const 9)
     )
    )
   )
-  ;;@ core/sound/channel3.ts:107:4
+  ;;@ core/sound/channel3.ts:108:4
   (set_global $core/sound/channel3/Channel3.lengthCounter
-   ;;@ core/sound/channel3.ts:107:29
+   ;;@ core/sound/channel3.ts:108:29
    (i32.load
-    ;;@ core/sound/channel3.ts:107:39
+    ;;@ core/sound/channel3.ts:108:39
     (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/sound/channel3.ts:107:64
+     ;;@ core/sound/channel3.ts:108:64
      (i32.const 5)
      (i32.const 9)
     )
    )
   )
-  ;;@ core/sound/channel3.ts:108:4
+  ;;@ core/sound/channel3.ts:109:4
   (set_global $core/sound/channel3/Channel3.waveTablePosition
-   ;;@ core/sound/channel3.ts:108:33
+   ;;@ core/sound/channel3.ts:109:33
    (i32.load16_u
-    ;;@ core/sound/channel3.ts:108:43
+    ;;@ core/sound/channel3.ts:109:43
     (call $core/core/getSaveStateMemoryOffset
-     ;;@ core/sound/channel3.ts:108:68
+     ;;@ core/sound/channel3.ts:109:68
      (i32.const 9)
      (i32.const 9)
     )
@@ -6936,42 +6936,42 @@
  )
  (func $core/sound/channel3/Channel3.updateLength (; 99 ;) (; has Stack IR ;) (type $v)
   (local $0 i32)
-  ;;@ core/sound/channel3.ts:268:8
+  ;;@ core/sound/channel3.ts:269:8
   (if
    (tee_local $0
     (i32.gt_s
      (get_global $core/sound/channel3/Channel3.lengthCounter)
-     ;;@ core/sound/channel3.ts:268:33
+     ;;@ core/sound/channel3.ts:269:33
      (i32.const 0)
     )
    )
    (set_local $0
-    ;;@ core/sound/channel3.ts:268:38
+    ;;@ core/sound/channel3.ts:269:38
     (get_global $core/sound/channel3/Channel3.NRx4LengthEnabled)
    )
   )
-  ;;@ core/sound/channel3.ts:268:4
+  ;;@ core/sound/channel3.ts:269:4
   (if
    (get_local $0)
-   ;;@ core/sound/channel3.ts:268:66
+   ;;@ core/sound/channel3.ts:269:66
    (set_global $core/sound/channel3/Channel3.lengthCounter
     (i32.sub
-     ;;@ core/sound/channel3.ts:269:6
+     ;;@ core/sound/channel3.ts:270:6
      (get_global $core/sound/channel3/Channel3.lengthCounter)
-     ;;@ core/sound/channel3.ts:269:32
+     ;;@ core/sound/channel3.ts:270:32
      (i32.const 1)
     )
    )
   )
-  ;;@ core/sound/channel3.ts:272:4
+  ;;@ core/sound/channel3.ts:273:4
   (if
    (i32.eqz
-    ;;@ core/sound/channel3.ts:272:8
+    ;;@ core/sound/channel3.ts:273:8
     (get_global $core/sound/channel3/Channel3.lengthCounter)
    )
-   ;;@ core/sound/channel3.ts:272:38
+   ;;@ core/sound/channel3.ts:273:38
    (set_global $core/sound/channel3/Channel3.isEnabled
-    ;;@ core/sound/channel3.ts:273:27
+    ;;@ core/sound/channel3.ts:274:27
     (i32.const 0)
    )
   )
@@ -7491,32 +7491,32 @@
  )
  (func $core/sound/sound/updateFrameSequencer (; 108 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
-  ;;@ core/sound/sound.ts:261:2
+  ;;@ core/sound/sound.ts:262:2
   (set_global $core/sound/sound/Sound.frameSequenceCycleCounter
    (i32.add
     (get_global $core/sound/sound/Sound.frameSequenceCycleCounter)
     (get_local $0)
    )
   )
-  ;;@ core/sound/sound.ts:262:2
+  ;;@ core/sound/sound.ts:263:2
   (if
-   ;;@ core/sound/sound.ts:262:6
+   ;;@ core/sound/sound.ts:263:6
    (i32.ge_s
     (get_global $core/sound/sound/Sound.frameSequenceCycleCounter)
-    ;;@ core/sound/sound.ts:262:47
+    ;;@ core/sound/sound.ts:263:47
     (call $core/sound/sound/Sound.maxFrameSequenceCycles)
    )
-   ;;@ core/sound/sound.ts:262:73
+   ;;@ core/sound/sound.ts:263:73
    (block
-    ;;@ core/sound/sound.ts:265:4
+    ;;@ core/sound/sound.ts:266:4
     (set_global $core/sound/sound/Sound.frameSequenceCycleCounter
      (i32.sub
       (get_global $core/sound/sound/Sound.frameSequenceCycleCounter)
-      ;;@ core/sound/sound.ts:265:45
+      ;;@ core/sound/sound.ts:266:45
       (call $core/sound/sound/Sound.maxFrameSequenceCycles)
      )
     )
-    ;;@ core/sound/sound.ts:269:4
+    ;;@ core/sound/sound.ts:270:4
     (block $break|0
      (block $case4|0
       (block $case3|0
@@ -7524,7 +7524,7 @@
         (block $case1|0
          (if
           (tee_local $1
-           ;;@ core/sound/sound.ts:269:12
+           ;;@ core/sound/sound.ts:270:12
            (get_global $core/sound/sound/Sound.frameSequencer)
           )
           (block
@@ -7539,84 +7539,84 @@
            (br $break|0)
           )
          )
-         ;;@ core/sound/sound.ts:272:17
-         (call $core/sound/channel1/Channel1.updateLength)
          ;;@ core/sound/sound.ts:273:17
-         (call $core/sound/channel2/Channel2.updateLength)
+         (call $core/sound/channel1/Channel1.updateLength)
          ;;@ core/sound/sound.ts:274:17
-         (call $core/sound/channel3/Channel3.updateLength)
+         (call $core/sound/channel2/Channel2.updateLength)
          ;;@ core/sound/sound.ts:275:17
+         (call $core/sound/channel3/Channel3.updateLength)
+         ;;@ core/sound/sound.ts:276:17
          (call $core/sound/channel4/Channel4.updateLength)
-         ;;@ core/sound/sound.ts:276:8
+         ;;@ core/sound/sound.ts:277:8
          (br $break|0)
         )
-        ;;@ core/sound/sound.ts:280:17
-        (call $core/sound/channel1/Channel1.updateLength)
         ;;@ core/sound/sound.ts:281:17
-        (call $core/sound/channel2/Channel2.updateLength)
+        (call $core/sound/channel1/Channel1.updateLength)
         ;;@ core/sound/sound.ts:282:17
-        (call $core/sound/channel3/Channel3.updateLength)
+        (call $core/sound/channel2/Channel2.updateLength)
         ;;@ core/sound/sound.ts:283:17
+        (call $core/sound/channel3/Channel3.updateLength)
+        ;;@ core/sound/sound.ts:284:17
         (call $core/sound/channel4/Channel4.updateLength)
-        ;;@ core/sound/sound.ts:285:17
+        ;;@ core/sound/sound.ts:286:17
         (call $core/sound/channel1/Channel1.updateSweep)
-        ;;@ core/sound/sound.ts:286:8
+        ;;@ core/sound/sound.ts:287:8
         (br $break|0)
        )
-       ;;@ core/sound/sound.ts:290:17
-       (call $core/sound/channel1/Channel1.updateLength)
        ;;@ core/sound/sound.ts:291:17
-       (call $core/sound/channel2/Channel2.updateLength)
+       (call $core/sound/channel1/Channel1.updateLength)
        ;;@ core/sound/sound.ts:292:17
-       (call $core/sound/channel3/Channel3.updateLength)
+       (call $core/sound/channel2/Channel2.updateLength)
        ;;@ core/sound/sound.ts:293:17
+       (call $core/sound/channel3/Channel3.updateLength)
+       ;;@ core/sound/sound.ts:294:17
        (call $core/sound/channel4/Channel4.updateLength)
-       ;;@ core/sound/sound.ts:294:8
+       ;;@ core/sound/sound.ts:295:8
        (br $break|0)
       )
-      ;;@ core/sound/sound.ts:298:17
-      (call $core/sound/channel1/Channel1.updateLength)
       ;;@ core/sound/sound.ts:299:17
-      (call $core/sound/channel2/Channel2.updateLength)
+      (call $core/sound/channel1/Channel1.updateLength)
       ;;@ core/sound/sound.ts:300:17
-      (call $core/sound/channel3/Channel3.updateLength)
+      (call $core/sound/channel2/Channel2.updateLength)
       ;;@ core/sound/sound.ts:301:17
+      (call $core/sound/channel3/Channel3.updateLength)
+      ;;@ core/sound/sound.ts:302:17
       (call $core/sound/channel4/Channel4.updateLength)
-      ;;@ core/sound/sound.ts:303:17
+      ;;@ core/sound/sound.ts:304:17
       (call $core/sound/channel1/Channel1.updateSweep)
-      ;;@ core/sound/sound.ts:304:8
+      ;;@ core/sound/sound.ts:305:8
       (br $break|0)
      )
-     ;;@ core/sound/sound.ts:307:17
-     (call $core/sound/channel1/Channel1.updateEnvelope)
      ;;@ core/sound/sound.ts:308:17
-     (call $core/sound/channel2/Channel2.updateEnvelope)
+     (call $core/sound/channel1/Channel1.updateEnvelope)
      ;;@ core/sound/sound.ts:309:17
+     (call $core/sound/channel2/Channel2.updateEnvelope)
+     ;;@ core/sound/sound.ts:310:17
      (call $core/sound/channel4/Channel4.updateEnvelope)
     )
-    ;;@ core/sound/sound.ts:314:4
+    ;;@ core/sound/sound.ts:315:4
     (set_global $core/sound/sound/Sound.frameSequencer
      (i32.add
       (get_global $core/sound/sound/Sound.frameSequencer)
-      ;;@ core/sound/sound.ts:314:28
+      ;;@ core/sound/sound.ts:315:28
       (i32.const 1)
      )
     )
-    ;;@ core/sound/sound.ts:315:4
+    ;;@ core/sound/sound.ts:316:4
     (if
-     ;;@ core/sound/sound.ts:315:8
+     ;;@ core/sound/sound.ts:316:8
      (i32.ge_s
       (get_global $core/sound/sound/Sound.frameSequencer)
-      ;;@ core/sound/sound.ts:315:32
+      ;;@ core/sound/sound.ts:316:32
       (i32.const 8)
      )
-     ;;@ core/sound/sound.ts:315:35
+     ;;@ core/sound/sound.ts:316:35
      (set_global $core/sound/sound/Sound.frameSequencer
-      ;;@ core/sound/sound.ts:316:29
+      ;;@ core/sound/sound.ts:317:29
       (i32.const 0)
      )
     )
-    ;;@ core/sound/sound.ts:319:11
+    ;;@ core/sound/sound.ts:320:11
     (return
      (i32.const 1)
     )
@@ -7652,7 +7652,7 @@
  )
  (func $core/sound/accumulator/didChannelDacChange (; 110 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
-  ;;@ core/sound/accumulator.ts:105:2
+  ;;@ core/sound/accumulator.ts:107:2
   (block $break|0
    (block $case3|0
     (block $case2|0
@@ -7686,106 +7686,106 @@
         (br $break|0)
        )
       )
-      ;;@ core/sound/accumulator.ts:107:6
+      ;;@ core/sound/accumulator.ts:109:6
       (if
-       ;;@ core/sound/accumulator.ts:107:10
+       ;;@ core/sound/accumulator.ts:109:10
        (i32.ne
         (get_global $core/sound/accumulator/SoundAccumulator.channel1DacEnabled)
-        ;;@ core/sound/accumulator.ts:107:50
+        ;;@ core/sound/accumulator.ts:109:50
         (get_global $core/sound/channel1/Channel1.isDacEnabled)
        )
-       ;;@ core/sound/accumulator.ts:107:73
+       ;;@ core/sound/accumulator.ts:109:73
        (block
-        ;;@ core/sound/accumulator.ts:108:8
+        ;;@ core/sound/accumulator.ts:110:8
         (set_global $core/sound/accumulator/SoundAccumulator.channel1DacEnabled
-         ;;@ core/sound/accumulator.ts:108:46
+         ;;@ core/sound/accumulator.ts:110:46
          (get_global $core/sound/channel1/Channel1.isDacEnabled)
         )
-        ;;@ core/sound/accumulator.ts:109:15
+        ;;@ core/sound/accumulator.ts:111:15
         (return
          (i32.const 1)
         )
        )
       )
-      ;;@ core/sound/accumulator.ts:111:13
+      ;;@ core/sound/accumulator.ts:113:13
       (return
        (i32.const 0)
       )
      )
-     ;;@ core/sound/accumulator.ts:113:6
+     ;;@ core/sound/accumulator.ts:115:6
      (if
-      ;;@ core/sound/accumulator.ts:113:10
+      ;;@ core/sound/accumulator.ts:115:10
       (i32.ne
        (get_global $core/sound/accumulator/SoundAccumulator.channel2DacEnabled)
-       ;;@ core/sound/accumulator.ts:113:50
+       ;;@ core/sound/accumulator.ts:115:50
        (get_global $core/sound/channel2/Channel2.isDacEnabled)
       )
-      ;;@ core/sound/accumulator.ts:113:73
+      ;;@ core/sound/accumulator.ts:115:73
       (block
-       ;;@ core/sound/accumulator.ts:114:8
+       ;;@ core/sound/accumulator.ts:116:8
        (set_global $core/sound/accumulator/SoundAccumulator.channel2DacEnabled
-        ;;@ core/sound/accumulator.ts:114:46
+        ;;@ core/sound/accumulator.ts:116:46
         (get_global $core/sound/channel2/Channel2.isDacEnabled)
        )
-       ;;@ core/sound/accumulator.ts:115:15
+       ;;@ core/sound/accumulator.ts:117:15
        (return
         (i32.const 1)
        )
       )
      )
-     ;;@ core/sound/accumulator.ts:117:13
+     ;;@ core/sound/accumulator.ts:119:13
      (return
       (i32.const 0)
      )
     )
-    ;;@ core/sound/accumulator.ts:119:6
+    ;;@ core/sound/accumulator.ts:121:6
     (if
-     ;;@ core/sound/accumulator.ts:119:10
+     ;;@ core/sound/accumulator.ts:121:10
      (i32.ne
       (get_global $core/sound/accumulator/SoundAccumulator.channel3DacEnabled)
-      ;;@ core/sound/accumulator.ts:119:50
+      ;;@ core/sound/accumulator.ts:121:50
       (get_global $core/sound/channel3/Channel3.isDacEnabled)
      )
-     ;;@ core/sound/accumulator.ts:119:73
+     ;;@ core/sound/accumulator.ts:121:73
      (block
-      ;;@ core/sound/accumulator.ts:120:8
+      ;;@ core/sound/accumulator.ts:122:8
       (set_global $core/sound/accumulator/SoundAccumulator.channel3DacEnabled
-       ;;@ core/sound/accumulator.ts:120:46
+       ;;@ core/sound/accumulator.ts:122:46
        (get_global $core/sound/channel3/Channel3.isDacEnabled)
       )
-      ;;@ core/sound/accumulator.ts:121:15
+      ;;@ core/sound/accumulator.ts:123:15
       (return
        (i32.const 1)
       )
      )
     )
-    ;;@ core/sound/accumulator.ts:123:13
+    ;;@ core/sound/accumulator.ts:125:13
     (return
      (i32.const 0)
     )
    )
-   ;;@ core/sound/accumulator.ts:125:6
+   ;;@ core/sound/accumulator.ts:127:6
    (if
-    ;;@ core/sound/accumulator.ts:125:10
+    ;;@ core/sound/accumulator.ts:127:10
     (i32.ne
      (get_global $core/sound/accumulator/SoundAccumulator.channel4DacEnabled)
-     ;;@ core/sound/accumulator.ts:125:50
+     ;;@ core/sound/accumulator.ts:127:50
      (get_global $core/sound/channel4/Channel4.isDacEnabled)
     )
-    ;;@ core/sound/accumulator.ts:125:73
+    ;;@ core/sound/accumulator.ts:127:73
     (block
-     ;;@ core/sound/accumulator.ts:126:8
+     ;;@ core/sound/accumulator.ts:128:8
      (set_global $core/sound/accumulator/SoundAccumulator.channel4DacEnabled
-      ;;@ core/sound/accumulator.ts:126:46
+      ;;@ core/sound/accumulator.ts:128:46
       (get_global $core/sound/channel4/Channel4.isDacEnabled)
      )
-     ;;@ core/sound/accumulator.ts:127:15
+     ;;@ core/sound/accumulator.ts:129:15
      (return
       (i32.const 1)
      )
     )
    )
-   ;;@ core/sound/accumulator.ts:129:13
+   ;;@ core/sound/accumulator.ts:131:13
    (return
     (i32.const 0)
    )
@@ -7819,35 +7819,35 @@
   (i32.const 1)
  )
  (func $core/sound/channel3/Channel3.willChannelUpdate (; 112 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
-  ;;@ core/sound/channel3.ts:257:4
+  ;;@ core/sound/channel3.ts:258:4
   (set_global $core/sound/channel3/Channel3.cycleCounter
    (i32.add
     (get_global $core/sound/channel3/Channel3.cycleCounter)
     (get_local $0)
    )
   )
-  ;;@ core/sound/channel3.ts:260:8
+  ;;@ core/sound/channel3.ts:261:8
   (if
    (tee_local $0
     (i32.gt_s
      (i32.sub
       (get_global $core/sound/channel3/Channel3.frequencyTimer)
-      ;;@ core/sound/channel3.ts:260:34
+      ;;@ core/sound/channel3.ts:261:34
       (get_global $core/sound/channel3/Channel3.cycleCounter)
      )
-     ;;@ core/sound/channel3.ts:260:58
+     ;;@ core/sound/channel3.ts:261:58
      (i32.const 0)
     )
    )
    (set_local $0
-    ;;@ core/sound/channel3.ts:260:63
+    ;;@ core/sound/channel3.ts:261:63
     (i32.eqz
-     ;;@ core/sound/channel3.ts:260:64
+     ;;@ core/sound/channel3.ts:261:64
      (get_global $core/sound/channel3/Channel3.volumeCodeChanged)
     )
    )
   )
-  ;;@ core/sound/channel3.ts:260:4
+  ;;@ core/sound/channel3.ts:261:4
   (if
    (get_local $0)
    (return
@@ -8283,66 +8283,69 @@
   )
  )
  (func $core/sound/channel3/Channel3.resetTimer (; 121 ;) (; has Stack IR ;) (type $v)
-  ;;@ core/sound/channel3.ts:131:4
+  ;;@ core/sound/channel3.ts:132:4
   (set_global $core/sound/channel3/Channel3.frequencyTimer
-   ;;@ core/sound/channel3.ts:131:30
+   ;;@ core/sound/channel3.ts:132:30
    (i32.shl
     (i32.sub
-     ;;@ core/sound/channel3.ts:131:31
+     ;;@ core/sound/channel3.ts:132:31
      (i32.const 2048)
-     ;;@ core/sound/channel3.ts:131:38
+     ;;@ core/sound/channel3.ts:132:38
      (get_global $core/sound/channel3/Channel3.frequency)
     )
-    ;;@ core/sound/channel3.ts:131:60
+    ;;@ core/sound/channel3.ts:132:60
     (i32.const 1)
    )
   )
-  ;;@ core/sound/channel3.ts:134:4
+  ;;@ core/sound/channel3.ts:135:4
   (if
-   ;;@ core/sound/channel3.ts:134:8
+   ;;@ core/sound/channel3.ts:135:8
    (get_global $core/cpu/cpu/Cpu.GBCDoubleSpeed)
-   ;;@ core/sound/channel3.ts:134:28
+   ;;@ core/sound/channel3.ts:135:28
    (set_global $core/sound/channel3/Channel3.frequencyTimer
-    ;;@ core/sound/channel3.ts:135:32
+    ;;@ core/sound/channel3.ts:136:32
     (i32.shl
      (get_global $core/sound/channel3/Channel3.frequencyTimer)
-     ;;@ core/sound/channel3.ts:135:58
+     ;;@ core/sound/channel3.ts:136:58
      (i32.const 1)
     )
    )
   )
  )
- (func $core/sound/channel3/Channel3.getSample (; 122 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/portable/portable/i32Portable (; 122 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+  (get_local $0)
+ )
+ (func $core/sound/channel3/Channel3.getSample (; 123 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
-  ;;@ core/sound/channel3.ts:141:4
+  ;;@ core/sound/channel3.ts:142:4
   (set_global $core/sound/channel3/Channel3.frequencyTimer
    (i32.sub
     (get_global $core/sound/channel3/Channel3.frequencyTimer)
     (get_local $0)
    )
   )
-  ;;@ core/sound/channel3.ts:142:4
+  ;;@ core/sound/channel3.ts:143:4
   (if
-   ;;@ core/sound/channel3.ts:142:8
+   ;;@ core/sound/channel3.ts:143:8
    (i32.le_s
     (get_global $core/sound/channel3/Channel3.frequencyTimer)
-    ;;@ core/sound/channel3.ts:142:35
+    ;;@ core/sound/channel3.ts:143:35
     (i32.const 0)
    )
-   ;;@ core/sound/channel3.ts:142:38
+   ;;@ core/sound/channel3.ts:143:38
    (block
     (set_local $2
-     ;;@ core/sound/channel3.ts:144:36
+     ;;@ core/sound/channel3.ts:145:36
      (get_global $core/sound/channel3/Channel3.frequencyTimer)
     )
-    ;;@ core/sound/channel3.ts:149:15
+    ;;@ core/sound/channel3.ts:150:15
     (call $core/sound/channel3/Channel3.resetTimer)
-    ;;@ core/sound/channel3.ts:150:6
+    ;;@ core/sound/channel3.ts:151:6
     (set_global $core/sound/channel3/Channel3.frequencyTimer
      (i32.sub
       (get_global $core/sound/channel3/Channel3.frequencyTimer)
-      ;;@ core/sound/channel3.ts:144:32
+      ;;@ core/sound/channel3.ts:145:32
       (select
        (get_local $2)
        (i32.sub
@@ -8356,80 +8359,80 @@
       )
      )
     )
-    ;;@ core/sound/channel3.ts:153:6
+    ;;@ core/sound/channel3.ts:154:6
     (set_global $core/sound/channel3/Channel3.waveTablePosition
      (i32.add
       (get_global $core/sound/channel3/Channel3.waveTablePosition)
-      ;;@ core/sound/channel3.ts:153:36
+      ;;@ core/sound/channel3.ts:154:36
       (i32.const 1)
      )
     )
-    ;;@ core/sound/channel3.ts:154:6
+    ;;@ core/sound/channel3.ts:155:6
     (if
-     ;;@ core/sound/channel3.ts:154:10
+     ;;@ core/sound/channel3.ts:155:10
      (i32.ge_s
       (get_global $core/sound/channel3/Channel3.waveTablePosition)
-      ;;@ core/sound/channel3.ts:154:40
+      ;;@ core/sound/channel3.ts:155:40
       (i32.const 32)
      )
-     ;;@ core/sound/channel3.ts:154:44
+     ;;@ core/sound/channel3.ts:155:44
      (set_global $core/sound/channel3/Channel3.waveTablePosition
-      ;;@ core/sound/channel3.ts:155:37
+      ;;@ core/sound/channel3.ts:156:37
       (i32.const 0)
      )
     )
    )
   )
-  ;;@ core/sound/channel3.ts:160:4
+  ;;@ core/sound/channel3.ts:161:4
   (set_local $2
-   ;;@ core/sound/channel3.ts:160:28
+   ;;@ core/sound/channel3.ts:161:28
    (i32.const 0)
   )
-  ;;@ core/sound/channel3.ts:161:4
+  ;;@ core/sound/channel3.ts:162:4
   (set_local $0
-   ;;@ core/sound/channel3.ts:161:26
+   ;;@ core/sound/channel3.ts:162:26
    (get_global $core/sound/channel3/Channel3.volumeCode)
   )
-  ;;@ core/sound/channel3.ts:166:4
+  ;;@ core/sound/channel3.ts:167:4
   (if
    (tee_local $1
-    ;;@ core/sound/channel3.ts:166:8
+    ;;@ core/sound/channel3.ts:167:8
     (if (result i32)
      (get_global $core/sound/channel3/Channel3.isEnabled)
-     ;;@ core/sound/channel3.ts:166:30
+     ;;@ core/sound/channel3.ts:167:30
      (get_global $core/sound/channel3/Channel3.isDacEnabled)
      (get_global $core/sound/channel3/Channel3.isEnabled)
     )
    )
-   ;;@ core/sound/channel3.ts:166:53
+   ;;@ core/sound/channel3.ts:167:53
    (if
-    ;;@ core/sound/channel3.ts:168:10
+    ;;@ core/sound/channel3.ts:169:10
     (get_global $core/sound/channel3/Channel3.volumeCodeChanged)
-    ;;@ core/sound/channel3.ts:168:38
+    ;;@ core/sound/channel3.ts:169:38
     (block
-     ;;@ core/sound/channel3.ts:172:8
+     ;;@ core/sound/channel3.ts:173:8
      (set_global $core/sound/channel3/Channel3.volumeCode
-      ;;@ core/sound/channel3.ts:171:8
+      ;;@ core/sound/channel3.ts:172:8
       (tee_local $0
-       ;;@ core/sound/channel3.ts:171:21
+       ;;@ core/sound/channel3.ts:172:21
        (i32.and
-        ;;@ core/sound/channel3.ts:170:21
+        ;;@ core/sound/channel3.ts:171:21
         (i32.shr_s
-         ;;@ core/sound/channel3.ts:169:21
+         ;;@ core/sound/channel3.ts:170:21
          (call $core/memory/load/eightBitLoadFromGBMemory
           (i32.const 65308)
          )
-         ;;@ core/sound/channel3.ts:170:35
+         ;;@ core/sound/channel3.ts:171:35
          (i32.const 5)
         )
-        ;;@ core/sound/channel3.ts:171:34
+        ;;@ core/sound/channel3.ts:172:34
         (i32.const 15)
        )
       )
      )
-     ;;@ core/sound/channel3.ts:173:8
+     ;;@ core/sound/channel3.ts:174:8
      (set_global $core/sound/channel3/Channel3.volumeCodeChanged
-      ;;@ core/sound/channel3.ts:173:37
+      ;;@ core/sound/channel3.ts:174:37
       (i32.const 0)
      )
     )
@@ -8438,51 +8441,54 @@
     (i32.const 15)
    )
   )
-  ;;@ core/sound/channel3.ts:188:4
+  ;;@ core/sound/channel3.ts:189:4
   (set_local $1
-   ;;@ core/sound/channel3.ts:188:13
+   ;;@ core/sound/channel3.ts:189:13
    (call $core/memory/load/eightBitLoadFromGBMemory
-    ;;@ core/sound/channel3.ts:186:40
+    ;;@ core/sound/channel3.ts:187:40
     (i32.add
-     ;;@ core/sound/channel3.ts:185:34
-     (i32.div_s
-      (get_global $core/sound/channel3/Channel3.waveTablePosition)
-      ;;@ core/sound/channel3.ts:185:63
-      (i32.const 2)
+     ;;@ core/sound/channel3.ts:186:34
+     (call $core/portable/portable/i32Portable
+      ;;@ core/sound/channel3.ts:186:46
+      (i32.div_s
+       (get_global $core/sound/channel3/Channel3.waveTablePosition)
+       ;;@ core/sound/channel3.ts:186:75
+       (i32.const 2)
+      )
      )
      (i32.const 65328)
     )
    )
   )
   (set_local $1
-   ;;@ core/sound/channel3.ts:191:4
+   ;;@ core/sound/channel3.ts:192:4
    (if (result i32)
-    ;;@ core/sound/channel3.ts:191:8
+    ;;@ core/sound/channel3.ts:192:8
     (i32.rem_s
      (get_global $core/sound/channel3/Channel3.waveTablePosition)
-     ;;@ core/sound/channel3.ts:191:37
+     ;;@ core/sound/channel3.ts:192:37
      (i32.const 2)
     )
-    ;;@ core/sound/channel3.ts:197:15
+    ;;@ core/sound/channel3.ts:198:15
     (i32.and
      (get_local $1)
-     ;;@ core/sound/channel3.ts:197:24
+     ;;@ core/sound/channel3.ts:198:24
      (i32.const 15)
     )
-    ;;@ core/sound/channel3.ts:194:15
+    ;;@ core/sound/channel3.ts:195:15
     (i32.and
-     ;;@ core/sound/channel3.ts:193:15
+     ;;@ core/sound/channel3.ts:194:15
      (i32.shr_s
       (get_local $1)
-      ;;@ core/sound/channel3.ts:193:25
+      ;;@ core/sound/channel3.ts:194:25
       (i32.const 4)
      )
-     ;;@ core/sound/channel3.ts:194:24
+     ;;@ core/sound/channel3.ts:195:24
      (i32.const 15)
     )
    )
   )
-  ;;@ core/sound/channel3.ts:203:4
+  ;;@ core/sound/channel3.ts:204:4
   (block $break|0
    (block $case3|0
     (block $case2|0
@@ -8493,114 +8499,114 @@
         (br_if $case1|0
          (i32.eq
           (get_local $0)
-          ;;@ core/sound/channel3.ts:207:11
+          ;;@ core/sound/channel3.ts:208:11
           (i32.const 1)
          )
         )
         (br_if $case2|0
          (i32.eq
           (get_local $0)
-          ;;@ core/sound/channel3.ts:211:11
+          ;;@ core/sound/channel3.ts:212:11
           (i32.const 2)
          )
         )
         (br $case3|0)
        )
       )
-      ;;@ core/sound/channel3.ts:205:8
+      ;;@ core/sound/channel3.ts:206:8
       (set_local $1
-       ;;@ core/sound/channel3.ts:205:17
+       ;;@ core/sound/channel3.ts:206:17
        (i32.shr_s
         (get_local $1)
-        ;;@ core/sound/channel3.ts:205:27
+        ;;@ core/sound/channel3.ts:206:27
         (i32.const 4)
        )
       )
-      ;;@ core/sound/channel3.ts:206:8
+      ;;@ core/sound/channel3.ts:207:8
       (br $break|0)
      )
-     ;;@ core/sound/channel3.ts:209:8
+     ;;@ core/sound/channel3.ts:210:8
      (set_local $2
-      ;;@ core/sound/channel3.ts:209:23
+      ;;@ core/sound/channel3.ts:210:23
       (i32.const 1)
      )
-     ;;@ core/sound/channel3.ts:210:8
+     ;;@ core/sound/channel3.ts:211:8
      (br $break|0)
     )
-    ;;@ core/sound/channel3.ts:212:8
+    ;;@ core/sound/channel3.ts:213:8
     (set_local $1
-     ;;@ core/sound/channel3.ts:212:17
+     ;;@ core/sound/channel3.ts:213:17
      (i32.shr_s
       (get_local $1)
-      ;;@ core/sound/channel3.ts:212:27
+      ;;@ core/sound/channel3.ts:213:27
       (i32.const 1)
      )
     )
-    ;;@ core/sound/channel3.ts:213:8
+    ;;@ core/sound/channel3.ts:214:8
     (set_local $2
-     ;;@ core/sound/channel3.ts:213:23
+     ;;@ core/sound/channel3.ts:214:23
      (i32.const 2)
     )
-    ;;@ core/sound/channel3.ts:214:8
+    ;;@ core/sound/channel3.ts:215:8
     (br $break|0)
    )
-   ;;@ core/sound/channel3.ts:216:8
+   ;;@ core/sound/channel3.ts:217:8
    (set_local $1
-    ;;@ core/sound/channel3.ts:216:17
+    ;;@ core/sound/channel3.ts:217:17
     (i32.shr_s
      (get_local $1)
-     ;;@ core/sound/channel3.ts:216:27
+     ;;@ core/sound/channel3.ts:217:27
      (i32.const 2)
     )
    )
-   ;;@ core/sound/channel3.ts:217:8
+   ;;@ core/sound/channel3.ts:218:8
    (set_local $2
-    ;;@ core/sound/channel3.ts:217:23
+    ;;@ core/sound/channel3.ts:218:23
     (i32.const 4)
    )
   )
-  ;;@ core/sound/channel3.ts:229:13
+  ;;@ core/sound/channel3.ts:230:13
   (i32.add
    (tee_local $1
-    ;;@ core/sound/channel3.ts:222:4
+    ;;@ core/sound/channel3.ts:223:4
     (if (result i32)
-     ;;@ core/sound/channel3.ts:222:8
+     ;;@ core/sound/channel3.ts:223:8
      (i32.gt_s
       (get_local $2)
-      ;;@ core/sound/channel3.ts:222:23
+      ;;@ core/sound/channel3.ts:223:23
       (i32.const 0)
      )
-     ;;@ core/sound/channel3.ts:223:15
+     ;;@ core/sound/channel3.ts:224:15
      (i32.div_s
       (get_local $1)
       (get_local $2)
      )
-     ;;@ core/sound/channel3.ts:225:15
+     ;;@ core/sound/channel3.ts:226:15
      (i32.const 0)
     )
    )
-   ;;@ core/sound/channel3.ts:229:22
+   ;;@ core/sound/channel3.ts:230:22
    (i32.const 15)
   )
  )
- (func $core/sound/channel3/Channel3.getSampleFromCycleCounter (; 123 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/sound/channel3/Channel3.getSampleFromCycleCounter (; 124 ;) (; has Stack IR ;) (type $i) (result i32)
   (local $0 i32)
-  ;;@ core/sound/channel3.ts:124:4
+  ;;@ core/sound/channel3.ts:125:4
   (set_local $0
-   ;;@ core/sound/channel3.ts:124:33
+   ;;@ core/sound/channel3.ts:125:33
    (get_global $core/sound/channel3/Channel3.cycleCounter)
   )
-  ;;@ core/sound/channel3.ts:125:4
+  ;;@ core/sound/channel3.ts:126:4
   (set_global $core/sound/channel3/Channel3.cycleCounter
-   ;;@ core/sound/channel3.ts:125:28
+   ;;@ core/sound/channel3.ts:126:28
    (i32.const 0)
   )
-  ;;@ core/sound/channel3.ts:126:47
+  ;;@ core/sound/channel3.ts:127:47
   (call $core/sound/channel3/Channel3.getSample
    (get_local $0)
   )
  )
- (func $core/sound/channel4/Channel4.getNoiseChannelFrequencyPeriod (; 124 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/sound/channel4/Channel4.getNoiseChannelFrequencyPeriod (; 125 ;) (; has Stack IR ;) (type $i) (result i32)
   (local $0 i32)
   ;;@ core/sound/channel4.ts:258:4
   (set_local $0
@@ -8627,7 +8633,7 @@
   )
   (get_local $0)
  )
- (func $core/sound/channel4/Channel4.getSample (; 125 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/sound/channel4/Channel4.getSample (; 126 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   ;;@ core/sound/channel4.ts:155:4
   (set_global $core/sound/channel4/Channel4.frequencyTimer
@@ -8801,7 +8807,7 @@
    (i32.const 15)
   )
  )
- (func $core/sound/channel4/Channel4.getSampleFromCycleCounter (; 126 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/sound/channel4/Channel4.getSampleFromCycleCounter (; 127 ;) (; has Stack IR ;) (type $i) (result i32)
   (local $0 i32)
   ;;@ core/sound/channel4.ts:148:4
   (set_local $0
@@ -8818,7 +8824,7 @@
    (get_local $0)
   )
  )
- (func $core/cpu/cpu/Cpu.CLOCK_SPEED (; 127 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/cpu/cpu/Cpu.CLOCK_SPEED (; 128 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/cpu/cpu.ts:45:4
   (if
    ;;@ core/cpu/cpu.ts:45:8
@@ -8829,84 +8835,93 @@
   )
   (i32.const 4194304)
  )
- (func $core/sound/sound/Sound.maxDownSampleCycles (; 128 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/sound/sound/Sound.maxDownSampleCycles (; 129 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/sound/sound.ts:105:27
   (call $core/cpu/cpu/Cpu.CLOCK_SPEED)
  )
- (func $core/portable/portable/i32Portable (; 129 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
-  (get_local $0)
- )
  (func $core/sound/sound/getSampleAsUnsignedByte (; 130 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
-  ;;@ core/sound/sound.ts:421:2
+  ;;@ core/sound/sound.ts:422:2
   (if
-   ;;@ core/sound/sound.ts:421:6
+   ;;@ core/sound/sound.ts:422:6
    (i32.eq
     (get_local $0)
-    ;;@ core/sound/sound.ts:421:17
+    ;;@ core/sound/sound.ts:422:17
     (i32.const 60)
    )
    (return
     (i32.const 127)
    )
   )
-  ;;@ core/sound/sound.ts:449:20
+  ;;@ core/sound/sound.ts:450:20
   (call $core/portable/portable/i32Portable
-   ;;@ core/sound/sound.ts:446:20
-   (i32.div_s
-    (i32.mul
-     ;;@ core/sound/sound.ts:436:20
-     (i32.add
-      ;;@ core/sound/sound.ts:435:20
-      (i32.div_s
-       ;;@ core/sound/sound.ts:432:20
-       (i32.div_s
-        (i32.mul
-         ;;@ core/sound/sound.ts:429:20
-         (i32.mul
-          ;;@ core/sound/sound.ts:428:29
-          (i32.sub
-           (get_local $0)
-           ;;@ core/sound/sound.ts:428:38
-           (i32.const 60)
+   ;;@ core/sound/sound.ts:447:20
+   (call $core/portable/portable/i32Portable
+    ;;@ core/sound/sound.ts:447:32
+    (i32.div_s
+     (i32.mul
+      ;;@ core/sound/sound.ts:437:20
+      (i32.add
+       ;;@ core/sound/sound.ts:436:20
+       (call $core/portable/portable/i32Portable
+        ;;@ core/sound/sound.ts:436:32
+        (i32.div_s
+         ;;@ core/sound/sound.ts:433:20
+         (call $core/portable/portable/i32Portable
+          ;;@ core/sound/sound.ts:433:32
+          (i32.div_s
+           (i32.mul
+            ;;@ core/sound/sound.ts:430:20
+            (i32.mul
+             ;;@ core/sound/sound.ts:429:29
+             (i32.sub
+              (get_local $0)
+              ;;@ core/sound/sound.ts:429:38
+              (i32.const 60)
+             )
+             (i32.const 100000)
+            )
+            (get_local $1)
+           )
+           ;;@ core/sound/sound.ts:433:66
+           (i32.const 8)
           )
-          (i32.const 100000)
          )
-         (get_local $1)
+         (i32.const 100000)
         )
-        ;;@ core/sound/sound.ts:432:54
-        (i32.const 8)
        )
-       (i32.const 100000)
+       ;;@ core/sound/sound.ts:437:38
+       (i32.const 60)
       )
-      ;;@ core/sound/sound.ts:436:38
-      (i32.const 60)
+      (i32.const 100000)
      )
-     (i32.const 100000)
+     ;;@ core/sound/sound.ts:446:24
+     (call $core/portable/portable/i32Portable
+      (i32.const 47244)
+     )
     )
-    (i32.const 47244)
    )
   )
  )
  (func $core/sound/sound/mixChannelSamples (; 131 ;) (; has Stack IR ;) (type $iiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (result i32)
   (local $4 i32)
-  ;;@ core/sound/sound.ts:344:2
+  ;;@ core/sound/sound.ts:345:2
   (set_global $core/sound/accumulator/SoundAccumulator.mixerVolumeChanged
-   ;;@ core/sound/sound.ts:344:40
+   ;;@ core/sound/sound.ts:345:40
    (i32.const 0)
   )
   (set_local $4
-   ;;@ core/sound/sound.ts:352:2
+   ;;@ core/sound/sound.ts:353:2
    (if (result i32)
-    ;;@ core/sound/sound.ts:352:6
+    ;;@ core/sound/sound.ts:353:6
     (get_global $core/sound/sound/Sound.NR51IsChannel1EnabledOnLeftOutput)
     (get_local $0)
     (i32.const 15)
    )
   )
   (set_local $4
-   ;;@ core/sound/sound.ts:357:2
+   ;;@ core/sound/sound.ts:358:2
    (if (result i32)
-    ;;@ core/sound/sound.ts:357:6
+    ;;@ core/sound/sound.ts:358:6
     (get_global $core/sound/sound/Sound.NR51IsChannel2EnabledOnLeftOutput)
     (i32.add
      (get_local $4)
@@ -8914,15 +8929,15 @@
     )
     (i32.add
      (get_local $4)
-     ;;@ core/sound/sound.ts:360:25
+     ;;@ core/sound/sound.ts:361:25
      (i32.const 15)
     )
    )
   )
   (set_local $4
-   ;;@ core/sound/sound.ts:362:2
+   ;;@ core/sound/sound.ts:363:2
    (if (result i32)
-    ;;@ core/sound/sound.ts:362:6
+    ;;@ core/sound/sound.ts:363:6
     (get_global $core/sound/sound/Sound.NR51IsChannel3EnabledOnLeftOutput)
     (i32.add
      (get_local $4)
@@ -8930,15 +8945,15 @@
     )
     (i32.add
      (get_local $4)
-     ;;@ core/sound/sound.ts:365:25
+     ;;@ core/sound/sound.ts:366:25
      (i32.const 15)
     )
    )
   )
   (set_local $4
-   ;;@ core/sound/sound.ts:367:2
+   ;;@ core/sound/sound.ts:368:2
    (if (result i32)
-    ;;@ core/sound/sound.ts:367:6
+    ;;@ core/sound/sound.ts:368:6
     (get_global $core/sound/sound/Sound.NR51IsChannel4EnabledOnLeftOutput)
     (i32.add
      (get_local $4)
@@ -8946,24 +8961,24 @@
     )
     (i32.add
      (get_local $4)
-     ;;@ core/sound/sound.ts:370:25
+     ;;@ core/sound/sound.ts:371:25
      (i32.const 15)
     )
    )
   )
   (set_local $0
-   ;;@ core/sound/sound.ts:375:2
+   ;;@ core/sound/sound.ts:376:2
    (if (result i32)
-    ;;@ core/sound/sound.ts:375:6
+    ;;@ core/sound/sound.ts:376:6
     (get_global $core/sound/sound/Sound.NR51IsChannel1EnabledOnRightOutput)
     (get_local $0)
     (i32.const 15)
    )
   )
   (set_local $0
-   ;;@ core/sound/sound.ts:380:2
+   ;;@ core/sound/sound.ts:381:2
    (if (result i32)
-    ;;@ core/sound/sound.ts:380:6
+    ;;@ core/sound/sound.ts:381:6
     (get_global $core/sound/sound/Sound.NR51IsChannel2EnabledOnRightOutput)
     (i32.add
      (get_local $0)
@@ -8971,15 +8986,15 @@
     )
     (i32.add
      (get_local $0)
-     ;;@ core/sound/sound.ts:383:26
+     ;;@ core/sound/sound.ts:384:26
      (i32.const 15)
     )
    )
   )
   (set_local $0
-   ;;@ core/sound/sound.ts:385:2
+   ;;@ core/sound/sound.ts:386:2
    (if (result i32)
-    ;;@ core/sound/sound.ts:385:6
+    ;;@ core/sound/sound.ts:386:6
     (get_global $core/sound/sound/Sound.NR51IsChannel3EnabledOnRightOutput)
     (i32.add
      (get_local $0)
@@ -8987,15 +9002,15 @@
     )
     (i32.add
      (get_local $0)
-     ;;@ core/sound/sound.ts:388:26
+     ;;@ core/sound/sound.ts:389:26
      (i32.const 15)
     )
    )
   )
   (set_local $0
-   ;;@ core/sound/sound.ts:390:2
+   ;;@ core/sound/sound.ts:391:2
    (if (result i32)
-    ;;@ core/sound/sound.ts:390:6
+    ;;@ core/sound/sound.ts:391:6
     (get_global $core/sound/sound/Sound.NR51IsChannel4EnabledOnRightOutput)
     (i32.add
      (get_local $0)
@@ -9003,56 +9018,56 @@
     )
     (i32.add
      (get_local $0)
-     ;;@ core/sound/sound.ts:393:26
+     ;;@ core/sound/sound.ts:394:26
      (i32.const 15)
     )
    )
   )
-  ;;@ core/sound/sound.ts:397:2
-  (set_global $core/sound/accumulator/SoundAccumulator.mixerEnabledChanged
-   ;;@ core/sound/sound.ts:397:41
-   (i32.const 0)
-  )
   ;;@ core/sound/sound.ts:398:2
-  (set_global $core/sound/accumulator/SoundAccumulator.needToRemixSamples
-   ;;@ core/sound/sound.ts:398:40
+  (set_global $core/sound/accumulator/SoundAccumulator.mixerEnabledChanged
+   ;;@ core/sound/sound.ts:398:41
    (i32.const 0)
   )
-  ;;@ core/sound/sound.ts:408:2
-  (set_local $1
-   ;;@ core/sound/sound.ts:408:43
-   (call $core/sound/sound/getSampleAsUnsignedByte
-    (get_local $4)
-    ;;@ core/sound/sound.ts:408:86
-    (i32.add
-     (get_global $core/sound/sound/Sound.NR50LeftMixerVolume)
-     ;;@ core/sound/sound.ts:408:114
-     (i32.const 1)
-    )
-   )
+  ;;@ core/sound/sound.ts:399:2
+  (set_global $core/sound/accumulator/SoundAccumulator.needToRemixSamples
+   ;;@ core/sound/sound.ts:399:40
+   (i32.const 0)
   )
   ;;@ core/sound/sound.ts:409:2
-  (set_local $0
-   ;;@ core/sound/sound.ts:409:44
+  (set_local $1
+   ;;@ core/sound/sound.ts:409:43
    (call $core/sound/sound/getSampleAsUnsignedByte
-    (get_local $0)
-    ;;@ core/sound/sound.ts:409:88
+    (get_local $4)
+    ;;@ core/sound/sound.ts:409:86
     (i32.add
-     (get_global $core/sound/sound/Sound.NR50RightMixerVolume)
-     ;;@ core/sound/sound.ts:409:117
+     (get_global $core/sound/sound/Sound.NR50LeftMixerVolume)
+     ;;@ core/sound/sound.ts:409:114
      (i32.const 1)
     )
    )
   )
-  ;;@ core/sound/sound.ts:412:2
+  ;;@ core/sound/sound.ts:410:2
+  (set_local $0
+   ;;@ core/sound/sound.ts:410:44
+   (call $core/sound/sound/getSampleAsUnsignedByte
+    (get_local $0)
+    ;;@ core/sound/sound.ts:410:88
+    (i32.add
+     (get_global $core/sound/sound/Sound.NR50RightMixerVolume)
+     ;;@ core/sound/sound.ts:410:117
+     (i32.const 1)
+    )
+   )
+  )
+  ;;@ core/sound/sound.ts:413:2
   (set_global $core/sound/accumulator/SoundAccumulator.leftChannelSampleUnsignedByte
    (get_local $1)
   )
-  ;;@ core/sound/sound.ts:413:2
+  ;;@ core/sound/sound.ts:414:2
   (set_global $core/sound/accumulator/SoundAccumulator.rightChannelSampleUnsignedByte
    (get_local $0)
   )
-  ;;@ core/sound/sound.ts:415:87
+  ;;@ core/sound/sound.ts:416:87
   (call $core/helpers/index/concatenateBytes
    (get_local $1)
    (get_local $0)
@@ -9060,40 +9075,40 @@
  )
  (func $core/sound/sound/setLeftAndRightOutputForAudioQueue (; 132 ;) (; has Stack IR ;) (type $iiiv) (param $0 i32) (param $1 i32) (param $2 i32)
   (local $3 i32)
-  ;;@ core/sound/sound.ts:461:2
+  ;;@ core/sound/sound.ts:462:2
   (i32.store8
-   ;;@ core/sound/sound.ts:457:2
+   ;;@ core/sound/sound.ts:458:2
    (tee_local $3
-    ;;@ core/sound/sound.ts:457:25
+    ;;@ core/sound/sound.ts:458:25
     (i32.add
-     ;;@ core/sound/sound.ts:457:49
+     ;;@ core/sound/sound.ts:458:49
      (i32.shl
       (get_local $2)
-      ;;@ core/sound/sound.ts:457:67
+      ;;@ core/sound/sound.ts:458:67
       (i32.const 1)
      )
      (i32.const 588800)
     )
    )
-   ;;@ core/sound/sound.ts:461:30
+   ;;@ core/sound/sound.ts:462:30
    (i32.add
     (get_local $0)
-    ;;@ core/sound/sound.ts:461:48
+    ;;@ core/sound/sound.ts:462:48
     (i32.const 1)
    )
   )
-  ;;@ core/sound/sound.ts:462:2
+  ;;@ core/sound/sound.ts:463:2
   (i32.store8
-   ;;@ core/sound/sound.ts:462:12
+   ;;@ core/sound/sound.ts:463:12
    (i32.add
     (get_local $3)
-    ;;@ core/sound/sound.ts:462:31
+    ;;@ core/sound/sound.ts:463:31
     (i32.const 1)
    )
-   ;;@ core/sound/sound.ts:462:34
+   ;;@ core/sound/sound.ts:463:34
    (i32.add
     (get_local $1)
-    ;;@ core/sound/sound.ts:462:53
+    ;;@ core/sound/sound.ts:463:53
     (i32.const 1)
    )
   )
@@ -9103,123 +9118,123 @@
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
-  ;;@ core/sound/accumulator.ts:45:36
+  ;;@ core/sound/accumulator.ts:46:36
   (if
    (i32.eqz
     (tee_local $1
-     ;;@ core/sound/accumulator.ts:45:45
+     ;;@ core/sound/accumulator.ts:46:45
      (call $core/sound/channel1/Channel1.willChannelUpdate
       (get_local $0)
      )
     )
    )
    (set_local $1
-    ;;@ core/sound/accumulator.ts:45:82
-    (call $core/sound/accumulator/didChannelDacChange
-     (i32.const 1)
-    )
-   )
-  )
-  ;;@ core/sound/accumulator.ts:46:36
-  (if
-   (i32.eqz
-    (tee_local $2
-     ;;@ core/sound/accumulator.ts:46:45
-     (call $core/sound/channel2/Channel2.willChannelUpdate
-      (get_local $0)
-     )
-    )
-   )
-   (set_local $2
     ;;@ core/sound/accumulator.ts:46:82
     (call $core/sound/accumulator/didChannelDacChange
-     (i32.const 2)
+     (i32.const 1)
     )
    )
   )
   ;;@ core/sound/accumulator.ts:47:36
   (if
    (i32.eqz
-    (tee_local $3
+    (tee_local $2
      ;;@ core/sound/accumulator.ts:47:45
-     (call $core/sound/channel3/Channel3.willChannelUpdate
+     (call $core/sound/channel2/Channel2.willChannelUpdate
       (get_local $0)
      )
     )
    )
-   (set_local $3
+   (set_local $2
     ;;@ core/sound/accumulator.ts:47:82
     (call $core/sound/accumulator/didChannelDacChange
-     (i32.const 3)
+     (i32.const 2)
     )
    )
   )
   ;;@ core/sound/accumulator.ts:48:36
   (if
    (i32.eqz
-    (tee_local $4
+    (tee_local $3
      ;;@ core/sound/accumulator.ts:48:45
+     (call $core/sound/channel3/Channel3.willChannelUpdate
+      (get_local $0)
+     )
+    )
+   )
+   (set_local $3
+    ;;@ core/sound/accumulator.ts:48:82
+    (call $core/sound/accumulator/didChannelDacChange
+     (i32.const 3)
+    )
+   )
+  )
+  ;;@ core/sound/accumulator.ts:49:36
+  (if
+   (i32.eqz
+    (tee_local $4
+     ;;@ core/sound/accumulator.ts:49:45
      (call $core/sound/channel4/Channel4.willChannelUpdate
       (get_local $0)
      )
     )
    )
    (set_local $4
-    ;;@ core/sound/accumulator.ts:48:82
+    ;;@ core/sound/accumulator.ts:49:82
     (call $core/sound/accumulator/didChannelDacChange
      (i32.const 4)
     )
    )
   )
-  ;;@ core/sound/accumulator.ts:50:2
+  ;;@ core/sound/accumulator.ts:51:2
   (if
    (i32.and
     (get_local $1)
     (i32.const 1)
    )
-   ;;@ core/sound/accumulator.ts:50:26
+   ;;@ core/sound/accumulator.ts:51:26
    (set_global $core/sound/accumulator/SoundAccumulator.channel1Sample
-    ;;@ core/sound/accumulator.ts:51:47
+    ;;@ core/sound/accumulator.ts:52:47
     (call $core/sound/channel1/Channel1.getSampleFromCycleCounter)
    )
   )
-  ;;@ core/sound/accumulator.ts:53:2
+  ;;@ core/sound/accumulator.ts:54:2
   (if
    (i32.and
     (get_local $2)
     (i32.const 1)
    )
-   ;;@ core/sound/accumulator.ts:53:26
+   ;;@ core/sound/accumulator.ts:54:26
    (set_global $core/sound/accumulator/SoundAccumulator.channel2Sample
-    ;;@ core/sound/accumulator.ts:54:47
+    ;;@ core/sound/accumulator.ts:55:47
     (call $core/sound/channel2/Channel2.getSampleFromCycleCounter)
    )
   )
-  ;;@ core/sound/accumulator.ts:56:2
+  ;;@ core/sound/accumulator.ts:57:2
   (if
    (i32.and
     (get_local $3)
     (i32.const 1)
    )
-   ;;@ core/sound/accumulator.ts:56:26
+   ;;@ core/sound/accumulator.ts:57:26
    (set_global $core/sound/accumulator/SoundAccumulator.channel3Sample
-    ;;@ core/sound/accumulator.ts:57:47
+    ;;@ core/sound/accumulator.ts:58:47
     (call $core/sound/channel3/Channel3.getSampleFromCycleCounter)
    )
   )
-  ;;@ core/sound/accumulator.ts:59:2
+  ;;@ core/sound/accumulator.ts:60:2
   (if
    (i32.and
     (get_local $4)
     (i32.const 1)
    )
-   ;;@ core/sound/accumulator.ts:59:26
+   ;;@ core/sound/accumulator.ts:60:26
    (set_global $core/sound/accumulator/SoundAccumulator.channel4Sample
-    ;;@ core/sound/accumulator.ts:60:47
+    ;;@ core/sound/accumulator.ts:61:47
     (call $core/sound/channel4/Channel4.getSampleFromCycleCounter)
    )
   )
-  ;;@ core/sound/accumulator.ts:64:6
+  ;;@ core/sound/accumulator.ts:65:6
   (if
    (i32.eqz
     (i32.and
@@ -9253,129 +9268,136 @@
     (get_local $4)
    )
   )
-  ;;@ core/sound/accumulator.ts:64:2
+  ;;@ core/sound/accumulator.ts:65:2
   (if
    (i32.and
     (get_local $1)
     (i32.const 1)
    )
-   ;;@ core/sound/accumulator.ts:64:92
+   ;;@ core/sound/accumulator.ts:65:92
    (set_global $core/sound/accumulator/SoundAccumulator.needToRemixSamples
-    ;;@ core/sound/accumulator.ts:65:42
+    ;;@ core/sound/accumulator.ts:66:42
     (i32.const 1)
    )
   )
-  ;;@ core/sound/accumulator.ts:69:2
+  ;;@ core/sound/accumulator.ts:70:2
   (set_global $core/sound/sound/Sound.downSampleCycleCounter
    (i32.add
     (get_global $core/sound/sound/Sound.downSampleCycleCounter)
-    ;;@ core/sound/accumulator.ts:69:34
+    ;;@ core/sound/accumulator.ts:70:34
     (i32.mul
      (get_local $0)
-     ;;@ core/sound/accumulator.ts:69:51
+     ;;@ core/sound/accumulator.ts:70:51
      (get_global $core/sound/sound/Sound.downSampleCycleMultiplier)
     )
    )
   )
-  ;;@ core/sound/accumulator.ts:70:2
+  ;;@ core/sound/accumulator.ts:71:2
   (if
-   ;;@ core/sound/accumulator.ts:70:6
+   ;;@ core/sound/accumulator.ts:71:6
    (i32.ge_s
     (get_global $core/sound/sound/Sound.downSampleCycleCounter)
-    ;;@ core/sound/accumulator.ts:70:44
+    ;;@ core/sound/accumulator.ts:71:44
     (call $core/sound/sound/Sound.maxDownSampleCycles)
    )
-   ;;@ core/sound/accumulator.ts:70:67
+   ;;@ core/sound/accumulator.ts:71:67
    (block
-    ;;@ core/sound/accumulator.ts:73:4
+    ;;@ core/sound/accumulator.ts:74:4
     (set_global $core/sound/sound/Sound.downSampleCycleCounter
      (i32.sub
       (get_global $core/sound/sound/Sound.downSampleCycleCounter)
-      ;;@ core/sound/accumulator.ts:73:42
+      ;;@ core/sound/accumulator.ts:74:42
       (call $core/sound/sound/Sound.maxDownSampleCycles)
      )
     )
-    ;;@ core/sound/accumulator.ts:75:8
+    ;;@ core/sound/accumulator.ts:76:8
     (if
      (i32.eqz
       (tee_local $1
        (if (result i32)
         (get_global $core/sound/accumulator/SoundAccumulator.needToRemixSamples)
         (get_global $core/sound/accumulator/SoundAccumulator.needToRemixSamples)
-        ;;@ core/sound/accumulator.ts:75:47
+        ;;@ core/sound/accumulator.ts:76:47
         (get_global $core/sound/accumulator/SoundAccumulator.mixerVolumeChanged)
        )
       )
      )
      (set_local $1
-      ;;@ core/sound/accumulator.ts:75:86
+      ;;@ core/sound/accumulator.ts:76:86
       (get_global $core/sound/accumulator/SoundAccumulator.mixerEnabledChanged)
      )
     )
-    ;;@ core/sound/accumulator.ts:75:4
+    ;;@ core/sound/accumulator.ts:76:4
     (if
      (get_local $1)
-     ;;@ core/sound/accumulator.ts:75:124
+     ;;@ core/sound/accumulator.ts:76:124
      (drop
       (call $core/sound/sound/mixChannelSamples
-       ;;@ core/sound/accumulator.ts:77:8
-       (get_global $core/sound/accumulator/SoundAccumulator.channel1Sample)
        ;;@ core/sound/accumulator.ts:78:8
-       (get_global $core/sound/accumulator/SoundAccumulator.channel2Sample)
+       (get_global $core/sound/accumulator/SoundAccumulator.channel1Sample)
        ;;@ core/sound/accumulator.ts:79:8
-       (get_global $core/sound/accumulator/SoundAccumulator.channel3Sample)
+       (get_global $core/sound/accumulator/SoundAccumulator.channel2Sample)
        ;;@ core/sound/accumulator.ts:80:8
+       (get_global $core/sound/accumulator/SoundAccumulator.channel3Sample)
+       ;;@ core/sound/accumulator.ts:81:8
        (get_global $core/sound/accumulator/SoundAccumulator.channel4Sample)
       )
      )
     )
-    ;;@ core/sound/accumulator.ts:87:4
+    ;;@ core/sound/accumulator.ts:88:4
     (call $core/sound/sound/setLeftAndRightOutputForAudioQueue
-     ;;@ core/sound/accumulator.ts:88:6
-     (i32.add
-      (get_global $core/sound/accumulator/SoundAccumulator.leftChannelSampleUnsignedByte)
-      ;;@ core/sound/accumulator.ts:88:55
-      (i32.const 1)
-     )
      ;;@ core/sound/accumulator.ts:89:6
      (i32.add
-      (get_global $core/sound/accumulator/SoundAccumulator.rightChannelSampleUnsignedByte)
-      ;;@ core/sound/accumulator.ts:89:56
+      (get_global $core/sound/accumulator/SoundAccumulator.leftChannelSampleUnsignedByte)
+      ;;@ core/sound/accumulator.ts:89:55
       (i32.const 1)
      )
      ;;@ core/sound/accumulator.ts:90:6
+     (i32.add
+      (get_global $core/sound/accumulator/SoundAccumulator.rightChannelSampleUnsignedByte)
+      ;;@ core/sound/accumulator.ts:90:56
+      (i32.const 1)
+     )
+     ;;@ core/sound/accumulator.ts:91:6
      (get_global $core/sound/sound/Sound.audioQueueIndex)
     )
-    ;;@ core/sound/accumulator.ts:92:4
+    ;;@ core/sound/accumulator.ts:93:4
     (set_global $core/sound/sound/Sound.audioQueueIndex
      (i32.add
       (get_global $core/sound/sound/Sound.audioQueueIndex)
-      ;;@ core/sound/accumulator.ts:92:29
+      ;;@ core/sound/accumulator.ts:93:29
       (i32.const 1)
      )
     )
-    ;;@ core/sound/accumulator.ts:97:4
-    (if
-     ;;@ core/sound/accumulator.ts:97:8
-     (i32.ge_s
-      (get_global $core/sound/sound/Sound.audioQueueIndex)
-      ;;@ core/sound/accumulator.ts:97:33
-      (i32.sub
+    ;;@ core/sound/accumulator.ts:98:4
+    (set_local $1
+     ;;@ core/sound/accumulator.ts:98:24
+     (i32.sub
+      (call $core/portable/portable/i32Portable
+       ;;@ core/sound/accumulator.ts:98:36
        (i32.div_s
         (get_global $core/sound/sound/Sound.wasmBoyMemoryMaxBufferSize)
-        ;;@ core/sound/accumulator.ts:97:68
+        ;;@ core/sound/accumulator.ts:98:71
         (i32.const 2)
        )
-       ;;@ core/sound/accumulator.ts:97:72
-       (i32.const 1)
       )
+      ;;@ core/sound/accumulator.ts:98:76
+      (i32.const 1)
      )
-     ;;@ core/sound/accumulator.ts:97:75
+    )
+    ;;@ core/sound/accumulator.ts:99:4
+    (if
+     ;;@ core/sound/accumulator.ts:99:8
+     (i32.ge_s
+      (get_global $core/sound/sound/Sound.audioQueueIndex)
+      (get_local $1)
+     )
+     ;;@ core/sound/accumulator.ts:99:43
      (set_global $core/sound/sound/Sound.audioQueueIndex
       (i32.sub
-       ;;@ core/sound/accumulator.ts:98:6
+       ;;@ core/sound/accumulator.ts:100:6
        (get_global $core/sound/sound/Sound.audioQueueIndex)
-       ;;@ core/sound/accumulator.ts:98:31
+       ;;@ core/sound/accumulator.ts:100:31
        (i32.const 1)
       )
      )
@@ -9410,30 +9432,42 @@
   (local $4 i32)
   ;;@ core/sound/sound.ts:215:2
   (set_local $1
-   ;;@ core/sound/sound.ts:215:37
-   (call $core/sound/channel1/Channel1.getSample
-    (get_local $0)
+   ;;@ core/sound/sound.ts:215:28
+   (call $core/portable/portable/i32Portable
+    ;;@ core/sound/sound.ts:215:49
+    (call $core/sound/channel1/Channel1.getSample
+     (get_local $0)
+    )
    )
   )
   ;;@ core/sound/sound.ts:216:2
   (set_local $2
-   ;;@ core/sound/sound.ts:216:37
-   (call $core/sound/channel2/Channel2.getSample
-    (get_local $0)
+   ;;@ core/sound/sound.ts:216:28
+   (call $core/portable/portable/i32Portable
+    ;;@ core/sound/sound.ts:216:49
+    (call $core/sound/channel2/Channel2.getSample
+     (get_local $0)
+    )
    )
   )
   ;;@ core/sound/sound.ts:217:2
   (set_local $3
-   ;;@ core/sound/sound.ts:217:37
-   (call $core/sound/channel3/Channel3.getSample
-    (get_local $0)
+   ;;@ core/sound/sound.ts:217:28
+   (call $core/portable/portable/i32Portable
+    ;;@ core/sound/sound.ts:217:49
+    (call $core/sound/channel3/Channel3.getSample
+     (get_local $0)
+    )
    )
   )
   ;;@ core/sound/sound.ts:218:2
   (set_local $4
-   ;;@ core/sound/sound.ts:218:37
-   (call $core/sound/channel4/Channel4.getSample
-    (get_local $0)
+   ;;@ core/sound/sound.ts:218:28
+   (call $core/portable/portable/i32Portable
+    ;;@ core/sound/sound.ts:218:49
+    (call $core/sound/channel4/Channel4.getSample
+     (get_local $0)
+    )
    )
   )
   ;;@ core/sound/sound.ts:226:2
@@ -9523,27 +9557,34 @@
      )
     )
     ;;@ core/sound/sound.ts:251:4
-    (if
-     ;;@ core/sound/sound.ts:251:8
-     (i32.ge_s
-      (get_global $core/sound/sound/Sound.audioQueueIndex)
-      ;;@ core/sound/sound.ts:251:33
-      (i32.sub
+    (set_local $0
+     ;;@ core/sound/sound.ts:251:24
+     (i32.sub
+      (call $core/portable/portable/i32Portable
+       ;;@ core/sound/sound.ts:251:36
        (i32.div_s
         (get_global $core/sound/sound/Sound.wasmBoyMemoryMaxBufferSize)
-        ;;@ core/sound/sound.ts:251:68
+        ;;@ core/sound/sound.ts:251:71
         (i32.const 2)
        )
-       ;;@ core/sound/sound.ts:251:72
-       (i32.const 1)
       )
+      ;;@ core/sound/sound.ts:251:76
+      (i32.const 1)
      )
-     ;;@ core/sound/sound.ts:251:75
+    )
+    ;;@ core/sound/sound.ts:252:4
+    (if
+     ;;@ core/sound/sound.ts:252:8
+     (i32.ge_s
+      (get_global $core/sound/sound/Sound.audioQueueIndex)
+      (get_local $0)
+     )
+     ;;@ core/sound/sound.ts:252:43
      (set_global $core/sound/sound/Sound.audioQueueIndex
       (i32.sub
-       ;;@ core/sound/sound.ts:252:6
+       ;;@ core/sound/sound.ts:253:6
        (get_global $core/sound/sound/Sound.audioQueueIndex)
-       ;;@ core/sound/sound.ts:252:31
+       ;;@ core/sound/sound.ts:253:31
        (i32.const 1)
       )
      )
@@ -10711,11 +10752,11 @@
   )
  )
  (func $core/sound/channel3/Channel3.updateNRx0 (; 145 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
-  ;;@ core/sound/channel3.ts:25:4
+  ;;@ core/sound/channel3.ts:26:4
   (set_global $core/sound/channel3/Channel3.isDacEnabled
-   ;;@ core/sound/channel3.ts:25:28
+   ;;@ core/sound/channel3.ts:26:28
    (call $core/helpers/index/checkBitOnByte
-    ;;@ core/sound/channel3.ts:25:43
+    ;;@ core/sound/channel3.ts:26:43
     (i32.const 7)
     (get_local $0)
    )
@@ -10788,16 +10829,16 @@
   )
  )
  (func $core/sound/channel3/Channel3.updateNRx1 (; 148 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
-  ;;@ core/sound/channel3.ts:33:4
+  ;;@ core/sound/channel3.ts:34:4
   (set_global $core/sound/channel3/Channel3.NRx1LengthLoad
    (get_local $0)
   )
-  ;;@ core/sound/channel3.ts:40:4
+  ;;@ core/sound/channel3.ts:41:4
   (set_global $core/sound/channel3/Channel3.lengthCounter
-   ;;@ core/sound/channel3.ts:40:29
+   ;;@ core/sound/channel3.ts:41:29
    (i32.sub
     (i32.const 256)
-    ;;@ core/sound/channel3.ts:40:35
+    ;;@ core/sound/channel3.ts:41:35
     (get_global $core/sound/channel3/Channel3.NRx1LengthLoad)
    )
   )
@@ -10915,16 +10956,16 @@
   )
  )
  (func $core/sound/channel3/Channel3.updateNRx2 (; 152 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
-  ;;@ core/sound/channel3.ts:48:4
+  ;;@ core/sound/channel3.ts:49:4
   (set_global $core/sound/channel3/Channel3.NRx2VolumeCode
-   ;;@ core/sound/channel3.ts:48:30
+   ;;@ core/sound/channel3.ts:49:30
    (i32.and
     (i32.shr_s
      (get_local $0)
-     ;;@ core/sound/channel3.ts:48:40
+     ;;@ core/sound/channel3.ts:49:40
      (i32.const 5)
     )
-    ;;@ core/sound/channel3.ts:48:45
+    ;;@ core/sound/channel3.ts:49:45
     (i32.const 15)
    )
   )
@@ -11016,21 +11057,21 @@
   )
  )
  (func $core/sound/channel3/Channel3.updateNRx3 (; 156 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
-  ;;@ core/sound/channel3.ts:56:4
+  ;;@ core/sound/channel3.ts:57:4
   (set_global $core/sound/channel3/Channel3.NRx3FrequencyLSB
    (get_local $0)
   )
-  ;;@ core/sound/channel3.ts:60:4
+  ;;@ core/sound/channel3.ts:61:4
   (set_global $core/sound/channel3/Channel3.frequency
-   ;;@ core/sound/channel3.ts:59:25
+   ;;@ core/sound/channel3.ts:60:25
    (i32.or
     (i32.shl
-     ;;@ core/sound/channel3.ts:59:26
+     ;;@ core/sound/channel3.ts:60:26
      (get_global $core/sound/channel3/Channel3.NRx4FrequencyMSB)
-     ;;@ core/sound/channel3.ts:59:55
+     ;;@ core/sound/channel3.ts:60:55
      (i32.const 8)
     )
-    ;;@ core/sound/channel3.ts:59:60
+    ;;@ core/sound/channel3.ts:60:60
     (get_global $core/sound/channel3/Channel3.NRx3FrequencyLSB)
    )
   )
@@ -11364,74 +11405,74 @@
   )
  )
  (func $core/sound/channel3/Channel3.updateNRx4 (; 162 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
-  ;;@ core/sound/channel3.ts:69:4
+  ;;@ core/sound/channel3.ts:70:4
   (set_global $core/sound/channel3/Channel3.NRx4LengthEnabled
-   ;;@ core/sound/channel3.ts:69:33
+   ;;@ core/sound/channel3.ts:70:33
    (call $core/helpers/index/checkBitOnByte
-    ;;@ core/sound/channel3.ts:69:48
+    ;;@ core/sound/channel3.ts:70:48
     (i32.const 6)
     (get_local $0)
    )
   )
-  ;;@ core/sound/channel3.ts:70:4
+  ;;@ core/sound/channel3.ts:71:4
   (set_global $core/sound/channel3/Channel3.NRx4FrequencyMSB
-   ;;@ core/sound/channel3.ts:70:32
+   ;;@ core/sound/channel3.ts:71:32
    (i32.and
     (get_local $0)
-    ;;@ core/sound/channel3.ts:70:40
+    ;;@ core/sound/channel3.ts:71:40
     (i32.const 7)
    )
   )
-  ;;@ core/sound/channel3.ts:74:4
+  ;;@ core/sound/channel3.ts:75:4
   (set_global $core/sound/channel3/Channel3.frequency
-   ;;@ core/sound/channel3.ts:73:25
+   ;;@ core/sound/channel3.ts:74:25
    (i32.or
     (i32.shl
-     ;;@ core/sound/channel3.ts:73:26
+     ;;@ core/sound/channel3.ts:74:26
      (get_global $core/sound/channel3/Channel3.NRx4FrequencyMSB)
-     ;;@ core/sound/channel3.ts:73:55
+     ;;@ core/sound/channel3.ts:74:55
      (i32.const 8)
     )
-    ;;@ core/sound/channel3.ts:73:60
+    ;;@ core/sound/channel3.ts:74:60
     (get_global $core/sound/channel3/Channel3.NRx3FrequencyLSB)
    )
   )
  )
  (func $core/sound/channel3/Channel3.trigger (; 163 ;) (; has Stack IR ;) (type $v)
-  ;;@ core/sound/channel3.ts:235:4
+  ;;@ core/sound/channel3.ts:236:4
   (set_global $core/sound/channel3/Channel3.isEnabled
-   ;;@ core/sound/channel3.ts:235:25
+   ;;@ core/sound/channel3.ts:236:25
    (i32.const 1)
   )
-  ;;@ core/sound/channel3.ts:236:4
+  ;;@ core/sound/channel3.ts:237:4
   (if
    (i32.eqz
-    ;;@ core/sound/channel3.ts:236:8
+    ;;@ core/sound/channel3.ts:237:8
     (get_global $core/sound/channel3/Channel3.lengthCounter)
    )
-   ;;@ core/sound/channel3.ts:236:38
+   ;;@ core/sound/channel3.ts:237:38
    (set_global $core/sound/channel3/Channel3.lengthCounter
-    ;;@ core/sound/channel3.ts:237:31
+    ;;@ core/sound/channel3.ts:238:31
     (i32.const 256)
    )
   )
-  ;;@ core/sound/channel3.ts:242:13
+  ;;@ core/sound/channel3.ts:243:13
   (call $core/sound/channel3/Channel3.resetTimer)
-  ;;@ core/sound/channel3.ts:245:4
+  ;;@ core/sound/channel3.ts:246:4
   (set_global $core/sound/channel3/Channel3.waveTablePosition
-   ;;@ core/sound/channel3.ts:245:33
+   ;;@ core/sound/channel3.ts:246:33
    (i32.const 0)
   )
-  ;;@ core/sound/channel3.ts:248:4
+  ;;@ core/sound/channel3.ts:249:4
   (if
-   ;;@ core/sound/channel3.ts:248:8
+   ;;@ core/sound/channel3.ts:249:8
    (i32.eqz
-    ;;@ core/sound/channel3.ts:248:9
+    ;;@ core/sound/channel3.ts:249:9
     (get_global $core/sound/channel3/Channel3.isDacEnabled)
    )
-   ;;@ core/sound/channel3.ts:248:32
+   ;;@ core/sound/channel3.ts:249:32
    (set_global $core/sound/channel3/Channel3.isEnabled
-    ;;@ core/sound/channel3.ts:249:27
+    ;;@ core/sound/channel3.ts:250:27
     (i32.const 0)
    )
   )
@@ -17036,7 +17077,7 @@
                      ;;@ core/cpu/opcodes.ts:800:43
                      (get_global $core/cpu/cpu/Cpu.registerA)
                     )
-                    (br $folding-inner2)
+                    (br $folding-inner1)
                    )
                    ;;@ core/cpu/opcodes.ts:808:6
                    (set_global $core/cpu/cpu/Cpu.stackPointer
@@ -17108,7 +17149,7 @@
                    ;;@ core/cpu/opcodes.ts:829:22
                    (i32.const 0)
                   )
-                  (br $folding-inner1)
+                  (br $folding-inner2)
                  )
                  ;;@ core/cpu/opcodes.ts:842:6
                  (call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
@@ -17165,7 +17206,7 @@
                   ;;@ core/cpu/opcodes.ts:849:22
                   (i32.const 1)
                  )
-                 (br $folding-inner1)
+                 (br $folding-inner2)
                 )
                 ;;@ core/cpu/opcodes.ts:857:6
                 (call $core/cpu/opcodes/eightBitStoreSyncCycles
@@ -17317,7 +17358,7 @@
               (i32.const 255)
              )
             )
-            (br $folding-inner2)
+            (br $folding-inner1)
            )
            ;;@ core/cpu/opcodes.ts:904:6
            (set_global $core/cpu/cpu/Cpu.stackPointer
@@ -17477,47 +17518,47 @@
      )
      (br $folding-inner3)
     )
-    ;;@ core/cpu/opcodes.ts:831:6
-    (call $core/cpu/opcodes/eightBitStoreSyncCycles
-     ;;@ core/cpu/opcodes.ts:831:30
+    ;;@ core/cpu/opcodes.ts:802:6
+    (set_global $core/cpu/cpu/Cpu.registerH
      (i32.and
-      (get_local $0)
-      (i32.const 65535)
-     )
-     (get_local $1)
-    )
-    (br $folding-inner3)
-   )
-   ;;@ core/cpu/opcodes.ts:802:6
-   (set_global $core/cpu/cpu/Cpu.registerH
-    (i32.and
-     ;;@ core/cpu/opcodes.ts:802:22
-     (call $core/helpers/index/splitHighByte
-      ;;@ core/cpu/opcodes.ts:801:6
-      (tee_local $0
-       ;;@ core/cpu/opcodes.ts:801:20
-       (call $core/portable/portable/u16Portable
-        ;;@ core/cpu/opcodes.ts:801:32
-        (i32.sub
-         (get_local $0)
-         ;;@ core/cpu/opcodes.ts:801:46
-         (i32.const 1)
+      ;;@ core/cpu/opcodes.ts:802:22
+      (call $core/helpers/index/splitHighByte
+       ;;@ core/cpu/opcodes.ts:801:6
+       (tee_local $0
+        ;;@ core/cpu/opcodes.ts:801:20
+        (call $core/portable/portable/u16Portable
+         ;;@ core/cpu/opcodes.ts:801:32
+         (i32.sub
+          (get_local $0)
+          ;;@ core/cpu/opcodes.ts:801:46
+          (i32.const 1)
+         )
         )
        )
       )
+      (i32.const 255)
      )
-     (i32.const 255)
     )
+    ;;@ core/cpu/opcodes.ts:803:6
+    (set_global $core/cpu/cpu/Cpu.registerL
+     (i32.and
+      ;;@ core/cpu/opcodes.ts:803:22
+      (call $core/helpers/index/splitLowByte
+       (get_local $0)
+      )
+      (i32.const 255)
+     )
+    )
+    (br $folding-inner3)
    )
-   ;;@ core/cpu/opcodes.ts:803:6
-   (set_global $core/cpu/cpu/Cpu.registerL
+   ;;@ core/cpu/opcodes.ts:831:6
+   (call $core/cpu/opcodes/eightBitStoreSyncCycles
+    ;;@ core/cpu/opcodes.ts:831:30
     (i32.and
-     ;;@ core/cpu/opcodes.ts:803:22
-     (call $core/helpers/index/splitLowByte
-      (get_local $0)
-     )
-     (i32.const 255)
+     (get_local $0)
+     (i32.const 65535)
     )
+    (get_local $1)
    )
   )
   ;;@ core/cpu/opcodes.ts:794:13

@@ -10,11 +10,11 @@ let exports = [];
 
 if (!process.env.SKIP_LIB) {
   exports = [...getCoreBundles, ...workerBundles, ...libBundles];
-}
 
-// Add TS Bundles
-if (process.env.TS) {
-  exports = [...coreTsBundles, ...exports];
+  // Add TS Bundles
+  if (process.env.TS) {
+    exports = [...coreTsBundles, ...exports];
+  }
 }
 
 if (process.env.BENCHMARK) {

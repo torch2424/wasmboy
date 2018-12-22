@@ -212,10 +212,10 @@ function calculateSound(numberOfCycles: i32): void {
   // All samples will be returned as 0 to 30
   // 0 being -1.0, and 30 being 1.0
   // (see blurb at top)
-  let channel1Sample: i32 = Channel1.getSample(numberOfCycles);
-  let channel2Sample: i32 = Channel2.getSample(numberOfCycles);
-  let channel3Sample: i32 = Channel3.getSample(numberOfCycles);
-  let channel4Sample: i32 = Channel4.getSample(numberOfCycles);
+  let channel1Sample: i32 = i32Portable(Channel1.getSample(numberOfCycles));
+  let channel2Sample: i32 = i32Portable(Channel2.getSample(numberOfCycles));
+  let channel3Sample: i32 = i32Portable(Channel3.getSample(numberOfCycles));
+  let channel4Sample: i32 = i32Portable(Channel4.getSample(numberOfCycles));
   // TODO: Allow individual channels to be muted
   // let channel1Sample: i32 = 15;
   // let channel2Sample: i32 = 15;
@@ -248,7 +248,8 @@ function calculateSound(numberOfCycles: i32): void {
     // Don't allow our audioQueueIndex to overflow into other parts of the wasmBoy memory map
     // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit#gid=0
     // Not 0xFFFF because we need half of 64kb since we store left and right channel
-    if (Sound.audioQueueIndex >= Sound.wasmBoyMemoryMaxBufferSize / 2 - 1) {
+    let maxIndex: i32 = i32Portable(Sound.wasmBoyMemoryMaxBufferSize / 2) - 1;
+    if (Sound.audioQueueIndex >= maxIndex) {
       Sound.audioQueueIndex -= 1;
     }
   }
@@ -429,10 +430,10 @@ function getSampleAsUnsignedByte(sample: i32, mixerVolume: i32): i32 {
   convertedSample = convertedSample * precision;
 
   // Multiply by the mixer volume fraction (to find the actual volume)
-  convertedSample = (convertedSample * mixerVolume) / 8;
+  convertedSample = i32Portable((convertedSample * mixerVolume) / 8);
 
   // Convert back to scale of 0 to 120
-  convertedSample = convertedSample / precision;
+  convertedSample = i32Portable(convertedSample / precision);
   convertedSample = convertedSample + 60;
 
   // Finally, convert to an unsigned byte scale
@@ -442,8 +443,8 @@ function getSampleAsUnsignedByte(sample: i32, mixerVolume: i32): i32 {
   // For example, 120 / 254 = 0.47244094488188976
   // Multiply by 1000 to increase the float into an int
   // so, 120 * 1000 / (0.47244094488188976 * 1000) should give approximate answer for max mixer volume
-  let maxDivider: i32 = (120 * precision) / 254;
-  convertedSample = (convertedSample * precision) / maxDivider;
+  let maxDivider: i32 = i32Portable((120 * precision) / 254);
+  convertedSample = i32Portable((convertedSample * precision) / maxDivider);
 
   // Ensure we have an i32 and not a float for JS builds
   convertedSample = i32Portable(convertedSample);

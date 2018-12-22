@@ -3,6 +3,7 @@ import { Channel1 } from './channel1';
 import { Channel2 } from './channel2';
 import { Channel3 } from './channel3';
 import { Channel4 } from './channel4';
+import { i32Portable } from '../portable/portable';
 
 // Another class simply for accumulating samples
 // Default everything to silence
@@ -94,7 +95,8 @@ export function accumulateSound(numberOfCycles: i32): void {
     // Don't allow our audioQueueIndex to overflow into other parts of the wasmBoy memory map
     // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit#gid=0
     // Not 0xFFFF because we need half of 64kb since we store left and right channel
-    if (Sound.audioQueueIndex >= Sound.wasmBoyMemoryMaxBufferSize / 2 - 1) {
+    let maxIndex: i32 = i32Portable(Sound.wasmBoyMemoryMaxBufferSize / 2) - 1;
+    if (Sound.audioQueueIndex >= maxIndex) {
       Sound.audioQueueIndex -= 1;
     }
   }

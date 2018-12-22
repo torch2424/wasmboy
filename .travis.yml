@@ -7,4 +7,4 @@ node_js:
 install:
   - npm install
 script:
-  - npm run prettier:lint && npm run demo:build && npm test
+  - npm run prettier:lint && npm run demo:build:apps && npm test
