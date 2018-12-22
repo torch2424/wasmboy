@@ -3,6 +3,7 @@
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
+import compiler from '@ampproject/rollup-plugin-closure-compiler';
 import url from 'rollup-plugin-url';
 import json from 'rollup-plugin-json';
 import serve from 'rollup-plugin-serve';
@@ -15,7 +16,7 @@ import pkg from './package.json';
 const fs = require('fs');
 
 const writeIndexHtmlToBuild = bundleName => {
-  let indexHtml = fs.readFileSync('demo/debugger-rebuild/index.html', 'utf8');
+  let indexHtml = fs.readFileSync('demo/debugger/index.html', 'utf8');
   indexHtml = indexHtml.replace('<%BUNDLE%>', bundleName);
   fs.writeFileSync('build/index.html', indexHtml, 'utf8');
 };
@@ -52,21 +53,24 @@ if (process.env.DEBUGGER && process.env.SERVE) {
   plugins = [
     ...plugins,
     serve({
-      contentBase: ['dist/', 'build/', 'demo/debugger-rebuild/'],
+      contentBase: ['dist/', 'build/', 'demo/debugger/'],
       port: 8080
     })
   ];
   writeIndexHtmlToBuild('index.iife.js');
   sourcemap = 'inline';
 } else {
-  // Not running through closure to show difference between
-  // Closure and non closure.
   plugins = [
     ...plugins,
+    compiler(),
     copy([
       {
-        files: 'demo/debugger-rebuild/assets/**/*',
+        files: 'demo/debugger/assets/**/*',
         dest: 'build/assets'
+      },
+      {
+        files: 'demo/debugger/manifest.json',
+        dest: 'build/'
       }
     ]),
     hash({
@@ -82,7 +86,7 @@ plugins = [...plugins, bundleSize()];
 
 const debuggerBundles = [
   {
-    input: 'demo/debugger-rebuild/index.js',
+    input: 'demo/debugger/index.js',
     output: {
       name: 'WasmBoyBenchmark',
       file: 'build/index.iife.js',
