@@ -12,6 +12,7 @@ import {
   storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
 import { checkBitOnByte, hexLog } from '../helpers/index';
+import { i32Portable } from '../portable/portable';
 
 export class Channel3 {
   // Cycle Counter for our sound accumulator
@@ -182,7 +183,7 @@ export class Channel3 {
     let sample: i32 = 0;
 
     // Will Find the position, and knock off any remainder
-    let positionIndexToAdd: i32 = Channel3.waveTablePosition / 2;
+    let positionIndexToAdd: i32 = i32Portable(Channel3.waveTablePosition / 2);
     let memoryLocationWaveSample: i32 = Channel3.memoryLocationWaveTable + positionIndexToAdd;
 
     sample = eightBitLoadFromGBMemory(memoryLocationWaveSample);
