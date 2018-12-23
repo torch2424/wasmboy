@@ -12,7 +12,7 @@ class WasmBoyDebuggerApp extends Component {
   }
 
   render() {
-    return <div>Hello Debugger!</div>;
+    return <div class="tall">Hello Debugger!</div>;
   }
 }
 
@@ -27,13 +27,14 @@ const createPreactNode = () => {
 };
 
 class PhosphorPreactWidget extends phosphorWidgets.Widget {
-  constructor(name) {
+  constructor(name, notClosable) {
     super({ node: createPreactNode() });
-    this.setFlag(phosphorWidgets.Widget.Flag.DisallowLayout);
     this.addClass('content');
     this.addClass(name.toLowerCase());
     this.title.label = name;
-    this.title.closable = true;
+
+    // edit this
+    this.title.closable = !notClosable;
     this.title.caption = `Long description for: ${name}`;
   }
 
@@ -61,7 +62,11 @@ commands.addCommand('open:local', {
 const dockPanel = new phosphorWidgets.DockPanel();
 dockPanel.id = 'dock';
 
-const panelWidgets = [new PhosphorPreactWidget('wasmboy1'), new PhosphorPreactWidget('wasmboy2'), new PhosphorPreactWidget('wasmboy3')];
+const panelWidgets = [
+  new PhosphorPreactWidget('wasmboy1', true),
+  new PhosphorPreactWidget('wasmboy2'),
+  new PhosphorPreactWidget('wasmboy3')
+];
 dockPanel.addWidget(panelWidgets[0]);
 dockPanel.addWidget(panelWidgets[1], { mode: 'split-right', ref: panelWidgets[0] });
 dockPanel.addWidget(panelWidgets[2], { mode: 'split-bottom', ref: panelWidgets[1] });

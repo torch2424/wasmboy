@@ -20,6 +20,13 @@ body {
   overflow: hidden;
 }
 
+.tall {
+  height: 100vh;
+  width: 100vw;
+  background-color: purple;
+  color: white;
+}
+
 #menuBar {
   flex: 0 0 auto;
 }
