@@ -1,0 +1,7 @@
+.notification {
+  display: none;
+}
+
+.notification--show {
+  display: block;
+}

@@ -10,6 +10,11 @@ import PreactWidget from './preactWidget';
 
 import menus from './menus';
 
+import { Pubx } from 'pubx';
+import { PUBX_KEYS, PUBX_INITIALIZE } from './pubx.config';
+
+import Overlay from './components/overlay/overlay';
+
 class WasmBoyDebuggerApp extends Component {
   constructor() {
     super();
@@ -63,6 +68,18 @@ window.onresize = () => {
   main.update();
 };
 
+// Initialize Pubx for State Management
+PUBX_INITIALIZE();
+
+// Bind phosphor to DOM
 const phosphorContainer = document.getElementById('phosphor-container');
 phosphorWidgets.Widget.attach(menuBar, phosphorContainer);
 phosphorWidgets.Widget.attach(main, phosphorContainer);
+
+// Bind Preact Overlay to DOM
+const overlayContainer = document.getElementById('overlay-container');
+render(<Overlay />, overlayContainer);
+
+setTimeout(() => {
+  Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Welcome to the WasmBoy Debugger!');
+}, 1000);
