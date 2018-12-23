@@ -63,5 +63,6 @@ window.onresize = () => {
   main.update();
 };
 
-phosphorWidgets.Widget.attach(menuBar, document.body);
-phosphorWidgets.Widget.attach(main, document.body);
+const phosphorContainer = document.getElementById('phosphor-container');
+phosphorWidgets.Widget.attach(menuBar, phosphorContainer);
+phosphorWidgets.Widget.attach(main, phosphorContainer);

@@ -6,9 +6,11 @@ export default class Command {
     // http://phosphorjs.github.io/phosphor/api/commands/interfaces/commandregistry.icommandoptions.html
     this.options = {
       label: 'Command',
-      execute: () => {
-        console.log('Command Exectued!');
-      }
+      execute: () => this.execute()
     };
+  }
+
+  execute() {
+    console.log('Command Executed!');
   }
 }
