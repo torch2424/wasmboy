@@ -137,6 +137,7 @@
     "rollup-plugin-bundle-size": "^1.0.2",
     "rollup-plugin-commonjs": "^9.2.0",
     "rollup-plugin-copy-glob": "^0.2.2",
+    "rollup-plugin-delete": "^0.1.2",
     "rollup-plugin-hash": "^1.3.0",
     "rollup-plugin-json": "^3.1.0",
     "rollup-plugin-node-resolve": "^3.4.0",

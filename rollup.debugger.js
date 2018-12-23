@@ -11,6 +11,7 @@ import bundleSize from 'rollup-plugin-bundle-size';
 import postcss from 'rollup-plugin-postcss';
 import postcssImport from 'postcss-import';
 import copy from 'rollup-plugin-copy-glob';
+import del from 'rollup-plugin-delete';
 import hash from 'rollup-plugin-hash';
 import pkg from './package.json';
 
@@ -18,7 +19,7 @@ const fs = require('fs');
 
 const writeIndexHtmlToBuild = bundleName => {
   let indexHtml = fs.readFileSync('demo/debugger/index.html', 'utf8');
-  indexHtml = indexHtml.replace('<%BUNDLE%>', bundleName);
+  indexHtml = indexHtml.replace('<%BUNDLE%>', bundleName.replace('build/', ''));
   fs.writeFileSync('build/index.html', indexHtml, 'utf8');
 };
 
@@ -75,6 +76,9 @@ if (process.env.DEBUGGER && process.env.SERVE) {
         dest: 'build/'
       }
     ]),
+    del({
+      targets: ['build/bundle.*.js']
+    }),
     hash({
       dest: 'build/bundle.[hash].js',
       callback: bundleName => {
