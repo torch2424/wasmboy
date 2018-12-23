@@ -2,9 +2,12 @@ import { h, render, Component } from 'preact';
 import phosphorCommands from '@phosphor/commands';
 import phosphorMessaging from '@phosphor/messaging';
 import phosphorWidgets from '@phosphor/widgets';
-import './index.css';
 
 import packageJson from '../../package.json';
+
+import './index.css';
+
+import PreactWidget from './preactWidget';
 
 class WasmBoyDebuggerApp extends Component {
   constructor() {
@@ -13,35 +16,6 @@ class WasmBoyDebuggerApp extends Component {
 
   render() {
     return <div class="tall">Hello Debugger!</div>;
-  }
-}
-
-const createPreactNode = () => {
-  let node = document.createElement('div');
-  let content = document.createElement('div');
-
-  render(<WasmBoyDebuggerApp />, content);
-
-  node.appendChild(content);
-  return node;
-};
-
-class PhosphorPreactWidget extends phosphorWidgets.Widget {
-  constructor(name, notClosable) {
-    super({ node: createPreactNode() });
-    this.addClass('content');
-    this.addClass(name.toLowerCase());
-    this.title.label = name;
-
-    // edit this
-    this.title.closable = !notClosable;
-    this.title.caption = `Long description for: ${name}`;
-  }
-
-  onActivateRequest(msg) {
-    if (this.isAttached) {
-      // Called whenever panel is focused
-    }
   }
 }
 
@@ -63,9 +37,19 @@ const dockPanel = new phosphorWidgets.DockPanel();
 dockPanel.id = 'dock';
 
 const panelWidgets = [
-  new PhosphorPreactWidget('wasmboy1', true),
-  new PhosphorPreactWidget('wasmboy2'),
-  new PhosphorPreactWidget('wasmboy3')
+  new PreactWidget({
+    component: <WasmBoyDebuggerApp />,
+    label: '1',
+    closable: false
+  }),
+  new PreactWidget({
+    component: <WasmBoyDebuggerApp />,
+    label: '2'
+  }),
+  new PreactWidget({
+    component: <WasmBoyDebuggerApp />,
+    label: '3'
+  })
 ];
 dockPanel.addWidget(panelWidgets[0]);
 dockPanel.addWidget(panelWidgets[1], { mode: 'split-right', ref: panelWidgets[0] });
