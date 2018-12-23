@@ -9,6 +9,7 @@ import json from 'rollup-plugin-json';
 import serve from 'rollup-plugin-serve';
 import bundleSize from 'rollup-plugin-bundle-size';
 import postcss from 'rollup-plugin-postcss';
+import postcssImport from 'postcss-import';
 import copy from 'rollup-plugin-copy-glob';
 import hash from 'rollup-plugin-hash';
 import pkg from './package.json';
@@ -32,7 +33,8 @@ const babelPluginConfig = {
 
 let plugins = [
   postcss({
-    extensions: ['.css']
+    extensions: ['.css'],
+    plugins: [postcssImport()]
   }),
   resolve({
     preferBuiltins: false
@@ -84,6 +86,8 @@ if (process.env.DEBUGGER && process.env.SERVE) {
 
 plugins = [...plugins, bundleSize()];
 
+// Had to hack around crypto for phosphor
+// https://github.com/phosphorjs/phosphor/issues/353
 const debuggerBundles = [
   {
     input: 'demo/debugger/index.js',
@@ -91,8 +95,12 @@ const debuggerBundles = [
       name: 'WasmBoyBenchmark',
       file: 'build/index.iife.js',
       format: 'iife',
+      globals: {
+        crypto: 'crypto'
+      },
       sourcemap: sourcemap
     },
+    external: ['crypto'],
     context: 'window',
     plugins: plugins
   }
