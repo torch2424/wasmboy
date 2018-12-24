@@ -1,5 +1,7 @@
 import { h, render, Component } from 'preact';
 
+import loadScript from 'load-script';
+
 import phosphorWidgets from '@phosphor/widgets';
 
 import packageJson from '../../package.json';
@@ -23,6 +25,25 @@ class WasmBoyDebuggerApp extends Component {
   render() {
     return <div class="tall">Hello Debugger!</div>;
   }
+}
+
+// Setup Google Analytics
+if (typeof window !== 'undefined') {
+  // TODO: Uncomment this once we put into PROD
+  /*
+  loadScript('https://www.googletagmanager.com/gtag/js?id=UA-125276735-1', function(err, script) {
+    if (!err) {
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        window.dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', 'UA-125276735-1');
+      // Attach Analytics to window
+      window.gtag = gtag;
+    }
+  });
+  */
 }
 
 // Setup from:
@@ -80,6 +101,7 @@ phosphorWidgets.Widget.attach(main, phosphorContainer);
 const overlayContainer = document.getElementById('overlay-container');
 render(<Overlay />, overlayContainer);
 
+// Show a nice welcome message
 setTimeout(() => {
   Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Welcome to the WasmBoy Debugger!');
-}, 500);
+}, 100);
