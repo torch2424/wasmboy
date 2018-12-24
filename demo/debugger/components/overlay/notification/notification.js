@@ -13,23 +13,38 @@ export default class Notification extends Component {
     this.state.hideTimeout = false;
 
     Pubx.subscribe(PUBX_KEYS.NOTIFICATION, newState => {
-      if (this.state.hideTimeout) {
-        clearTimeout(this.state.hideTimeout);
-      }
+      this.close();
 
       this.setState({
         ...newState,
         visible: 'notification--show',
         hideTimeout: setTimeout(() => {
-          this.setState({
-            visible: undefined
-          });
+          this.close();
         }, newState.timeout)
       });
     });
   }
 
+  close() {
+    if (this.state.hideTimeout) {
+      clearTimeout(this.state.hideTimeout);
+    }
+
+    this.setState({
+      visible: undefined
+    });
+  }
+
   render() {
-    return <div className={`notification ${this.state.visible}`}>{this.state.text}</div>;
+    return (
+      <div className={`notification ${this.state.visible}`}>
+        <div class="notification__close">
+          <button class="remove-default-button" onClick={() => this.close()}>
+            X
+          </button>
+        </div>
+        <div class="notification__text">{this.state.text}</div>
+      </div>
+    );
   }
 }

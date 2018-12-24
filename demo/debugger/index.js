@@ -82,4 +82,4 @@ render(<Overlay />, overlayContainer);
 
 setTimeout(() => {
   Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Welcome to the WasmBoy Debugger!');
-}, 1000);
+}, 500);
