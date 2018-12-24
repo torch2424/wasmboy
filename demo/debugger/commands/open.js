@@ -1,19 +1,25 @@
+import { Pubx } from 'pubx';
+
 import Command from './command';
 import WasmBoy from '../wasmboy';
+import { PUBX_KEYS } from '../pubx.config';
 
 const loadROM = (file, fileName) => {
-  this.setFileLoadingStatus(true);
+  // this.setFileLoadingStatus(true);
 
   const loadROMTask = async () => {
     await WasmBoy.loadROM(file);
-    this.props.showNotification('Game Loaded! 🎉');
-    this.setFileLoadingStatus(false);
+    Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Game Loaded! 🎉');
+    // this.setFileLoadingStatus(false);
 
     // To test the new autoplay in safari
     // and in chrome
+    // TODO
+    /*
     if (this.props.autoplay) {
       WasmBoy.play();
     }
+    */
 
     // Fire off Analytics
     if (window !== undefined && window.gtag) {
@@ -23,8 +29,8 @@ const loadROM = (file, fileName) => {
 
   loadROMTask().catch(error => {
     console.log('Load Game Error:', error);
-    this.props.showNotification('Game Load Error! 😞');
-    this.setFileLoadingStatus(false);
+    Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Game Load Error! 😞');
+    // this.setFileLoadingStatus(false);
 
     // Fire off Analytics
     if (window !== undefined && window.gtag) {
@@ -32,10 +38,7 @@ const loadROM = (file, fileName) => {
     }
   });
 
-  // Set our file name
-  const newState = Object.assign({}, this.state);
-  newState.currentFileName = fileName;
-  this.setState(newState);
+  // TODO: Set our file name
 };
 
 class OpenLocalFile extends Command {
