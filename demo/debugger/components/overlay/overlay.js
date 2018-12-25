@@ -7,6 +7,7 @@ import { PUBX_KEYS } from '../../pubx.config';
 import './overlay.css';
 
 import Notification from './notification/notification';
+import Modal from './modal/modal';
 
 export default class Overlay extends Component {
   constructor() {
@@ -18,7 +19,7 @@ export default class Overlay extends Component {
   render() {
     return (
       <div class="overlay">
-        <div class="overlay__mask" />
+        <Modal />
         <Notification />
       </div>
     );

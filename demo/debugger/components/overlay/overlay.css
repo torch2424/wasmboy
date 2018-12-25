@@ -10,16 +10,3 @@
   padding: 0;
   overflow: hidden;
 }
-
-.overlay--capture-input {
-  pointer-events: all;
-}
-
-.overlay__mask {
-  display: none;
-  background-color: rgba(255, 255, 255, 0.35);
-}
-
-.overlay--show-mask .overlay__mask {
-  display: block;
-}

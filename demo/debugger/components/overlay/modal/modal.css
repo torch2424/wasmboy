@@ -1,0 +1,21 @@
+.modal {
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.modal--visible {
+  display: flex;
+  pointer-events: all;
+}
+
+.modal__mask {
+  background-color: rgba(255, 255, 255, 0.35);
+}

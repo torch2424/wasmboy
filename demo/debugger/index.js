@@ -17,7 +17,7 @@ import menus from './menus';
 import { Pubx } from 'pubx';
 import { PUBX_KEYS, PUBX_INITIALIZE } from './pubx.config';
 
-import WasmBoyPlayer from './components/wasmboyPlayer';
+import WasmBoyPlayer from './components/wasmboyPlayer/wasmboyPlayer';
 import Overlay from './components/overlay/overlay';
 
 class WasmBoyDebuggerApp extends Component {
@@ -59,7 +59,7 @@ dockPanel.id = 'dock';
 const panelWidgets = [
   new PreactWidget({
     component: <WasmBoyPlayer />,
-    label: '1',
+    label: 'WasmBoy Player',
     closable: false
   }),
   new PreactWidget({

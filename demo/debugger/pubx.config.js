@@ -1,15 +1,26 @@
 import { Pubx } from 'pubx';
 
 export const PUBX_KEYS = {
-  OVERLAY: 'OVERLAY',
+  MODAL: 'MODAL',
   NOTIFICATION: 'NOTIFICATION'
 };
 
 export function PUBX_INITIALIZE() {
-  // OVERLAY
-  Pubx.publish(PUBX_KEYS.OVERLAY, {
-    captureInput: false,
-    showMask: false
+  // MODAL
+  Pubx.publish(PUBX_KEYS.MODAL, {
+    visible: false,
+    component: false,
+    showModal: component => {
+      Pubx.pubblish(PUBX_KEYS.MODAL, {
+        visible: 'modal--visible',
+        component
+      });
+    },
+    closeModal: () => {
+      Pubx.pubblish(PUBX_KEYS.MODAL, {
+        visible: false
+      });
+    }
   });
 
   // NOTIFICATION

@@ -3,7 +3,7 @@
 
 import { h, Component } from 'preact';
 
-import WasmBoy from '../wasmboy';
+import WasmBoy from '../../wasmboy';
 
 import './wasmboyPlayer.css';
 
