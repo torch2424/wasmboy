@@ -106,7 +106,7 @@ export class Sound {
   }
 
   // Frame sequencer controls what should be updated and and ticked
-  // Everyt time the sound is updated :) It is updated everytime the
+  // Every time the sound is updated :) It is updated everytime the
   // Cycle counter reaches the max cycle
   static frameSequencer: i32 = 0x00;
 
