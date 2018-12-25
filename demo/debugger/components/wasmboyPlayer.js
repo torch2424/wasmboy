@@ -5,6 +5,8 @@ import { h, Component } from 'preact';
 
 import WasmBoy from '../wasmboy';
 
+import './wasmboyPlayer.css';
+
 // Variables to tell if our callbacks were ever run
 let saveStateCallbackCalled = false;
 let graphicsCallbackCalled = false;

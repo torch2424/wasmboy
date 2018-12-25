@@ -73,7 +73,7 @@ const panelWidgets = [
 ];
 dockPanel.addWidget(panelWidgets[0]);
 dockPanel.addWidget(panelWidgets[1], { mode: 'split-right', ref: panelWidgets[0] });
-dockPanel.addWidget(panelWidgets[2], { mode: 'split-bottom', ref: panelWidgets[1] });
+dockPanel.addWidget(panelWidgets[2], { mode: 'split-bottom', ref: panelWidgets[0] });
 
 // Create our top menu bar
 let menuBar = new phosphorWidgets.MenuBar();
