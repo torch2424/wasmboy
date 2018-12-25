@@ -20,6 +20,7 @@ const loadROM = (file, fileName) => {
       WasmBoy.play();
     }
     */
+    WasmBoy.play();
 
     // Fire off Analytics
     if (window !== undefined && window.gtag) {
