@@ -1,8 +1,12 @@
+import { h } from 'preact';
+
 import { Pubx } from 'pubx';
 
 import Command from './command';
 import WasmBoy from '../wasmboy';
 import { PUBX_KEYS } from '../pubx.config';
+
+import { getOpenSourceROMElements } from '../../openSourceROMsPreact';
 
 const loadROM = (file, fileName) => {
   // this.setFileLoadingStatus(true);
@@ -72,5 +76,30 @@ class OpenLocalFile extends Command {
   }
 }
 
-const exportedCommands = [new OpenLocalFile()];
+class OpenOpenSourceROM extends Command {
+  constructor() {
+    super('open:opensource');
+    this.options.label = 'Open Source ROMs';
+  }
+
+  execute() {
+    console.log('Open Open Source File!');
+    // Allow autoplaying audio to work
+    WasmBoy.resumeAudioContext();
+
+    // Using a stateless functional component
+    Pubx.get(PUBX_KEYS.MODAL).showModal(() => {
+      return (
+        <div class="open-source-rom-container">
+          {getOpenSourceROMElements(ROMObject => {
+            console.log(ROMObject);
+            loadROM();
+          })}
+        </div>
+      );
+    });
+  }
+}
+
+const exportedCommands = [new OpenLocalFile(), new OpenOpenSourceROM()];
 export default exportedCommands;

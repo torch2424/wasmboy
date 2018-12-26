@@ -11,13 +11,14 @@ export function PUBX_INITIALIZE() {
     visible: false,
     component: false,
     showModal: component => {
-      Pubx.pubblish(PUBX_KEYS.MODAL, {
+      console.log(component);
+      Pubx.publish(PUBX_KEYS.MODAL, {
         visible: 'modal--visible',
         component
       });
     },
     closeModal: () => {
-      Pubx.pubblish(PUBX_KEYS.MODAL, {
+      Pubx.publish(PUBX_KEYS.MODAL, {
         visible: false
       });
     }

@@ -106,5 +106,6 @@ body {
 /* Phosphor FontAwesome Fix */
 .p-TabBar-tab.p-mod-closable > .p-TabBar-tabCloseIcon:before {
   content: 'X';
+  cursor: pointer;
   font-weight: bold;
 }
