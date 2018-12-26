@@ -11,7 +11,6 @@ export function PUBX_INITIALIZE() {
     visible: false,
     component: false,
     showModal: component => {
-      console.log(component);
       Pubx.publish(PUBX_KEYS.MODAL, {
         visible: 'modal--visible',
         component

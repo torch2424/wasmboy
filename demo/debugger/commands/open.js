@@ -92,8 +92,8 @@ class OpenOpenSourceROM extends Command {
       return (
         <div class="open-source-rom-container">
           {getOpenSourceROMElements(ROMObject => {
-            console.log(ROMObject);
-            loadROM();
+            loadROM(ROMObject.url, ROMObject.title);
+            Pubx.get(PUBX_KEYS.MODAL).closeModal();
           })}
         </div>
       );
