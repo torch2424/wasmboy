@@ -72,3 +72,9 @@
   height: calc(100% - 20px);
   min-height: 100px;
 }
+
+@media only screen and (max-width: 675px) {
+  .modal__container__component .open-source-rom__button {
+    justify-content: space-around;
+  }
+}

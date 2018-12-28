@@ -4,11 +4,17 @@ import { h } from 'preact';
 // Import our demo roms
 import { blarggsCpuROM, blarggsInstrTimingROM, tobuTobuGirlROM, backToColorDemoROM } from './openSourceROMs';
 
+// Import our ROM imags
+import tobuTobuGirlImage from './debugger/assets/tobutobugirl.png';
+import backToColorImage from './debugger/assets/back-to-color.gbc.noPerformanceOptions.png';
+import blarggsCpuImage from './debugger/assets/cpu_instrs.golden.png';
+import blarggsInstrTimingImage from './debugger/assets/instr_timing.golden.png';
+
 export const openSourceROMs = {
   tobutobugirl: {
     title: 'tobu tobu girl',
     url: tobuTobuGirlROM,
-    image: 'assets/tobutobugirl.png',
+    image: tobuTobuGirlImage,
     link: 'http://tangramgames.dk/tobutobugirl/',
     infoElement: (
       <div>
@@ -22,7 +28,7 @@ export const openSourceROMs = {
   backToColor: {
     title: 'Back to Color',
     url: backToColorDemoROM,
-    image: 'assets/back-to-color.gbc.noPerformanceOptions.png',
+    image: backToColorImage,
     link: 'https://github.com/AntonioND/back-to-color',
     infoElement: (
       <div>
@@ -33,7 +39,7 @@ export const openSourceROMs = {
   blarggsCpu: {
     title: "Blargg's CPU Test",
     url: blarggsCpuROM,
-    image: 'assets/cpu_instrs.golden.png',
+    image: blarggsCpuImage,
     link: 'http://gbdev.gg8.se/wiki/articles/Test_ROMs',
     infoElement: (
       <div>
@@ -44,7 +50,7 @@ export const openSourceROMs = {
   blarggsInstrTiming: {
     title: "Blargg's instr_timing Test",
     url: blarggsInstrTimingROM,
-    image: 'assets/instr_timing.golden.png',
+    image: blarggsInstrTimingImage,
     link: 'http://gbdev.gg8.se/wiki/articles/Test_ROMs',
     infoElement: (
       <div>
