@@ -67,5 +67,8 @@
   z-index: 1;
   overflow: auto;
   width: 100%;
-  min-height: 100%;
+
+  /* Height is 100% - title bar height */
+  height: calc(100% - 20px);
+  min-height: 100px;
 }
