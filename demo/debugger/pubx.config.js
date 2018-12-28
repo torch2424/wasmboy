@@ -2,7 +2,8 @@ import { Pubx } from 'pubx';
 
 export const PUBX_KEYS = {
   MODAL: 'MODAL',
-  NOTIFICATION: 'NOTIFICATION'
+  NOTIFICATION: 'NOTIFICATION',
+  WASMBOY: 'WASMBOY'
 };
 
 export function PUBX_INITIALIZE() {
@@ -38,5 +39,10 @@ export function PUBX_INITIALIZE() {
         timeout
       });
     }
+  });
+
+  // WASMBOY
+  Pubx.publish(PUBX_KEYS.WASMBOY, {
+    name: ''
   });
 }

@@ -14,6 +14,9 @@ const loadROM = (file, fileName) => {
   const loadROMTask = async () => {
     await WasmBoy.loadROM(file);
     Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Game Loaded! 🎉');
+    Pubx.publish(PUBX_KEYS.WASMBOY, {
+      name: fileName
+    });
     // this.setFileLoadingStatus(false);
 
     // To test the new autoplay in safari

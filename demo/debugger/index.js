@@ -18,6 +18,7 @@ import { Pubx } from 'pubx';
 import { PUBX_KEYS, PUBX_INITIALIZE } from './pubx.config';
 
 import WasmBoyPlayer from './components/wasmboyPlayer/wasmboyPlayer';
+import WasmBoyControls from './components/wasmboyControls/wasmboyControls';
 import Overlay from './components/overlay/overlay';
 
 class WasmBoyDebuggerApp extends Component {
@@ -63,7 +64,7 @@ const panelWidgets = [
     closable: false
   }),
   new PreactWidget({
-    component: <WasmBoyDebuggerApp />,
+    component: <WasmBoyControls />,
     label: '2'
   }),
   new PreactWidget({

@@ -3,6 +3,9 @@
 
 import { h, Component } from 'preact';
 
+import { Pubx } from 'pubx';
+import { PUBX_KEYS } from '../../pubx.config';
+
 import WasmBoy from '../../wasmboy';
 
 import './wasmboyPlayer.css';
