@@ -83,32 +83,6 @@ const widgetManager = new WidgetManager(dockPanel);
 Pubx.publish(PUBX_KEYS.WIDGET, {
   widgetManager
 });
-const pubxWidget = Pubx.get(PUBX_KEYS.WIDGET);
-pubxWidget.addWidget({
-  component: <WasmBoyPlayer />,
-  label: 'Player',
-  closable: false
-});
-pubxWidget.addWidget(
-  {
-    component: <WasmBoyControls />,
-    label: 'Playback Controls'
-  },
-  {
-    mode: 'split-right',
-    refIndex: 0
-  }
-);
-pubxWidget.addWidget(
-  {
-    component: <WasmBoyInfo />,
-    label: 'Playback Info'
-  },
-  {
-    mode: 'split-bottom',
-    refIndex: 0
-  }
-);
 
 // Bind phosphor to DOM
 const phosphorContainer = document.getElementById('phosphor-container');
