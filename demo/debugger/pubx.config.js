@@ -4,7 +4,8 @@ import WasmBoy from './wasmboy';
 export const PUBX_KEYS = {
   MODAL: 'MODAL',
   NOTIFICATION: 'NOTIFICATION',
-  WASMBOY: 'WASMBOY'
+  WASMBOY: 'WASMBOY',
+  WIDGET: 'WIDGET'
 };
 
 export function PUBX_INITIALIZE() {
@@ -44,17 +45,38 @@ export function PUBX_INITIALIZE() {
 
   // WASMBOY
   Pubx.publish(PUBX_KEYS.WASMBOY, {
-    name: '',
+    filename: '',
     version: WasmBoy.getVersion(),
+    core: 'Please Load a ROM for the Core Type',
+    cartridge: {},
     update: () => {
-      setTimeout(() => {
+      const updateTask = async () => {
+        const cartridgeInfo = await WasmBoy._getCartridgeInfo();
+
         Pubx.publish(PUBX_KEYS.WASMBOY, {
           playing: WasmBoy.isPlaying(),
           paused: WasmBoy.isPaused(),
           ready: WasmBoy.isReady(),
-          loadedAndStarted: WasmBoy.isLoadedAndStarted()
+          loadedAndStarted: WasmBoy.isLoadedAndStarted(),
+          core: WasmBoy.getCoreType(),
+          cartridge: cartridgeInfo
         });
-      });
+      };
+      updateTask();
+    }
+  });
+
+  // WIDGET
+  Pubx.publish(PUBX_KEYS.WIDGET, {
+    widgetManager: undefined,
+    addWidget: (preactWidgetConfig, splitConfig) => {
+      const widgetManager = Pubx.get(PUBX_KEYS.WIDGET).widgetManager;
+
+      if (widgetManager) {
+        widgetManager.addPreactWidget(preactWidgetConfig, splitConfig);
+      } else {
+        throw new Error('Widget Manager not Created!');
+      }
     }
   });
 }

@@ -103,7 +103,7 @@ export default class WasmBoyControls extends Component {
   render() {
     return (
       <div class="wasmboy-controls">
-        <h1>System Controls</h1>
+        <h1>Playback Controls</h1>
 
         {/* Play/Pause Toggle */}
         <div class="wasmboy-controls__group">

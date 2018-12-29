@@ -10,7 +10,7 @@ import packageJson from '../../package.json';
 
 import './index.css';
 
-import PreactWidget from './preactWidget';
+import WidgetManager from './widgetManager';
 
 import menus from './menus';
 
@@ -19,6 +19,7 @@ import { PUBX_KEYS, PUBX_INITIALIZE } from './pubx.config';
 
 import WasmBoyPlayer from './components/wasmboyPlayer/wasmboyPlayer';
 import WasmBoyControls from './components/wasmboyControls/wasmboyControls';
+import WasmBoyInfo from './components/wasmboyInfo/wasmboyInfo';
 import Overlay from './components/overlay/overlay';
 
 class WasmBoyDebuggerApp extends Component {
@@ -57,25 +58,6 @@ if (typeof window !== 'undefined') {
 const dockPanel = new phosphorWidgets.DockPanel();
 dockPanel.id = 'dock';
 
-const panelWidgets = [
-  new PreactWidget({
-    component: <WasmBoyPlayer />,
-    label: 'Player',
-    closable: false
-  }),
-  new PreactWidget({
-    component: <WasmBoyControls />,
-    label: 'System Controls'
-  }),
-  new PreactWidget({
-    component: <WasmBoyDebuggerApp />,
-    label: '3'
-  })
-];
-dockPanel.addWidget(panelWidgets[0]);
-dockPanel.addWidget(panelWidgets[1], { mode: 'split-right', ref: panelWidgets[0] });
-dockPanel.addWidget(panelWidgets[2], { mode: 'split-bottom', ref: panelWidgets[0] });
-
 // Create our top menu bar
 let menuBar = new phosphorWidgets.MenuBar();
 menus.forEach(menu => {
@@ -95,6 +77,38 @@ window.onresize = () => {
 
 // Initialize Pubx for State Management
 PUBX_INITIALIZE();
+
+// Set up our Widget Manager
+const widgetManager = new WidgetManager(dockPanel);
+Pubx.publish(PUBX_KEYS.WIDGET, {
+  widgetManager
+});
+const pubxWidget = Pubx.get(PUBX_KEYS.WIDGET);
+pubxWidget.addWidget({
+  component: <WasmBoyPlayer />,
+  label: 'Player',
+  closable: false
+});
+pubxWidget.addWidget(
+  {
+    component: <WasmBoyControls />,
+    label: 'Playback Controls'
+  },
+  {
+    mode: 'split-right',
+    refIndex: 0
+  }
+);
+pubxWidget.addWidget(
+  {
+    component: <WasmBoyInfo />,
+    label: 'Playback Info'
+  },
+  {
+    mode: 'split-bottom',
+    refIndex: 0
+  }
+);
 
 // Bind phosphor to DOM
 const phosphorContainer = document.getElementById('phosphor-container');

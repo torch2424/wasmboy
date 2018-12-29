@@ -14,10 +14,11 @@ const loadROM = (file, fileName) => {
   // this.setFileLoadingStatus(true);
 
   const loadROMTask = async () => {
+    await WasmBoy.pause();
     await WasmBoy.loadROM(file);
     Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Game Loaded! 🎉');
     Pubx.publish(PUBX_KEYS.WASMBOY, {
-      name: fileName
+      filename: fileName
     });
     // this.setFileLoadingStatus(false);
 
@@ -233,6 +234,9 @@ class OpenGoogleDriveROM extends Command {
           fileName: responseJson.title
         });
         await WasmBoy.play();
+        Pubx.publish(PUBX_KEYS.WASMBOY, {
+          filename: responseJson.title
+        });
         Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Game Loaded! 🎉');
       } else {
         Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Invalid file type. 😞');

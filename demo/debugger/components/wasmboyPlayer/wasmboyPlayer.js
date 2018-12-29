@@ -79,9 +79,6 @@ const WasmBoyDefaultOptions = {
   }
 };
 
-// Log the wasmboy lib
-console.log('WasmBoy', WasmBoy);
-
 export default class WasmBoyPlayer extends Component {
   constructor() {
     super();

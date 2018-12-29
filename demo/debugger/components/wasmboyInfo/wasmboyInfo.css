@@ -1,7 +1,5 @@
-.wasmboy-controls {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.wasmboy-info {
+  display: block;
 
   width: 100%;
   height: 100%;
