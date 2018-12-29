@@ -60,12 +60,12 @@ dockPanel.id = 'dock';
 const panelWidgets = [
   new PreactWidget({
     component: <WasmBoyPlayer />,
-    label: 'WasmBoy Player',
+    label: 'Player',
     closable: false
   }),
   new PreactWidget({
     component: <WasmBoyControls />,
-    label: '2'
+    label: 'System Controls'
   }),
   new PreactWidget({
     component: <WasmBoyDebuggerApp />,

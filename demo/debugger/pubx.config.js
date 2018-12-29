@@ -1,4 +1,5 @@
 import { Pubx } from 'pubx';
+import WasmBoy from './wasmboy';
 
 export const PUBX_KEYS = {
   MODAL: 'MODAL',
@@ -43,6 +44,17 @@ export function PUBX_INITIALIZE() {
 
   // WASMBOY
   Pubx.publish(PUBX_KEYS.WASMBOY, {
-    name: ''
+    name: '',
+    version: WasmBoy.getVersion(),
+    update: () => {
+      setTimeout(() => {
+        Pubx.publish(PUBX_KEYS.WASMBOY, {
+          playing: WasmBoy.isPlaying(),
+          paused: WasmBoy.isPaused(),
+          ready: WasmBoy.isReady(),
+          loadedAndStarted: WasmBoy.isLoadedAndStarted()
+        });
+      });
+    }
   });
 }

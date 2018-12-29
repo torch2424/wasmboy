@@ -2,6 +2,8 @@ import { h } from 'preact';
 
 import { Pubx } from 'pubx';
 
+import loadScript from 'load-script';
+
 import Command from './command';
 import WasmBoy from '../wasmboy';
 import { PUBX_KEYS } from '../pubx.config';
@@ -67,7 +69,6 @@ class OpenLocalFile extends Command {
   }
 
   execute() {
-    console.log('Open Local File!');
     // Allow autoplaying audio to work
     WasmBoy.resumeAudioContext();
     this.hiddenInput.click();
@@ -86,7 +87,6 @@ class OpenOpenSourceROM extends Command {
   }
 
   execute() {
-    console.log('Open Open Source File!');
     // Allow autoplaying audio to work
     WasmBoy.resumeAudioContext();
 
@@ -104,5 +104,144 @@ class OpenOpenSourceROM extends Command {
   }
 }
 
-const exportedCommands = [new OpenLocalFile(), new OpenOpenSourceROM()];
+// Google drive
+const GOOGLE_SDK_URL = 'https://apis.google.com/js/api.js';
+// Public Keys for Google Drive API
+const WASMBOY_DEBUGGER_GOOGLE_PICKER_CLIENT_ID = '427833658710-bntpbmf6pimh8trt0n4c36gteomseg61.apps.googleusercontent.com';
+// OAuth Key for Google Drive
+let googlePickerOAuthToken = '';
+class OpenGoogleDriveROM extends Command {
+  constructor() {
+    super('open:googledrive');
+    this.options.label = 'Google Drive';
+
+    loadScript(GOOGLE_SDK_URL, () => {
+      window.gapi.load('auth');
+      window.gapi.load('picker');
+    });
+  }
+
+  execute() {
+    // Allow autoplaying audio to work
+    WasmBoy.resumeAudioContext();
+
+    if (!this._isGoogleReady() || !this._isGoogleAuthReady() || !this._isGooglePickerReady()) {
+      // TODO:
+      console.error('Google Drive not ready');
+      Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Google Drive Still Loading, Please Try Again ♻️');
+      return;
+    }
+
+    const token = window.gapi.auth.getToken();
+    const oauthToken = token && token.access_token;
+
+    if (oauthToken) {
+      this._createPicker(oauthToken);
+    } else {
+      this._doAuth(({ access_token }) => this._createPicker(access_token));
+    }
+  }
+
+  _isGoogleReady() {
+    return !!window.gapi;
+  }
+
+  _isGoogleAuthReady() {
+    return !!window.gapi.auth;
+  }
+
+  _isGooglePickerReady() {
+    return !!window.google.picker;
+  }
+
+  _doAuth(callback) {
+    window.gapi.auth.authorize(
+      {
+        client_id: WASMBOY_DEBUGGER_GOOGLE_PICKER_CLIENT_ID,
+        scope: ['https://www.googleapis.com/auth/drive.readonly'],
+        immediate: false
+      },
+      callback
+    );
+  }
+
+  _createPicker(oauthToken) {
+    googlePickerOAuthToken = oauthToken;
+
+    const googleViewId = google.picker.ViewId['DOCS'];
+    const view = new window.google.picker.DocsView(googleViewId);
+
+    view.setMimeTypes(['application/zip', 'application/octet-stream'].join(','));
+
+    if (!view) {
+      throw new Error("Can't find view by viewId");
+    }
+
+    view.setMode(window.google.picker.DocsViewMode.LIST);
+
+    const picker = new window.google.picker.PickerBuilder()
+      .addView(view)
+      .setOAuthToken(oauthToken)
+      .setCallback(data => this._pickerCallback(data));
+
+    picker.enableFeature(window.google.picker.Feature.NAV_HIDDEN);
+
+    // Calculate our picker size
+    // https://stackoverflow.com/questions/1248081/get-the-browser-viewport-dimensions-with-javascript
+    // https://developers.google.com/picker/docs/reference#PickerBuilder
+    const viewportWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+    const viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+    picker.setSize(parseInt(viewportWidth, 10), parseInt(viewportHeight, 10));
+
+    picker.build().setVisible(true);
+  }
+
+  _pickerCallback(data) {
+    const loadGoogleDriveROMTask = async () => {
+      // We only want the picked action
+      if (data.action !== 'picked') {
+        return;
+      }
+
+      // TODO:
+      /*
+      if (window !== undefined && window.gtag) {
+        gtag("event", "google_drive_load");
+      }
+      */
+
+      // Fetch from the drive api to download the file
+      // https://developers.google.com/drive/v3/web/picker
+      // https://developers.google.com/drive/v2/reference/files/get
+
+      const googlePickerFileObject = data.docs[0];
+      const oAuthHeaders = new Headers({
+        Authorization: 'Bearer ' + googlePickerOAuthToken
+      });
+
+      // First Fetch the Information about the file
+      const responseJson = await fetch('https://www.googleapis.com/drive/v2/files/' + googlePickerFileObject.id, {
+        headers: oAuthHeaders
+      }).then(response => {
+        return response.json();
+      });
+
+      if (responseJson.title.endsWith('.zip') || responseJson.title.endsWith('.gb') || responseJson.title.endsWith('.gbc')) {
+        await WasmBoy.pause();
+        await WasmBoy.loadROM(responseJson.downloadUrl, {
+          headers: oAuthHeaders,
+          fileName: responseJson.title
+        });
+        await WasmBoy.play();
+        Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Game Loaded! 🎉');
+      } else {
+        Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Invalid file type. 😞');
+      }
+    };
+
+    loadGoogleDriveROMTask();
+  }
+}
+
+const exportedCommands = [new OpenLocalFile(), new OpenOpenSourceROM(), new OpenGoogleDriveROM()];
 export default exportedCommands;

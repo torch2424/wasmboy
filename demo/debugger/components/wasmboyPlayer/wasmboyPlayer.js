@@ -15,6 +15,10 @@ let saveStateCallbackCalled = false;
 let graphicsCallbackCalled = false;
 let audioCallbackCalled = false;
 
+const getCanvasElement = () => {
+  return document.querySelector('.wasmboy-player canvas');
+};
+
 // WasmBoy Options
 const WasmBoyDefaultOptions = {
   isGbcEnabled: true,
@@ -52,19 +56,26 @@ const WasmBoyDefaultOptions = {
 
     // Function called everytime a savestate occurs
     // Used by the WasmBoySystemControls to show screenshots on save states
-    saveStateObject.screenshotCanvasDataURL = getCanvasElement().toDataURL();
+    const canvasElement = getCanvasElement();
+    if (canvasElement) {
+      saveStateObject.screenshotCanvasDataURL = getCanvasElement().toDataURL();
+    }
   },
   onReady: () => {
     console.log('onReady Callback Called!');
+    Pubx.get(PUBX_KEYS.WASMBOY).update();
   },
   onPlay: () => {
     console.log('onPlay Callback Called!');
+    Pubx.get(PUBX_KEYS.WASMBOY).update();
   },
   onPause: () => {
     console.log('onPause Callback Called!');
+    Pubx.get(PUBX_KEYS.WASMBOY).update();
   },
   onLoadedAndStarted: () => {
     console.log('onLoadedAndStarted Callback Called!');
+    Pubx.get(PUBX_KEYS.WASMBOY).update();
   }
 };
 
@@ -79,7 +90,7 @@ export default class WasmBoyPlayer extends Component {
   componentDidMount() {
     WasmBoy.config(WasmBoyDefaultOptions)
       .then(() => {
-        return WasmBoy.setCanvas(document.querySelector('.wasmboy-player canvas'));
+        return WasmBoy.setCanvas(getCanvasElement());
       })
       .catch(error => {
         console.error(error);

@@ -1,4 +1,5 @@
 @import 'normalize.css';
+@import 'chota/dist/chota.css';
 @import '@phosphor/dragdrop/style/index.css';
 @import '@phosphor/widgets/style/index.css';
 @import '@phosphor/default-theme/style/dockpanel.css';
@@ -51,7 +52,9 @@ body {
 }
 
 .hidden-rom-input {
-  display: none;
+  display: none !important;
+  opacity: 0;
+  visibility: hidden;
 }
 
 .remove-default-button {
