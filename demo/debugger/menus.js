@@ -3,16 +3,39 @@
 import phosphorWidgets from '@phosphor/widgets';
 
 import commands from './commands/commands';
+
 import openCommands from './commands/open';
 
+import playbackCommands from './commands/widgets/playback';
+
 const menus = [];
+
+const addCommandsToMenu = (commands, menu) => {
+  commands.forEach(command => {
+    menu.addItem({ command: command.id });
+  });
+};
 
 // Open
 let openMenu = new phosphorWidgets.Menu({ commands });
 openMenu.title.label = 'Open';
-openCommands.forEach(command => {
-  openMenu.addItem({ command: command.id });
-});
+addCommandsToMenu(openCommands, openMenu);
 menus.push(openMenu);
+
+// Widgets
+let widgetMenu = new phosphorWidgets.Menu({ commands });
+widgetMenu.title.label = 'Widgets';
+
+// Playback Sub Menu
+let playbackSubMenu = new phosphorWidgets.Menu({ commands });
+playbackSubMenu.title.label = 'Playback';
+addCommandsToMenu(playbackCommands, playbackSubMenu);
+widgetMenu.addItem({ type: 'submenu', submenu: playbackSubMenu });
+
+let cpuSubMenu = new phosphorWidgets.Menu({ commands });
+cpuSubMenu.title.label = 'CPU';
+widgetMenu.addItem({ type: 'submenu', submenu: cpuSubMenu });
+
+menus.push(widgetMenu);
 
 export default menus;

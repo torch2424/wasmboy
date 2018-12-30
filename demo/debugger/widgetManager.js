@@ -50,13 +50,21 @@ export default class WidgetManager {
     this._saveLayout();
   }
 
+  handlePreactWidgetClosed(widget) {
+    this.widgets.splice(this.widgets.indexOf(widget), 1);
+  }
+
   _saveLayout() {
-    this.state.layout = this.dockPanel.saveLayout();
-    this._save();
+    // TODO:
+    // this.state.layout = this.dockPanel.saveLayout();
+    // this._save();
   }
 
   _restoreLayout() {
-    dock.restoreLayout(this.state.layout);
+    // TODO:
+    // this.dockPanel.restoreLayout(this.state.layout);
+
+    this._createDefaultLayout();
   }
 
   _createDefaultLayout() {

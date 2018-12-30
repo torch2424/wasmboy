@@ -1,4 +1,6 @@
 import { h, render, Component } from 'preact';
+import { Pubx } from 'pubx';
+import { PUBX_KEYS } from './pubx.config';
 import phosphorWidgets from '@phosphor/widgets';
 
 const createPreactNode = component => {
@@ -50,6 +52,16 @@ export default class PreactWidget extends phosphorWidgets.Widget {
   onActivateRequest(msg) {
     if (this.isAttached) {
       // Called whenever panel is focused
+    }
+  }
+
+  onCloseRequest() {
+    Pubx.get(PUBX_KEYS.WIDGET).widgetClosed(this);
+
+    if (this.parent) {
+      this.parent = null;
+    } else if (this.isAttached) {
+      phosphorWidgets.Widget.detach(this);
     }
   }
 }

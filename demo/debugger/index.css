@@ -108,7 +108,11 @@ body {
 
 /* Phosphor FontAwesome Fix */
 .p-TabBar-tab.p-mod-closable > .p-TabBar-tabCloseIcon:before {
-  content: 'X';
+  content: 'X' !important;
   cursor: pointer;
+  font-weight: bold;
+}
+.p-Menu-item[data-type='submenu'] > .p-Menu-itemSubmenuIcon::before {
+  content: '>' !important;
   font-weight: bold;
 }

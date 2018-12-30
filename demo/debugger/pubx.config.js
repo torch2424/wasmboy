@@ -77,6 +77,15 @@ export function PUBX_INITIALIZE() {
       } else {
         throw new Error('Widget Manager not Created!');
       }
+    },
+    widgetClosed: widget => {
+      const widgetManager = Pubx.get(PUBX_KEYS.WIDGET).widgetManager;
+
+      if (widgetManager) {
+        widgetManager.handlePreactWidgetClosed(widget);
+      } else {
+        throw new Error('Widget Manager not Created!');
+      }
     }
   });
 }
