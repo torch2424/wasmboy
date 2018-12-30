@@ -1,5 +1,5 @@
 import { Pubx } from 'pubx';
-import WasmBoy from './wasmboy';
+import { WasmBoy } from './wasmboy';
 
 export const PUBX_KEYS = {
   MODAL: 'MODAL',

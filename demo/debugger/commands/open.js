@@ -7,7 +7,7 @@ import { Pubx } from 'pubx';
 import loadScript from 'load-script';
 
 import Command from './command';
-import WasmBoy from '../wasmboy';
+import { WasmBoy } from '../wasmboy';
 import { PUBX_KEYS } from '../pubx.config';
 
 import { getOpenSourceROMElements } from '../../openSourceROMsPreact';
