@@ -3,9 +3,9 @@
 import { h, Component } from 'preact';
 
 import { Pubx } from 'pubx';
-import { PUBX_KEYS } from '../../pubx.config';
+import { PUBX_KEYS } from '../../../pubx.config';
 
-import { WasmBoy, WasmBoyDefaultOptions } from '../../wasmboy';
+import { WasmBoy, WasmBoyDefaultOptions } from '../../../wasmboy';
 
 import './wasmboyOptions.css';
 

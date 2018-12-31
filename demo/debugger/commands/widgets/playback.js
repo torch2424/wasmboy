@@ -8,9 +8,9 @@ import { PUBX_KEYS } from '../../pubx.config';
 
 import Command from '../command';
 
-import WasmBoyControls from '../../components/wasmboyControls/wasmboyControls';
-import WasmBoyInfo from '../../components/wasmboyInfo/wasmboyInfo';
-import WasmBoyOptions from '../../components/wasmboyOptions/wasmboyOptions';
+import WasmBoyControls from '../../components/playback/wasmboyControls/wasmboyControls';
+import WasmBoyInfo from '../../components/playback/wasmboyInfo/wasmboyInfo';
+import WasmBoyOptions from '../../components/playback/wasmboyOptions/wasmboyOptions';
 
 class PlaybackControls extends Command {
   constructor() {

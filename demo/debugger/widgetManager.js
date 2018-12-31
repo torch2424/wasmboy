@@ -8,15 +8,17 @@ import { PUBX_KEYS } from './pubx.config';
 import PreactWidget from './preactWidget';
 
 // Add all available widgets so they can serialized and restored
-import WasmBoyPlayer from './components/wasmboyPlayer/wasmboyPlayer';
-import WasmBoyControls from './components/wasmboyControls/wasmboyControls';
-import WasmBoyInfo from './components/wasmboyInfo/wasmboyInfo';
-import WasmBoyOptions from './components/wasmboyOptions/wasmboyOptions';
+import WasmBoyPlayer from './components/playback/wasmboyPlayer/wasmboyPlayer';
+import WasmBoyControls from './components/playback/wasmboyControls/wasmboyControls';
+import WasmBoyInfo from './components/playback/wasmboyInfo/wasmboyInfo';
+import WasmBoyOptions from './components/playback/wasmboyOptions/wasmboyOptions';
+import CpuState from './components/cpu/cpuState/cpuState';
 const components = {
   WasmBoyPlayer: <WasmBoyPlayer />,
   WasmBoyControls: <WasmBoyControls />,
   WasmBoyInfo: <WasmBoyInfo />,
-  WasmBoyOptions: <WasmBoyOptions />
+  WasmBoyOptions: <WasmBoyOptions />,
+  CpuState: <CpuState />
 };
 
 const LOCALSTORAGE_KEY = 'WASMBOY_DEBUGGER_WIDGET_MANAGER';

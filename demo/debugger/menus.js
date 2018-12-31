@@ -5,8 +5,8 @@ import phosphorWidgets from '@phosphor/widgets';
 import commands from './commands/commands';
 
 import openCommands from './commands/open';
-
 import playbackCommands from './commands/widgets/playback';
+import cpuCommands from './commands/widgets/cpu';
 
 const menus = [];
 
@@ -34,6 +34,7 @@ widgetMenu.addItem({ type: 'submenu', submenu: playbackSubMenu });
 
 let cpuSubMenu = new phosphorWidgets.Menu({ commands });
 cpuSubMenu.title.label = 'CPU';
+addCommandsToMenu(cpuCommands, cpuSubMenu);
 widgetMenu.addItem({ type: 'submenu', submenu: cpuSubMenu });
 
 menus.push(widgetMenu);

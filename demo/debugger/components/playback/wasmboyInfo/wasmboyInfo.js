@@ -4,9 +4,9 @@
 import { h, Component } from 'preact';
 
 import { Pubx } from 'pubx';
-import { PUBX_KEYS } from '../../pubx.config';
+import { PUBX_KEYS } from '../../../pubx.config';
 
-import { WasmBoy } from '../../wasmboy';
+import { WasmBoy } from '../../../wasmboy';
 
 import './wasmboyInfo.css';
 
@@ -17,17 +17,6 @@ export default class WasmBoyInfo extends Component {
     // Exerytime WasmBoy gets updated, simply re-render
     Pubx.subscribe(PUBX_KEYS.WASMBOY, newState => this.setState(newState));
 
-    const rafCallback = () => {
-      const fpsElement = document.getElementById('wasmboy-info__fps');
-
-      if (fpsElement) {
-        fpsElement.innerHTML = `WasmBoy Current FPS: ${WasmBoy.getFPS()}`;
-      }
-
-      requestAnimationFrame(rafCallback);
-    };
-    requestAnimationFrame(rafCallback);
-
     this.state = {
       cartridge: {}
     };
@@ -35,6 +24,14 @@ export default class WasmBoyInfo extends Component {
 
   componentDidMount() {
     Pubx.get(PUBX_KEYS.WASMBOY).update();
+
+    const callback = () => {
+      const fpsElement = document.getElementById('wasmboy-info__fps');
+      if (fpsElement) {
+        fpsElement.textContent = `WasmBoy Current FPS: ${WasmBoy.getFPS()}`;
+      }
+    };
+    setInterval(callback, 1000);
   }
 
   render() {

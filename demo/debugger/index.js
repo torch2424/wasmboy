@@ -17,9 +17,6 @@ import menus from './menus';
 import { Pubx } from 'pubx';
 import { PUBX_KEYS, PUBX_INITIALIZE } from './pubx.config';
 
-import WasmBoyPlayer from './components/wasmboyPlayer/wasmboyPlayer';
-import WasmBoyControls from './components/wasmboyControls/wasmboyControls';
-import WasmBoyInfo from './components/wasmboyInfo/wasmboyInfo';
 import Overlay from './components/overlay/overlay';
 
 class WasmBoyDebuggerApp extends Component {
