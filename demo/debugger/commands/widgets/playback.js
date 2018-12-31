@@ -10,6 +10,7 @@ import Command from '../command';
 
 import WasmBoyControls from '../../components/wasmboyControls/wasmboyControls';
 import WasmBoyInfo from '../../components/wasmboyInfo/wasmboyInfo';
+import WasmBoyOptions from '../../components/wasmboyOptions/wasmboyOptions';
 
 class PlaybackControls extends Command {
   constructor() {
@@ -39,5 +40,19 @@ class PlaybackInfo extends Command {
   }
 }
 
-const exportedCommands = [new PlaybackControls(), new PlaybackInfo()];
+class PlaybackOptions extends Command {
+  constructor() {
+    super('playback:options');
+    this.options.label = 'Options';
+  }
+
+  execute() {
+    Pubx.get(PUBX_KEYS.WIDGET).addWidget({
+      component: <WasmBoyOptions />,
+      label: 'Playback Options'
+    });
+  }
+}
+
+const exportedCommands = [new PlaybackControls(), new PlaybackInfo(), new PlaybackOptions()];
 export default exportedCommands;

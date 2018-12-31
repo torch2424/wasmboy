@@ -50,6 +50,10 @@ export function PUBX_INITIALIZE() {
     core: 'Please Load a ROM for the Core Type',
     cartridge: {},
     update: () => {
+      if (!WasmBoy.isLoadedAndStarted()) {
+        return;
+      }
+
       const updateTask = async () => {
         const cartridgeInfo = await WasmBoy._getCartridgeInfo();
 
@@ -83,6 +87,15 @@ export function PUBX_INITIALIZE() {
 
       if (widgetManager) {
         widgetManager.handlePreactWidgetClosed(widget);
+      } else {
+        throw new Error('Widget Manager not Created!');
+      }
+    },
+    widgetResized: widget => {
+      const widgetManager = Pubx.get(PUBX_KEYS.WIDGET).widgetManager;
+
+      if (widgetManager) {
+        widgetManager.handlePreactWidgetResized(widget);
       } else {
         throw new Error('Widget Manager not Created!');
       }

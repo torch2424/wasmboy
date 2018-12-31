@@ -18,6 +18,10 @@ export default class WasmBoyControls extends Component {
     Pubx.subscribe(PUBX_KEYS.WASMBOY, newState => this.setState(newState));
   }
 
+  componentDidMount() {
+    Pubx.get(PUBX_KEYS.WASMBOY).update();
+  }
+
   saveState() {
     WasmBoy.saveState()
       .then(saveState => {

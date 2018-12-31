@@ -20,7 +20,22 @@ export default class WasmBoyPlayer extends Component {
   }
 
   componentDidMount() {
-    WasmBoy.config(WasmBoyDefaultOptions)
+    // Add some pubx hooks by default
+    const wasmboyOptions = {
+      ...WasmBoyDefaultOptions
+    };
+
+    const wasmboyStateCallbackKeys = ['onReady', 'onPlay', 'onPause', 'onLoadedAndStarted'];
+
+    wasmboyStateCallbackKeys.forEach(callbackKey => {
+      const callback = wasmboyOptions[callbackKey];
+      wasmboyOptions[callbackKey] = () => {
+        callback();
+        Pubx.get(PUBX_KEYS.WASMBOY).update();
+      };
+    });
+
+    WasmBoy.config(wasmboyOptions)
       .then(() => {
         return WasmBoy.setCanvas(getCanvasElement());
       })

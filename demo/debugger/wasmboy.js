@@ -1,14 +1,15 @@
 // Single place to import WasmBoy
 // This is so we can swap between Different Lib outputs Easily
-import { Pubx } from 'pubx';
-import { PUBX_KEYS } from './pubx.config';
-
 export { WasmBoy } from '../../dist/wasmboy.wasm.esm';
 
 // Variables to tell if our callbacks were ever run
 let saveStateCallbackCalled = false;
 let graphicsCallbackCalled = false;
 let audioCallbackCalled = false;
+
+const getCanvasElement = () => {
+  return document.querySelector('.wasmboy-player canvas');
+};
 
 // WasmBoy Options
 export const WasmBoyDefaultOptions = {
@@ -54,18 +55,14 @@ export const WasmBoyDefaultOptions = {
   },
   onReady: () => {
     console.log('onReady Callback Called!');
-    Pubx.get(PUBX_KEYS.WASMBOY).update();
   },
   onPlay: () => {
     console.log('onPlay Callback Called!');
-    Pubx.get(PUBX_KEYS.WASMBOY).update();
   },
   onPause: () => {
     console.log('onPause Callback Called!');
-    Pubx.get(PUBX_KEYS.WASMBOY).update();
   },
   onLoadedAndStarted: () => {
     console.log('onLoadedAndStarted Callback Called!');
-    Pubx.get(PUBX_KEYS.WASMBOY).update();
   }
 };

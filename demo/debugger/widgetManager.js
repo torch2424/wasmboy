@@ -1,15 +1,23 @@
 // Organize and hnadle which widgets are currently active
 
 import { h } from 'preact';
-import { parse, stringify } from 'flatted/esm';
 import { Pubx } from 'pubx';
+import traverse from 'traverse';
 import { PUBX_KEYS } from './pubx.config';
 
 import PreactWidget from './preactWidget';
 
+// Add all available widgets so they can serialized and restored
 import WasmBoyPlayer from './components/wasmboyPlayer/wasmboyPlayer';
 import WasmBoyControls from './components/wasmboyControls/wasmboyControls';
 import WasmBoyInfo from './components/wasmboyInfo/wasmboyInfo';
+import WasmBoyOptions from './components/wasmboyOptions/wasmboyOptions';
+const components = {
+  WasmBoyPlayer: <WasmBoyPlayer />,
+  WasmBoyControls: <WasmBoyControls />,
+  WasmBoyInfo: <WasmBoyInfo />,
+  WasmBoyOptions: <WasmBoyOptions />
+};
 
 const LOCALSTORAGE_KEY = 'WASMBOY_DEBUGGER_WIDGET_MANAGER';
 
@@ -27,6 +35,9 @@ export default class WidgetManager {
     } else {
       this._createDefaultLayout();
     }
+
+    // Some event throttlers
+    this.eventThrottle = false;
   }
 
   addPreactWidget(preactWidgetConfig, splitConfig) {
@@ -52,18 +63,56 @@ export default class WidgetManager {
 
   handlePreactWidgetClosed(widget) {
     this.widgets.splice(this.widgets.indexOf(widget), 1);
+    this._saveLayout();
+  }
+
+  handlePreactWidgetResized(widget) {
+    if (this.eventThrottle) {
+      return;
+    }
+
+    this.eventThrottle = setTimeout(() => {
+      this._saveLayout();
+      this.eventThrottle = false;
+    }, 100);
   }
 
   _saveLayout() {
-    // TODO:
-    // this.state.layout = this.dockPanel.saveLayout();
-    // this._save();
+    setTimeout(() => {
+      this.state.layout = this.dockPanel.saveLayout();
+      this._save();
+    });
   }
 
   _restoreLayout() {
-    // TODO:
-    // this.dockPanel.restoreLayout(this.state.layout);
+    if (this.state.layout) {
+      // Try to create all of the appropriate preact widgets
+      const hadError = false;
+      traverse(this.state.layout).forEach(function(value) {
+        if (this.parent && this.parent.key === 'widgets') {
+          const widgetJson = JSON.parse(value);
 
+          if (widgetJson.type === 'PreactWidget') {
+            const preactWidgetConfig = widgetJson.widgetConfig;
+
+            preactWidgetConfig.component = components[preactWidgetConfig.component];
+
+            this.update(new PreactWidget(preactWidgetConfig));
+          } else {
+            console.error('Could not restore widget', widgetJson);
+            hadError = true;
+          }
+        }
+      });
+
+      // Finally restore the layout
+      if (!hadError) {
+        this.dockPanel.restoreLayout(this.state.layout);
+        return;
+      }
+    }
+
+    // If could not restore, use the default
     this._createDefaultLayout();
   }
 
@@ -96,14 +145,14 @@ export default class WidgetManager {
   }
 
   _save() {
-    localStorage.setItem(LOCALSTORAGE_KEY, stringify(this.state));
+    localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(this.state));
   }
 
   _restore() {
     const restoredState = localStorage.getItem(LOCALSTORAGE_KEY);
 
     if (restoredState) {
-      this.state = parse(restoredState);
+      this.state = JSON.parse(restoredState);
     }
   }
 }

@@ -33,6 +33,10 @@ export default class WasmBoyInfo extends Component {
     };
   }
 
+  componentDidMount() {
+    Pubx.get(PUBX_KEYS.WASMBOY).update();
+  }
+
   render() {
     return (
       <div class="wasmboy-info">
