@@ -11,7 +11,7 @@ export default class CpuState extends ValueTable {
   }
 
   intervalUpdate() {
-    if (!WasmBoy.isLoadedAndStarted()) {
+    if (!WasmBoy.isReady()) {
       return;
     }
 

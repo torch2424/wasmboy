@@ -14,7 +14,7 @@ export default class ValueTable extends Component {
   }
 
   componentDidMount() {
-    this.updateInterval = setInterval(() => this.intervalUpdate(), 500);
+    this.updateInterval = setInterval(() => this.intervalUpdate(), 100);
   }
 
   componentWillUnmount() {

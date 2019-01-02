@@ -50,12 +50,11 @@ export function PUBX_INITIALIZE() {
     core: 'Please Load a ROM for the Core Type',
     cartridge: {},
     update: () => {
-      if (!WasmBoy.isLoadedAndStarted()) {
-        return;
-      }
-
       const updateTask = async () => {
-        const cartridgeInfo = await WasmBoy._getCartridgeInfo();
+        let cartridgeInfo = {};
+        if (WasmBoy.isLoadedAndStarted()) {
+          cartridgeInfo = await WasmBoy._getCartridgeInfo();
+        }
 
         Pubx.publish(PUBX_KEYS.WASMBOY, {
           playing: WasmBoy.isPlaying(),

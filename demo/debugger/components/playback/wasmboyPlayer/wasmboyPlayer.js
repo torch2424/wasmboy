@@ -31,7 +31,9 @@ export default class WasmBoyPlayer extends Component {
       const callback = wasmboyOptions[callbackKey];
       wasmboyOptions[callbackKey] = () => {
         callback();
-        Pubx.get(PUBX_KEYS.WASMBOY).update();
+        setTimeout(() => {
+          Pubx.get(PUBX_KEYS.WASMBOY).update();
+        }, 50);
       };
     });
 

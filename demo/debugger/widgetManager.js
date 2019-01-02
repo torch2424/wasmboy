@@ -13,12 +13,14 @@ import WasmBoyControls from './components/playback/wasmboyControls/wasmboyContro
 import WasmBoyInfo from './components/playback/wasmboyInfo/wasmboyInfo';
 import WasmBoyOptions from './components/playback/wasmboyOptions/wasmboyOptions';
 import CpuState from './components/cpu/cpuState/cpuState';
+import CpuControl from './components/cpu/cpuControl/cpuControl';
 const components = {
   WasmBoyPlayer: <WasmBoyPlayer />,
   WasmBoyControls: <WasmBoyControls />,
   WasmBoyInfo: <WasmBoyInfo />,
   WasmBoyOptions: <WasmBoyOptions />,
-  CpuState: <CpuState />
+  CpuState: <CpuState />,
+  CpuControl: <CpuControl />
 };
 
 const LOCALSTORAGE_KEY = 'WASMBOY_DEBUGGER_WIDGET_MANAGER';

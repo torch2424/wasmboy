@@ -32,7 +32,8 @@ const loadROM = (file, fileName) => {
       WasmBoy.play();
     }
     */
-    WasmBoy.play();
+    // WasmBoy.play();
+    Pubx.get(PUBX_KEYS.WASMBOY).update();
 
     // Fire off Analytics
     if (window !== undefined && window.gtag) {

@@ -114,16 +114,16 @@ export default class WasmBoyControls extends Component {
           {this.state.playing ? (
             <button
               onClick={() => WasmBoy.pause()}
-              disabled={!this.state.loadedAndStarted}
-              class={this.state.loadedAndStarted ? 'button success' : 'button error'}
+              disabled={!this.state.ready}
+              class={this.state.ready ? 'button success' : 'button error'}
             >
               Pause
             </button>
           ) : (
             <button
               onClick={() => WasmBoy.play()}
-              disabled={!this.state.loadedAndStarted}
-              class={this.state.loadedAndStarted ? 'button success' : 'button error'}
+              disabled={!this.state.ready}
+              class={this.state.ready ? 'button success' : 'button error'}
             >
               Play
             </button>
