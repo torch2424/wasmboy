@@ -1,13 +1,13 @@
 import { WasmBoy } from '../../../wasmboy';
 
 import ValueTable from '../../valueTable.js';
-import './cpuState.css';
+import './interruptState.css';
 
-export default class CpuState extends ValueTable {
+export default class InterruptState extends ValueTable {
   constructor() {
     super();
 
-    this.state.title = 'CPU';
+    this.state.title = 'Interrupt';
   }
 
   intervalUpdate() {
@@ -18,18 +18,20 @@ export default class CpuState extends ValueTable {
     const updateTask = async () => {
       const valueTable = {};
 
-      // Update CPU valueTable
-      valueTable['Program Counter (PC)'] = await WasmBoy._runWasmExport('getProgramCounter');
-      valueTable['Opcode at PC'] = await WasmBoy._runWasmExport('getOpcodeAtProgramCounter');
-      valueTable['Stack Pointer'] = await WasmBoy._runWasmExport('getStackPointer');
-      valueTable['Register A'] = await WasmBoy._runWasmExport('getRegisterA');
-      valueTable['Register F'] = await WasmBoy._runWasmExport('getRegisterF');
-      valueTable['Register B'] = await WasmBoy._runWasmExport('getRegisterB');
-      valueTable['Register C'] = await WasmBoy._runWasmExport('getRegisterC');
-      valueTable['Register D'] = await WasmBoy._runWasmExport('getRegisterD');
-      valueTable['Register E'] = await WasmBoy._runWasmExport('getRegisterE');
-      valueTable['Register H'] = await WasmBoy._runWasmExport('getRegisterH');
-      valueTable['Register L'] = await WasmBoy._runWasmExport('getRegisterL');
+      // Get all of the gameboy 0xffXX memory
+      const debugMemoryStart = await WasmBoy._runWasmExport('getWasmBoyOffsetFromGameBoyOffset', [0xff00]);
+      const debugMemoryEnd = await WasmBoy._runWasmExport('getWasmBoyOffsetFromGameBoyOffset', [0xffff]);
+      const debugMemory = await WasmBoy._getWasmMemorySection(debugMemoryStart, debugMemoryEnd + 1);
+
+      // Update interrupts valueTable
+      // TODO: Interrupot master switch
+      // if(WasmBoy._getWasmInstance().exports.areInterruptsEnabled()) {
+      //   valueTable.interrupts['Interrupt Master Switch'] = 0x01;
+      // } else {
+      //   valueTable.interrupts['Interrupt Master Switch'] = 0x00;
+      // }
+      valueTable['IE/Interrupt Enabled - 0xFFFF'] = debugMemory[0x00ff];
+      valueTable['IF/Interrupt Request - 0xFF0F'] = debugMemory[0x000f];
 
       this.setState({
         ...this.state,

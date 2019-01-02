@@ -1,13 +1,13 @@
 import { WasmBoy } from '../../../wasmboy';
 
 import ValueTable from '../../valueTable.js';
-import './cpuState.css';
+import './graphicsState.css';
 
-export default class CpuState extends ValueTable {
+export default class GraphicsState extends ValueTable {
   constructor() {
     super();
 
-    this.state.title = 'CPU';
+    this.state.title = 'Graphics';
   }
 
   intervalUpdate() {
@@ -18,18 +18,19 @@ export default class CpuState extends ValueTable {
     const updateTask = async () => {
       const valueTable = {};
 
+      // Get all of the gameboy 0xffXX memory
+      const debugMemoryStart = await WasmBoy._runWasmExport('getWasmBoyOffsetFromGameBoyOffset', [0xff00]);
+      const debugMemoryEnd = await WasmBoy._runWasmExport('getWasmBoyOffsetFromGameBoyOffset', [0xffff]);
+      const debugMemory = await WasmBoy._getWasmMemorySection(debugMemoryStart, debugMemoryEnd + 1);
+
       // Update CPU valueTable
-      valueTable['Program Counter (PC)'] = await WasmBoy._runWasmExport('getProgramCounter');
-      valueTable['Opcode at PC'] = await WasmBoy._runWasmExport('getOpcodeAtProgramCounter');
-      valueTable['Stack Pointer'] = await WasmBoy._runWasmExport('getStackPointer');
-      valueTable['Register A'] = await WasmBoy._runWasmExport('getRegisterA');
-      valueTable['Register F'] = await WasmBoy._runWasmExport('getRegisterF');
-      valueTable['Register B'] = await WasmBoy._runWasmExport('getRegisterB');
-      valueTable['Register C'] = await WasmBoy._runWasmExport('getRegisterC');
-      valueTable['Register D'] = await WasmBoy._runWasmExport('getRegisterD');
-      valueTable['Register E'] = await WasmBoy._runWasmExport('getRegisterE');
-      valueTable['Register H'] = await WasmBoy._runWasmExport('getRegisterH');
-      valueTable['Register L'] = await WasmBoy._runWasmExport('getRegisterL');
+      valueTable['Scanline Register (LY) - 0xFF44'] = await WasmBoy._runWasmExport('getLY');
+      valueTable['LCD Status (STAT) - 0xFF41'] = debugMemory[0x0041];
+      valueTable['LCD Control (LCDC) - 0xFF40'] = debugMemory[0x0040];
+      valueTable['Scroll X - 0xFF43'] = debugMemory[0x0043];
+      valueTable['Scroll Y - 0xFF42'] = debugMemory[0x0042];
+      valueTable['Window X - 0xFF4B'] = debugMemory[0x004b];
+      valueTable['Window Y - 0xFF4A'] = debugMemory[0x004a];
 
       this.setState({
         ...this.state,

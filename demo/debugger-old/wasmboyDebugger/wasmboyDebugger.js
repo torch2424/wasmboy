@@ -218,7 +218,7 @@ export class WasmBoyDebugger extends Component {
       const debugMemoryEnd = await getWasmBoyOffsetFromGameBoyOffset(0xffff);
       const debugMemory = await WasmBoy._getWasmMemorySection(debugMemoryStart, debugMemoryEnd + 1);
 
-      // Update PPI
+      // Update PPU
       valueTable.ppu['Scanline Register (LY) - 0xFF44'] = await WasmBoy._runWasmExport('getLY');
       valueTable.ppu['LCD Status (STAT) - 0xFF41'] = debugMemory[0x0041];
       valueTable.ppu['LCD Control (LCDC) - 0xFF40'] = debugMemory[0x0040];

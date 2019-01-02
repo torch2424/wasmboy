@@ -1,13 +1,13 @@
 import { WasmBoy } from '../../../wasmboy';
 
 import ValueTable from '../../valueTable.js';
-import './cpuState.css';
+import './timerState.css';
 
-export default class CpuState extends ValueTable {
+export default class TimerState extends ValueTable {
   constructor() {
     super();
 
-    this.state.title = 'CPU';
+    this.state.title = 'Timer';
   }
 
   intervalUpdate() {
@@ -18,18 +18,16 @@ export default class CpuState extends ValueTable {
     const updateTask = async () => {
       const valueTable = {};
 
-      // Update CPU valueTable
-      valueTable['Program Counter (PC)'] = await WasmBoy._runWasmExport('getProgramCounter');
-      valueTable['Opcode at PC'] = await WasmBoy._runWasmExport('getOpcodeAtProgramCounter');
-      valueTable['Stack Pointer'] = await WasmBoy._runWasmExport('getStackPointer');
-      valueTable['Register A'] = await WasmBoy._runWasmExport('getRegisterA');
-      valueTable['Register F'] = await WasmBoy._runWasmExport('getRegisterF');
-      valueTable['Register B'] = await WasmBoy._runWasmExport('getRegisterB');
-      valueTable['Register C'] = await WasmBoy._runWasmExport('getRegisterC');
-      valueTable['Register D'] = await WasmBoy._runWasmExport('getRegisterD');
-      valueTable['Register E'] = await WasmBoy._runWasmExport('getRegisterE');
-      valueTable['Register H'] = await WasmBoy._runWasmExport('getRegisterH');
-      valueTable['Register L'] = await WasmBoy._runWasmExport('getRegisterL');
+      // Get all of the gameboy 0xffXX memory
+      const debugMemoryStart = await WasmBoy._runWasmExport('getWasmBoyOffsetFromGameBoyOffset', [0xff00]);
+      const debugMemoryEnd = await WasmBoy._runWasmExport('getWasmBoyOffsetFromGameBoyOffset', [0xffff]);
+      const debugMemory = await WasmBoy._getWasmMemorySection(debugMemoryStart, debugMemoryEnd + 1);
+
+      // Update Timers valueTable
+      valueTable['TIMA - 0xFF05'] = await WasmBoy._runWasmExport('getTIMA');
+      valueTable['TMA - 0xFF06'] = await WasmBoy._runWasmExport('getTMA');
+      valueTable['TIMC/TAC - 0xFF07'] = await WasmBoy._runWasmExport('getTAC');
+      valueTable['DIV/Divider Register - 0xFF04'] = await WasmBoy._runWasmExport('getDIV');
 
       this.setState({
         ...this.state,
