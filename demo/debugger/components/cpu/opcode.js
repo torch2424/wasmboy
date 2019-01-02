@@ -6,7 +6,10 @@ import { WasmBoy } from '../../wasmboy';
 export function stepOpcode() {
   const stepOpcodeTask = async () => {
     // We should pause wasmboy
-    await WasmBoy.pause();
+    if (WasmBoy.isPlaying()) {
+      await WasmBoy.pause();
+    }
+
     const numberOfCycles = await WasmBoy._runWasmExport('emulationStep');
 
     if (numberOfCycles <= 0) {
@@ -21,10 +24,7 @@ export function stepOpcode() {
 // Function to run a specifed number of opcodes for faster stepping
 export function runNumberOfOpcodes(numberOfOpcodes, breakPoint) {
   // Keep stepping until highest opcode increases
-  let opcodesToRun = this.state.opcodesToRun;
-  if (numberOfOpcodes) {
-    opcodesToRun = numberOfOpcodes;
-  }
+  let opcodesToRun = numberOfOpcodes;
 
   const runNumberOfOpcodesTask = async () => {
     let opcodesRan = 0;
@@ -48,29 +48,33 @@ export function runNumberOfOpcodes(numberOfOpcodes, breakPoint) {
 }
 
 // Function to keep running opcodes until a breakpoint is reached
-export function breakPoint(skipInitialStep) {
+export function runUntilBreakPoint(passedBreakPoint) {
   // Set our opcode breakpoint
-  const breakPoint = parseInt(this.state.breakPoint, 16);
+  const breakPoint = parseInt(passedBreakPoint, 16);
 
-  const breakPointTask = async () => {
-    if (!skipInitialStep) {
-      await this.runNumberOfOpcodes(1, breakPoint);
-    }
+  stepOpcode();
 
+  const breakPointTask = async breakPoint => {
     const response = await WasmBoy._runWasmExport('executeFrameUntilBreakpoint', [breakPoint]);
+
     if (response === 0) {
-      requestAnimationFrame(() => {
-        this.updateExecutionProgress();
-        this.updateValueTable();
-        this.breakPoint(true);
-      });
+      const continueSearchingForBreakPointTask = async () => {
+        await new Promise(resolve => {
+          requestAnimationFrame(() => {
+            resolve();
+          });
+        });
+
+        return breakPointTask(breakPoint);
+      };
+
+      return continueSearchingForBreakPointTask();
     } else if (response === -1) {
       throw new Error('WasmBoy Crashed while trying to reach the breakpoint');
-    } else {
-      console.log('Reached Breakpoint, that satisfies test inside runNumberOfOpcodes');
-      this.updateExecutionProgress();
-      this.updateValueTable();
     }
+
+    // We Reached the breakpoint!
+    return true;
   };
-  breakPointTask();
+  return breakPointTask(breakPoint);
 }
