@@ -34,6 +34,49 @@ export default class WasmBoyInfo extends Component {
     setInterval(callback, 1000);
   }
 
+  notifyWasmBoyMustBeReady() {
+    Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Please load a ROM. 💾');
+  }
+
+  logWasmBoyObject() {
+    console.log('WasmBoy', WasmBoy);
+  }
+
+  logWasmBoyMemory() {
+    if (!WasmBoy.isReady()) {
+      this.notifyWasmBoyMustBeReady();
+      return;
+    }
+
+    WasmBoy._getWasmMemorySection().then(wasmByteMemory => {
+      console.log(`[WasmBoy Debugger] Entire WasmBoy Memory:`, wasmByteMemory);
+    });
+  }
+
+  logGameBoyMemory() {
+    if (!WasmBoy.isReady()) {
+      this.notifyWasmBoyMustBeReady();
+      return;
+    }
+
+    const asyncTask = async () => {
+      const location = await WasmBoy._getWasmConstant('GAMEBOY_INTERNAL_MEMORY_LOCATION');
+      const size = await WasmBoy._getWasmConstant('GAMEBOY_INTERNAL_MEMORY_SIZE');
+      const memory = await WasmBoy._getWasmMemorySection(location, location + size + 1);
+      console.log(`[WasmBoy Debugger] Gameboy Memory:`, memory);
+    };
+    asyncTask();
+  }
+
+  saveAudioBuffer() {
+    if (!WasmBoy.isReady()) {
+      this.notifyWasmBoyMustBeReady();
+      return;
+    }
+
+    WasmBoy._saveCurrentAudioBufferToWav();
+  }
+
   render() {
     return (
       <div class="wasmboy-info">
@@ -41,7 +84,14 @@ export default class WasmBoyInfo extends Component {
         <div>WasmBoy Version: {this.state.version}</div>
         <div>WasmBoy Core Type: {this.state.core}</div>
         <div id="wasmboy-info__fps" />
-        <button onClick={() => console.log('WasmBoy', WasmBoy)}>Log WasmBoy Object to JS Console</button>
+
+        <h1>WasmBoy Debug Actions</h1>
+        <div class="wasmboy-info__action-buttons">
+          <button onClick={() => this.logWasmBoyObject()}>Log WasmBoy Object to JS Console</button>
+          <button onClick={() => this.logWasmBoyMemory()}>Log WasmBoy Memory to JS Console</button>
+          <button onClick={() => this.logGameBoyMemory()}>Log Game Boy Memory to JS Console</button>
+          <button onClick={() => this.saveAudioBuffer()}>Save Current Audio Buffer as .wav</button>
+        </div>
 
         <h1>ROM</h1>
         <div>Loaded ROM Filename: {this.state.filename}</div>

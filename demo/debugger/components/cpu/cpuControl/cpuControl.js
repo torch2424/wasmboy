@@ -15,6 +15,8 @@ export default class CpuControl extends Component {
     super();
 
     this.state.isBusy = false;
+    this.state.numberOfOpcodes = 2000;
+    this.state.breakPoint = 40;
   }
 
   stepOpcode() {

@@ -88,6 +88,7 @@ export default class ValueTable extends Component {
     return (
       <div className="value-table-container">
         <h1>{this.state.title}</h1>
+        {this.state.headerElement}
         <table className="value-table">
           <tr>
             <th>Value</th>

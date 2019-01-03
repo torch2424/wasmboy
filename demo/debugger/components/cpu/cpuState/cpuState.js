@@ -1,3 +1,5 @@
+import { h } from 'preact';
+
 import { WasmBoy } from '../../../wasmboy';
 
 import ValueTable from '../../valueTable.js';
@@ -31,9 +33,12 @@ export default class CpuState extends ValueTable {
       valueTable['Register H'] = await WasmBoy._runWasmExport('getRegisterH');
       valueTable['Register L'] = await WasmBoy._runWasmExport('getRegisterL');
 
+      const cyclesRan = await WasmBoy._getCyclesAsString();
+
       this.setState({
         ...this.state,
-        object: valueTable
+        object: valueTable,
+        headerElement: <div>Cycles Ran: {cyclesRan}</div>
       });
     };
     updateTask();
