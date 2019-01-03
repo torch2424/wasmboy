@@ -15,6 +15,7 @@ import WasmBoyOptions from './components/playback/wasmboyOptions/wasmboyOptions'
 import CpuState from './components/cpu/cpuState/cpuState';
 import CpuControl from './components/cpu/cpuControl/cpuControl';
 import GraphicsState from './components/graphics/graphicsState/graphicsState';
+import BackgroundMap from './components/graphics/backgroundMap/backgroundMap';
 import AudioState from './components/audio/audioState/audioState';
 import InterruptState from './components/interrupt/interruptState/interruptState';
 import TimerState from './components/timer/timerState/timerState';
@@ -26,6 +27,7 @@ const components = {
   CpuState: <CpuState />,
   CpuControl: <CpuControl />,
   GraphicsState: <GraphicsState />,
+  BackgroundMap: <BackgroundMap />,
   AudioState: <AudioState />,
   InterruptState: <InterruptState />,
   TimerState: <TimerState />
