@@ -84,6 +84,7 @@ class OpenLocalFile extends Command {
   }
 }
 
+// Open Source Roms
 class OpenOpenSourceROM extends Command {
   constructor() {
     super('open:opensource');
@@ -105,6 +106,32 @@ class OpenOpenSourceROM extends Command {
         </div>
       );
     });
+  }
+}
+
+// TODO: This is for testing for now
+// https://gbhh.avivace.com/developers
+class OpenHomebrewHubROM extends Command {
+  constructor() {
+    super('open:homebrewhub');
+    this.options.label = 'Homebrew Hub ROMs';
+  }
+
+  execute() {
+    // Allow autoplaying audio to work
+    WasmBoy.resumeAudioContext();
+
+    // Just fetch and run 2048 for testing
+    const homebrewHubTask = async () => {
+      // Test making a request for the ROMS
+      const json = await fetch('https://gbhh.avivace.com/api/homebrews').then(response => response.json());
+      console.log('Homebrews response', json);
+
+      // Fetch using Wasmboy
+      await WasmBoy.loadROM('https://gbhh.avivace.com/database/entries/2048gb/2048.gb');
+      await WasmBoy.play();
+    };
+    homebrewHubTask();
   }
 }
 
@@ -250,5 +277,10 @@ class OpenGoogleDriveROM extends Command {
   }
 }
 
-const exportedCommands = [new OpenLocalFile(), new OpenOpenSourceROM(), new OpenGoogleDriveROM()];
+const exportedCommands = [
+  new OpenLocalFile(),
+  new OpenOpenSourceROM(),
+  // new OpenHomebrewHubROM(),
+  new OpenGoogleDriveROM()
+];
 export default exportedCommands;
