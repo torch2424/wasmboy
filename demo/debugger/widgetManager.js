@@ -16,6 +16,7 @@ import CpuState from './components/cpu/cpuState/cpuState';
 import CpuControl from './components/cpu/cpuControl/cpuControl';
 import GraphicsState from './components/graphics/graphicsState/graphicsState';
 import BackgroundMap from './components/graphics/backgroundMap/backgroundMap';
+import TileData from './components/graphics/tileData/tileData';
 import AudioState from './components/audio/audioState/audioState';
 import InterruptState from './components/interrupt/interruptState/interruptState';
 import TimerState from './components/timer/timerState/timerState';
@@ -28,6 +29,7 @@ const components = {
   CpuControl: <CpuControl />,
   GraphicsState: <GraphicsState />,
   BackgroundMap: <BackgroundMap />,
+  TileData: <TileData />,
   AudioState: <AudioState />,
   InterruptState: <InterruptState />,
   TimerState: <TimerState />
