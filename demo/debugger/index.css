@@ -51,6 +51,12 @@ body {
   overflow: hidden;
 }
 
+.pixel-canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 .hidden-rom-input {
   display: none !important;
   opacity: 0;

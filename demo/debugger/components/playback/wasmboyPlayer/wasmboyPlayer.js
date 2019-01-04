@@ -49,7 +49,7 @@ export default class WasmBoyPlayer extends Component {
   render() {
     return (
       <div class="wasmboy-player">
-        <canvas />
+        <canvas class="pixel-canvas" />
       </div>
     );
   }

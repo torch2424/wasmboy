@@ -161,7 +161,7 @@ export default class BackgroundMap extends Component {
     return (
       <div id="background-map">
         <h1>Background Map</h1>
-        <canvas id="background-map__canvas" width="256" height="256" />
+        <canvas id="background-map__canvas" class="pixel-canvas" width="256" height="256" />
       </div>
     );
   }
