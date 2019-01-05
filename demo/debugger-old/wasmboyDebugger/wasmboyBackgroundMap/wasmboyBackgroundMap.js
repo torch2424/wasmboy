@@ -51,7 +51,7 @@ export class WasmBoyBackgroundMap extends Component {
       WasmBoy._runWasmExport('drawBackgroundMapToWasmMemory', [1]);
 
       // Get our background map location constant
-      const backgroundMapLocation = await WasmBoy._getWasmConstant('backgroundMapLocation');
+      const backgroundMapLocation = await WasmBoy._getWasmConstant('backgroundMapLocation', [0]);
       const backgroundMapMemory = await WasmBoy._getWasmMemorySection(backgroundMapLocation, backgroundMapLocation + 256 * 256 * 3);
 
       const imageDataArray = new Uint8ClampedArray(256 * 256 * 4);

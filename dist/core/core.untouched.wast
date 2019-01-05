@@ -261,7 +261,6 @@
  (global $core/graphics/palette/Palette.memoryLocationBackgroundPaletteIndex (mut i32) (i32.const 65384))
  (global $core/graphics/palette/Palette.memoryLocationSpritePaletteData (mut i32) (i32.const 65387))
  (global $core/graphics/palette/Palette.memoryLocationBackgroundPaletteData (mut i32) (i32.const 65385))
- (global $~argc (mut i32) (i32.const 0))
  (global $core/legacy/wasmMemorySize i32 (i32.const 9109504))
  (global $core/legacy/wasmBoyInternalStateLocation i32 (i32.const 1024))
  (global $core/legacy/wasmBoyInternalStateSize i32 (i32.const 1024))
@@ -276,6 +275,7 @@
  (global $core/legacy/soundOutputLocation i32 (i32.const 588800))
  (global $core/legacy/gameRamBanksLocation i32 (i32.const 719872))
  (global $core/legacy/gameBytesLocation i32 (i32.const 850944))
+ (global $~argc (mut i32) (i32.const 0))
  (memory $0 0)
  (export "memory" (memory $0))
  (export "config" (func $core/core/config))
@@ -346,7 +346,7 @@
  (export "getStackPointer" (func $core/debug/debug-cpu/getStackPointer))
  (export "getOpcodeAtProgramCounter" (func $core/debug/debug-cpu/getOpcodeAtProgramCounter))
  (export "getLY" (func $core/debug/debug-graphics/getLY))
- (export "drawBackgroundMapToWasmMemory" (func $core/debug/debug-graphics/drawBackgroundMapToWasmMemory|trampoline))
+ (export "drawBackgroundMapToWasmMemory" (func $core/debug/debug-graphics/drawBackgroundMapToWasmMemory))
  (export "drawTileDataToWasmMemory" (func $core/debug/debug-graphics/drawTileDataToWasmMemory))
  (export "getDIV" (func $core/debug/debug-timer/getDIV))
  (export "getTIMA" (func $core/debug/debug-timer/getTIMA))
@@ -25151,53 +25151,7 @@
    )
   )
  )
- (func $core/graphics/tiles/drawPixelsFromLineOfTile|trampoline (; 299 ;) (; has Stack IR ;) (type $iiiiiiiiiiiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (param $7 i32) (param $8 i32) (param $9 i32) (param $10 i32) (param $11 i32) (param $12 i32) (result i32)
-  (block $3of3
-   (block $2of3
-    (block $1of3
-     (block $0of3
-      (block $outOfRange
-       (br_table $0of3 $1of3 $2of3 $3of3 $outOfRange
-        (i32.sub
-         (get_global $~argc)
-         (i32.const 10)
-        )
-       )
-      )
-      (unreachable)
-     )
-     (set_local $10
-      ;;@ core/graphics/tiles.ts:36:53
-      (i32.const 0)
-     )
-    )
-    (set_local $11
-     ;;@ core/graphics/tiles.ts:37:25
-     (i32.const 0)
-    )
-   )
-   (set_local $12
-    ;;@ core/graphics/tiles.ts:38:25
-    (i32.const -1)
-   )
-  )
-  (call $core/graphics/tiles/drawPixelsFromLineOfTile
-   (get_local $0)
-   (get_local $1)
-   (get_local $2)
-   (get_local $3)
-   (get_local $4)
-   (get_local $5)
-   (get_local $6)
-   (get_local $7)
-   (get_local $8)
-   (get_local $9)
-   (get_local $10)
-   (get_local $11)
-   (get_local $12)
-  )
- )
- (func $core/debug/debug-graphics/drawTileDataToWasmMemory (; 300 ;) (; has Stack IR ;) (type $v)
+ (func $core/debug/debug-graphics/drawTileDataToWasmMemory (; 299 ;) (; has Stack IR ;) (type $v)
   (local $0 i32)
   (local $1 i32)
   (local $2 i32)
@@ -25339,11 +25293,9 @@
           (i32.const 8)
          )
         )
-        (set_global $~argc
-         (i32.const 11)
-        )
+        ;;@ core/debug/debug-graphics.ts:213:8
         (drop
-         (call $core/graphics/tiles/drawPixelsFromLineOfTile|trampoline
+         (call $core/graphics/tiles/drawPixelsFromLineOfTile
           (get_local $1)
           (get_local $5)
           (get_local $4)
@@ -25371,8 +25323,10 @@
           (i32.const 429056)
           ;;@ core/debug/debug-graphics.ts:224:10
           (i32.const 1)
+          ;;@ core/debug/debug-graphics.ts:225:10
           (i32.const 0)
-          (i32.const 0)
+          ;;@ core/debug/debug-graphics.ts:226:10
+          (i32.const -1)
          )
         )
         ;;@ core/debug/debug-graphics.ts:212:50
@@ -25406,19 +25360,19 @@
    )
   )
  )
- (func $core/debug/debug-timer/getDIV (; 301 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/debug/debug-timer/getDIV (; 300 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/debug/debug-timer.ts:5:16
   (get_global $core/timers/timers/Timers.dividerRegister)
  )
- (func $core/debug/debug-timer/getTIMA (; 302 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/debug/debug-timer/getTIMA (; 301 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/debug/debug-timer.ts:9:16
   (get_global $core/timers/timers/Timers.timerCounter)
  )
- (func $core/debug/debug-timer/getTMA (; 303 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/debug/debug-timer/getTMA (; 302 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/debug/debug-timer.ts:13:16
   (get_global $core/timers/timers/Timers.timerModulo)
  )
- (func $core/debug/debug-timer/getTAC (; 304 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/debug/debug-timer/getTAC (; 303 ;) (; has Stack IR ;) (type $i) (result i32)
   (local $0 i32)
   ;;@ core/debug/debug-timer.ts:17:2
   (set_local $0
@@ -25441,7 +25395,7 @@
   )
   (get_local $0)
  )
- (func $start (; 305 ;) (; has Stack IR ;) (type $v)
+ (func $start (; 304 ;) (; has Stack IR ;) (type $v)
   ;;@ core/core.ts:17:0
   (if
    ;;@ core/core.ts:17:4
@@ -25463,7 +25417,7 @@
    )
   )
  )
- (func $core/execute/executeFrameAndCheckAudio|trampoline (; 306 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/execute/executeFrameAndCheckAudio|trampoline (; 305 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (block $1of1
    (block $0of1
     (block $outOfRange
@@ -25482,12 +25436,12 @@
    (get_local $0)
   )
  )
- (func $~setargc (; 307 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $~setargc (; 306 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   (set_global $~argc
    (get_local $0)
   )
  )
- (func $core/execute/executeUntilCondition|trampoline (; 308 ;) (; has Stack IR ;) (type $iiii) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $core/execute/executeUntilCondition|trampoline (; 307 ;) (; has Stack IR ;) (type $iiii) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   (block $3of3
    (block $2of3
     (block $1of3
@@ -25518,25 +25472,6 @@
    (get_local $0)
    (get_local $1)
    (get_local $2)
-  )
- )
- (func $core/debug/debug-graphics/drawBackgroundMapToWasmMemory|trampoline (; 309 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
-  (block $1of1
-   (block $0of1
-    (block $outOfRange
-     (br_table $0of1 $1of1 $outOfRange
-      (get_global $~argc)
-     )
-    )
-    (unreachable)
-   )
-   (set_local $0
-    ;;@ core/debug/debug-graphics.ts:22:63
-    (i32.const 0)
-   )
-  )
-  (call $core/debug/debug-graphics/drawBackgroundMapToWasmMemory
-   (get_local $0)
   )
  )
 )

@@ -7,6 +7,9 @@ import { WasmBoy } from '../../../wasmboy';
 
 import './tileData.css';
 
+const tileDataXPixels = 0x1f * 8;
+const tileDataYPixels = 0x17 * 8;
+
 export default class TileData extends Component {
   constructor() {
     super();
@@ -18,7 +21,7 @@ export default class TileData extends Component {
   componentDidMount() {
     const canvasElement = this.base.querySelector('#tile-data__canvas');
     const canvasContext = canvasElement.getContext('2d');
-    const canvasImageData = canvasContext.createImageData(256, 256);
+    const canvasImageData = canvasContext.createImageData(tileDataXPixels, tileDataYPixels);
 
     // Add some css for smooth 8-bit canvas scaling
     // https://stackoverflow.com/questions/7615009/disable-interpolation-when-scaling-a-canvas
@@ -49,7 +52,7 @@ export default class TileData extends Component {
         }
       });
     };
-    // updateCallback();
+    updateCallback();
   }
 
   componentWillUnmount() {
@@ -60,15 +63,16 @@ export default class TileData extends Component {
     }
   }
 
-  updateCallback() {
+  updateCallback(canvasElement, canvasContext, canvasImageData) {
     const updateCanvasTask = async () => {
       // Dont update for the following
-      if (!WasmBoy.isReady() || WasmBoy.isPaused() || !this.props.shouldUpdate) {
+      if (!WasmBoy.isReady() || WasmBoy.isPaused()) {
         return;
       }
 
       // Draw our tile Data
-      WasmBoy._runWasmExport('drawTileDataToWasmMemory');
+      // Tested old debugger, this is definitely bug on the JS side
+      await WasmBoy._runWasmExport('drawTileDataToWasmMemory');
 
       const imageDataArray = new Uint8ClampedArray(tileDataYPixels * tileDataXPixels * 4);
       const rgbColor = new Uint8ClampedArray(3);
@@ -118,7 +122,7 @@ export default class TileData extends Component {
     return (
       <div id="tile-data">
         <h1>Tile Data</h1>
-        <canvas id="tile-data__canvas" class="pixel-canvas" width="256" height="256" />
+        <canvas id="tile-data__canvas" class="pixel-canvas" width={tileDataXPixels} height={tileDataYPixels} />
       </div>
     );
   }

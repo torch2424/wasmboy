@@ -19,7 +19,7 @@ export function getLY(): i32 {
   return Graphics.scanlineRegister;
 }
 
-export function drawBackgroundMapToWasmMemory(showColor: i32 = 0): void {
+export function drawBackgroundMapToWasmMemory(showColor: i32): void {
   // http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html
   // Bit 7 - LCD Display Enable (0=Off, 1=On)
   // Bit 6 - Window Tile Map Display Select (0=9800-9BFF, 1=9C00-9FFF)
@@ -221,7 +221,9 @@ export function drawTileDataToWasmMemory(): void {
           tileDataMapGridY * 8 + tileLineY,
           0x1f * 8,
           TILE_DATA_LOCATION,
-          true
+          true,
+          0,
+          -1
         );
       }
     }
