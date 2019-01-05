@@ -98,6 +98,30 @@ export function PUBX_INITIALIZE() {
       } else {
         throw new Error('Widget Manager not Created!');
       }
+    },
+    isWidgetOpen: widgetComponentName => {
+      const widgetManager = Pubx.get(PUBX_KEYS.WIDGET).widgetManager;
+
+      if (widgetManager) {
+        return widgetManager.widgets.some(widget => {
+          const widgetJson = JSON.parse(widget.toJSON());
+
+          if (widgetJson.widgetConfig.component === widgetComponentName) {
+            return true;
+          }
+
+          return false;
+        });
+      }
+
+      return false;
+    },
+    isControlWidgetsOpen: () => {
+      // Check if the Playback Control or CPU Control is open , if not, let's autoplay
+      const pubxWidget = Pubx.get(PUBX_KEYS.WIDGET);
+
+      const controlWidgetComponentNames = ['WasmBoyControls', 'CpuControl'];
+      return controlWidgetComponentNames.some(componentName => pubxWidget.isWidgetOpen(componentName));
     }
   });
 }

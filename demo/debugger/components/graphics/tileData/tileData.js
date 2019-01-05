@@ -71,7 +71,6 @@ export default class TileData extends Component {
       }
 
       // Draw our tile Data
-      // Tested old debugger, this is definitely bug on the JS side
       await WasmBoy._runWasmExport('drawTileDataToWasmMemory');
 
       const imageDataArray = new Uint8ClampedArray(tileDataYPixels * tileDataXPixels * 4);

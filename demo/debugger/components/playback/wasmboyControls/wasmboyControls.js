@@ -55,8 +55,6 @@ export default class WasmBoyControls extends Component {
         const saveStateElements = [];
 
         saveStates.forEach(saveState => {
-          console.log(saveState);
-
           let saveStateDateString = new Date(saveState.date);
           saveStateDateString = saveStateDateString.toLocaleString();
           saveStateElements.unshift(
@@ -88,26 +86,28 @@ export default class WasmBoyControls extends Component {
   }
 
   loadState(saveState) {
-    console.log(saveState);
-    WasmBoy.loadState(saveState)
-      .then(() => {
-        WasmBoy.play()
-          .then(() => {
-            Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('State Loaded! 😀');
-          })
-          .catch(() => {
-            Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Error Loading State... 😞');
-          });
-      })
-      .catch(() => {
-        Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Error Loading State... 😞');
-      });
+    const loadStateTask = async () => {
+      await WasmBoy.loadState(saveState);
+
+      // Check if the Playback Control or CPU Control is open , if not, let's autoplay
+      if (!Pubx.get(PUBX_KEYS.WIDGET).isControlWidgetsOpen()) {
+        await WasmBoy.play();
+      }
+
+      Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('State Loaded! 😀');
+    };
+    loadStateTask().catch(() => {
+      Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Error Loading State... 😞');
+    });
   }
 
   render() {
     return (
       <div class="wasmboy-controls">
         <h1>Playback Controls</h1>
+        <div>
+          <i>ROMs will not autoplay while this widget is open.</i>
+        </div>
 
         {/* Play/Pause Toggle */}
         <div class="wasmboy-controls__group">

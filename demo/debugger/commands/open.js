@@ -22,17 +22,12 @@ const loadROM = (file, fileName) => {
     Pubx.publish(PUBX_KEYS.WASMBOY, {
       filename: fileName
     });
-    // this.setFileLoadingStatus(false);
 
-    // To test the new autoplay in safari
-    // and in chrome
-    // TODO
-    /*
-    if (this.props.autoplay) {
-      WasmBoy.play();
+    // Check if the Playback Control or CPU Control is open , if not, let's autoplay
+    if (!Pubx.get(PUBX_KEYS.WIDGET).isControlWidgetsOpen()) {
+      await WasmBoy.play();
     }
-    */
-    // WasmBoy.play();
+
     Pubx.get(PUBX_KEYS.WASMBOY).update();
 
     // Fire off Analytics

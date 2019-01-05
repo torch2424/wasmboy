@@ -88,6 +88,9 @@ export default class CpuControl extends Component {
     return (
       <div class="cpu-control">
         <h1>CPU Control</h1>
+        <div>
+          <i>ROMs will not autoplay while this widget is open.</i>
+        </div>
 
         {/* Single Stepping */}
         <div>

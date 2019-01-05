@@ -104,6 +104,7 @@ export default class WidgetManager {
     if (this.state.layout) {
       // Try to create all of the appropriate preact widgets
       const hadError = false;
+      const self = this;
       traverse(this.state.layout).forEach(function(value) {
         if (this.parent && this.parent.key === 'widgets') {
           const widgetJson = JSON.parse(value);
@@ -113,10 +114,13 @@ export default class WidgetManager {
 
             preactWidgetConfig.component = components[preactWidgetConfig.component];
 
-            this.update(new PreactWidget(preactWidgetConfig));
+            const newWidget = new PreactWidget(preactWidgetConfig);
+            this.update(newWidget);
+            self.widgets.push(newWidget);
           } else {
             console.error('Could not restore widget', widgetJson);
             hadError = true;
+            self.widgets = [];
           }
         }
       });
