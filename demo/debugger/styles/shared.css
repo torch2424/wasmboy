@@ -1,5 +1,9 @@
 /* Styles used by individual elements across the app */
 
+.hide {
+  display: none;
+}
+
 .pixel-canvas {
   width: 100%;
   height: 100%;

@@ -5,7 +5,7 @@ import { h, Component } from 'preact';
 import { Pubx } from 'pubx';
 import { PUBX_KEYS } from '../../../pubx.config';
 
-import { WasmBoy, WasmBoyDefaultOptions } from '../../../wasmboy';
+import { WasmBoy, WasmBoyDefaultDesktopOptions } from '../../../wasmboy';
 
 import './wasmboyOptions.css';
 
@@ -20,7 +20,7 @@ export default class WasmBoyOptions extends Component {
     // Add all of our default options from the props to our component state
     const newState = Object.assign({}, this.state);
     const wasmboyConfig = WasmBoy.getConfig();
-    Object.keys(WasmBoyDefaultOptions).forEach(optionKey => {
+    Object.keys(WasmBoyDefaultDesktopOptions).forEach(optionKey => {
       newState[optionKey] = wasmboyConfig[optionKey];
     });
     this.setState(newState);

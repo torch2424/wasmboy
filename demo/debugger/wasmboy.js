@@ -1,28 +1,35 @@
 // Single place to import WasmBoy
 // This is so we can swap between Different Lib outputs Easily
-export { WasmBoy } from '../../dist/wasmboy.wasm.esm';
+import { WasmBoy as WasmBoyImport } from '../../dist/wasmboy.wasm.esm';
+export const WasmBoy = WasmBoyImport;
 
 // Variables to tell if our callbacks were ever run
 let saveStateCallbackCalled = false;
 let graphicsCallbackCalled = false;
 let audioCallbackCalled = false;
 
-const getCanvasElement = () => {
+let isMobileCanvas = false;
+
+const getDesktopCanvasElement = () => {
+  return document.querySelector('.wasmboy-player canvas');
+};
+
+const getMobileCanvasElement = () => {
   return document.querySelector('.wasmboy-player canvas');
 };
 
 // WasmBoy Options
-export const WasmBoyDefaultOptions = {
+const WasmBoyDefaultOptions = {
   isGbcEnabled: true,
   isAudioEnabled: true,
   frameSkip: 0,
-  audioBatchProcessing: true,
+  audioBatchProcessing: false,
   timersBatchProcessing: false,
-  audioAccumulateSamples: true,
+  audioAccumulateSamples: false,
   graphicsBatchProcessing: false,
   graphicsDisableScanlineRendering: false,
-  tileRendering: true,
-  tileCaching: true,
+  tileRendering: false,
+  tileCaching: false,
   gameboyFrameRate: 60,
   updateGraphicsCallback: imageDataArray => {
     if (!graphicsCallbackCalled) {
@@ -48,9 +55,15 @@ export const WasmBoyDefaultOptions = {
 
     // Function called everytime a savestate occurs
     // Used by the WasmBoySystemControls to show screenshots on save states
-    const canvasElement = getCanvasElement();
+    let canvasElement;
+    if (isMobileCanvas) {
+      canvasElement = getMobileCanvasElement();
+    } else {
+      canvasElement = getDesktopCanvasElement();
+    }
+
     if (canvasElement) {
-      saveStateObject.screenshotCanvasDataURL = getCanvasElement().toDataURL();
+      saveStateObject.screenshotCanvasDataURL = canvasElement.toDataURL();
     }
   },
   onReady: () => {
@@ -65,4 +78,42 @@ export const WasmBoyDefaultOptions = {
   onLoadedAndStarted: () => {
     console.log('onLoadedAndStarted Callback Called!');
   }
+};
+
+export const WasmBoyDefaultDesktopOptions = {
+  ...WasmBoyDefaultOptions
+};
+
+export const WasmBoyDefaultMobileOptions = {
+  ...WasmBoyDefaultOptions,
+  audioBatchProcessing: true,
+  audioAccumulateSamples: true,
+  tileRendering: true,
+  tileCaching: true
+};
+
+export const WasmBoyUpdateCanvas = isMobile => {
+  isMobileCanvas = isMobile;
+
+  const updateTask = async () => {
+    let canvasElement;
+    let defaultOptions;
+
+    if (isMobile) {
+      canvasElement = getMobileCanvasElement();
+      defaultOptions = WasmBoyDefaultMobileOptions;
+    } else {
+      canvasElement = getDesktopCanvasElement();
+      defaultOptions = WasmBoyDefaultDesktopOptions;
+    }
+
+    if (!canvasElement) {
+      setTimeout(updateTask, 500);
+      return;
+    }
+
+    await WasmBoy.config(defaultOptions);
+    await WasmBoy.setCanvas(canvasElement);
+  };
+  updateTask();
 };

@@ -6,7 +6,7 @@ import { h, Component } from 'preact';
 import { Pubx } from 'pubx';
 import { PUBX_KEYS } from '../../../pubx.config';
 
-import { WasmBoy, WasmBoyDefaultOptions } from '../../../wasmboy';
+import { WasmBoy, WasmBoyDefaultDesktopOptions } from '../../../wasmboy';
 
 import './wasmboyPlayer.css';
 
@@ -22,7 +22,7 @@ export default class WasmBoyPlayer extends Component {
   componentDidMount() {
     // Add some pubx hooks by default
     const wasmboyOptions = {
-      ...WasmBoyDefaultOptions
+      ...WasmBoyDefaultDesktopOptions
     };
 
     const wasmboyStateCallbackKeys = ['onReady', 'onPlay', 'onPause', 'onLoadedAndStarted'];
@@ -37,13 +37,7 @@ export default class WasmBoyPlayer extends Component {
       };
     });
 
-    WasmBoy.config(wasmboyOptions)
-      .then(() => {
-        return WasmBoy.setCanvas(getCanvasElement());
-      })
-      .catch(error => {
-        console.error(error);
-      });
+    // WasmBay configured and set in wasmboy.js
 
     Pubx.subscribe(PUBX_KEYS.LOADING, newState => {
       if (newState.controlLoading) {

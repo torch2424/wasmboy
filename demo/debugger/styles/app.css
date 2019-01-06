@@ -28,9 +28,14 @@ body {
   overflow: hidden;
 }
 
+#mobile-container {
+  display: block;
+  z-index: 1;
+}
+
 #overlay-container {
   display: flex;
-  z-index: 1;
+  z-index: 2;
   pointer-events: none;
   flex-direction: column;
   position: absolute;

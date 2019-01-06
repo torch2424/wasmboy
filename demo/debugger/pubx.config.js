@@ -1,8 +1,9 @@
 import { Pubx } from 'pubx';
-import { WasmBoy } from './wasmboy';
+import { WasmBoy, WasmBoyUpdateCanvas } from './wasmboy';
 
 export const PUBX_KEYS = {
   LOADING: 'LOADING',
+  MOBILE: 'MOBILE',
   MODAL: 'MODAL',
   NOTIFICATION: 'NOTIFICATION',
   WASMBOY: 'WASMBOY',
@@ -31,6 +32,50 @@ export function PUBX_INITIALIZE() {
       };
 
       promise.then(finallyCallback).catch(finallyCallback);
+    }
+  });
+
+  // MOBILE
+  Pubx.publish(PUBX_KEYS.MOBILE, {
+    isMobile: false,
+    isLandscape: false,
+    isPortrait: false,
+    update: () => {
+      const mobile = window.matchMedia('(max-width: 1024px)').matches;
+      const landscape = window.matchMedia('screen and (orientation: landscape)').matches;
+      const portrait = window.matchMedia('screen and (orientation: portrait)').matches;
+
+      // Get our document class list
+      const documentClassList = document.documentElement.classList;
+
+      // Add all Media query based on mobile vs desktop
+      if (mobile) {
+        documentClassList.add('mobile');
+        documentClassList.remove('desktop');
+      } else {
+        documentClassList.remove('mobile');
+        documentClassList.add('desktop');
+      }
+      if (landscape) {
+        documentClassList.add('landscape');
+      } else {
+        documentClassList.remove('landscape');
+      }
+      if (portrait) {
+        documentClassList.add('portrait');
+      } else {
+        documentClassList.remove('portrait');
+      }
+
+      if (Pubx.get(PUBX_KEYS.MOBILE).isMobile !== mobile) {
+        WasmBoyUpdateCanvas(mobile);
+      }
+
+      Pubx.publish(PUBX_KEYS.MOBILE, {
+        isMobile: mobile,
+        isLandscape: landscape && mobile,
+        isPortrait: portrait && mobile
+      });
     }
   });
 

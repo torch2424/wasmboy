@@ -18,16 +18,7 @@ import { Pubx } from 'pubx';
 import { PUBX_KEYS, PUBX_INITIALIZE } from './pubx.config';
 
 import Overlay from './components/overlay/overlay';
-
-class WasmBoyDebuggerApp extends Component {
-  constructor() {
-    super();
-  }
-
-  render() {
-    return <div class="tall">Hello Debugger!</div>;
-  }
-}
+import Mobile from './components/mobile/mobile';
 
 // Setup Google Analytics
 if (typeof window !== 'undefined') {
@@ -89,6 +80,10 @@ phosphorWidgets.Widget.attach(main, phosphorContainer);
 // Bind Preact Overlay to DOM
 const overlayContainer = document.getElementById('overlay-container');
 render(<Overlay />, overlayContainer);
+
+// Bind the Mobile UI to DOM
+const mobileContainer = document.getElementById('mobile-container');
+render(<Mobile />, mobileContainer);
 
 // Show a nice welcome message
 setTimeout(() => {
