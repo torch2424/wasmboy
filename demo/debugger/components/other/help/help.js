@@ -9,8 +9,9 @@ export default class HelpComponent extends Component {
         <h1>Help</h1>
         <h2>How do I use this Debugger</h2>
         <div>
-          Please see the video below on how to open a ROM, open widgets, move around tabs, and resize widgets. All open widgets, and layout
-          configurations are saved in localStorage, and are preserved between sessions.
+          Please see the video below on how to open a ROM, open widgets, and move around tabs. Widgets can also be resiezed, by hovering
+          over their edges, and stretching to the desired size. All open widgets, and layout configurations are saved in localStorage, and
+          are preserved between sessions.
           <div class="help__media-container">
             <video autoplay loop muted playsinline>
               <source src="assets/debuggerWalkthrough.mp4" type="video/mp4" />

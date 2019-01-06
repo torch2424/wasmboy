@@ -69,8 +69,8 @@ export default class WidgetManager {
       };
     }
 
-    if (splitConfig.refIndex) {
-      splitConfig.ref = this.widgets[refIndex];
+    if (splitConfig.refIndex !== undefined) {
+      splitConfig.ref = this.widgets[splitConfig.refIndex];
       delete splitConfig.refIndex;
     }
 
@@ -149,6 +149,16 @@ export default class WidgetManager {
     });
     this.addPreactWidget(
       {
+        component: <HelpComponent />,
+        label: 'Help'
+      },
+      {
+        mode: 'split-right',
+        refIndex: 0
+      }
+    );
+    this.addPreactWidget(
+      {
         component: <WasmBoyControls />,
         label: 'Playback Controls'
       },
@@ -159,12 +169,12 @@ export default class WidgetManager {
     );
     this.addPreactWidget(
       {
-        component: <WasmBoyInfo />,
-        label: 'Playback Info'
+        component: <AboutComponent />,
+        label: 'About'
       },
       {
-        mode: 'split-right',
-        refIndex: 0
+        mode: 'split-bottom',
+        refIndex: 1
       }
     );
   }
