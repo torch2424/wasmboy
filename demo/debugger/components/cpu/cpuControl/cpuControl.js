@@ -10,6 +10,8 @@ import './cpuControl.css';
 
 import { stepOpcode, runNumberOfOpcodes, runUntilBreakPoint } from '../opcode.js';
 
+let unsubLoading = false;
+
 export default class CpuControl extends Component {
   constructor() {
     super();
@@ -17,6 +19,22 @@ export default class CpuControl extends Component {
     this.state.isBusy = false;
     this.state.numberOfOpcodes = 2000;
     this.state.breakPoint = 40;
+  }
+
+  componentDidMount() {
+    unsubLoading = Pubx.subscribe(PUBX_KEYS.LOADING, newState => {
+      if (newState.controlLoading) {
+        this.base.classList.add('cpu-control--control-loading');
+      } else {
+        this.base.classList.remove('cpu-control--control-loading');
+      }
+    });
+  }
+
+  componentWillUnmount() {
+    if (unsubLoading) {
+      unsubLoading();
+    }
   }
 
   stepOpcode() {
@@ -92,13 +110,15 @@ export default class CpuControl extends Component {
           <i>ROMs will not autoplay while this widget is open.</i>
         </div>
 
+        <div class="donut" />
+
         {/* Single Stepping */}
-        <div>
+        <div class="cpu-control__control-container">
           <button onClick={() => this.stepOpcode()}>Step Opcode</button>
         </div>
 
         {/* Run a specified number */}
-        <div>
+        <div class="cpu-control__control-container">
           <label for="runNumberOfOpcodes">Number of Opcodes to run:</label>
           <input
             type="number"
@@ -111,7 +131,7 @@ export default class CpuControl extends Component {
         </div>
 
         {/* Break Points */}
-        <div>
+        <div class="cpu-control__control-container">
           <label for="runNumberOfOpcodes">Run until breakpoint (In Hex): 0x</label>
           <input
             type="number"

@@ -2,6 +2,7 @@ import { Pubx } from 'pubx';
 import { WasmBoy } from './wasmboy';
 
 export const PUBX_KEYS = {
+  LOADING: 'LOADING',
   MODAL: 'MODAL',
   NOTIFICATION: 'NOTIFICATION',
   WASMBOY: 'WASMBOY',
@@ -9,6 +10,30 @@ export const PUBX_KEYS = {
 };
 
 export function PUBX_INITIALIZE() {
+  // LOADING
+  Pubx.publish(PUBX_KEYS.LOADING, {
+    controlLoading: false,
+    controlPromises: [],
+    addControlPromise: promise => {
+      Pubx.publish(PUBX_KEYS.LOADING, {
+        controlLoading: true,
+        controlPromises: [...Pubx.get(PUBX_KEYS.LOADING).controlPromises, promise]
+      });
+
+      const finallyCallback = () => {
+        const controlPromises = Pubx.get(PUBX_KEYS.LOADING).controlPromises;
+        controlPromises.splice(controlPromises.indexOf(promise), 1);
+
+        Pubx.publish(PUBX_KEYS.LOADING, {
+          controlLoading: controlPromises.length > 0,
+          controlPromises
+        });
+      };
+
+      promise.then(finallyCallback).catch(finallyCallback);
+    }
+  });
+
   // MODAL
   Pubx.publish(PUBX_KEYS.MODAL, {
     visible: false,

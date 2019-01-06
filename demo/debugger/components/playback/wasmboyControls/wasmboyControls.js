@@ -2,13 +2,15 @@
 // of WasmBoy
 
 import { h, Component } from 'preact';
-
+s;
 import { Pubx } from 'pubx';
 import { PUBX_KEYS } from '../../../pubx.config';
 
 import { WasmBoy } from '../../../wasmboy';
 
 import './wasmboyControls.css';
+
+let unsubLoading = false;
 
 export default class WasmBoyControls extends Component {
   constructor() {
@@ -20,6 +22,20 @@ export default class WasmBoyControls extends Component {
 
   componentDidMount() {
     Pubx.get(PUBX_KEYS.WASMBOY).update();
+
+    unsubLoading = Pubx.subscribe(PUBX_KEYS.LOADING, newState => {
+      if (newState.controlLoading) {
+        this.base.classList.add('wasmboy-controls--control-loading');
+      } else {
+        this.base.classList.remove('wasmboy-controls--control-loading');
+      }
+    });
+  }
+
+  componentWillUnmount() {
+    if (unsubLoading) {
+      unsubLoading();
+    }
   }
 
   saveState() {
@@ -108,6 +124,8 @@ export default class WasmBoyControls extends Component {
         <div>
           <i>ROMs will not autoplay while this widget is open.</i>
         </div>
+
+        <div class="donut" />
 
         {/* Play/Pause Toggle */}
         <div class="wasmboy-controls__group">

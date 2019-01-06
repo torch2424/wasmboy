@@ -44,11 +44,20 @@ export default class WasmBoyPlayer extends Component {
       .catch(error => {
         console.error(error);
       });
+
+    Pubx.subscribe(PUBX_KEYS.LOADING, newState => {
+      if (newState.controlLoading) {
+        this.base.classList.add('wasmboy-player--control-loading');
+      } else {
+        this.base.classList.remove('wasmboy-player--control-loading');
+      }
+    });
   }
 
   render() {
     return (
       <div class="wasmboy-player">
+        <div class="donut" />
         <canvas class="pixel-canvas" />
       </div>
     );

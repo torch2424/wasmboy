@@ -36,7 +36,9 @@ const loadROM = (file, fileName) => {
     }
   };
 
-  loadROMTask().catch(error => {
+  const loadROMPromise = loadROMTask();
+
+  loadROMPromise.catch(error => {
     console.log('Load Game Error:', error);
     Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Game Load Error! 😞');
     // this.setFileLoadingStatus(false);
@@ -47,7 +49,7 @@ const loadROM = (file, fileName) => {
     }
   });
 
-  // TODO: Set our file name
+  Pubx.get(PUBX_KEYS.LOADING).addControlPromise(loadROMPromise);
 };
 
 class OpenLocalFile extends Command {
