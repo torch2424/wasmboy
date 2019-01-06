@@ -20,6 +20,9 @@ import TileData from './components/graphics/tileData/tileData';
 import AudioState from './components/audio/audioState/audioState';
 import InterruptState from './components/interrupt/interruptState/interruptState';
 import TimerState from './components/timer/timerState/timerState';
+import AboutComponent from './components/other/about/about';
+import HelpComponent from './components/other/help/help';
+
 const components = {
   WasmBoyPlayer: <WasmBoyPlayer />,
   WasmBoyControls: <WasmBoyControls />,
@@ -32,7 +35,9 @@ const components = {
   TileData: <TileData />,
   AudioState: <AudioState />,
   InterruptState: <InterruptState />,
-  TimerState: <TimerState />
+  TimerState: <TimerState />,
+  AboutComponent: <AboutComponent />,
+  HelpComponent: <HelpComponent />
 };
 
 const LOCALSTORAGE_KEY = 'WASMBOY_DEBUGGER_WIDGET_MANAGER';

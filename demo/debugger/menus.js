@@ -11,6 +11,7 @@ import graphicsCommands from './commands/widgets/graphics';
 import audioCommands from './commands/widgets/audio';
 import interruptCommands from './commands/widgets/interrupt';
 import timerCommands from './commands/widgets/timer';
+import otherCommands from './commands/widgets/other';
 
 const menus = [];
 
@@ -65,6 +66,12 @@ let timerSubMenu = new phosphorWidgets.Menu({ commands });
 timerSubMenu.title.label = 'Timer';
 addCommandsToMenu(timerCommands, timerSubMenu);
 widgetMenu.addItem({ type: 'submenu', submenu: timerSubMenu });
+
+// Other
+let otherSubMenu = new phosphorWidgets.Menu({ commands });
+otherSubMenu.title.label = 'Other';
+addCommandsToMenu(otherCommands, otherSubMenu);
+widgetMenu.addItem({ type: 'submenu', submenu: otherSubMenu });
 
 menus.push(widgetMenu);
 

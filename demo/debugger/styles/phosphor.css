@@ -1,0 +1,20 @@
+/* Styles to allow phosphor to work */
+
+@import '@phosphor/dragdrop/style/index.css';
+@import '@phosphor/widgets/style/index.css';
+@import '@phosphor/default-theme/style/dockpanel.css';
+@import '@phosphor/default-theme/style/menu.css';
+@import '@phosphor/default-theme/style/menubar.css';
+@import '@phosphor/default-theme/style/scrollbar.css';
+@import '@phosphor/default-theme/style/tabbar.css';
+
+/* Phosphor FontAwesome Fix */
+.p-TabBar-tab.p-mod-closable > .p-TabBar-tabCloseIcon:before {
+  content: 'X' !important;
+  cursor: pointer;
+  font-weight: bold;
+}
+.p-Menu-item[data-type='submenu'] > .p-Menu-itemSubmenuIcon::before {
+  content: '>' !important;
+  font-weight: bold;
+}

@@ -8,8 +8,18 @@ import graphicsCommands from './widgets/graphics';
 import audioCommands from './widgets/audio';
 import interruptCommands from './widgets/interrupt';
 import timerCommands from './widgets/timer';
+import otherCommands from './widgets/other';
 
-const importedCommands = [openCommands, playbackCommands, cpuCommands, graphicsCommands, audioCommands, interruptCommands, timerCommands];
+const importedCommands = [
+  openCommands,
+  playbackCommands,
+  cpuCommands,
+  graphicsCommands,
+  audioCommands,
+  interruptCommands,
+  timerCommands,
+  otherCommands
+];
 
 // Commands that will be execute by click actions and things
 const commands = new phosphorCommands.CommandRegistry();
