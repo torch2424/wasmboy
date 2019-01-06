@@ -47,7 +47,6 @@ let plugins = [
   url({
     limit: 1000000 * 1024, // Always inline
     include: ['**/*.gb', '**/*.gbc', '**/*.png', '**/*.jpg'],
-    // Don't emit files, this will replace the worker build output
     emitFiles: false
   })
 ];

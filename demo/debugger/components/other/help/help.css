@@ -1,0 +1,19 @@
+.help__media-container {
+  width: 100%;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+
+  padding: 2px;
+  border: 1px solid black;
+}
+
+.help__media-container img {
+  width: 100%;
+  max-width: 350px;
+}
+
+.help__media-container video {
+  width: 100%;
+  max-width: 350px;
+}
