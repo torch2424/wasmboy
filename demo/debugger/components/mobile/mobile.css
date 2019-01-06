@@ -10,6 +10,7 @@ html.mobile #mobile-container {
   width: 100%;
   height: 100%;
   display: block;
+  overflow: hidden;
 }
 
 html.mobile,
@@ -46,4 +47,8 @@ html.mobile body {
 .mobile-container__canvas-container {
   width: 100%;
   height: 100%;
+}
+
+.mobile-container__canvas-container canvas {
+  object-position: top;
 }

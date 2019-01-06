@@ -17,12 +17,19 @@
 
   padding: 3px;
   overflow: visible;
+  cursor: pointer;
 }
 
 .touchpad-container svg path,
 .touchpad-container svg rect {
   stroke: #000;
   stroke-width: 2px;
+}
+
+.touchpad-container svg text,
+.touchpad-container svg polygon {
+  stroke: #000;
+  stroke-width: 1px;
 }
 
 .touchpad-container svg text {

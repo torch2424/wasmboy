@@ -20,7 +20,23 @@ export default class Touchpad extends Component {
     super();
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    // Add our touch inputs
+    const dpadElement = document.querySelector('.gameboy-input__dpad');
+    const startElement = document.querySelector('.gameboy-input__start');
+    const selectElement = document.querySelector('.gameboy-input__select');
+    const aElement = document.querySelector('.gameboy-input__a');
+    const bElement = document.querySelector('.gameboy-input__b');
+
+    WasmBoy.addTouchInput('UP', dpadElement, 'DPAD', 'UP');
+    WasmBoy.addTouchInput('RIGHT', dpadElement, 'DPAD', 'RIGHT');
+    WasmBoy.addTouchInput('DOWN', dpadElement, 'DPAD', 'DOWN');
+    WasmBoy.addTouchInput('LEFT', dpadElement, 'DPAD', 'LEFT');
+    WasmBoy.addTouchInput('A', aElement, 'BUTTON');
+    WasmBoy.addTouchInput('B', bElement, 'BUTTON');
+    WasmBoy.addTouchInput('START', startElement, 'BUTTON');
+    WasmBoy.addTouchInput('SELECT', selectElement, 'BUTTON');
+  }
 
   render() {
     return (
