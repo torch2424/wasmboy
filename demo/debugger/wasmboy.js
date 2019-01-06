@@ -15,7 +15,7 @@ const getDesktopCanvasElement = () => {
 };
 
 const getMobileCanvasElement = () => {
-  return document.querySelector('.wasmboy-player canvas');
+  return document.querySelector('.mobile-container #mobile-container__wasmboy-canvas');
 };
 
 // WasmBoy Options
@@ -112,8 +112,10 @@ export const WasmBoyUpdateCanvas = isMobile => {
       return;
     }
 
+    console.log(canvasElement);
     await WasmBoy.config(defaultOptions);
     await WasmBoy.setCanvas(canvasElement);
+    await WasmBoy.play();
   };
   updateTask();
 };

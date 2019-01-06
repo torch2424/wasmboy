@@ -3,6 +3,9 @@
 import { h, Component } from 'preact';
 import { Pubx } from 'pubx';
 import { PUBX_KEYS } from '../../pubx.config';
+
+import Touchpad from './touchpad/touchpad';
+
 import './mobile.css';
 
 export default class Mobile extends Component {
@@ -22,7 +25,16 @@ export default class Mobile extends Component {
     Pubx.get(PUBX_KEYS.MOBILE).update();
   }
 
+  componentDidMount() {}
+
   render() {
-    return <div class="mobile-container" />;
+    return (
+      <div class="mobile-container">
+        <div class="mobile-container__canvas-container">
+          <canvas id="mobile-container__wasmboy-canvas" class="pixel-canvas" />
+        </div>
+        <Touchpad />
+      </div>
+    );
   }
 }

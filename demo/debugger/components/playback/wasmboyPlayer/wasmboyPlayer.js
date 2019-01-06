@@ -6,7 +6,7 @@ import { h, Component } from 'preact';
 import { Pubx } from 'pubx';
 import { PUBX_KEYS } from '../../../pubx.config';
 
-import { WasmBoy, WasmBoyDefaultDesktopOptions } from '../../../wasmboy';
+import { WasmBoy, WasmBoyDefaultDesktopOptions, WasmBoyUpdateCanvas } from '../../../wasmboy';
 
 import './wasmboyPlayer.css';
 
@@ -37,7 +37,8 @@ export default class WasmBoyPlayer extends Component {
       };
     });
 
-    // WasmBay configured and set in wasmboy.js
+    // Set our canvas
+    WasmBoyUpdateCanvas(false);
 
     Pubx.subscribe(PUBX_KEYS.LOADING, newState => {
       if (newState.controlLoading) {
