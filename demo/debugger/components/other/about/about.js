@@ -16,7 +16,7 @@ export default class AboutComponent extends Component {
           <a href="https://preactjs.com/" target="_blank">
             Preact
           </a>{' '}
-          ⚛️ .{' '}
+          ⚛️.{' '}
           <a href="http://phosphorjs.github.io/" target="_blank">
             PhosphorJS
           </a>{' '}
