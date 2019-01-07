@@ -38,9 +38,9 @@ export default class AboutComponent extends Component {
           <br />
           For standard game boy emulation playing for fun, speed running, etc... Check out{' '}
           <a href="https://vaporboy.net/" target="_blank">
-            VaporBoy{' '}
+            VaporBoy
           </a>
-          a full featured GB / GBC Emulator Progressive Web App.
+          , a full featured GB / GBC Emulator Progressive Web App.
         </div>
         <h2>WasmBoy Links</h2>
         <ul>
