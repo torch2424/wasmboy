@@ -87,5 +87,5 @@ render(<Mobile />, mobileContainer);
 
 // Show a nice welcome message
 setTimeout(() => {
-  Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Welcome to the WasmBoy Debugger!');
+  Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Welcome to the WasmBoy Debugger/Demo!');
 }, 100);

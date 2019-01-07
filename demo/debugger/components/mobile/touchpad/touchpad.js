@@ -5,6 +5,9 @@ import { WasmBoy } from '../../../wasmboy';
 import { Pubx } from 'pubx';
 import { PUBX_KEYS } from '../../../pubx.config';
 
+import loadROM from '../../../loadROM';
+import { getOpenSourceROMElements } from '../../../../openSourceROMsPreact';
+
 import AboutComponent from '../../other/about/about';
 
 import {
@@ -45,15 +48,15 @@ export default class Touchpad extends Component {
     Pubx.get(PUBX_KEYS.MODAL).showModal(() => {
       return (
         <div class="mobile-rom-source">
-          <button>
+          <button onClick={() => this.openLocalFile()}>
             <div>⬆️ </div>
             <div>Upload Local File</div>
           </button>
-          <button>
+          <button onClick={() => this.openOpenSourceROMViewer()}>
             <div>🍺</div>
             <div>Open Source Homebrew</div>
           </button>
-          <button>
+          <button onClick={() => this.openGoogleDriveROM()}>
             <div>☁️</div>
             <div>Google Drive</div>
           </button>
@@ -61,6 +64,40 @@ export default class Touchpad extends Component {
       );
     });
   }
+
+  openLocalFile() {
+    // Allow autoplaying audio to work
+    WasmBoy.resumeAudioContext();
+
+    // Close the modal
+    Pubx.get(PUBX_KEYS.MODAL).closeModal();
+
+    // Use the hidden input from the desktop open command
+    // Will handle loading the rom for us as well!
+    document.querySelector('.hidden-rom-input').click();
+  }
+
+  openOpenSourceROMViewer() {
+    // Allow autoplaying audio to work
+    WasmBoy.resumeAudioContext();
+
+    // Close the modal
+    Pubx.get(PUBX_KEYS.MODAL).closeModal();
+
+    // Using a stateless functional component
+    Pubx.get(PUBX_KEYS.MODAL).showModal(() => {
+      return (
+        <div class="open-source-rom-container">
+          {getOpenSourceROMElements(ROMObject => {
+            loadROM(ROMObject.url, ROMObject.title);
+            Pubx.get(PUBX_KEYS.MODAL).closeModal();
+          })}
+        </div>
+      );
+    });
+  }
+
+  openGoogleDriveROM() {}
 
   togglePlayPause() {
     if (!WasmBoy.isLoadedAndStarted()) {
