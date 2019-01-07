@@ -16,12 +16,16 @@ export default class AboutComponent extends Component {
           <a href="https://preactjs.com/" target="_blank">
             Preact
           </a>{' '}
-          ⚛️ , and uses{' '}
+          ⚛️ .{' '}
+          <a href="http://phosphorjs.github.io/" target="_blank">
+            PhosphorJS
+          </a>{' '}
+          is used for the Desktop UI.{' '}
           <a href="https://www.npmjs.com/package/pubx" target="_blank">
             Pubx
           </a>{' '}
-          for state management. This debugger is meant for developing / debugging the emulation lib, as well as game boy homebrew
-          development. WasmBoy is written by
+          is used for for state management. This debugger is meant for developing / debugging the emulation lib, as well as game boy
+          homebrew development. WasmBoy is written by{' '}
           <a href="https://github.com/torch2424" target="_blank">
             Aaron Turner (torch2424)
           </a>
