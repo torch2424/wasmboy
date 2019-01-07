@@ -40,13 +40,16 @@ export default class WasmBoyPlayer extends Component {
     // Set our canvas
     WasmBoyUpdateCanvas(false);
 
-    Pubx.subscribe(PUBX_KEYS.LOADING, newState => {
-      if (newState.controlLoading) {
-        this.base.classList.add('wasmboy-player--control-loading');
-      } else {
-        this.base.classList.remove('wasmboy-player--control-loading');
-      }
-    });
+    Pubx.subscribe(PUBX_KEYS.LOADING, newState => this.checkControlLoading(newState));
+    this.checkControlLoading(Pubx.get(PUBX_KEYS.LOADING));
+  }
+
+  checkControlLoading(newState) {
+    if (newState.controlLoading) {
+      this.base.classList.add('wasmboy-player--control-loading');
+    } else {
+      this.base.classList.remove('wasmboy-player--control-loading');
+    }
   }
 
   render() {

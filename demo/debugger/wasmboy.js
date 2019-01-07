@@ -86,6 +86,7 @@ export const WasmBoyDefaultDesktopOptions = {
 
 export const WasmBoyDefaultMobileOptions = {
   ...WasmBoyDefaultOptions,
+  frameSkip: 1,
   audioBatchProcessing: true,
   audioAccumulateSamples: true,
   tileRendering: true,

@@ -23,18 +23,21 @@ export default class WasmBoyControls extends Component {
   componentDidMount() {
     Pubx.get(PUBX_KEYS.WASMBOY).update();
 
-    unsubLoading = Pubx.subscribe(PUBX_KEYS.LOADING, newState => {
-      if (newState.controlLoading) {
-        this.base.classList.add('wasmboy-controls--control-loading');
-      } else {
-        this.base.classList.remove('wasmboy-controls--control-loading');
-      }
-    });
+    unsubLoading = Pubx.subscribe(PUBX_KEYS.LOADING, newState => this.checkControlLoading(newState));
+    this.checkControlLoading(Pubx.get(PUBX_KEYS.LOADING));
   }
 
   componentWillUnmount() {
     if (unsubLoading) {
       unsubLoading();
+    }
+  }
+
+  checkControlLoading(newState) {
+    if (newState.controlLoading) {
+      this.base.classList.add('wasmboy-controls--control-loading');
+    } else {
+      this.base.classList.remove('wasmboy-controls--control-loading');
     }
   }
 

@@ -109,38 +109,39 @@ class OpenGoogleDriveROM extends Command {
     // Allow autoplaying audio to work
     WasmBoy.resumeAudioContext();
 
-    // TODO:
-    /*
-      if (window !== undefined && window.gtag) {
-        gtag("event", "google_drive_load");
-      }
-      */
+    if (window !== undefined && window.gtag) {
+      gtag('event', 'google_drive_load');
+    }
 
     // Get the ROM from google drive
     const loadGDriveROMTask = async () => {
-      const response = await GoogleDrivePicker.getFile(['application/zip', 'application/octet-stream']);
+      const pickerResponse = await GoogleDrivePicker.getFile(['application/zip', 'application/octet-stream']);
 
-      console.log(response);
+      if (pickerResponse.cancelled) {
+        return;
+      }
 
-      const responseJson = response[0];
-      const oAuthHeaders = response[1];
+      const { response, oAuthHeaders } = pickerResponse;
 
-      if (responseJson.title.endsWith('.zip') || responseJson.title.endsWith('.gb') || responseJson.title.endsWith('.gbc')) {
+      if (response.title.endsWith('.zip') || response.title.endsWith('.gb') || response.title.endsWith('.gbc')) {
         await WasmBoy.pause();
-        await WasmBoy.loadROM(responseJson.downloadUrl, {
+        await WasmBoy.loadROM(response.downloadUrl, {
           headers: oAuthHeaders,
-          fileName: responseJson.title
+          fileName: response.title
         });
         await WasmBoy.play();
         Pubx.publish(PUBX_KEYS.WASMBOY, {
-          filename: responseJson.title
+          filename: response.title
         });
         Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Game Loaded! 🎉');
       } else {
         Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Invalid file type. 😞');
       }
     };
-    loadGDriveROMTask();
+    const loadGDriveROMPromise = loadGDriveROMTask().catch(error => {
+      Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification(error);
+    });
+    Pubx.get(PUBX_KEYS.LOADING).addControlPromise(loadGDriveROMPromise);
   }
 }
 

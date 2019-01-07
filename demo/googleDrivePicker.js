@@ -25,31 +25,27 @@ class GoogleDrivePickerLib {
   }
 
   getFile(mimeTypes) {
-    const getFileTask = async () => {
-      if (!this._isGoogleReady() || !this._isGoogleAuthReady() || !this._isGooglePickerReady()) {
-        throw new Error('Google Drive not ready');
-        return;
-      }
+    if (!this._isGoogleReady() || !this._isGoogleAuthReady() || !this._isGooglePickerReady()) {
+      return Promise.reject('Google Drive not ready');
+    }
 
-      const token = window.gapi.auth.getToken();
-      const oauthToken = token && token.access_token;
+    const token = window.gapi.auth.getToken();
+    const oauthToken = token && token.access_token;
 
-      const getFilePromiseObject = {};
+    const getFilePromiseObject = {};
 
-      const getFilePromise = new Promise((resolve, reject) => {
-        getFilePromiseObject.resolve = resolve;
-        getFilePromiseObject.reject = reject;
-      });
+    const getFilePromise = new Promise((resolve, reject) => {
+      getFilePromiseObject.resolve = resolve;
+      getFilePromiseObject.reject = reject;
+    });
 
-      if (oauthToken) {
-        this._createPicker(oauthToken, mimeTypes, getFilePromiseObject);
-      } else {
-        this._doAuth(({ access_token }) => this._createPicker(access_token, mimeTypes, getFilePromiseObject));
-      }
+    if (oauthToken) {
+      this._createPicker(oauthToken, mimeTypes, getFilePromiseObject);
+    } else {
+      this._doAuth(({ access_token }) => this._createPicker(access_token, mimeTypes, getFilePromiseObject));
+    }
 
-      await getFilePromise;
-    };
-    return getFileTask();
+    return getFilePromise;
   }
 
   _isGoogleReady() {
@@ -94,7 +90,7 @@ class GoogleDrivePickerLib {
     const picker = new window.google.picker.PickerBuilder()
       .addView(view)
       .setOAuthToken(oauthToken)
-      .setCallback(data => this._pickerCallback(data, getROMPromiseObject));
+      .setCallback(data => this._pickerCallback(data, getFilePromiseObject));
 
     picker.enableFeature(window.google.picker.Feature.NAV_HIDDEN);
 
@@ -110,6 +106,11 @@ class GoogleDrivePickerLib {
 
   _pickerCallback(data, getFilePromiseObject) {
     const loadGoogleDriveFileTask = async () => {
+      if (data.action === 'cancel') {
+        getFilePromiseObject.resolve({ cancelled: true });
+        return;
+      }
+
       // We only want the picked action
       if (data.action !== 'picked') {
         return;
@@ -136,12 +137,15 @@ class GoogleDrivePickerLib {
         });
 
       // Resolve the final downloadUrl and oAuthHeader
-      getFilePromiseObject.resolve(responseJson, oAuthHeaders);
+      getFilePromiseObject.resolve({
+        response: responseJson,
+        oAuthHeaders
+      });
     };
     loadGoogleDriveFileTask();
   }
 }
 
 // Export a singleton
-const GoogleDriveROMPicker = new GoogleDriveROMPickerLib();
-export default GoogleDriveROMPicker;
+const GoogleDrivePicker = new GoogleDrivePickerLib();
+export default GoogleDrivePicker;

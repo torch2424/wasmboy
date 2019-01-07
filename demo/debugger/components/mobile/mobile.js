@@ -9,18 +9,41 @@ import Touchpad from './touchpad/touchpad';
 
 import './mobile.css';
 
+let resizeThrottle = undefined;
+
 export default class Mobile extends Component {
   constructor() {
     super();
 
     Pubx.subscribe(PUBX_KEYS.WASMBOY, newState => this.setState(newState));
+    Pubx.subscribe(PUBX_KEYS.LOADING, newState => {
+      if (newState.controlLoading) {
+        this.base.classList.add('control-loading');
+      } else {
+        this.base.classList.remove('control-loading');
+      }
+    });
 
     window.addEventListener('resize', () => {
-      Pubx.get(PUBX_KEYS.MOBILE).update();
+      if (resizeThrottle) {
+        return;
+      }
+
+      resizeThrottle = setTimeout(() => {
+        Pubx.get(PUBX_KEYS.MOBILE).update();
+        resizeThrottle = undefined;
+      }, 500);
     });
 
     window.addEventListener('orientationchange', () => {
-      Pubx.get(PUBX_KEYS.MOBILE).update();
+      if (resizeThrottle) {
+        return;
+      }
+
+      resizeThrottle = setTimeout(() => {
+        Pubx.get(PUBX_KEYS.MOBILE).update();
+        resizeThrottle = undefined;
+      }, 500);
     });
 
     Pubx.get(PUBX_KEYS.MOBILE).update();
@@ -71,12 +94,13 @@ export default class Mobile extends Component {
             ⚛️. This website also happens to be the Wasmboy Debugger. However, the debugger is only available on desktop, due to UX issues.
             <br />
             <br />
-            Since this is a demo, this is lacking some features that would, normally be present that the lib does support (such as save
-            states), for a full-featured GB / GBC emulator built with WasmBoy, try{' '}
+            Since this is a demo, this is only meant for "checking it out", and this is lacking some features that would, normally be
+            present that the lib does support (such as save states), for a full-featured GB / GBC emulator built with WasmBoy, try{' '}
             <a href="https://vaporboy.net/" target="_blank">
               VaporBoy
             </a>
-            .
+            . Also, since this is meant for mobile, some of the WasmBoy configuration options are set to improve performance, but at the
+            expense of less accuracy.
           </div>
 
           {/* Getting Started */}
@@ -91,6 +115,7 @@ export default class Mobile extends Component {
 
     return (
       <div class="mobile-container">
+        <div class="donut" />
         <div class="mobile-container__canvas-container">
           <canvas id="mobile-container__wasmboy-canvas" class="pixel-canvas" />
         </div>

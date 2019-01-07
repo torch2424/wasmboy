@@ -7,6 +7,7 @@ import { PUBX_KEYS } from '../../../pubx.config';
 
 import loadROM from '../../../loadROM';
 import { getOpenSourceROMElements } from '../../../../openSourceROMsPreact';
+import GoogleDrivePicker from '../../../../googleDrivePicker';
 
 import AboutComponent from '../../other/about/about';
 
@@ -97,7 +98,47 @@ export default class Touchpad extends Component {
     });
   }
 
-  openGoogleDriveROM() {}
+  openGoogleDriveROM() {
+    // Allow autoplaying audio to work
+    WasmBoy.resumeAudioContext();
+
+    // Close the modal
+    Pubx.get(PUBX_KEYS.MODAL).closeModal();
+
+    if (window !== undefined && window.gtag) {
+      gtag('event', 'google_drive_load');
+    }
+
+    // Get the ROM from google drive
+    const loadGDriveROMTask = async () => {
+      const pickerResponse = await GoogleDrivePicker.getFile(['application/zip', 'application/octet-stream']);
+
+      if (pickerResponse.cancelled) {
+        return;
+      }
+
+      const { response, oAuthHeaders } = pickerResponse;
+
+      if (response.title.endsWith('.zip') || response.title.endsWith('.gb') || response.title.endsWith('.gbc')) {
+        await WasmBoy.pause();
+        await WasmBoy.loadROM(response.downloadUrl, {
+          headers: oAuthHeaders,
+          fileName: response.title
+        });
+        await WasmBoy.play();
+        Pubx.publish(PUBX_KEYS.WASMBOY, {
+          filename: response.title
+        });
+        Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Game Loaded! 🎉');
+      } else {
+        Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Invalid file type. 😞');
+      }
+    };
+    const loadGDriveROMPromise = loadGDriveROMTask().catch(error => {
+      Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification(error);
+    });
+    Pubx.get(PUBX_KEYS.LOADING).addControlPromise(loadGDriveROMPromise);
+  }
 
   togglePlayPause() {
     if (!WasmBoy.isLoadedAndStarted()) {

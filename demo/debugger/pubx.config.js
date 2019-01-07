@@ -41,7 +41,7 @@ export function PUBX_INITIALIZE() {
     isLandscape: false,
     isPortrait: false,
     update: () => {
-      const mobile = window.matchMedia('(max-width: 1024px)').matches;
+      const mobile = window.matchMedia('(max-width: 901px)').matches;
       const landscape = window.matchMedia('screen and (orientation: landscape)').matches;
       const portrait = window.matchMedia('screen and (orientation: portrait)').matches;
 

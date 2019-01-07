@@ -22,18 +22,21 @@ export default class CpuControl extends Component {
   }
 
   componentDidMount() {
-    unsubLoading = Pubx.subscribe(PUBX_KEYS.LOADING, newState => {
-      if (newState.controlLoading) {
-        this.base.classList.add('cpu-control--control-loading');
-      } else {
-        this.base.classList.remove('cpu-control--control-loading');
-      }
-    });
+    unsubLoading = Pubx.subscribe(PUBX_KEYS.LOADING, newState => this.checkControlLoading(newState));
+    this.checkControlLoading(Pubx.get(PUBX_KEYS.LOADING));
   }
 
   componentWillUnmount() {
     if (unsubLoading) {
       unsubLoading();
+    }
+  }
+
+  checkControlLoading(newState) {
+    if (newState.controlLoading) {
+      this.base.classList.add('cpu-control--control-loading');
+    } else {
+      this.base.classList.remove('cpu-control--control-loading');
     }
   }
 

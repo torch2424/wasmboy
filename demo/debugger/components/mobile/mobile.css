@@ -82,7 +82,7 @@ html.landscape .mobile-container__info-container {
 
 html.portrait .mobile-container__info-container__info {
   width: 100%;
-  height: 50%;
+  height: 45%;
   overflow: auto;
 }
 
@@ -93,4 +93,27 @@ html.landscape .mobile-container__info-container__info {
 
   padding-top: 50px;
   padding-bottom: 100px;
+}
+
+.mobile-container .donut {
+  position: absolute;
+
+  display: none;
+  z-index: 2;
+}
+
+.mobile-container.control-loading .donut {
+  display: flex;
+}
+
+.mobile-container.control-loading .mobile-container__info-container {
+  display: none;
+}
+
+html.portrait .mobile-container.control-loading .donut {
+  height: 45%;
+}
+
+html.landscape .mobile-container.control-loading .donut {
+  height: 100%;
 }

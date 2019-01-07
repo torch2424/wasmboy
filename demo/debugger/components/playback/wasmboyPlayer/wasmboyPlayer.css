@@ -15,7 +15,7 @@
 }
 
 .wasmboy-player--control-loading .donut {
-  display: block;
+  display: flex;
 }
 
 .wasmboy-player--control-loading canvas {
