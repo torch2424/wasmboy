@@ -33,7 +33,7 @@ export default class Mobile extends Component {
     if (!WasmBoy.isLoadedAndStarted()) {
       wasmboyInfo = (
         <div class="mobile-container__info-container__info">
-          <h1>Yo!</h1>
+          <h1>WasmBoy Mobile Demo</h1>
         </div>
       );
     }
