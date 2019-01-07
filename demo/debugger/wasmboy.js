@@ -112,7 +112,6 @@ export const WasmBoyUpdateCanvas = isMobile => {
       return;
     }
 
-    console.log(canvasElement);
     await WasmBoy.config(defaultOptions);
     await WasmBoy.setCanvas(canvasElement);
     await WasmBoy.play();

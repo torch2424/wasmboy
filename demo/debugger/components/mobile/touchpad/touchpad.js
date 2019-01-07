@@ -5,6 +5,8 @@ import { WasmBoy } from '../../../wasmboy';
 import { Pubx } from 'pubx';
 import { PUBX_KEYS } from '../../../pubx.config';
 
+import AboutComponent from '../../other/about/about';
+
 import {
   vaporboyExpandedDpad,
   vaporboyExpandedAButton,
@@ -38,6 +40,55 @@ export default class Touchpad extends Component {
     WasmBoy.addTouchInput('SELECT', selectElement, 'BUTTON');
   }
 
+  openROM() {
+    // Using a stateless functional component
+    Pubx.get(PUBX_KEYS.MODAL).showModal(() => {
+      return (
+        <div class="mobile-rom-source">
+          <button>
+            <div>⬆️ </div>
+            <div>Upload Local File</div>
+          </button>
+          <button>
+            <div>🍺</div>
+            <div>Open Source Homebrew</div>
+          </button>
+          <button>
+            <div>☁️</div>
+            <div>Google Drive</div>
+          </button>
+        </div>
+      );
+    });
+  }
+
+  togglePlayPause() {
+    if (!WasmBoy.isLoadedAndStarted()) {
+      Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Please load a ROM first. 💾');
+      return;
+    }
+
+    if (WasmBoy.isPlaying()) {
+      WasmBoy.pause();
+    } else {
+      WasmBoy.play();
+    }
+  }
+
+  showAbout() {
+    // Using a stateless functional component
+    Pubx.get(PUBX_KEYS.MODAL).showModal(() => {
+      return <AboutComponent />;
+    });
+  }
+
+  reload() {
+    if (window !== undefined && window.gtag) {
+      gtag('event', 'reload');
+    }
+    window.location.reload(true);
+  }
+
   render() {
     return (
       <div class="touchpad-container">
@@ -51,7 +102,20 @@ export default class Touchpad extends Component {
           <div class="gameboy-input__start">{vaporboyExpandedStartButton}</div>
         </div>
 
-        <div class="debugger-input" />
+        <div class="debugger-input">
+          <button class="remove-default-button" onClick={() => this.openROM()}>
+            💾
+          </button>
+          <button class="remove-default-button" onClick={() => this.togglePlayPause()}>
+            ⏯️
+          </button>
+          <button class="remove-default-button" onClick={() => this.showAbout()}>
+            ℹ️
+          </button>
+          <button class="remove-default-button" onClick={() => this.reload()}>
+            ♻️
+          </button>
+        </div>
       </div>
     );
   }

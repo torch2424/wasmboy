@@ -11,6 +11,33 @@
   user-select: none;
 }
 
+.debugger-input {
+  position: absolute;
+  left: 0;
+  width: 100%;
+
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+html.portrait .debugger-input {
+  bottom: 0;
+}
+
+html.landscape .debugger-input {
+  top: 0;
+}
+
+.debugger-input {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.debugger-input button {
+  padding: 12px;
+  font-size: 2em;
+}
+
 .touchpad-container svg {
   width: 100%;
   height: 100%;
@@ -47,6 +74,13 @@
   width: 100%;
 }
 
+.gameboy-input__select svg text,
+.gameboy-input__start svg text {
+  font-size: 23px;
+}
+
+/* PORTRAIT */
+
 html.portrait .gameboy-input__dpad {
   width: 37vw;
   height: 37vw;
@@ -55,16 +89,7 @@ html.portrait .gameboy-input__dpad {
 
   position: absolute;
   z-index: 1;
-  bottom: 20.5%;
-  left: 5%;
-}
-
-html.landscape .gameboy-input__dpad {
-  width: 20vw;
-  height: 20vw;
-  position: absolute;
-  z-index: 1;
-  top: calc(50% - 13vw);
+  bottom: 27.5%;
   left: 5%;
 }
 
@@ -76,17 +101,8 @@ html.portrait .gameboy-input__b {
 
   position: absolute;
   z-index: 1;
-  bottom: 20.5%;
+  bottom: 27.5%;
   right: 21%;
-}
-
-html.landscape .gameboy-input__b {
-  width: 12vw;
-  height: 12vw;
-  position: absolute;
-  z-index: 1;
-  top: calc(50% - 5vw);
-  right: 15%;
 }
 
 html.portrait .gameboy-input__a {
@@ -97,22 +113,8 @@ html.portrait .gameboy-input__a {
 
   position: absolute;
   z-index: 1;
-  bottom: 31.5%;
+  bottom: 38.5%;
   right: 3%;
-}
-
-html.landscape .gameboy-input__a {
-  width: 12vw;
-  height: 12vw;
-  position: absolute;
-  z-index: 1;
-  top: calc(50% - 13vw);
-  right: 1%;
-}
-
-.gameboy-input__select svg text,
-.gameboy-input__start svg text {
-  font-size: 23px;
 }
 
 html.portrait .gameboy-input__select {
@@ -124,16 +126,7 @@ html.portrait .gameboy-input__select {
   position: absolute;
   z-index: 1;
   left: 25.5%;
-  bottom: 6%;
-}
-
-html.landscape .gameboy-input__select {
-  width: 22.5vh;
-  height: 22.5vh;
-  position: absolute;
-  z-index: 1;
-  left: 30.5%;
-  bottom: 7%;
+  bottom: 13%;
 }
 
 html.portrait .gameboy-input__start {
@@ -145,7 +138,45 @@ html.portrait .gameboy-input__start {
   position: absolute;
   z-index: 1;
   left: 51.5%;
-  bottom: 6%;
+  bottom: 13%;
+}
+
+/* LANDSCAPE */
+
+html.landscape .gameboy-input__dpad {
+  width: 20vw;
+  height: 20vw;
+  position: absolute;
+  z-index: 1;
+  top: calc(50% - 13vw);
+  left: 5%;
+}
+
+html.landscape .gameboy-input__b {
+  width: 12vw;
+  height: 12vw;
+  position: absolute;
+  z-index: 1;
+  top: calc(50% - 5vw);
+  right: 15%;
+}
+
+html.landscape .gameboy-input__a {
+  width: 12vw;
+  height: 12vw;
+  position: absolute;
+  z-index: 1;
+  top: calc(50% - 13vw);
+  right: 1%;
+}
+
+html.landscape .gameboy-input__select {
+  width: 22.5vh;
+  height: 22.5vh;
+  position: absolute;
+  z-index: 1;
+  left: 30.5%;
+  bottom: 7%;
 }
 
 html.landscape .gameboy-input__start {

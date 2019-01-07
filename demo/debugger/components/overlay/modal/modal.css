@@ -71,6 +71,7 @@
   /* Height is 100% - title bar height */
   height: calc(100% - 20px);
   min-height: 100px;
+  padding: 10px;
 }
 
 @media only screen and (max-width: 675px) {
