@@ -1,6 +1,7 @@
 import { Pubx } from 'pubx';
 import { PUBX_KEYS } from './pubx.config';
 import { WasmBoy } from './wasmboy';
+import DebuggerAnalytics from './analytics';
 
 export default function(file, fileName) {
   const loadROMTask = async () => {
@@ -12,16 +13,14 @@ export default function(file, fileName) {
     });
 
     // Check if the Playback Control or CPU Control is open , if not, let's autoplay
-    if (!Pubx.get(PUBX_KEYS.WIDGET).isControlWidgetsOpen()) {
+    if (Pubx.get(PUBX_KEYS.MOBILE).isMobile || !Pubx.get(PUBX_KEYS.WIDGET).isControlWidgetsOpen()) {
       await WasmBoy.play();
     }
 
     Pubx.get(PUBX_KEYS.WASMBOY).update();
 
     // Fire off Analytics
-    if (window !== undefined && window.gtag) {
-      gtag('event', 'load_rom_success');
-    }
+    DebuggerAnalytics.loadROMSuccess();
   };
 
   const loadROMPromise = loadROMTask();
@@ -31,9 +30,7 @@ export default function(file, fileName) {
     Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Game Load Error! 😞');
 
     // Fire off Analytics
-    if (window !== undefined && window.gtag) {
-      gtag('event', 'load_rom_fail');
-    }
+    DebuggerAnalytics.loadROMFail();
   });
 
   Pubx.get(PUBX_KEYS.LOADING).addControlPromise(loadROMPromise);

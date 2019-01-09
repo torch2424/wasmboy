@@ -2,8 +2,6 @@ import { h, render, Component } from 'preact';
 
 import { WasmBoy } from './wasmboy';
 
-import loadScript from 'load-script';
-
 import phosphorWidgets from '@phosphor/widgets';
 
 import packageJson from '../../package.json';
@@ -19,24 +17,6 @@ import { PUBX_KEYS, PUBX_INITIALIZE } from './pubx.config';
 
 import Overlay from './components/overlay/overlay';
 import Mobile from './components/mobile/mobile';
-
-// Setup Google Analytics
-/*
-if (typeof window !== 'undefined') {
-  loadScript('https://www.googletagmanager.com/gtag/js?id=UA-125276735-1', function(err, script) {
-    if (!err) {
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        window.dataLayer.push(arguments);
-      }
-      gtag('js', new Date());
-      gtag('config', 'UA-125276735-1');
-      // Attach Analytics to window
-      window.gtag = gtag;
-    }
-  });
-}
-*/
 
 // Setup from:
 // https://github.com/phosphorjs/phosphor/blob/master/examples/example-dockpanel/src/index.ts

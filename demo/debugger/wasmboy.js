@@ -3,6 +3,8 @@
 import { WasmBoy as WasmBoyImport } from '../../dist/wasmboy.wasm.esm';
 export const WasmBoy = WasmBoyImport;
 
+import DebuggerAnalytics from './analytics';
+
 // Variables to tell if our callbacks were ever run
 let saveStateCallbackCalled = false;
 let graphicsCallbackCalled = false;
@@ -134,9 +136,7 @@ export const WasmBoyUpdateCanvas = (isMobile, stateUpdateCallback) => {
     const currentLoadedAndStarted = wasmboyOptions.onLoadedAndStarted;
     wasmboyOptions.onLoadedAndStarted = () => {
       currentLoadedAndStarted();
-      if (window !== undefined && window.gtag) {
-        gtag('event', 'rom_loaded_and_started');
-      }
+      DebuggerAnalytics.ROMLoadedAndStarted();
     };
 
     await WasmBoy.config(wasmboyOptions);

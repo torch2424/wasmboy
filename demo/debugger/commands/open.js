@@ -8,6 +8,7 @@ import loadScript from 'load-script';
 
 import Command from './command';
 import { WasmBoy } from '../wasmboy';
+import DebuggerAnalytics from '../analytics';
 import loadROM from '../loadROM';
 import { PUBX_KEYS } from '../pubx.config';
 
@@ -108,9 +109,8 @@ class OpenGoogleDriveROM extends Command {
     // Allow autoplaying audio to work
     WasmBoy.resumeAudioContext();
 
-    if (window !== undefined && window.gtag) {
-      gtag('event', 'google_drive_load');
-    }
+    // Fire off some analytics
+    DebuggerAnalytics.googleDriveLoad();
 
     // Get the ROM from google drive
     const loadGDriveROMTask = async () => {

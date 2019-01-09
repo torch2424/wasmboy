@@ -6,6 +6,7 @@ import { Pubx } from 'pubx';
 import { PUBX_KEYS } from '../../../pubx.config';
 
 import loadROM from '../../../loadROM';
+import DebuggerAnalytics from '../../../analytics';
 import { getOpenSourceROMElements } from '../../../../openSourceROMsPreact';
 import GoogleDrivePicker from '../../../../googleDrivePicker';
 
@@ -105,9 +106,8 @@ export default class Touchpad extends Component {
     // Close the modal
     Pubx.get(PUBX_KEYS.MODAL).closeModal();
 
-    if (window !== undefined && window.gtag) {
-      gtag('event', 'google_drive_load');
-    }
+    // Fire off some analytics
+    DebuggerAnalytics.googleDriveLoad();
 
     // Get the ROM from google drive
     const loadGDriveROMTask = async () => {
@@ -161,9 +161,10 @@ export default class Touchpad extends Component {
   }
 
   reload() {
-    if (window !== undefined && window.gtag) {
-      gtag('event', 'reload');
-    }
+    // Fire off some analytics
+    DebuggerAnalytics.reload();
+
+    // Reload
     window.location.reload(true);
   }
 

@@ -7,6 +7,7 @@ import compiler from '@ampproject/rollup-plugin-closure-compiler';
 import url from 'rollup-plugin-url';
 import json from 'rollup-plugin-json';
 import serve from 'rollup-plugin-serve';
+import replace from 'rollup-plugin-replace';
 import bundleSize from 'rollup-plugin-bundle-size';
 import postcss from 'rollup-plugin-postcss';
 import postcssImport from 'postcss-import';
@@ -55,6 +56,13 @@ let sourcemap = false;
 if (process.env.DEBUGGER && process.env.SERVE) {
   plugins = [
     ...plugins,
+    replace({
+      delimiters: ['', ''],
+      values: {
+        '/*ROLLUP_REPLACE_DEBUGGER_DEV': '',
+        'ROLLUP_REPLACE_DEBUGGER_DEV*/': ''
+      }
+    }),
     serve({
       contentBase: ['dist/', 'build/', 'demo/debugger/'],
       port: 8080

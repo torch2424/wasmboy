@@ -5,6 +5,7 @@ import { h, Component } from 'preact';
 import { Pubx } from 'pubx';
 import { PUBX_KEYS } from '../../../pubx.config';
 
+import DebuggerAnalytics from '../../../analytics';
 import { WasmBoy, WasmBoyDefaultDesktopOptions } from '../../../wasmboy';
 
 import './wasmboyOptions.css';
@@ -39,9 +40,7 @@ export default class WasmBoyOptions extends Component {
         Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Applied Options! 🛠️');
 
         // Fire off Analytics
-        if (window !== undefined && window.gtag) {
-          gtag('event', 'applied_options');
-        }
+        DebuggerAnalytics.appliedOptions();
       })
       .catch(error => {
         Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Options Error! 😞');

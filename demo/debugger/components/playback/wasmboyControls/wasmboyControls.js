@@ -6,6 +6,7 @@ s;
 import { Pubx } from 'pubx';
 import { PUBX_KEYS } from '../../../pubx.config';
 
+import DebuggerAnalytics from '../../../analytics';
 import { WasmBoy } from '../../../wasmboy';
 
 import './wasmboyControls.css';
@@ -48,6 +49,7 @@ export default class WasmBoyControls extends Component {
         WasmBoy.play()
           .then(() => {
             Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('State Saved! 💾');
+            DebuggerAnalytics.saveState();
           })
           .catch(err => {
             Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Error Saving State... 😞');
@@ -117,6 +119,7 @@ export default class WasmBoyControls extends Component {
       }
 
       Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('State Loaded! 😀');
+      DebuggerAnalytics.loadState();
     };
     loadStateTask().catch(() => {
       Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Error Loading State... 😞');
