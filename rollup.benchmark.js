@@ -3,6 +3,7 @@
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
+import compiler from '@ampproject/rollup-plugin-closure-compiler';
 import url from 'rollup-plugin-url';
 import json from 'rollup-plugin-json';
 import serve from 'rollup-plugin-serve';
@@ -63,7 +64,8 @@ if (process.env.BENCHMARK && process.env.SERVE) {
         files: 'demo/benchmark/index.html',
         dest: 'build/benchmark/'
       }
-    ])
+    ]),
+    compiler()
   ];
 }
 
