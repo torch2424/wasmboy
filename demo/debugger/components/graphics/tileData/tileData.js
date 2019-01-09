@@ -38,7 +38,6 @@ export default class TileData extends Component {
     // Fill the canvas with a blank screen
     // using client width since we are not requiring a width and height oin the canvas
     // https://developer.mozilla.org/en-US/docs/Web/API/Element/clientWidth
-    // TODO: Mention respopnsive canvas scaling in the docs
     canvasContext.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
     this.shouldUpdate = true;

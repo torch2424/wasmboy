@@ -93,7 +93,7 @@ export const WasmBoyDefaultMobileOptions = {
   tileCaching: true
 };
 
-export const WasmBoyUpdateCanvas = isMobile => {
+export const WasmBoyUpdateCanvas = (isMobile, stateUpdateCallback) => {
   isMobileCanvas = isMobile;
 
   const updateTask = async () => {
@@ -112,8 +112,26 @@ export const WasmBoyUpdateCanvas = isMobile => {
       setTimeout(updateTask, 500);
       return;
     }
+    const wasmboyOptions = {
+      ...defaultOptions
+    };
 
-    await WasmBoy.config(defaultOptions);
+    if (stateUpdateCallback) {
+      console.log('yooo', stateUpdateCallback);
+      const wasmboyStateCallbackKeys = ['onReady', 'onPlay', 'onPause', 'onLoadedAndStarted'];
+
+      wasmboyStateCallbackKeys.forEach(callbackKey => {
+        const callback = wasmboyOptions[callbackKey];
+        wasmboyOptions[callbackKey] = () => {
+          callback();
+          setTimeout(() => {
+            stateUpdateCallback();
+          }, 50);
+        };
+      });
+    }
+
+    await WasmBoy.config(wasmboyOptions);
     await WasmBoy.setCanvas(canvasElement);
     await WasmBoy.play();
   };

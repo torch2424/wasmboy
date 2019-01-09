@@ -61,7 +61,10 @@ export default class WasmBoyControls extends Component {
   }
 
   showLoadStateModal() {
-    // TODO: Show a loading spinner while loading
+    // Using a stateless functional component
+    Pubx.get(PUBX_KEYS.MODAL).showModal(() => {
+      return <div class="donut" />;
+    });
 
     // Get our save states
     WasmBoy.getSaveStates()

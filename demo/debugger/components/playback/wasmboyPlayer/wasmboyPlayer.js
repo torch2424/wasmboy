@@ -6,7 +6,7 @@ import { h, Component } from 'preact';
 import { Pubx } from 'pubx';
 import { PUBX_KEYS } from '../../../pubx.config';
 
-import { WasmBoy, WasmBoyDefaultDesktopOptions, WasmBoyUpdateCanvas } from '../../../wasmboy';
+import { WasmBoy, WasmBoyUpdateCanvas } from '../../../wasmboy';
 
 import './wasmboyPlayer.css';
 
@@ -20,25 +20,8 @@ export default class WasmBoyPlayer extends Component {
   }
 
   componentDidMount() {
-    // Add some pubx hooks by default
-    const wasmboyOptions = {
-      ...WasmBoyDefaultDesktopOptions
-    };
-
-    const wasmboyStateCallbackKeys = ['onReady', 'onPlay', 'onPause', 'onLoadedAndStarted'];
-
-    wasmboyStateCallbackKeys.forEach(callbackKey => {
-      const callback = wasmboyOptions[callbackKey];
-      wasmboyOptions[callbackKey] = () => {
-        callback();
-        setTimeout(() => {
-          Pubx.get(PUBX_KEYS.WASMBOY).update();
-        }, 50);
-      };
-    });
-
     // Set our canvas
-    WasmBoyUpdateCanvas(false);
+    WasmBoyUpdateCanvas(false, Pubx.get(PUBX_KEYS.WASMBOY).update);
 
     Pubx.subscribe(PUBX_KEYS.LOADING, newState => this.checkControlLoading(newState));
     this.checkControlLoading(Pubx.get(PUBX_KEYS.LOADING));

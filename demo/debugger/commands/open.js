@@ -39,7 +39,6 @@ class OpenLocalFile extends Command {
 
   onChange(event) {
     loadROM(event.target.files[0], event.target.files[0].name);
-    // TODO: autoplay
   }
 }
 

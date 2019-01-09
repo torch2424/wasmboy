@@ -68,7 +68,7 @@ export function PUBX_INITIALIZE() {
       }
 
       if (Pubx.get(PUBX_KEYS.MOBILE).isMobile !== mobile) {
-        WasmBoyUpdateCanvas(mobile);
+        WasmBoyUpdateCanvas(mobile, Pubx.get(PUBX_KEYS.WASMBOY).update);
       }
 
       Pubx.publish(PUBX_KEYS.MOBILE, {

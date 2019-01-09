@@ -16,7 +16,6 @@ export default class CpuControl extends Component {
   constructor() {
     super();
 
-    this.state.isBusy = false;
     this.state.numberOfOpcodes = 2000;
     this.state.breakPoint = 40;
   }
@@ -62,16 +61,11 @@ export default class CpuControl extends Component {
       return;
     }
 
-    this.setState({
-      isBusy: true
-    });
-    runNumberOfOpcodes(numberOfOpcodes).then(() => {
+    const runOpcodesPromise = runNumberOfOpcodes(numberOfOpcodes);
+    runOpcodesPromise.then(() => {
       Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification(`Ran ${numberOfOpcodes} opcodes! 😄`);
-
-      this.setState({
-        isBusy: false
-      });
     });
+    Pubx.get(PUBX_KEYS.LOADING).addControlPromise(runOpcodesPromise);
   }
 
   runUntilBreakPoint() {
@@ -87,25 +81,14 @@ export default class CpuControl extends Component {
       return;
     }
 
-    this.setState({
-      isBusy: true
-    });
-
-    runUntilBreakPoint(breakPoint).then(() => {
+    const runUntilBreakPointPromise = runUntilBreakPoint(breakPoint);
+    runUntilBreakPointPromise.then(() => {
       Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification(`Ran until the 0x${breakPoint} break point! 😄`);
-
-      this.setState({
-        isBusy: false
-      });
     });
+    Pubx.get(PUBX_KEYS.LOADING).addControlPromise(runUntilBreakPointPromise);
   }
 
   render() {
-    if (this.state.isBusy) {
-      // TODO:
-      return <div>Running...</div>;
-    }
-
     return (
       <div class="cpu-control">
         <h1>CPU Control</h1>
