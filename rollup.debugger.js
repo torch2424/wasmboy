@@ -71,9 +71,14 @@ if (process.env.DEBUGGER && process.env.SERVE) {
   writeIndexHtmlToBuild('index.iife.js');
   sourcemap = 'inline';
 } else {
+  // Using whitespace only closure as,
+  // It will mangle preact nodeNames, which is used
+  // For restoring debugger layout
   plugins = [
     ...plugins,
-    compiler(),
+    compiler({
+      compilation_level: 'WHITESPACE_ONLY'
+    }),
     copy([
       {
         files: 'demo/debugger/assets/**/*',
