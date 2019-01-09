@@ -22,8 +22,6 @@ import Mobile from './components/mobile/mobile';
 
 // Setup Google Analytics
 if (typeof window !== 'undefined') {
-  // TODO: Uncomment this once we put into PROD
-  /*
   loadScript('https://www.googletagmanager.com/gtag/js?id=UA-125276735-1', function(err, script) {
     if (!err) {
       window.dataLayer = window.dataLayer || [];
@@ -36,7 +34,6 @@ if (typeof window !== 'undefined') {
       window.gtag = gtag;
     }
   });
-  */
 }
 
 // Setup from:

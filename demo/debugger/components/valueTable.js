@@ -69,6 +69,7 @@ export default class ValueTable extends Component {
       return (
         <div className="value-table-container">
           <h1>{this.state.title}</h1>
+          <div>Please open a ROM to view the state values.</div>
         </div>
       );
     }
