@@ -108,7 +108,7 @@ export default class WidgetManager {
   _restoreLayout() {
     if (this.state.layout) {
       // Try to create all of the appropriate preact widgets
-      const hadError = false;
+      let hadError = false;
       const self = this;
       traverse(this.state.layout).forEach(function(value) {
         if (this.parent && this.parent.key === 'widgets') {

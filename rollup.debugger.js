@@ -46,9 +46,9 @@ let plugins = [
   commonjs(),
   json(),
   url({
-    limit: 1000000 * 1024, // Always inline
+    limit: 0, // Always emit file
     include: ['**/*.gb', '**/*.gbc', '**/*.png', '**/*.jpg'],
-    emitFiles: false
+    emitFiles: true
   })
 ];
 

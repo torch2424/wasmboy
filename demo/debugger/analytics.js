@@ -9,7 +9,7 @@ class DebuggerAnalyticsLib {
 
     this.readyPromise = new Promise((resolve, reject) => {
       if (typeof window !== 'undefined') {
-        loadScript('https://www.googletagmanager.com/gtag/js?id=UA-125276735-1', function(err, script) {
+        loadScript('https://www.googletagmanager.com/gtag/js?id=UA-125276735-1', (err, script) => {
           if (err) {
             reject(err);
           }
