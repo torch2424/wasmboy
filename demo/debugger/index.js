@@ -21,6 +21,7 @@ import Overlay from './components/overlay/overlay';
 import Mobile from './components/mobile/mobile';
 
 // Setup Google Analytics
+/*
 if (typeof window !== 'undefined') {
   loadScript('https://www.googletagmanager.com/gtag/js?id=UA-125276735-1', function(err, script) {
     if (!err) {
@@ -35,6 +36,7 @@ if (typeof window !== 'undefined') {
     }
   });
 }
+*/
 
 // Setup from:
 // https://github.com/phosphorjs/phosphor/blob/master/examples/example-dockpanel/src/index.ts

@@ -117,7 +117,6 @@ export const WasmBoyUpdateCanvas = (isMobile, stateUpdateCallback) => {
     };
 
     if (stateUpdateCallback) {
-      console.log('yooo', stateUpdateCallback);
       const wasmboyStateCallbackKeys = ['onReady', 'onPlay', 'onPause', 'onLoadedAndStarted'];
 
       wasmboyStateCallbackKeys.forEach(callbackKey => {
@@ -130,6 +129,15 @@ export const WasmBoyUpdateCanvas = (isMobile, stateUpdateCallback) => {
         };
       });
     }
+
+    // Add an analytics event for when a rom is played from onLoadedAndStarted
+    const currentLoadedAndStarted = wasmboyOptions.onLoadedAndStarted;
+    wasmboyOptions.onLoadedAndStarted = () => {
+      currentLoadedAndStarted();
+      if (window !== undefined && window.gtag) {
+        gtag('event', 'rom_loaded_and_started');
+      }
+    };
 
     await WasmBoy.config(wasmboyOptions);
     await WasmBoy.setCanvas(canvasElement);

@@ -39,12 +39,9 @@ export default class WasmBoyOptions extends Component {
         Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Applied Options! 🛠️');
 
         // Fire off Analytics
-        // TODO
-        /*
         if (window !== undefined && window.gtag) {
           gtag('event', 'applied_options');
         }
-        */
       })
       .catch(error => {
         Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Options Error! 😞');
