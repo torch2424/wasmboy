@@ -18,7 +18,7 @@
 
 <!-- Header Images -->
 
-<img src="./docs/images/debuggerDesktopDemo.gif" alt="Pokemon Crystal Wasmboy Debugger Demo" width="1000" height="500"/>
+<img src="./docs/images/debuggerDesktopDemo.gif" alt="Pokemon Crystal Wasmboy Debugger Demo" width="750" height="369"/>
 
 <img src="./docs/images/debuggerMobileDemo.gif" alt="Pokemon Crystal Wasmboy Debugger Demo" width="320" height="609"/>
 
