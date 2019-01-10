@@ -14,29 +14,37 @@
 
 **Project is still < 1.0.0. Most games are playable, but the emulator is still not very accurate. Expect bugs.**
 
-[1.0 Roadmap Tracking Issue](https://github.com/torch2424/wasmBoy/issues/197) [Debugger / Demo with support for mobile controls](https://torch2424.github.io/wasmBoy/) [Documentation](https://github.com/torch2424/wasmBoy/wiki)
+[Core/Lib Documentation](https://github.com/torch2424/wasmBoy/wiki)
 
 <!-- Header Images -->
 
-<img src="./docs/images/debuggerMobileDemo.gif" alt="Pokemon Crystal Wasmboy Debugger Demo" width="250" height="609"/> <img src="./docs/images/debuggerDesktopDemo.gif" alt="Pokemon Crystal Wasmboy Debugger Demo" width="600" height="369"/>
+![Pokemon Crystal Wasmboy Debugger Demo](./docs/images/debuggerDesktopDemo.gif)
 
 <!-- Generated with: https://github.com/ekalinin/github-markdown-toc -->
 
 # Table of Contents
 
+- [wasmboy](#wasmboy)
+- [Table of Contents](#table-of-contents)
 - [Features](#features)
 - [Usage](#usage)
   - [Supported Platforms](#supported-platforms)
-- [Example Gifs &amp; Screenshots](#example-gifs--screenshots)
+- [In-Game Screenshots](#in-game-screenshots)
+  - [Gameboy Support](#gameboy-support)
+  - [Gameboy Color Support](#gameboy-color-support)
+- [Demo Applications](#demo-applications)
+  - [Debugger](#debugger)
+  - [Benchmark](#benchmark)
 - [Tests](#tests)
   - [Blarrg](#blarrg)
   - [Mooneye](#mooneye)
+    - [Timing](#timing)
+    - [Halt](#halt)
 - [Contributing](#contributing)
   - [Installation](#installation)
   - [CLI Commands / Npm Scripts](#cli-commands--npm-scripts)
 - [Notable Projects](#notable-projects)
 - [Special Thanks](#special-thanks)
-- [Random Tips for new Gameboy EmuDevs](#random-tips-for-new-gameboy-emudevs)
 - [Resources](#resources)
 
 # Features
@@ -68,7 +76,7 @@ Documentation for the project can be found on the [WasmBoy Wiki](https://github.
 
 Try to test and aim for support on all major browsers (Chrome, Firefox, and Safari). Also, Node support works with the [`headless` option in the WasmBoy config](https://github.com/torch2424/wasmBoy/wiki/Lib-API#wasmboyoptions), and using the [Worker Threads](https://nodejs.org/api/worker_threads.html) `--experimental-worker` flag.
 
-# Game Screenshots
+# In-Game Screenshots
 
 ### Gameboy Support
 
@@ -82,7 +90,37 @@ Try to test and aim for support on all major browsers (Chrome, Firefox, and Safa
 
 ### Debugger
 
+[Application Link](https://wasmboy.app/)
+
+A full debugger meant for analyzing the internals of the gameboy. Great for HomeBrew Gameboy Development, or using as a reference point for building your own GameBoy emulator.
+
+**Features**
+
+- Support of all Gameboy Components: CPU, PPU (Graphics), APU (Audio), Memory, Interrupts, and Timers. 🎮
+- Per cycle state of each Game Boy components data, internal registers, and relevant memory addresses. 🌐
+- Loaded ROM Information and parsing of the [Cartridge Header](http://gbdev.gg8.se/wiki/articles/The_Cartridge_Header). 💾
+- CPU Control options. Stepping per opcode, and breakpoints. 🧠
+- Graphics Background Map, with border for current "camera" location with respect to scroll registers. 🖼️
+- Graphics Tile Data, to display the loaded tiles currently loaded across all VRAM Banks. 🎨
+- WasmBoy Control options. Play, Pause, Save State, and Load State. ⏯️ 📚
+- Ability to log the entire WasmBoy Library Object and Memory to the DevTools Console. 🖥️
+- Highly productive "Docker" layout, with snapping of widgets onto sections of the screen and tab support. ⚓
+- Saved Layouts between sessions. 💠
+- Help widget with tips on how to be effective in the debugger. 🙋
+
+**Mobile Demo**
+
+For UI/UX reasons, on mobile the debugger is simply a web app for testing the lib. This is useful for testing a ROM on the go. For playing games, I would suggest [VaporBoy](https://vaporboy.net/). Below is an example of the mobile demo:
+
+![Pokemon Crystal Wasmboy Mobile Demo](./docs/images/debuggerMobileDemo.gif)
+
 ### Benchmark
+
+[Application Link](https://wasmboy.app/benchmark/)
+
+[Medium Article](https://medium.com/@torch2424/webassembly-is-fast-a-real-world-benchmark-of-webassembly-vs-es6-d85a23f8e193)
+
+Since WasmBoy is built in AssemblyScript, it can also run it's core through the Typescript compiler if we mock out some of the WebAssembly interface. The benchmarking tool was built as a way to compare WebAssembly performance to Javascript / ES6 performance, after compiling the core to both WebAssembly and Javascript. It includes detailed stats, live running output, and multiple graphs. Also great for comparing the performance of devices that run WasmBoy.
 
 # Tests
 
