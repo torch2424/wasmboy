@@ -1,320 +1,70 @@
-import './style';
-import 'bulma/css/bulma.css';
-import { Component } from 'preact';
-// The following line can be changed to './dist/wasmboy.esm.js', to test the built lib
-import { WasmBoy } from '../../dist/wasmboy.wasm.esm';
-import { WasmBoyDebugger } from './wasmboyDebugger/wasmboyDebugger';
-import { WasmBoySystemControls } from './wasmboySystemControls/wasmboySystemControls';
-import { WasmBoyFilePicker } from './wasmboyFilePicker/wasmboyFilePicker';
-import { WasmBoyOptions } from './wasmboyOptions/wasmboyOptions';
-import { WasmBoyGamepad } from './wasmboyGamepad/wasmboyGamepad';
+import { h, render, Component } from 'preact';
 
-// Log the wasmboy lib
-console.log('WasmBoy', WasmBoy);
+import { WasmBoy } from './wasmboy';
 
-// Our current canvas object.
-// Up here for the saveStateCallback
-const getCanvasElement = () => {
-  const canvasElement = document.querySelector('.wasmboy__canvas-container__canvas');
-  return canvasElement;
+import phosphorWidgets from '@phosphor/widgets';
+
+import packageJson from '../../package.json';
+
+import './index.css';
+
+import WidgetManager from './widgetManager';
+
+import menus from './menus';
+
+import { Pubx } from 'pubx';
+import { PUBX_KEYS, PUBX_INITIALIZE } from './pubx.config';
+
+import Overlay from './components/overlay/overlay';
+import Mobile from './components/mobile/mobile';
+
+// Setup from:
+// https://github.com/phosphorjs/phosphor/blob/master/examples/example-dockpanel/src/index.ts
+
+// Create our dockPanel
+const dockPanel = new phosphorWidgets.DockPanel();
+dockPanel.id = 'dock';
+
+// Create our top menu bar
+let menuBar = new phosphorWidgets.MenuBar();
+menus.forEach(menu => {
+  menuBar.addMenu(menu);
+});
+menuBar.id = 'menuBar';
+
+phosphorWidgets.BoxPanel.setStretch(dockPanel, 1);
+
+let main = new phosphorWidgets.BoxPanel({ direction: 'left-to-right', spacing: 0 });
+main.id = 'main';
+main.addWidget(dockPanel);
+
+window.onresize = () => {
+  main.update();
 };
 
-// Our notification timeout
-let notificationTimeout = undefined;
+// Initialize Pubx for State Management
+PUBX_INITIALIZE();
 
-// Variables to tell if our callbacks were ever run
-let saveStateCallbackCalled = false;
-let graphicsCallbackCalled = false;
-let audioCallbackCalled = false;
+// Set up our Widget Manager
+const widgetManager = new WidgetManager(dockPanel);
+Pubx.publish(PUBX_KEYS.WIDGET, {
+  widgetManager
+});
 
-// WasmBoy Options
-const WasmBoyDefaultOptions = {
-  isGbcEnabled: true,
-  isAudioEnabled: true,
-  frameSkip: 0,
-  audioBatchProcessing: true,
-  timersBatchProcessing: false,
-  audioAccumulateSamples: true,
-  graphicsBatchProcessing: false,
-  graphicsDisableScanlineRendering: false,
-  tileRendering: true,
-  tileCaching: true,
-  gameboyFrameRate: 60,
-  updateGraphicsCallback: imageDataArray => {
-    if (!graphicsCallbackCalled) {
-      console.log('Graphics Callback Called! Only Logging this once... imageDataArray:', imageDataArray);
-      graphicsCallbackCalled = true;
-    }
-  },
-  updateAudioCallback: (audioContext, audioBufferSourceNode) => {
-    if (!audioCallbackCalled) {
-      console.log(
-        'Audio Callback Called! Only Logging this once... audioContext, audioBufferSourceNode:',
-        audioContext,
-        audioBufferSourceNode
-      );
-      audioCallbackCalled = true;
-    }
-  },
-  saveStateCallback: saveStateObject => {
-    if (!saveStateCallbackCalled) {
-      console.log('Save State Callback Called! Only Logging this once... saveStateObject:', saveStateObject);
-      saveStateCallbackCalled = true;
-    }
+// Bind phosphor to DOM
+const phosphorContainer = document.getElementById('phosphor-container');
+phosphorWidgets.Widget.attach(menuBar, phosphorContainer);
+phosphorWidgets.Widget.attach(main, phosphorContainer);
 
-    // Function called everytime a savestate occurs
-    // Used by the WasmBoySystemControls to show screenshots on save states
-    saveStateObject.screenshotCanvasDataURL = getCanvasElement().toDataURL();
-  },
-  onReady: () => {
-    console.log('onReady Callback Called!');
-  },
-  onPlay: () => {
-    console.log('onPlay Callback Called!');
-  },
-  onPause: () => {
-    console.log('onPause Callback Called!');
-  },
-  onLoadedAndStarted: () => {
-    console.log('onLoadedAndStarted Callback Called!');
-  }
-};
+// Bind Preact Overlay to DOM
+const overlayContainer = document.getElementById('overlay-container');
+render(<Overlay />, overlayContainer);
 
-// Setup Google Analytics
-if (typeof window !== 'undefined') {
-  const loadScript = require('load-script');
-  loadScript('https://www.googletagmanager.com/gtag/js?id=UA-125276735-1', function(err, script) {
-    if (!err) {
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        window.dataLayer.push(arguments);
-      }
-      gtag('js', new Date());
-      gtag('config', 'UA-125276735-1');
-      // Attach Analytics to window
-      window.gtag = gtag;
-    }
-  });
-}
+// Bind the Mobile UI to DOM
+const mobileContainer = document.getElementById('mobile-container');
+render(<Mobile />, mobileContainer);
 
-export default class App extends Component {
-  constructor() {
-    super();
-
-    this.state = {
-      showDebugger: false,
-      showOptions: false,
-      showGamepad: false,
-      autoPlayROMOnLoad: false,
-      notification: <div />
-    };
-  }
-
-  // Using componentDidMount to wait for the canvas element to be inserted in DOM
-  componentDidMount() {
-    // Config our WasmBoy instance
-    WasmBoy.config(WasmBoyDefaultOptions)
-      .then(() => {
-        // Wait for input
-        this.setWasmBoyCanvas();
-      })
-      .catch(error => {
-        console.error(error);
-      });
-  }
-
-  setWasmBoyCanvas() {
-    const setCanvasTask = async () => {
-      // Get our canvas element
-      await WasmBoy.setCanvas(getCanvasElement());
-      await WasmBoy.play();
-    };
-
-    return setCanvasTask();
-  }
-
-  // Function to show notifications to the user
-  showNotification(notificationText) {
-    if (notificationTimeout) {
-      clearTimeout(notificationTimeout);
-      notificationTimeout = undefined;
-    }
-
-    const closeNotification = () => {
-      const newState = Object.assign({}, this.state);
-      newState.notification = <div />;
-      this.setState(newState);
-    };
-
-    const newState = Object.assign({}, this.state);
-    newState.notification = (
-      <div class="notification animated fadeIn">
-        <button
-          class="delete"
-          onClick={() => {
-            closeNotification();
-          }}
-        />
-        {notificationText}
-      </div>
-    );
-    this.setState(newState);
-
-    notificationTimeout = setTimeout(() => {
-      closeNotification();
-    }, 3000);
-  }
-
-  render() {
-    // Optionally render the options
-    let optionsComponent = <div />;
-    if (this.state.showOptions) {
-      optionsComponent = (
-        <section>
-          <WasmBoyOptions
-            availableOptions={WasmBoyDefaultOptions}
-            showNotification={text => {
-              this.showNotification(text);
-            }}
-          />
-        </section>
-      );
-    }
-
-    // optionally render the debugger
-    let debuggerComponent = <div />;
-    if (this.state.showDebugger) {
-      debuggerComponent = (
-        <section>
-          <WasmBoyDebugger />
-        </section>
-      );
-    }
-
-    return (
-      <div class="wasmboy">
-        <h1 class="wasmboy__title">WasmBoy (Debugger / Demo)</h1>
-        <div style="text-align: center">
-          <b>WasmBoy Lib Version: {WasmBoy.getVersion()}</b>
-        </div>
-        {WasmBoy.getCoreType() ? (
-          <div style="text-align: center">
-            <b>WasmBoy Core Type: {WasmBoy.getCoreType()}</b>
-          </div>
-        ) : (
-          ''
-        )}
-        <div style="text-align: center">
-          <a href="https://github.com/torch2424/wasmBoy" target="_blank" rel="noopener">
-            Fork me on Github
-          </a>
-        </div>
-        <div style="text-align: center">
-          Try{' '}
-          <a href="https://vaporboy.net/" target="_blank" rel="noopener">
-            VaporBoy
-          </a>{' '}
-          for a full featured, GB / GBC Emulator Progressive Web App.
-        </div>
-
-        <div style="text-align: center;margin-top: 10px">
-          <label class="checkbox">
-            Show Options
-            <input
-              id="showOptions"
-              type="checkbox"
-              checked={this.state.showOptions}
-              onChange={() => {
-                const newState = Object.assign({}, this.state);
-                newState.showOptions = !newState.showOptions;
-                this.setState(newState);
-              }}
-            />
-          </label>
-        </div>
-
-        {optionsComponent}
-
-        <div style="text-align: center">
-          <label class="checkbox">
-            Show Debugger
-            <input
-              type="checkbox"
-              checked={this.state.showDebugger}
-              onChange={() => {
-                const newState = Object.assign({}, this.state);
-                newState.showDebugger = !newState.showDebugger;
-                this.setState(newState);
-
-                // Fire off Analytics
-                if (window !== undefined && window.gtag) {
-                  gtag('event', 'opened_debugger');
-                }
-              }}
-            />
-          </label>
-        </div>
-
-        <div style="text-align: center">
-          <label class="checkbox">
-            Auto Play ROM on Load
-            <input
-              type="checkbox"
-              checked={this.state.autoPlayROMOnLoad}
-              onChange={() => {
-                const newState = Object.assign({}, this.state);
-                newState.autoPlayROMOnLoad = !newState.autoPlayROMOnLoad;
-                this.setState(newState);
-              }}
-            />
-          </label>
-        </div>
-
-        <div style="text-align: center">
-          <label class="checkbox">
-            Show Touchpad
-            <input
-              type="checkbox"
-              checked={this.state.showGamepad}
-              onChange={() => {
-                const newState = Object.assign({}, this.state);
-                newState.showGamepad = !newState.showGamepad;
-                this.setState(newState);
-
-                // Fire off Analytics
-                if (window !== undefined && window.gtag) {
-                  gtag('event', 'showed_gamepad');
-                }
-              }}
-            />
-          </label>
-        </div>
-
-        {debuggerComponent}
-
-        <WasmBoyFilePicker
-          showNotification={text => {
-            this.showNotification(text);
-          }}
-          autoplay={this.state.autoPlayROMOnLoad}
-        />
-
-        <div>
-          <WasmBoySystemControls
-            showNotification={text => {
-              this.showNotification(text);
-            }}
-          />
-        </div>
-
-        <main className="wasmboy__canvas-container">
-          <canvas className="wasmboy__canvas-container__canvas" />
-        </main>
-
-        {this.state.showGamepad ? <WasmBoyGamepad /> : ''}
-
-        {this.state.notification}
-      </div>
-    );
-  }
-}
+// Show a nice welcome message
+setTimeout(() => {
+  Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Welcome to the WasmBoy Debugger/Demo!');
+}, 100);

@@ -1,0 +1,10 @@
+.wasmboy-info {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+}
+
+.wasmboy-info__action-buttons button {
+  margin: 5px;
+}

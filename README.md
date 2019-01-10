@@ -7,7 +7,6 @@
 ![npm bundle size (minified)](https://img.shields.io/bundlephobia/min/wasmboy.svg)
 ![npm](https://img.shields.io/npm/dt/wasmboy.svg)
 ![GitHub](https://img.shields.io/github/license/torch2424/wasmboy.svg)
-[![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/torch2424)
 
 <!--- Short Description-->
 
@@ -15,15 +14,11 @@
 
 **Project is still < 1.0.0. Most games are playable, but the emulator is still not very accurate. Expect bugs.**
 
-[1.0 Roadmap Tracking Issue](https://github.com/torch2424/wasmBoy/issues/197)
+[Core/Lib Documentation](https://github.com/torch2424/wasmBoy/wiki)
 
-[Debugger / Demo with support for mobile controls](https://torch2424.github.io/wasmBoy/)
+<!-- Header Images -->
 
-[Documentation](https://github.com/torch2424/wasmBoy/wiki)
-
-<!-- Header gif -->
-
-![Pokemon Crystal Wasmboy Demo](./docs/images/wasmBoyPokemonCrystal.gif)
+![Pokemon Crystal Wasmboy Debugger Demo](./docs/images/debuggerDesktopDemo.gif)
 
 <!-- Generated with: https://github.com/ekalinin/github-markdown-toc -->
 
@@ -32,16 +27,22 @@
 - [Features](#features)
 - [Usage](#usage)
   - [Supported Platforms](#supported-platforms)
-- [Example Gifs &amp; Screenshots](#example-gifs--screenshots)
+- [In-Game Screenshots](#in-game-screenshots)
+  - [Gameboy Support](#gameboy-support)
+  - [Gameboy Color Support](#gameboy-color-support)
+- [Demo Applications](#demo-applications)
+  - [Debugger](#debugger)
+  - [Benchmark](#benchmark)
 - [Tests](#tests)
   - [Blarrg](#blarrg)
   - [Mooneye](#mooneye)
+    - [Timing](#timing)
+    - [Halt](#halt)
 - [Contributing](#contributing)
   - [Installation](#installation)
   - [CLI Commands / Npm Scripts](#cli-commands--npm-scripts)
 - [Notable Projects](#notable-projects)
 - [Special Thanks](#special-thanks)
-- [Random Tips for new Gameboy EmuDevs](#random-tips-for-new-gameboy-emudevs)
 - [Resources](#resources)
 
 # Features
@@ -73,23 +74,77 @@ Documentation for the project can be found on the [WasmBoy Wiki](https://github.
 
 Try to test and aim for support on all major browsers (Chrome, Firefox, and Safari). Also, Node support works with the [`headless` option in the WasmBoy config](https://github.com/torch2424/wasmBoy/wiki/Lib-API#wasmboyoptions), and using the [Worker Threads](https://nodejs.org/api/worker_threads.html) `--experimental-worker` flag.
 
-# Example Gifs & Screenshots
+# In-Game Screenshots
 
-**Gameboy Support**
+### Gameboy Support
 
 ![Is that a demo in your pocket](./docs/images/wasmBoyIsThatADemoInYourPocket.png) ![Megaman 2](./docs/images/wasmBoyMegaman2.png) ![Pokemon Blue](./docs/images/wasmBoyPokemonBlue.png) ![tetris](./docs/images/wasmBoyTetris.png) ![tobu tobu girl](./test/performance/testroms/tobutobugirl/tobutobugirl.gb.noPerformanceOptions.png)
 
-**Gameboy Color Support**
+### Gameboy Color Support
 
 ![Links Awakening](./docs/images/wasmBoyLinksAwakening.png) ![L s d j](./docs/images/wasmBoyLsdj.png) ![Megaman extreme 2](./docs/images/wasmBoyMegamanXtreme2.png) ![Pokemon Silver](./docs/images/wasmBoyPokemonSilver.png) ![Pokemon Yellow](./docs/images/wasmBoyPokemonYellow.png) ![back to color demo](./test/performance/testroms/back-to-color/back-to-color.gbc.noPerformanceOptions.png)
 
-**Options & Save States**
+# Demo Applications
 
-![Wasm boy options and save states gif](./docs/images/wasmBoySaveStateOptions.gif)
+### Debugger
 
-**Debugger**
+[Application Link](https://wasmboy.app/)
 
-![was boy pokemon silver debugger demo](./docs/images/wasmBoyPokemonSilverDebugger.gif)
+A full debugger meant for analyzing the internals of the gameboy. Great for HomeBrew Gameboy Development, or using as a reference point for building your own GameBoy emulator. **See the gif at the top of the README for an example.**
+
+**Features**
+
+- Support of all Gameboy Components: CPU, PPU (Graphics), APU (Audio), Memory, Interrupts, and Timers. 🎮
+- Per cycle state of each Game Boy components data, internal registers, and relevant memory addresses. 🌐
+- Loaded ROM Information and parsing of the [Cartridge Header](http://gbdev.gg8.se/wiki/articles/The_Cartridge_Header). 💾
+- CPU Control options. Stepping per opcode, and breakpoints. 🧠
+- Graphics Background Map, with border for current "camera" location with respect to scroll registers. 🖼️
+- Graphics Tile Data, to display the loaded tiles currently loaded across all VRAM Banks. 🎨
+- WasmBoy Control options. Play, Pause, Save State, and Load State. ⏯️ 📚
+- Ability to log the entire WasmBoy Library Object and Memory to the DevTools Console. 🖥️
+- Highly productive "Docker" layout, with snapping of widgets onto sections of the screen and tab support. ⚓
+- Saved Layouts between sessions. 💠
+- Help widget with tips on how to be effective in the debugger. 🙋
+
+**Anaytics / Privacy**
+
+[Analytics Wrapper Service](./demo/debugger/analytics.js)
+
+Analytics is used on this application simply for performance monitoring, and tracking popularity of the applications. The following events are sent, with nothing more than the event name. The analytics provider used is [Google Analytics](https://analytics.google.com/analytics/web/).
+
+- Whenever a new ROM is loaded, and played for the first time.
+- Whether attempting to load a ROM was successful.
+- Whenever a state is saved.
+- Whenever a state is loaded.
+- Whenever custom WasmBoy options are applied.
+- Whenever the Google Drive option is selected.
+- Whenever the mobile demo is manually reloaded.
+
+**Mobile Demo**
+
+For UI/UX reasons, on mobile the debugger is simply a web app for testing the lib. This is useful for testing a ROM on the go. For playing games, I would suggest [VaporBoy](https://vaporboy.net/). Below is an example of the mobile demo:
+
+![Pokemon Crystal Wasmboy Mobile Demo](./docs/images/debuggerMobileDemo.gif)
+
+### Benchmark
+
+[Application Link](https://wasmboy.app/benchmark/)
+
+[Medium Article](https://medium.com/@torch2424/webassembly-is-fast-a-real-world-benchmark-of-webassembly-vs-es6-d85a23f8e193)
+
+Since WasmBoy is built in AssemblyScript, it can also run it's core through the Typescript compiler if we mock out some of the WebAssembly interface. The benchmarking tool was built as a way to compare WebAssembly performance to Javascript / ES6 performance, after compiling the core to both WebAssembly and Javascript. It includes detailed stats, live running output, and multiple graphs. Also great for comparing the performance of devices that run WasmBoy.
+
+**Anaytics / Privacy**
+
+Analytics is used on this application simply for performance monitoring, and tracking popularity of the application. The following events are sent, with nothing more than the event name. The analytics provider used is [Google Analytics](https://analytics.google.com/analytics/web/).
+
+- Whenever a new ROM is loaded from the particular source.
+- Whenever the benchmark is ran.
+- Whenever results are rendered for the benchmark.
+
+**Example**
+
+![WasmBoy Benchmark Runner Section on Safari](./docs/images/benchmarkSafariBackToColorRunner.png)
 
 # Tests
 
@@ -139,7 +194,7 @@ halt_ime0_ei, halt_ime0_nointr_timing, halt_ime1_timing
 
 # Contributing
 
-Feel free to fork and submit PRs! Any help is much appreciated, and would be a ton of fun!
+Feel free to fork and submit PRs! Opening an issue is reccomended before starting any development, as a discussion would be nice on the idea / feature before writing code. Any help is much appreciated, and would be a ton of fun!
 
 ### Installation
 
@@ -149,21 +204,30 @@ Just your standard node app. Install Node with [nvm](https://github.com/creation
 
 The project contains three different elements.
 
-- The `debugger` is the container for the wasmboy library, which is simply a [preact](https://github.com/developit/preact) application, generated with [preact-cli](https://github.com/developit/preact-cli).
 - The `core` or `wasm` which is the web assembly module for wasmboy written in [AssemblyScript](https://github.com/AssemblyScript/assemblyscript).
 - The `lib` which is the importable library of wasmboy that can be used in other projects, that adds a top level API to the `core`.
+- The `demo`, which is a collection of different apps that are used for demoing purposes of the `lib` and `core`.
 
-Each of these uses a different build process. The debugger uses [webpack](https://webpack.js.org/), the wasm uses the [AssemblyScript](https://github.com/AssemblyScript/assemblyscript) compiler CLI tool, and the lib uses [Rollup.js](https://rollupjs.org/guide/en).
+Most of the build process in this project is done using [Rollup.js](https://rollupjs.org/guide/en). Each element / component of the project is configured in its own `rollup.*.js` file, and are then all used within the standard `rollup.config.js` file by the rollup CLI. Also, The `core` wasm uses the [AssemblyScript](https://github.com/AssemblyScript/assemblyscript) compiler CLI tool.
 
 Commands for each part of the project will be prepended with their element name and a colon, e.g `debugger:[command here]`.
 
+Common command parts are:
+
+- `dev` / `watch` - How the project should be served and developed with tools like reloading.
+- `build` - Make production builds of the component / element of the project.
+
 Commands not prepended with a colon are meant for easily building on all of the different parts as a whole.
+
+Not all commands are documented, only ones relevant to making changes to the library for contributions. `*` represents the category of commands, and is not an actual command.
 
 ```bash
 # Command to serve the project, and watch the debugger, wasm, and lib for changes
 # Uses concurrently: https://github.com/kimmobrunfeldt/concurrently
-# Concurrently helps cleanup the output and organizes all three watchers/servers
-npm start
+# Concurrently helps cleanup the output and organizes watchers on commands that require concurrent tools
+
+# Serve the general project for development (Watches the core, lib, and debugger)
+npm run start
 
 # Same as npm start
 npm run dev
@@ -171,8 +235,17 @@ npm run dev
 # Same as npm start
 npm run watch
 
-# Build the wasm module and the lib to be ready to be pushed to npm or released
+# Build everything to be ready to be pushed to npm or released
 npm run build
+
+# Linting commands used during precommit an tests
+npm run prettier:*
+
+# Commands for building/serving the core, offers commands for building with the Assemblyscript Compiler (WASM) or Typescript (JS)
+npm run core:*
+
+# Commands for building/serving the JS lib
+npm run lib:*
 
 # Run tests in `test/accuracy/test.js`
 npm run test
@@ -180,29 +253,18 @@ npm run test
 # Run tests in `test/performance/test.js`
 npm run test:performance
 
-# Watch the debugger (preact) project for changes and livereload
-npm run debugger:watch
+# All commands for testing, and are test related
+npm run test:*
 
-# Build the debugger (preact) project and serve it
-npm run debugger:serve
+# Commands for the building / serving the debugger
+npm run debugger:*
 
-# Build the debugger (preact) project
-npm run debugger:build
+# Commands for building / serving the benchmark tool
+npm run benchmark:*
 
-# Watch the wasm (AssemblyScript) *.ts files and build on changes
-npm run core:watch
-
-# Build the wasm (AssemblyScript) *.ts files, with the correct CLI flags
-npm run core:build
-
-# Watch the Wasmboy ES6 Module for changes, and build
-npm run lib:watch
-
-# Build the WasmBoy Es6 module
-npm run lib:build
+# Commands for building / serving all available apps in wasmboy
+npm run demo:*
 ```
-
-The debugger application/container for wasmboy utilizes the [preact-cli](https://github.com/developit/preact-cli/blob/master/README.md). Additional workflow commands and tips can be found there.
 
 Using the [gh-pages](https://www.npmjs.com/package/gh-pages) for debugger/demo deployment onto gh-pages.
 

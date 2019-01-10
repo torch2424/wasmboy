@@ -1,0 +1,87 @@
+/* Styles pertaining to the app itself */
+
+body {
+  display: flex;
+  z-index: 0;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+#phosphor-container {
+  display: flex;
+  z-index: 0;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+#mobile-container {
+  display: block;
+  z-index: 1;
+}
+
+#overlay-container {
+  display: flex;
+  z-index: 2;
+  pointer-events: none;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+#menuBar {
+  flex: 0 0 auto;
+}
+
+#main {
+  flex: 1 1 auto;
+}
+
+#palette {
+  min-width: 300px;
+  border-right: 1px solid #dddddd;
+}
+
+#dock {
+  padding: 4px;
+}
+
+/* The widget themselves inner content */
+.content {
+  min-width: 50px;
+  min-height: 50px;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  border: 1px solid #c0c0c0;
+  border-top: none;
+  background: white;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.content > div {
+  flex: 1 1 auto;
+  border: 1px solid #020202;
+  overflow: auto;
+  height: 100%;
+  padding: 10px;
+}

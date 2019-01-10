@@ -1,14 +1,15 @@
 import { h, Component } from 'preact';
 import Portal from 'preact-portal';
 
-import '../debugger/wasmboyFilePicker/wasmboyFilePicker.css';
+import './wasmboyFilePicker.css';
 
 // Import some functions from our lib
 import { sendAnalyticsEvent } from './analytics';
 import { fetchROMAsByteArray } from '../../lib/wasmboy/fetchrom.js';
 
-// Import our open source roms from the debugger
-import { openSourceROMs, getOpenSourceROMElements } from '../debugger/wasmboyFilePicker/openSourceROMs';
+// Import our open source roms
+import { openSourceROMS } from '../openSourceROMs';
+import { getOpenSourceROMElements } from '../openSourceROMsPreact';
 
 export default class LoadROMSelector extends Component {
   constructor(props) {

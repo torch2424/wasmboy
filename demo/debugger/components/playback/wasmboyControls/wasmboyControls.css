@@ -1,0 +1,58 @@
+.wasmboy-controls {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+}
+
+.wasmboy-controls .donut {
+  display: none;
+}
+
+.wasmboy-controls--control-loading .donut {
+  display: block;
+}
+
+.wasmboy-controls--control-loading .wasmboy-controls__group {
+  display: none;
+}
+
+.wasmboy-controls__group {
+  width: 100%;
+
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.wasmboy-controls__group * {
+  margin: 5px;
+}
+
+.load-state-container {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 25px;
+
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  flex-direction: row;
+}
+
+.load-state-container__save-state {
+  margin-left: 5px;
+  margin-right: 5px;
+  padding: 10px;
+
+  word-wrap: break-word;
+
+  transition: background-color 0.25s;
+}
+
+.load-state-container__save-state:hover {
+  background-color: rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+}

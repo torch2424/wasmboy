@@ -1,0 +1,17 @@
+.wasmboy-options {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.wasmboy-options__info {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.wasmboy-options__inputs div {
+  margin: 5px;
+}
+
+.wasmboy-options__apply {
+  margin-top: 10px;
+}

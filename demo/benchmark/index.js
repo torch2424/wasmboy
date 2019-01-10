@@ -1,7 +1,7 @@
 import { h, render, Component } from 'preact';
 
 import 'bulma/css/bulma.css';
-import '../debugger/style.css';
+import './style.css';
 import './index.css';
 
 import valoo from 'valoo';

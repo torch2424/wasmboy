@@ -1,0 +1,119 @@
+html.mobile #phosphor-container {
+  display: none;
+}
+
+html:not(.mobile) #mobile-container {
+  display: none;
+}
+
+html.mobile #mobile-container {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: hidden;
+}
+
+html.mobile,
+html.mobile body {
+  height: 100%;
+  width: 100vw;
+  margin: 0px;
+
+  /*
+  // Disable pull to refresh on Chrome and Firefox
+  // https://stackoverflow.com/questions/36212722/how-to-prevent-pull-down-to-refresh-of-mobile-chrome
+  // https://developers.google.com/web/updates/2017/11/overscroll-behavior
+  */
+  overscroll-behavior-y: contain;
+}
+
+html.mobile {
+  overflow: hidden;
+}
+
+html.mobile body {
+  position: fixed; /* prevent overscroll bounce*/
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch; /* iOS velocity scrolling */
+}
+
+.mobile-container {
+  width: 100%;
+  height: 100%;
+
+  background-color: #020202;
+}
+
+.mobile-container__canvas-container {
+  width: 100%;
+  height: 100%;
+}
+
+.mobile-container__canvas-container canvas {
+  object-position: top;
+}
+
+.mobile-container__info-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+}
+
+html.portrait .mobile-container__info-container {
+  justify-content: center;
+  align-items: flex-start;
+}
+
+html.landscape .mobile-container__info-container {
+  justify-content: center;
+  align-items: center;
+}
+
+.mobile-container__info-container__info {
+  padding: 10px;
+  background-color: #fff;
+}
+
+html.portrait .mobile-container__info-container__info {
+  width: 100%;
+  height: 45%;
+  overflow: auto;
+}
+
+html.landscape .mobile-container__info-container__info {
+  width: 50%;
+  height: 100%;
+  overflow: auto;
+
+  padding-top: 50px;
+  padding-bottom: 100px;
+}
+
+.mobile-container .donut {
+  position: absolute;
+
+  display: none;
+  z-index: 2;
+}
+
+.mobile-container.control-loading .donut {
+  display: flex;
+}
+
+.mobile-container.control-loading .mobile-container__info-container {
+  display: none;
+}
+
+html.portrait .mobile-container.control-loading .donut {
+  height: 45%;
+}
+
+html.landscape .mobile-container.control-loading .donut {
+  height: 100%;
+}

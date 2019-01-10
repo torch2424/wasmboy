@@ -1,0 +1,60 @@
+/* Styles used by individual elements across the app */
+
+.hide {
+  display: none;
+}
+
+.pixel-canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.hidden-rom-input {
+  display: none !important;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.remove-default-button {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+}
+
+.tall {
+  height: 100vh;
+  width: 100vw;
+  background-color: purple;
+  color: white;
+}
+
+/* https://30-seconds.github.io/30-seconds-of-css/#donut-spinner */
+@keyframes donut-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.donut {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+
+  width: 100%;
+}
+
+.donut:after {
+  content: ' ';
+  display: inline-block;
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #7983ff;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: donut-spin 1.2s linear infinite;
+}

@@ -11,6 +11,9 @@ import compiler from '@ampproject/rollup-plugin-closure-compiler';
 import bundleSize from 'rollup-plugin-bundle-size';
 import pkg from './package.json';
 
+// For Worker URL Loading
+const path = require('path');
+
 // Our final bundles we are generating for the lib
 const libBundles = [];
 
@@ -78,6 +81,22 @@ const replaceBrowserOptions = {
   }
 };
 
+const replaceProdBrowserOptions = {
+  delimiters: ['', ''],
+  values: {
+    '/*ROLLUP_REPLACE_PROD_BROWSER': '',
+    'ROLLUP_REPLACE_PROD_BROWSER*/': ''
+  }
+};
+
+const replaceDevBrowserOptions = {
+  delimiters: ['', ''],
+  values: {
+    '/*ROLLUP_REPLACE_DEV_BROWSER': '',
+    'ROLLUP_REPLACE_DEV_BROWSER*/': ''
+  }
+};
+
 const babelPluginConfig = {
   // so Rollup can convert unsupported es6 code to es5
   exclude: ['node_modules/**'],
@@ -100,6 +119,12 @@ baseLibBundles.forEach(baseLibBundle => {
   // Determine our replacements
   if (baseLibBundle.output.format !== 'cjs') {
     plugins.push(replace(replaceBrowserOptions));
+
+    if (process.env.PROD) {
+      plugins.push(replace(replaceProdBrowserOptions));
+    } else {
+      plugins.push(replace(replaceDevBrowserOptions));
+    }
   } else {
     plugins.push(replace(replaceNodeOptions));
   }
@@ -109,12 +134,22 @@ baseLibBundles.forEach(baseLibBundle => {
     ...plugins,
     resolve(), // so Rollup can find node modules
     commonjs(),
-    json(),
+    json()
+  ];
+
+  // For Sourcemapping, only url encode workers if we are building for PROD
+  // Using fileName key, to simply point to our workers in dist
+  let workerUrlLimit = 0; // Always URL
+  if (process.env.PROD) {
+    workerUrlLimit = 1000000 * 1024; // Always inline
+  }
+  plugins = [
+    ...plugins,
     url({
-      limit: 1000000 * 1024, // Always inline
+      limit: workerUrlLimit,
       include: ['**/*.worker.js'],
-      // Don't emit files, this will replace the worker build output
-      emitFiles: false
+      emitFiles: false,
+      fileName: 'worker/[name][extname]'
     })
   ];
 

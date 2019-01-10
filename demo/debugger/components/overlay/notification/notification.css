@@ -1,0 +1,39 @@
+.notification {
+  display: none;
+  pointer-events: all;
+
+  position: absolute;
+  bottom: 0;
+  right: 0;
+
+  width: 50vw;
+  min-width: 200px;
+  max-width: 500px;
+
+  min-height: 50px;
+
+  background-color: rgba(0, 0, 0, 0.85);
+  color: #fafafa;
+
+  margin: 10px;
+  padding: 5px;
+
+  border-radius: 5px;
+  box-shadow: 1px 1px 10px 1px rgba(0, 0, 0, 0.75);
+}
+
+.notification--show {
+  display: block;
+}
+
+.notification__close {
+  text-align: right;
+  margin-right: 5px;
+}
+
+.notification__close > button {
+  color: #fafafa;
+
+  padding-left: 10px;
+  padding-right: 10px;
+}
