@@ -7,7 +7,6 @@
 ![npm bundle size (minified)](https://img.shields.io/bundlephobia/min/wasmboy.svg)
 ![npm](https://img.shields.io/npm/dt/wasmboy.svg)
 ![GitHub](https://img.shields.io/github/license/torch2424/wasmboy.svg)
-[![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/torch2424)
 
 <!--- Short Description-->
 
@@ -15,15 +14,11 @@
 
 **Project is still < 1.0.0. Most games are playable, but the emulator is still not very accurate. Expect bugs.**
 
-[1.0 Roadmap Tracking Issue](https://github.com/torch2424/wasmBoy/issues/197)
-
-[Debugger / Demo with support for mobile controls](https://torch2424.github.io/wasmBoy/)
-
-[Documentation](https://github.com/torch2424/wasmBoy/wiki)
+[1.0 Roadmap Tracking Issue](https://github.com/torch2424/wasmBoy/issues/197) [Debugger / Demo with support for mobile controls](https://torch2424.github.io/wasmBoy/) [Documentation](https://github.com/torch2424/wasmBoy/wiki)
 
 <!-- Header gif -->
 
-![Pokemon Crystal Wasmboy Demo](./docs/images/wasmBoyPokemonCrystal.gif)
+![Pokemon Crystal Wasmboy Debugger Demo](./docs/images/debuggerDesktopDemo.gif) ![Pokemon Crystal Wasmboy Mobile Demo](./docs/images/debuggerMobileDemo.gif)
 
 <!-- Generated with: https://github.com/ekalinin/github-markdown-toc -->
 
@@ -73,23 +68,21 @@ Documentation for the project can be found on the [WasmBoy Wiki](https://github.
 
 Try to test and aim for support on all major browsers (Chrome, Firefox, and Safari). Also, Node support works with the [`headless` option in the WasmBoy config](https://github.com/torch2424/wasmBoy/wiki/Lib-API#wasmboyoptions), and using the [Worker Threads](https://nodejs.org/api/worker_threads.html) `--experimental-worker` flag.
 
-# Example Gifs & Screenshots
+# Game Screenshots
 
-**Gameboy Support**
+### Gameboy Support
 
 ![Is that a demo in your pocket](./docs/images/wasmBoyIsThatADemoInYourPocket.png) ![Megaman 2](./docs/images/wasmBoyMegaman2.png) ![Pokemon Blue](./docs/images/wasmBoyPokemonBlue.png) ![tetris](./docs/images/wasmBoyTetris.png) ![tobu tobu girl](./test/performance/testroms/tobutobugirl/tobutobugirl.gb.noPerformanceOptions.png)
 
-**Gameboy Color Support**
+### Gameboy Color Support
 
 ![Links Awakening](./docs/images/wasmBoyLinksAwakening.png) ![L s d j](./docs/images/wasmBoyLsdj.png) ![Megaman extreme 2](./docs/images/wasmBoyMegamanXtreme2.png) ![Pokemon Silver](./docs/images/wasmBoyPokemonSilver.png) ![Pokemon Yellow](./docs/images/wasmBoyPokemonYellow.png) ![back to color demo](./test/performance/testroms/back-to-color/back-to-color.gbc.noPerformanceOptions.png)
 
-**Options & Save States**
+# Demo Applications
 
-![Wasm boy options and save states gif](./docs/images/wasmBoySaveStateOptions.gif)
+### Debugger
 
-**Debugger**
-
-![was boy pokemon silver debugger demo](./docs/images/wasmBoyPokemonSilverDebugger.gif)
+### Benchmark
 
 # Tests
 
@@ -162,8 +155,7 @@ Commands not prepended with a colon are meant for easily building on all of the 
 ```bash
 # Command to serve the project, and watch the debugger, wasm, and lib for changes
 # Uses concurrently: https://github.com/kimmobrunfeldt/concurrently
-# Concurrently helps cleanup the output and organizes all three watchers/servers
-npm start
+# Concurrently helps cleanup the output and organizes watchers on commands that require concurrent tools
 
 # Same as npm start
 npm run dev
