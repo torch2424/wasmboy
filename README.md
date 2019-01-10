@@ -18,9 +18,7 @@
 
 <!-- Header Images -->
 
-<img src="./docs/images/debuggerDesktopDemo.gif" alt="Pokemon Crystal Wasmboy Debugger Demo" width="550" height="369"/>
-
-<img src="./docs/images/debuggerMobileDemo.gif" alt="Pokemon Crystal Wasmboy Debugger Demo" width="220" height="609"/>
+<img src="./docs/images/debuggerDesktopDemo.gif" alt="Pokemon Crystal Wasmboy Debugger Demo" width="750" height="369"/> <img src="./docs/images/debuggerMobileDemo.gif" alt="Pokemon Crystal Wasmboy Debugger Demo" width="320" height="609"/>
 
 <!-- Generated with: https://github.com/ekalinin/github-markdown-toc -->
 
