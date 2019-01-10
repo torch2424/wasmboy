@@ -106,6 +106,20 @@ A full debugger meant for analyzing the internals of the gameboy. Great for Home
 - Saved Layouts between sessions. 💠
 - Help widget with tips on how to be effective in the debugger. 🙋
 
+**Anaytics / Privacy**
+
+[Analytics Wrapper Service](./demo/debugger/analytics.js)
+
+Analytics is used on this application simply for performance monitoring, and tracking popularity of the applications. The following events are sent, with nothing more than the event name. The analytics provider used is [Google Analytics](https://analytics.google.com/analytics/web/).
+
+- Whenever a new ROM is loaded, and played for the first time.
+- Whether attempting to load a ROM was successful.
+- Whenever a state is saved.
+- Whenever a state is loaded.
+- Whenever custom WasmBoy options are applied.
+- Whenever the Google Drive option is selected.
+- Whenever the mobile demo is manually reloaded.
+
 **Mobile Demo**
 
 For UI/UX reasons, on mobile the debugger is simply a web app for testing the lib. This is useful for testing a ROM on the go. For playing games, I would suggest [VaporBoy](https://vaporboy.net/). Below is an example of the mobile demo:
@@ -119,6 +133,16 @@ For UI/UX reasons, on mobile the debugger is simply a web app for testing the li
 [Medium Article](https://medium.com/@torch2424/webassembly-is-fast-a-real-world-benchmark-of-webassembly-vs-es6-d85a23f8e193)
 
 Since WasmBoy is built in AssemblyScript, it can also run it's core through the Typescript compiler if we mock out some of the WebAssembly interface. The benchmarking tool was built as a way to compare WebAssembly performance to Javascript / ES6 performance, after compiling the core to both WebAssembly and Javascript. It includes detailed stats, live running output, and multiple graphs. Also great for comparing the performance of devices that run WasmBoy.
+
+**Anaytics / Privacy**
+
+Analytics is used on this application simply for performance monitoring, and tracking popularity of the application. The following events are sent, with nothing more than the event name. The analytics provider used is [Google Analytics](https://analytics.google.com/analytics/web/).
+
+- Whenever a new ROM is loaded from the particular source.
+- Whenever the benchmark is ran.
+- Whenever results are rendered for the benchmark.
+
+**Example**
 
 ![WasmBoy Benchmark Runner Section on Safari](./docs/images/benchmarkSafariBackToColorRunner.png)
 
