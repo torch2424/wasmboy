@@ -22,8 +22,6 @@
 
 <img src="./docs/images/debuggerMobileDemo.gif" alt="Pokemon Crystal Wasmboy Debugger Demo" width="320" height="609"/>
 
-![Pokemon Crystal Wasmboy Debugger Demo](./docs/images/debuggerDesktopDemo.gif) ![Pokemon Crystal Wasmboy Mobile Demo](./docs/images/debuggerMobileDemo.gif)
-
 <!-- Generated with: https://github.com/ekalinin/github-markdown-toc -->
 
 # Table of Contents
