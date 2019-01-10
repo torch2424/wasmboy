@@ -1,0 +1,150 @@
+/* General styles for the debugger, and the index component */
+
+html,
+body {
+  font: 14px/1.21 'Helvetica Neue', arial, sans-serif;
+  font-weight: 400;
+  /* For mobile phones to be able to scroll the view into place */
+  min-height: 600px;
+}
+
+h1 {
+  text-align: center;
+  font-weight: bold !important;
+}
+
+p {
+  text-align: center;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+button {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+input[type='checkbox'] {
+  margin-left: 5px;
+}
+
+.hide {
+  display: none;
+}
+
+.notification {
+  width: 50vw;
+  max-width: 400px;
+  color: #fafafa;
+  background-color: rgba(0, 0, 0, 0.65) !important;
+  position: fixed !important;
+  bottom: 10px;
+  right: 20px;
+  text-overflow: wrap !important;
+  z-index: 100000;
+}
+
+.wasmboy {
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.wasmboy__title {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-size: 1rem;
+}
+
+.wasmboy__canvas-container {
+  text-align: center;
+}
+
+.wasmboy__canvas-container__canvas {
+  border: 1px solid black;
+
+  /* Width and height are 160x144 pixel aspect ratio in vw */
+  width: 50vw;
+  height: 45vw;
+  min-width: 160px;
+  min-height: 144px;
+  max-width: 640px;
+  max-height: 576px;
+}
+
+/* https://atomiks.github.io/30-seconds-of-css/ */
+@keyframes donut-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.donut {
+  display: inline-block;
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #7983ff;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: donut-spin 1.2s linear infinite;
+}
+
+/* animate.css https://github.com/daneden/animate.css/blob/master/animate.css */
+.animated {
+  -webkit-animation-duration: 0.5s;
+  animation-duration: 0.5s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
+
+@-webkit-keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.fadeIn {
+  -webkit-animation-name: fadeIn;
+  animation-name: fadeIn;
+}
+
+.modal-background {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  border: 5px solid rgba(0, 0, 0, 0.75);
+  border-radius: 5px;
+  background-color: #f5f5f5;
+  color: #020202;
+  padding: 10px;
+
+  width: 80vw;
+  height: 80vh;
+  max-width: 800px;
+  max-height: 800px;
+  min-width: 250px;
+  min-height: 300px;
+
+  overflow: auto;
+  z-index: 101;
+}
