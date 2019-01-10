@@ -24,8 +24,6 @@
 
 # Table of Contents
 
-- [wasmboy](#wasmboy)
-- [Table of Contents](#table-of-contents)
 - [Features](#features)
 - [Usage](#usage)
   - [Supported Platforms](#supported-platforms)
@@ -92,7 +90,7 @@ Try to test and aim for support on all major browsers (Chrome, Firefox, and Safa
 
 [Application Link](https://wasmboy.app/)
 
-A full debugger meant for analyzing the internals of the gameboy. Great for HomeBrew Gameboy Development, or using as a reference point for building your own GameBoy emulator.
+A full debugger meant for analyzing the internals of the gameboy. Great for HomeBrew Gameboy Development, or using as a reference point for building your own GameBoy emulator. **See the gif at the top of the README for an example.**
 
 **Features**
 
@@ -121,6 +119,8 @@ For UI/UX reasons, on mobile the debugger is simply a web app for testing the li
 [Medium Article](https://medium.com/@torch2424/webassembly-is-fast-a-real-world-benchmark-of-webassembly-vs-es6-d85a23f8e193)
 
 Since WasmBoy is built in AssemblyScript, it can also run it's core through the Typescript compiler if we mock out some of the WebAssembly interface. The benchmarking tool was built as a way to compare WebAssembly performance to Javascript / ES6 performance, after compiling the core to both WebAssembly and Javascript. It includes detailed stats, live running output, and multiple graphs. Also great for comparing the performance of devices that run WasmBoy.
+
+![WasmBoy Benchmark Runner Section on Safari](./docs/images/benchmarkSafariBackToColorRunner.png)
 
 # Tests
 
