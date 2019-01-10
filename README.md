@@ -16,7 +16,11 @@
 
 [1.0 Roadmap Tracking Issue](https://github.com/torch2424/wasmBoy/issues/197) [Debugger / Demo with support for mobile controls](https://torch2424.github.io/wasmBoy/) [Documentation](https://github.com/torch2424/wasmBoy/wiki)
 
-<!-- Header gif -->
+<!-- Header Images -->
+
+<img src="./docs/images/debuggerDesktopDemo.gif" alt="Pokemon Crystal Wasmboy Debugger Demo" width="1000" height="500"/>
+
+<img src="./docs/images/debuggerMobileDemo.gif" alt="Pokemon Crystal Wasmboy Debugger Demo" width="320" height="609"/>
 
 ![Pokemon Crystal Wasmboy Debugger Demo](./docs/images/debuggerDesktopDemo.gif) ![Pokemon Crystal Wasmboy Mobile Demo](./docs/images/debuggerMobileDemo.gif)
 
