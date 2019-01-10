@@ -170,7 +170,7 @@ halt_ime0_ei, halt_ime0_nointr_timing, halt_ime1_timing
 
 # Contributing
 
-Feel free to fork and submit PRs! Any help is much appreciated, and would be a ton of fun!
+Feel free to fork and submit PRs! Opening an issue is reccomended before starting any development, as a discussion would be nice on the idea / feature before writing code. Any help is much appreciated, and would be a ton of fun!
 
 ### Installation
 
@@ -180,20 +180,30 @@ Just your standard node app. Install Node with [nvm](https://github.com/creation
 
 The project contains three different elements.
 
-- The `debugger` is the container for the wasmboy library, which is simply a [preact](https://github.com/developit/preact) application, generated with [preact-cli](https://github.com/developit/preact-cli).
 - The `core` or `wasm` which is the web assembly module for wasmboy written in [AssemblyScript](https://github.com/AssemblyScript/assemblyscript).
 - The `lib` which is the importable library of wasmboy that can be used in other projects, that adds a top level API to the `core`.
+- The `demo`, which is a collection of different apps that are used for demoing purposes of the `lib` and `core`.
 
-Each of these uses a different build process. The debugger uses [webpack](https://webpack.js.org/), the wasm uses the [AssemblyScript](https://github.com/AssemblyScript/assemblyscript) compiler CLI tool, and the lib uses [Rollup.js](https://rollupjs.org/guide/en).
+Most of the build process in this project is done using [Rollup.js](https://rollupjs.org/guide/en). Each element / component of the project is configured in its own `rollup.*.js` file, and are then all used within the standard `rollup.config.js` file by the rollup CLI. Also, The `core` wasm uses the [AssemblyScript](https://github.com/AssemblyScript/assemblyscript) compiler CLI tool.
 
 Commands for each part of the project will be prepended with their element name and a colon, e.g `debugger:[command here]`.
 
+Common command parts are:
+
+- `dev` / `watch` - How the project should be served and developed with tools like reloading.
+- `build` - Make production builds of the component / element of the project.
+
 Commands not prepended with a colon are meant for easily building on all of the different parts as a whole.
+
+Not all commands are documented, only ones relevant to making changes to the library for contributions. `*` represents the category of commands, and is not an actual command.
 
 ```bash
 # Command to serve the project, and watch the debugger, wasm, and lib for changes
 # Uses concurrently: https://github.com/kimmobrunfeldt/concurrently
 # Concurrently helps cleanup the output and organizes watchers on commands that require concurrent tools
+
+# Serve the general project for development (Watches the core, lib, and debugger)
+npm run start
 
 # Same as npm start
 npm run dev
@@ -201,8 +211,17 @@ npm run dev
 # Same as npm start
 npm run watch
 
-# Build the wasm module and the lib to be ready to be pushed to npm or released
+# Build everything to be ready to be pushed to npm or released
 npm run build
+
+# Linting commands used during precommit an tests
+npm run prettier:*
+
+# Commands for building/serving the core, offers commands for building with the Assemblyscript Compiler (WASM) or Typescript (JS)
+npm run core:*
+
+# Commands for building/serving the JS lib
+npm run lib:*
 
 # Run tests in `test/accuracy/test.js`
 npm run test
@@ -210,29 +229,18 @@ npm run test
 # Run tests in `test/performance/test.js`
 npm run test:performance
 
-# Watch the debugger (preact) project for changes and livereload
-npm run debugger:watch
+# All commands for testing, and are test related
+npm run test:*
 
-# Build the debugger (preact) project and serve it
-npm run debugger:serve
+# Commands for the building / serving the debugger
+npm run debugger:*
 
-# Build the debugger (preact) project
-npm run debugger:build
+# Commands for building / serving the benchmark tool
+npm run benchmark:*
 
-# Watch the wasm (AssemblyScript) *.ts files and build on changes
-npm run core:watch
-
-# Build the wasm (AssemblyScript) *.ts files, with the correct CLI flags
-npm run core:build
-
-# Watch the Wasmboy ES6 Module for changes, and build
-npm run lib:watch
-
-# Build the WasmBoy Es6 module
-npm run lib:build
+# Commands for building / serving all available apps in wasmboy
+npm run demo:*
 ```
-
-The debugger application/container for wasmboy utilizes the [preact-cli](https://github.com/developit/preact-cli/blob/master/README.md). Additional workflow commands and tips can be found there.
 
 Using the [gh-pages](https://www.npmjs.com/package/gh-pages) for debugger/demo deployment onto gh-pages.
 
