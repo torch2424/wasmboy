@@ -530,19 +530,7 @@ function resetTileCache() {
 }
 
 function drawPixelsFromLineOfTile(tileId, tileDataMemoryLocation, vramBankId, tileLineXStart, tileLineXEnd, tileLineY, outputLineX, outputLineY, outputWidth, wasmMemoryStart, shouldRepresentMonochromeColorByColorId, paletteLocation, bgMapAttributes) {
-  if (shouldRepresentMonochromeColorByColorId === void 0) {
-    shouldRepresentMonochromeColorByColorId = false;
-  }
-
-  if (paletteLocation === void 0) {
-    paletteLocation = 0;
-  }
-
-  if (bgMapAttributes === void 0) {
-    bgMapAttributes = -1;
-  } // Get our number of pixels drawn
-
-
+  // Get our number of pixels drawn
   var pixelsDrawn = 0; // Get our tile data address
 
   var tileDataAddress = getTileDataAddress(tileDataMemoryLocation, tileId); // Get the bytes for our tile
@@ -2051,7 +2039,7 @@ function () {
 
   Sound.downSampleCycleCounter = 0x00;
   Sound.downSampleCycleMultiplier = 48000; // Frame sequencer controls what should be updated and and ticked
-  // Everyt time the sound is updated :) It is updated everytime the
+  // Every time the sound is updated :) It is updated everytime the
   // Cycle counter reaches the max cycle
 
   Sound.frameSequencer = 0x00; // Our current sample number we are passing back to the wasmboy memory map
@@ -9238,11 +9226,7 @@ function drawBackgroundMapToWasmMemory(showColor) {
   // Bit 2 - OBJ (Sprite) Size (0=8x8, 1=8x16)
   // Bit 1 - OBJ (Sprite) Display Enable (0=Off, 1=On)
   // Bit 0 - BG Display (for CGB see below) (0=Off, 1=On)
-  if (showColor === void 0) {
-    showColor = 0;
-  } // Get our seleted tile data memory location
-
-
+  // Get our seleted tile data memory location
   var tileDataMemoryLocation = Graphics.memoryLocationTileDataSelectZeroStart;
 
   if (Lcd.bgWindowTileDataSelect) {
@@ -9420,7 +9404,7 @@ function drawTileDataToWasmMemory() {
 
 
       for (var tileLineY = 0; tileLineY < 8; tileLineY++) {
-        drawPixelsFromLineOfTile(tileId, tileDataMemoryLocation, vramBankId, 0, 7, tileLineY, tileDataMapGridX * 8, tileDataMapGridY * 8 + tileLineY, 0x1f * 8, TILE_DATA_LOCATION, true);
+        drawPixelsFromLineOfTile(tileId, tileDataMemoryLocation, vramBankId, 0, 7, tileLineY, tileDataMapGridX * 8, tileDataMapGridY * 8 + tileLineY, 0x1f * 8, TILE_DATA_LOCATION, true, 0, -1);
       }
     }
   }
