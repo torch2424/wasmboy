@@ -1,6 +1,5 @@
 import { Pubx } from 'pubx';
 import { WasmBoy, WasmBoyUpdateCanvas } from './wasmboy';
-import devtoolsDetect from 'devtools-detect';
 
 // devtools change for mobile
 window.addEventListener('devtoolschange', e => {
@@ -50,8 +49,6 @@ export function PUBX_INITIALIZE() {
       let mobile = window.matchMedia('(max-width: 500px)').matches;
 
       if (!isDevtoolsOpen) {
-        mobile = window.matchMedia('(max-width: 1024px)').matches;
-      } else if (!devtoolsDetect.open) {
         mobile = window.matchMedia('(max-width: 1024px)').matches;
       }
 

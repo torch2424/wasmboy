@@ -3255,8 +3255,8 @@
    )
   )
  )
- (func $core/graphics/lcd/resetLcd (; 46 ;) (; has Stack IR ;) (type $v)
-  (local $0 i32)
+ (func $core/graphics/lcd/resetLcd (; 46 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+  (local $1 i32)
   ;;@ core/graphics/lcd.ts:89:2
   (set_global $core/graphics/graphics/Graphics.scanlineCycleCounter
    ;;@ core/graphics/lcd.ts:89:34
@@ -3274,7 +3274,7 @@
    (i32.const 0)
   )
   ;;@ core/graphics/lcd.ts:97:2
-  (set_local $0
+  (set_local $1
    ;;@ core/graphics/lcd.ts:97:14
    (call $core/helpers/index/resetBitOnByte
     ;;@ core/graphics/lcd.ts:97:29
@@ -3298,31 +3298,48 @@
   ;;@ core/graphics/lcd.ts:101:2
   (call $core/memory/store/eightBitStoreIntoGBMemory
    (i32.const 65345)
-   (get_local $0)
+   (get_local $1)
   )
   ;;@ core/graphics/lcd.ts:104:2
-  (block $break|0
-   ;;@ core/graphics/lcd.ts:104:7
-   (set_local $0
-    ;;@ core/graphics/lcd.ts:104:15
-    (i32.const 0)
+  (if
+   (i32.and
+    (get_local $0)
+    (i32.const 1)
    )
-   (loop $repeat|0
-    (br_if $break|0
-     ;;@ core/graphics/lcd.ts:104:18
-     (i32.ge_s
-      (get_local $0)
-      (i32.const 521216)
-     )
-    )
-    ;;@ core/graphics/lcd.ts:104:44
+   ;;@ core/graphics/lcd.ts:104:25
+   (block $break|0
+    ;;@ core/graphics/lcd.ts:105:9
     (set_local $0
-     (i32.add
-      (get_local $0)
-      (i32.const 1)
-     )
+     ;;@ core/graphics/lcd.ts:105:17
+     (i32.const 0)
     )
-    (br $repeat|0)
+    (loop $repeat|0
+     (br_if $break|0
+      ;;@ core/graphics/lcd.ts:105:20
+      (i32.ge_s
+       (get_local $0)
+       (i32.const 521216)
+      )
+     )
+     ;;@ core/graphics/lcd.ts:106:6
+     (i32.store8
+      ;;@ core/graphics/lcd.ts:106:16
+      (i32.add
+       (get_local $0)
+       (i32.const 67584)
+      )
+      ;;@ core/graphics/lcd.ts:106:46
+      (i32.const 255)
+     )
+     ;;@ core/graphics/lcd.ts:105:46
+     (set_local $0
+      (i32.add
+       (get_local $0)
+       (i32.const 1)
+      )
+     )
+     (br $repeat|0)
+    )
    )
   )
  )
@@ -3420,7 +3437,10 @@
     )
    )
    ;;@ core/graphics/lcd.ts:75:39
-   (call $core/graphics/lcd/resetLcd)
+   (call $core/graphics/lcd/resetLcd
+    ;;@ core/graphics/lcd.ts:77:15
+    (i32.const 1)
+   )
   )
   ;;@ core/graphics/lcd.ts:80:8
   (if
@@ -3438,7 +3458,10 @@
   (if
    (get_local $0)
    ;;@ core/graphics/lcd.ts:80:39
-   (call $core/graphics/lcd/resetLcd)
+   (call $core/graphics/lcd/resetLcd
+    ;;@ core/graphics/lcd.ts:82:15
+    (i32.const 0)
+   )
   )
  )
  (func $core/graphics/graphics/Graphics.loadState (; 48 ;) (; has Stack IR ;) (type $v)
@@ -13902,12 +13925,12 @@
  (func $core/graphics/lcd/checkCoincidence (; 196 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
-  ;;@ core/graphics/lcd.ts:202:2
+  ;;@ core/graphics/lcd.ts:204:2
   (set_local $3
-   ;;@ core/graphics/lcd.ts:202:32
+   ;;@ core/graphics/lcd.ts:204:32
    (get_global $core/graphics/lcd/Lcd.coincidenceCompare)
   )
-  ;;@ core/graphics/lcd.ts:203:6
+  ;;@ core/graphics/lcd.ts:205:6
   (if
    (i32.eqz
     (tee_local $2
@@ -13917,52 +13940,52 @@
     )
    )
    (set_local $2
-    ;;@ core/graphics/lcd.ts:203:24
+    ;;@ core/graphics/lcd.ts:205:24
     (i32.eq
      (get_local $0)
-     ;;@ core/graphics/lcd.ts:203:36
+     ;;@ core/graphics/lcd.ts:205:36
      (i32.const 1)
     )
    )
   )
-  ;;@ core/graphics/lcd.ts:203:6
+  ;;@ core/graphics/lcd.ts:205:6
   (if
    (get_local $2)
    (set_local $2
-    ;;@ core/graphics/lcd.ts:203:42
+    ;;@ core/graphics/lcd.ts:205:42
     (i32.eq
      (get_global $core/graphics/graphics/Graphics.scanlineRegister)
      (get_local $3)
     )
    )
   )
-  ;;@ core/graphics/lcd.ts:203:2
+  ;;@ core/graphics/lcd.ts:205:2
   (if
    (get_local $2)
-   ;;@ core/graphics/lcd.ts:205:4
+   ;;@ core/graphics/lcd.ts:207:4
    (if
-    ;;@ core/graphics/lcd.ts:205:8
+    ;;@ core/graphics/lcd.ts:207:8
     (call $core/helpers/index/checkBitOnByte
-     ;;@ core/graphics/lcd.ts:205:23
+     ;;@ core/graphics/lcd.ts:207:23
      (i32.const 6)
-     ;;@ core/graphics/lcd.ts:204:4
+     ;;@ core/graphics/lcd.ts:206:4
      (tee_local $1
-      ;;@ core/graphics/lcd.ts:204:16
+      ;;@ core/graphics/lcd.ts:206:16
       (call $core/helpers/index/setBitOnByte
-       ;;@ core/graphics/lcd.ts:204:29
+       ;;@ core/graphics/lcd.ts:206:29
        (i32.const 2)
        (get_local $1)
       )
      )
     )
-    ;;@ core/graphics/lcd.ts:205:38
+    ;;@ core/graphics/lcd.ts:207:38
     (call $core/interrupts/interrupts/requestLcdInterrupt)
    )
-   ;;@ core/graphics/lcd.ts:208:9
+   ;;@ core/graphics/lcd.ts:210:9
    (set_local $1
-    ;;@ core/graphics/lcd.ts:209:16
+    ;;@ core/graphics/lcd.ts:211:16
     (call $core/helpers/index/resetBitOnByte
-     ;;@ core/graphics/lcd.ts:209:31
+     ;;@ core/graphics/lcd.ts:211:31
      (i32.const 2)
      (get_local $1)
     )
@@ -13974,92 +13997,92 @@
   (local $0 i32)
   (local $1 i32)
   (local $2 i32)
-  ;;@ core/graphics/lcd.ts:112:2
+  ;;@ core/graphics/lcd.ts:114:2
   (if
-   ;;@ core/graphics/lcd.ts:112:6
+   ;;@ core/graphics/lcd.ts:114:6
    (i32.eqz
-    ;;@ core/graphics/lcd.ts:112:7
+    ;;@ core/graphics/lcd.ts:114:7
     (get_global $core/graphics/lcd/Lcd.enabled)
    )
    (return)
   )
-  ;;@ core/graphics/lcd.ts:118:2
+  ;;@ core/graphics/lcd.ts:120:2
   (set_local $1
-   ;;@ core/graphics/lcd.ts:118:21
+   ;;@ core/graphics/lcd.ts:120:21
    (get_global $core/graphics/lcd/Lcd.currentLcdMode)
   )
-  ;;@ core/graphics/lcd.ts:124:2
+  ;;@ core/graphics/lcd.ts:126:2
   (if
-   ;;@ core/graphics/lcd.ts:124:6
+   ;;@ core/graphics/lcd.ts:126:6
    (i32.ge_s
-    ;;@ core/graphics/lcd.ts:117:2
+    ;;@ core/graphics/lcd.ts:119:2
     (tee_local $2
-     ;;@ core/graphics/lcd.ts:117:30
+     ;;@ core/graphics/lcd.ts:119:30
      (get_global $core/graphics/graphics/Graphics.scanlineRegister)
     )
-    ;;@ core/graphics/lcd.ts:124:26
+    ;;@ core/graphics/lcd.ts:126:26
     (i32.const 144)
    )
-   ;;@ core/graphics/lcd.ts:124:31
+   ;;@ core/graphics/lcd.ts:126:31
    (set_local $0
-    ;;@ core/graphics/lcd.ts:126:17
+    ;;@ core/graphics/lcd.ts:128:17
     (i32.const 1)
    )
-   ;;@ core/graphics/lcd.ts:127:9
+   ;;@ core/graphics/lcd.ts:129:9
    (if
-    ;;@ core/graphics/lcd.ts:128:8
+    ;;@ core/graphics/lcd.ts:130:8
     (i32.ge_s
      (get_global $core/graphics/graphics/Graphics.scanlineCycleCounter)
-     ;;@ core/graphics/lcd.ts:128:50
+     ;;@ core/graphics/lcd.ts:130:50
      (call $core/graphics/graphics/Graphics.MIN_CYCLES_SPRITES_LCD_MODE)
     )
-    ;;@ core/graphics/lcd.ts:128:81
+    ;;@ core/graphics/lcd.ts:130:81
     (set_local $0
-     ;;@ core/graphics/lcd.ts:130:19
+     ;;@ core/graphics/lcd.ts:132:19
      (i32.const 2)
     )
-    ;;@ core/graphics/lcd.ts:131:11
+    ;;@ core/graphics/lcd.ts:133:11
     (if
-     ;;@ core/graphics/lcd.ts:131:15
+     ;;@ core/graphics/lcd.ts:133:15
      (i32.ge_s
       (get_global $core/graphics/graphics/Graphics.scanlineCycleCounter)
-      ;;@ core/graphics/lcd.ts:131:57
+      ;;@ core/graphics/lcd.ts:133:57
       (call $core/graphics/graphics/Graphics.MIN_CYCLES_TRANSFER_DATA_LCD_MODE)
      )
-     ;;@ core/graphics/lcd.ts:131:94
+     ;;@ core/graphics/lcd.ts:133:94
      (set_local $0
-      ;;@ core/graphics/lcd.ts:133:19
+      ;;@ core/graphics/lcd.ts:135:19
       (i32.const 3)
      )
     )
    )
   )
-  ;;@ core/graphics/lcd.ts:137:2
+  ;;@ core/graphics/lcd.ts:139:2
   (if
-   ;;@ core/graphics/lcd.ts:137:6
+   ;;@ core/graphics/lcd.ts:139:6
    (i32.ne
     (get_local $1)
     (get_local $0)
    )
-   ;;@ core/graphics/lcd.ts:137:30
+   ;;@ core/graphics/lcd.ts:139:30
    (block
-    ;;@ core/graphics/lcd.ts:139:4
+    ;;@ core/graphics/lcd.ts:141:4
     (set_local $1
-     ;;@ core/graphics/lcd.ts:139:25
+     ;;@ core/graphics/lcd.ts:141:25
      (call $core/memory/load/eightBitLoadFromGBMemory
       (i32.const 65345)
      )
     )
-    ;;@ core/graphics/lcd.ts:142:4
+    ;;@ core/graphics/lcd.ts:144:4
     (set_global $core/graphics/lcd/Lcd.currentLcdMode
      (get_local $0)
     )
-    ;;@ core/graphics/lcd.ts:144:4
+    ;;@ core/graphics/lcd.ts:146:4
     (set_local $2
-     ;;@ core/graphics/lcd.ts:144:42
+     ;;@ core/graphics/lcd.ts:146:42
      (i32.const 0)
     )
-    ;;@ core/graphics/lcd.ts:147:4
+    ;;@ core/graphics/lcd.ts:149:4
     (block $break|0
      (block $case3|0
       (block $case2|0
@@ -14078,21 +14101,21 @@
           (br $break|0)
          )
         )
-        ;;@ core/graphics/lcd.ts:151:8
+        ;;@ core/graphics/lcd.ts:153:8
         (set_local $2
-         ;;@ core/graphics/lcd.ts:151:33
+         ;;@ core/graphics/lcd.ts:153:33
          (call $core/helpers/index/checkBitOnByte
-          ;;@ core/graphics/lcd.ts:151:48
+          ;;@ core/graphics/lcd.ts:153:48
           (i32.const 3)
-          ;;@ core/graphics/lcd.ts:150:8
+          ;;@ core/graphics/lcd.ts:152:8
           (tee_local $1
-           ;;@ core/graphics/lcd.ts:150:20
+           ;;@ core/graphics/lcd.ts:152:20
            (call $core/helpers/index/resetBitOnByte
-            ;;@ core/graphics/lcd.ts:150:35
+            ;;@ core/graphics/lcd.ts:152:35
             (i32.const 1)
-            ;;@ core/graphics/lcd.ts:149:20
+            ;;@ core/graphics/lcd.ts:151:20
             (call $core/helpers/index/resetBitOnByte
-             ;;@ core/graphics/lcd.ts:149:35
+             ;;@ core/graphics/lcd.ts:151:35
              (i32.const 0)
              (get_local $1)
             )
@@ -14100,24 +14123,24 @@
           )
          )
         )
-        ;;@ core/graphics/lcd.ts:152:8
+        ;;@ core/graphics/lcd.ts:154:8
         (br $break|0)
        )
-       ;;@ core/graphics/lcd.ts:156:8
+       ;;@ core/graphics/lcd.ts:158:8
        (set_local $2
-        ;;@ core/graphics/lcd.ts:156:33
+        ;;@ core/graphics/lcd.ts:158:33
         (call $core/helpers/index/checkBitOnByte
-         ;;@ core/graphics/lcd.ts:156:48
+         ;;@ core/graphics/lcd.ts:158:48
          (i32.const 4)
-         ;;@ core/graphics/lcd.ts:155:8
+         ;;@ core/graphics/lcd.ts:157:8
          (tee_local $1
-          ;;@ core/graphics/lcd.ts:155:20
+          ;;@ core/graphics/lcd.ts:157:20
           (call $core/helpers/index/setBitOnByte
-           ;;@ core/graphics/lcd.ts:155:33
+           ;;@ core/graphics/lcd.ts:157:33
            (i32.const 0)
-           ;;@ core/graphics/lcd.ts:154:20
+           ;;@ core/graphics/lcd.ts:156:20
            (call $core/helpers/index/resetBitOnByte
-            ;;@ core/graphics/lcd.ts:154:35
+            ;;@ core/graphics/lcd.ts:156:35
             (i32.const 1)
             (get_local $1)
            )
@@ -14125,24 +14148,24 @@
          )
         )
        )
-       ;;@ core/graphics/lcd.ts:157:8
+       ;;@ core/graphics/lcd.ts:159:8
        (br $break|0)
       )
-      ;;@ core/graphics/lcd.ts:161:8
+      ;;@ core/graphics/lcd.ts:163:8
       (set_local $2
-       ;;@ core/graphics/lcd.ts:161:33
+       ;;@ core/graphics/lcd.ts:163:33
        (call $core/helpers/index/checkBitOnByte
-        ;;@ core/graphics/lcd.ts:161:48
+        ;;@ core/graphics/lcd.ts:163:48
         (i32.const 5)
-        ;;@ core/graphics/lcd.ts:160:8
+        ;;@ core/graphics/lcd.ts:162:8
         (tee_local $1
-         ;;@ core/graphics/lcd.ts:160:20
+         ;;@ core/graphics/lcd.ts:162:20
          (call $core/helpers/index/setBitOnByte
-          ;;@ core/graphics/lcd.ts:160:33
+          ;;@ core/graphics/lcd.ts:162:33
           (i32.const 1)
-          ;;@ core/graphics/lcd.ts:159:20
+          ;;@ core/graphics/lcd.ts:161:20
           (call $core/helpers/index/resetBitOnByte
-           ;;@ core/graphics/lcd.ts:159:35
+           ;;@ core/graphics/lcd.ts:161:35
            (i32.const 0)
            (get_local $1)
           )
@@ -14150,74 +14173,74 @@
         )
        )
       )
-      ;;@ core/graphics/lcd.ts:162:8
+      ;;@ core/graphics/lcd.ts:164:8
       (br $break|0)
      )
-     ;;@ core/graphics/lcd.ts:165:8
+     ;;@ core/graphics/lcd.ts:167:8
      (set_local $1
-      ;;@ core/graphics/lcd.ts:165:20
+      ;;@ core/graphics/lcd.ts:167:20
       (call $core/helpers/index/setBitOnByte
-       ;;@ core/graphics/lcd.ts:165:33
+       ;;@ core/graphics/lcd.ts:167:33
        (i32.const 1)
-       ;;@ core/graphics/lcd.ts:164:20
+       ;;@ core/graphics/lcd.ts:166:20
        (call $core/helpers/index/setBitOnByte
-        ;;@ core/graphics/lcd.ts:164:33
+        ;;@ core/graphics/lcd.ts:166:33
         (i32.const 0)
         (get_local $1)
        )
       )
      )
     )
-    ;;@ core/graphics/lcd.ts:170:4
+    ;;@ core/graphics/lcd.ts:172:4
     (if
      (get_local $2)
-     ;;@ core/graphics/lcd.ts:170:32
+     ;;@ core/graphics/lcd.ts:172:32
      (call $core/interrupts/interrupts/requestLcdInterrupt)
     )
-    ;;@ core/graphics/lcd.ts:175:4
+    ;;@ core/graphics/lcd.ts:177:4
     (if
      (i32.eqz
       (get_local $0)
      )
-     ;;@ core/graphics/lcd.ts:175:26
+     ;;@ core/graphics/lcd.ts:177:26
      (call $core/memory/dma/updateHblankHdma)
     )
-    ;;@ core/graphics/lcd.ts:181:4
+    ;;@ core/graphics/lcd.ts:183:4
     (if
-     ;;@ core/graphics/lcd.ts:181:8
+     ;;@ core/graphics/lcd.ts:183:8
      (i32.eq
       (get_local $0)
-      ;;@ core/graphics/lcd.ts:181:23
+      ;;@ core/graphics/lcd.ts:183:23
       (i32.const 1)
      )
-     ;;@ core/graphics/lcd.ts:181:26
+     ;;@ core/graphics/lcd.ts:183:26
      (call $core/interrupts/interrupts/requestVBlankInterrupt)
     )
-    ;;@ core/graphics/lcd.ts:189:4
+    ;;@ core/graphics/lcd.ts:191:4
     (call $core/memory/store/eightBitStoreIntoGBMemory
      (i32.const 65345)
-     ;;@ core/graphics/lcd.ts:186:16
+     ;;@ core/graphics/lcd.ts:188:16
      (call $core/graphics/lcd/checkCoincidence
       (get_local $0)
       (get_local $1)
      )
     )
    )
-   ;;@ core/graphics/lcd.ts:190:9
+   ;;@ core/graphics/lcd.ts:192:9
    (if
-    ;;@ core/graphics/lcd.ts:190:13
+    ;;@ core/graphics/lcd.ts:192:13
     (i32.eq
      (get_local $2)
-     ;;@ core/graphics/lcd.ts:190:34
+     ;;@ core/graphics/lcd.ts:192:34
      (i32.const 153)
     )
-    ;;@ core/graphics/lcd.ts:195:4
+    ;;@ core/graphics/lcd.ts:197:4
     (call $core/memory/store/eightBitStoreIntoGBMemory
      (i32.const 65345)
-     ;;@ core/graphics/lcd.ts:194:16
+     ;;@ core/graphics/lcd.ts:196:16
      (call $core/graphics/lcd/checkCoincidence
       (get_local $0)
-      ;;@ core/graphics/lcd.ts:193:25
+      ;;@ core/graphics/lcd.ts:195:25
       (call $core/memory/load/eightBitLoadFromGBMemory
        (i32.const 65345)
       )
@@ -15279,7 +15302,7 @@
                         (i32.const 255)
                        )
                       )
-                      (br $folding-inner1)
+                      (br $folding-inner3)
                      )
                      ;;@ core/cpu/opcodes.ts:198:6
                      (call $core/cpu/opcodes/eightBitStoreSyncCycles
@@ -15412,7 +15435,7 @@
                    (i32.const 255)
                   )
                  )
-                 (br $folding-inner3)
+                 (br $folding-inner2)
                 )
                 ;;@ core/cpu/opcodes.ts:249:6
                 (if
@@ -15446,7 +15469,7 @@
                   (get_global $core/cpu/cpu/Cpu.registerA)
                  )
                 )
-                (br $folding-inner2)
+                (br $folding-inner1)
                )
                ;;@ core/cpu/opcodes.ts:266:6
                (call $core/cpu/opcodes/sixteenBitStoreSyncCycles
@@ -15458,7 +15481,7 @@
                 ;;@ core/cpu/opcodes.ts:266:59
                 (get_global $core/cpu/cpu/Cpu.stackPointer)
                )
-               (br $folding-inner1)
+               (br $folding-inner3)
               )
               ;;@ core/cpu/opcodes.ts:276:6
               (call $core/cpu/flags/checkAndSetSixteenBitFlagsAddOverflow
@@ -15666,7 +15689,7 @@
            (i32.const 255)
           )
          )
-         (br $folding-inner3)
+         (br $folding-inner2)
         )
         ;;@ core/cpu/opcodes.ts:338:6
         (if
@@ -15700,7 +15723,7 @@
           (get_global $core/cpu/cpu/Cpu.registerA)
          )
         )
-        (br $folding-inner2)
+        (br $folding-inner1)
        )
        (return
         (i32.const -1)
@@ -15721,46 +15744,46 @@
        (i32.const 8)
       )
      )
-     ;;@ core/cpu/opcodes.ts:189:6
-     (set_global $core/cpu/cpu/Cpu.programCounter
-      ;;@ core/cpu/opcodes.ts:189:27
-      (call $core/portable/portable/u16Portable
-       ;;@ core/cpu/opcodes.ts:189:39
-       (i32.add
-        (get_global $core/cpu/cpu/Cpu.programCounter)
-        ;;@ core/cpu/opcodes.ts:189:60
-        (i32.const 2)
-       )
-      )
+     ;;@ core/cpu/opcodes.ts:256:6
+     (call $core/cpu/flags/setZeroFlag
+      ;;@ core/cpu/opcodes.ts:256:18
+      (i32.const 0)
+     )
+     ;;@ core/cpu/opcodes.ts:257:6
+     (call $core/cpu/flags/setSubtractFlag
+      ;;@ core/cpu/opcodes.ts:257:22
+      (i32.const 0)
+     )
+     ;;@ core/cpu/opcodes.ts:258:6
+     (call $core/cpu/flags/setHalfCarryFlag
+      ;;@ core/cpu/opcodes.ts:258:23
+      (i32.const 0)
      )
      (br $folding-inner4)
     )
-    ;;@ core/cpu/opcodes.ts:256:6
-    (call $core/cpu/flags/setZeroFlag
-     ;;@ core/cpu/opcodes.ts:256:18
-     (i32.const 0)
-    )
-    ;;@ core/cpu/opcodes.ts:257:6
-    (call $core/cpu/flags/setSubtractFlag
-     ;;@ core/cpu/opcodes.ts:257:22
-     (i32.const 0)
-    )
-    ;;@ core/cpu/opcodes.ts:258:6
-    (call $core/cpu/flags/setHalfCarryFlag
-     ;;@ core/cpu/opcodes.ts:258:23
-     (i32.const 0)
+    ;;@ core/cpu/opcodes.ts:241:6
+    (set_global $core/cpu/cpu/Cpu.programCounter
+     ;;@ core/cpu/opcodes.ts:241:27
+     (call $core/portable/portable/u16Portable
+      ;;@ core/cpu/opcodes.ts:241:39
+      (i32.add
+       (get_global $core/cpu/cpu/Cpu.programCounter)
+       ;;@ core/cpu/opcodes.ts:241:60
+       (i32.const 1)
+      )
+     )
     )
     (br $folding-inner4)
    )
-   ;;@ core/cpu/opcodes.ts:241:6
+   ;;@ core/cpu/opcodes.ts:189:6
    (set_global $core/cpu/cpu/Cpu.programCounter
-    ;;@ core/cpu/opcodes.ts:241:27
+    ;;@ core/cpu/opcodes.ts:189:27
     (call $core/portable/portable/u16Portable
-     ;;@ core/cpu/opcodes.ts:241:39
+     ;;@ core/cpu/opcodes.ts:189:39
      (i32.add
       (get_global $core/cpu/cpu/Cpu.programCounter)
-      ;;@ core/cpu/opcodes.ts:241:60
-      (i32.const 1)
+      ;;@ core/cpu/opcodes.ts:189:60
+      (i32.const 2)
      )
     )
    )
@@ -21980,7 +22003,7 @@
                          ;;@ core/cpu/opcodes.ts:1752:10
                          (call $core/cpu/flags/getZeroFlag)
                         )
-                        (br $folding-inner4)
+                        (br $folding-inner3)
                        )
                        ;;@ core/cpu/opcodes.ts:1764:6
                        (set_local $1
@@ -22034,7 +22057,7 @@
                       (if
                        ;;@ core/cpu/opcodes.ts:1772:10
                        (call $core/cpu/flags/getZeroFlag)
-                       (br $folding-inner3)
+                       (br $folding-inner4)
                        (br $folding-inner1)
                       )
                      )
@@ -22044,7 +22067,7 @@
                     (if
                      ;;@ core/cpu/opcodes.ts:1789:10
                      (call $core/cpu/flags/getZeroFlag)
-                     (br $folding-inner3)
+                     (br $folding-inner4)
                      (br $folding-inner0)
                     )
                    )
@@ -22115,7 +22138,7 @@
                   (i32.const 1)
                  )
                 )
-                (br $folding-inner4)
+                (br $folding-inner3)
                )
                ;;@ core/cpu/opcodes.ts:1838:6
                (set_global $core/cpu/cpu/Cpu.programCounter
@@ -22151,7 +22174,7 @@
                 (i32.const 1)
                )
                (br $folding-inner1)
-               (br $folding-inner3)
+               (br $folding-inner4)
               )
              )
              ;;@ core/cpu/opcodes.ts:1856:6
@@ -22220,7 +22243,7 @@
               )
               (br $folding-inner1)
              )
-             (br $folding-inner3)
+             (br $folding-inner4)
             )
            )
            (br $folding-inner0)
@@ -22302,47 +22325,47 @@
       (i32.const 8)
      )
     )
-    ;;@ core/cpu/opcodes.ts:1777:8
+    ;;@ core/cpu/opcodes.ts:1754:8
     (set_global $core/cpu/cpu/Cpu.programCounter
-     ;;@ core/cpu/opcodes.ts:1777:29
+     (i32.and
+      ;;@ core/cpu/opcodes.ts:1754:29
+      (call $core/cpu/opcodes/sixteenBitLoadSyncCycles
+       ;;@ core/cpu/opcodes.ts:1754:59
+       (get_global $core/cpu/cpu/Cpu.stackPointer)
+      )
+      (i32.const 65535)
+     )
+    )
+    ;;@ core/cpu/opcodes.ts:1755:8
+    (set_global $core/cpu/cpu/Cpu.stackPointer
+     ;;@ core/cpu/opcodes.ts:1755:27
      (call $core/portable/portable/u16Portable
-      ;;@ core/cpu/opcodes.ts:1777:41
+      ;;@ core/cpu/opcodes.ts:1755:39
       (i32.add
-       (get_global $core/cpu/cpu/Cpu.programCounter)
-       ;;@ core/cpu/opcodes.ts:1777:62
+       (get_global $core/cpu/cpu/Cpu.stackPointer)
+       ;;@ core/cpu/opcodes.ts:1755:58
        (i32.const 2)
       )
      )
     )
-    ;;@ core/cpu/opcodes.ts:1778:15
+    ;;@ core/cpu/opcodes.ts:1756:15
     (return
      (i32.const 12)
     )
    )
-   ;;@ core/cpu/opcodes.ts:1754:8
+   ;;@ core/cpu/opcodes.ts:1777:8
    (set_global $core/cpu/cpu/Cpu.programCounter
-    (i32.and
-     ;;@ core/cpu/opcodes.ts:1754:29
-     (call $core/cpu/opcodes/sixteenBitLoadSyncCycles
-      ;;@ core/cpu/opcodes.ts:1754:59
-      (get_global $core/cpu/cpu/Cpu.stackPointer)
-     )
-     (i32.const 65535)
-    )
-   )
-   ;;@ core/cpu/opcodes.ts:1755:8
-   (set_global $core/cpu/cpu/Cpu.stackPointer
-    ;;@ core/cpu/opcodes.ts:1755:27
+    ;;@ core/cpu/opcodes.ts:1777:29
     (call $core/portable/portable/u16Portable
-     ;;@ core/cpu/opcodes.ts:1755:39
+     ;;@ core/cpu/opcodes.ts:1777:41
      (i32.add
-      (get_global $core/cpu/cpu/Cpu.stackPointer)
-      ;;@ core/cpu/opcodes.ts:1755:58
+      (get_global $core/cpu/cpu/Cpu.programCounter)
+      ;;@ core/cpu/opcodes.ts:1777:62
       (i32.const 2)
      )
     )
    )
-   ;;@ core/cpu/opcodes.ts:1756:15
+   ;;@ core/cpu/opcodes.ts:1778:15
    (return
     (i32.const 12)
    )
@@ -22425,7 +22448,7 @@
                      ;;@ core/cpu/opcodes.ts:1907:10
                      (call $core/cpu/flags/getCarryFlag)
                     )
-                    (br $folding-inner3)
+                    (br $folding-inner2)
                    )
                    ;;@ core/cpu/opcodes.ts:1919:6
                    (set_local $1
@@ -22479,7 +22502,7 @@
                   (if
                    ;;@ core/cpu/opcodes.ts:1927:10
                    (call $core/cpu/flags/getCarryFlag)
-                   (br $folding-inner2)
+                   (br $folding-inner3)
                    (br $folding-inner0)
                   )
                  )
@@ -22487,7 +22510,7 @@
                  (if
                   ;;@ core/cpu/opcodes.ts:1939:10
                   (call $core/cpu/flags/getCarryFlag)
-                  (br $folding-inner2)
+                  (br $folding-inner3)
                   ;;@ core/cpu/opcodes.ts:1939:32
                   (block
                    ;;@ core/cpu/opcodes.ts:1940:8
@@ -22587,7 +22610,7 @@
                (i32.const 1)
               )
              )
-             (br $folding-inner3)
+             (br $folding-inner2)
             )
             ;;@ core/cpu/opcodes.ts:1989:6
             (set_global $core/cpu/cpu/Cpu.programCounter
@@ -22628,7 +22651,7 @@
              (i32.const 1)
             )
             (br $folding-inner0)
-            (br $folding-inner2)
+            (br $folding-inner3)
            )
           )
           ;;@ core/cpu/opcodes.ts:2009:6
@@ -22669,7 +22692,7 @@
             )
             (br $folding-inner0)
            )
-           (br $folding-inner2)
+           (br $folding-inner3)
           )
          )
          ;;@ core/cpu/opcodes.ts:2026:6
@@ -22722,47 +22745,47 @@
       (i32.const 8)
      )
     )
-    ;;@ core/cpu/opcodes.ts:1932:8
+    ;;@ core/cpu/opcodes.ts:1909:8
     (set_global $core/cpu/cpu/Cpu.programCounter
-     ;;@ core/cpu/opcodes.ts:1932:29
+     (i32.and
+      ;;@ core/cpu/opcodes.ts:1909:29
+      (call $core/cpu/opcodes/sixteenBitLoadSyncCycles
+       ;;@ core/cpu/opcodes.ts:1909:59
+       (get_global $core/cpu/cpu/Cpu.stackPointer)
+      )
+      (i32.const 65535)
+     )
+    )
+    ;;@ core/cpu/opcodes.ts:1910:8
+    (set_global $core/cpu/cpu/Cpu.stackPointer
+     ;;@ core/cpu/opcodes.ts:1910:27
      (call $core/portable/portable/u16Portable
-      ;;@ core/cpu/opcodes.ts:1932:41
+      ;;@ core/cpu/opcodes.ts:1910:39
       (i32.add
-       (get_global $core/cpu/cpu/Cpu.programCounter)
-       ;;@ core/cpu/opcodes.ts:1932:62
+       (get_global $core/cpu/cpu/Cpu.stackPointer)
+       ;;@ core/cpu/opcodes.ts:1910:58
        (i32.const 2)
       )
      )
     )
-    ;;@ core/cpu/opcodes.ts:1933:15
+    ;;@ core/cpu/opcodes.ts:1911:15
     (return
      (i32.const 12)
     )
    )
-   ;;@ core/cpu/opcodes.ts:1909:8
+   ;;@ core/cpu/opcodes.ts:1932:8
    (set_global $core/cpu/cpu/Cpu.programCounter
-    (i32.and
-     ;;@ core/cpu/opcodes.ts:1909:29
-     (call $core/cpu/opcodes/sixteenBitLoadSyncCycles
-      ;;@ core/cpu/opcodes.ts:1909:59
-      (get_global $core/cpu/cpu/Cpu.stackPointer)
-     )
-     (i32.const 65535)
-    )
-   )
-   ;;@ core/cpu/opcodes.ts:1910:8
-   (set_global $core/cpu/cpu/Cpu.stackPointer
-    ;;@ core/cpu/opcodes.ts:1910:27
+    ;;@ core/cpu/opcodes.ts:1932:29
     (call $core/portable/portable/u16Portable
-     ;;@ core/cpu/opcodes.ts:1910:39
+     ;;@ core/cpu/opcodes.ts:1932:41
      (i32.add
-      (get_global $core/cpu/cpu/Cpu.stackPointer)
-      ;;@ core/cpu/opcodes.ts:1910:58
+      (get_global $core/cpu/cpu/Cpu.programCounter)
+      ;;@ core/cpu/opcodes.ts:1932:62
       (i32.const 2)
      )
     )
    )
-   ;;@ core/cpu/opcodes.ts:1911:15
+   ;;@ core/cpu/opcodes.ts:1933:15
    (return
     (i32.const 12)
    )

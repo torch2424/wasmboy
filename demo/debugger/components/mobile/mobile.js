@@ -9,8 +9,6 @@ import Touchpad from './touchpad/touchpad';
 
 import './mobile.css';
 
-let resizeThrottle = undefined;
-
 export default class Mobile extends Component {
   constructor() {
     super();
@@ -23,30 +21,6 @@ export default class Mobile extends Component {
         this.base.classList.remove('control-loading');
       }
     });
-
-    window.addEventListener('resize', () => {
-      if (resizeThrottle) {
-        return;
-      }
-
-      resizeThrottle = setTimeout(() => {
-        Pubx.get(PUBX_KEYS.MOBILE).update();
-        resizeThrottle = undefined;
-      }, 500);
-    });
-
-    window.addEventListener('orientationchange', () => {
-      if (resizeThrottle) {
-        return;
-      }
-
-      resizeThrottle = setTimeout(() => {
-        Pubx.get(PUBX_KEYS.MOBILE).update();
-        resizeThrottle = undefined;
-      }, 500);
-    });
-
-    Pubx.get(PUBX_KEYS.MOBILE).update();
   }
 
   componentDidMount() {}

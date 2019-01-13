@@ -74,17 +74,17 @@ export class Lcd {
 
     if (wasLcdEnabled && !Lcd.enabled) {
       // Disable the LCD
-      resetLcd();
+      resetLcd(true);
     }
 
     if (!wasLcdEnabled && Lcd.enabled) {
       // Re-enable the LCD
-      resetLcd();
+      resetLcd(false);
     }
   }
 }
 
-function resetLcd(): void {
+function resetLcd(shouldBlankScreen: boolean): void {
   // Reset scanline cycle counter
   Graphics.scanlineCycleCounter = 0;
   Graphics.scanlineRegister = 0;
@@ -101,8 +101,10 @@ function resetLcd(): void {
   eightBitStoreIntoGBMemory(Lcd.memoryLocationLcdStatus, lcdStatus);
 
   // Blank the screen
-  for (let i = 0; i < GRAPHICS_OUTPUT_SIZE; i++) {
-    // store<u8>(GRAPHICS_OUTPUT_LOCATION + i, 255);
+  if (shouldBlankScreen) {
+    for (let i = 0; i < GRAPHICS_OUTPUT_SIZE; i++) {
+      store<u8>(GRAPHICS_OUTPUT_LOCATION + i, 255);
+    }
   }
 }
 

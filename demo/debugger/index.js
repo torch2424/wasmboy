@@ -40,10 +40,6 @@ let main = new phosphorWidgets.BoxPanel({ direction: 'left-to-right', spacing: 0
 main.id = 'main';
 main.addWidget(dockPanel);
 
-window.onresize = () => {
-  main.update();
-};
-
 // Initialize Pubx for State Management
 PUBX_INITIALIZE();
 
@@ -65,6 +61,15 @@ render(<Overlay />, overlayContainer);
 // Bind the Mobile UI to DOM
 const mobileContainer = document.getElementById('mobile-container');
 render(<Mobile />, mobileContainer);
+Pubx.get(PUBX_KEYS.MOBILE).update(devtoolsDetect.open);
+
+// Show a nice welcome message
+setTimeout(() => {
+  Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Welcome to the WasmBoy Debugger/Demo!');
+}, 100);
+
+// Add all of our layout events
+let layoutChangeThrottle = undefined;
 
 // devtools change for mobile
 // uses devtools-detect
@@ -73,7 +78,26 @@ window.addEventListener('devtoolschange', e => {
   main.update();
 });
 
-// Show a nice welcome message
-setTimeout(() => {
-  Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Welcome to the WasmBoy Debugger/Demo!');
-}, 100);
+window.addEventListener('resize', () => {
+  if (layoutChangeThrottle) {
+    return;
+  }
+
+  layoutChangeThrottle = setTimeout(() => {
+    Pubx.get(PUBX_KEYS.MOBILE).update(devtoolsDetect.open);
+    main.update();
+    layoutChangeThrottle = undefined;
+  }, 500);
+});
+
+window.addEventListener('orientationchange', () => {
+  if (layoutChangeThrottle) {
+    return;
+  }
+
+  layoutChangeThrottle = setTimeout(() => {
+    Pubx.get(PUBX_KEYS.MOBILE).update(devtoolsDetect.open);
+    main.update();
+    layoutChangeThrottle = undefined;
+  }, 500);
+});
