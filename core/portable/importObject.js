@@ -20,16 +20,12 @@ const wasmImportObject = {
 
       console.log('[WasmBoy] ' + str);
     },
-    hexLog: (arg0, arg1, arg2, arg3, arg4, arg5) => {
+    hexLog: (arg0, arg1) => {
       if (!logRequest[arg0]) {
         // Grab our arguments, and log as hex
         let logString = '[WasmBoy]';
         if (arg0 !== -9999) logString += ` 0x${arg0.toString(16)} `;
         if (arg1 !== -9999) logString += ` 0x${arg1.toString(16)} `;
-        if (arg2 !== -9999) logString += ` 0x${arg2.toString(16)} `;
-        if (arg3 !== -9999) logString += ` 0x${arg3.toString(16)} `;
-        if (arg4 !== -9999) logString += ` 0x${arg4.toString(16)} `;
-        if (arg5 !== -9999) logString += ` 0x${arg5.toString(16)} `;
 
         // Uncomment to unthrottle
         console.log(logString);

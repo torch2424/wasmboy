@@ -1,6 +1,11 @@
 import { Pubx } from 'pubx';
 import { WasmBoy, WasmBoyUpdateCanvas } from './wasmboy';
 
+// devtools change for mobile
+window.addEventListener('devtoolschange', e => {
+  Pubx.get(PUBX_KEYS.MOBILE).update(e.detail.open);
+});
+
 export const PUBX_KEYS = {
   LOADING: 'LOADING',
   MOBILE: 'MOBILE',
@@ -40,10 +45,15 @@ export function PUBX_INITIALIZE() {
     isMobile: false,
     isLandscape: false,
     isPortrait: false,
-    update: () => {
-      const mobile = window.matchMedia('(max-width: 901px)').matches;
-      const landscape = window.matchMedia('screen and (orientation: landscape)').matches;
-      const portrait = window.matchMedia('screen and (orientation: portrait)').matches;
+    update: isDevtoolsOpen => {
+      let mobile = window.matchMedia('(max-width: 500px)').matches;
+
+      if (!isDevtoolsOpen) {
+        mobile = window.matchMedia('(max-width: 1024px)').matches;
+      }
+
+      let landscape = mobile && window.matchMedia('screen and (orientation: landscape)').matches;
+      let portrait = mobile && window.matchMedia('screen and (orientation: portrait)').matches;
 
       // Get our document class list
       const documentClassList = document.documentElement.classList;

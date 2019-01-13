@@ -6,5 +6,6 @@ export {
   requestLcdInterrupt,
   requestTimerInterrupt,
   requestJoypadInterrupt,
-  requestVBlankInterrupt
+  requestVBlankInterrupt,
+  requestSerialInterrupt
 } from './interrupts';

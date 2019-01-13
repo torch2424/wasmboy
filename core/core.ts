@@ -10,6 +10,7 @@ import { Joypad } from './joypad/index';
 import { Memory, initializeCartridge, initializeDma, eightBitStoreIntoGBMemory, eightBitLoadFromGBMemory } from './memory/index';
 import { Timers, initializeTimers } from './timers/index';
 import { Sound, initializeSound, Channel1, Channel2, Channel3, Channel4 } from './sound/index';
+import { initializeSerial } from './serial/serial';
 import { hexLog, log } from './helpers/index';
 import { u16Portable } from './portable/portable';
 
@@ -130,6 +131,7 @@ function initialize(): void {
   initializeSound();
   initializeInterrupts();
   initializeTimers();
+  initializeSerial();
 
   // Various Other Registers
   if (Cpu.GBCEnabled) {
@@ -138,8 +140,6 @@ function initialize(): void {
     eightBitStoreIntoGBMemory(0xff4f, 0xfe);
     eightBitStoreIntoGBMemory(0xff4d, 0x7e);
     eightBitStoreIntoGBMemory(0xff00, 0xcf);
-    // FF01 = 0x00
-    eightBitStoreIntoGBMemory(0xff02, 0x7c);
 
     eightBitStoreIntoGBMemory(0xff0f, 0xe1);
     // 0xFFFF = 0x00
@@ -152,8 +152,6 @@ function initialize(): void {
     eightBitStoreIntoGBMemory(0xff4f, 0xff);
     eightBitStoreIntoGBMemory(0xff4d, 0xff);
     eightBitStoreIntoGBMemory(0xff00, 0xcf);
-    // FF01 = 0x00
-    eightBitStoreIntoGBMemory(0xff02, 0x7e);
 
     eightBitStoreIntoGBMemory(0xff0f, 0xe1);
     // 0xFFFF = 0x00

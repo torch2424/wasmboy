@@ -8,6 +8,7 @@ import { Joypad } from './joypad/index';
 import { Memory, eightBitStoreIntoGBMemory, eightBitLoadFromGBMemory } from './memory/index';
 import { Timers, updateTimers, batchProcessTimers } from './timers/index';
 import { Sound, updateSound } from './sound/index';
+import { Serial, updateSerial } from './serial/serial';
 import { hexLog, log } from './helpers/index';
 import { u16Portable } from './portable/portable';
 
@@ -71,6 +72,8 @@ export function syncCycles(numberOfCycles: i32): void {
     } else {
       updateSound(numberOfCycles);
     }
+
+    updateSerial(numberOfCycles);
   }
 
   if (Config.timersBatchProcessing) {
