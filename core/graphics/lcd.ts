@@ -6,6 +6,7 @@ import { eightBitStoreIntoGBMemory } from '../memory/store';
 import { updateHblankHdma } from '../memory/index';
 import { requestLcdInterrupt, requestVBlankInterrupt } from '../interrupts/index';
 import { checkBitOnByte, setBitOnByte, resetBitOnByte, hexLog } from '../helpers/index';
+import { GRAPHICS_OUTPUT_LOCATION, GRAPHICS_OUTPUT_SIZE } from '../constants';
 
 export class Lcd {
   // Memory Locations
@@ -60,6 +61,8 @@ export class Lcd {
 
   // Function called in write traps to update our hardware registers
   static updateLcdControl(value: i32): void {
+    let wasLcdEnabled = Lcd.enabled;
+
     Lcd.enabled = checkBitOnByte(7, value);
     Lcd.windowTileMapDisplaySelect = checkBitOnByte(6, value);
     Lcd.windowDisplayEnabled = checkBitOnByte(5, value);
@@ -68,6 +71,40 @@ export class Lcd {
     Lcd.tallSpriteSize = checkBitOnByte(2, value);
     Lcd.spriteDisplayEnable = checkBitOnByte(1, value);
     Lcd.bgDisplayEnabled = checkBitOnByte(0, value);
+
+    if (wasLcdEnabled && !Lcd.enabled) {
+      // Disable the LCD
+      resetLcd(true);
+    }
+
+    if (!wasLcdEnabled && Lcd.enabled) {
+      // Re-enable the LCD
+      resetLcd(false);
+    }
+  }
+}
+
+function resetLcd(shouldBlankScreen: boolean): void {
+  // Reset scanline cycle counter
+  Graphics.scanlineCycleCounter = 0;
+  Graphics.scanlineRegister = 0;
+  eightBitStoreIntoGBMemory(Graphics.memoryLocationScanlineRegister, 0);
+
+  // Set to mode 0
+  // https://www.reddit.com/r/EmuDev/comments/4w6479/gb_dr_mario_level_generation_issues/
+  let lcdStatus: i32 = eightBitLoadFromGBMemory(Lcd.memoryLocationLcdStatus);
+  lcdStatus = resetBitOnByte(1, lcdStatus);
+  lcdStatus = resetBitOnByte(0, lcdStatus);
+  Lcd.currentLcdMode = 0;
+
+  // Store the status in memory
+  eightBitStoreIntoGBMemory(Lcd.memoryLocationLcdStatus, lcdStatus);
+
+  // Blank the screen
+  if (shouldBlankScreen) {
+    for (let i = 0; i < GRAPHICS_OUTPUT_SIZE; i++) {
+      store<u8>(GRAPHICS_OUTPUT_LOCATION + i, 255);
+    }
   }
 }
 
@@ -75,20 +112,6 @@ export class Lcd {
 export function setLcdStatus(): void {
   // Check if the Lcd was disabled
   if (!Lcd.enabled) {
-    // Reset scanline cycle counter
-    Graphics.scanlineCycleCounter = 0;
-    Graphics.scanlineRegister = 0;
-    eightBitStoreIntoGBMemory(Graphics.memoryLocationScanlineRegister, 0);
-
-    // Set to mode 0
-    // https://www.reddit.com/r/EmuDev/comments/4w6479/gb_dr_mario_level_generation_issues/
-    let lcdStatus: i32 = eightBitLoadFromGBMemory(Lcd.memoryLocationLcdStatus);
-    lcdStatus = resetBitOnByte(1, lcdStatus);
-    lcdStatus = resetBitOnByte(0, lcdStatus);
-    Lcd.currentLcdMode = 0;
-
-    // Store the status in memory
-    eightBitStoreIntoGBMemory(Lcd.memoryLocationLcdStatus, lcdStatus);
     return;
   }
 
@@ -122,7 +145,7 @@ export function setLcdStatus(): void {
 
     let shouldRequestInterrupt: boolean = false;
 
-    // Set our LCD Statuc accordingly
+    // Set our LCD Status accordingly
     switch (newLcdMode) {
       case 0x00:
         lcdStatus = resetBitOnByte(0, lcdStatus);
@@ -161,19 +184,32 @@ export function setLcdStatus(): void {
       requestVBlankInterrupt();
     }
 
-    // Check for the coincidence flag
-    // Need to check on every mode, and not just HBLANK, as checking on hblank breaks shantae, which checks on vblank
-    let coincidenceCompare: i32 = Lcd.coincidenceCompare;
-    if ((newLcdMode === 0 || newLcdMode === 1) && scanlineRegister === coincidenceCompare) {
-      lcdStatus = setBitOnByte(2, lcdStatus);
-      if (checkBitOnByte(6, lcdStatus)) {
-        requestLcdInterrupt();
-      }
-    } else {
-      lcdStatus = resetBitOnByte(2, lcdStatus);
-    }
+    // Check for the coincidence
+    lcdStatus = checkCoincidence(newLcdMode, lcdStatus);
 
     // Finally, save our status
     eightBitStoreIntoGBMemory(Lcd.memoryLocationLcdStatus, lcdStatus);
+  } else if (scanlineRegister === 153) {
+    // Special Case, need to check LYC
+    // Fix prehistorik man freeze
+    let lcdStatus: i32 = eightBitLoadFromGBMemory(Lcd.memoryLocationLcdStatus);
+    lcdStatus = checkCoincidence(newLcdMode, lcdStatus);
+    eightBitStoreIntoGBMemory(Lcd.memoryLocationLcdStatus, lcdStatus);
   }
+}
+
+function checkCoincidence(lcdMode: i32, lcdStatus: i32): i32 {
+  // Check for the coincidence flag
+  // Need to check on every mode, and not just HBLANK, as checking on hblank breaks shantae, which checks on vblank
+  let coincidenceCompare: i32 = Lcd.coincidenceCompare;
+  if ((lcdMode === 0 || lcdMode === 1) && Graphics.scanlineRegister === coincidenceCompare) {
+    lcdStatus = setBitOnByte(2, lcdStatus);
+    if (checkBitOnByte(6, lcdStatus)) {
+      requestLcdInterrupt();
+    }
+  } else {
+    lcdStatus = resetBitOnByte(2, lcdStatus);
+  }
+
+  return lcdStatus;
 }

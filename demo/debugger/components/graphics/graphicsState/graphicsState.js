@@ -27,6 +27,7 @@ export default class GraphicsState extends ValueTable {
       valueTable['Scanline Register (LY) - 0xFF44'] = await WasmBoy._runWasmExport('getLY');
       valueTable['LCD Status (STAT) - 0xFF41'] = debugMemory[0x0041];
       valueTable['LCD Control (LCDC) - 0xFF40'] = debugMemory[0x0040];
+      valueTable['LCD Coincidence Compare - 0xFF45'] = debugMemory[0x0045];
       valueTable['Scroll X - 0xFF43'] = debugMemory[0x0043];
       valueTable['Scroll Y - 0xFF42'] = debugMemory[0x0042];
       valueTable['Window X - 0xFF4B'] = debugMemory[0x004b];
