@@ -7,6 +7,7 @@ import { eightBitStoreIntoGBMemory } from './store';
 import { eightBitLoadFromGBMemory } from './load';
 import { Joypad, getJoypadState } from '../joypad/index';
 import { Timers } from '../timers/index';
+import { Serial } from '../serial/serial';
 import { Interrupts } from '../interrupts/index';
 import { checkBitOnByte, resetBitOnByte, splitHighByte, hexLog } from '../helpers/index';
 

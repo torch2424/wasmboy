@@ -20,6 +20,7 @@ export class Interrupts {
   static readonly bitPositionVBlankInterrupt: i32 = 0;
   static readonly bitPositionLcdInterrupt: i32 = 1;
   static readonly bitPositionTimerInterrupt: i32 = 2;
+  static readonly bitPositionSerialInterrupt: i32 = 3;
   static readonly bitPositionJoypadInterrupt: i32 = 4;
 
   static readonly memoryLocationInterruptEnabled: i32 = 0xffff; // A.K.A interrupt Flag (IE)
@@ -28,11 +29,13 @@ export class Interrupts {
   static isVBlankInterruptEnabled: boolean = false;
   static isLcdInterruptEnabled: boolean = false;
   static isTimerInterruptEnabled: boolean = false;
+  static isSerialInterruptEnabled: boolean = false;
   static isJoypadInterruptEnabled: boolean = false;
   static updateInterruptEnabled(value: i32): void {
     Interrupts.isVBlankInterruptEnabled = checkBitOnByte(Interrupts.bitPositionVBlankInterrupt, value);
     Interrupts.isLcdInterruptEnabled = checkBitOnByte(Interrupts.bitPositionLcdInterrupt, value);
     Interrupts.isTimerInterruptEnabled = checkBitOnByte(Interrupts.bitPositionTimerInterrupt, value);
+    Interrupts.isSerialInterruptEnabled = checkBitOnByte(Interrupts.bitPositionSerialInterrupt, value);
     Interrupts.isJoypadInterruptEnabled = checkBitOnByte(Interrupts.bitPositionJoypadInterrupt, value);
 
     Interrupts.interruptsEnabledValue = value;
@@ -44,11 +47,13 @@ export class Interrupts {
   static isVBlankInterruptRequested: boolean = false;
   static isLcdInterruptRequested: boolean = false;
   static isTimerInterruptRequested: boolean = false;
+  static isSerialInterruptRequested: boolean = false;
   static isJoypadInterruptRequested: boolean = false;
   static updateInterruptRequested(value: i32): void {
     Interrupts.isVBlankInterruptRequested = checkBitOnByte(Interrupts.bitPositionVBlankInterrupt, value);
     Interrupts.isLcdInterruptRequested = checkBitOnByte(Interrupts.bitPositionLcdInterrupt, value);
     Interrupts.isTimerInterruptRequested = checkBitOnByte(Interrupts.bitPositionTimerInterrupt, value);
+    Interrupts.isSerialInterruptRequested = checkBitOnByte(Interrupts.bitPositionSerialInterrupt, value);
     Interrupts.isJoypadInterruptRequested = checkBitOnByte(Interrupts.bitPositionJoypadInterrupt, value);
 
     Interrupts.interruptsRequestedValue = value;
@@ -121,6 +126,9 @@ export function checkInterrupts(): i32 {
       } else if (Interrupts.isTimerInterruptEnabled && Interrupts.isTimerInterruptRequested) {
         _handleInterrupt(Interrupts.bitPositionTimerInterrupt);
         wasInterruptHandled = true;
+      } else if (Interrupts.isSerialInterruptEnabled && Interrupts.isSerialInterruptRequested) {
+        _handleInterrupt(Interrupts.bitPositionSerialInterrupt);
+        wasInterruptHandled = true;
       } else if (Interrupts.isJoypadInterruptEnabled && Interrupts.isJoypadInterruptRequested) {
         _handleInterrupt(Interrupts.bitPositionJoypadInterrupt);
         wasInterruptHandled = true;
@@ -187,6 +195,10 @@ function _handleInterrupt(bitPosition: i32): void {
       Interrupts.isTimerInterruptRequested = false;
       Cpu.programCounter = 0x50;
       break;
+    case Interrupts.bitPositionSerialInterrupt:
+      Interrupts.isSerialInterruptRequested = false;
+      Cpu.programCounter = 0x58;
+      break;
     case Interrupts.bitPositionJoypadInterrupt:
       Interrupts.isJoypadInterruptRequested = false;
       Cpu.programCounter = 0x60;
@@ -233,4 +245,9 @@ export function requestTimerInterrupt(): void {
 export function requestJoypadInterrupt(): void {
   Interrupts.isJoypadInterruptRequested = true;
   _requestInterrupt(Interrupts.bitPositionJoypadInterrupt);
+}
+
+export function requestSerialInterrupt(): void {
+  Interrupts.isSerialInterruptRequested = true;
+  _requestInterrupt(Interrupts.bitPositionSerialInterrupt);
 }

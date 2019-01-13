@@ -4,6 +4,7 @@ import { Graphics, batchProcessGraphics } from '../graphics/graphics';
 import { Palette, writeColorPaletteToMemory, Lcd } from '../graphics/index';
 import { batchProcessAudio, SoundRegisterWriteTraps } from '../sound/index';
 import { Timers, batchProcessTimers } from '../timers/index';
+import { Serial } from '../serial/serial';
 import { Interrupts } from '../interrupts/index';
 import { Joypad } from '../joypad/index';
 import { handleBanking } from './banking';
@@ -82,6 +83,12 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
 
   if (offset >= Memory.unusableMemoryLocation && offset <= Memory.unusableMemoryEndLocation) {
     return false;
+  }
+
+  // Serial
+  if (offset === Serial.memoryLocationSerialTransferControl) {
+    // SC
+    return Serial.updateTransferControl(value);
   }
 
   // Sound
