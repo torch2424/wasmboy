@@ -1775,29 +1775,29 @@
   )
  )
  (func $core/serial/serial/Serial.updateTransferControl (; 21 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
-  ;;@ core/serial/serial.ts:34:4
+  ;;@ core/serial/serial.ts:33:4
   (set_global $core/serial/serial/Serial.isShiftClockInternal
-   ;;@ core/serial/serial.ts:34:34
+   ;;@ core/serial/serial.ts:33:34
    (call $core/helpers/index/checkBitOnByte
-    ;;@ core/serial/serial.ts:34:49
+    ;;@ core/serial/serial.ts:33:49
     (i32.const 0)
     (get_local $0)
    )
   )
-  ;;@ core/serial/serial.ts:35:4
+  ;;@ core/serial/serial.ts:34:4
   (set_global $core/serial/serial/Serial.isClockSpeedFast
-   ;;@ core/serial/serial.ts:35:30
+   ;;@ core/serial/serial.ts:34:30
    (call $core/helpers/index/checkBitOnByte
-    ;;@ core/serial/serial.ts:35:45
+    ;;@ core/serial/serial.ts:34:45
     (i32.const 1)
     (get_local $0)
    )
   )
-  ;;@ core/serial/serial.ts:36:4
+  ;;@ core/serial/serial.ts:35:4
   (set_global $core/serial/serial/Serial.transferStartFlag
-   ;;@ core/serial/serial.ts:36:31
+   ;;@ core/serial/serial.ts:35:31
    (call $core/helpers/index/checkBitOnByte
-    ;;@ core/serial/serial.ts:36:46
+    ;;@ core/serial/serial.ts:35:46
     (i32.const 7)
     (get_local $0)
    )
@@ -1805,50 +1805,50 @@
   (i32.const 1)
  )
  (func $core/serial/serial/initializeSerial (; 22 ;) (; has Stack IR ;) (type $v)
-  ;;@ core/serial/serial.ts:46:2
+  ;;@ core/serial/serial.ts:44:2
   (set_global $core/serial/serial/Serial.currentCycles
-   ;;@ core/serial/serial.ts:46:25
+   ;;@ core/serial/serial.ts:44:25
+   (i32.const 0)
+  )
+  ;;@ core/serial/serial.ts:45:2
+  (set_global $core/serial/serial/Serial.numberOfBitsTransferred
+   ;;@ core/serial/serial.ts:45:35
    (i32.const 0)
   )
   ;;@ core/serial/serial.ts:47:2
-  (set_global $core/serial/serial/Serial.numberOfBitsTransferred
-   ;;@ core/serial/serial.ts:47:35
-   (i32.const 0)
-  )
-  ;;@ core/serial/serial.ts:49:2
   (if
-   ;;@ core/serial/serial.ts:49:6
+   ;;@ core/serial/serial.ts:47:6
    (get_global $core/cpu/cpu/Cpu.GBCEnabled)
-   ;;@ core/serial/serial.ts:49:22
+   ;;@ core/serial/serial.ts:47:22
    (block
-    ;;@ core/serial/serial.ts:51:4
+    ;;@ core/serial/serial.ts:49:4
     (call $core/memory/store/eightBitStoreIntoGBMemory
-     ;;@ core/serial/serial.ts:51:30
+     ;;@ core/serial/serial.ts:49:30
      (i32.const 65282)
-     ;;@ core/serial/serial.ts:51:38
+     ;;@ core/serial/serial.ts:49:38
      (i32.const 124)
     )
-    ;;@ core/serial/serial.ts:52:11
+    ;;@ core/serial/serial.ts:50:11
     (drop
      (call $core/serial/serial/Serial.updateTransferControl
-      ;;@ core/serial/serial.ts:52:33
+      ;;@ core/serial/serial.ts:50:33
       (i32.const 124)
      )
     )
    )
-   ;;@ core/serial/serial.ts:53:9
+   ;;@ core/serial/serial.ts:51:9
    (block
-    ;;@ core/serial/serial.ts:55:4
+    ;;@ core/serial/serial.ts:53:4
     (call $core/memory/store/eightBitStoreIntoGBMemory
-     ;;@ core/serial/serial.ts:55:30
+     ;;@ core/serial/serial.ts:53:30
      (i32.const 65282)
-     ;;@ core/serial/serial.ts:55:38
+     ;;@ core/serial/serial.ts:53:38
      (i32.const 126)
     )
-    ;;@ core/serial/serial.ts:56:11
+    ;;@ core/serial/serial.ts:54:11
     (drop
      (call $core/serial/serial/Serial.updateTransferControl
-      ;;@ core/serial/serial.ts:56:33
+      ;;@ core/serial/serial.ts:54:33
       (i32.const 126)
      )
     )
@@ -3239,81 +3239,219 @@
    )
   )
  )
- (func $core/graphics/lcd/Lcd.updateLcdControl (; 45 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
-  ;;@ core/graphics/lcd.ts:63:4
+ (func $core/helpers/index/resetBitOnByte (; 45 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+  ;;@ core/helpers/index.ts:52:37
+  (i32.and
+   (get_local $1)
+   ;;@ core/helpers/index.ts:52:16
+   (i32.xor
+    ;;@ core/helpers/index.ts:52:17
+    (i32.shl
+     ;;@ core/helpers/index.ts:52:18
+     (i32.const 1)
+     (get_local $0)
+    )
+    (i32.const -1)
+   )
+  )
+ )
+ (func $core/graphics/lcd/resetLcd (; 46 ;) (; has Stack IR ;) (type $v)
+  (local $0 i32)
+  ;;@ core/graphics/lcd.ts:89:2
+  (set_global $core/graphics/graphics/Graphics.scanlineCycleCounter
+   ;;@ core/graphics/lcd.ts:89:34
+   (i32.const 0)
+  )
+  ;;@ core/graphics/lcd.ts:90:2
+  (set_global $core/graphics/graphics/Graphics.scanlineRegister
+   ;;@ core/graphics/lcd.ts:90:30
+   (i32.const 0)
+  )
+  ;;@ core/graphics/lcd.ts:91:2
+  (call $core/memory/store/eightBitStoreIntoGBMemory
+   (i32.const 65348)
+   ;;@ core/graphics/lcd.ts:91:69
+   (i32.const 0)
+  )
+  ;;@ core/graphics/lcd.ts:97:2
+  (set_local $0
+   ;;@ core/graphics/lcd.ts:97:14
+   (call $core/helpers/index/resetBitOnByte
+    ;;@ core/graphics/lcd.ts:97:29
+    (i32.const 0)
+    ;;@ core/graphics/lcd.ts:96:14
+    (call $core/helpers/index/resetBitOnByte
+     ;;@ core/graphics/lcd.ts:96:29
+     (i32.const 1)
+     ;;@ core/graphics/lcd.ts:95:23
+     (call $core/memory/load/eightBitLoadFromGBMemory
+      (i32.const 65345)
+     )
+    )
+   )
+  )
+  ;;@ core/graphics/lcd.ts:98:2
+  (set_global $core/graphics/lcd/Lcd.currentLcdMode
+   ;;@ core/graphics/lcd.ts:98:23
+   (i32.const 0)
+  )
+  ;;@ core/graphics/lcd.ts:101:2
+  (call $core/memory/store/eightBitStoreIntoGBMemory
+   (i32.const 65345)
+   (get_local $0)
+  )
+  ;;@ core/graphics/lcd.ts:104:2
+  (block $break|0
+   ;;@ core/graphics/lcd.ts:104:7
+   (set_local $0
+    ;;@ core/graphics/lcd.ts:104:15
+    (i32.const 0)
+   )
+   (loop $repeat|0
+    (br_if $break|0
+     ;;@ core/graphics/lcd.ts:104:18
+     (i32.ge_s
+      (get_local $0)
+      (i32.const 521216)
+     )
+    )
+    ;;@ core/graphics/lcd.ts:105:4
+    (i32.store8
+     ;;@ core/graphics/lcd.ts:105:14
+     (i32.add
+      (get_local $0)
+      (i32.const 67584)
+     )
+     ;;@ core/graphics/lcd.ts:105:44
+     (i32.const 255)
+    )
+    ;;@ core/graphics/lcd.ts:104:44
+    (set_local $0
+     (i32.add
+      (get_local $0)
+      (i32.const 1)
+     )
+    )
+    (br $repeat|0)
+   )
+  )
+ )
+ (func $core/graphics/lcd/Lcd.updateLcdControl (; 47 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+  (local $1 i32)
+  ;;@ core/graphics/lcd.ts:64:4
+  (set_local $1
+   ;;@ core/graphics/lcd.ts:64:24
+   (get_global $core/graphics/lcd/Lcd.enabled)
+  )
+  ;;@ core/graphics/lcd.ts:66:4
   (set_global $core/graphics/lcd/Lcd.enabled
-   ;;@ core/graphics/lcd.ts:63:18
+   ;;@ core/graphics/lcd.ts:66:18
    (call $core/helpers/index/checkBitOnByte
-    ;;@ core/graphics/lcd.ts:63:33
+    ;;@ core/graphics/lcd.ts:66:33
     (i32.const 7)
     (get_local $0)
    )
   )
-  ;;@ core/graphics/lcd.ts:64:4
+  ;;@ core/graphics/lcd.ts:67:4
   (set_global $core/graphics/lcd/Lcd.windowTileMapDisplaySelect
-   ;;@ core/graphics/lcd.ts:64:37
+   ;;@ core/graphics/lcd.ts:67:37
    (call $core/helpers/index/checkBitOnByte
-    ;;@ core/graphics/lcd.ts:64:52
+    ;;@ core/graphics/lcd.ts:67:52
     (i32.const 6)
     (get_local $0)
    )
   )
-  ;;@ core/graphics/lcd.ts:65:4
+  ;;@ core/graphics/lcd.ts:68:4
   (set_global $core/graphics/lcd/Lcd.windowDisplayEnabled
-   ;;@ core/graphics/lcd.ts:65:31
+   ;;@ core/graphics/lcd.ts:68:31
    (call $core/helpers/index/checkBitOnByte
-    ;;@ core/graphics/lcd.ts:65:46
+    ;;@ core/graphics/lcd.ts:68:46
     (i32.const 5)
     (get_local $0)
    )
   )
-  ;;@ core/graphics/lcd.ts:66:4
+  ;;@ core/graphics/lcd.ts:69:4
   (set_global $core/graphics/lcd/Lcd.bgWindowTileDataSelect
-   ;;@ core/graphics/lcd.ts:66:33
+   ;;@ core/graphics/lcd.ts:69:33
    (call $core/helpers/index/checkBitOnByte
-    ;;@ core/graphics/lcd.ts:66:48
+    ;;@ core/graphics/lcd.ts:69:48
     (i32.const 4)
     (get_local $0)
    )
   )
-  ;;@ core/graphics/lcd.ts:67:4
+  ;;@ core/graphics/lcd.ts:70:4
   (set_global $core/graphics/lcd/Lcd.bgTileMapDisplaySelect
-   ;;@ core/graphics/lcd.ts:67:33
+   ;;@ core/graphics/lcd.ts:70:33
    (call $core/helpers/index/checkBitOnByte
-    ;;@ core/graphics/lcd.ts:67:48
+    ;;@ core/graphics/lcd.ts:70:48
     (i32.const 3)
     (get_local $0)
    )
   )
-  ;;@ core/graphics/lcd.ts:68:4
+  ;;@ core/graphics/lcd.ts:71:4
   (set_global $core/graphics/lcd/Lcd.tallSpriteSize
-   ;;@ core/graphics/lcd.ts:68:25
+   ;;@ core/graphics/lcd.ts:71:25
    (call $core/helpers/index/checkBitOnByte
-    ;;@ core/graphics/lcd.ts:68:40
+    ;;@ core/graphics/lcd.ts:71:40
     (i32.const 2)
     (get_local $0)
    )
   )
-  ;;@ core/graphics/lcd.ts:69:4
+  ;;@ core/graphics/lcd.ts:72:4
   (set_global $core/graphics/lcd/Lcd.spriteDisplayEnable
-   ;;@ core/graphics/lcd.ts:69:30
+   ;;@ core/graphics/lcd.ts:72:30
    (call $core/helpers/index/checkBitOnByte
-    ;;@ core/graphics/lcd.ts:69:45
+    ;;@ core/graphics/lcd.ts:72:45
     (i32.const 1)
     (get_local $0)
    )
   )
-  ;;@ core/graphics/lcd.ts:70:4
+  ;;@ core/graphics/lcd.ts:73:4
   (set_global $core/graphics/lcd/Lcd.bgDisplayEnabled
-   ;;@ core/graphics/lcd.ts:70:27
+   ;;@ core/graphics/lcd.ts:73:27
    (call $core/helpers/index/checkBitOnByte
-    ;;@ core/graphics/lcd.ts:70:42
+    ;;@ core/graphics/lcd.ts:73:42
     (i32.const 0)
     (get_local $0)
    )
   )
+  ;;@ core/graphics/lcd.ts:75:4
+  (if
+   (tee_local $0
+    ;;@ core/graphics/lcd.ts:75:8
+    (if (result i32)
+     (get_local $1)
+     ;;@ core/graphics/lcd.ts:75:25
+     (i32.eqz
+      ;;@ core/graphics/lcd.ts:75:26
+      (get_global $core/graphics/lcd/Lcd.enabled)
+     )
+     (get_local $1)
+    )
+   )
+   ;;@ core/graphics/lcd.ts:75:39
+   (call $core/graphics/lcd/resetLcd)
+  )
+  ;;@ core/graphics/lcd.ts:80:8
+  (if
+   (tee_local $0
+    (i32.eqz
+     (get_local $1)
+    )
+   )
+   (set_local $0
+    ;;@ core/graphics/lcd.ts:80:26
+    (get_global $core/graphics/lcd/Lcd.enabled)
+   )
+  )
+  ;;@ core/graphics/lcd.ts:80:4
+  (if
+   (get_local $0)
+   ;;@ core/graphics/lcd.ts:80:39
+   (call $core/graphics/lcd/resetLcd)
+  )
  )
- (func $core/graphics/graphics/Graphics.loadState (; 46 ;) (; has Stack IR ;) (type $v)
+ (func $core/graphics/graphics/Graphics.loadState (; 48 ;) (; has Stack IR ;) (type $v)
   ;;@ core/graphics/graphics.ts:119:4
   (set_global $core/graphics/graphics/Graphics.scanlineCycleCounter
    ;;@ core/graphics/graphics.ts:119:36
@@ -3353,7 +3491,7 @@
    )
   )
  )
- (func $core/interrupts/interrupts/Interrupts.loadState (; 47 ;) (; has Stack IR ;) (type $v)
+ (func $core/interrupts/interrupts/Interrupts.loadState (; 49 ;) (; has Stack IR ;) (type $v)
   ;;@ core/interrupts/interrupts.ts:80:4
   (set_global $core/interrupts/interrupts/Interrupts.masterInterruptSwitch
    ;;@ core/interrupts/interrupts.ts:80:39
@@ -3393,7 +3531,7 @@
    )
   )
  )
- (func $core/joypad/joypad/Joypad.updateJoypad (; 48 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/joypad/joypad/Joypad.updateJoypad (; 50 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/joypad/joypad.ts:45:4
   (set_global $core/joypad/joypad/Joypad.joypadRegisterFlipped
    ;;@ core/joypad/joypad.ts:45:35
@@ -3424,7 +3562,7 @@
    )
   )
  )
- (func $core/joypad/joypad/Joypad.loadState (; 49 ;) (; has Stack IR ;) (type $v)
+ (func $core/joypad/joypad/Joypad.loadState (; 51 ;) (; has Stack IR ;) (type $v)
   ;;@ core/joypad/joypad.ts:60:11
   (call $core/joypad/joypad/Joypad.updateJoypad
    ;;@ core/joypad/joypad.ts:60:24
@@ -3433,7 +3571,7 @@
    )
   )
  )
- (func $core/memory/memory/Memory.loadState (; 50 ;) (; has Stack IR ;) (type $v)
+ (func $core/memory/memory/Memory.loadState (; 52 ;) (; has Stack IR ;) (type $v)
   ;;@ core/memory/memory.ts:119:4
   (set_global $core/memory/memory/Memory.currentRomBank
    ;;@ core/memory/memory.ts:119:28
@@ -3543,7 +3681,7 @@
    )
   )
  )
- (func $core/timers/timers/Timers.loadState (; 51 ;) (; has Stack IR ;) (type $v)
+ (func $core/timers/timers/Timers.loadState (; 53 ;) (; has Stack IR ;) (type $v)
   ;;@ core/timers/timers.ts:148:4
   (set_global $core/timers/timers/Timers.currentCycles
    ;;@ core/timers/timers.ts:148:27
@@ -3614,14 +3752,14 @@
    )
   )
  )
- (func $core/sound/sound/clearAudioBuffer (; 52 ;) (; has Stack IR ;) (type $v)
+ (func $core/sound/sound/clearAudioBuffer (; 54 ;) (; has Stack IR ;) (type $v)
   ;;@ core/sound/sound.ts:207:2
   (set_global $core/sound/sound/Sound.audioQueueIndex
    ;;@ core/sound/sound.ts:207:26
    (i32.const 0)
   )
  )
- (func $core/sound/sound/Sound.loadState (; 53 ;) (; has Stack IR ;) (type $v)
+ (func $core/sound/sound/Sound.loadState (; 55 ;) (; has Stack IR ;) (type $v)
   ;;@ core/sound/sound.ts:133:4
   (set_global $core/sound/sound/Sound.frameSequenceCycleCounter
    ;;@ core/sound/sound.ts:133:38
@@ -3661,7 +3799,7 @@
   ;;@ core/sound/sound.ts:137:4
   (call $core/sound/sound/clearAudioBuffer)
  )
- (func $core/sound/channel1/Channel1.loadState (; 54 ;) (; has Stack IR ;) (type $v)
+ (func $core/sound/channel1/Channel1.loadState (; 56 ;) (; has Stack IR ;) (type $v)
   ;;@ core/sound/channel1.ts:131:4
   (set_global $core/sound/channel1/Channel1.isEnabled
    ;;@ core/sound/channel1.ts:131:25
@@ -3783,7 +3921,7 @@
    )
   )
  )
- (func $core/sound/channel2/Channel2.loadState (; 55 ;) (; has Stack IR ;) (type $v)
+ (func $core/sound/channel2/Channel2.loadState (; 57 ;) (; has Stack IR ;) (type $v)
   ;;@ core/sound/channel2.ts:111:4
   (set_global $core/sound/channel2/Channel2.isEnabled
    ;;@ core/sound/channel2.ts:111:25
@@ -3869,7 +4007,7 @@
    )
   )
  )
- (func $core/sound/channel3/Channel3.loadState (; 56 ;) (; has Stack IR ;) (type $v)
+ (func $core/sound/channel3/Channel3.loadState (; 58 ;) (; has Stack IR ;) (type $v)
   ;;@ core/sound/channel3.ts:106:4
   (set_global $core/sound/channel3/Channel3.isEnabled
    ;;@ core/sound/channel3.ts:106:25
@@ -3919,7 +4057,7 @@
    )
   )
  )
- (func $core/sound/channel4/Channel4.loadState (; 57 ;) (; has Stack IR ;) (type $v)
+ (func $core/sound/channel4/Channel4.loadState (; 59 ;) (; has Stack IR ;) (type $v)
   ;;@ core/sound/channel4.ts:130:4
   (set_global $core/sound/channel4/Channel4.isEnabled
    ;;@ core/sound/channel4.ts:130:25
@@ -3993,7 +4131,7 @@
    )
   )
  )
- (func $core/core/loadState (; 58 ;) (; has Stack IR ;) (type $v)
+ (func $core/core/loadState (; 60 ;) (; has Stack IR ;) (type $v)
   ;;@ core/core.ts:198:6
   (call $core/cpu/cpu/Cpu.loadState)
   ;;@ core/core.ts:199:11
@@ -4026,26 +4164,26 @@
   ;;@ core/core.ts:215:2
   (call $core/execute/resetSteps)
  )
- (func $core/execute/getStepsPerStepSet (; 59 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/execute/getStepsPerStepSet (; 61 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/execute.ts:20:17
   (get_global $core/execute/Execute.stepsPerStepSet)
  )
- (func $core/execute/getStepSets (; 60 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/execute/getStepSets (; 62 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/execute.ts:24:17
   (get_global $core/execute/Execute.stepSets)
  )
- (func $core/execute/getSteps (; 61 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/execute/getSteps (; 63 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/execute.ts:28:17
   (get_global $core/execute/Execute.steps)
  )
- (func $core/portable/portable/u16Portable (; 62 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/portable/portable/u16Portable (; 64 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   ;;@ core/portable/portable.ts:12:17
   (i32.and
    (get_local $0)
    (i32.const 65535)
   )
  )
- (func $core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE (; 63 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE (; 65 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/graphics/graphics.ts:40:4
   (if
    ;;@ core/graphics/graphics.ts:40:8
@@ -4084,11 +4222,11 @@
   )
   (i32.const 456)
  )
- (func $core/graphics/graphics/Graphics.batchProcessCycles (; 64 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/graphics/graphics/Graphics.batchProcessCycles (; 66 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/graphics/graphics.ts:30:44
   (call $core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE)
  )
- (func $core/graphics/graphics/loadFromVramBank (; 65 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/graphics/graphics/loadFromVramBank (; 67 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   ;;@ core/graphics/graphics.ts:313:32
   (i32.load8_u
    ;;@ core/graphics/graphics.ts:312:28
@@ -4111,7 +4249,7 @@
    )
   )
  )
- (func $core/graphics/graphics/getRgbPixelStart (; 66 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/graphics/graphics/getRgbPixelStart (; 68 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   ;;@ core/graphics/graphics.ts:299:25
   (i32.mul
    ;;@ core/graphics/graphics.ts:299:9
@@ -4128,7 +4266,7 @@
    (i32.const 3)
   )
  )
- (func $core/graphics/graphics/setPixelOnFrame (; 67 ;) (; has Stack IR ;) (type $iiiiv) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32)
+ (func $core/graphics/graphics/setPixelOnFrame (; 69 ;) (; has Stack IR ;) (type $iiiiv) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32)
   ;;@ core/graphics/graphics.ts:307:2
   (i32.store8
    ;;@ core/graphics/graphics.ts:307:12
@@ -4146,7 +4284,7 @@
    (get_local $3)
   )
  )
- (func $core/graphics/priority/getPixelStart (; 68 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/graphics/priority/getPixelStart (; 70 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   ;;@ core/graphics/priority.ts:31:19
   (i32.add
    ;;@ core/graphics/priority.ts:31:9
@@ -4158,7 +4296,7 @@
    (get_local $0)
   )
  )
- (func $core/graphics/priority/getPriorityforPixel (; 69 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/graphics/priority/getPriorityforPixel (; 71 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   ;;@ core/graphics/priority.ts:18:64
   (i32.load8_u
    ;;@ core/graphics/priority.ts:18:18
@@ -4172,23 +4310,7 @@
    )
   )
  )
- (func $core/helpers/index/resetBitOnByte (; 70 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
-  ;;@ core/helpers/index.ts:52:37
-  (i32.and
-   (get_local $1)
-   ;;@ core/helpers/index.ts:52:16
-   (i32.xor
-    ;;@ core/helpers/index.ts:52:17
-    (i32.shl
-     ;;@ core/helpers/index.ts:52:18
-     (i32.const 1)
-     (get_local $0)
-    )
-    (i32.const -1)
-   )
-  )
- )
- (func $core/helpers/index/setBitOnByte (; 71 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/helpers/index/setBitOnByte (; 72 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   ;;@ core/helpers/index.ts:48:36
   (i32.or
    (get_local $1)
@@ -4200,7 +4322,7 @@
    )
   )
  )
- (func $core/graphics/priority/addPriorityforPixel (; 72 ;) (; has Stack IR ;) (type $iiiiv) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32)
+ (func $core/graphics/priority/addPriorityforPixel (; 73 ;) (; has Stack IR ;) (type $iiiiv) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32)
   (local $4 i32)
   ;;@ core/graphics/priority.ts:9:2
   (set_local $4
@@ -4241,7 +4363,7 @@
    (get_local $4)
   )
  )
- (func $core/graphics/backgroundWindow/drawLineOfTileFromTileCache (; 73 ;) (; has Stack IR ;) (type $iiiiiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (result i32)
+ (func $core/graphics/backgroundWindow/drawLineOfTileFromTileCache (; 74 ;) (; has Stack IR ;) (type $iiiiiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (result i32)
   (local $7 i32)
   (local $8 i32)
   (local $9 i32)
@@ -4559,7 +4681,7 @@
   )
   (get_local $7)
  )
- (func $core/graphics/tiles/getTileDataAddress (; 74 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/graphics/tiles/getTileDataAddress (; 75 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   ;;@ core/graphics/tiles.ts:148:2
   (if
@@ -4623,7 +4745,7 @@
    )
   )
  )
- (func $core/graphics/palette/loadPaletteByteFromWasmMemory (; 75 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/graphics/palette/loadPaletteByteFromWasmMemory (; 76 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   ;;@ core/graphics/palette.ts:140:2
   (set_local $2
@@ -4658,7 +4780,7 @@
    )
   )
  )
- (func $core/helpers/index/concatenateBytes (; 76 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/helpers/index/concatenateBytes (; 77 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   ;;@ core/helpers/index.ts:9:51
   (i32.or
    ;;@ core/helpers/index.ts:9:9
@@ -4680,7 +4802,7 @@
    )
   )
  )
- (func $core/graphics/palette/getRgbColorFromPalette (; 77 ;) (; has Stack IR ;) (type $iiii) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $core/graphics/palette/getRgbColorFromPalette (; 78 ;) (; has Stack IR ;) (type $iiii) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   (local $3 i32)
   ;;@ core/graphics/palette.ts:122:62
   (call $core/helpers/index/concatenateBytes
@@ -4717,7 +4839,7 @@
    )
   )
  )
- (func $core/graphics/palette/getColorComponentFromRgb (; 78 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/graphics/palette/getColorComponentFromRgb (; 79 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   ;;@ core/graphics/palette.ts:134:22
   (i32.shl
    ;;@ core/graphics/palette.ts:130:24
@@ -4743,7 +4865,7 @@
    (i32.const 3)
   )
  )
- (func $core/graphics/palette/getMonochromeColorFromPalette (; 79 ;) (; has Stack IR ;) (type $iiii) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $core/graphics/palette/getMonochromeColorFromPalette (; 80 ;) (; has Stack IR ;) (type $iiii) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   ;;@ core/graphics/palette.ts:43:2
   (if
    ;;@ core/graphics/palette.ts:43:6
@@ -4825,7 +4947,7 @@
   )
   (get_local $1)
  )
- (func $core/graphics/tiles/getTilePixelStart (; 80 ;) (; has Stack IR ;) (type $iiii) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $core/graphics/tiles/getTilePixelStart (; 81 ;) (; has Stack IR ;) (type $iiii) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   ;;@ core/graphics/tiles.ts:134:22
   (i32.mul
    ;;@ core/graphics/tiles.ts:131:24
@@ -4840,7 +4962,7 @@
    (i32.const 3)
   )
  )
- (func $core/graphics/tiles/drawPixelsFromLineOfTile (; 81 ;) (; has Stack IR ;) (type $iiiiiiiiiiiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (param $7 i32) (param $8 i32) (param $9 i32) (param $10 i32) (param $11 i32) (param $12 i32) (result i32)
+ (func $core/graphics/tiles/drawPixelsFromLineOfTile (; 82 ;) (; has Stack IR ;) (type $iiiiiiiiiiiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (param $7 i32) (param $8 i32) (param $9 i32) (param $10 i32) (param $11 i32) (param $12 i32) (result i32)
   (local $13 i32)
   (local $14 i32)
   (local $15 i32)
@@ -5160,7 +5282,7 @@
   )
   (get_local $13)
  )
- (func $core/graphics/backgroundWindow/drawLineOfTileFromTileId (; 82 ;) (; has Stack IR ;) (type $iiiiiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (result i32)
+ (func $core/graphics/backgroundWindow/drawLineOfTileFromTileId (; 83 ;) (; has Stack IR ;) (type $iiiiiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (result i32)
   (local $7 i32)
   (local $8 i32)
   (local $9 i32)
@@ -5298,7 +5420,7 @@
    (get_local $2)
   )
  )
- (func $core/graphics/backgroundWindow/drawColorPixelFromTileId (; 83 ;) (; has Stack IR ;) (type $iiiiiiiv) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32)
+ (func $core/graphics/backgroundWindow/drawColorPixelFromTileId (; 84 ;) (; has Stack IR ;) (type $iiiiiiiv) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32)
   ;;@ core/graphics/backgroundWindow.ts:269:2
   (set_local $6
    ;;@ core/graphics/backgroundWindow.ts:269:29
@@ -5533,7 +5655,7 @@
    )
   )
  )
- (func $core/graphics/backgroundWindow/drawMonochromePixelFromTileId (; 84 ;) (; has Stack IR ;) (type $iiiiiiv) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32)
+ (func $core/graphics/backgroundWindow/drawMonochromePixelFromTileId (; 85 ;) (; has Stack IR ;) (type $iiiiiiv) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32)
   ;;@ core/graphics/backgroundWindow.ts:205:2
   (set_local $5
    ;;@ core/graphics/backgroundWindow.ts:205:40
@@ -5664,7 +5786,7 @@
    (i32.const 0)
   )
  )
- (func $core/graphics/backgroundWindow/drawBackgroundWindowScanline (; 85 ;) (; has Stack IR ;) (type $iiiiiiv) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32)
+ (func $core/graphics/backgroundWindow/drawBackgroundWindowScanline (; 86 ;) (; has Stack IR ;) (type $iiiiiiv) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32)
   (local $6 i32)
   (local $7 i32)
   (local $8 i32)
@@ -5884,7 +6006,7 @@
    )
   )
  )
- (func $core/graphics/backgroundWindow/renderBackground (; 86 ;) (; has Stack IR ;) (type $iiiv) (param $0 i32) (param $1 i32) (param $2 i32)
+ (func $core/graphics/backgroundWindow/renderBackground (; 87 ;) (; has Stack IR ;) (type $iiiv) (param $0 i32) (param $1 i32) (param $2 i32)
   (local $3 i32)
   (local $4 i32)
   ;;@ core/graphics/backgroundWindow.ts:23:2
@@ -5928,7 +6050,7 @@
    (get_local $4)
   )
  )
- (func $core/graphics/backgroundWindow/renderWindow (; 87 ;) (; has Stack IR ;) (type $iiiv) (param $0 i32) (param $1 i32) (param $2 i32)
+ (func $core/graphics/backgroundWindow/renderWindow (; 88 ;) (; has Stack IR ;) (type $iiiv) (param $0 i32) (param $1 i32) (param $2 i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
@@ -5981,7 +6103,7 @@
    (get_local $5)
   )
  )
- (func $core/graphics/sprites/renderSprites (; 88 ;) (; has Stack IR ;) (type $iiv) (param $0 i32) (param $1 i32)
+ (func $core/graphics/sprites/renderSprites (; 89 ;) (; has Stack IR ;) (type $iiv) (param $0 i32) (param $1 i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -6667,7 +6789,7 @@
    )
   )
  )
- (func $core/graphics/graphics/_drawScanline (; 89 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/graphics/graphics/_drawScanline (; 90 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   ;;@ core/graphics/graphics.ts:242:2
@@ -6756,7 +6878,7 @@
    )
   )
  )
- (func $core/graphics/graphics/_renderEntireFrame (; 90 ;) (; has Stack IR ;) (type $v)
+ (func $core/graphics/graphics/_renderEntireFrame (; 91 ;) (; has Stack IR ;) (type $v)
   (local $0 i32)
   ;;@ core/graphics/graphics.ts:289:2
   (block $break|0
@@ -6788,7 +6910,7 @@
    )
   )
  )
- (func $core/graphics/priority/clearPriorityMap (; 91 ;) (; has Stack IR ;) (type $v)
+ (func $core/graphics/priority/clearPriorityMap (; 92 ;) (; has Stack IR ;) (type $v)
   (local $0 i32)
   (local $1 i32)
   ;;@ core/graphics/priority.ts:22:2
@@ -6853,7 +6975,7 @@
    )
   )
  )
- (func $core/graphics/tiles/resetTileCache (; 92 ;) (; has Stack IR ;) (type $v)
+ (func $core/graphics/tiles/resetTileCache (; 93 ;) (; has Stack IR ;) (type $v)
   ;;@ core/graphics/tiles.ts:21:2
   (set_global $core/graphics/tiles/TileCache.tileId
    ;;@ core/graphics/tiles.ts:21:21
@@ -6865,7 +6987,7 @@
    (i32.const -1)
   )
  )
- (func $core/graphics/graphics/Graphics.MIN_CYCLES_SPRITES_LCD_MODE (; 93 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/graphics/graphics/Graphics.MIN_CYCLES_SPRITES_LCD_MODE (; 94 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/graphics/graphics.ts:56:4
   (if
    ;;@ core/graphics/graphics.ts:56:8
@@ -6876,7 +6998,7 @@
   )
   (i32.const 376)
  )
- (func $core/graphics/graphics/Graphics.MIN_CYCLES_TRANSFER_DATA_LCD_MODE (; 94 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/graphics/graphics/Graphics.MIN_CYCLES_TRANSFER_DATA_LCD_MODE (; 95 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/graphics/graphics.ts:64:4
   (if
    ;;@ core/graphics/graphics.ts:64:8
@@ -6887,7 +7009,7 @@
   )
   (i32.const 249)
  )
- (func $core/interrupts/interrupts/_requestInterrupt (; 95 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/interrupts/interrupts/_requestInterrupt (; 96 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   (local $1 i32)
   ;;@ core/interrupts/interrupts.ts:215:2
   (set_global $core/interrupts/interrupts/Interrupts.interruptsRequestedValue
@@ -6909,7 +7031,7 @@
    (get_local $1)
   )
  )
- (func $core/interrupts/interrupts/requestLcdInterrupt (; 96 ;) (; has Stack IR ;) (type $v)
+ (func $core/interrupts/interrupts/requestLcdInterrupt (; 97 ;) (; has Stack IR ;) (type $v)
   ;;@ core/interrupts/interrupts.ts:236:2
   (set_global $core/interrupts/interrupts/Interrupts.isLcdInterruptRequested
    ;;@ core/interrupts/interrupts.ts:236:39
@@ -6920,7 +7042,7 @@
    (i32.const 1)
   )
  )
- (func $core/sound/sound/Sound.batchProcessCycles (; 97 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/sound/sound/Sound.batchProcessCycles (; 98 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/sound/sound.ts:41:4
   (if
    ;;@ core/sound/sound.ts:41:8
@@ -6931,7 +7053,7 @@
   )
   (i32.const 87)
  )
- (func $core/sound/sound/Sound.maxFrameSequenceCycles (; 98 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/sound/sound/Sound.maxFrameSequenceCycles (; 99 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/sound/sound.ts:92:4
   (if
    ;;@ core/sound/sound.ts:92:8
@@ -6942,7 +7064,7 @@
   )
   (i32.const 8192)
  )
- (func $core/sound/channel1/Channel1.updateLength (; 99 ;) (; has Stack IR ;) (type $v)
+ (func $core/sound/channel1/Channel1.updateLength (; 100 ;) (; has Stack IR ;) (type $v)
   (local $0 i32)
   ;;@ core/sound/channel1.ts:294:8
   (if
@@ -6984,7 +7106,7 @@
    )
   )
  )
- (func $core/sound/channel2/Channel2.updateLength (; 100 ;) (; has Stack IR ;) (type $v)
+ (func $core/sound/channel2/Channel2.updateLength (; 101 ;) (; has Stack IR ;) (type $v)
   (local $0 i32)
   ;;@ core/sound/channel2.ts:232:8
   (if
@@ -7026,7 +7148,7 @@
    )
   )
  )
- (func $core/sound/channel3/Channel3.updateLength (; 101 ;) (; has Stack IR ;) (type $v)
+ (func $core/sound/channel3/Channel3.updateLength (; 102 ;) (; has Stack IR ;) (type $v)
   (local $0 i32)
   ;;@ core/sound/channel3.ts:269:8
   (if
@@ -7068,7 +7190,7 @@
    )
   )
  )
- (func $core/sound/channel4/Channel4.updateLength (; 102 ;) (; has Stack IR ;) (type $v)
+ (func $core/sound/channel4/Channel4.updateLength (; 103 ;) (; has Stack IR ;) (type $v)
   (local $0 i32)
   ;;@ core/sound/channel4.ts:266:8
   (if
@@ -7110,7 +7232,7 @@
    )
   )
  )
- (func $core/sound/channel1/getNewFrequencyFromSweep (; 103 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/sound/channel1/getNewFrequencyFromSweep (; 104 ;) (; has Stack IR ;) (type $i) (result i32)
   (local $0 i32)
   ;;@ core/sound/channel1.ts:375:2
   (set_local $0
@@ -7140,7 +7262,7 @@
    )
   )
  )
- (func $core/sound/channel1/Channel1.setFrequency (; 104 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/sound/channel1/Channel1.setFrequency (; 105 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   ;;@ core/sound/channel1.ts:332:4
@@ -7208,7 +7330,7 @@
    )
   )
  )
- (func $core/sound/channel1/calculateSweepAndCheckOverflow (; 105 ;) (; has Stack IR ;) (type $v)
+ (func $core/sound/channel1/calculateSweepAndCheckOverflow (; 106 ;) (; has Stack IR ;) (type $v)
   (local $0 i32)
   (local $1 i32)
   ;;@ core/sound/channel1.ts:351:6
@@ -7268,7 +7390,7 @@
    )
   )
  )
- (func $core/sound/channel1/Channel1.updateSweep (; 106 ;) (; has Stack IR ;) (type $v)
+ (func $core/sound/channel1/Channel1.updateSweep (; 107 ;) (; has Stack IR ;) (type $v)
   ;;@ core/sound/channel1.ts:278:4
   (set_global $core/sound/channel1/Channel1.sweepCounter
    (i32.sub
@@ -7311,7 +7433,7 @@
    )
   )
  )
- (func $core/sound/channel1/Channel1.updateEnvelope (; 107 ;) (; has Stack IR ;) (type $v)
+ (func $core/sound/channel1/Channel1.updateEnvelope (; 108 ;) (; has Stack IR ;) (type $v)
   (local $0 i32)
   ;;@ core/sound/channel1.ts:307:4
   (set_global $core/sound/channel1/Channel1.envelopeCounter
@@ -7401,7 +7523,7 @@
    )
   )
  )
- (func $core/sound/channel2/Channel2.updateEnvelope (; 108 ;) (; has Stack IR ;) (type $v)
+ (func $core/sound/channel2/Channel2.updateEnvelope (; 109 ;) (; has Stack IR ;) (type $v)
   (local $0 i32)
   ;;@ core/sound/channel2.ts:245:4
   (set_global $core/sound/channel2/Channel2.envelopeCounter
@@ -7491,7 +7613,7 @@
    )
   )
  )
- (func $core/sound/channel4/Channel4.updateEnvelope (; 109 ;) (; has Stack IR ;) (type $v)
+ (func $core/sound/channel4/Channel4.updateEnvelope (; 110 ;) (; has Stack IR ;) (type $v)
   (local $0 i32)
   ;;@ core/sound/channel4.ts:279:4
   (set_global $core/sound/channel4/Channel4.envelopeCounter
@@ -7581,7 +7703,7 @@
    )
   )
  )
- (func $core/sound/sound/updateFrameSequencer (; 110 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/sound/sound/updateFrameSequencer (; 111 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   ;;@ core/sound/sound.ts:262:2
   (set_global $core/sound/sound/Sound.frameSequenceCycleCounter
@@ -7716,7 +7838,7 @@
   )
   (i32.const 0)
  )
- (func $core/sound/channel1/Channel1.willChannelUpdate (; 111 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/sound/channel1/Channel1.willChannelUpdate (; 112 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   ;;@ core/sound/channel1.ts:264:4
   (set_global $core/sound/channel1/Channel1.cycleCounter
    (i32.add
@@ -7742,7 +7864,7 @@
   )
   (i32.const 1)
  )
- (func $core/sound/accumulator/didChannelDacChange (; 112 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/sound/accumulator/didChannelDacChange (; 113 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   ;;@ core/sound/accumulator.ts:107:2
   (block $break|0
@@ -7884,7 +8006,7 @@
   )
   (i32.const 0)
  )
- (func $core/sound/channel2/Channel2.willChannelUpdate (; 113 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/sound/channel2/Channel2.willChannelUpdate (; 114 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   ;;@ core/sound/channel2.ts:221:4
   (set_global $core/sound/channel2/Channel2.cycleCounter
    (i32.add
@@ -7910,7 +8032,7 @@
   )
   (i32.const 1)
  )
- (func $core/sound/channel3/Channel3.willChannelUpdate (; 114 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/sound/channel3/Channel3.willChannelUpdate (; 115 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   ;;@ core/sound/channel3.ts:258:4
   (set_global $core/sound/channel3/Channel3.cycleCounter
    (i32.add
@@ -7948,7 +8070,7 @@
   )
   (i32.const 1)
  )
- (func $core/sound/channel4/Channel4.willChannelUpdate (; 115 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/sound/channel4/Channel4.willChannelUpdate (; 116 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   ;;@ core/sound/channel4.ts:246:4
   (set_global $core/sound/channel4/Channel4.cycleCounter
    (i32.add
@@ -7974,7 +8096,7 @@
   )
   (i32.const 1)
  )
- (func $core/sound/channel1/Channel1.resetTimer (; 116 ;) (; has Stack IR ;) (type $v)
+ (func $core/sound/channel1/Channel1.resetTimer (; 117 ;) (; has Stack IR ;) (type $v)
   ;;@ core/sound/channel1.ts:162:4
   (set_global $core/sound/channel1/Channel1.frequencyTimer
    ;;@ core/sound/channel1.ts:162:30
@@ -8004,7 +8126,7 @@
    )
   )
  )
- (func $core/sound/duty/isDutyCycleClockPositiveOrNegativeForWaveform (; 117 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/sound/duty/isDutyCycleClockPositiveOrNegativeForWaveform (; 118 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (block $case3|0
    (block $case2|0
@@ -8072,7 +8194,7 @@
    (i32.const 1)
   )
  )
- (func $core/sound/channel1/Channel1.getSample (; 118 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/sound/channel1/Channel1.getSample (; 119 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   ;;@ core/sound/channel1.ts:172:4
   (set_global $core/sound/channel1/Channel1.frequencyTimer
@@ -8191,7 +8313,7 @@
    (i32.const 15)
   )
  )
- (func $core/sound/channel1/Channel1.getSampleFromCycleCounter (; 119 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/sound/channel1/Channel1.getSampleFromCycleCounter (; 120 ;) (; has Stack IR ;) (type $i) (result i32)
   (local $0 i32)
   ;;@ core/sound/channel1.ts:155:4
   (set_local $0
@@ -8208,7 +8330,7 @@
    (get_local $0)
   )
  )
- (func $core/sound/channel2/Channel2.resetTimer (; 120 ;) (; has Stack IR ;) (type $v)
+ (func $core/sound/channel2/Channel2.resetTimer (; 121 ;) (; has Stack IR ;) (type $v)
   ;;@ core/sound/channel2.ts:138:4
   (set_global $core/sound/channel2/Channel2.frequencyTimer
    ;;@ core/sound/channel2.ts:138:30
@@ -8238,7 +8360,7 @@
    )
   )
  )
- (func $core/sound/channel2/Channel2.getSample (; 121 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/sound/channel2/Channel2.getSample (; 122 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   ;;@ core/sound/channel2.ts:148:4
   (set_global $core/sound/channel2/Channel2.frequencyTimer
@@ -8357,7 +8479,7 @@
    (i32.const 15)
   )
  )
- (func $core/sound/channel2/Channel2.getSampleFromCycleCounter (; 122 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/sound/channel2/Channel2.getSampleFromCycleCounter (; 123 ;) (; has Stack IR ;) (type $i) (result i32)
   (local $0 i32)
   ;;@ core/sound/channel2.ts:131:4
   (set_local $0
@@ -8374,7 +8496,7 @@
    (get_local $0)
   )
  )
- (func $core/sound/channel3/Channel3.resetTimer (; 123 ;) (; has Stack IR ;) (type $v)
+ (func $core/sound/channel3/Channel3.resetTimer (; 124 ;) (; has Stack IR ;) (type $v)
   ;;@ core/sound/channel3.ts:132:4
   (set_global $core/sound/channel3/Channel3.frequencyTimer
    ;;@ core/sound/channel3.ts:132:30
@@ -8404,10 +8526,10 @@
    )
   )
  )
- (func $core/portable/portable/i32Portable (; 124 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/portable/portable/i32Portable (; 125 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (get_local $0)
  )
- (func $core/sound/channel3/Channel3.getSample (; 125 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/sound/channel3/Channel3.getSample (; 126 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   ;;@ core/sound/channel3.ts:142:4
@@ -8681,7 +8803,7 @@
    (i32.const 15)
   )
  )
- (func $core/sound/channel3/Channel3.getSampleFromCycleCounter (; 126 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/sound/channel3/Channel3.getSampleFromCycleCounter (; 127 ;) (; has Stack IR ;) (type $i) (result i32)
   (local $0 i32)
   ;;@ core/sound/channel3.ts:125:4
   (set_local $0
@@ -8698,7 +8820,7 @@
    (get_local $0)
   )
  )
- (func $core/sound/channel4/Channel4.getNoiseChannelFrequencyPeriod (; 127 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/sound/channel4/Channel4.getNoiseChannelFrequencyPeriod (; 128 ;) (; has Stack IR ;) (type $i) (result i32)
   (local $0 i32)
   ;;@ core/sound/channel4.ts:258:4
   (set_local $0
@@ -8725,7 +8847,7 @@
   )
   (get_local $0)
  )
- (func $core/sound/channel4/Channel4.getSample (; 128 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/sound/channel4/Channel4.getSample (; 129 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   ;;@ core/sound/channel4.ts:155:4
   (set_global $core/sound/channel4/Channel4.frequencyTimer
@@ -8899,7 +9021,7 @@
    (i32.const 15)
   )
  )
- (func $core/sound/channel4/Channel4.getSampleFromCycleCounter (; 129 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/sound/channel4/Channel4.getSampleFromCycleCounter (; 130 ;) (; has Stack IR ;) (type $i) (result i32)
   (local $0 i32)
   ;;@ core/sound/channel4.ts:148:4
   (set_local $0
@@ -8916,7 +9038,7 @@
    (get_local $0)
   )
  )
- (func $core/cpu/cpu/Cpu.CLOCK_SPEED (; 130 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/cpu/cpu/Cpu.CLOCK_SPEED (; 131 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/cpu/cpu.ts:45:4
   (if
    ;;@ core/cpu/cpu.ts:45:8
@@ -8927,11 +9049,11 @@
   )
   (i32.const 4194304)
  )
- (func $core/sound/sound/Sound.maxDownSampleCycles (; 131 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/sound/sound/Sound.maxDownSampleCycles (; 132 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/sound/sound.ts:105:27
   (call $core/cpu/cpu/Cpu.CLOCK_SPEED)
  )
- (func $core/sound/sound/getSampleAsUnsignedByte (; 132 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/sound/sound/getSampleAsUnsignedByte (; 133 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   ;;@ core/sound/sound.ts:422:2
   (if
    ;;@ core/sound/sound.ts:422:6
@@ -8994,7 +9116,7 @@
    )
   )
  )
- (func $core/sound/sound/mixChannelSamples (; 133 ;) (; has Stack IR ;) (type $iiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (result i32)
+ (func $core/sound/sound/mixChannelSamples (; 134 ;) (; has Stack IR ;) (type $iiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (result i32)
   (local $4 i32)
   ;;@ core/sound/sound.ts:345:2
   (set_global $core/sound/accumulator/SoundAccumulator.mixerVolumeChanged
@@ -9165,7 +9287,7 @@
    (get_local $0)
   )
  )
- (func $core/sound/sound/setLeftAndRightOutputForAudioQueue (; 134 ;) (; has Stack IR ;) (type $iiiv) (param $0 i32) (param $1 i32) (param $2 i32)
+ (func $core/sound/sound/setLeftAndRightOutputForAudioQueue (; 135 ;) (; has Stack IR ;) (type $iiiv) (param $0 i32) (param $1 i32) (param $2 i32)
   (local $3 i32)
   ;;@ core/sound/sound.ts:462:2
   (i32.store8
@@ -9205,7 +9327,7 @@
    )
   )
  )
- (func $core/sound/accumulator/accumulateSound (; 135 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/sound/accumulator/accumulateSound (; 136 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -9497,7 +9619,7 @@
    )
   )
  )
- (func $core/helpers/index/splitHighByte (; 136 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/helpers/index/splitHighByte (; 137 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   ;;@ core/helpers/index.ts:13:35
   (i32.shr_s
    ;;@ core/helpers/index.ts:13:9
@@ -9510,14 +9632,14 @@
    (i32.const 8)
   )
  )
- (func $core/helpers/index/splitLowByte (; 137 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/helpers/index/splitLowByte (; 138 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   ;;@ core/helpers/index.ts:17:23
   (i32.and
    (get_local $0)
    (i32.const 255)
   )
  )
- (func $core/sound/sound/calculateSound (; 138 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/sound/sound/calculateSound (; 139 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -9684,7 +9806,7 @@
    )
   )
  )
- (func $core/sound/sound/updateSound (; 139 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/sound/sound/updateSound (; 140 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   (local $1 i32)
   ;;@ core/sound/sound.ts:191:2
   (set_local $1
@@ -9716,7 +9838,7 @@
    )
   )
  )
- (func $core/sound/sound/batchProcessAudio (; 140 ;) (; has Stack IR ;) (type $v)
+ (func $core/sound/sound/batchProcessAudio (; 141 ;) (; has Stack IR ;) (type $v)
   ;;@ core/sound/sound.ts:178:2
   (if
    ;;@ core/sound/sound.ts:178:6
@@ -9755,7 +9877,7 @@
    )
   )
  )
- (func $core/sound/registers/SoundRegisterReadTraps (; 141 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/sound/registers/SoundRegisterReadTraps (; 142 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   ;;@ core/sound/registers.ts:130:2
   (if
@@ -9859,7 +9981,7 @@
   )
   (i32.const -1)
  )
- (func $core/joypad/joypad/getJoypadState (; 142 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/joypad/joypad/getJoypadState (; 143 ;) (; has Stack IR ;) (type $i) (result i32)
   (local $0 i32)
   ;;@ core/joypad/joypad.ts:66:2
   (set_local $0
@@ -10041,7 +10163,7 @@
    (i32.const 240)
   )
  )
- (func $core/memory/readTraps/checkReadTraps (; 143 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/memory/readTraps/checkReadTraps (; 144 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   ;;@ core/memory/readTraps.ts:20:2
   (if
@@ -10380,7 +10502,7 @@
   )
   (i32.const -1)
  )
- (func $core/memory/load/eightBitLoadFromGBMemoryWithTraps (; 144 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/memory/load/eightBitLoadFromGBMemoryWithTraps (; 145 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (if
    (i32.eq
@@ -10408,7 +10530,7 @@
    (i32.const 255)
   )
  )
- (func $core/memory/banking/handleBanking (; 145 ;) (; has Stack IR ;) (type $iiv) (param $0 i32) (param $1 i32)
+ (func $core/memory/banking/handleBanking (; 146 ;) (; has Stack IR ;) (type $iiv) (param $0 i32) (param $1 i32)
   (local $2 i32)
   (local $3 i32)
   ;;@ core/memory/banking.ts:7:2
@@ -10810,7 +10932,7 @@
    )
   )
  )
- (func $core/sound/channel1/Channel1.updateNRx0 (; 146 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/sound/channel1/Channel1.updateNRx0 (; 147 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/sound/channel1.ts:29:4
   (set_global $core/sound/channel1/Channel1.NRx0SweepPeriod
    ;;@ core/sound/channel1.ts:29:31
@@ -10843,7 +10965,7 @@
    )
   )
  )
- (func $core/sound/channel3/Channel3.updateNRx0 (; 147 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/sound/channel3/Channel3.updateNRx0 (; 148 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/sound/channel3.ts:26:4
   (set_global $core/sound/channel3/Channel3.isDacEnabled
    ;;@ core/sound/channel3.ts:26:28
@@ -10854,7 +10976,7 @@
    )
   )
  )
- (func $core/sound/channel1/Channel1.updateNRx1 (; 148 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/sound/channel1/Channel1.updateNRx1 (; 149 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/sound/channel1.ts:40:4
   (set_global $core/sound/channel1/Channel1.NRx1Duty
    ;;@ core/sound/channel1.ts:40:24
@@ -10887,7 +11009,7 @@
    )
   )
  )
- (func $core/sound/channel2/Channel2.updateNRx1 (; 149 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/sound/channel2/Channel2.updateNRx1 (; 150 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/sound/channel2.ts:28:4
   (set_global $core/sound/channel2/Channel2.NRx1Duty
    ;;@ core/sound/channel2.ts:28:24
@@ -10920,7 +11042,7 @@
    )
   )
  )
- (func $core/sound/channel3/Channel3.updateNRx1 (; 150 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/sound/channel3/Channel3.updateNRx1 (; 151 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/sound/channel3.ts:34:4
   (set_global $core/sound/channel3/Channel3.NRx1LengthLoad
    (get_local $0)
@@ -10935,7 +11057,7 @@
    )
   )
  )
- (func $core/sound/channel4/Channel4.updateNRx1 (; 151 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/sound/channel4/Channel4.updateNRx1 (; 152 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/sound/channel4.ts:28:4
   (set_global $core/sound/channel4/Channel4.NRx1LengthLoad
    ;;@ core/sound/channel4.ts:28:30
@@ -10955,7 +11077,7 @@
    )
   )
  )
- (func $core/sound/channel1/Channel1.updateNRx2 (; 152 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/sound/channel1/Channel1.updateNRx2 (; 153 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/sound/channel1.ts:57:4
   (set_global $core/sound/channel1/Channel1.NRx2StartingVolume
    ;;@ core/sound/channel1.ts:57:34
@@ -11001,7 +11123,7 @@
    )
   )
  )
- (func $core/sound/channel2/Channel2.updateNRx2 (; 153 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/sound/channel2/Channel2.updateNRx2 (; 154 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/sound/channel2.ts:45:4
   (set_global $core/sound/channel2/Channel2.NRx2StartingVolume
    ;;@ core/sound/channel2.ts:45:34
@@ -11047,7 +11169,7 @@
    )
   )
  )
- (func $core/sound/channel3/Channel3.updateNRx2 (; 154 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/sound/channel3/Channel3.updateNRx2 (; 155 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/sound/channel3.ts:49:4
   (set_global $core/sound/channel3/Channel3.NRx2VolumeCode
    ;;@ core/sound/channel3.ts:49:30
@@ -11062,7 +11184,7 @@
    )
   )
  )
- (func $core/sound/channel4/Channel4.updateNRx2 (; 155 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/sound/channel4/Channel4.updateNRx2 (; 156 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/sound/channel4.ts:44:4
   (set_global $core/sound/channel4/Channel4.NRx2StartingVolume
    ;;@ core/sound/channel4.ts:44:34
@@ -11108,7 +11230,7 @@
    )
   )
  )
- (func $core/sound/channel1/Channel1.updateNRx3 (; 156 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/sound/channel1/Channel1.updateNRx3 (; 157 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/sound/channel1.ts:70:4
   (set_global $core/sound/channel1/Channel1.NRx3FrequencyLSB
    (get_local $0)
@@ -11128,7 +11250,7 @@
    )
   )
  )
- (func $core/sound/channel2/Channel2.updateNRx3 (; 157 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/sound/channel2/Channel2.updateNRx3 (; 158 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/sound/channel2.ts:58:4
   (set_global $core/sound/channel2/Channel2.NRx3FrequencyLSB
    (get_local $0)
@@ -11148,7 +11270,7 @@
    )
   )
  )
- (func $core/sound/channel3/Channel3.updateNRx3 (; 158 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/sound/channel3/Channel3.updateNRx3 (; 159 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/sound/channel3.ts:57:4
   (set_global $core/sound/channel3/Channel3.NRx3FrequencyLSB
    (get_local $0)
@@ -11168,7 +11290,7 @@
    )
   )
  )
- (func $core/sound/channel4/Channel4.updateNRx3 (; 159 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/sound/channel4/Channel4.updateNRx3 (; 160 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   (local $1 i32)
   ;;@ core/sound/channel4.ts:59:4
   (set_global $core/sound/channel4/Channel4.NRx3ClockShift
@@ -11286,7 +11408,7 @@
    )
   )
  )
- (func $core/sound/channel1/Channel1.updateNRx4 (; 160 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/sound/channel1/Channel1.updateNRx4 (; 161 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/sound/channel1.ts:83:4
   (set_global $core/sound/channel1/Channel1.NRx4LengthEnabled
    ;;@ core/sound/channel1.ts:83:33
@@ -11320,7 +11442,7 @@
    )
   )
  )
- (func $core/sound/channel1/Channel1.trigger (; 161 ;) (; has Stack IR ;) (type $v)
+ (func $core/sound/channel1/Channel1.trigger (; 162 ;) (; has Stack IR ;) (type $v)
   (local $0 i32)
   ;;@ core/sound/channel1.ts:221:4
   (set_global $core/sound/channel1/Channel1.isEnabled
@@ -11418,7 +11540,7 @@
    )
   )
  )
- (func $core/sound/channel2/Channel2.updateNRx4 (; 162 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/sound/channel2/Channel2.updateNRx4 (; 163 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/sound/channel2.ts:71:4
   (set_global $core/sound/channel2/Channel2.NRx4LengthEnabled
    ;;@ core/sound/channel2.ts:71:33
@@ -11452,7 +11574,7 @@
    )
   )
  )
- (func $core/sound/channel2/Channel2.trigger (; 163 ;) (; has Stack IR ;) (type $v)
+ (func $core/sound/channel2/Channel2.trigger (; 164 ;) (; has Stack IR ;) (type $v)
   ;;@ core/sound/channel2.ts:197:4
   (set_global $core/sound/channel2/Channel2.isEnabled
    ;;@ core/sound/channel2.ts:197:25
@@ -11496,7 +11618,7 @@
    )
   )
  )
- (func $core/sound/channel3/Channel3.updateNRx4 (; 164 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/sound/channel3/Channel3.updateNRx4 (; 165 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/sound/channel3.ts:70:4
   (set_global $core/sound/channel3/Channel3.NRx4LengthEnabled
    ;;@ core/sound/channel3.ts:70:33
@@ -11530,7 +11652,7 @@
    )
   )
  )
- (func $core/sound/channel3/Channel3.trigger (; 165 ;) (; has Stack IR ;) (type $v)
+ (func $core/sound/channel3/Channel3.trigger (; 166 ;) (; has Stack IR ;) (type $v)
   ;;@ core/sound/channel3.ts:236:4
   (set_global $core/sound/channel3/Channel3.isEnabled
    ;;@ core/sound/channel3.ts:236:25
@@ -11569,7 +11691,7 @@
    )
   )
  )
- (func $core/sound/channel4/Channel4.updateNRx4 (; 166 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/sound/channel4/Channel4.updateNRx4 (; 167 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/sound/channel4.ts:97:4
   (set_global $core/sound/channel4/Channel4.NRx4LengthEnabled
    ;;@ core/sound/channel4.ts:97:33
@@ -11580,7 +11702,7 @@
    )
   )
  )
- (func $core/sound/channel4/Channel4.trigger (; 167 ;) (; has Stack IR ;) (type $v)
+ (func $core/sound/channel4/Channel4.trigger (; 168 ;) (; has Stack IR ;) (type $v)
   ;;@ core/sound/channel4.ts:221:4
   (set_global $core/sound/channel4/Channel4.isEnabled
    ;;@ core/sound/channel4.ts:221:25
@@ -11632,7 +11754,7 @@
    )
   )
  )
- (func $core/sound/sound/Sound.updateNR50 (; 168 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/sound/sound/Sound.updateNR50 (; 169 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/sound/sound.ts:53:4
   (set_global $core/sound/sound/Sound.NR50LeftMixerVolume
    ;;@ core/sound/sound.ts:53:32
@@ -11656,7 +11778,7 @@
    )
   )
  )
- (func $core/sound/sound/Sound.updateNR51 (; 169 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/sound/sound/Sound.updateNR51 (; 170 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/sound/sound.ts:68:4
   (set_global $core/sound/sound/Sound.NR51IsChannel4EnabledOnLeftOutput
    ;;@ core/sound/sound.ts:68:46
@@ -11730,7 +11852,7 @@
    )
   )
  )
- (func $core/sound/sound/Sound.updateNR52 (; 170 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/sound/sound/Sound.updateNR52 (; 171 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/sound/sound.ts:82:4
   (set_global $core/sound/sound/Sound.NR52IsSoundEnabled
    ;;@ core/sound/sound.ts:82:31
@@ -11741,7 +11863,7 @@
    )
   )
  )
- (func $core/sound/registers/SoundRegisterWriteTraps (; 171 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/sound/registers/SoundRegisterWriteTraps (; 172 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (block $folding-inner0
    ;;@ core/sound/registers.ts:16:6
@@ -12056,36 +12178,36 @@
   ;;@ core/sound/registers.ts:29:13
   (i32.const 1)
  )
- (func $core/graphics/lcd/Lcd.updateLcdStatus (; 172 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
-  ;;@ core/graphics/lcd.ts:34:4
+ (func $core/graphics/lcd/Lcd.updateLcdStatus (; 173 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+  ;;@ core/graphics/lcd.ts:35:4
   (call $core/memory/store/eightBitStoreIntoGBMemory
    (i32.const 65345)
-   ;;@ core/graphics/lcd.ts:32:12
+   ;;@ core/graphics/lcd.ts:33:12
    (call $core/helpers/index/setBitOnByte
-    ;;@ core/graphics/lcd.ts:32:25
+    ;;@ core/graphics/lcd.ts:33:25
     (i32.const 7)
-    ;;@ core/graphics/lcd.ts:29:12
+    ;;@ core/graphics/lcd.ts:30:12
     (i32.or
-     ;;@ core/graphics/lcd.ts:27:33
+     ;;@ core/graphics/lcd.ts:28:33
      (i32.and
       (get_local $0)
-      ;;@ core/graphics/lcd.ts:27:41
+      ;;@ core/graphics/lcd.ts:28:41
       (i32.const 248)
      )
-     ;;@ core/graphics/lcd.ts:28:39
+     ;;@ core/graphics/lcd.ts:29:39
      (i32.and
-      ;;@ core/graphics/lcd.ts:26:32
+      ;;@ core/graphics/lcd.ts:27:32
       (call $core/memory/load/eightBitLoadFromGBMemory
        (i32.const 65345)
       )
-      ;;@ core/graphics/lcd.ts:28:58
+      ;;@ core/graphics/lcd.ts:29:58
       (i32.const 7)
      )
     )
    )
   )
  )
- (func $core/memory/dma/startDmaTransfer (; 173 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/memory/dma/startDmaTransfer (; 174 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   (local $1 i32)
   ;;@ core/memory/dma.ts:27:2
   (set_local $1
@@ -12144,7 +12266,7 @@
    (i32.const 644)
   )
  )
- (func $core/memory/dma/getHdmaSourceFromMemory (; 174 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/memory/dma/getHdmaSourceFromMemory (; 175 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/memory/dma.ts:162:15
   (i32.and
    ;;@ core/memory/dma.ts:158:24
@@ -12164,7 +12286,7 @@
    (i32.const 65520)
   )
  )
- (func $core/memory/dma/getHdmaDestinationFromMemory (; 175 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/memory/dma/getHdmaDestinationFromMemory (; 176 ;) (; has Stack IR ;) (type $i) (result i32)
   (i32.add
    ;;@ core/memory/dma.ts:179:20
    (i32.and
@@ -12187,7 +12309,7 @@
    (i32.const 32768)
   )
  )
- (func $core/memory/dma/startHdmaTransfer (; 176 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/memory/dma/startHdmaTransfer (; 177 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -12333,7 +12455,7 @@
    )
   )
  )
- (func $core/graphics/palette/storePaletteByteInWasmMemory (; 177 ;) (; has Stack IR ;) (type $iiiv) (param $0 i32) (param $1 i32) (param $2 i32)
+ (func $core/graphics/palette/storePaletteByteInWasmMemory (; 178 ;) (; has Stack IR ;) (type $iiiv) (param $0 i32) (param $1 i32) (param $2 i32)
   (local $3 i32)
   ;;@ core/graphics/palette.ts:153:2
   (set_local $3
@@ -12369,7 +12491,7 @@
    (get_local $1)
   )
  )
- (func $core/graphics/palette/incrementPaletteIndexIfSet (; 178 ;) (; has Stack IR ;) (type $iiv) (param $0 i32) (param $1 i32)
+ (func $core/graphics/palette/incrementPaletteIndexIfSet (; 179 ;) (; has Stack IR ;) (type $iiv) (param $0 i32) (param $1 i32)
   ;;@ core/graphics/palette.ts:96:2
   (if
    ;;@ core/graphics/palette.ts:96:6
@@ -12394,7 +12516,7 @@
    )
   )
  )
- (func $core/graphics/palette/writeColorPaletteToMemory (; 179 ;) (; has Stack IR ;) (type $iiv) (param $0 i32) (param $1 i32)
+ (func $core/graphics/palette/writeColorPaletteToMemory (; 180 ;) (; has Stack IR ;) (type $iiv) (param $0 i32) (param $1 i32)
   (local $2 i32)
   (local $3 i32)
   ;;@ core/graphics/palette.ts:72:6
@@ -12472,7 +12594,7 @@
    )
   )
  )
- (func $core/interrupts/interrupts/requestTimerInterrupt (; 180 ;) (; has Stack IR ;) (type $v)
+ (func $core/interrupts/interrupts/requestTimerInterrupt (; 181 ;) (; has Stack IR ;) (type $v)
   ;;@ core/interrupts/interrupts.ts:241:2
   (set_global $core/interrupts/interrupts/Interrupts.isTimerInterruptRequested
    ;;@ core/interrupts/interrupts.ts:241:41
@@ -12483,7 +12605,7 @@
    (i32.const 2)
   )
  )
- (func $core/timers/timers/_getTimerCounterMaskBit (; 181 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/timers/timers/_getTimerCounterMaskBit (; 182 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   ;;@ core/timers/timers.ts:267:2
   (block $break|0
@@ -12541,7 +12663,7 @@
   )
   (i32.const 0)
  )
- (func $core/timers/timers/_checkDividerRegisterFallingEdgeDetector (; 182 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/timers/timers/_checkDividerRegisterFallingEdgeDetector (; 183 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   ;;@ core/timers/timers.ts:256:6
   (if
@@ -12578,7 +12700,7 @@
   )
   (i32.const 0)
  )
- (func $core/timers/timers/_incrementTimerCounter (; 183 ;) (; has Stack IR ;) (type $v)
+ (func $core/timers/timers/_incrementTimerCounter (; 184 ;) (; has Stack IR ;) (type $v)
   ;;@ core/timers/timers.ts:236:2
   (set_global $core/timers/timers/Timers.timerCounter
    (i32.add
@@ -12610,7 +12732,7 @@
    )
   )
  )
- (func $core/timers/timers/updateTimers (; 184 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/timers/timers/updateTimers (; 185 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   (loop $continue|0
@@ -12719,7 +12841,7 @@
    )
   )
  )
- (func $core/timers/timers/batchProcessTimers (; 185 ;) (; has Stack IR ;) (type $v)
+ (func $core/timers/timers/batchProcessTimers (; 186 ;) (; has Stack IR ;) (type $v)
   ;;@ core/timers/timers.ts:199:2
   (call $core/timers/timers/updateTimers
    ;;@ core/timers/timers.ts:199:15
@@ -12731,7 +12853,7 @@
    (i32.const 0)
   )
  )
- (func $core/timers/timers/Timers.updateDividerRegister (; 186 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/timers/timers/Timers.updateDividerRegister (; 187 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/timers/timers.ts:34:4
   (set_local $0
    ;;@ core/timers/timers.ts:34:34
@@ -12767,7 +12889,7 @@
    (call $core/timers/timers/_incrementTimerCounter)
   )
  )
- (func $core/timers/timers/Timers.updateTimerCounter (; 187 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/timers/timers/Timers.updateTimerCounter (; 188 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/timers/timers.ts:54:4
   (if
    ;;@ core/timers/timers.ts:54:8
@@ -12797,7 +12919,7 @@
    (get_local $0)
   )
  )
- (func $core/timers/timers/Timers.updateTimerModulo (; 188 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/timers/timers/Timers.updateTimerModulo (; 189 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/timers/timers.ts:80:4
   (set_global $core/timers/timers/Timers.timerModulo
    (get_local $0)
@@ -12826,7 +12948,7 @@
    )
   )
  )
- (func $core/timers/timers/Timers.updateTimerControl (; 189 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/timers/timers/Timers.updateTimerControl (; 190 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   ;;@ core/timers/timers.ts:106:4
@@ -12920,7 +13042,7 @@
    (get_local $2)
   )
  )
- (func $core/memory/writeTraps/checkWriteTraps (; 190 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/memory/writeTraps/checkWriteTraps (; 191 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (block $folding-inner1
    (block $folding-inner0
@@ -13555,7 +13677,7 @@
   ;;@ core/memory/writeTraps.ts:25:11
   (i32.const 0)
  )
- (func $core/memory/store/eightBitStoreIntoGBMemoryWithTraps (; 191 ;) (; has Stack IR ;) (type $iiv) (param $0 i32) (param $1 i32)
+ (func $core/memory/store/eightBitStoreIntoGBMemoryWithTraps (; 192 ;) (; has Stack IR ;) (type $iiv) (param $0 i32) (param $1 i32)
   ;;@ core/memory/store.ts:11:2
   (if
    ;;@ core/memory/store.ts:11:6
@@ -13570,7 +13692,7 @@
    )
   )
  )
- (func $core/memory/dma/hdmaTransfer (; 192 ;) (; has Stack IR ;) (type $iiiv) (param $0 i32) (param $1 i32) (param $2 i32)
+ (func $core/memory/dma/hdmaTransfer (; 193 ;) (; has Stack IR ;) (type $iiiv) (param $0 i32) (param $1 i32) (param $2 i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
@@ -13672,7 +13794,7 @@
    )
   )
  )
- (func $core/memory/dma/updateHblankHdma (; 193 ;) (; has Stack IR ;) (type $v)
+ (func $core/memory/dma/updateHblankHdma (; 194 ;) (; has Stack IR ;) (type $v)
   (local $0 i32)
   ;;@ core/memory/dma.ts:90:2
   (if
@@ -13776,7 +13898,7 @@
    )
   )
  )
- (func $core/interrupts/interrupts/requestVBlankInterrupt (; 194 ;) (; has Stack IR ;) (type $v)
+ (func $core/interrupts/interrupts/requestVBlankInterrupt (; 195 ;) (; has Stack IR ;) (type $v)
   ;;@ core/interrupts/interrupts.ts:231:2
   (set_global $core/interrupts/interrupts/Interrupts.isVBlankInterruptRequested
    ;;@ core/interrupts/interrupts.ts:231:42
@@ -13787,358 +13909,334 @@
    (i32.const 0)
   )
  )
- (func $core/graphics/lcd/setLcdStatus (; 195 ;) (; has Stack IR ;) (type $v)
-  (local $0 i32)
-  (local $1 i32)
+ (func $core/graphics/lcd/checkCoincidence (; 196 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
-  (local $4 i32)
-  ;;@ core/graphics/lcd.ts:77:2
+  ;;@ core/graphics/lcd.ts:202:2
+  (set_local $3
+   ;;@ core/graphics/lcd.ts:202:32
+   (get_global $core/graphics/lcd/Lcd.coincidenceCompare)
+  )
+  ;;@ core/graphics/lcd.ts:203:6
   (if
-   ;;@ core/graphics/lcd.ts:77:6
    (i32.eqz
-    ;;@ core/graphics/lcd.ts:77:7
-    (get_global $core/graphics/lcd/Lcd.enabled)
+    (tee_local $2
+     (i32.eqz
+      (get_local $0)
+     )
+    )
    )
-   ;;@ core/graphics/lcd.ts:77:20
-   (block
-    ;;@ core/graphics/lcd.ts:79:4
-    (set_global $core/graphics/graphics/Graphics.scanlineCycleCounter
-     ;;@ core/graphics/lcd.ts:79:36
-     (i32.const 0)
+   (set_local $2
+    ;;@ core/graphics/lcd.ts:203:24
+    (i32.eq
+     (get_local $0)
+     ;;@ core/graphics/lcd.ts:203:36
+     (i32.const 1)
     )
-    ;;@ core/graphics/lcd.ts:80:4
-    (set_global $core/graphics/graphics/Graphics.scanlineRegister
-     ;;@ core/graphics/lcd.ts:80:32
-     (i32.const 0)
+   )
+  )
+  ;;@ core/graphics/lcd.ts:203:6
+  (if
+   (get_local $2)
+   (set_local $2
+    ;;@ core/graphics/lcd.ts:203:42
+    (i32.eq
+     (get_global $core/graphics/graphics/Graphics.scanlineRegister)
+     (get_local $3)
     )
-    ;;@ core/graphics/lcd.ts:81:4
-    (call $core/memory/store/eightBitStoreIntoGBMemory
-     (i32.const 65348)
-     ;;@ core/graphics/lcd.ts:81:71
-     (i32.const 0)
-    )
-    ;;@ core/graphics/lcd.ts:87:4
-    (set_local $3
-     ;;@ core/graphics/lcd.ts:87:16
-     (call $core/helpers/index/resetBitOnByte
-      ;;@ core/graphics/lcd.ts:87:31
-      (i32.const 0)
-      ;;@ core/graphics/lcd.ts:86:16
-      (call $core/helpers/index/resetBitOnByte
-       ;;@ core/graphics/lcd.ts:86:31
-       (i32.const 1)
-       ;;@ core/graphics/lcd.ts:85:25
-       (call $core/memory/load/eightBitLoadFromGBMemory
-        (i32.const 65345)
-       )
+   )
+  )
+  ;;@ core/graphics/lcd.ts:203:2
+  (if
+   (get_local $2)
+   ;;@ core/graphics/lcd.ts:205:4
+   (if
+    ;;@ core/graphics/lcd.ts:205:8
+    (call $core/helpers/index/checkBitOnByte
+     ;;@ core/graphics/lcd.ts:205:23
+     (i32.const 6)
+     ;;@ core/graphics/lcd.ts:204:4
+     (tee_local $1
+      ;;@ core/graphics/lcd.ts:204:16
+      (call $core/helpers/index/setBitOnByte
+       ;;@ core/graphics/lcd.ts:204:29
+       (i32.const 2)
+       (get_local $1)
       )
      )
     )
-    ;;@ core/graphics/lcd.ts:88:4
-    (set_global $core/graphics/lcd/Lcd.currentLcdMode
-     ;;@ core/graphics/lcd.ts:88:25
-     (i32.const 0)
+    ;;@ core/graphics/lcd.ts:205:38
+    (call $core/interrupts/interrupts/requestLcdInterrupt)
+   )
+   ;;@ core/graphics/lcd.ts:208:9
+   (set_local $1
+    ;;@ core/graphics/lcd.ts:209:16
+    (call $core/helpers/index/resetBitOnByte
+     ;;@ core/graphics/lcd.ts:209:31
+     (i32.const 2)
+     (get_local $1)
     )
-    ;;@ core/graphics/lcd.ts:91:4
-    (call $core/memory/store/eightBitStoreIntoGBMemory
-     (i32.const 65345)
-     (get_local $3)
-    )
-    ;;@ core/graphics/lcd.ts:92:4
-    (return)
    )
   )
-  ;;@ core/graphics/lcd.ts:97:2
+  (get_local $1)
+ )
+ (func $core/graphics/lcd/setLcdStatus (; 197 ;) (; has Stack IR ;) (type $v)
+  (local $0 i32)
+  (local $1 i32)
+  (local $2 i32)
+  ;;@ core/graphics/lcd.ts:112:2
+  (if
+   ;;@ core/graphics/lcd.ts:112:6
+   (i32.eqz
+    ;;@ core/graphics/lcd.ts:112:7
+    (get_global $core/graphics/lcd/Lcd.enabled)
+   )
+   (return)
+  )
+  ;;@ core/graphics/lcd.ts:118:2
   (set_local $1
-   ;;@ core/graphics/lcd.ts:97:21
+   ;;@ core/graphics/lcd.ts:118:21
    (get_global $core/graphics/lcd/Lcd.currentLcdMode)
   )
-  ;;@ core/graphics/lcd.ts:103:2
+  ;;@ core/graphics/lcd.ts:124:2
   (if
-   ;;@ core/graphics/lcd.ts:103:6
+   ;;@ core/graphics/lcd.ts:124:6
    (i32.ge_s
-    ;;@ core/graphics/lcd.ts:96:2
-    (tee_local $3
-     ;;@ core/graphics/lcd.ts:96:30
+    ;;@ core/graphics/lcd.ts:117:2
+    (tee_local $2
+     ;;@ core/graphics/lcd.ts:117:30
      (get_global $core/graphics/graphics/Graphics.scanlineRegister)
     )
-    ;;@ core/graphics/lcd.ts:103:26
+    ;;@ core/graphics/lcd.ts:124:26
     (i32.const 144)
    )
-   ;;@ core/graphics/lcd.ts:103:31
-   (set_local $2
-    ;;@ core/graphics/lcd.ts:105:17
+   ;;@ core/graphics/lcd.ts:124:31
+   (set_local $0
+    ;;@ core/graphics/lcd.ts:126:17
     (i32.const 1)
    )
-   ;;@ core/graphics/lcd.ts:106:9
+   ;;@ core/graphics/lcd.ts:127:9
    (if
-    ;;@ core/graphics/lcd.ts:107:8
+    ;;@ core/graphics/lcd.ts:128:8
     (i32.ge_s
      (get_global $core/graphics/graphics/Graphics.scanlineCycleCounter)
-     ;;@ core/graphics/lcd.ts:107:50
+     ;;@ core/graphics/lcd.ts:128:50
      (call $core/graphics/graphics/Graphics.MIN_CYCLES_SPRITES_LCD_MODE)
     )
-    ;;@ core/graphics/lcd.ts:107:81
-    (set_local $2
-     ;;@ core/graphics/lcd.ts:109:19
+    ;;@ core/graphics/lcd.ts:128:81
+    (set_local $0
+     ;;@ core/graphics/lcd.ts:130:19
      (i32.const 2)
     )
-    ;;@ core/graphics/lcd.ts:110:11
+    ;;@ core/graphics/lcd.ts:131:11
     (if
-     ;;@ core/graphics/lcd.ts:110:15
+     ;;@ core/graphics/lcd.ts:131:15
      (i32.ge_s
       (get_global $core/graphics/graphics/Graphics.scanlineCycleCounter)
-      ;;@ core/graphics/lcd.ts:110:57
+      ;;@ core/graphics/lcd.ts:131:57
       (call $core/graphics/graphics/Graphics.MIN_CYCLES_TRANSFER_DATA_LCD_MODE)
      )
-     ;;@ core/graphics/lcd.ts:110:94
-     (set_local $2
-      ;;@ core/graphics/lcd.ts:112:19
+     ;;@ core/graphics/lcd.ts:131:94
+     (set_local $0
+      ;;@ core/graphics/lcd.ts:133:19
       (i32.const 3)
      )
     )
    )
   )
-  ;;@ core/graphics/lcd.ts:116:2
+  ;;@ core/graphics/lcd.ts:137:2
   (if
-   ;;@ core/graphics/lcd.ts:116:6
+   ;;@ core/graphics/lcd.ts:137:6
    (i32.ne
     (get_local $1)
-    (get_local $2)
+    (get_local $0)
    )
-   ;;@ core/graphics/lcd.ts:116:30
+   ;;@ core/graphics/lcd.ts:137:30
    (block
-    ;;@ core/graphics/lcd.ts:118:4
-    (set_local $0
-     ;;@ core/graphics/lcd.ts:118:25
+    ;;@ core/graphics/lcd.ts:139:4
+    (set_local $1
+     ;;@ core/graphics/lcd.ts:139:25
      (call $core/memory/load/eightBitLoadFromGBMemory
       (i32.const 65345)
      )
     )
-    ;;@ core/graphics/lcd.ts:121:4
+    ;;@ core/graphics/lcd.ts:142:4
     (set_global $core/graphics/lcd/Lcd.currentLcdMode
-     (get_local $2)
+     (get_local $0)
     )
-    ;;@ core/graphics/lcd.ts:123:4
-    (set_local $1
-     ;;@ core/graphics/lcd.ts:123:42
+    ;;@ core/graphics/lcd.ts:144:4
+    (set_local $2
+     ;;@ core/graphics/lcd.ts:144:42
      (i32.const 0)
     )
-    ;;@ core/graphics/lcd.ts:126:4
+    ;;@ core/graphics/lcd.ts:147:4
     (block $break|0
      (block $case3|0
       (block $case2|0
        (block $case1|0
-        (block $case0|0
-         (set_local $4
-          (get_local $2)
-         )
-         (br_if $case0|0
-          (i32.eqz
-           (get_local $2)
-          )
-         )
-         (block $tablify|0
-          (br_table $case1|0 $case2|0 $case3|0 $tablify|0
-           (i32.sub
-            (get_local $4)
-            (i32.const 1)
+        (if
+         (get_local $0)
+         (block
+          (block $tablify|0
+           (br_table $case1|0 $case2|0 $case3|0 $tablify|0
+            (i32.sub
+             (get_local $0)
+             (i32.const 1)
+            )
            )
           )
+          (br $break|0)
          )
-         (br $break|0)
         )
-        ;;@ core/graphics/lcd.ts:130:8
-        (set_local $1
-         ;;@ core/graphics/lcd.ts:130:33
+        ;;@ core/graphics/lcd.ts:151:8
+        (set_local $2
+         ;;@ core/graphics/lcd.ts:151:33
          (call $core/helpers/index/checkBitOnByte
-          ;;@ core/graphics/lcd.ts:130:48
+          ;;@ core/graphics/lcd.ts:151:48
           (i32.const 3)
-          ;;@ core/graphics/lcd.ts:129:8
-          (tee_local $0
-           ;;@ core/graphics/lcd.ts:129:20
+          ;;@ core/graphics/lcd.ts:150:8
+          (tee_local $1
+           ;;@ core/graphics/lcd.ts:150:20
            (call $core/helpers/index/resetBitOnByte
-            ;;@ core/graphics/lcd.ts:129:35
+            ;;@ core/graphics/lcd.ts:150:35
             (i32.const 1)
-            ;;@ core/graphics/lcd.ts:128:20
+            ;;@ core/graphics/lcd.ts:149:20
             (call $core/helpers/index/resetBitOnByte
-             ;;@ core/graphics/lcd.ts:128:35
+             ;;@ core/graphics/lcd.ts:149:35
              (i32.const 0)
-             (get_local $0)
+             (get_local $1)
             )
            )
           )
          )
         )
-        ;;@ core/graphics/lcd.ts:131:8
+        ;;@ core/graphics/lcd.ts:152:8
         (br $break|0)
        )
-       ;;@ core/graphics/lcd.ts:135:8
-       (set_local $1
-        ;;@ core/graphics/lcd.ts:135:33
+       ;;@ core/graphics/lcd.ts:156:8
+       (set_local $2
+        ;;@ core/graphics/lcd.ts:156:33
         (call $core/helpers/index/checkBitOnByte
-         ;;@ core/graphics/lcd.ts:135:48
+         ;;@ core/graphics/lcd.ts:156:48
          (i32.const 4)
-         ;;@ core/graphics/lcd.ts:134:8
-         (tee_local $0
-          ;;@ core/graphics/lcd.ts:134:20
+         ;;@ core/graphics/lcd.ts:155:8
+         (tee_local $1
+          ;;@ core/graphics/lcd.ts:155:20
           (call $core/helpers/index/setBitOnByte
-           ;;@ core/graphics/lcd.ts:134:33
+           ;;@ core/graphics/lcd.ts:155:33
            (i32.const 0)
-           ;;@ core/graphics/lcd.ts:133:20
+           ;;@ core/graphics/lcd.ts:154:20
            (call $core/helpers/index/resetBitOnByte
-            ;;@ core/graphics/lcd.ts:133:35
+            ;;@ core/graphics/lcd.ts:154:35
             (i32.const 1)
-            (get_local $0)
+            (get_local $1)
            )
           )
          )
         )
        )
-       ;;@ core/graphics/lcd.ts:136:8
+       ;;@ core/graphics/lcd.ts:157:8
        (br $break|0)
       )
-      ;;@ core/graphics/lcd.ts:140:8
-      (set_local $1
-       ;;@ core/graphics/lcd.ts:140:33
+      ;;@ core/graphics/lcd.ts:161:8
+      (set_local $2
+       ;;@ core/graphics/lcd.ts:161:33
        (call $core/helpers/index/checkBitOnByte
-        ;;@ core/graphics/lcd.ts:140:48
+        ;;@ core/graphics/lcd.ts:161:48
         (i32.const 5)
-        ;;@ core/graphics/lcd.ts:139:8
-        (tee_local $0
-         ;;@ core/graphics/lcd.ts:139:20
+        ;;@ core/graphics/lcd.ts:160:8
+        (tee_local $1
+         ;;@ core/graphics/lcd.ts:160:20
          (call $core/helpers/index/setBitOnByte
-          ;;@ core/graphics/lcd.ts:139:33
+          ;;@ core/graphics/lcd.ts:160:33
           (i32.const 1)
-          ;;@ core/graphics/lcd.ts:138:20
+          ;;@ core/graphics/lcd.ts:159:20
           (call $core/helpers/index/resetBitOnByte
-           ;;@ core/graphics/lcd.ts:138:35
+           ;;@ core/graphics/lcd.ts:159:35
            (i32.const 0)
-           (get_local $0)
+           (get_local $1)
           )
          )
         )
        )
       )
-      ;;@ core/graphics/lcd.ts:141:8
+      ;;@ core/graphics/lcd.ts:162:8
       (br $break|0)
      )
-     ;;@ core/graphics/lcd.ts:144:8
-     (set_local $0
-      ;;@ core/graphics/lcd.ts:144:20
+     ;;@ core/graphics/lcd.ts:165:8
+     (set_local $1
+      ;;@ core/graphics/lcd.ts:165:20
       (call $core/helpers/index/setBitOnByte
-       ;;@ core/graphics/lcd.ts:144:33
+       ;;@ core/graphics/lcd.ts:165:33
        (i32.const 1)
-       ;;@ core/graphics/lcd.ts:143:20
+       ;;@ core/graphics/lcd.ts:164:20
        (call $core/helpers/index/setBitOnByte
-        ;;@ core/graphics/lcd.ts:143:33
+        ;;@ core/graphics/lcd.ts:164:33
         (i32.const 0)
-        (get_local $0)
+        (get_local $1)
        )
       )
      )
     )
-    ;;@ core/graphics/lcd.ts:149:4
+    ;;@ core/graphics/lcd.ts:170:4
     (if
-     (get_local $1)
-     ;;@ core/graphics/lcd.ts:149:32
+     (get_local $2)
+     ;;@ core/graphics/lcd.ts:170:32
      (call $core/interrupts/interrupts/requestLcdInterrupt)
     )
-    ;;@ core/graphics/lcd.ts:154:4
+    ;;@ core/graphics/lcd.ts:175:4
     (if
      (i32.eqz
-      (get_local $2)
+      (get_local $0)
      )
-     ;;@ core/graphics/lcd.ts:154:26
+     ;;@ core/graphics/lcd.ts:175:26
      (call $core/memory/dma/updateHblankHdma)
     )
-    ;;@ core/graphics/lcd.ts:160:4
+    ;;@ core/graphics/lcd.ts:181:4
     (if
-     ;;@ core/graphics/lcd.ts:160:8
+     ;;@ core/graphics/lcd.ts:181:8
      (i32.eq
-      (get_local $2)
-      ;;@ core/graphics/lcd.ts:160:23
+      (get_local $0)
+      ;;@ core/graphics/lcd.ts:181:23
       (i32.const 1)
      )
-     ;;@ core/graphics/lcd.ts:160:26
+     ;;@ core/graphics/lcd.ts:181:26
      (call $core/interrupts/interrupts/requestVBlankInterrupt)
     )
-    ;;@ core/graphics/lcd.ts:166:4
-    (set_local $4
-     ;;@ core/graphics/lcd.ts:166:34
-     (get_global $core/graphics/lcd/Lcd.coincidenceCompare)
-    )
-    ;;@ core/graphics/lcd.ts:167:8
-    (if
-     (i32.eqz
-      (tee_local $1
-       (i32.eqz
-        (get_local $2)
-       )
-      )
-     )
-     (set_local $1
-      ;;@ core/graphics/lcd.ts:167:29
-      (i32.eq
-       (get_local $2)
-       ;;@ core/graphics/lcd.ts:167:44
-       (i32.const 1)
-      )
-     )
-    )
-    ;;@ core/graphics/lcd.ts:167:8
-    (if
-     (get_local $1)
-     (set_local $1
-      ;;@ core/graphics/lcd.ts:167:50
-      (i32.eq
-       (get_local $3)
-       (get_local $4)
-      )
-     )
-    )
-    ;;@ core/graphics/lcd.ts:167:4
-    (if
-     (get_local $1)
-     ;;@ core/graphics/lcd.ts:169:6
-     (if
-      ;;@ core/graphics/lcd.ts:169:10
-      (call $core/helpers/index/checkBitOnByte
-       ;;@ core/graphics/lcd.ts:169:25
-       (i32.const 6)
-       ;;@ core/graphics/lcd.ts:168:6
-       (tee_local $0
-        ;;@ core/graphics/lcd.ts:168:18
-        (call $core/helpers/index/setBitOnByte
-         ;;@ core/graphics/lcd.ts:168:31
-         (i32.const 2)
-         (get_local $0)
-        )
-       )
-      )
-      ;;@ core/graphics/lcd.ts:169:40
-      (call $core/interrupts/interrupts/requestLcdInterrupt)
-     )
-     ;;@ core/graphics/lcd.ts:172:11
-     (set_local $0
-      ;;@ core/graphics/lcd.ts:173:18
-      (call $core/helpers/index/resetBitOnByte
-       ;;@ core/graphics/lcd.ts:173:33
-       (i32.const 2)
-       (get_local $0)
-      )
-     )
-    )
-    ;;@ core/graphics/lcd.ts:177:4
+    ;;@ core/graphics/lcd.ts:189:4
     (call $core/memory/store/eightBitStoreIntoGBMemory
      (i32.const 65345)
-     (get_local $0)
+     ;;@ core/graphics/lcd.ts:186:16
+     (call $core/graphics/lcd/checkCoincidence
+      (get_local $0)
+      (get_local $1)
+     )
+    )
+   )
+   ;;@ core/graphics/lcd.ts:190:9
+   (if
+    ;;@ core/graphics/lcd.ts:190:13
+    (i32.eq
+     (get_local $2)
+     ;;@ core/graphics/lcd.ts:190:34
+     (i32.const 153)
+    )
+    ;;@ core/graphics/lcd.ts:195:4
+    (call $core/memory/store/eightBitStoreIntoGBMemory
+     (i32.const 65345)
+     ;;@ core/graphics/lcd.ts:194:16
+     (call $core/graphics/lcd/checkCoincidence
+      (get_local $0)
+      ;;@ core/graphics/lcd.ts:193:25
+      (call $core/memory/load/eightBitLoadFromGBMemory
+       (i32.const 65345)
+      )
+     )
     )
    )
   )
  )
- (func $core/graphics/graphics/updateGraphics (; 196 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/graphics/graphics/updateGraphics (; 198 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   (local $1 i32)
   ;;@ core/graphics/graphics.ts:184:2
   (if
@@ -14252,7 +14350,7 @@
   ;;@ core/graphics/graphics.ts:236:2
   (call $core/graphics/lcd/setLcdStatus)
  )
- (func $core/graphics/graphics/batchProcessGraphics (; 197 ;) (; has Stack IR ;) (type $v)
+ (func $core/graphics/graphics/batchProcessGraphics (; 199 ;) (; has Stack IR ;) (type $v)
   ;;@ core/graphics/graphics.ts:132:2
   (if
    ;;@ core/graphics/graphics.ts:132:6
@@ -14291,10 +14389,10 @@
    )
   )
  )
- (func $core/serial/serial/_getFallingEdgeMaskBit (; 198 ;) (; has Stack IR ;) (type $i) (result i32)
-  ;;@ core/serial/serial.ts:121:2
+ (func $core/serial/serial/_getFallingEdgeMaskBit (; 200 ;) (; has Stack IR ;) (type $i) (result i32)
+  ;;@ core/serial/serial.ts:117:2
   (if
-   ;;@ core/serial/serial.ts:121:6
+   ;;@ core/serial/serial.ts:117:6
    (get_global $core/serial/serial/Serial.isClockSpeedFast)
    (return
     (i32.const 2)
@@ -14302,24 +14400,24 @@
   )
   (i32.const 7)
  )
- (func $core/serial/serial/_checkFallingEdgeDetector (; 199 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/serial/serial/_checkFallingEdgeDetector (; 201 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
-  ;;@ core/serial/serial.ts:110:6
+  ;;@ core/serial/serial.ts:106:6
   (if
    (tee_local $0
     (call $core/helpers/index/checkBitOnByte
-     ;;@ core/serial/serial.ts:106:2
+     ;;@ core/serial/serial.ts:102:2
      (tee_local $2
-      ;;@ core/serial/serial.ts:106:16
+      ;;@ core/serial/serial.ts:102:16
       (call $core/serial/serial/_getFallingEdgeMaskBit)
      )
      (get_local $0)
     )
    )
    (set_local $0
-    ;;@ core/serial/serial.ts:110:44
+    ;;@ core/serial/serial.ts:106:44
     (i32.eqz
-     ;;@ core/serial/serial.ts:110:45
+     ;;@ core/serial/serial.ts:106:45
      (call $core/helpers/index/checkBitOnByte
       (get_local $2)
       (get_local $1)
@@ -14327,7 +14425,7 @@
     )
    )
   )
-  ;;@ core/serial/serial.ts:110:2
+  ;;@ core/serial/serial.ts:106:2
   (if
    (get_local $0)
    (return
@@ -14336,7 +14434,7 @@
   )
   (i32.const 0)
  )
- (func $core/interrupts/interrupts/requestSerialInterrupt (; 200 ;) (; has Stack IR ;) (type $v)
+ (func $core/interrupts/interrupts/requestSerialInterrupt (; 202 ;) (; has Stack IR ;) (type $v)
   ;;@ core/interrupts/interrupts.ts:251:2
   (set_global $core/interrupts/interrupts/Interrupts.isSerialInterruptRequested
    ;;@ core/interrupts/interrupts.ts:251:42
@@ -14347,138 +14445,138 @@
    (i32.const 3)
   )
  )
- (func $core/serial/serial/updateSerial (; 201 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/serial/serial/updateSerial (; 203 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
-  ;;@ core/serial/serial.ts:66:2
+  ;;@ core/serial/serial.ts:63:2
   (if
-   ;;@ core/serial/serial.ts:66:6
+   ;;@ core/serial/serial.ts:63:6
    (i32.eqz
-    ;;@ core/serial/serial.ts:66:7
+    ;;@ core/serial/serial.ts:63:7
     (get_global $core/serial/serial/Serial.transferStartFlag)
    )
    (return)
   )
   (loop $continue|0
    (if
-    ;;@ core/serial/serial.ts:72:9
+    ;;@ core/serial/serial.ts:69:9
     (i32.lt_s
      (get_local $1)
      (get_local $0)
     )
     (block
-     ;;@ core/serial/serial.ts:73:4
+     ;;@ core/serial/serial.ts:70:4
      (set_local $2
-      ;;@ core/serial/serial.ts:73:25
+      ;;@ core/serial/serial.ts:70:25
       (get_global $core/serial/serial/Serial.currentCycles)
      )
-     ;;@ core/serial/serial.ts:74:4
+     ;;@ core/serial/serial.ts:71:4
      (set_local $1
       (i32.add
        (get_local $1)
-       ;;@ core/serial/serial.ts:74:23
+       ;;@ core/serial/serial.ts:71:23
        (i32.const 4)
       )
      )
-     ;;@ core/serial/serial.ts:75:4
+     ;;@ core/serial/serial.ts:72:4
      (set_global $core/serial/serial/Serial.currentCycles
       (i32.add
        (get_global $core/serial/serial/Serial.currentCycles)
-       ;;@ core/serial/serial.ts:75:28
+       ;;@ core/serial/serial.ts:72:28
        (i32.const 4)
       )
      )
-     ;;@ core/serial/serial.ts:77:4
+     ;;@ core/serial/serial.ts:74:4
      (if
-      ;;@ core/serial/serial.ts:77:8
+      ;;@ core/serial/serial.ts:74:8
       (i32.gt_s
        (get_global $core/serial/serial/Serial.currentCycles)
-       ;;@ core/serial/serial.ts:77:31
+       ;;@ core/serial/serial.ts:74:31
        (i32.const 65535)
       )
-      ;;@ core/serial/serial.ts:77:39
+      ;;@ core/serial/serial.ts:74:39
       (set_global $core/serial/serial/Serial.currentCycles
        (i32.sub
-        ;;@ core/serial/serial.ts:78:6
+        ;;@ core/serial/serial.ts:75:6
         (get_global $core/serial/serial/Serial.currentCycles)
-        ;;@ core/serial/serial.ts:78:30
+        ;;@ core/serial/serial.ts:75:30
         (i32.const 65536)
        )
       )
      )
-     ;;@ core/serial/serial.ts:81:4
+     ;;@ core/serial/serial.ts:78:4
      (if
-      ;;@ core/serial/serial.ts:81:8
+      ;;@ core/serial/serial.ts:78:8
       (call $core/serial/serial/_checkFallingEdgeDetector
        (get_local $2)
-       ;;@ core/serial/serial.ts:81:45
+       ;;@ core/serial/serial.ts:78:45
        (get_global $core/serial/serial/Serial.currentCycles)
       )
-      ;;@ core/serial/serial.ts:81:68
+      ;;@ core/serial/serial.ts:78:68
       (block
-       ;;@ core/serial/serial.ts:88:6
+       ;;@ core/serial/serial.ts:84:6
        (call $core/memory/store/eightBitStoreIntoGBMemory
         (i32.const 65281)
-        ;;@ core/serial/serial.ts:87:21
+        ;;@ core/serial/serial.ts:83:21
         (i32.and
-         ;;@ core/serial/serial.ts:86:21
+         ;;@ core/serial/serial.ts:82:21
          (i32.add
           (i32.shl
-           ;;@ core/serial/serial.ts:85:30
+           ;;@ core/serial/serial.ts:81:30
            (call $core/memory/load/eightBitLoadFromGBMemory
             (i32.const 65281)
            )
-           ;;@ core/serial/serial.ts:86:38
+           ;;@ core/serial/serial.ts:82:38
            (i32.const 1)
           )
-          ;;@ core/serial/serial.ts:86:43
+          ;;@ core/serial/serial.ts:82:43
           (i32.const 1)
          )
-         ;;@ core/serial/serial.ts:87:36
+         ;;@ core/serial/serial.ts:83:36
          (i32.const 255)
         )
        )
-       ;;@ core/serial/serial.ts:89:6
+       ;;@ core/serial/serial.ts:85:6
        (set_global $core/serial/serial/Serial.numberOfBitsTransferred
         (i32.add
          (get_global $core/serial/serial/Serial.numberOfBitsTransferred)
-         ;;@ core/serial/serial.ts:89:40
+         ;;@ core/serial/serial.ts:85:40
          (i32.const 1)
         )
        )
-       ;;@ core/serial/serial.ts:91:6
+       ;;@ core/serial/serial.ts:87:6
        (if
-        ;;@ core/serial/serial.ts:91:10
+        ;;@ core/serial/serial.ts:87:10
         (i32.eq
          (get_global $core/serial/serial/Serial.numberOfBitsTransferred)
-         ;;@ core/serial/serial.ts:91:45
+         ;;@ core/serial/serial.ts:87:45
          (i32.const 8)
         )
-        ;;@ core/serial/serial.ts:91:48
+        ;;@ core/serial/serial.ts:87:48
         (block
-         ;;@ core/serial/serial.ts:92:8
+         ;;@ core/serial/serial.ts:88:8
          (set_global $core/serial/serial/Serial.numberOfBitsTransferred
-          ;;@ core/serial/serial.ts:92:41
+          ;;@ core/serial/serial.ts:88:41
           (i32.const 0)
          )
-         ;;@ core/serial/serial.ts:93:8
+         ;;@ core/serial/serial.ts:89:8
          (call $core/interrupts/interrupts/requestSerialInterrupt)
-         ;;@ core/serial/serial.ts:97:8
+         ;;@ core/serial/serial.ts:93:8
          (call $core/memory/store/eightBitStoreIntoGBMemory
           (i32.const 65282)
-          ;;@ core/serial/serial.ts:97:78
+          ;;@ core/serial/serial.ts:93:78
           (call $core/helpers/index/resetBitOnByte
-           ;;@ core/serial/serial.ts:97:93
+           ;;@ core/serial/serial.ts:93:93
            (i32.const 7)
-           ;;@ core/serial/serial.ts:96:30
+           ;;@ core/serial/serial.ts:92:30
            (call $core/memory/load/eightBitLoadFromGBMemory
             (i32.const 65282)
            )
           )
          )
-         ;;@ core/serial/serial.ts:98:8
+         ;;@ core/serial/serial.ts:94:8
          (set_global $core/serial/serial/Serial.transferStartFlag
-          ;;@ core/serial/serial.ts:98:35
+          ;;@ core/serial/serial.ts:94:35
           (i32.const 0)
          )
         )
@@ -14490,7 +14588,7 @@
    )
   )
  )
- (func $core/cycles/trackCyclesRan (; 202 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/cycles/trackCyclesRan (; 204 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/cycles.ts:35:2
   (set_global $core/cycles/Cycles.cycles
    (i32.add
@@ -14527,7 +14625,7 @@
    )
   )
  )
- (func $core/cycles/syncCycles (; 203 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/cycles/syncCycles (; 205 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/cycles.ts:51:2
   (if
    ;;@ core/cycles.ts:51:6
@@ -14639,7 +14737,7 @@
    (get_local $0)
   )
  )
- (func $core/cpu/opcodes/getDataByteTwo (; 204 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/cpu/opcodes/getDataByteTwo (; 206 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/cpu/opcodes.ts:164:2
   (call $core/cycles/syncCycles
    ;;@ core/cpu/opcodes.ts:164:13
@@ -14658,7 +14756,7 @@
    )
   )
  )
- (func $core/cpu/opcodes/getDataByteOne (; 205 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/cpu/opcodes/getDataByteOne (; 207 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/cpu/opcodes.ts:159:2
   (call $core/cycles/syncCycles
    ;;@ core/cpu/opcodes.ts:159:13
@@ -14670,7 +14768,7 @@
    (get_global $core/cpu/cpu/Cpu.programCounter)
   )
  )
- (func $core/cpu/opcodes/getConcatenatedDataByte (; 206 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/cpu/opcodes/getConcatenatedDataByte (; 208 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/cpu/opcodes.ts:170:65
   (call $core/helpers/index/concatenateBytes
    ;;@ core/cpu/opcodes.ts:170:31
@@ -14685,7 +14783,7 @@
    )
   )
  )
- (func $core/cpu/opcodes/eightBitStoreSyncCycles (; 207 ;) (; has Stack IR ;) (type $iiv) (param $0 i32) (param $1 i32)
+ (func $core/cpu/opcodes/eightBitStoreSyncCycles (; 209 ;) (; has Stack IR ;) (type $iiv) (param $0 i32) (param $1 i32)
   ;;@ core/cpu/opcodes.ts:142:2
   (call $core/cycles/syncCycles
    ;;@ core/cpu/opcodes.ts:142:13
@@ -14697,7 +14795,7 @@
    (get_local $1)
   )
  )
- (func $core/cpu/flags/setFlagBit (; 208 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/cpu/flags/setFlagBit (; 210 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   ;;@ core/cpu/flags.ts:6:2
   (set_local $2
@@ -14745,7 +14843,7 @@
   ;;@ core/cpu/flags.ts:15:13
   (get_global $core/cpu/cpu/Cpu.registerF)
  )
- (func $core/cpu/flags/setHalfCarryFlag (; 209 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/cpu/flags/setHalfCarryFlag (; 211 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/cpu/flags.ts:28:2
   (drop
    (call $core/cpu/flags/setFlagBit
@@ -14755,7 +14853,7 @@
    )
   )
  )
- (func $core/cpu/flags/checkAndSetEightBitHalfCarryFlag (; 210 ;) (; has Stack IR ;) (type $iiv) (param $0 i32) (param $1 i32)
+ (func $core/cpu/flags/checkAndSetEightBitHalfCarryFlag (; 212 ;) (; has Stack IR ;) (type $iiv) (param $0 i32) (param $1 i32)
   ;;@ core/cpu/flags.ts:55:2
   (if
    ;;@ core/cpu/flags.ts:55:6
@@ -14838,7 +14936,7 @@
    )
   )
  )
- (func $core/cpu/flags/setZeroFlag (; 211 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/cpu/flags/setZeroFlag (; 213 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/cpu/flags.ts:20:2
   (drop
    (call $core/cpu/flags/setFlagBit
@@ -14848,7 +14946,7 @@
    )
   )
  )
- (func $core/cpu/flags/setSubtractFlag (; 212 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/cpu/flags/setSubtractFlag (; 214 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/cpu/flags.ts:24:2
   (drop
    (call $core/cpu/flags/setFlagBit
@@ -14858,7 +14956,7 @@
    )
   )
  )
- (func $core/cpu/flags/setCarryFlag (; 213 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/cpu/flags/setCarryFlag (; 215 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/cpu/flags.ts:32:2
   (drop
    (call $core/cpu/flags/setFlagBit
@@ -14868,7 +14966,7 @@
    )
   )
  )
- (func $core/helpers/index/rotateByteLeft (; 214 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/helpers/index/rotateByteLeft (; 216 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   ;;@ core/helpers/index.ts:25:47
   (call $core/helpers/index/splitLowByte
    ;;@ core/helpers/index.ts:25:20
@@ -14890,7 +14988,7 @@
    )
   )
  )
- (func $core/memory/store/sixteenBitStoreIntoGBMemoryWithTraps (; 215 ;) (; has Stack IR ;) (type $iiv) (param $0 i32) (param $1 i32)
+ (func $core/memory/store/sixteenBitStoreIntoGBMemoryWithTraps (; 217 ;) (; has Stack IR ;) (type $iiv) (param $0 i32) (param $1 i32)
   (local $2 i32)
   (local $3 i32)
   ;;@ core/memory/store.ts:19:2
@@ -14942,7 +15040,7 @@
    )
   )
  )
- (func $core/cpu/opcodes/sixteenBitStoreSyncCycles (; 216 ;) (; has Stack IR ;) (type $iiv) (param $0 i32) (param $1 i32)
+ (func $core/cpu/opcodes/sixteenBitStoreSyncCycles (; 218 ;) (; has Stack IR ;) (type $iiv) (param $0 i32) (param $1 i32)
   ;;@ core/cpu/opcodes.ts:153:2
   (call $core/cycles/syncCycles
    ;;@ core/cpu/opcodes.ts:153:13
@@ -14954,7 +15052,7 @@
    (get_local $1)
   )
  )
- (func $core/cpu/flags/checkAndSetSixteenBitFlagsAddOverflow (; 217 ;) (; has Stack IR ;) (type $iiiv) (param $0 i32) (param $1 i32) (param $2 i32)
+ (func $core/cpu/flags/checkAndSetSixteenBitFlagsAddOverflow (; 219 ;) (; has Stack IR ;) (type $iiiv) (param $0 i32) (param $1 i32) (param $2 i32)
   ;;@ core/cpu/flags.ts:96:2
   (if
    (i32.and
@@ -15092,7 +15190,7 @@
    )
   )
  )
- (func $core/cpu/opcodes/eightBitLoadSyncCycles (; 218 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/eightBitLoadSyncCycles (; 220 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   ;;@ core/cpu/opcodes.ts:137:2
   (call $core/cycles/syncCycles
    ;;@ core/cpu/opcodes.ts:137:13
@@ -15103,7 +15201,7 @@
    (get_local $0)
   )
  )
- (func $core/helpers/index/rotateByteRight (; 219 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/helpers/index/rotateByteRight (; 221 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   ;;@ core/helpers/index.ts:38:47
   (call $core/helpers/index/splitLowByte
    ;;@ core/helpers/index.ts:38:20
@@ -15125,7 +15223,7 @@
    )
   )
  )
- (func $core/cpu/opcodes/handleOpcode0x (; 220 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcode0x (; 222 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (block $folding-inner4
    (block $folding-inner3
@@ -15191,7 +15289,7 @@
                         (i32.const 255)
                        )
                       )
-                      (br $folding-inner2)
+                      (br $folding-inner1)
                      )
                      ;;@ core/cpu/opcodes.ts:198:6
                      (call $core/cpu/opcodes/eightBitStoreSyncCycles
@@ -15358,7 +15456,7 @@
                   (get_global $core/cpu/cpu/Cpu.registerA)
                  )
                 )
-                (br $folding-inner1)
+                (br $folding-inner2)
                )
                ;;@ core/cpu/opcodes.ts:266:6
                (call $core/cpu/opcodes/sixteenBitStoreSyncCycles
@@ -15370,7 +15468,7 @@
                 ;;@ core/cpu/opcodes.ts:266:59
                 (get_global $core/cpu/cpu/Cpu.stackPointer)
                )
-               (br $folding-inner2)
+               (br $folding-inner1)
               )
               ;;@ core/cpu/opcodes.ts:276:6
               (call $core/cpu/flags/checkAndSetSixteenBitFlagsAddOverflow
@@ -15612,7 +15710,7 @@
           (get_global $core/cpu/cpu/Cpu.registerA)
          )
         )
-        (br $folding-inner1)
+        (br $folding-inner2)
        )
        (return
         (i32.const -1)
@@ -15633,34 +15731,34 @@
        (i32.const 8)
       )
      )
-     ;;@ core/cpu/opcodes.ts:256:6
-     (call $core/cpu/flags/setZeroFlag
-      ;;@ core/cpu/opcodes.ts:256:18
-      (i32.const 0)
-     )
-     ;;@ core/cpu/opcodes.ts:257:6
-     (call $core/cpu/flags/setSubtractFlag
-      ;;@ core/cpu/opcodes.ts:257:22
-      (i32.const 0)
-     )
-     ;;@ core/cpu/opcodes.ts:258:6
-     (call $core/cpu/flags/setHalfCarryFlag
-      ;;@ core/cpu/opcodes.ts:258:23
-      (i32.const 0)
+     ;;@ core/cpu/opcodes.ts:189:6
+     (set_global $core/cpu/cpu/Cpu.programCounter
+      ;;@ core/cpu/opcodes.ts:189:27
+      (call $core/portable/portable/u16Portable
+       ;;@ core/cpu/opcodes.ts:189:39
+       (i32.add
+        (get_global $core/cpu/cpu/Cpu.programCounter)
+        ;;@ core/cpu/opcodes.ts:189:60
+        (i32.const 2)
+       )
+      )
      )
      (br $folding-inner4)
     )
-    ;;@ core/cpu/opcodes.ts:189:6
-    (set_global $core/cpu/cpu/Cpu.programCounter
-     ;;@ core/cpu/opcodes.ts:189:27
-     (call $core/portable/portable/u16Portable
-      ;;@ core/cpu/opcodes.ts:189:39
-      (i32.add
-       (get_global $core/cpu/cpu/Cpu.programCounter)
-       ;;@ core/cpu/opcodes.ts:189:60
-       (i32.const 2)
-      )
-     )
+    ;;@ core/cpu/opcodes.ts:256:6
+    (call $core/cpu/flags/setZeroFlag
+     ;;@ core/cpu/opcodes.ts:256:18
+     (i32.const 0)
+    )
+    ;;@ core/cpu/opcodes.ts:257:6
+    (call $core/cpu/flags/setSubtractFlag
+     ;;@ core/cpu/opcodes.ts:257:22
+     (i32.const 0)
+    )
+    ;;@ core/cpu/opcodes.ts:258:6
+    (call $core/cpu/flags/setHalfCarryFlag
+     ;;@ core/cpu/opcodes.ts:258:23
+     (i32.const 0)
     )
     (br $folding-inner4)
    )
@@ -15680,7 +15778,7 @@
   ;;@ core/cpu/opcodes.ts:179:13
   (i32.const 4)
  )
- (func $core/cpu/flags/getCarryFlag (; 221 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/cpu/flags/getCarryFlag (; 223 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/cpu/flags.ts:49:32
   (i32.and
    ;;@ core/cpu/flags.ts:49:9
@@ -15694,7 +15792,7 @@
    (i32.const 1)
   )
  )
- (func $core/helpers/index/rotateByteLeftThroughCarry (; 222 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/helpers/index/rotateByteLeftThroughCarry (; 224 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   ;;@ core/helpers/index.ts:31:49
   (call $core/helpers/index/splitLowByte
    ;;@ core/helpers/index.ts:31:20
@@ -15709,7 +15807,7 @@
    )
   )
  )
- (func $core/portable/portable/i8Portable (; 223 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/portable/portable/i8Portable (; 225 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   ;;@ core/portable/portable.ts:19:2
   (if
@@ -15752,7 +15850,7 @@
   )
   (get_local $1)
  )
- (func $core/cpu/instructions/relativeJump (; 224 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/cpu/instructions/relativeJump (; 226 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   (local $1 i32)
   ;;@ core/cpu/instructions.ts:425:2
   (set_local $1
@@ -15791,7 +15889,7 @@
    )
   )
  )
- (func $core/helpers/index/rotateByteRightThroughCarry (; 225 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/helpers/index/rotateByteRightThroughCarry (; 227 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   ;;@ core/helpers/index.ts:44:56
   (call $core/helpers/index/splitLowByte
    ;;@ core/helpers/index.ts:44:20
@@ -15814,7 +15912,7 @@
    )
   )
  )
- (func $core/cpu/opcodes/handleOpcode1x (; 226 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcode1x (; 228 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (block $folding-inner3
    (block $folding-inner2
@@ -16474,7 +16572,7 @@
   ;;@ core/cpu/opcodes.ts:403:13
   (i32.const 4)
  )
- (func $core/cpu/flags/getZeroFlag (; 227 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/cpu/flags/getZeroFlag (; 229 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/cpu/flags.ts:37:32
   (i32.and
    ;;@ core/cpu/flags.ts:37:9
@@ -16488,7 +16586,7 @@
    (i32.const 1)
   )
  )
- (func $core/cpu/flags/getHalfCarryFlag (; 228 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/cpu/flags/getHalfCarryFlag (; 230 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/cpu/flags.ts:45:32
   (i32.and
    ;;@ core/cpu/flags.ts:45:9
@@ -16502,7 +16600,7 @@
    (i32.const 1)
   )
  )
- (func $core/cpu/flags/getSubtractFlag (; 229 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/cpu/flags/getSubtractFlag (; 231 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/cpu/flags.ts:41:32
   (i32.and
    ;;@ core/cpu/flags.ts:41:9
@@ -16516,7 +16614,7 @@
    (i32.const 1)
   )
  )
- (func $core/cpu/opcodes/handleOpcode2x (; 230 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcode2x (; 232 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (block $folding-inner1
    (block $folding-inner0
@@ -17279,7 +17377,7 @@
   ;;@ core/cpu/opcodes.ts:596:13
   (i32.const 4)
  )
- (func $core/cpu/opcodes/handleOpcode3x (; 231 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcode3x (; 233 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (block $folding-inner3
    (block $folding-inner2
@@ -17387,7 +17485,7 @@
                      ;;@ core/cpu/opcodes.ts:800:43
                      (get_global $core/cpu/cpu/Cpu.registerA)
                     )
-                    (br $folding-inner0)
+                    (br $folding-inner1)
                    )
                    ;;@ core/cpu/opcodes.ts:808:6
                    (set_global $core/cpu/cpu/Cpu.stackPointer
@@ -17459,7 +17557,7 @@
                    ;;@ core/cpu/opcodes.ts:829:22
                    (i32.const 0)
                   )
-                  (br $folding-inner1)
+                  (br $folding-inner0)
                  )
                  ;;@ core/cpu/opcodes.ts:842:6
                  (call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
@@ -17516,7 +17614,7 @@
                   ;;@ core/cpu/opcodes.ts:849:22
                   (i32.const 1)
                  )
-                 (br $folding-inner1)
+                 (br $folding-inner0)
                 )
                 ;;@ core/cpu/opcodes.ts:857:6
                 (call $core/cpu/opcodes/eightBitStoreSyncCycles
@@ -17668,7 +17766,7 @@
               (i32.const 255)
              )
             )
-            (br $folding-inner0)
+            (br $folding-inner1)
            )
            ;;@ core/cpu/opcodes.ts:904:6
            (set_global $core/cpu/cpu/Cpu.stackPointer
@@ -17814,47 +17912,47 @@
        (i32.const -1)
       )
      )
-     ;;@ core/cpu/opcodes.ts:802:6
-     (set_global $core/cpu/cpu/Cpu.registerH
+     ;;@ core/cpu/opcodes.ts:831:6
+     (call $core/cpu/opcodes/eightBitStoreSyncCycles
+      ;;@ core/cpu/opcodes.ts:831:30
       (i32.and
-       ;;@ core/cpu/opcodes.ts:802:22
-       (call $core/helpers/index/splitHighByte
-        ;;@ core/cpu/opcodes.ts:801:6
-        (tee_local $0
-         ;;@ core/cpu/opcodes.ts:801:20
-         (call $core/portable/portable/u16Portable
-          ;;@ core/cpu/opcodes.ts:801:32
-          (i32.sub
-           (get_local $0)
-           ;;@ core/cpu/opcodes.ts:801:46
-           (i32.const 1)
-          )
-         )
-        )
-       )
-       (i32.const 255)
+       (get_local $0)
+       (i32.const 65535)
       )
-     )
-     ;;@ core/cpu/opcodes.ts:803:6
-     (set_global $core/cpu/cpu/Cpu.registerL
-      (i32.and
-       ;;@ core/cpu/opcodes.ts:803:22
-       (call $core/helpers/index/splitLowByte
-        (get_local $0)
-       )
-       (i32.const 255)
-      )
+      (get_local $1)
      )
      (br $folding-inner3)
     )
-    ;;@ core/cpu/opcodes.ts:831:6
-    (call $core/cpu/opcodes/eightBitStoreSyncCycles
-     ;;@ core/cpu/opcodes.ts:831:30
+    ;;@ core/cpu/opcodes.ts:802:6
+    (set_global $core/cpu/cpu/Cpu.registerH
      (i32.and
-      (get_local $0)
-      (i32.const 65535)
+      ;;@ core/cpu/opcodes.ts:802:22
+      (call $core/helpers/index/splitHighByte
+       ;;@ core/cpu/opcodes.ts:801:6
+       (tee_local $0
+        ;;@ core/cpu/opcodes.ts:801:20
+        (call $core/portable/portable/u16Portable
+         ;;@ core/cpu/opcodes.ts:801:32
+         (i32.sub
+          (get_local $0)
+          ;;@ core/cpu/opcodes.ts:801:46
+          (i32.const 1)
+         )
+        )
+       )
+      )
+      (i32.const 255)
      )
-     (get_local $1)
+    )
+    ;;@ core/cpu/opcodes.ts:803:6
+    (set_global $core/cpu/cpu/Cpu.registerL
+     (i32.and
+      ;;@ core/cpu/opcodes.ts:803:22
+      (call $core/helpers/index/splitLowByte
+       (get_local $0)
+      )
+      (i32.const 255)
+     )
     )
     (br $folding-inner3)
    )
@@ -17874,7 +17972,7 @@
   ;;@ core/cpu/opcodes.ts:794:13
   (i32.const 4)
  )
- (func $core/cpu/opcodes/handleOpcode4x (; 232 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcode4x (; 234 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (block $folding-inner0
    (block $break|0
@@ -18051,7 +18149,7 @@
   ;;@ core/cpu/opcodes.ts:961:13
   (i32.const 4)
  )
- (func $core/cpu/opcodes/handleOpcode5x (; 233 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcode5x (; 235 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (block $folding-inner0
    (block $break|0
@@ -18228,7 +18326,7 @@
   ;;@ core/cpu/opcodes.ts:1049:13
   (i32.const 4)
  )
- (func $core/cpu/opcodes/handleOpcode6x (; 234 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcode6x (; 236 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (block $folding-inner0
    (block $break|0
@@ -18405,7 +18503,7 @@
   ;;@ core/cpu/opcodes.ts:1137:13
   (i32.const 4)
  )
- (func $core/cpu/cpu/Cpu.enableHalt (; 235 ;) (; has Stack IR ;) (type $v)
+ (func $core/cpu/cpu/Cpu.enableHalt (; 237 ;) (; has Stack IR ;) (type $v)
   ;;@ core/cpu/cpu.ts:75:4
   (if
    ;;@ core/cpu/cpu.ts:75:8
@@ -18452,7 +18550,7 @@
    (i32.const 1)
   )
  )
- (func $core/cpu/opcodes/handleOpcode7x (; 236 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcode7x (; 238 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (block $folding-inner0
    (block $break|0
@@ -18677,7 +18775,7 @@
   ;;@ core/cpu/opcodes.ts:1226:13
   (i32.const 4)
  )
- (func $core/cpu/flags/checkAndSetEightBitCarryFlag (; 237 ;) (; has Stack IR ;) (type $iiv) (param $0 i32) (param $1 i32)
+ (func $core/cpu/flags/checkAndSetEightBitCarryFlag (; 239 ;) (; has Stack IR ;) (type $iiv) (param $0 i32) (param $1 i32)
   ;;@ core/cpu/flags.ts:75:2
   (if
    ;;@ core/cpu/flags.ts:75:6
@@ -18748,7 +18846,7 @@
    )
   )
  )
- (func $core/cpu/instructions/addARegister (; 238 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/cpu/instructions/addARegister (; 240 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   (local $1 i32)
   ;;@ core/cpu/instructions.ts:31:2
   (call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
@@ -18800,7 +18898,7 @@
    (i32.const 0)
   )
  )
- (func $core/cpu/instructions/addAThroughCarryRegister (; 239 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/cpu/instructions/addAThroughCarryRegister (; 241 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   (local $1 i32)
   ;;@ core/cpu/instructions.ts:46:2
   (set_local $1
@@ -18909,7 +19007,7 @@
    (i32.const 0)
   )
  )
- (func $core/cpu/opcodes/handleOpcode8x (; 240 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcode8x (; 242 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (block $folding-inner0
    (block $break|0
@@ -19083,7 +19181,7 @@
   ;;@ core/cpu/opcodes.ts:1329:13
   (i32.const 4)
  )
- (func $core/cpu/instructions/subARegister (; 241 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/cpu/instructions/subARegister (; 243 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   (local $1 i32)
   ;;@ core/cpu/instructions.ts:74:2
   (call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
@@ -19141,7 +19239,7 @@
    (i32.const 1)
   )
  )
- (func $core/cpu/instructions/subAThroughCarryRegister (; 242 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/cpu/instructions/subAThroughCarryRegister (; 244 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   (local $1 i32)
   ;;@ core/cpu/instructions.ts:89:2
   (set_local $1
@@ -19250,7 +19348,7 @@
    (i32.const 1)
   )
  )
- (func $core/cpu/opcodes/handleOpcode9x (; 243 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcode9x (; 245 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (block $folding-inner0
    (block $break|0
@@ -19424,7 +19522,7 @@
   ;;@ core/cpu/opcodes.ts:1435:13
   (i32.const 4)
  )
- (func $core/cpu/instructions/andARegister (; 244 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/cpu/instructions/andARegister (; 246 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/cpu/instructions.ts:115:2
   (set_global $core/cpu/cpu/Cpu.registerA
    ;;@ core/cpu/instructions.ts:115:18
@@ -19464,7 +19562,7 @@
    (i32.const 0)
   )
  )
- (func $core/cpu/instructions/xorARegister (; 245 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/cpu/instructions/xorARegister (; 247 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/cpu/instructions.ts:127:2
   (set_global $core/cpu/cpu/Cpu.registerA
    ;;@ core/cpu/instructions.ts:127:18
@@ -19507,7 +19605,7 @@
    (i32.const 0)
   )
  )
- (func $core/cpu/opcodes/handleOpcodeAx (; 246 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcodeAx (; 248 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (block $folding-inner0
    (block $break|0
@@ -19681,7 +19779,7 @@
   ;;@ core/cpu/opcodes.ts:1541:13
   (i32.const 4)
  )
- (func $core/cpu/instructions/orARegister (; 247 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/cpu/instructions/orARegister (; 249 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/cpu/instructions.ts:139:2
   (set_global $core/cpu/cpu/Cpu.registerA
    (i32.and
@@ -19724,7 +19822,7 @@
    (i32.const 0)
   )
  )
- (func $core/cpu/instructions/cpARegister (; 248 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/cpu/instructions/cpARegister (; 250 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   (local $1 i32)
   ;;@ core/cpu/instructions.ts:157:2
   (call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
@@ -19774,7 +19872,7 @@
    (i32.const 1)
   )
  )
- (func $core/cpu/opcodes/handleOpcodeBx (; 249 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcodeBx (; 251 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (block $folding-inner0
    (block $break|0
@@ -19948,7 +20046,7 @@
   ;;@ core/cpu/opcodes.ts:1648:13
   (i32.const 4)
  )
- (func $core/memory/load/sixteenBitLoadFromGBMemory (; 250 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/memory/load/sixteenBitLoadFromGBMemory (; 252 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   ;;@ core/memory/load.ts:25:2
@@ -20016,7 +20114,7 @@
    (get_local $1)
   )
  )
- (func $core/cpu/opcodes/sixteenBitLoadSyncCycles (; 251 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/sixteenBitLoadSyncCycles (; 253 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   ;;@ core/cpu/opcodes.ts:147:2
   (call $core/cycles/syncCycles
    ;;@ core/cpu/opcodes.ts:147:13
@@ -20027,7 +20125,7 @@
    (get_local $0)
   )
  )
- (func $core/cpu/instructions/rotateRegisterLeft (; 252 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/instructions/rotateRegisterLeft (; 254 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   ;;@ core/cpu/instructions.ts:171:2
   (if
    ;;@ core/cpu/instructions.ts:171:6
@@ -20083,7 +20181,7 @@
   )
   (get_local $0)
  )
- (func $core/cpu/instructions/rotateRegisterRight (; 253 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/instructions/rotateRegisterRight (; 255 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   ;;@ core/cpu/instructions.ts:195:2
   (if
    ;;@ core/cpu/instructions.ts:195:6
@@ -20139,7 +20237,7 @@
   )
   (get_local $0)
  )
- (func $core/cpu/instructions/rotateRegisterLeftThroughCarry (; 254 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/instructions/rotateRegisterLeftThroughCarry (; 256 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   ;;@ core/cpu/instructions.ts:220:2
   (if
@@ -20206,7 +20304,7 @@
   )
   (get_local $0)
  )
- (func $core/cpu/instructions/rotateRegisterRightThroughCarry (; 255 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/instructions/rotateRegisterRightThroughCarry (; 257 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   ;;@ core/cpu/instructions.ts:247:2
   (if
@@ -20273,7 +20371,7 @@
   )
   (get_local $0)
  )
- (func $core/cpu/instructions/shiftLeftRegister (; 256 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/instructions/shiftLeftRegister (; 258 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   ;;@ core/cpu/instructions.ts:274:2
   (if
@@ -20345,7 +20443,7 @@
   )
   (get_local $0)
  )
- (func $core/cpu/instructions/shiftRightArithmeticRegister (; 257 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/instructions/shiftRightArithmeticRegister (; 259 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   ;;@ core/cpu/instructions.ts:304:2
@@ -20452,7 +20550,7 @@
   )
   (get_local $0)
  )
- (func $core/cpu/instructions/swapNibblesOnRegister (; 258 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/instructions/swapNibblesOnRegister (; 260 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   ;;@ core/cpu/instructions.ts:344:2
   (if
    ;;@ core/cpu/instructions.ts:342:2
@@ -20513,7 +20611,7 @@
   )
   (get_local $0)
  )
- (func $core/cpu/instructions/shiftRightLogicalRegister (; 259 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/instructions/shiftRightLogicalRegister (; 261 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   ;;@ core/cpu/instructions.ts:364:2
   (if
@@ -20587,7 +20685,7 @@
   )
   (get_local $0)
  )
- (func $core/cpu/instructions/testBitOnRegister (; 260 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/cpu/instructions/testBitOnRegister (; 262 ;) (; has Stack IR ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   ;;@ core/cpu/instructions.ts:394:2
   (if
    (i32.and
@@ -20625,7 +20723,7 @@
   )
   (get_local $1)
  )
- (func $core/cpu/instructions/setBitOnRegister (; 261 ;) (; has Stack IR ;) (type $iiii) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $core/cpu/instructions/setBitOnRegister (; 263 ;) (; has Stack IR ;) (type $iiii) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   (tee_local $2
    ;;@ core/cpu/instructions.ts:409:2
    (if (result i32)
@@ -20661,7 +20759,7 @@
    )
   )
  )
- (func $core/cpu/cbOpcodes/handleCbOpcode (; 262 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/cbOpcodes/handleCbOpcode (; 264 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -21844,7 +21942,7 @@
   )
   (get_local $6)
  )
- (func $core/cpu/opcodes/handleOpcodeCx (; 263 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcodeCx (; 265 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (block $folding-inner5
    (block $folding-inner4
@@ -22274,7 +22372,7 @@
   ;;@ core/cpu/opcodes.ts:1814:13
   (i32.const 4)
  )
- (func $core/interrupts/interrupts/setInterrupts (; 264 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/interrupts/interrupts/setInterrupts (; 266 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/interrupts/interrupts.ts:223:2
   (if
    (i32.and
@@ -22293,7 +22391,7 @@
    )
   )
  )
- (func $core/cpu/opcodes/handleOpcodeDx (; 265 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcodeDx (; 267 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (block $folding-inner4
    (block $folding-inner3
@@ -22694,7 +22792,7 @@
   ;;@ core/cpu/opcodes.ts:1964:13
   (i32.const 4)
  )
- (func $core/cpu/opcodes/handleOpcodeEx (; 266 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcodeEx (; 268 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (block $folding-inner0
    (block $break|0
     (block $case10|0
@@ -23035,7 +23133,7 @@
   ;;@ core/cpu/opcodes.ts:2053:13
   (i32.const 4)
  )
- (func $core/cpu/opcodes/handleOpcodeFx (; 267 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcodeFx (; 269 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (block $folding-inner1
    (block $folding-inner0
     (block $break|0
@@ -23417,7 +23515,7 @@
   ;;@ core/cpu/opcodes.ts:2165:13
   (i32.const 4)
  )
- (func $core/cpu/opcodes/executeOpcode (; 268 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/executeOpcode (; 270 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   ;;@ core/cpu/opcodes.ts:71:2
   (set_global $core/cpu/cpu/Cpu.programCounter
@@ -23622,7 +23720,7 @@
    (get_local $0)
   )
  )
- (func $core/cpu/cpu/Cpu.exitHaltAndStop (; 269 ;) (; has Stack IR ;) (type $v)
+ (func $core/cpu/cpu/Cpu.exitHaltAndStop (; 271 ;) (; has Stack IR ;) (type $v)
   ;;@ core/cpu/cpu.ts:91:4
   (set_global $core/cpu/cpu/Cpu.isHaltNoJump
    ;;@ core/cpu/cpu.ts:91:23
@@ -23644,7 +23742,7 @@
    (i32.const 0)
   )
  )
- (func $core/cpu/cpu/Cpu.isHalted (; 270 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/cpu/cpu/Cpu.isHalted (; 272 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/cpu/cpu.ts:98:4
   (if
    ;;@ core/cpu/cpu.ts:98:8
@@ -23660,7 +23758,7 @@
   )
   (i32.const 0)
  )
- (func $core/memory/store/sixteenBitStoreIntoGBMemory (; 271 ;) (; has Stack IR ;) (type $iiv) (param $0 i32) (param $1 i32)
+ (func $core/memory/store/sixteenBitStoreIntoGBMemory (; 273 ;) (; has Stack IR ;) (type $iiv) (param $0 i32) (param $1 i32)
   (local $2 i32)
   ;;@ core/memory/store.ts:35:2
   (set_local $2
@@ -23688,7 +23786,7 @@
    (get_local $2)
   )
  )
- (func $core/interrupts/interrupts/_handleInterrupt (; 272 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/interrupts/interrupts/_handleInterrupt (; 274 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   (local $1 i32)
   ;;@ core/interrupts/interrupts.ts:163:2
   (call $core/interrupts/interrupts/setInterrupts
@@ -23827,7 +23925,7 @@
    )
   )
  )
- (func $core/interrupts/interrupts/checkInterrupts (; 273 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/interrupts/interrupts/checkInterrupts (; 275 ;) (; has Stack IR ;) (type $i) (result i32)
   (local $0 i32)
   (local $1 i32)
   ;;@ core/interrupts/interrupts.ts:103:2
@@ -24048,7 +24146,7 @@
   )
   (i32.const 0)
  )
- (func $core/execute/trackStepsRan (; 274 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/execute/trackStepsRan (; 276 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/execute.ts:32:2
   (set_global $core/execute/Execute.steps
    (i32.add
@@ -24085,7 +24183,7 @@
    )
   )
  )
- (func $core/execute/executeStep (; 275 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/execute/executeStep (; 277 ;) (; has Stack IR ;) (type $i) (result i32)
   (local $0 i32)
   (local $1 i32)
   ;;@ core/execute.ts:166:2
@@ -24208,7 +24306,7 @@
   )
   (get_local $0)
  )
- (func $core/cpu/cpu/Cpu.MAX_CYCLES_PER_FRAME (; 276 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/cpu/cpu/Cpu.MAX_CYCLES_PER_FRAME (; 278 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/cpu/cpu.ts:56:4
   (if
    ;;@ core/cpu/cpu.ts:56:8
@@ -24219,11 +24317,11 @@
   )
   (i32.const 70224)
  )
- (func $core/sound/sound/getNumberOfSamplesInAudioBuffer (; 277 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/sound/sound/getNumberOfSamplesInAudioBuffer (; 279 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/sound/sound.ts:202:15
   (get_global $core/sound/sound/Sound.audioQueueIndex)
  )
- (func $core/execute/executeUntilCondition (; 278 ;) (; has Stack IR ;) (type $iiii) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $core/execute/executeUntilCondition (; 280 ;) (; has Stack IR ;) (type $iiii) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
@@ -24439,7 +24537,7 @@
   )
   (i32.const -1)
  )
- (func $core/execute/executeFrame (; 279 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/execute/executeFrame (; 281 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/execute.ts:71:43
   (call $core/execute/executeUntilCondition
    ;;@ core/execute.ts:71:31
@@ -24450,7 +24548,7 @@
    (i32.const -1)
   )
  )
- (func $core/execute/executeMultipleFrames (; 280 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/execute/executeMultipleFrames (; 282 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -24507,7 +24605,7 @@
   )
   (i32.const 0)
  )
- (func $core/execute/executeFrameAndCheckAudio (; 281 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/execute/executeFrameAndCheckAudio (; 283 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   ;;@ core/execute.ts:80:55
   (call $core/execute/executeUntilCondition
    ;;@ core/execute.ts:80:31
@@ -24517,7 +24615,7 @@
    (i32.const -1)
   )
  )
- (func $core/execute/executeFrameUntilBreakpoint (; 282 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/execute/executeFrameUntilBreakpoint (; 284 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   ;;@ core/execute.ts:92:2
   (if
@@ -24543,19 +24641,19 @@
   )
   (get_local $1)
  )
- (func $core/cycles/getCyclesPerCycleSet (; 283 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/cycles/getCyclesPerCycleSet (; 285 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/cycles.ts:23:16
   (get_global $core/cycles/Cycles.cyclesPerCycleSet)
  )
- (func $core/cycles/getCycleSets (; 284 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/cycles/getCycleSets (; 286 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/cycles.ts:27:16
   (get_global $core/cycles/Cycles.cycleSets)
  )
- (func $core/cycles/getCycles (; 285 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/cycles/getCycles (; 287 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/cycles.ts:31:16
   (get_global $core/cycles/Cycles.cycles)
  )
- (func $core/joypad/joypad/_getJoypadButtonStateFromButtonId (; 286 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/joypad/joypad/_getJoypadButtonStateFromButtonId (; 288 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (block $case8|0
    (block $case7|0
@@ -24639,7 +24737,7 @@
   ;;@ core/joypad/joypad.ts:251:13
   (i32.const 0)
  )
- (func $core/joypad/joypad/_setJoypadButtonStateFromButtonId (; 287 ;) (; has Stack IR ;) (type $iiv) (param $0 i32) (param $1 i32)
+ (func $core/joypad/joypad/_setJoypadButtonStateFromButtonId (; 289 ;) (; has Stack IR ;) (type $iiv) (param $0 i32) (param $1 i32)
   (local $2 i32)
   ;;@ core/joypad/joypad.ts:256:2
   (block $break|0
@@ -24752,7 +24850,7 @@
    )
   )
  )
- (func $core/interrupts/interrupts/requestJoypadInterrupt (; 288 ;) (; has Stack IR ;) (type $v)
+ (func $core/interrupts/interrupts/requestJoypadInterrupt (; 290 ;) (; has Stack IR ;) (type $v)
   ;;@ core/interrupts/interrupts.ts:246:2
   (set_global $core/interrupts/interrupts/Interrupts.isJoypadInterruptRequested
    ;;@ core/interrupts/interrupts.ts:246:42
@@ -24763,7 +24861,7 @@
    (i32.const 4)
   )
  )
- (func $core/joypad/joypad/_pressJoypadButton (; 289 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/joypad/joypad/_pressJoypadButton (; 291 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   ;;@ core/joypad/joypad.ts:186:2
@@ -24860,7 +24958,7 @@
    )
   )
  )
- (func $core/joypad/joypad/_releaseJoypadButton (; 290 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/joypad/joypad/_releaseJoypadButton (; 292 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   ;;@ core/joypad/joypad.ts:229:2
   (call $core/joypad/joypad/_setJoypadButtonStateFromButtonId
    (get_local $0)
@@ -24868,7 +24966,7 @@
    (i32.const 0)
   )
  )
- (func $core/joypad/joypad/setJoypadState (; 291 ;) (; has Stack IR ;) (type $iiiiiiiiv) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (param $7 i32)
+ (func $core/joypad/joypad/setJoypadState (; 293 ;) (; has Stack IR ;) (type $iiiiiiiiv) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (param $7 i32)
   ;;@ core/joypad/joypad.ts:135:2
   (if
    ;;@ core/joypad/joypad.ts:135:6
@@ -25022,58 +25120,58 @@
    )
   )
  )
- (func $core/debug/debug-cpu/getRegisterA (; 292 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterA (; 294 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/debug/debug-cpu.ts:6:13
   (get_global $core/cpu/cpu/Cpu.registerA)
  )
- (func $core/debug/debug-cpu/getRegisterB (; 293 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterB (; 295 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/debug/debug-cpu.ts:10:13
   (get_global $core/cpu/cpu/Cpu.registerB)
  )
- (func $core/debug/debug-cpu/getRegisterC (; 294 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterC (; 296 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/debug/debug-cpu.ts:14:13
   (get_global $core/cpu/cpu/Cpu.registerC)
  )
- (func $core/debug/debug-cpu/getRegisterD (; 295 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterD (; 297 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/debug/debug-cpu.ts:18:13
   (get_global $core/cpu/cpu/Cpu.registerD)
  )
- (func $core/debug/debug-cpu/getRegisterE (; 296 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterE (; 298 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/debug/debug-cpu.ts:22:13
   (get_global $core/cpu/cpu/Cpu.registerE)
  )
- (func $core/debug/debug-cpu/getRegisterH (; 297 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterH (; 299 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/debug/debug-cpu.ts:26:13
   (get_global $core/cpu/cpu/Cpu.registerH)
  )
- (func $core/debug/debug-cpu/getRegisterL (; 298 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterL (; 300 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/debug/debug-cpu.ts:30:13
   (get_global $core/cpu/cpu/Cpu.registerL)
  )
- (func $core/debug/debug-cpu/getRegisterF (; 299 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterF (; 301 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/debug/debug-cpu.ts:34:13
   (get_global $core/cpu/cpu/Cpu.registerF)
  )
- (func $core/debug/debug-cpu/getProgramCounter (; 300 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getProgramCounter (; 302 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/debug/debug-cpu.ts:38:13
   (get_global $core/cpu/cpu/Cpu.programCounter)
  )
- (func $core/debug/debug-cpu/getStackPointer (; 301 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getStackPointer (; 303 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/debug/debug-cpu.ts:42:13
   (get_global $core/cpu/cpu/Cpu.stackPointer)
  )
- (func $core/debug/debug-cpu/getOpcodeAtProgramCounter (; 302 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getOpcodeAtProgramCounter (; 304 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/debug/debug-cpu.ts:46:56
   (call $core/memory/load/eightBitLoadFromGBMemory
    ;;@ core/debug/debug-cpu.ts:46:38
    (get_global $core/cpu/cpu/Cpu.programCounter)
   )
  )
- (func $core/debug/debug-graphics/getLY (; 303 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/debug/debug-graphics/getLY (; 305 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/debug/debug-graphics.ts:19:18
   (get_global $core/graphics/graphics/Graphics.scanlineRegister)
  )
- (func $core/debug/debug-graphics/drawBackgroundMapToWasmMemory (; 304 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $core/debug/debug-graphics/drawBackgroundMapToWasmMemory (; 306 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -25505,7 +25603,7 @@
    )
   )
  )
- (func $core/debug/debug-graphics/drawTileDataToWasmMemory (; 305 ;) (; has Stack IR ;) (type $v)
+ (func $core/debug/debug-graphics/drawTileDataToWasmMemory (; 307 ;) (; has Stack IR ;) (type $v)
   (local $0 i32)
   (local $1 i32)
   (local $2 i32)
@@ -25714,19 +25812,19 @@
    )
   )
  )
- (func $core/debug/debug-timer/getDIV (; 306 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/debug/debug-timer/getDIV (; 308 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/debug/debug-timer.ts:5:16
   (get_global $core/timers/timers/Timers.dividerRegister)
  )
- (func $core/debug/debug-timer/getTIMA (; 307 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/debug/debug-timer/getTIMA (; 309 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/debug/debug-timer.ts:9:16
   (get_global $core/timers/timers/Timers.timerCounter)
  )
- (func $core/debug/debug-timer/getTMA (; 308 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/debug/debug-timer/getTMA (; 310 ;) (; has Stack IR ;) (type $i) (result i32)
   ;;@ core/debug/debug-timer.ts:13:16
   (get_global $core/timers/timers/Timers.timerModulo)
  )
- (func $core/debug/debug-timer/getTAC (; 309 ;) (; has Stack IR ;) (type $i) (result i32)
+ (func $core/debug/debug-timer/getTAC (; 311 ;) (; has Stack IR ;) (type $i) (result i32)
   (local $0 i32)
   ;;@ core/debug/debug-timer.ts:17:2
   (set_local $0
@@ -25749,7 +25847,7 @@
   )
   (get_local $0)
  )
- (func $start (; 310 ;) (; has Stack IR ;) (type $v)
+ (func $start (; 312 ;) (; has Stack IR ;) (type $v)
   ;;@ core/core.ts:18:0
   (if
    ;;@ core/core.ts:18:4
@@ -25771,7 +25869,7 @@
    )
   )
  )
- (func $core/execute/executeFrameAndCheckAudio|trampoline (; 311 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/execute/executeFrameAndCheckAudio|trampoline (; 313 ;) (; has Stack IR ;) (type $ii) (param $0 i32) (result i32)
   (block $1of1
    (block $0of1
     (block $outOfRange
@@ -25790,12 +25888,12 @@
    (get_local $0)
   )
  )
- (func $~setargc (; 312 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
+ (func $~setargc (; 314 ;) (; has Stack IR ;) (type $iv) (param $0 i32)
   (set_global $~argc
    (get_local $0)
   )
  )
- (func $core/execute/executeUntilCondition|trampoline (; 313 ;) (; has Stack IR ;) (type $iiii) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $core/execute/executeUntilCondition|trampoline (; 315 ;) (; has Stack IR ;) (type $iiii) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   (block $3of3
    (block $2of3
     (block $1of3

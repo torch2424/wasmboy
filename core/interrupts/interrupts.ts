@@ -180,7 +180,7 @@ function _handleInterrupt(bitPosition: i32): void {
   }
 
   // Jump to the correct interrupt location
-  // Also puiggyback off of the switch to reset our HW Register caching
+  // Also piggyback off of the switch to reset our HW Register caching
   // http://www.codeslinger.co.uk/pages/projects/gameboy/interupts.html
   switch (bitPosition) {
     case Interrupts.bitPositionVBlankInterrupt:
