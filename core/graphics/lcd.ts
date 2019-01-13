@@ -102,7 +102,7 @@ function resetLcd(): void {
 
   // Blank the screen
   for (let i = 0; i < GRAPHICS_OUTPUT_SIZE; i++) {
-    store<u8>(GRAPHICS_OUTPUT_LOCATION + i, 255);
+    // store<u8>(GRAPHICS_OUTPUT_LOCATION + i, 255);
   }
 }
 

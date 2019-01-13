@@ -2,6 +2,8 @@ import { h, render, Component } from 'preact';
 
 import { WasmBoy } from './wasmboy';
 
+import devtoolsDetect from 'devtools-detect';
+
 import phosphorWidgets from '@phosphor/widgets';
 
 import packageJson from '../../package.json';
@@ -63,6 +65,13 @@ render(<Overlay />, overlayContainer);
 // Bind the Mobile UI to DOM
 const mobileContainer = document.getElementById('mobile-container');
 render(<Mobile />, mobileContainer);
+
+// devtools change for mobile
+// uses devtools-detect
+window.addEventListener('devtoolschange', e => {
+  Pubx.get(PUBX_KEYS.MOBILE).update(e.detail.open);
+  main.update();
+});
 
 // Show a nice welcome message
 setTimeout(() => {
