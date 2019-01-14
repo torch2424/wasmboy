@@ -49,7 +49,9 @@ export {
   CARTRIDGE_RAM_LOCATION,
   CARTRIDGE_RAM_SIZE,
   CARTRIDGE_ROM_LOCATION,
-  CARTRIDGE_ROM_SIZE
+  CARTRIDGE_ROM_SIZE,
+  DEBUG_GAMEBOY_MEMORY_LOCATION,
+  DEBUG_GAMEBOY_MEMORY_SIZE
 } from './constants';
 export { getWasmBoyOffsetFromGameBoyOffset } from './memory/memoryMap';
 export {
@@ -67,6 +69,7 @@ export {
 } from './debug/debug-cpu';
 export { getLY, drawBackgroundMapToWasmMemory, drawTileDataToWasmMemory } from './debug/debug-graphics';
 export { getDIV, getTIMA, getTMA, getTAC } from './debug/debug-timer';
+export { updateDebugGBMemory } from './debug/debug-memory';
 export {
   update,
   emulationStep,

@@ -1,0 +1,26 @@
+.disassembler {
+}
+
+.disassembler .disassembler__list {
+  display: none;
+}
+
+.disassembler.disassembler--ready .disassembler__not-ready {
+  display: none;
+}
+
+.disassembler.disassembler--ready .disassembler__list {
+  display: block;
+}
+
+.disassembler__list {
+  width: 100%;
+  height: 500px;
+  border: 1px solid black;
+}
+
+.disassembler__list__virtual {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}

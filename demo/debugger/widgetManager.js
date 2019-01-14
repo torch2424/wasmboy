@@ -14,6 +14,7 @@ import WasmBoyInfo from './components/playback/wasmboyInfo/wasmboyInfo';
 import WasmBoyOptions from './components/playback/wasmboyOptions/wasmboyOptions';
 import CpuState from './components/cpu/cpuState/cpuState';
 import CpuControl from './components/cpu/cpuControl/cpuControl';
+import Disassembler from './components/cpu/disassembler/disassembler';
 import GraphicsState from './components/graphics/graphicsState/graphicsState';
 import BackgroundMap from './components/graphics/backgroundMap/backgroundMap';
 import TileData from './components/graphics/tileData/tileData';
@@ -30,6 +31,7 @@ const components = {
   WasmBoyOptions: <WasmBoyOptions />,
   CpuState: <CpuState />,
   CpuControl: <CpuControl />,
+  Disassembler: <Disassembler />,
   GraphicsState: <GraphicsState />,
   BackgroundMap: <BackgroundMap />,
   TileData: <TileData />,

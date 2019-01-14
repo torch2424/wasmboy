@@ -10,6 +10,7 @@ import Command from '../command';
 
 import CpuState from '../../components/cpu/cpuState/cpuState';
 import CpuControl from '../../components/cpu/cpuControl/cpuControl';
+import Disassembler from '../../components/cpu/disassembler/disassembler';
 
 class CpuStateCommand extends Command {
   constructor() {
@@ -39,5 +40,19 @@ class CpuControlCommand extends Command {
   }
 }
 
-const exportedCommands = [new CpuStateCommand(), new CpuControlCommand()];
+class DisassemblerCommand extends Command {
+  constructor() {
+    super('cpu:disassembler');
+    this.options.label = 'Disassembler';
+  }
+
+  execute() {
+    Pubx.get(PUBX_KEYS.WIDGET).addWidget({
+      component: <Disassembler />,
+      label: 'Disassembler'
+    });
+  }
+}
+
+const exportedCommands = [new CpuStateCommand(), new CpuControlCommand(), new DisassemblerCommand()];
 export default exportedCommands;
