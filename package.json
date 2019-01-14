@@ -105,7 +105,7 @@
     "@phosphor/default-theme": "^0.1.0",
     "@phosphor/messaging": "^1.2.2",
     "@phosphor/widgets": "^1.6.0",
-    "assemblyscript": "github:AssemblyScript/assemblyscript#c769f65bacd5392e5c9efab112b33244fc0a0c8f",
+    "assemblyscript": "github:AssemblyScript/assemblyscript",
     "babel-plugin-filter-imports": "^2.0.3",
     "babel-preset-env": "^1.6.1",
     "big-integer": "^1.6.38",

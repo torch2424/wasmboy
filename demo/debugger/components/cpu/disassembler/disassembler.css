@@ -17,10 +17,25 @@
   width: 100%;
   height: 500px;
   border: 1px solid black;
+  padding: 5px;
 }
 
 .disassembler__list__virtual {
   width: 100%;
   height: 100%;
   overflow: auto;
+}
+
+.disassembler__list__virtual__row {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.disassembler__list__virtual__row__index {
+  width: 50px;
+  margin-left: 5px;
+  margin-right: 5px;
+  text-align: center;
+  font-weight: bold;
 }

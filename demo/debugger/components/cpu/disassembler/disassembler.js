@@ -34,6 +34,7 @@ export default class Disassembler extends Component {
     this.updateInterval = false;
     this.data = [];
 
+    this.state.programCounter = 0;
     this.state.wasmboy = {};
     this.state.loading = {};
   }
@@ -62,24 +63,50 @@ export default class Disassembler extends Component {
       return;
     }
 
-    updateTask().then(gbMemory => {
-      // Build our rows
-      for (let i = 0; i < gbMemory.length; i++) {
-        this.data[i] = {
-          index: i,
-          data: gbMemory[i]
-        };
-      }
+    updateTask()
+      .then(gbMemory => {
+        // Build our rows
+        for (let i = 0; i < gbMemory.length; i++) {
+          this.data[i] = {
+            index: i,
+            data: gbMemory[i]
+          };
+        }
 
-      // Have to re-render to pass data
-      this.setState({});
-    });
+        // Get our program Counter
+        return WasmBoy._runWasmExport('getProgramCounter');
+
+        // Have to re-render to pass data
+        this.setState({});
+      })
+      .then(programCounter => {
+        // Check if the program counter changed, if it did, scroll to it
+        if (programCounter !== this.state.programCounter) {
+          const virtualElement = this.base.querySelector('.disassembler__list__virtual > div > div');
+
+          if (virtualElement) {
+            const top = this.rowHeight * programCounter;
+            virtualElement.style.top = `${top}px`;
+          }
+        }
+
+        // Have to re-render to pass data
+        this.setState({
+          programCounter
+        });
+      });
   }
 
   renderRow(row) {
     return (
       <div class="disassembler__list__virtual__row">
-        <b>{row.index}</b> | <i>{row.data}</i>
+        <div class="disassembler__list__virtual__row__index">
+          {row.index
+            .toString(16)
+            .toUpperCase()
+            .padStart(4, '0')}
+        </div>
+        <div class="disassembler__list__virtual__row__data">{row.data.toString(16).toUpperCase()}</div>
       </div>
     );
   }
