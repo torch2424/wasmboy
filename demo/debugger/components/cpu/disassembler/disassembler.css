@@ -1,6 +1,10 @@
 .disassembler {
 }
 
+.disassembler .disassembler__header-list {
+  display: none;
+}
+
 .disassembler .disassembler__list {
   display: none;
 }
@@ -9,8 +13,41 @@
   display: none;
 }
 
+.disassembler.disassembler--ready .disassembler__header-list {
+  display: flex;
+}
+
 .disassembler.disassembler--ready .disassembler__list {
   display: block;
+}
+
+.disassembler__header-list {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
+  padding: 5px;
+  border-top: 1px solid black;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+}
+
+.disassembler__header-list__actions {
+  width: 75px;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.disassembler__header-list__address {
+  width: 75px;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.disassembler__header-list__value {
+  width: 75px;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 .disassembler__list {
@@ -26,16 +63,32 @@
   overflow: auto;
 }
 
+/*NOTE: Height MUST be kept in sync with this.rowHeight, see renderRow()*/
 .disassembler__list__virtual__row {
   display: flex;
+  height: 30px !important;
+  overflow: hidden;
   justify-content: flex-start;
   align-items: center;
 }
 
-.disassembler__list__virtual__row__index {
-  width: 50px;
+.disassembler__list__virtual__row__actions {
+  width: 75px;
   margin-left: 5px;
   margin-right: 5px;
-  text-align: center;
+  font-weight: bold;
+}
+
+.disassembler__list__virtual__row__address {
+  width: 75px;
+  margin-left: 5px;
+  margin-right: 5px;
+  font-weight: bold;
+}
+
+.disassembler__list__virtual__row__value {
+  width: 75px;
+  margin-left: 5px;
+  margin-right: 5px;
   font-weight: bold;
 }

@@ -12,12 +12,13 @@ import VirtualList from 'preact-virtual-list';
 // Long Living functions to avoid memory leaks
 // https://developers.google.com/web/tools/chrome-devtools/memory-problems/#identify_js_heap_memory_leaks_with_allocation_timelines
 // https://stackoverflow.com/questions/18364175/best-practices-for-reducing-garbage-collector-activity-in-javascript
+let gbMemory = [];
 const updateTask = async () => {
   const gbMemoryStart = await WasmBoy._getWasmConstant('DEBUG_GAMEBOY_MEMORY_LOCATION');
   const gbMemorySize = await WasmBoy._getWasmConstant('DEBUG_GAMEBOY_MEMORY_SIZE');
   const gbMemoryEnd = gbMemoryStart + gbMemorySize;
   await WasmBoy._runWasmExport('updateDebugGBMemory', []);
-  return await WasmBoy._getWasmMemorySection(gbMemoryStart, gbMemoryEnd);
+  gbMemory = await WasmBoy._getWasmMemorySection(gbMemoryStart, gbMemoryEnd);
 };
 
 // Our unsub
@@ -64,7 +65,7 @@ export default class Disassembler extends Component {
     }
 
     updateTask()
-      .then(gbMemory => {
+      .then(() => {
         // Build our rows
         for (let i = 0; i < gbMemory.length; i++) {
           this.data[i] = {
@@ -82,11 +83,12 @@ export default class Disassembler extends Component {
       .then(programCounter => {
         // Check if the program counter changed, if it did, scroll to it
         if (programCounter !== this.state.programCounter) {
-          const virtualElement = this.base.querySelector('.disassembler__list__virtual > div > div');
+          const virtualListElement = this.base.querySelector('.disassembler__list__virtual');
 
-          if (virtualElement) {
+          if (virtualListElement) {
+            // Scroll to the current PC element.
             const top = this.rowHeight * programCounter;
-            virtualElement.style.top = `${top}px`;
+            virtualListElement.scrollTop = top;
           }
         }
 
@@ -98,15 +100,19 @@ export default class Disassembler extends Component {
   }
 
   renderRow(row) {
+    // The row height needs to be forced, or will mess up virtual list overscan
+    // Height is set in CSS for performance
+    // Can't set background color here, as rows are rendered ahead of time
     return (
-      <div class="disassembler__list__virtual__row">
-        <div class="disassembler__list__virtual__row__index">
+      <div id={`disassembler-row-${row.index}`} class="disassembler__list__virtual__row">
+        <div class="disassembler__list__virtual__row__actions" />
+        <div class="disassembler__list__virtual__row__address">
           {row.index
             .toString(16)
             .toUpperCase()
             .padStart(4, '0')}
         </div>
-        <div class="disassembler__list__virtual__row__data">{row.data.toString(16).toUpperCase()}</div>
+        <div class="disassembler__list__virtual__row__value">{row.data.toString(16).toUpperCase()}</div>
       </div>
     );
   }
@@ -124,8 +130,29 @@ export default class Disassembler extends Component {
           <i>Please Load a ROM to be disassmbled.</i>
         </div>
 
+        {/*Style tag to apply styles to whatever our current program counter is at*/}
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+          #disassembler-row-${this.state.programCounter} {
+            background-color: rgba(13, 136, 244, 0.78);
+          }
+        `
+          }}
+        />
+
+        <div class="disassembler__header-list">
+          <div class="disassembler__header-list__actions">Actions</div>
+          <div class="disassembler__header-list__address">Address (Hex)</div>
+          <div class="disassembler__header-list__value">Value (Hex)</div>
+        </div>
         <div class="disassembler__list">
-          <VirtualList class="disassembler__list__virtual" data={this.data} rowHeight={this.rowHeight} renderRow={this.renderRow} />
+          <VirtualList
+            class="disassembler__list__virtual"
+            data={this.data}
+            rowHeight={this.rowHeight}
+            renderRow={row => this.renderRow(row)}
+          />
         </div>
       </div>
     );
