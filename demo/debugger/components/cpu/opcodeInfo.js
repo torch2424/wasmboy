@@ -244,6 +244,7 @@ generateOpcode(0x18, 'JR', ['n16'], 12);
 
 // LD
 generateInstruction('LD', 'Load value into destination.', generateFlags(undefined, undefined, undefined, undefined));
+//TODO:
 
 // NOP
 generateInstruction('NOP', 'No Operation.', generateFlags(undefined, undefined, undefined, undefined));
