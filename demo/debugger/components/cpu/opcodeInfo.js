@@ -244,64 +244,197 @@ generateOpcode(0x18, 'JR', ['n16'], 12);
 
 // LD
 generateInstruction('LD', 'Load value into destination.', generateFlags(undefined, undefined, undefined, undefined));
-//TODO:
+// Generate our Load Columns
+const generateLoadColumns = (startHex, changingParams, constantParam) => {
+  for (let i = 0; i < changingParams.length; i++) {
+    const hex = startHex + 0x10 * i;
+    generateOpcode(hex, 'LD', [changingParams[i], constantParam], 8);
+  }
+};
+generateLoadColumns(0x02, ['[BC]', '[DE]', '[HL+]', '[HL-]'], 'A');
+generateLoadColumns(0x06, ['B', 'D', 'H'], 'd8');
+generateOpcode(0x32, 'LD', ['[HL]', 'd8'], 12);
+generateOpcode(0x0a, 'LD', ['A', '[BC]'], 8);
+generateOpcode(0x1a, 'LD', ['A', '[DE]'], 8);
+generateOpcode(0x2a, 'LD', ['A', '[HL+]'], 8);
+generateOpcode(0x3a, 'LD', ['A', '[HL-]'], 8);
+generateLoadColumns(0x0e, ['C', 'E', 'L', 'A'], 'd8');
+let loadRowHex = 0x40;
+const loadRegisterParams = ['B', 'C', 'D', 'E', 'H', 'L', '[HL]', 'A'];
+loadRegisterParams.forEach(firstParam => {
+  loadRegisterParams.forEach(secondParam => {
+    // Handle not setting halt
+    if (firstParam === '[HL]' && secondParam === '[HL]') {
+      loadRowHex++;
+      return;
+    }
+
+    let loadCycles = 4;
+    if (firstParam === '[HL]' || secondParam === '[HL]') {
+      loadCycles = 8;
+    }
+
+    generateOpcode(loadRowHex, 'LD', [firstParam, secondParam], loadCycles);
+
+    loadRowHex++;
+  });
+});
 
 // NOP
 generateInstruction('NOP', 'No Operation.', generateFlags(undefined, undefined, undefined, undefined));
+generateOpcode(0x00, 'NOP', [], 4);
+
+// OR
 generateInstruction('OR', 'Bitwise OR.', generateFlags(true, 0, 0, 0));
-generateInstruction(
-  'POP',
-  'Pop value from the stack.',
-  generateFlags(
-    'Set from bit 7 of the popped low byte',
-    'Set from bit 6 of the popped low byte.',
-    'Set from bit 5 of the popped low byte.',
-    'Set from bit 4 of the popped low byte.'
-  )
-);
+generateSimpleArithmeticOpcodeSet(0xb0, 'OR');
+generateOpcode(0xf6, 'OR', ['n8'], 8);
+
+// POP
+generateInstruction('POP', 'Pop value from the stack.', generateFlags(undefined, undefined, undefined, undefined));
+generateOpcode(0xc1, 'POP', ['BC'], 12);
+generateOpcode(0xd1, 'POP', ['DE'], 12);
+generateOpcode(0xe1, 'POP', ['HL'], 12);
+generateOpcode(0xf1, 'POP', ['AF'], 12);
+
+// PUSH
 generateInstruction(
   'PUSH',
   "Push register AF into the stack. The low byte's bit 7 corresponds to the Z flag, its bit 6 to the N flag, bit 5 to the H flag, and bit 4 to the C flag. Bits 3 to 0 are reset.",
   generateFlags(undefined, undefined, undefined, undefined)
 );
+generateOpcode(0xc5, 'PUSH', ['BC'], 16);
+generateOpcode(0xd5, 'PUSH', ['DE'], 16);
+generateOpcode(0xe5, 'PUSH', ['HL'], 16);
+generateOpcode(0xf5, 'PUSH', ['AF'], 16);
+
+// RES
 generateInstruction('RES', 'Set bit on value', generateFlags(undefined, undefined, undefined, undefined));
+generateNumberedCBOpcodeSet(0x80, 'RES');
+
+// RET
 generateInstruction('RET', 'Return from subroutine', generateFlags(undefined, undefined, undefined, undefined));
+generateOpcode(0xc0, 'RET', ['NZ'], [20, 8]);
+generateOpcode(0xd0, 'RET', ['NC'], [20, 8]);
+generateOpcode(0xc8, 'RET', ['Z'], [20, 8]);
+generateOpcode(0xd8, 'RET', ['C'], [20, 8]);
+generateOpcode(0xc9, 'RET', [], 16);
+
+// RETI
 generateInstruction('RETI', 'return from subroutine, and enable interrupts', generateFlags(undefined, undefined, undefined, undefined));
+generateOpcode(0xd9, 'RETI', [], 16);
+
 // Left
+// RL
 generateInstruction('RL', 'Rotate value left through carry. (C <- [7 <- 0] <- C)', generateFlags(true, 0, 0, true));
+generateSimpleCBOpcodeSet(0x10, 'RL');
+
+// RLA
 generateInstruction('RLA', 'Rotate register A left through carry. (C <- [7 <- 0] <- C)', generateFlags(0, 0, 0, true));
+generateOpcode(0x17, 'RLA', [], 4);
+
+// RLC
 generateInstruction('RLC', 'Rotate value left. (C <- [7 <- 0] <- [7])', generateFlags(true, 0, 0, true));
+generateSimpleCBOpcodeSet(0x00, 'RLC');
+
+// RLCA
 generateInstruction('RLCA', 'Rotate register A left. (C <- [7 <- 0] <- [7])', generateFlags(0, 0, 0, true));
+generateOpcode(0x07, 'RLCA', [], 4);
+
 // Right
+// RR
 generateInstruction('RR', 'Rotate value right through carry. (C -> [7 -> 0] -> C)', generateFlags(true, 0, 0, true));
+generateSimpleCBOpcodeSet(0x18, 'RR');
+
+// RRA
 generateInstruction('RRA', 'Rotate register A right through carry. (C -> [7 -> 0] -> C)', generateFlags(0, 0, 0, true));
+generateOpcode(0x1f, 'RRA', [], 4);
+
+// RRC
 generateInstruction('RRC', 'Rotate value right. (C -> [7 -> 0] -> [7])', generateFlags(true, 0, 0, true));
+generateSimpleCBOpcodeSet(0x08, 'RR');
+
+// RRCA
 generateInstruction('RRCA', 'Rotate register A right. (C -> [7 -> 0] -> [7])', generateFlags(0, 0, 0, true));
+generateOpcode(0x0f, 'RRCA', [], 4);
+
+// RST
 generateInstruction('RST', 'Call restart vector.', generateFlags(undefined, undefined, undefined, undefined));
+generateOpcode(0xc7, 'RST', ['0x00'], 16);
+generateOpcode(0xd7, 'RST', ['0x10'], 16);
+generateOpcode(0xe7, 'RST', ['0x20'], 16);
+generateOpcode(0xf7, 'RST', ['0x30'], 16);
+generateOpcode(0xcf, 'RST', ['0x08'], 16);
+generateOpcode(0xdf, 'RST', ['0x18'], 16);
+generateOpcode(0xef, 'RST', ['0x28'], 16);
+generateOpcode(0xff, 'RST', ['0x38'], 16);
+
+// SBC
 generateInstruction(
   'SBC',
   'Subtract the value and the carry flag from A.',
   generateFlags(true, 1, 'Set if no borrow from bit 4.', 'Set if no borrow (set if r8 > A).')
 );
+generateSimpleArithmeticOpcodeSet(0x98, 'SBC');
+generateOpcode(0xde, 'SBC', ['n8'], 8);
+
+// SCF
 generateInstruction('SCF', 'Set Carry Flag.', generateFlags(undefined, 0, 0, 1));
+generateOpcode(0x37, 'SCF', ['n8'], 8);
+
+// SET
 generateInstruction('SET', 'Set bit on value.', generateFlags(undefined, undefined, undefined, undefined));
+generateNumberedCBOpcodeSet(0xc0, 'SET');
+
+// SLA
 generateInstruction('SLA', 'Shift left arithmetic. (C <- [7 <- 0] <- 0)', generateFlags(true, 0, 0, true));
+generateSimpleCBOpcodeSet(0x20, 'SLA');
+
+// SRA
 generateInstruction('SRA', 'Shift right arithmetic. ([7] -> [7 -> 0] -> C)', generateFlags(true, 0, 0, true));
+generateSimpleCBOpcodeSet(0x28, 'SRA');
+
+// SRL
 generateInstruction('SRL', 'Shift right logic. (0 -> [7 -> 0] -> C)', generateFlags(true, 0, 0, true));
+generateSimpleCBOpcodeSet(0x28, 'SRL');
+
+// STOP
 generateInstruction(
   'STOP',
   'GB: Enter CPU Very Low Power Mode. GBC: Enter Double Speed Mode.',
   generateFlags(undefined, undefined, undefined)
 );
+generateOpcode(0x10, 'STOP', ['n8'], 8);
+
+// SUB
 generateInstruction(
   'SUB',
   'Subtract the values',
   generateFlags(true, 1, 'Set if no borrow from bit 4.', 'Set if no borrow (set if r8 > A).')
 );
-generateInstruction('SWAP', 'Swap upper 4 bits in the value with the lower ones.', generateFlags(true, 0, 0, 0));
-generateInstruction('XOR', 'Bitwise XOR between the values.', generateFlags(true, 0, 0, 0));
+generateSimpleArithmeticOpcodeSet(0x90, 'SUB');
+generateOpcode(0xd6, 'SUB', ['n8'], 8);
 
-console.log(instructions);
-console.log(opcodes);
-console.log(cbOpcodes);
-console.log('test', instructions.ADC);
+// SWAP
+generateInstruction('SWAP', 'Swap upper 4 bits in the value with the lower ones.', generateFlags(true, 0, 0, 0));
+generateSimpleCBOpcodeSet(0x30, 'SRL');
+
+// XOR
+generateInstruction('XOR', 'Bitwise XOR between the values.', generateFlags(true, 0, 0, 0));
+generateSimpleArithmeticOpcodeSet(0xa8, 'XOR');
+generateOpcode(0xee, 'XOR', ['n8'], 8);
+
+// Finally, sort by hex Code
+const opcodeKeys = Object.keys(opcodes);
+const cbOpcodeKeys = Object.keys(cbOpcodes);
+opcodeKeys.sort();
+cbOpcodeKeys.sort();
+
+const sortedOpcodes = {};
+opcodeKeys.forEach(key => {
+  sortedOpcodes[key] = opcodes[key];
+});
+
+const sortedCbOpcodes = {};
+cbOpcodeKeys.forEach(key => {
+  sortedCbOpcodes[key] = cbOpcodes[key];
+});
