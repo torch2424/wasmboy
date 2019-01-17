@@ -1,11 +1,7 @@
 .disassembler {
 }
 
-.disassembler .disassembler__header-list {
-  display: none;
-}
-
-.disassembler .disassembler__list {
+.disassembler .disassembler__container {
   display: none;
 }
 
@@ -13,12 +9,12 @@
   display: none;
 }
 
-.disassembler.disassembler--ready .disassembler__header-list {
-  display: flex;
+.disassembler.disassembler--ready .disassembler__container {
+  display: block;
 }
 
-.disassembler.disassembler--ready .disassembler__list {
-  display: block;
+.disassembler__container {
+  width: 500px;
 }
 
 .disassembler__header-list {

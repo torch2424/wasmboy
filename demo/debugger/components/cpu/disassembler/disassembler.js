@@ -74,42 +74,36 @@ export default class Disassembler extends Component {
         // Build our rows
         for (let i = 0; i < gbMemory.length; i++) {
           const opcode = gbMemory[i];
-          const opcodeAsString = opcode
-            .toString(16)
-            .toUpperCase()
-            .padStart(2, '0');
-          const gbOpcode = GBOpcodes.opcodes[`0x${opcodeAsString}`];
+          const gbOpcode = GBOpcodes.getOpcode(opcode);
           let gbOpcodeParams = [];
-          if (gbOpcode && gbOpcode.params) {
+          if (gbOpcode) {
             gbOpcodeParams = gbOpcode.params;
-          } else {
-            console.log(opcodeAsString, gbOpcode);
-          }
 
-          // Check if our instruction has parameters
-          const params = [];
-          let isCb = false;
-          if (opcode === 0xcb) {
-            isCb = true;
-            params.push(gbMemory[i + 1]);
-          } else {
-            if (gbOpcodeParams.includes('d8')) {
+            // Check if our instruction has parameters
+            const params = [];
+            let isCb = false;
+            if (opcode === 0xcb) {
+              isCb = true;
               params.push(gbMemory[i + 1]);
-            } else if (gbOpcodeParams.includes('d16')) {
-              params.push(gbMemory[i + 1]);
-              params.push(gbMemory[i + 2]);
+            } else {
+              if (gbOpcodeParams.includes('d8')) {
+                params.push(gbMemory[i + 1]);
+              } else if (gbOpcodeParams.includes('d16')) {
+                params.push(gbMemory[i + 1]);
+                params.push(gbMemory[i + 2]);
+              }
             }
+
+            this.data[i] = {
+              index: i,
+              data: gbMemory[i],
+              isCb,
+              params,
+              mnemonic: gbOpcode.instruction.mnemonic
+            };
+
+            i += params.length;
           }
-
-          this.data[i] = {
-            index: i,
-            data: gbMemory[i],
-            isCb,
-            params,
-            mnemonic: gbOpcode.instruction.mnemonic
-          };
-
-          i += params.length;
         }
 
         // Get our program Counter
@@ -139,10 +133,10 @@ export default class Disassembler extends Component {
 
   renderRow(row) {
     let paramColumn = <div class="disassembler__list__virtual__row__param" />;
-    if (row.params) {
+    if (row.params && row.params.length > 0) {
       let paramValue = row.params[0];
       if (row.params[1]) {
-        paramValue = (row.params[1] << 8) + paramValu;
+        paramValue = (row.params[1] << 8) + paramValue;
       }
 
       paramColumn = (
@@ -161,13 +155,13 @@ export default class Disassembler extends Component {
     return (
       <div id={`disassembler-row-${row.index}`} class="disassembler__list__virtual__row">
         <div class="disassembler__list__virtual__row__actions" />
-        <div class="disassembler__list__virtual__row__mnemonic">{row.mnemonic}</div>
         <div class="disassembler__list__virtual__row__address">
           {row.index
             .toString(16)
             .toUpperCase()
             .padStart(4, '0')}
         </div>
+        <div class="disassembler__list__virtual__row__mnemonic">{row.mnemonic}</div>
         <div class="disassembler__list__virtual__row__value">
           {row.data
             .toString(16)
@@ -203,18 +197,22 @@ export default class Disassembler extends Component {
           }}
         />
 
-        <div class="disassembler__header-list">
-          <div class="disassembler__header-list__actions">Actions</div>
-          <div class="disassembler__header-list__address">Address (Hex)</div>
-          <div class="disassembler__header-list__value">Value (Hex)</div>
-        </div>
-        <div class="disassembler__list">
-          <VirtualList
-            class="disassembler__list__virtual"
-            data={this.data}
-            rowHeight={this.rowHeight}
-            renderRow={row => this.renderRow(row)}
-          />
+        <div class="disassembler__container">
+          <div class="disassembler__header-list">
+            <div class="disassembler__header-list__actions">Actions</div>
+            <div class="disassembler__header-list__address">Address (Hex)</div>
+            <div class="disassembler__header-list__mnemonic">Instruction Mnemonic</div>
+            <div class="disassembler__header-list__value">Opcode (Hex)</div>
+            <div class="disassembler__header-list__param">Constant (Hex)</div>
+          </div>
+          <div class="disassembler__list">
+            <VirtualList
+              class="disassembler__list__virtual"
+              data={this.data}
+              rowHeight={this.rowHeight}
+              renderRow={row => this.renderRow(row)}
+            />
+          </div>
         </div>
       </div>
     );
