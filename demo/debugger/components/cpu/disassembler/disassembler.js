@@ -5,6 +5,8 @@ import { PUBX_KEYS } from '../../../pubx.config';
 
 import { WasmBoy } from '../../../wasmboy';
 
+import { GBOpcodes } from 'gb-instructions-opcodes';
+
 import './disassembler.css';
 
 import VirtualList from 'preact-virtual-list';
@@ -46,6 +48,9 @@ export default class Disassembler extends Component {
     unsubWasmBoy = Pubx.subscribe(PUBX_KEYS.WASMBOY, newState => this.setState({ wasmboy: newState }));
 
     this.updateInterval = setInterval(() => this.intervalUpdate(), 500);
+
+    console.log(GBOpcodes);
+    console.log(GBOpcodes.opcodes['0x01']);
   }
 
   componentWillUnmount() {
@@ -68,10 +73,43 @@ export default class Disassembler extends Component {
       .then(() => {
         // Build our rows
         for (let i = 0; i < gbMemory.length; i++) {
+          const opcode = gbMemory[i];
+          const opcodeAsString = opcode
+            .toString(16)
+            .toUpperCase()
+            .padStart(2, '0');
+          const gbOpcode = GBOpcodes.opcodes[`0x${opcodeAsString}`];
+          let gbOpcodeParams = [];
+          if (gbOpcode && gbOpcode.params) {
+            gbOpcodeParams = gbOpcode.params;
+          } else {
+            console.log(opcodeAsString, gbOpcode);
+          }
+
+          // Check if our instruction has parameters
+          const params = [];
+          let isCb = false;
+          if (opcode === 0xcb) {
+            isCb = true;
+            params.push(gbMemory[i + 1]);
+          } else {
+            if (gbOpcodeParams.includes('d8')) {
+              params.push(gbMemory[i + 1]);
+            } else if (gbOpcodeParams.includes('d16')) {
+              params.push(gbMemory[i + 1]);
+              params.push(gbMemory[i + 2]);
+            }
+          }
+
           this.data[i] = {
             index: i,
-            data: gbMemory[i]
+            data: gbMemory[i],
+            isCb,
+            params,
+            mnemonic: gbOpcode.instruction.mnemonic
           };
+
+          i += params.length;
         }
 
         // Get our program Counter
@@ -100,19 +138,43 @@ export default class Disassembler extends Component {
   }
 
   renderRow(row) {
+    let paramColumn = <div class="disassembler__list__virtual__row__param" />;
+    if (row.params) {
+      let paramValue = row.params[0];
+      if (row.params[1]) {
+        paramValue = (row.params[1] << 8) + paramValu;
+      }
+
+      paramColumn = (
+        <div class="disassembler__list__virtual__row__param">
+          {paramValue
+            .toString(16)
+            .toUpperCase()
+            .padStart(2, '0')}
+        </div>
+      );
+    }
+
     // The row height needs to be forced, or will mess up virtual list overscan
     // Height is set in CSS for performance
     // Can't set background color here, as rows are rendered ahead of time
     return (
       <div id={`disassembler-row-${row.index}`} class="disassembler__list__virtual__row">
         <div class="disassembler__list__virtual__row__actions" />
+        <div class="disassembler__list__virtual__row__mnemonic">{row.mnemonic}</div>
         <div class="disassembler__list__virtual__row__address">
           {row.index
             .toString(16)
             .toUpperCase()
             .padStart(4, '0')}
         </div>
-        <div class="disassembler__list__virtual__row__value">{row.data.toString(16).toUpperCase()}</div>
+        <div class="disassembler__list__virtual__row__value">
+          {row.data
+            .toString(16)
+            .toUpperCase()
+            .padStart(2, '0')}
+        </div>
+        {paramColumn}
       </div>
     );
   }
