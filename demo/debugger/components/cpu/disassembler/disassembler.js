@@ -98,10 +98,7 @@ export default class Disassembler extends Component {
     unsubLoading = Pubx.subscribe(PUBX_KEYS.LOADING, newState => this.setState({ loading: newState }));
     unsubWasmBoy = Pubx.subscribe(PUBX_KEYS.WASMBOY, newState => this.setState({ wasmboy: newState }));
 
-    this.updateInterval = setInterval(() => this.intervalUpdate(), 750);
-
-    console.log(GBOpcodes);
-    console.log(GBOpcodes.opcodes['0x01']);
+    this.updateInterval = setInterval(() => this.intervalUpdate(), 250);
   }
 
   componentWillUnmount() {
@@ -128,8 +125,12 @@ export default class Disassembler extends Component {
         const virtualListElement = this.base.querySelector('.disassembler__list__virtual');
 
         if (virtualListElement) {
-          // Scroll to the current PC element.
-          const top = this.rowHeight * programCounter;
+          // Scroll to the current PC element (-1 to stop the no view bug).
+          let top = this.rowHeight * (programCounter - 5);
+          if (programCounter >= data.length - 5) {
+            top = this.rowHeight * programCounter;
+          }
+
           virtualListElement.scrollTop = top;
         }
       }
@@ -144,8 +145,31 @@ export default class Disassembler extends Component {
   showInstructionInfo(gbOpcode) {
     // Using a stateless functional component
     Pubx.get(PUBX_KEYS.MODAL).showModal(() => {
-      console.log(gbOpcode);
-      return <div class="disassembler__opcode-info" />;
+      const flags = gbOpcode.instruction.flags;
+
+      return (
+        <div class="disassembler__opcode-info">
+          <h1>
+            {gbOpcode.instruction.mnemonic} ({gbOpcode.value})
+          </h1>
+          <div>{gbOpcode.instruction.description}</div>
+          <h3>Cycles</h3>
+          <div>{gbOpcode.cycles}</div>
+          <h3>Flags</h3>
+          <div>
+            <b>Z</b>: {flags[0].shorthand} {flags[0].description}
+          </div>
+          <div>
+            <b>N</b>: {flags[1].shorthand} {flags[1].description}
+          </div>
+          <div>
+            <b>H</b>: {flags[2].shorthand} {flags[2].description}
+          </div>
+          <div>
+            <b>C</b>: {flags[3].shorthand} {flags[3].description}
+          </div>
+        </div>
+      );
     });
   }
 
