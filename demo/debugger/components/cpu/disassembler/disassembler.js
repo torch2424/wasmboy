@@ -98,7 +98,14 @@ export default class Disassembler extends Component {
     unsubLoading = Pubx.subscribe(PUBX_KEYS.LOADING, newState => this.setState({ loading: newState }));
     unsubWasmBoy = Pubx.subscribe(PUBX_KEYS.WASMBOY, newState => this.setState({ wasmboy: newState }));
 
-    this.updateInterval = setInterval(() => this.intervalUpdate(), 250);
+    const updateLoop = () => {
+      this.updateInterval = setTimeout(() => {
+        this.intervalUpdate().then(() => {
+          updateLoop();
+        });
+      }, 250);
+    };
+    updateLoop();
   }
 
   componentWillUnmount() {
@@ -115,10 +122,10 @@ export default class Disassembler extends Component {
 
   intervalUpdate() {
     if (!WasmBoy.isReady()) {
-      return;
+      return Promise.resolve();
     }
 
-    updateTask().then(programCounter => {
+    return updateTask().then(programCounter => {
       // Check if the program counter changed, if it did, scroll to it
       if (programCounter !== this.state.programCounter) {
         const virtualListElement = this.base.querySelector('.disassembler__list__virtual');
