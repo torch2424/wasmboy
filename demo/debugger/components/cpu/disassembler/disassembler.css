@@ -15,6 +15,18 @@
 
 .disassembler__container {
   width: 500px;
+  margin: 5px;
+}
+
+/* Variables for our psuedo table */
+/*NOTE: Height MUST be kept in sync with this.rowHeight, see renderRow()*/
+:root {
+  --dissassembler-row-height: 30px;
+  --disassembler-actions-width: 75px;
+  --disassembler-hex-width: 75px;
+  --disassembler-mnemonic-width: 75px;
+  --disassembler-column-spacing: 5px;
+  --disassembler-column-border: 1px solid black;
 }
 
 .disassembler__header-list {
@@ -22,28 +34,15 @@
   justify-content: flex-start;
   align-items: center;
 
+  width: 100%;
   padding: 5px;
   border-top: 1px solid black;
   border-left: 1px solid black;
   border-right: 1px solid black;
 }
 
-.disassembler__header-list__actions {
-  width: 75px;
-  margin-left: 5px;
-  margin-right: 5px;
-}
-
-.disassembler__header-list__address {
-  width: 75px;
-  margin-left: 5px;
-  margin-right: 5px;
-}
-
-.disassembler__header-list__value {
-  width: 75px;
-  margin-left: 5px;
-  margin-right: 5px;
+.disassembler__header-list > * {
+  height: 50px;
 }
 
 .disassembler__list {
@@ -59,32 +58,42 @@
   overflow: auto;
 }
 
-/*NOTE: Height MUST be kept in sync with this.rowHeight, see renderRow()*/
 .disassembler__list__virtual__row {
   display: flex;
-  height: 30px !important;
+  height: var(--dissassembler-row-height) !important;
   overflow: hidden;
   justify-content: flex-start;
   align-items: center;
 }
 
+.disassembler__list__virtual__row:hover {
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
+.disassembler__header-list__actions,
 .disassembler__list__virtual__row__actions {
-  width: 75px;
-  margin-left: 5px;
-  margin-right: 5px;
-  font-weight: bold;
+  text-align: center;
+
+  width: var(--disassembler-actions-width);
+  padding-left: var(--disassembler-column-spacing);
+  padding-right: var(--disassembler-column-spacing);
 }
 
-.disassembler__list__virtual__row__address {
-  width: 75px;
-  margin-left: 5px;
-  margin-right: 5px;
-  font-weight: bold;
-}
+.disassembler__header-list__address,
+.disassembler__list__virtual__row__address,
+.disassembler__header-list__value,
+.disassembler__list__virtual__row__value,
+.disassembler__header-list__param,
+.disassembler__list__virtual__row__param,
+.disassembler__header-list__mnemonic,
+.disassembler__list__virtual__row__mnemonic,
+.disassembler__header-list__cycles,
+.disassembler__list__virtual__row__cycles {
+  text-align: center;
 
-.disassembler__list__virtual__row__value {
-  width: 75px;
-  margin-left: 5px;
-  margin-right: 5px;
-  font-weight: bold;
+  width: var(--disassembler-hex-width);
+  height: var(--dissassembler-row-height);
+  border-left: var(--disassembler-column-border);
+  padding-left: var(--disassembler-column-spacing);
+  padding-right: var(--disassembler-column-spacing);
 }
