@@ -19,7 +19,7 @@ const data = [];
 let gbMemoryStart;
 let gbMemorySize;
 let gbMemoryEnd;
-const updateTask = async () => {
+let updateTask = async () => {
   if (!gbMemoryStart) {
     gbMemoryStart = await WasmBoy._getWasmConstant('DEBUG_GAMEBOY_MEMORY_LOCATION');
     gbMemorySize = await WasmBoy._getWasmConstant('DEBUG_GAMEBOY_MEMORY_SIZE');
@@ -63,7 +63,8 @@ const updateTask = async () => {
         isCb,
         params,
         mnemonic: gbOpcode.instruction.mnemonic,
-        cycles
+        cycles,
+        gbOpcode
       };
 
       i += params.length;
@@ -97,7 +98,7 @@ export default class Disassembler extends Component {
     unsubLoading = Pubx.subscribe(PUBX_KEYS.LOADING, newState => this.setState({ loading: newState }));
     unsubWasmBoy = Pubx.subscribe(PUBX_KEYS.WASMBOY, newState => this.setState({ wasmboy: newState }));
 
-    this.updateInterval = setInterval(() => this.intervalUpdate(), 500);
+    this.updateInterval = setInterval(() => this.intervalUpdate(), 750);
 
     console.log(GBOpcodes);
     console.log(GBOpcodes.opcodes['0x01']);
@@ -111,7 +112,9 @@ export default class Disassembler extends Component {
       unsubWasmBoy();
     }
 
+    // CLean up, and try to get the updateTask out of memory
     clearInterval(this.updateInterval);
+    updateTask = undefined;
   }
 
   intervalUpdate() {
@@ -138,6 +141,14 @@ export default class Disassembler extends Component {
     });
   }
 
+  showInstructionInfo(gbOpcode) {
+    // Using a stateless functional component
+    Pubx.get(PUBX_KEYS.MODAL).showModal(() => {
+      console.log(gbOpcode);
+      return <div class="disassembler__opcode-info" />;
+    });
+  }
+
   renderRow(row) {
     let paramColumn = <div class="disassembler__list__virtual__row__param" />;
     if (row.params && row.params.length > 0) {
@@ -161,7 +172,11 @@ export default class Disassembler extends Component {
     // Can't set background color here, as rows are rendered ahead of time
     return (
       <div id={`disassembler-row-${row.index}`} class="disassembler__list__virtual__row">
-        <div class="disassembler__list__virtual__row__actions" />
+        <div class="disassembler__list__virtual__row__actions">
+          <button class="button clear" onClick={() => this.showInstructionInfo(row.gbOpcode)}>
+            ℹ️
+          </button>
+        </div>
         <div class="disassembler__list__virtual__row__mnemonic">{row.mnemonic}</div>
         <div class="disassembler__list__virtual__row__cycles">{row.cycles}</div>
         <div class="disassembler__list__virtual__row__address">

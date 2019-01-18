@@ -14,13 +14,15 @@
 }
 
 .disassembler__container {
-  width: 500px;
+  width: 475px;
+  overflow: hidden;
   margin: 5px;
 }
 
 /* Variables for our psuedo table */
 /*NOTE: Height MUST be kept in sync with this.rowHeight, see renderRow()*/
 :root {
+  --dissassembler-width: 450px;
   --dissassembler-row-height: 30px;
   --disassembler-actions-width: 75px;
   --disassembler-hex-width: 75px;
@@ -34,22 +36,22 @@
   justify-content: flex-start;
   align-items: center;
 
-  width: 100%;
-  padding: 5px;
+  width: var(--dissassembler-width);
+
   border-top: 1px solid black;
   border-left: 1px solid black;
   border-right: 1px solid black;
 }
 
 .disassembler__header-list > * {
-  height: 50px;
+  height: 50px !important;
 }
 
 .disassembler__list {
-  width: 100%;
+  width: var(--dissassembler-width);
   height: 500px;
+
   border: 1px solid black;
-  padding: 5px;
 }
 
 .disassembler__list__virtual {
@@ -75,8 +77,15 @@
   text-align: center;
 
   width: var(--disassembler-actions-width);
-  padding-left: var(--disassembler-column-spacing);
-  padding-right: var(--disassembler-column-spacing);
+}
+
+.disassembler__header-list__mnemonic,
+.disassembler__list__virtual__row__mnemonic {
+  text-align: center;
+
+  width: 100px;
+  height: var(--dissassembler-row-height);
+  border-left: var(--disassembler-column-border);
 }
 
 .disassembler__header-list__address,
@@ -85,8 +94,6 @@
 .disassembler__list__virtual__row__value,
 .disassembler__header-list__param,
 .disassembler__list__virtual__row__param,
-.disassembler__header-list__mnemonic,
-.disassembler__list__virtual__row__mnemonic,
 .disassembler__header-list__cycles,
 .disassembler__list__virtual__row__cycles {
   text-align: center;
@@ -94,6 +101,19 @@
   width: var(--disassembler-hex-width);
   height: var(--dissassembler-row-height);
   border-left: var(--disassembler-column-border);
-  padding-left: var(--disassembler-column-spacing);
-  padding-right: var(--disassembler-column-spacing);
+}
+
+.disassembler__list__virtual__row__actions {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+
+  height: var(--dissassembler-row-height);
+}
+
+.disassembler__list__virtual__row__actions > button {
+  padding: 5px;
+  width: 20px !important;
+  height: 20px !important;
+  cursor: pointer;
 }
