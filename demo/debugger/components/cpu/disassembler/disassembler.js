@@ -19,7 +19,7 @@ const data = [];
 let gbMemoryStart;
 let gbMemorySize;
 let gbMemoryEnd;
-let updateTask = async () => {
+let tempFunc = async () => {
   if (!gbMemoryStart) {
     gbMemoryStart = await WasmBoy._getWasmConstant('DEBUG_GAMEBOY_MEMORY_LOCATION');
     gbMemorySize = await WasmBoy._getWasmConstant('DEBUG_GAMEBOY_MEMORY_SIZE');
@@ -28,48 +28,61 @@ let updateTask = async () => {
 
   await WasmBoy._runWasmExport('updateDebugGBMemory', []);
   gbMemory = await WasmBoy._getWasmMemorySection(gbMemoryStart, gbMemoryEnd);
-
-  // Build our rows
-  for (let i = 0; i < gbMemory.length; i++) {
-    const opcode = gbMemory[i];
-    const gbOpcode = GBOpcodes.getOpcode(opcode);
-    let gbOpcodeParams = [];
-    if (gbOpcode) {
-      let cycles = gbOpcode.cycles;
-      if (Array.isArray(cycles)) {
-        cycles = cycles.join(', ');
-      }
-
-      gbOpcodeParams = gbOpcode.params;
-
-      // Check if our instruction has parameters
-      const params = [];
-      let isCb = false;
-      if (opcode === 0xcb) {
-        isCb = true;
-        params.push(gbMemory[i + 1]);
-      } else {
-        if (gbOpcodeParams.includes('d8')) {
-          params.push(gbMemory[i + 1]);
-        } else if (gbOpcodeParams.includes('d16')) {
-          params.push(gbMemory[i + 1]);
-          params.push(gbMemory[i + 2]);
-        }
-      }
-
-      data[i] = {
-        index: i,
-        data: gbMemory[i],
-        isCb,
-        params,
-        mnemonic: gbOpcode.instruction.mnemonic,
-        cycles,
-        gbOpcode
-      };
-
-      i += params.length;
+};
+let getOpcode = i => {
+  return GBOpcodes.getOpcode(gbMemory[i]);
+};
+let loopFunc = i => {
+  const gbOpcode = getOpcode(i);
+  let gbOpcodeParams = [];
+  if (gbOpcode) {
+    let cycles = gbOpcode.cycles;
+    if (Array.isArray(cycles)) {
+      cycles = cycles.join(', ');
     }
+
+    gbOpcodeParams = gbOpcode.params;
+
+    // Check if our instruction has parameters
+    const params = [];
+    let isCb = false;
+    if (gbMemory[i] === 0xcb) {
+      isCb = true;
+      params.push(gbMemory[i + 1]);
+    } else {
+      if (gbOpcodeParams.includes('d8')) {
+        params.push(gbMemory[i + 1]);
+      } else if (gbOpcodeParams.includes('d16')) {
+        params.push(gbMemory[i + 1]);
+        params.push(gbMemory[i + 2]);
+      }
+    }
+
+    data[i] = {
+      index: i,
+      data: gbMemory[i],
+      isCb,
+      params,
+      mnemonic: gbOpcode.instruction.mnemonic,
+      cycles,
+      gbOpcode
+    };
+
+    i += params.length;
   }
+};
+const proxyFunc = i => {
+  loopFunc(i);
+};
+let temperFunc = () => {
+  // Build our rows
+  for (let i = 0; i < gbMemorySize; i++) {
+    proxyFunc(i);
+  }
+};
+let updateTask = async () => {
+  await tempFunc();
+  temperFunc();
 
   // Get our program Counter
   return await WasmBoy._runWasmExport('getProgramCounter');
@@ -110,8 +123,9 @@ export default class Disassembler extends Component {
     }
 
     // CLean up, and try to get the updateTask out of memory
-    clearInterval(this.updateInterval);
-    updateTask = undefined;
+    if (this.updateInterval) {
+      clearInterval(this.updateInterval);
+    }
   }
 
   intervalUpdate() {
