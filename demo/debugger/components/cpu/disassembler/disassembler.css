@@ -23,6 +23,7 @@
 /*NOTE: Height MUST be kept in sync with this.rowHeight, see renderRow()*/
 :root {
   --dissassembler-width: 450px;
+  --dissassembler-height: 450px;
   --dissassembler-row-height: 30px;
   --disassembler-actions-width: 75px;
   --disassembler-hex-width: 75px;
@@ -49,7 +50,7 @@
 
 .disassembler__list {
   width: var(--dissassembler-width);
-  height: 500px;
+  height: var(--dissassembler-height);
 
   border: 1px solid black;
 }

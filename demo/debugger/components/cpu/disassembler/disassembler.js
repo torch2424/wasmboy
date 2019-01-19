@@ -9,7 +9,7 @@ import { GBOpcodes } from 'gb-instructions-opcodes';
 
 import './disassembler.css';
 
-import VirtualList from 'preact-virtual-list';
+import VirtualList from '../../virtualList';
 
 // Long Living functions to avoid memory leaks
 // https://developers.google.com/web/tools/chrome-devtools/memory-problems/#identify_js_heap_memory_leaks_with_allocation_timelines
@@ -23,7 +23,7 @@ let updateTask = async () => {
   if (!gbMemoryStart) {
     gbMemoryStart = await WasmBoy._getWasmConstant('DEBUG_GAMEBOY_MEMORY_LOCATION');
     gbMemorySize = await WasmBoy._getWasmConstant('DEBUG_GAMEBOY_MEMORY_SIZE');
-    gbMemoryEnd = gbMemoryStart + gbMemorySize;
+    gbMemoryEnd = gbMemoryStart + gbMemorySize + 1;
   }
 
   await WasmBoy._runWasmExport('updateDebugGBMemory', []);
@@ -85,6 +85,8 @@ export default class Disassembler extends Component {
 
     // 30 px rows
     this.rowHeight = 30;
+    // 450 px total height
+    this.height = 450;
 
     this.updateInterval = false;
 
@@ -264,6 +266,7 @@ export default class Disassembler extends Component {
               class="disassembler__list__virtual"
               data={data}
               rowHeight={this.rowHeight}
+              height={this.height}
               renderRow={row => this.renderRow(row)}
             />
           </div>
