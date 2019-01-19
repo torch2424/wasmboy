@@ -137,7 +137,7 @@ export function PUBX_INITIALIZE() {
         }
 
         Pubx.publish(PUBX_KEYS.WASMBOY, {
-          playing: WasmBoy.isPlaying(),
+          playing: WasmBoy.isReady() && WasmBoy.isPlaying(),
           paused: WasmBoy.isPaused(),
           ready: WasmBoy.isReady(),
           loadedAndStarted: WasmBoy.isLoadedAndStarted(),

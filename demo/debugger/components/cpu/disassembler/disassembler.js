@@ -1,21 +1,22 @@
 import { h, Component } from 'preact';
 
+import { GBOpcodes } from 'gb-instructions-opcodes';
+
 import { Pubx } from 'pubx';
 import { PUBX_KEYS } from '../../../pubx.config';
 
 import { WasmBoy } from '../../../wasmboy';
 
-import { GBOpcodes } from 'gb-instructions-opcodes';
+import VirtualList from '../../virtualList';
+
+import { stepOpcode, runNumberOfOpcodes, runUntilBreakPoint } from '../opcode.js';
 
 import './disassembler.css';
-
-import VirtualList from '../../virtualList';
 
 // Long Living functions to avoid memory leaks
 // https://developers.google.com/web/tools/chrome-devtools/memory-problems/#identify_js_heap_memory_leaks_with_allocation_timelines
 // https://stackoverflow.com/questions/18364175/best-practices-for-reducing-garbage-collector-activity-in-javascript
 let gbMemory = [];
-const data = [];
 let gbMemoryStart;
 let gbMemorySize;
 let gbMemoryEnd;
@@ -26,10 +27,13 @@ let updateTask = async () => {
     gbMemoryEnd = gbMemoryStart + gbMemorySize + 1;
   }
 
+  const data = [];
+
   await WasmBoy._runWasmExport('updateDebugGBMemory', []);
   gbMemory = await WasmBoy._getWasmMemorySection(gbMemoryStart, gbMemoryEnd);
 
   // Build our rows
+  let address = 0;
   for (let i = 0; i < gbMemory.length; i++) {
     const opcode = gbMemory[i];
     const gbOpcode = GBOpcodes.getOpcode(opcode);
@@ -58,7 +62,7 @@ let updateTask = async () => {
       }
 
       data[i] = {
-        index: i,
+        address: address,
         data: gbMemory[i],
         isCb,
         params,
@@ -67,12 +71,13 @@ let updateTask = async () => {
         gbOpcode
       };
 
-      i += params.length;
+      address++;
+      address += params.length;
     }
   }
 
   // Get our program Counter
-  return await WasmBoy._runWasmExport('getProgramCounter');
+  return data;
 };
 
 // Our unsub
@@ -88,22 +93,38 @@ export default class Disassembler extends Component {
     // 450 px total height
     this.height = 450;
 
-    this.updateInterval = false;
+    this.updateTimeout = false;
 
     this.state.programCounter = 0;
     this.state.wasmboy = {};
     this.state.loading = {};
+
+    this.data = [];
   }
 
   componentDidMount() {
     this.ready = false;
     unsubLoading = Pubx.subscribe(PUBX_KEYS.LOADING, newState => this.setState({ loading: newState }));
-    unsubWasmBoy = Pubx.subscribe(PUBX_KEYS.WASMBOY, newState => this.setState({ wasmboy: newState }));
+    unsubWasmBoy = Pubx.subscribe(PUBX_KEYS.WASMBOY, newState => {
+      this.setState({ wasmboy: newState });
+      this.update();
+    });
+    this.setState({
+      loading: Pubx.get(PUBX_KEYS.LOADING),
+      wasmboy: Pubx.get(PUBX_KEYS.WASMBOY)
+    });
 
     const updateLoop = () => {
-      this.updateInterval = setTimeout(() => {
-        this.intervalUpdate().then(() => {
+      this.updateTimeout = setTimeout(() => {
+        if (!this.state.wasmboy.ready || !this.state.wasmboy.playing) {
           updateLoop();
+          return;
+        }
+
+        this.update().then(() => {
+          if (this.updateTimeout) {
+            updateLoop();
+          }
         });
       }, 250);
     };
@@ -119,35 +140,86 @@ export default class Disassembler extends Component {
     }
 
     // CLean up, and try to get the updateTask out of memory
-    clearInterval(this.updateInterval);
+    clearTimeout(this.updateTimeout);
+    this.updateTimeout = false;
   }
 
-  intervalUpdate() {
+  update() {
     if (!WasmBoy.isReady()) {
       return Promise.resolve();
     }
 
-    return updateTask().then(programCounter => {
-      // Check if the program counter changed, if it did, scroll to it
-      if (programCounter !== this.state.programCounter) {
-        const virtualListElement = this.base.querySelector('.disassembler__list__virtual');
+    return updateTask()
+      .then(data => {
+        delete this.data;
+        this.data = data;
+        return WasmBoy._runWasmExport('getProgramCounter');
+      })
+      .then(programCounter => {
+        // Check if the program counter changed, if it did, scroll to it
+        if (programCounter !== this.state.programCounter) {
+          this.scrollToAddress(programCounter);
+        }
 
-        if (virtualListElement) {
-          // Scroll to the current PC element (-1 to stop the no view bug).
-          let top = this.rowHeight * (programCounter - 5);
-          if (programCounter >= data.length - 5) {
-            top = this.rowHeight * programCounter;
-          }
+        // Have to re-render to pass data
+        this.setState({
+          programCounter
+        });
+      });
+  }
 
-          virtualListElement.scrollTop = top;
+  stepOpcode() {
+    stepOpcode();
+    this.update();
+  }
+
+  scrollToAddress(address) {
+    const virtualListElement = this.base.querySelector('.disassembler__list__virtual');
+
+    if (virtualListElement) {
+      // We need to find which row the address is closest to.
+      let rowIndex = 0;
+      for (let i = address; i > 0; i--) {
+        if (this.data[i] && (this.data[i].address === address || address > this.data[i].address)) {
+          rowIndex = i;
+          i = 0;
         }
       }
 
-      // Have to re-render to pass data
-      this.setState({
-        programCounter
+      // Get a row offset
+      let rowOffset = 2;
+      if (rowIndex < rowOffset || address >= 0xfff0) {
+        rowOffset = 0;
+      }
+
+      // Set the scrolltop
+      let top = this.rowHeight * rowIndex;
+      top -= this.rowHeight * rowOffset;
+      virtualListElement.scrollTop = top;
+
+      // Now the virtual list is weird, so this will now render the rows
+      // So now let's find the element, and figure out how far out of view it is
+      setTimeout(() => {
+        let row = this.base.querySelector(`.disassembler__list__virtual .disassembler-row-${address}`);
+        if (!row) {
+          row = this.base.querySelector(`.disassembler__list__virtual > div > div > div[id]`);
+        }
+
+        if (!row) {
+          return;
+        }
+
+        const listRect = virtualListElement.getBoundingClientRect();
+        const rowRect = row.getBoundingClientRect();
+
+        const difference = listRect.y - rowRect.y;
+        if (difference > 0) {
+          top = virtualListElement.scrollTop - difference;
+          top -= this.rowHeight * rowOffset;
+          virtualListElement.scrollTop = top;
+        }
       });
-    });
+    }
   }
 
   showInstructionInfo(gbOpcode) {
@@ -199,11 +271,18 @@ export default class Disassembler extends Component {
       );
     }
 
+    // Our classes for the row
+    const classes = ['disassembler__list__virtual__row'];
+    classes.push(`disassembler-row-${row.address}`);
+    for (let i = 1; i <= row.params.length; i++) {
+      classes.push(`disassembler-row-${row.address + i}`);
+    }
+
     // The row height needs to be forced, or will mess up virtual list overscan
     // Height is set in CSS for performance
     // Can't set background color here, as rows are rendered ahead of time
     return (
-      <div id={`disassembler-row-${row.index}`} class="disassembler__list__virtual__row">
+      <div class={classes.join(' ')}>
         <div class="disassembler__list__virtual__row__actions">
           <button class="button clear" onClick={() => this.showInstructionInfo(row.gbOpcode)}>
             ℹ️
@@ -212,7 +291,7 @@ export default class Disassembler extends Component {
         <div class="disassembler__list__virtual__row__mnemonic">{row.mnemonic}</div>
         <div class="disassembler__list__virtual__row__cycles">{row.cycles}</div>
         <div class="disassembler__list__virtual__row__address">
-          {row.index
+          {row.address
             .toString(16)
             .toUpperCase()
             .padStart(4, '0')}
@@ -245,7 +324,7 @@ export default class Disassembler extends Component {
         <style
           dangerouslySetInnerHTML={{
             __html: `
-          #disassembler-row-${this.state.programCounter} {
+          .disassembler-row-${this.state.programCounter} {
             background-color: rgba(13, 136, 244, 0.78);
           }
         `
@@ -253,6 +332,18 @@ export default class Disassembler extends Component {
         />
 
         <div class="disassembler__container">
+          <div class="disassembler__info">
+            Program Counter: 0x
+            {this.state.programCounter
+              .toString(16)
+              .toUpperCase()
+              .padStart(2, '0')}
+          </div>
+
+          <div class="disassembler__control">
+            <button onClick={() => this.stepOpcode()}>Step</button>
+          </div>
+
           <div class="disassembler__header-list">
             <div class="disassembler__header-list__actions">Actions</div>
             <div class="disassembler__header-list__mnemonic">Instruction</div>
@@ -264,7 +355,7 @@ export default class Disassembler extends Component {
           <div class="disassembler__list">
             <VirtualList
               class="disassembler__list__virtual"
-              data={data}
+              data={this.data}
               rowHeight={this.rowHeight}
               height={this.height}
               renderRow={row => this.renderRow(row)}

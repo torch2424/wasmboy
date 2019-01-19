@@ -30,7 +30,7 @@ export default class VirtualList extends Component {
 
   render({ data, rowHeight, renderRow, overscanCount = 10, sync, height, ...props }, { offset = 0 }) {
     // Increase our height, for some reason doesn't work without this :p
-    height = height * 3;
+    height = height * 2.5;
 
     // first visible row index
     let start = (offset / rowHeight) | 0;
