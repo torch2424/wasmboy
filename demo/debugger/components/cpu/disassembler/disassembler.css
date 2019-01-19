@@ -13,6 +13,19 @@
   display: block;
 }
 
+.disassembler .donut {
+  display: none;
+}
+
+.disassembler--control-loading .donut {
+  display: block;
+}
+
+.disassembler.disassembler--control-loading .disassembler__container,
+.disassembler.disassembler--control-loading .disassembler__not-ready {
+  display: none;
+}
+
 .disassembler__container {
   width: 475px;
   overflow: hidden;

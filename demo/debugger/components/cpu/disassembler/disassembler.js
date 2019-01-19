@@ -108,6 +108,7 @@ export default class Disassembler extends Component {
     unsubWasmBoy = Pubx.subscribe(PUBX_KEYS.WASMBOY, newState => {
       this.setState({ wasmboy: newState });
       this.update();
+      setTimeout(() => this.scrollToAddress(this.state.programCounter), 250);
     });
     this.setState({
       loading: Pubx.get(PUBX_KEYS.LOADING),
@@ -308,17 +309,23 @@ export default class Disassembler extends Component {
   }
 
   render() {
+    const classes = ['disassembler'];
+    if (this.state.wasmboy.ready) {
+      classes.push('disassembler--ready');
+    }
+    if (this.state.loading.controlLoading) {
+      classes.push('disassembler--control-loading');
+    }
+
     return (
-      <div
-        class={`disassembler 
-        ${this.state.wasmboy.ready ? 'disassembler--ready' : ''} 
-        ${this.state.loading.controlLoading ? 'disassembler--control-loading' : ''}`}
-      >
+      <div class={classes.join(' ')}>
         <h1>Disassembler</h1>
 
         <div class="disassembler__not-ready">
           <i>Please Load a ROM to be disassmbled.</i>
         </div>
+
+        <div class="donut" />
 
         {/*Style tag to apply styles to whatever our current program counter is at*/}
         <style
