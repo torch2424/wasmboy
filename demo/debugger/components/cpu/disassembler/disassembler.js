@@ -103,6 +103,7 @@ export default class Disassembler extends Component {
     this.updateTimeout = false;
 
     this.state.programCounter = 0;
+    this.state.breakpoint = 0;
     this.state.wasmboy = {};
     this.state.loading = {};
 
@@ -198,6 +199,33 @@ export default class Disassembler extends Component {
     const runOpcodesPromise = runNumberOfOpcodes(numberOfOpcodes);
     runOpcodesPromise.then(() => {
       Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification(`Ran ${numberOfOpcodes} opcodes! 😄`);
+      this.update();
+      this.setState({
+        running: false
+      });
+    });
+  }
+
+  runUntilBreakPoint() {
+    const breakPoint = this.state.breakpoint;
+
+    if (!breakPoint || breakPoint < 0) {
+      Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Please enter a valid value. 😄');
+      return;
+    }
+
+    this.setState({
+      running: true
+    });
+
+    const runUntilBreakPointPromise = runUntilBreakPoint(breakPoint);
+    runUntilBreakPointPromise.then(() => {
+      Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification(
+        `Ran until the 0x${breakPoint
+          .toString(16)
+          .toUpperCase()
+          .padStart(4, '0')} break point! 😄`
+      );
       this.update();
       this.setState({
         running: false
@@ -320,9 +348,10 @@ export default class Disassembler extends Component {
     return (
       <div class={classes.join(' ')}>
         <div class="disassembler__list__virtual__row__actions">
-          <button class="button clear" onClick={() => this.showInstructionInfo(row.gbOpcode)}>
-            ℹ️
+          <button onClick={() => this.setState({ breakpoint: row.address })}>
+            {this.state.breakpoint === row.address ? <div>🔴</div> : <div>⚪</div>}
           </button>
+          <button onClick={() => this.showInstructionInfo(row.gbOpcode)}>ℹ️</button>
         </div>
         <div class="disassembler__list__virtual__row__mnemonic">{row.mnemonic}</div>
         <div class="disassembler__list__virtual__row__cycles">{row.cycles}</div>
@@ -378,15 +407,25 @@ export default class Disassembler extends Component {
 
         <div class="disassembler__container">
           <div class="disassembler__info">
-            Program Counter: 0x
-            {this.state.programCounter
-              .toString(16)
-              .toUpperCase()
-              .padStart(2, '0')}
+            <div>
+              Program Counter: 0x
+              {this.state.programCounter
+                .toString(16)
+                .toUpperCase()
+                .padStart(2, '0')}
+            </div>
+            <div>
+              Breakpoint: 0x
+              {this.state.breakpoint
+                .toString(16)
+                .toUpperCase()
+                .padStart(4, '0')}
+            </div>
           </div>
 
           <div class="disassembler__control">
             <button onClick={() => this.stepOpcode()}>Step</button>
+            <button onClick={() => this.runUntilBreakPoint()}>Run Until Breakpoint</button>
             <button onClick={() => this.scrollToProgramCounter()}>Scroll To Program Counter</button>
             <InputSubmit
               class="disassembler__control__jump-address"
