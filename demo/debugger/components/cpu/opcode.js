@@ -47,31 +47,12 @@ export function runNumberOfOpcodes(numberOfOpcodes) {
 // Function to keep running opcodes until a breakpoint is reached
 export function runUntilBreakPoint(passedBreakPoint) {
   // Set our opcode breakpoint
-  const breakPoint = parseInt(passedBreakPoint, 16);
+  const breakPoint = passedBreakPoint;
 
   stepOpcode();
 
   const breakPointTask = async breakPoint => {
-    const response = await WasmBoy._runWasmExport('executeFrameUntilBreakpoint', [breakPoint]);
-
-    if (response === 0) {
-      const continueSearchingForBreakPointTask = async () => {
-        await new Promise(resolve => {
-          requestAnimationFrame(() => {
-            resolve();
-          });
-        });
-
-        return breakPointTask(breakPoint);
-      };
-
-      return continueSearchingForBreakPointTask();
-    } else if (response === -1) {
-      throw new Error('WasmBoy Crashed while trying to reach the breakpoint');
-    }
-
-    // We Reached the breakpoint!
-    return true;
+    await WasmBoy._playUntilBreakpoint(breakPoint);
   };
   return breakPointTask(breakPoint);
 }

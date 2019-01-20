@@ -183,6 +183,11 @@ export default class Disassembler extends Component {
   }
 
   runNumberOfOpcodes(value) {
+    if (!WasmBoy.isReady()) {
+      Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Please load a ROM. 💾');
+      return;
+    }
+
     const numberOfOpcodes = value;
 
     runNumberOfOpcodes(numberOfOpcodes);
@@ -204,9 +209,15 @@ export default class Disassembler extends Component {
         running: false
       });
     });
+    Pubx.get(PUBX_KEYS.LOADING).addControlPromise(runOpcodesPromise);
   }
 
   runUntilBreakPoint() {
+    if (!WasmBoy.isReady()) {
+      Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Please load a ROM. 💾');
+      return;
+    }
+
     const breakPoint = this.state.breakpoint;
 
     if (!breakPoint || breakPoint < 0) {
@@ -231,6 +242,7 @@ export default class Disassembler extends Component {
         running: false
       });
     });
+    Pubx.get(PUBX_KEYS.LOADING).addControlPromise(runUntilBreakPointPromise);
   }
 
   scrollToProgramCounter() {
@@ -390,11 +402,12 @@ export default class Disassembler extends Component {
       <div class={classes.join(' ')}>
         <h1>Disassembler</h1>
 
+        <div>
+          <i>ROMs will not autoplay while this widget is open.</i>
+        </div>
+
         <div class="disassembler__not-ready">
           <i>Please Load a ROM to be disassmbled.</i>
-        </div>
-        <div class="disassembler__not-ready">
-          <i>ROMs will not autoplay while this widget is open.</i>
         </div>
 
         <div class="donut" />
@@ -438,6 +451,7 @@ export default class Disassembler extends Component {
               pattern="[a-fA-F\d]+"
               initialValue="100"
               label="Jump To Address: 0x"
+              buttonText="Jump"
               maxlength="4"
               onSubmit={value => this.scrollToAddress(parseInt(value, 16))}
             />
@@ -446,6 +460,7 @@ export default class Disassembler extends Component {
               type="number"
               initialValue="100"
               label="Run Number of Opcodes:"
+              buttonText="Run"
               min="1"
               onSubmit={value => this.runNumberOfOpcodes(value)}
             />

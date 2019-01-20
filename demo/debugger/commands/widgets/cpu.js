@@ -9,7 +9,6 @@ import { PUBX_KEYS } from '../../pubx.config';
 import Command from '../command';
 
 import CpuState from '../../components/cpu/cpuState/cpuState';
-import CpuControl from '../../components/cpu/cpuControl/cpuControl';
 import Disassembler from '../../components/cpu/disassembler/disassembler';
 
 class CpuStateCommand extends Command {
@@ -22,20 +21,6 @@ class CpuStateCommand extends Command {
     Pubx.get(PUBX_KEYS.WIDGET).addWidget({
       component: <CpuState />,
       label: 'CPU State'
-    });
-  }
-}
-
-class CpuControlCommand extends Command {
-  constructor() {
-    super('cpu:control');
-    this.options.label = 'Control';
-  }
-
-  execute() {
-    Pubx.get(PUBX_KEYS.WIDGET).addWidget({
-      component: <CpuControl />,
-      label: 'CPU Control'
     });
   }
 }
@@ -54,5 +39,5 @@ class DisassemblerCommand extends Command {
   }
 }
 
-const exportedCommands = [new CpuStateCommand(), new CpuControlCommand(), new DisassemblerCommand()];
+const exportedCommands = [new CpuStateCommand(), new DisassemblerCommand()];
 export default exportedCommands;

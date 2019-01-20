@@ -6,6 +6,8 @@ s;
 import { Pubx } from 'pubx';
 import { PUBX_KEYS } from '../../../pubx.config';
 
+import InputSubmit from '../../inputSubmit';
+
 import DebuggerAnalytics from '../../../analytics';
 import { WasmBoy } from '../../../wasmboy';
 
@@ -40,6 +42,24 @@ export default class WasmBoyControls extends Component {
     } else {
       this.base.classList.remove('wasmboy-controls--control-loading');
     }
+  }
+
+  runNumberOfFrames(frames) {
+    if (!WasmBoy.isReady()) {
+      Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Please load a ROM. 💾');
+      return;
+    }
+
+    if (!frames || frames < 1) {
+      Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Please enter a valid value. 😄');
+      return;
+    }
+
+    const runFramesPromise = WasmBoy._runNumberOfFrames(frames);
+    runFramesPromise.then(() => {
+      Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification(`Ran ${frames} frame(s)! 😄`);
+    });
+    Pubx.get(PUBX_KEYS.LOADING).addControlPromise(runFramesPromise);
   }
 
   saveState() {
@@ -155,6 +175,16 @@ export default class WasmBoyControls extends Component {
               Play
             </button>
           )}
+          {/* Run Number Of Frames */}
+          <InputSubmit
+            class="wasmboy-controls__group__input-submit"
+            type="number"
+            initialValue="1"
+            label="Run Number of Frames:"
+            buttonText="Run"
+            min="1"
+            onSubmit={value => this.runNumberOfFrames(value)}
+          />
         </div>
 
         {/* Save / Load States */}

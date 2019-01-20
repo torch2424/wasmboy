@@ -84,6 +84,10 @@ body {
 }
 
 .content > div {
+  position: relative;
+  top: 0;
+  left: 0;
+
   flex: 1 1 auto;
   border: 1px solid #020202;
   overflow: auto;

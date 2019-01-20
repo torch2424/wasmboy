@@ -8,6 +8,7 @@ export {
   executeFrame,
   executeFrameAndCheckAudio,
   executeFrameUntilBreakpoint,
+  executeFrameAndCheckAudioUntilBreakpoint,
   executeUntilCondition,
   executeStep
 } from './execute';

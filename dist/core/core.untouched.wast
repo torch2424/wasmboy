@@ -275,6 +275,9 @@
  (global $core/graphics/palette/Palette.memoryLocationBackgroundPaletteIndex (mut i32) (i32.const 65384))
  (global $core/graphics/palette/Palette.memoryLocationSpritePaletteData (mut i32) (i32.const 65387))
  (global $core/graphics/palette/Palette.memoryLocationBackgroundPaletteData (mut i32) (i32.const 65385))
+ (global $core/execute/Execute.RESPONSE_CONDITION_FRAME (mut i32) (i32.const 0))
+ (global $core/execute/Execute.RESPONSE_CONDITION_AUDIO (mut i32) (i32.const 1))
+ (global $core/execute/Execute.RESPONSE_CONDITION_BREAKPOINT (mut i32) (i32.const 2))
  (global $core/legacy/wasmMemorySize i32 (i32.const 9175040))
  (global $core/legacy/wasmBoyInternalStateLocation i32 (i32.const 1024))
  (global $core/legacy/wasmBoyInternalStateSize i32 (i32.const 1024))
@@ -304,6 +307,7 @@
  (export "_setargc" (func $~setargc))
  (export "executeFrameAndCheckAudio" (func $core/execute/executeFrameAndCheckAudio|trampoline))
  (export "executeFrameUntilBreakpoint" (func $core/execute/executeFrameUntilBreakpoint))
+ (export "executeFrameAndCheckAudioUntilBreakpoint" (func $core/execute/executeFrameAndCheckAudioUntilBreakpoint))
  (export "executeUntilCondition" (func $core/execute/executeUntilCondition|trampoline))
  (export "executeStep" (func $core/execute/executeStep))
  (export "getCyclesPerCycleSet" (func $core/cycles/getCyclesPerCycleSet))
@@ -13664,17 +13668,17 @@
    end
    i32.sub
    set_global $core/cpu/cpu/Cpu.currentCycles
-   i32.const 0
+   get_global $core/execute/Execute.RESPONSE_CONDITION_FRAME
    return
   end
   get_local $5
   if
-   i32.const 1
+   get_global $core/execute/Execute.RESPONSE_CONDITION_AUDIO
    return
   end
   get_local $3
   if
-   i32.const 2
+   get_global $core/execute/Execute.RESPONSE_CONDITION_BREAKPOINT
    return
   end
   get_global $core/cpu/cpu/Cpu.programCounter
@@ -13726,29 +13730,25 @@
   i32.const 0
  )
  (func $core/execute/executeFrameUntilBreakpoint (; 175 ;) (type $ii) (param $0 i32) (result i32)
-  (local $1 i32)
   i32.const -1
   get_local $0
   call $core/execute/executeUntilCondition
-  tee_local $1
-  i32.const 2
-  i32.eq
-  if
-   i32.const 1
-   return
-  end
-  get_local $1
  )
- (func $core/cycles/getCyclesPerCycleSet (; 176 ;) (type $i) (result i32)
+ (func $core/execute/executeFrameAndCheckAudioUntilBreakpoint (; 176 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+  get_local $0
+  get_local $1
+  call $core/execute/executeUntilCondition
+ )
+ (func $core/cycles/getCyclesPerCycleSet (; 177 ;) (type $i) (result i32)
   get_global $core/cycles/Cycles.cyclesPerCycleSet
  )
- (func $core/cycles/getCycleSets (; 177 ;) (type $i) (result i32)
+ (func $core/cycles/getCycleSets (; 178 ;) (type $i) (result i32)
   get_global $core/cycles/Cycles.cycleSets
  )
- (func $core/cycles/getCycles (; 178 ;) (type $i) (result i32)
+ (func $core/cycles/getCycles (; 179 ;) (type $i) (result i32)
   get_global $core/cycles/Cycles.cycles
  )
- (func $core/joypad/joypad/_getJoypadButtonStateFromButtonId (; 179 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/joypad/joypad/_getJoypadButtonStateFromButtonId (; 180 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   block $case8|0
    block $case7|0
@@ -13799,7 +13799,7 @@
   end
   i32.const 0
  )
- (func $core/joypad/joypad/_setJoypadButtonStateFromButtonId (; 180 ;) (type $iiv) (param $0 i32) (param $1 i32)
+ (func $core/joypad/joypad/_setJoypadButtonStateFromButtonId (; 181 ;) (type $iiv) (param $0 i32) (param $1 i32)
   (local $2 i32)
   block $break|0
    block $case7|0
@@ -13872,7 +13872,7 @@
    set_global $core/joypad/joypad/Joypad.start
   end
  )
- (func $core/joypad/joypad/_pressJoypadButton (; 181 ;) (type $iv) (param $0 i32)
+ (func $core/joypad/joypad/_pressJoypadButton (; 182 ;) (type $iv) (param $0 i32)
   (local $1 i32)
   i32.const 0
   set_global $core/cpu/cpu/Cpu.isStopped
@@ -13918,12 +13918,12 @@
    end
   end
  )
- (func $core/joypad/joypad/_releaseJoypadButton (; 182 ;) (type $iv) (param $0 i32)
+ (func $core/joypad/joypad/_releaseJoypadButton (; 183 ;) (type $iv) (param $0 i32)
   get_local $0
   i32.const 0
   call $core/joypad/joypad/_setJoypadButtonStateFromButtonId
  )
- (func $core/joypad/joypad/setJoypadState (; 183 ;) (type $iiiiiiiiv) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (param $7 i32)
+ (func $core/joypad/joypad/setJoypadState (; 184 ;) (type $iiiiiiiiv) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (param $7 i32)
   get_local $0
   i32.const 0
   i32.gt_s
@@ -14005,44 +14005,44 @@
    call $core/joypad/joypad/_releaseJoypadButton
   end
  )
- (func $core/debug/debug-cpu/getRegisterA (; 184 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterA (; 185 ;) (type $i) (result i32)
   get_global $core/cpu/cpu/Cpu.registerA
  )
- (func $core/debug/debug-cpu/getRegisterB (; 185 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterB (; 186 ;) (type $i) (result i32)
   get_global $core/cpu/cpu/Cpu.registerB
  )
- (func $core/debug/debug-cpu/getRegisterC (; 186 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterC (; 187 ;) (type $i) (result i32)
   get_global $core/cpu/cpu/Cpu.registerC
  )
- (func $core/debug/debug-cpu/getRegisterD (; 187 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterD (; 188 ;) (type $i) (result i32)
   get_global $core/cpu/cpu/Cpu.registerD
  )
- (func $core/debug/debug-cpu/getRegisterE (; 188 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterE (; 189 ;) (type $i) (result i32)
   get_global $core/cpu/cpu/Cpu.registerE
  )
- (func $core/debug/debug-cpu/getRegisterH (; 189 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterH (; 190 ;) (type $i) (result i32)
   get_global $core/cpu/cpu/Cpu.registerH
  )
- (func $core/debug/debug-cpu/getRegisterL (; 190 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterL (; 191 ;) (type $i) (result i32)
   get_global $core/cpu/cpu/Cpu.registerL
  )
- (func $core/debug/debug-cpu/getRegisterF (; 191 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterF (; 192 ;) (type $i) (result i32)
   get_global $core/cpu/cpu/Cpu.registerF
  )
- (func $core/debug/debug-cpu/getProgramCounter (; 192 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getProgramCounter (; 193 ;) (type $i) (result i32)
   get_global $core/cpu/cpu/Cpu.programCounter
  )
- (func $core/debug/debug-cpu/getStackPointer (; 193 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getStackPointer (; 194 ;) (type $i) (result i32)
   get_global $core/cpu/cpu/Cpu.stackPointer
  )
- (func $core/debug/debug-cpu/getOpcodeAtProgramCounter (; 194 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getOpcodeAtProgramCounter (; 195 ;) (type $i) (result i32)
   get_global $core/cpu/cpu/Cpu.programCounter
   call $core/memory/load/eightBitLoadFromGBMemory
  )
- (func $core/debug/debug-graphics/getLY (; 195 ;) (type $i) (result i32)
+ (func $core/debug/debug-graphics/getLY (; 196 ;) (type $i) (result i32)
   get_global $core/graphics/graphics/Graphics.scanlineRegister
  )
- (func $core/debug/debug-graphics/drawBackgroundMapToWasmMemory (; 196 ;) (type $iv) (param $0 i32)
+ (func $core/debug/debug-graphics/drawBackgroundMapToWasmMemory (; 197 ;) (type $iv) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -14284,7 +14284,7 @@
    end
   end
  )
- (func $core/debug/debug-graphics/drawTileDataToWasmMemory (; 197 ;) (type $v)
+ (func $core/debug/debug-graphics/drawTileDataToWasmMemory (; 198 ;) (type $v)
   (local $0 i32)
   (local $1 i32)
   (local $2 i32)
@@ -14401,16 +14401,16 @@
    unreachable
   end
  )
- (func $core/debug/debug-timer/getDIV (; 198 ;) (type $i) (result i32)
+ (func $core/debug/debug-timer/getDIV (; 199 ;) (type $i) (result i32)
   get_global $core/timers/timers/Timers.dividerRegister
  )
- (func $core/debug/debug-timer/getTIMA (; 199 ;) (type $i) (result i32)
+ (func $core/debug/debug-timer/getTIMA (; 200 ;) (type $i) (result i32)
   get_global $core/timers/timers/Timers.timerCounter
  )
- (func $core/debug/debug-timer/getTMA (; 200 ;) (type $i) (result i32)
+ (func $core/debug/debug-timer/getTMA (; 201 ;) (type $i) (result i32)
   get_global $core/timers/timers/Timers.timerModulo
  )
- (func $core/debug/debug-timer/getTAC (; 201 ;) (type $i) (result i32)
+ (func $core/debug/debug-timer/getTAC (; 202 ;) (type $i) (result i32)
   (local $0 i32)
   get_global $core/timers/timers/Timers.timerInputClock
   set_local $0
@@ -14423,7 +14423,7 @@
   end
   get_local $0
  )
- (func $core/debug/debug-memory/updateDebugGBMemory (; 202 ;) (type $v)
+ (func $core/debug/debug-memory/updateDebugGBMemory (; 203 ;) (type $v)
   (local $0 i32)
   block $break|0
    loop $repeat|0
@@ -14447,7 +14447,7 @@
    unreachable
   end
  )
- (func $start (; 203 ;) (type $v)
+ (func $start (; 204 ;) (type $v)
   current_memory
   i32.const 140
   i32.lt_s
@@ -14459,10 +14459,10 @@
    drop
   end
  )
- (func $null (; 204 ;) (type $v)
+ (func $null (; 205 ;) (type $v)
   nop
  )
- (func $core/execute/executeFrameAndCheckAudio|trampoline (; 205 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/execute/executeFrameAndCheckAudio|trampoline (; 206 ;) (type $ii) (param $0 i32) (result i32)
   block $1of1
    block $0of1
     block $outOfRange
@@ -14478,11 +14478,11 @@
   i32.const -1
   call $core/execute/executeUntilCondition
  )
- (func $~setargc (; 206 ;) (type $iv) (param $0 i32)
+ (func $~setargc (; 207 ;) (type $iv) (param $0 i32)
   get_local $0
   set_global $~argc
  )
- (func $core/execute/executeUntilCondition|trampoline (; 207 ;) (type $iiii) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $core/execute/executeUntilCondition|trampoline (; 208 ;) (type $iiii) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   block $3of3
    block $2of3
     block $1of3

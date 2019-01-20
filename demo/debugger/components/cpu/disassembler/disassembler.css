@@ -15,15 +15,30 @@
 
 .disassembler .donut {
   display: none;
+
+  position: absolute;
+  top: 25px;
+  right: 25px;
+  text-align: right;
 }
 
 .disassembler--control-loading .donut {
   display: block;
 }
 
-.disassembler.disassembler--control-loading .disassembler__container,
+.disassembler.disassembler--control-loading:not(.disassembler--running) .disassembler__container,
 .disassembler.disassembler--control-loading .disassembler__not-ready {
   display: none;
+}
+
+.disassembler--running .donut {
+  display: block;
+}
+
+.disassembler.disassembler--running button {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
 }
 
 .disassembler__container {
