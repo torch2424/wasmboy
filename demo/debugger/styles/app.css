@@ -1,5 +1,10 @@
 /* Styles pertaining to the app itself */
 
+html,
+body {
+  font-family: Sans-Serif, Helvetica, Arial;
+}
+
 body {
   display: flex;
   z-index: 0;

@@ -348,10 +348,12 @@ export default class Disassembler extends Component {
     return (
       <div class={classes.join(' ')}>
         <div class="disassembler__list__virtual__row__actions">
-          <button onClick={() => this.setState({ breakpoint: row.address })}>
+          <button class="remove-default-button" onClick={() => this.setState({ breakpoint: row.address })}>
             {this.state.breakpoint === row.address ? <div>🔴</div> : <div>⚪</div>}
           </button>
-          <button onClick={() => this.showInstructionInfo(row.gbOpcode)}>ℹ️</button>
+          <button class="remove-default-button" onClick={() => this.showInstructionInfo(row.gbOpcode)}>
+            <div>ℹ️</div>
+          </button>
         </div>
         <div class="disassembler__list__virtual__row__mnemonic">{row.mnemonic}</div>
         <div class="disassembler__list__virtual__row__cycles">{row.cycles}</div>
@@ -390,6 +392,9 @@ export default class Disassembler extends Component {
 
         <div class="disassembler__not-ready">
           <i>Please Load a ROM to be disassmbled.</i>
+        </div>
+        <div class="disassembler__not-ready">
+          <i>ROMs will not autoplay while this widget is open.</i>
         </div>
 
         <div class="donut" />

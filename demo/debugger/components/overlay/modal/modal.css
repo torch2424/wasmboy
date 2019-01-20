@@ -66,7 +66,6 @@
 .modal__container__component {
   z-index: 1;
   overflow: auto;
-  width: 100%;
 
   /* Height is 100% - title bar height */
   height: calc(100% - 20px);

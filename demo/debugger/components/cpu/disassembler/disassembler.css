@@ -135,15 +135,23 @@
 
 .disassembler__list__virtual__row__actions {
   display: flex;
-  justify-content: center;
+  justify-content: space-evenly;
   align-items: flex-start;
 
   height: var(--disassembler-row-height);
 }
 
 .disassembler__list__virtual__row__actions > button {
+  position: relative;
   padding: 5px;
+  margin-top: 3px;
   width: 20px !important;
   height: 20px !important;
   cursor: pointer;
+}
+
+.disassembler__list__virtual__row__actions > button > div {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
