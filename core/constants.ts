@@ -6,9 +6,9 @@
 // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
 // ----------------------------------
 
-// WasmBoy
+// WasmBoy General
 export const WASMBOY_MEMORY_LOCATION: i32 = 0x000000;
-export const WASMBOY_MEMORY_SIZE: i32 = 0x8b0000;
+export const WASMBOY_MEMORY_SIZE: i32 = 0x8c0000;
 export const WASMBOY_WASM_PAGES: i32 = WASMBOY_MEMORY_SIZE / 1024 / 64;
 
 // AssemblyScript
@@ -54,3 +54,7 @@ export const CARTRIDGE_RAM_LOCATION: i32 = 0x0afc00;
 export const CARTRIDGE_RAM_SIZE: i32 = 0x020000;
 export const CARTRIDGE_ROM_LOCATION: i32 = 0x0cfc00;
 export const CARTRIDGE_ROM_SIZE: i32 = 0x7e0400;
+
+// Debug
+export const DEBUG_GAMEBOY_MEMORY_LOCATION: i32 = 0x8b0000;
+export const DEBUG_GAMEBOY_MEMORY_SIZE: i32 = 0xffff;

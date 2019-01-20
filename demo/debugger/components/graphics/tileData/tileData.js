@@ -7,6 +7,53 @@ import { WasmBoy } from '../../../wasmboy';
 
 import './tileData.css';
 
+// To Stop memory leaks, see disassembler
+const updateCanvasTask = async (canvasElement, canvasContext, canvasImageData) => {
+  // Draw our tile Data
+  await WasmBoy._runWasmExport('drawTileDataToWasmMemory');
+
+  const imageDataArray = new Uint8ClampedArray(tileDataYPixels * tileDataXPixels * 4);
+  const rgbColor = new Uint8ClampedArray(3);
+
+  // Get our background map location constant
+  const tileDataMapLocation = await WasmBoy._getWasmConstant('tileDataMap');
+  const tileDataMapMemory = await WasmBoy._getWasmMemorySection(
+    tileDataMapLocation,
+    tileDataMapLocation + tileDataYPixels * tileDataXPixels * 3
+  );
+
+  for (let y = 0; y < tileDataYPixels; y++) {
+    for (let x = 0; x < tileDataXPixels; x++) {
+      // Each color has an R G B component
+      let pixelStart = (y * tileDataXPixels + x) * 3;
+
+      for (let color = 0; color < 3; color++) {
+        rgbColor[color] = tileDataMapMemory[pixelStart + color];
+      }
+
+      // Doing graphics using second answer on:
+      // https://stackoverflow.com/questions/4899799/whats-the-best-way-to-set-a-single-pixel-in-an-html5-canvas
+      // Image Data mapping
+      const imageDataIndex = (x + y * tileDataXPixels) * 4;
+
+      imageDataArray[imageDataIndex] = rgbColor[0];
+      imageDataArray[imageDataIndex + 1] = rgbColor[1];
+      imageDataArray[imageDataIndex + 2] = rgbColor[2];
+      // Alpha, no transparency
+      imageDataArray[imageDataIndex + 3] = 255;
+    }
+  }
+
+  // Add our new imageData
+  for (let i = 0; i < imageDataArray.length; i++) {
+    canvasImageData.data[i] = imageDataArray[i];
+  }
+
+  canvasContext.beginPath();
+  canvasContext.clearRect(0, 0, tileDataXPixels, tileDataYPixels);
+  canvasContext.putImageData(canvasImageData, 0, 0);
+};
+
 const tileDataXPixels = 0x1f * 8;
 const tileDataYPixels = 0x17 * 8;
 
@@ -63,57 +110,11 @@ export default class TileData extends Component {
   }
 
   updateCallback(canvasElement, canvasContext, canvasImageData) {
-    const updateCanvasTask = async () => {
-      // Dont update for the following
-      if (!WasmBoy.isReady() || WasmBoy.isPaused()) {
-        return;
-      }
-
-      // Draw our tile Data
-      await WasmBoy._runWasmExport('drawTileDataToWasmMemory');
-
-      const imageDataArray = new Uint8ClampedArray(tileDataYPixels * tileDataXPixels * 4);
-      const rgbColor = new Uint8ClampedArray(3);
-
-      // Get our background map location constant
-      const tileDataMapLocation = await WasmBoy._getWasmConstant('tileDataMap');
-      const tileDataMapMemory = await WasmBoy._getWasmMemorySection(
-        tileDataMapLocation,
-        tileDataMapLocation + tileDataYPixels * tileDataXPixels * 3
-      );
-
-      for (let y = 0; y < tileDataYPixels; y++) {
-        for (let x = 0; x < tileDataXPixels; x++) {
-          // Each color has an R G B component
-          let pixelStart = (y * tileDataXPixels + x) * 3;
-
-          for (let color = 0; color < 3; color++) {
-            rgbColor[color] = tileDataMapMemory[pixelStart + color];
-          }
-
-          // Doing graphics using second answer on:
-          // https://stackoverflow.com/questions/4899799/whats-the-best-way-to-set-a-single-pixel-in-an-html5-canvas
-          // Image Data mapping
-          const imageDataIndex = (x + y * tileDataXPixels) * 4;
-
-          imageDataArray[imageDataIndex] = rgbColor[0];
-          imageDataArray[imageDataIndex + 1] = rgbColor[1];
-          imageDataArray[imageDataIndex + 2] = rgbColor[2];
-          // Alpha, no transparency
-          imageDataArray[imageDataIndex + 3] = 255;
-        }
-      }
-
-      // Add our new imageData
-      for (let i = 0; i < imageDataArray.length; i++) {
-        canvasImageData.data[i] = imageDataArray[i];
-      }
-
-      canvasContext.beginPath();
-      canvasContext.clearRect(0, 0, tileDataXPixels, tileDataYPixels);
-      canvasContext.putImageData(canvasImageData, 0, 0);
-    };
-    return updateCanvasTask();
+    // Dont update for the following
+    if (!WasmBoy.isReady() || WasmBoy.isPaused()) {
+      return Promise.resolve();
+    }
+    return updateCanvasTask(canvasElement, canvasContext, canvasImageData);
   }
 
   render() {

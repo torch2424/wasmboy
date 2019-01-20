@@ -9,7 +9,7 @@ import { PUBX_KEYS } from '../../pubx.config';
 import Command from '../command';
 
 import CpuState from '../../components/cpu/cpuState/cpuState';
-import CpuControl from '../../components/cpu/cpuControl/cpuControl';
+import Disassembler from '../../components/cpu/disassembler/disassembler';
 
 class CpuStateCommand extends Command {
   constructor() {
@@ -25,19 +25,19 @@ class CpuStateCommand extends Command {
   }
 }
 
-class CpuControlCommand extends Command {
+class DisassemblerCommand extends Command {
   constructor() {
-    super('cpu:control');
-    this.options.label = 'Control';
+    super('cpu:disassembler');
+    this.options.label = 'Disassembler';
   }
 
   execute() {
     Pubx.get(PUBX_KEYS.WIDGET).addWidget({
-      component: <CpuControl />,
-      label: 'CPU Control'
+      component: <Disassembler />,
+      label: 'Disassembler'
     });
   }
 }
 
-const exportedCommands = [new CpuStateCommand(), new CpuControlCommand()];
+const exportedCommands = [new CpuStateCommand(), new DisassemblerCommand()];
 export default exportedCommands;

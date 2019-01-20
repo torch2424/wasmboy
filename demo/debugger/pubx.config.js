@@ -137,7 +137,7 @@ export function PUBX_INITIALIZE() {
         }
 
         Pubx.publish(PUBX_KEYS.WASMBOY, {
-          playing: WasmBoy.isPlaying(),
+          playing: WasmBoy.isReady() && WasmBoy.isPlaying(),
           paused: WasmBoy.isPaused(),
           ready: WasmBoy.isReady(),
           loadedAndStarted: WasmBoy.isLoadedAndStarted(),
@@ -200,7 +200,7 @@ export function PUBX_INITIALIZE() {
       // Check if the Playback Control or CPU Control is open , if not, let's autoplay
       const pubxWidget = Pubx.get(PUBX_KEYS.WIDGET);
 
-      const controlWidgetComponentNames = ['WasmBoyControls', 'CpuControl'];
+      const controlWidgetComponentNames = ['WasmBoyControls', 'Disassembler'];
       return controlWidgetComponentNames.some(componentName => pubxWidget.isWidgetOpen(componentName));
     }
   });

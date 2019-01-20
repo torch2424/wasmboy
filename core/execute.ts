@@ -14,6 +14,12 @@ export class Execute {
   static stepsPerStepSet: i32 = 2000000000;
   static stepSets: i32 = 0;
   static steps: i32 = 0;
+
+  // Response Codes from Execute Conditions
+  static RESPONSE_CONDITION_ERROR: i32 = -1;
+  static RESPONSE_CONDITION_FRAME: i32 = 0;
+  static RESPONSE_CONDITION_AUDIO: i32 = 1;
+  static RESPONSE_CONDITION_BREAKPOINT: i32 = 2;
 }
 
 export function getStepsPerStepSet(): i32 {
@@ -73,35 +79,25 @@ export function executeFrame(): i32 {
 
 // Public Function to run opcodes until,
 // a frame is ready, audio bufer is filled, or error
-// -1 = error
-// 0 = render a frame
-// 1 = output audio
 export function executeFrameAndCheckAudio(maxAudioBuffer: i32 = 0): i32 {
   return executeUntilCondition(true, maxAudioBuffer, -1);
 }
 
 // Public function to run opcodes until,
 // a breakpoint is reached
-// -1 = error
-// 0 = frame executed
-// 1 = reached breakpoint
 export function executeFrameUntilBreakpoint(breakpoint: i32): i32 {
-  let response: i32 = executeUntilCondition(true, -1, breakpoint);
+  return executeUntilCondition(true, -1, breakpoint);
+}
 
-  // Break point response will be 1 in our case
-  if (response === 2) {
-    return 1;
-  }
-
-  return response;
+// Public function to run opcodes until,
+// A frame needs to be rendered
+// a breakpoint is reached
+export function executeFrameAndCheckAudioUntilBreakpoint(maxAudioBuffer: i32, breakpoint: i32): i32 {
+  return executeUntilCondition(true, maxAudioBuffer, breakpoint);
 }
 
 // Base function that executes steps, and checks conditions
 // Return values:
-// -1 = error
-// 0 = render a frame
-// 1 = audio buffer reached
-// 2 = reached breakpoint
 export function executeUntilCondition(checkMaxCyclesPerFrame: boolean = true, maxAudioBuffer: i32 = -1, breakpoint: i32 = -1): i32 {
   // Common tracking variables
   let numberOfCycles: i32 = -1;
@@ -140,16 +136,15 @@ export function executeUntilCondition(checkMaxCyclesPerFrame: boolean = true, ma
     // Reset our currentCycles
     Cpu.currentCycles -= Cpu.MAX_CYCLES_PER_FRAME();
 
-    return 0;
+    return Execute.RESPONSE_CONDITION_FRAME;
   }
 
   if (audioBufferCondition) {
-    return 1;
+    return Execute.RESPONSE_CONDITION_AUDIO;
   }
 
   if (breakpointCondition) {
-    // breakpoint
-    return 2;
+    return Execute.RESPONSE_CONDITION_BREAKPOINT;
   }
 
   // TODO: Boot ROM handling

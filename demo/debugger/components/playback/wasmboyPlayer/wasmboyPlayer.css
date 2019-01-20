@@ -6,18 +6,3 @@
   width: 100%;
   height: 100%;
 }
-
-.wasmboy-player .donut {
-  display: none;
-}
-
-.wasmboy-player--control-loading {
-}
-
-.wasmboy-player--control-loading .donut {
-  display: flex;
-}
-
-.wasmboy-player--control-loading canvas {
-  display: none;
-}

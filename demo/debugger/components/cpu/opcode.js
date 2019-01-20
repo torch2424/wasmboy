@@ -22,7 +22,7 @@ export function stepOpcode() {
 }
 
 // Function to run a specifed number of opcodes for faster stepping
-export function runNumberOfOpcodes(numberOfOpcodes, breakPoint) {
+export function runNumberOfOpcodes(numberOfOpcodes) {
   // Keep stepping until highest opcode increases
   let opcodesToRun = numberOfOpcodes;
 
@@ -32,9 +32,6 @@ export function runNumberOfOpcodes(numberOfOpcodes, breakPoint) {
     const runOpcode = async () => {
       await stepOpcode(true);
       const programCounter = await WasmBoy._runWasmExport('getProgramCounter');
-      if (breakPoint && breakPoint === programCounter) {
-        return;
-      }
 
       if (opcodesRan < opcodesToRun) {
         opcodesRan++;
@@ -50,31 +47,12 @@ export function runNumberOfOpcodes(numberOfOpcodes, breakPoint) {
 // Function to keep running opcodes until a breakpoint is reached
 export function runUntilBreakPoint(passedBreakPoint) {
   // Set our opcode breakpoint
-  const breakPoint = parseInt(passedBreakPoint, 16);
+  const breakPoint = passedBreakPoint;
 
   stepOpcode();
 
   const breakPointTask = async breakPoint => {
-    const response = await WasmBoy._runWasmExport('executeFrameUntilBreakpoint', [breakPoint]);
-
-    if (response === 0) {
-      const continueSearchingForBreakPointTask = async () => {
-        await new Promise(resolve => {
-          requestAnimationFrame(() => {
-            resolve();
-          });
-        });
-
-        return breakPointTask(breakPoint);
-      };
-
-      return continueSearchingForBreakPointTask();
-    } else if (response === -1) {
-      throw new Error('WasmBoy Crashed while trying to reach the breakpoint');
-    }
-
-    // We Reached the breakpoint!
-    return true;
+    await WasmBoy._playUntilBreakpoint(breakPoint);
   };
   return breakPointTask(breakPoint);
 }
