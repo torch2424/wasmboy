@@ -44,6 +44,10 @@
   width: 45px;
 }
 
+.disassembler__control .disassembler__control__run-opcodes {
+  width: 60px;
+}
+
 /* Variables for our psuedo table */
 /*NOTE: Height MUST be kept in sync with this.rowHeight, see renderRow()*/
 :root {

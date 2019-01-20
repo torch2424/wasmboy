@@ -22,7 +22,7 @@ export function stepOpcode() {
 }
 
 // Function to run a specifed number of opcodes for faster stepping
-export function runNumberOfOpcodes(numberOfOpcodes, breakPoint) {
+export function runNumberOfOpcodes(numberOfOpcodes) {
   // Keep stepping until highest opcode increases
   let opcodesToRun = numberOfOpcodes;
 
@@ -32,9 +32,6 @@ export function runNumberOfOpcodes(numberOfOpcodes, breakPoint) {
     const runOpcode = async () => {
       await stepOpcode(true);
       const programCounter = await WasmBoy._runWasmExport('getProgramCounter');
-      if (breakPoint && breakPoint === programCounter) {
-        return;
-      }
 
       if (opcodesRan < opcodesToRun) {
         opcodesRan++;

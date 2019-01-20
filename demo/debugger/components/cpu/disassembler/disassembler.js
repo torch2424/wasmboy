@@ -124,7 +124,7 @@ export default class Disassembler extends Component {
 
     const updateLoop = () => {
       this.updateTimeout = setTimeout(() => {
-        if (!this.state.wasmboy.ready || !this.state.wasmboy.playing) {
+        if (!this.state.running && (!this.state.wasmboy.ready || !this.state.wasmboy.playing)) {
           updateLoop();
           return;
         }
@@ -179,6 +179,30 @@ export default class Disassembler extends Component {
   stepOpcode() {
     stepOpcode();
     this.update();
+  }
+
+  runNumberOfOpcodes(value) {
+    const numberOfOpcodes = value;
+
+    runNumberOfOpcodes(numberOfOpcodes);
+
+    if (!numberOfOpcodes || numberOfOpcodes < 1) {
+      Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Please enter a valid value. 😄');
+      return;
+    }
+
+    this.setState({
+      running: true
+    });
+
+    const runOpcodesPromise = runNumberOfOpcodes(numberOfOpcodes);
+    runOpcodesPromise.then(() => {
+      Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification(`Ran ${numberOfOpcodes} opcodes! 😄`);
+      this.update();
+      this.setState({
+        running: false
+      });
+    });
   }
 
   scrollToProgramCounter() {
@@ -327,6 +351,9 @@ export default class Disassembler extends Component {
     if (this.state.loading.controlLoading) {
       classes.push('disassembler--control-loading');
     }
+    if (this.state.running) {
+      classes.push('disassembler--running');
+    }
 
     return (
       <div class={classes.join(' ')}>
@@ -365,10 +392,18 @@ export default class Disassembler extends Component {
               class="disassembler__control__jump-address"
               type="text"
               pattern="[a-fA-F\d]+"
-              initalValue="100"
+              initialValue="100"
               label="Jump To Address: 0x"
               maxlength="4"
               onSubmit={value => this.scrollToAddress(parseInt(value, 16))}
+            />
+            <InputSubmit
+              class="disassembler__control__run-opcodes"
+              type="number"
+              initialValue="100"
+              label="Run Number of Opcodes:"
+              min="1"
+              onSubmit={value => this.runNumberOfOpcodes(value)}
             />
           </div>
 
