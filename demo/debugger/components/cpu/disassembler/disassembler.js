@@ -180,6 +180,7 @@ export default class Disassembler extends Component {
   stepOpcode() {
     stepOpcode();
     this.update();
+    Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Stepped Opcode! 😄');
   }
 
   runNumberOfOpcodes(value) {
