@@ -7,6 +7,8 @@ import { PUBX_KEYS } from '../../../pubx.config';
 
 import { WasmBoy } from '../../../wasmboy';
 
+import InputSubmit from '../../inputSubmit';
+
 import VirtualList from '../../virtualList';
 
 import { stepOpcode, runNumberOfOpcodes, runUntilBreakPoint } from '../opcode.js';
@@ -73,6 +75,11 @@ let updateTask = async () => {
 
       address++;
       address += params.length;
+
+      // Make sure we don't exceed our total memory
+      if (address > 0xffff) {
+        i = gbMemory.length;
+      }
     }
   }
 
@@ -174,6 +181,10 @@ export default class Disassembler extends Component {
     this.update();
   }
 
+  scrollToProgramCounter() {
+    this.scrollToAddress(this.state.programCounter);
+  }
+
   scrollToAddress(address) {
     const virtualListElement = this.base.querySelector('.disassembler__list__virtual');
 
@@ -189,7 +200,7 @@ export default class Disassembler extends Component {
 
       // Get a row offset
       let rowOffset = 2;
-      if (rowIndex < rowOffset || address >= 0xfff0) {
+      if (rowIndex < rowOffset || address >= 0xffd0) {
         rowOffset = 0;
       }
 
@@ -349,6 +360,16 @@ export default class Disassembler extends Component {
 
           <div class="disassembler__control">
             <button onClick={() => this.stepOpcode()}>Step</button>
+            <button onClick={() => this.scrollToProgramCounter()}>Scroll To Program Counter</button>
+            <InputSubmit
+              class="disassembler__control__jump-address"
+              type="text"
+              pattern="[a-fA-F\d]+"
+              initalValue="100"
+              label="Jump To Address: 0x"
+              maxlength="4"
+              onSubmit={value => this.scrollToAddress(parseInt(value, 16))}
+            />
           </div>
 
           <div class="disassembler__header-list">

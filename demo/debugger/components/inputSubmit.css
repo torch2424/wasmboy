@@ -1,0 +1,14 @@
+.input-submit {
+  display: flex;
+  justify-content: flex-start;
+  align-center: center;
+  flex-wrap: wrap;
+
+  width: 100%;
+}
+
+.input-submit input {
+  display: block;
+  margin-left: 5px;
+  margin-right: 5px;
+}

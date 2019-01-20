@@ -32,12 +32,24 @@
   margin: 5px;
 }
 
+.disassembler__info {
+  margin: 5px;
+}
+
+.disassembler__control > * {
+  margin: 5px;
+}
+
+.disassembler__control .disassembler__control__jump-address {
+  width: 45px;
+}
+
 /* Variables for our psuedo table */
 /*NOTE: Height MUST be kept in sync with this.rowHeight, see renderRow()*/
 :root {
-  --dissassembler-width: 450px;
-  --dissassembler-height: 450px;
-  --dissassembler-row-height: 30px;
+  --disassembler-width: 450px;
+  --disassembler-height: 350px;
+  --disassembler-row-height: 30px;
   --disassembler-actions-width: 75px;
   --disassembler-hex-width: 75px;
   --disassembler-mnemonic-width: 75px;
@@ -50,7 +62,7 @@
   justify-content: flex-start;
   align-items: center;
 
-  width: var(--dissassembler-width);
+  width: var(--disassembler-width);
 
   border-top: 1px solid black;
   border-left: 1px solid black;
@@ -62,8 +74,8 @@
 }
 
 .disassembler__list {
-  width: var(--dissassembler-width);
-  height: var(--dissassembler-height);
+  width: var(--disassembler-width);
+  height: var(--disassembler-height);
 
   border: 1px solid black;
 }
@@ -76,7 +88,7 @@
 
 .disassembler__list__virtual__row {
   display: flex;
-  height: var(--dissassembler-row-height) !important;
+  height: var(--disassembler-row-height) !important;
   overflow: hidden;
   justify-content: flex-start;
   align-items: center;
@@ -98,7 +110,7 @@
   text-align: center;
 
   width: 100px;
-  height: var(--dissassembler-row-height);
+  height: var(--disassembler-row-height);
   border-left: var(--disassembler-column-border);
 }
 
@@ -113,7 +125,7 @@
   text-align: center;
 
   width: var(--disassembler-hex-width);
-  height: var(--dissassembler-row-height);
+  height: var(--disassembler-row-height);
   border-left: var(--disassembler-column-border);
 }
 
@@ -122,7 +134,7 @@
   justify-content: center;
   align-items: flex-start;
 
-  height: var(--dissassembler-row-height);
+  height: var(--disassembler-row-height);
 }
 
 .disassembler__list__virtual__row__actions > button {

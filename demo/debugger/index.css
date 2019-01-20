@@ -2,6 +2,5 @@
 
 @import 'normalize.css';
 @import './styles/phosphor.css';
-@import 'chota/dist/chota.css';
 @import './styles/app.css';
 @import './styles/shared.css';
