@@ -35,14 +35,14 @@ export default class Touchpad extends Component {
     const aElement = document.querySelector('.gameboy-input__a');
     const bElement = document.querySelector('.gameboy-input__b');
 
-    WasmBoy.addTouchInput('UP', dpadElement, 'DPAD', 'UP');
-    WasmBoy.addTouchInput('RIGHT', dpadElement, 'DPAD', 'RIGHT');
-    WasmBoy.addTouchInput('DOWN', dpadElement, 'DPAD', 'DOWN');
-    WasmBoy.addTouchInput('LEFT', dpadElement, 'DPAD', 'LEFT');
-    WasmBoy.addTouchInput('A', aElement, 'BUTTON');
-    WasmBoy.addTouchInput('B', bElement, 'BUTTON');
-    WasmBoy.addTouchInput('START', startElement, 'BUTTON');
-    WasmBoy.addTouchInput('SELECT', selectElement, 'BUTTON');
+    // Add touch controls
+    WasmBoy.ResponsiveGamepad.TouchInput.addDpadInput(dpadElement, {
+      allowMultipleDirections: true
+    });
+    WasmBoy.ResponsiveGamepad.TouchInput.addButtonInput(aElement, WasmBoy.ResponsiveGamepad.RESPONSIVE_GAMEPAD_INPUTS.A);
+    WasmBoy.ResponsiveGamepad.TouchInput.addButtonInput(bElement, WasmBoy.ResponsiveGamepad.RESPONSIVE_GAMEPAD_INPUTS.B);
+    WasmBoy.ResponsiveGamepad.TouchInput.addButtonInput(startElement, WasmBoy.ResponsiveGamepad.RESPONSIVE_GAMEPAD_INPUTS.START);
+    WasmBoy.ResponsiveGamepad.TouchInput.addButtonInput(selectElement, WasmBoy.ResponsiveGamepad.RESPONSIVE_GAMEPAD_INPUTS.SELECT);
   }
 
   openROM() {
