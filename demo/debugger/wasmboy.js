@@ -98,22 +98,22 @@ export const WasmBoyDefaultMobileOptions = {
 export const WasmBoyUpdateCanvas = (isMobile, stateUpdateCallback) => {
   isMobileCanvas = isMobile;
 
+  let canvasElement;
+  let defaultOptions;
+
+  if (isMobile) {
+    canvasElement = getMobileCanvasElement();
+    defaultOptions = WasmBoyDefaultMobileOptions;
+  } else {
+    canvasElement = getDesktopCanvasElement();
+    defaultOptions = WasmBoyDefaultDesktopOptions;
+  }
+
+  if (!canvasElement) {
+    return;
+  }
+
   const updateTask = async () => {
-    let canvasElement;
-    let defaultOptions;
-
-    if (isMobile) {
-      canvasElement = getMobileCanvasElement();
-      defaultOptions = WasmBoyDefaultMobileOptions;
-    } else {
-      canvasElement = getDesktopCanvasElement();
-      defaultOptions = WasmBoyDefaultDesktopOptions;
-    }
-
-    if (!canvasElement) {
-      setTimeout(updateTask, 500);
-      return;
-    }
     const wasmboyOptions = {
       ...defaultOptions
     };
@@ -144,4 +144,6 @@ export const WasmBoyUpdateCanvas = (isMobile, stateUpdateCallback) => {
     await WasmBoy.play();
   };
   updateTask();
+
+  return true;
 };

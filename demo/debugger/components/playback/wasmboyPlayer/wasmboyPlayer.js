@@ -6,7 +6,7 @@ import { h, Component } from 'preact';
 import { Pubx } from 'pubx';
 import { PUBX_KEYS } from '../../../pubx.config';
 
-import { WasmBoy, WasmBoyUpdateCanvas } from '../../../wasmboy';
+import { WasmBoy } from '../../../wasmboy';
 
 import './wasmboyPlayer.css';
 
@@ -20,8 +20,9 @@ export default class WasmBoyPlayer extends Component {
   }
 
   componentDidMount() {
-    // Set our canvas
-    WasmBoyUpdateCanvas(false, Pubx.get(PUBX_KEYS.WASMBOY).update);
+    // Update our state of mobile
+    // This will assign our canvas
+    Pubx.get(PUBX_KEYS.MOBILE).update();
   }
 
   render() {
