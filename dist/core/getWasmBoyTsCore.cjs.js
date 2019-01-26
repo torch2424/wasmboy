@@ -30,11 +30,11 @@ const abs = value => {
 // Wasmboy Memory Map
 // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
 // ----------------------------------
-// WasmBoy
+// WasmBoy General
 
 
 var WASMBOY_MEMORY_LOCATION = 0x000000;
-var WASMBOY_MEMORY_SIZE = 0x8b0000;
+var WASMBOY_MEMORY_SIZE = 0x8c0000;
 var WASMBOY_WASM_PAGES = WASMBOY_MEMORY_SIZE / 1024 / 64; // AssemblyScript
 
 var ASSEMBLYSCRIPT_MEMORY_LOCATION = 0x000000;
@@ -73,7 +73,10 @@ var AUDIO_BUFFER_SIZE = 0x020000; // Catridge Memory
 var CARTRIDGE_RAM_LOCATION = 0x0afc00;
 var CARTRIDGE_RAM_SIZE = 0x020000;
 var CARTRIDGE_ROM_LOCATION = 0x0cfc00;
-var CARTRIDGE_ROM_SIZE = 0x7e0400;
+var CARTRIDGE_ROM_SIZE = 0x7e0400; // Debug
+
+var DEBUG_GAMEBOY_MEMORY_LOCATION = 0x8b0000;
+var DEBUG_GAMEBOY_MEMORY_SIZE = 0xffff;
 
 var Config =
 /** @class */
@@ -2546,6 +2549,7 @@ function () {
     Interrupts.isVBlankInterruptEnabled = checkBitOnByte(Interrupts.bitPositionVBlankInterrupt, value);
     Interrupts.isLcdInterruptEnabled = checkBitOnByte(Interrupts.bitPositionLcdInterrupt, value);
     Interrupts.isTimerInterruptEnabled = checkBitOnByte(Interrupts.bitPositionTimerInterrupt, value);
+    Interrupts.isSerialInterruptEnabled = checkBitOnByte(Interrupts.bitPositionSerialInterrupt, value);
     Interrupts.isJoypadInterruptEnabled = checkBitOnByte(Interrupts.bitPositionJoypadInterrupt, value);
     Interrupts.interruptsEnabledValue = value;
   };
@@ -2554,6 +2558,7 @@ function () {
     Interrupts.isVBlankInterruptRequested = checkBitOnByte(Interrupts.bitPositionVBlankInterrupt, value);
     Interrupts.isLcdInterruptRequested = checkBitOnByte(Interrupts.bitPositionLcdInterrupt, value);
     Interrupts.isTimerInterruptRequested = checkBitOnByte(Interrupts.bitPositionTimerInterrupt, value);
+    Interrupts.isSerialInterruptRequested = checkBitOnByte(Interrupts.bitPositionSerialInterrupt, value);
     Interrupts.isJoypadInterruptRequested = checkBitOnByte(Interrupts.bitPositionJoypadInterrupt, value);
     Interrupts.interruptsRequestedValue = value;
   }; // Function to return if we have any pending interrupts
@@ -2586,6 +2591,7 @@ function () {
   Interrupts.bitPositionVBlankInterrupt = 0;
   Interrupts.bitPositionLcdInterrupt = 1;
   Interrupts.bitPositionTimerInterrupt = 2;
+  Interrupts.bitPositionSerialInterrupt = 3;
   Interrupts.bitPositionJoypadInterrupt = 4;
   Interrupts.memoryLocationInterruptEnabled = 0xffff; // A.K.A interrupt Flag (IE)
   // Cache which Interrupts are enabled
@@ -2594,6 +2600,7 @@ function () {
   Interrupts.isVBlankInterruptEnabled = false;
   Interrupts.isLcdInterruptEnabled = false;
   Interrupts.isTimerInterruptEnabled = false;
+  Interrupts.isSerialInterruptEnabled = false;
   Interrupts.isJoypadInterruptEnabled = false;
   Interrupts.memoryLocationInterruptRequest = 0xff0f; // A.K.A interrupt Flag (IF)
   // Cache which Interrupts are requested
@@ -2602,6 +2609,7 @@ function () {
   Interrupts.isVBlankInterruptRequested = false;
   Interrupts.isLcdInterruptRequested = false;
   Interrupts.isTimerInterruptRequested = false;
+  Interrupts.isSerialInterruptRequested = false;
   Interrupts.isJoypadInterruptRequested = false; // Save States
 
   Interrupts.saveStateSlot = 2;
@@ -2647,6 +2655,10 @@ function checkInterrupts() {
         wasInterruptHandled = true;
       } else if (Interrupts.isTimerInterruptEnabled && Interrupts.isTimerInterruptRequested) {
         _handleInterrupt(Interrupts.bitPositionTimerInterrupt);
+
+        wasInterruptHandled = true;
+      } else if (Interrupts.isSerialInterruptEnabled && Interrupts.isSerialInterruptRequested) {
+        _handleInterrupt(Interrupts.bitPositionSerialInterrupt);
 
         wasInterruptHandled = true;
       } else if (Interrupts.isJoypadInterruptEnabled && Interrupts.isJoypadInterruptRequested) {
@@ -2700,7 +2712,7 @@ function _handleInterrupt(bitPosition) {
   } else {
     sixteenBitStoreIntoGBMemory(Cpu.stackPointer, Cpu.programCounter);
   } // Jump to the correct interrupt location
-  // Also puiggyback off of the switch to reset our HW Register caching
+  // Also piggyback off of the switch to reset our HW Register caching
   // http://www.codeslinger.co.uk/pages/projects/gameboy/interupts.html
 
 
@@ -2718,6 +2730,11 @@ function _handleInterrupt(bitPosition) {
     case Interrupts.bitPositionTimerInterrupt:
       Interrupts.isTimerInterruptRequested = false;
       Cpu.programCounter = 0x50;
+      break;
+
+    case Interrupts.bitPositionSerialInterrupt:
+      Interrupts.isSerialInterruptRequested = false;
+      Cpu.programCounter = 0x58;
       break;
 
     case Interrupts.bitPositionJoypadInterrupt:
@@ -2767,6 +2784,12 @@ function requestJoypadInterrupt() {
   Interrupts.isJoypadInterruptRequested = true;
 
   _requestInterrupt(Interrupts.bitPositionJoypadInterrupt);
+}
+
+function requestSerialInterrupt() {
+  Interrupts.isSerialInterruptRequested = true;
+
+  _requestInterrupt(Interrupts.bitPositionSerialInterrupt);
 }
 
 var Timers =
@@ -3038,6 +3061,118 @@ function _getTimerCounterMaskBit(timerInputClock) {
   }
 
   return 0;
+} // Link cable / serial implementation
+
+
+var Serial =
+/** @class */
+function () {
+  function Serial() {}
+
+  Serial.updateTransferControl = function (value) {
+    Serial.isShiftClockInternal = checkBitOnByte(0, value);
+    Serial.isClockSpeedFast = checkBitOnByte(1, value);
+    Serial.transferStartFlag = checkBitOnByte(7, value); // Allow the original write, and return since we dont need to look anymore
+
+    return true;
+  }; // Cycle counter
+
+
+  Serial.currentCycles = 0x00; // Register locations
+
+  Serial.memoryLocationSerialTransferData = 0xff01; // SB
+
+  Serial.memoryLocationSerialTransferControl = 0xff02; // SC
+  // Number of bits transferred
+
+  Serial.numberOfBitsTransferred = 0; // Transfer control variables
+
+  Serial.isShiftClockInternal = false;
+  Serial.isClockSpeedFast = false;
+  Serial.transferStartFlag = false;
+  return Serial;
+}(); // Function to initialize our serial values
+
+
+function initializeSerial() {
+  Serial.currentCycles = 0x00;
+  Serial.numberOfBitsTransferred = 0;
+
+  if (Cpu.GBCEnabled) {
+    // FF01 = 0x00
+    eightBitStoreIntoGBMemory(0xff02, 0x7c);
+    Serial.updateTransferControl(0x7c);
+  } else {
+    // FF01 = 0x00
+    eightBitStoreIntoGBMemory(0xff02, 0x7e);
+    Serial.updateTransferControl(0x7e);
+  }
+} // TODO: Finish serial
+// See minimal serial: https://github.com/binji/binjgb/commit/64dece05c4ef5a052c4b9b75eb3ddbbfc6677cbe
+
+
+function updateSerial(numberOfCycles) {
+  // If we aren't starting our transfer, or transferring,
+  // return
+  if (!Serial.transferStartFlag) {
+    return;
+  } // Want to increment 4 cycles at a time like an actual GB would
+
+
+  var cyclesIncreased = 0;
+
+  while (cyclesIncreased < numberOfCycles) {
+    var oldCycles = Serial.currentCycles;
+    cyclesIncreased += 4;
+    Serial.currentCycles += 4;
+
+    if (Serial.currentCycles > 0xffff) {
+      Serial.currentCycles -= 0x10000;
+    }
+
+    if (_checkFallingEdgeDetector(oldCycles, Serial.currentCycles)) {
+      // TODO: Since no actual connection, always transfer 1
+      // Need to fix this
+      var transferData = eightBitLoadFromGBMemory(Serial.memoryLocationSerialTransferData);
+      transferData = (transferData << 1) + 1;
+      transferData = transferData & 0xff;
+      eightBitStoreIntoGBMemory(Serial.memoryLocationSerialTransferData, transferData);
+      Serial.numberOfBitsTransferred += 1;
+
+      if (Serial.numberOfBitsTransferred === 8) {
+        Serial.numberOfBitsTransferred = 0;
+        requestSerialInterrupt(); // Disable transfer start
+
+        var transferControl = eightBitLoadFromGBMemory(Serial.memoryLocationSerialTransferControl);
+        eightBitStoreIntoGBMemory(Serial.memoryLocationSerialTransferControl, resetBitOnByte(7, transferControl));
+        Serial.transferStartFlag = false;
+      }
+    }
+  }
+}
+
+function _checkFallingEdgeDetector(oldCycles, newCycles) {
+  // Get our mask
+  var maskBit = _getFallingEdgeMaskBit(); // If the old register's watched bit was zero,
+  // but after adding the new registers wastch bit is now 1
+
+
+  if (checkBitOnByte(maskBit, oldCycles) && !checkBitOnByte(maskBit, newCycles)) {
+    return true;
+  }
+
+  return false;
+} // Function to get our current tima mask bit
+// used for our falling edge detector
+// See The docs linked above, or TCAGB for this bit mapping
+
+
+function _getFallingEdgeMaskBit() {
+  if (Serial.isClockSpeedFast) {
+    return 2;
+  }
+
+  return 7;
 } // http://www.codeslinger.co.uk/pages/projects/gameboy/joypad.html
 // Joypad Register
 // Taken from pandocs
@@ -3674,6 +3809,12 @@ function checkWriteTraps(offset, value) {
 
   if (offset >= Memory.unusableMemoryLocation && offset <= Memory.unusableMemoryEndLocation) {
     return false;
+  } // Serial
+
+
+  if (offset === Serial.memoryLocationSerialTransferControl) {
+    // SC
+    return Serial.updateTransferControl(value);
   } // Sound
   // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
 
@@ -3970,6 +4111,7 @@ function () {
 
 
   Lcd.updateLcdControl = function (value) {
+    var wasLcdEnabled = Lcd.enabled;
     Lcd.enabled = checkBitOnByte(7, value);
     Lcd.windowTileMapDisplaySelect = checkBitOnByte(6, value);
     Lcd.windowDisplayEnabled = checkBitOnByte(5, value);
@@ -3978,6 +4120,16 @@ function () {
     Lcd.tallSpriteSize = checkBitOnByte(2, value);
     Lcd.spriteDisplayEnable = checkBitOnByte(1, value);
     Lcd.bgDisplayEnabled = checkBitOnByte(0, value);
+
+    if (wasLcdEnabled && !Lcd.enabled) {
+      // Disable the LCD
+      resetLcd(true);
+    }
+
+    if (!wasLcdEnabled && Lcd.enabled) {
+      // Re-enable the LCD
+      resetLcd(false);
+    }
   }; // Memory Locations
   // Also known at STAT
   // LCD Status (0xFF41) bits Explanation
@@ -4015,24 +4167,33 @@ function () {
   Lcd.spriteDisplayEnable = false;
   Lcd.bgDisplayEnabled = false;
   return Lcd;
-}(); // Pass in the lcd status for performance
+}();
+
+function resetLcd(shouldBlankScreen) {
+  // Reset scanline cycle counter
+  Graphics.scanlineCycleCounter = 0;
+  Graphics.scanlineRegister = 0;
+  eightBitStoreIntoGBMemory(Graphics.memoryLocationScanlineRegister, 0); // Set to mode 0
+  // https://www.reddit.com/r/EmuDev/comments/4w6479/gb_dr_mario_level_generation_issues/
+
+  var lcdStatus = eightBitLoadFromGBMemory(Lcd.memoryLocationLcdStatus);
+  lcdStatus = resetBitOnByte(1, lcdStatus);
+  lcdStatus = resetBitOnByte(0, lcdStatus);
+  Lcd.currentLcdMode = 0; // Store the status in memory
+
+  eightBitStoreIntoGBMemory(Lcd.memoryLocationLcdStatus, lcdStatus); // Blank the screen
+
+  if (shouldBlankScreen) {
+    for (var i = 0; i < GRAPHICS_OUTPUT_SIZE; i++) {
+      store(GRAPHICS_OUTPUT_LOCATION + i, 255);
+    }
+  }
+} // Pass in the lcd status for performance
 
 
 function setLcdStatus() {
   // Check if the Lcd was disabled
   if (!Lcd.enabled) {
-    // Reset scanline cycle counter
-    Graphics.scanlineCycleCounter = 0;
-    Graphics.scanlineRegister = 0;
-    eightBitStoreIntoGBMemory(Graphics.memoryLocationScanlineRegister, 0); // Set to mode 0
-    // https://www.reddit.com/r/EmuDev/comments/4w6479/gb_dr_mario_level_generation_issues/
-
-    var lcdStatus = eightBitLoadFromGBMemory(Lcd.memoryLocationLcdStatus);
-    lcdStatus = resetBitOnByte(1, lcdStatus);
-    lcdStatus = resetBitOnByte(0, lcdStatus);
-    Lcd.currentLcdMode = 0; // Store the status in memory
-
-    eightBitStoreIntoGBMemory(Lcd.memoryLocationLcdStatus, lcdStatus);
     return;
   } // Get our current scanline, and lcd mode
 
@@ -4060,7 +4221,7 @@ function setLcdStatus() {
     var lcdStatus = eightBitLoadFromGBMemory(Lcd.memoryLocationLcdStatus); // Save our lcd mode
 
     Lcd.currentLcdMode = newLcdMode;
-    var shouldRequestInterrupt = false; // Set our LCD Statuc accordingly
+    var shouldRequestInterrupt = false; // Set our LCD Status accordingly
 
     switch (newLcdMode) {
       case 0x00:
@@ -4101,25 +4262,37 @@ function setLcdStatus() {
 
     if (newLcdMode === 1) {
       requestVBlankInterrupt();
-    } // Check for the coincidence flag
-    // Need to check on every mode, and not just HBLANK, as checking on hblank breaks shantae, which checks on vblank
+    } // Check for the coincidence
 
 
-    var coincidenceCompare = Lcd.coincidenceCompare;
-
-    if ((newLcdMode === 0 || newLcdMode === 1) && scanlineRegister === coincidenceCompare) {
-      lcdStatus = setBitOnByte(2, lcdStatus);
-
-      if (checkBitOnByte(6, lcdStatus)) {
-        requestLcdInterrupt();
-      }
-    } else {
-      lcdStatus = resetBitOnByte(2, lcdStatus);
-    } // Finally, save our status
-
+    lcdStatus = checkCoincidence(newLcdMode, lcdStatus); // Finally, save our status
 
     eightBitStoreIntoGBMemory(Lcd.memoryLocationLcdStatus, lcdStatus);
+  } else if (scanlineRegister === 153) {
+    // Special Case, need to check LYC
+    // Fix prehistorik man freeze
+    var lcdStatus = eightBitLoadFromGBMemory(Lcd.memoryLocationLcdStatus);
+    lcdStatus = checkCoincidence(newLcdMode, lcdStatus);
+    eightBitStoreIntoGBMemory(Lcd.memoryLocationLcdStatus, lcdStatus);
   }
+}
+
+function checkCoincidence(lcdMode, lcdStatus) {
+  // Check for the coincidence flag
+  // Need to check on every mode, and not just HBLANK, as checking on hblank breaks shantae, which checks on vblank
+  var coincidenceCompare = Lcd.coincidenceCompare;
+
+  if ((lcdMode === 0 || lcdMode === 1) && Graphics.scanlineRegister === coincidenceCompare) {
+    lcdStatus = setBitOnByte(2, lcdStatus);
+
+    if (checkBitOnByte(6, lcdStatus)) {
+      requestLcdInterrupt();
+    }
+  } else {
+    lcdStatus = resetBitOnByte(2, lcdStatus);
+  }
+
+  return lcdStatus;
 } // Functions for rendering the background
 
 
@@ -8745,6 +8918,8 @@ function syncCycles(numberOfCycles) {
     } else {
       updateSound(numberOfCycles);
     }
+
+    updateSerial(numberOfCycles);
   }
 
   if (Config.timersBatchProcessing) {
@@ -8767,7 +8942,12 @@ function () {
 
   Execute.stepsPerStepSet = 2000000000;
   Execute.stepSets = 0;
-  Execute.steps = 0;
+  Execute.steps = 0; // Response Codes from Execute Conditions
+
+  Execute.RESPONSE_CONDITION_ERROR = -1;
+  Execute.RESPONSE_CONDITION_FRAME = 0;
+  Execute.RESPONSE_CONDITION_AUDIO = 1;
+  Execute.RESPONSE_CONDITION_BREAKPOINT = 2;
   return Execute;
 }();
 
@@ -8828,9 +9008,6 @@ function executeFrame() {
   return executeUntilCondition(true, -1, -1);
 } // Public Function to run opcodes until,
 // a frame is ready, audio bufer is filled, or error
-// -1 = error
-// 0 = render a frame
-// 1 = output audio
 
 
 function executeFrameAndCheckAudio(maxAudioBuffer) {
@@ -8841,25 +9018,19 @@ function executeFrameAndCheckAudio(maxAudioBuffer) {
   return executeUntilCondition(true, maxAudioBuffer, -1);
 } // Public function to run opcodes until,
 // a breakpoint is reached
-// -1 = error
-// 0 = frame executed
-// 1 = reached breakpoint
 
 
 function executeFrameUntilBreakpoint(breakpoint) {
-  var response = executeUntilCondition(true, -1, breakpoint); // Break point response will be 1 in our case
+  return executeUntilCondition(true, -1, breakpoint);
+} // Public function to run opcodes until,
+// A frame needs to be rendered
+// a breakpoint is reached
 
-  if (response === 2) {
-    return 1;
-  }
 
-  return response;
+function executeFrameAndCheckAudioUntilBreakpoint(maxAudioBuffer, breakpoint) {
+  return executeUntilCondition(true, maxAudioBuffer, breakpoint);
 } // Base function that executes steps, and checks conditions
 // Return values:
-// -1 = error
-// 0 = render a frame
-// 1 = audio buffer reached
-// 2 = reached breakpoint
 
 
 function executeUntilCondition(checkMaxCyclesPerFrame, maxAudioBuffer, breakpoint) {
@@ -8909,16 +9080,15 @@ function executeUntilCondition(checkMaxCyclesPerFrame, maxAudioBuffer, breakpoin
     // Render a frame
     // Reset our currentCycles
     Cpu.currentCycles -= Cpu.MAX_CYCLES_PER_FRAME();
-    return 0;
+    return Execute.RESPONSE_CONDITION_FRAME;
   }
 
   if (audioBufferCondition) {
-    return 1;
+    return Execute.RESPONSE_CONDITION_AUDIO;
   }
 
   if (breakpointCondition) {
-    // breakpoint
-    return 2;
+    return Execute.RESPONSE_CONDITION_BREAKPOINT;
   } // TODO: Boot ROM handling
   // There was an error, return -1, and push the program counter back to grab the error opcode
 
@@ -9088,16 +9258,15 @@ function initialize() {
   initializePalette();
   initializeSound();
   initializeInterrupts();
-  initializeTimers(); // Various Other Registers
+  initializeTimers();
+  initializeSerial(); // Various Other Registers
 
   if (Cpu.GBCEnabled) {
     // Various other registers
     eightBitStoreIntoGBMemory(0xff70, 0xf8);
     eightBitStoreIntoGBMemory(0xff4f, 0xfe);
     eightBitStoreIntoGBMemory(0xff4d, 0x7e);
-    eightBitStoreIntoGBMemory(0xff00, 0xcf); // FF01 = 0x00
-
-    eightBitStoreIntoGBMemory(0xff02, 0x7c);
+    eightBitStoreIntoGBMemory(0xff00, 0xcf);
     eightBitStoreIntoGBMemory(0xff0f, 0xe1); // 0xFFFF = 0x00
     // Undocumented from Pandocs
 
@@ -9107,9 +9276,7 @@ function initialize() {
     eightBitStoreIntoGBMemory(0xff70, 0xff);
     eightBitStoreIntoGBMemory(0xff4f, 0xff);
     eightBitStoreIntoGBMemory(0xff4d, 0xff);
-    eightBitStoreIntoGBMemory(0xff00, 0xcf); // FF01 = 0x00
-
-    eightBitStoreIntoGBMemory(0xff02, 0x7e);
+    eightBitStoreIntoGBMemory(0xff00, 0xcf);
     eightBitStoreIntoGBMemory(0xff0f, 0xe1); // 0xFFFF = 0x00
   } // Reset hasStarted, since we are now reset
 
@@ -9430,6 +9597,13 @@ function getTAC() {
   }
 
   return response;
+} // Functions to debug internal gameboy memory
+
+
+function updateDebugGBMemory() {
+  for (var i = 0; i <= DEBUG_GAMEBOY_MEMORY_SIZE; i++) {
+    store(DEBUG_GAMEBOY_MEMORY_LOCATION + i, eightBitLoadFromGBMemoryWithTraps(i));
+  }
 } // These are legacy aliases for the original WasmBoy api
 // WasmBoy
 
@@ -9467,6 +9641,7 @@ var WasmBoyCore = /*#__PURE__*/Object.freeze({
   executeFrame: executeFrame,
   executeFrameAndCheckAudio: executeFrameAndCheckAudio,
   executeFrameUntilBreakpoint: executeFrameUntilBreakpoint,
+  executeFrameAndCheckAudioUntilBreakpoint: executeFrameAndCheckAudioUntilBreakpoint,
   executeUntilCondition: executeUntilCondition,
   executeStep: executeStep,
   getCyclesPerCycleSet: getCyclesPerCycleSet,
@@ -9510,6 +9685,8 @@ var WasmBoyCore = /*#__PURE__*/Object.freeze({
   CARTRIDGE_RAM_SIZE: CARTRIDGE_RAM_SIZE,
   CARTRIDGE_ROM_LOCATION: CARTRIDGE_ROM_LOCATION,
   CARTRIDGE_ROM_SIZE: CARTRIDGE_ROM_SIZE,
+  DEBUG_GAMEBOY_MEMORY_LOCATION: DEBUG_GAMEBOY_MEMORY_LOCATION,
+  DEBUG_GAMEBOY_MEMORY_SIZE: DEBUG_GAMEBOY_MEMORY_SIZE,
   getWasmBoyOffsetFromGameBoyOffset: getWasmBoyOffsetFromGameBoyOffset,
   getRegisterA: getRegisterA,
   getRegisterB: getRegisterB,
@@ -9529,6 +9706,7 @@ var WasmBoyCore = /*#__PURE__*/Object.freeze({
   getTIMA: getTIMA,
   getTMA: getTMA,
   getTAC: getTAC,
+  updateDebugGBMemory: updateDebugGBMemory,
   update: executeFrame,
   emulationStep: executeStep,
   getAudioQueueIndex: getNumberOfSamplesInAudioBuffer,
