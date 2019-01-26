@@ -23,7 +23,11 @@ export default class Mobile extends Component {
     });
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    // Update our state of mobile
+    // This will assign our canvas
+    Pubx.get(PUBX_KEYS.MOBILE).update();
+  }
 
   render() {
     let wasmboyInfo = '';

@@ -1,6 +1,8 @@
 import { Pubx } from 'pubx';
 import { WasmBoy, WasmBoyUpdateCanvas } from './wasmboy';
 
+import devtoolsDetect from 'devtools-detect';
+
 // devtools change for mobile
 window.addEventListener('devtoolschange', e => {
   Pubx.get(PUBX_KEYS.MOBILE).update(e.detail.open);
@@ -41,11 +43,16 @@ export function PUBX_INITIALIZE() {
   });
 
   // MOBILE
+  let updatedCanvas = false;
   Pubx.publish(PUBX_KEYS.MOBILE, {
     isMobile: false,
     isLandscape: false,
     isPortrait: false,
     update: isDevtoolsOpen => {
+      if (isDevtoolsOpen === undefined) {
+        isDevtoolsOpen = devtoolsDetect.open;
+      }
+
       let mobile = window.matchMedia('(max-width: 500px)').matches;
 
       if (!isDevtoolsOpen) {
@@ -78,7 +85,11 @@ export function PUBX_INITIALIZE() {
       }
 
       if (Pubx.get(PUBX_KEYS.MOBILE).isMobile !== mobile) {
-        WasmBoyUpdateCanvas(mobile, Pubx.get(PUBX_KEYS.WASMBOY).update);
+        updatedCanvas = false;
+      }
+
+      if (!updatedCanvas) {
+        updatedCanvas = WasmBoyUpdateCanvas(mobile, Pubx.get(PUBX_KEYS.WASMBOY).update);
       }
 
       Pubx.publish(PUBX_KEYS.MOBILE, {

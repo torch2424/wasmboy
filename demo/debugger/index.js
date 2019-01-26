@@ -61,7 +61,7 @@ render(<Overlay />, overlayContainer);
 // Bind the Mobile UI to DOM
 const mobileContainer = document.getElementById('mobile-container');
 render(<Mobile />, mobileContainer);
-Pubx.get(PUBX_KEYS.MOBILE).update(devtoolsDetect.open);
+Pubx.get(PUBX_KEYS.MOBILE).update();
 
 // Show a nice welcome message
 setTimeout(() => {
@@ -84,7 +84,7 @@ window.addEventListener('resize', () => {
   }
 
   layoutChangeThrottle = setTimeout(() => {
-    Pubx.get(PUBX_KEYS.MOBILE).update(devtoolsDetect.open);
+    Pubx.get(PUBX_KEYS.MOBILE).update();
     main.update();
     layoutChangeThrottle = undefined;
   }, 500);
@@ -96,7 +96,7 @@ window.addEventListener('orientationchange', () => {
   }
 
   layoutChangeThrottle = setTimeout(() => {
-    Pubx.get(PUBX_KEYS.MOBILE).update(devtoolsDetect.open);
+    Pubx.get(PUBX_KEYS.MOBILE).update();
     main.update();
     layoutChangeThrottle = undefined;
   }, 500);
