@@ -67,6 +67,8 @@ export function renderSprites(scanlineRegister: i32, useLargerSprites: boolean):
       let flipSpriteY: boolean = checkBitOnByte(6, spriteAttributes);
       let flipSpriteX: boolean = checkBitOnByte(5, spriteAttributes);
 
+      // TODO: Torch2424 continue here.
+
       // Find which line on the sprite we are on
       let currentSpriteLine: i32 = scanlineRegister - spriteYPosition;
 
