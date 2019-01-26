@@ -229,3 +229,38 @@ export function drawTileDataToWasmMemory(): void {
     }
   }
 }
+
+export function drawOamToWasmMemory(): void {
+  // Draw all 40 sprites
+  for (let i: i32 = 0; i < 40; i++) {
+    // Sprites occupy 4 bytes in the sprite attribute table
+    let spriteTableIndex: i32 = i * 4;
+    // Y positon is offset by 16, X position is offset by 8
+
+    let spriteYPosition: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex);
+    let spriteXPosition: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 1);
+    let spriteTileId: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 2);
+
+    // Find our sprite height
+    let spriteHeight: i32 = 8;
+    if (useLargerSprites) {
+      spriteHeight = 16;
+      // @binji says in 8x16 mode, even tileId always drawn first
+      // This will fix shantae sprites which always uses odd numbered indexes
+
+      // TODO: Do the actual Pandocs thing:
+      // "In 8x16 mode, the lower bit of the tile number is ignored. Ie. the upper 8x8 tile is "NN AND FEh", and the lower 8x8 tile is "NN OR 01h"."
+      // So just knock off the last bit? :)
+      if (spriteTileId % 2 === 1) {
+        spriteTileId -= 1;
+      }
+    }
+
+    // Get our sprite attributes since we know we shall be drawing the tile
+    let spriteAttributes: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 3);
+
+    // Check if we should flip the sprite on the x or y axis
+    let flipSpriteY: boolean = checkBitOnByte(6, spriteAttributes);
+    let flipSpriteX: boolean = checkBitOnByte(5, spriteAttributes);
+  }
+}
