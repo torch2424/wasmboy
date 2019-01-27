@@ -12,7 +12,7 @@
   ],
   "author": "Aaron Turner",
   "version": "0.3.4",
-  "license": "Apache-2.0",
+  "license": "GPL-3.0-or-later",
   "homepage": "https://wasmboy.app",
   "repository": {
     "type": "git",

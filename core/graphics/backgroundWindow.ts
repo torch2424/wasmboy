@@ -466,6 +466,7 @@ function drawLineOfTileFromTileId(
     FRAME_LOCATION,
     false,
     0,
-    bgMapAttributes
+    bgMapAttributes,
+    -1
   );
 }

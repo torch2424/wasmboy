@@ -1,5 +1,5 @@
 // Functions to debug graphical output
-import { BACKGROUND_MAP_LOCATION, TILE_DATA_LOCATION } from '../constants';
+import { BACKGROUND_MAP_LOCATION, TILE_DATA_LOCATION, OAM_TILES_LOCATION } from '../constants';
 import {
   Graphics,
   Lcd,
@@ -211,20 +211,91 @@ export function drawTileDataToWasmMemory(): void {
       // Draw each Y line of the tile
       for (let tileLineY: i32 = 0; tileLineY < 8; tileLineY++) {
         drawPixelsFromLineOfTile(
-          tileId,
-          tileDataMemoryLocation,
-          vramBankId,
-          0,
-          7,
-          tileLineY,
-          tileDataMapGridX * 8,
-          tileDataMapGridY * 8 + tileLineY,
-          0x1f * 8,
-          TILE_DATA_LOCATION,
-          true,
-          0,
-          -1
+          tileId, // tileId
+          tileDataMemoryLocation, // Graphics.memoryLocationTileDataSelect
+          vramBankId, // Vram Bank
+          0, // Tile Line X Start
+          7, // Tile Line X End
+          tileLineY, // Tile Line Y
+          tileDataMapGridX * 8, // Output line X
+          tileDataMapGridY * 8 + tileLineY, // Output line Y
+          0x1f * 8, // Output Width
+          TILE_DATA_LOCATION, // Wasm Memory Start
+          true, // shouldRepresentMonochromeColorByColorId
+          0, // paletteLocation
+          -1, // bgMapAttributes
+          -1 // spriteAttributes
         );
+      }
+    }
+  }
+}
+
+export function drawOamToWasmMemory(): void {
+  // Draw all 40 sprites
+  // Going to be like BGB and do 8 x 5 sprites
+  for (let spriteRow: i32 = 0; spriteRow < 8; spriteRow++) {
+    for (let spriteColumn: i32 = 0; spriteColumn < 5; spriteColumn++) {
+      let spriteIndex = spriteColumn * 8 + spriteRow;
+
+      // Sprites occupy 4 bytes in the sprite attribute table
+      let spriteTableIndex: i32 = spriteIndex * 4;
+
+      // Y positon is offset by 16, X position is offset by 8
+
+      let spriteYPosition: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex);
+      let spriteXPosition: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 1);
+      let spriteTileId: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 2);
+
+      let tilesToDraw: i32 = 1;
+      if (Lcd.tallSpriteSize) {
+        // @binji says in 8x16 mode, even tileId always drawn first
+        // This will fix shantae sprites which always uses odd numbered indexes
+
+        // TODO: Do the actual Pandocs thing:
+        // "In 8x16 mode, the lower bit of the tile number is ignored. Ie. the upper 8x8 tile is "NN AND FEh", and the lower 8x8 tile is "NN OR 01h"."
+        // So just knock off the last bit? :)
+        if (spriteTileId % 2 === 1) {
+          spriteTileId -= 1;
+        }
+
+        tilesToDraw += 1;
+      }
+
+      // Get our sprite attributes since we know we shall be drawing the tile
+      let spriteAttributes: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 3);
+
+      // Check if we should flip the sprite on the x or y axis
+      let flipSpriteY: boolean = checkBitOnByte(6, spriteAttributes);
+      let flipSpriteX: boolean = checkBitOnByte(5, spriteAttributes);
+
+      // Find which VRAM Bank to load from
+      let vramBankId: i32 = 0;
+      if (Cpu.GBCEnabled && checkBitOnByte(3, spriteAttributes)) {
+        vramBankId = 1;
+      }
+
+      // Start Drawing our tiles
+      for (let i: i32 = 0; i < tilesToDraw; i++) {
+        // Draw each Y line of the tile
+        for (let tileLineY: i32 = 0; tileLineY < 8; tileLineY++) {
+          drawPixelsFromLineOfTile(
+            spriteTileId + i, // tileId
+            Graphics.memoryLocationTileDataSelectOneStart, // Graphics.memoryLocationTileDataSelect
+            vramBankId, // VRAM Bank
+            0, // Tile Line X Start
+            7, // Tile Line X End
+            tileLineY, // Tile Line Y
+            spriteRow * 8, // Output line X
+            spriteColumn * 16 + tileLineY + i * 8, // Output line Y
+            8 * 8, // Output Width
+            OAM_TILES_LOCATION, // Wasm Memory Start
+            true, // shouldRepresentMonochromeColorByColorId
+            0, // paletteLocation
+            -1, // bgMapAttributes
+            -1 // spriteAttributes
+          );
+        }
       }
     }
   }

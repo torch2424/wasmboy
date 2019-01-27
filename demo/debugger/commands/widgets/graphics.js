@@ -11,6 +11,7 @@ import Command from '../command';
 import GraphicsState from '../../components/graphics/graphicsState/graphicsState';
 import BackgroundMap from '../../components/graphics/backgroundMap/backgroundMap';
 import TileData from '../../components/graphics/tileData/tileData';
+import OamViewer from '../../components/graphics/oamViewer/oamViewer';
 
 class GraphicsStateCommand extends Command {
   constructor() {
@@ -54,5 +55,19 @@ class TileDataCommand extends Command {
   }
 }
 
-const exportedCommands = [new GraphicsStateCommand(), new BackgroundMapCommand(), new TileDataCommand()];
+class OamViewerCommand extends Command {
+  constructor() {
+    super('graphics:oamviewer');
+    this.options.label = 'Oam Viewer';
+  }
+
+  execute() {
+    Pubx.get(PUBX_KEYS.WIDGET).addWidget({
+      component: <OamViewer />,
+      label: 'Oam Viewer'
+    });
+  }
+}
+
+const exportedCommands = [new GraphicsStateCommand(), new BackgroundMapCommand(), new TileDataCommand(), new OamViewerCommand()];
 export default exportedCommands;

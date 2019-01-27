@@ -35,7 +35,8 @@ export function drawPixelsFromLineOfTile(
   wasmMemoryStart: i32,
   shouldRepresentMonochromeColorByColorId: boolean,
   paletteLocation: i32,
-  bgMapAttributes: i32
+  bgMapAttributes: i32,
+  spriteAttributes: i32
 ): i32 {
   // Get our number of pixels drawn
   let pixelsDrawn: i32 = 0;
