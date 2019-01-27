@@ -259,7 +259,7 @@ export function drawOamToWasmMemory(): void {
           spriteTileId -= 1;
         }
 
-        tilesToDraw++;
+        tilesToDraw += 1;
       }
 
       // Get our sprite attributes since we know we shall be drawing the tile
@@ -277,19 +277,17 @@ export function drawOamToWasmMemory(): void {
 
       // Start Drawing our tiles
       for (let i: i32 = 0; i < tilesToDraw; i++) {
-        let spriteColumnLine: i32 = (i + 1) * 8;
-
         // Draw each Y line of the tile
         for (let tileLineY: i32 = 0; tileLineY < 8; tileLineY++) {
           drawPixelsFromLineOfTile(
-            spriteTileId, // tileId
+            spriteTileId + i, // tileId
             Graphics.memoryLocationTileDataSelectOneStart, // Graphics.memoryLocationTileDataSelect
             vramBankId, // VRAM Bank
             0, // Tile Line X Start
             7, // Tile Line X End
             tileLineY, // Tile Line Y
             spriteRow * 8, // Output line X
-            spriteColumn * spriteColumnLine + tileLineY, // Output line Y
+            spriteColumn * 16 + tileLineY + i * 8, // Output line Y
             8 * 8, // Output Width
             OAM_TILES_LOCATION, // Wasm Memory Start
             true, // shouldRepresentMonochromeColorByColorId
