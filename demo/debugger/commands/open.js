@@ -43,6 +43,72 @@ class OpenLocalFile extends Command {
   }
 }
 
+// Recently Uploaded ROMs
+class OpenRecentROM extends Command {
+  constructor() {
+    super('open:recent');
+    this.options.label = 'Recently Added';
+  }
+
+  loadROM(cartridge) {
+    loadROM(cartridge.cartridgeRom.ROM, cartridge.cartridgeRom.fileName);
+    Pubx.get(PUBX_KEYS.MODAL).closeModal();
+  }
+
+  execute() {
+    // Allow autoplaying audio to work
+    WasmBoy.resumeAudioContext();
+
+    // Show a loading spinner
+    Pubx.get(PUBX_KEYS.MODAL).showModal(() => {
+      return (
+        <div class="recent-rom-container">
+          <h1>Recently Added</h1>
+          <div class="donut" />
+        </div>
+      );
+    }, true);
+
+    const recentROMTask = async () => {
+      const wasmboyCartridges = await WasmBoy.getSavedMemory();
+
+      Pubx.get(PUBX_KEYS.MODAL).closeModal();
+
+      // Using a stateless functional component
+      Pubx.get(PUBX_KEYS.MODAL).showModal(() => {
+        const ROMListItems = [];
+        wasmboyCartridges.forEach(cartridge => {
+          if (!cartridge.cartridgeRom) {
+            return;
+          }
+
+          const ROMdate = new Date(cartridge.cartridgeRom.date).toLocaleDateString();
+
+          ROMListItems.push(
+            <li>
+              <button class="remove-default-button" onClick={() => this.loadROM(cartridge)}>
+                <b>{cartridge.cartridgeRom.fileName}</b> - {ROMdate}
+              </button>
+            </li>
+          );
+        });
+
+        if (ROMListItems.length === 0) {
+          return <h1>No Recently Added Local File ROMs.</h1>;
+        }
+
+        return (
+          <div class="recent-rom-container">
+            <h1>Recently Added</h1>
+            <ul>{ROMListItems}</ul>
+          </div>
+        );
+      });
+    };
+    recentROMTask();
+  }
+}
+
 // Open Source Roms
 class OpenOpenSourceROM extends Command {
   constructor() {
@@ -146,6 +212,7 @@ class OpenGoogleDriveROM extends Command {
 
 const exportedCommands = [
   new OpenLocalFile(),
+  new OpenRecentROM(),
   new OpenOpenSourceROM(),
   // new OpenHomebrewHubROM(),
   new OpenGoogleDriveROM()

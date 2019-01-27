@@ -104,10 +104,12 @@ export function PUBX_INITIALIZE() {
   Pubx.publish(PUBX_KEYS.MODAL, {
     visible: false,
     component: false,
-    showModal: component => {
+    blockClosing: false,
+    showModal: (component, blockClosing) => {
       Pubx.publish(PUBX_KEYS.MODAL, {
         visible: 'modal--visible',
-        component
+        component,
+        blockClosing: !!blockClosing
       });
     },
     closeModal: () => {

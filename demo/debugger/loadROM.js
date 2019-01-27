@@ -7,6 +7,11 @@ export default function(file, fileName) {
   const loadROMTask = async () => {
     await WasmBoy.pause();
     await WasmBoy.loadROM(file);
+    // Save the loaded cartridge
+    await WasmBoy.saveLoadedCartridge({
+      fileName
+    });
+
     Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Game Loaded! 🎉');
     Pubx.publish(PUBX_KEYS.WASMBOY, {
       filename: fileName
