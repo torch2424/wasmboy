@@ -68,6 +68,22 @@ setTimeout(() => {
   Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Welcome to the WasmBoy Debugger/Demo!');
 }, 100);
 
+// Add some hotkeys
+let quickSpeed = false;
+WasmBoy.ResponsiveGamepad.onInputsChange(
+  [WasmBoy.ResponsiveGamepad.RESPONSIVE_GAMEPAD_INPUTS.LEFT_TRIGGER, WasmBoy.ResponsiveGamepad.RESPONSIVE_GAMEPAD_INPUTS.RIGHT_TRIGGER],
+  state => {
+    if (!quickSpeed && state.LEFT_TRIGGER) {
+      WasmBoy.setSpeed(1.5);
+      quickSpeed = true;
+      Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Quick Speed Hotkey! ⚡');
+    } else if (quickSpeed && !state.LEFT_TRIGGER) {
+      WasmBoy.setSpeed(1.0);
+      quickSpeed = false;
+    }
+  }
+);
+
 // Add all of our layout events
 let layoutChangeThrottle = undefined;
 
