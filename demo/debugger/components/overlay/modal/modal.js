@@ -16,7 +16,9 @@ export default class Modal extends Component {
   }
 
   close() {
-    Pubx.get(PUBX_KEYS.MODAL).closeModal();
+    if (!this.state.blockClosing) {
+      Pubx.get(PUBX_KEYS.MODAL).closeModal();
+    }
   }
 
   render() {
@@ -31,7 +33,7 @@ export default class Modal extends Component {
         <div class="modal__container">
           <div class="modal__container__title-bar">
             <button class="modal__container__title-bar__close remove-default-button" onClick={() => this.close()}>
-              X
+              {this.state.blockClosing ? '' : 'X'}
             </button>
           </div>
           <div class="modal__container__component">
