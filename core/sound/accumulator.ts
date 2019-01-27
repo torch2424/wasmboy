@@ -4,6 +4,7 @@ import { Channel2 } from './channel2';
 import { Channel3 } from './channel3';
 import { Channel4 } from './channel4';
 import { i32Portable } from '../portable/portable';
+import { AUDIO_BUFFER_LOCATION } from '../constants';
 
 // Another class simply for accumulating samples
 // Default everything to silence
@@ -88,7 +89,7 @@ export function accumulateSound(numberOfCycles: i32): void {
     setLeftAndRightOutputForAudioQueue(
       SoundAccumulator.leftChannelSampleUnsignedByte + 1,
       SoundAccumulator.rightChannelSampleUnsignedByte + 1,
-      Sound.audioQueueIndex
+      AUDIO_BUFFER_LOCATION
     );
     Sound.audioQueueIndex += 1;
 

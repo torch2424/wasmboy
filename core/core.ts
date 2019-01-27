@@ -42,7 +42,8 @@ export function config(
   graphicsDisableScanlineRendering: i32,
   audioAccumulateSamples: i32,
   tileRendering: i32,
-  tileCaching: i32
+  tileCaching: i32,
+  enableAudioDebugging: i32
 ): void {
   // TODO: depending on the boot rom, initialization may be different
   // From: http://www.codeslinger.co.uk/pages/projects/gameboy/hardware.html
@@ -101,6 +102,12 @@ export function config(
     Config.tileCaching = true;
   } else {
     Config.tileCaching = false;
+  }
+
+  if (enableAudioDebugging > 0) {
+    Config.enableAudioDebugging = true;
+  } else {
+    Config.enableAudioDebugging = false;
   }
 
   initialize();
