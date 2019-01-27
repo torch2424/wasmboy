@@ -187,6 +187,19 @@ export default class WasmBoyControls extends Component {
           />
         </div>
 
+        {/* Speed Options */}
+        <div class="wasmboy-controls__group">
+          <button onClick={() => WasmBoy.setSpeed(0.5)} disabled={!this.state.ready}>
+            0.5x
+          </button>
+          <button onClick={() => WasmBoy.setSpeed(1.0)} disabled={!this.state.ready}>
+            1.0x
+          </button>
+          <button onClick={() => WasmBoy.setSpeed(2.0)} disabled={!this.state.ready}>
+            2.0x
+          </button>
+        </div>
+
         {/* Save / Load States */}
         <div class="wasmboy-controls__group">
           <button disabled={!this.state.loadedAndStarted} onClick={() => this.saveState()}>
