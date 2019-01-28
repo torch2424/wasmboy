@@ -19,4 +19,7 @@ export class Config {
   // Tile Rednering
   static tileRendering: boolean = false;
   static tileCaching: boolean = false;
+
+  // Audio Debugging
+  static enableAudioDebugging: boolean = false;
 }

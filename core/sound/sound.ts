@@ -8,7 +8,13 @@
 // getSampleAsUnsignedByte() will do the conversion of getting the total
 // of all the channels, times the (mixer volume + 1), to give us an unsigned
 // byte from 0 (-1.0) to 254 (1.0)
-import { AUDIO_BUFFER_LOCATION } from '../constants';
+import {
+  AUDIO_BUFFER_LOCATION,
+  CHANNEL_1_BUFFER_LOCATION,
+  CHANNEL_2_BUFFER_LOCATION,
+  CHANNEL_3_BUFFER_LOCATION,
+  CHANNEL_4_BUFFER_LOCATION
+} from '../constants';
 import { getSaveStateMemoryOffset } from '../core';
 import { SoundAccumulator, initializeSoundAccumulator, accumulateSound } from './accumulator';
 import { Channel1 } from './channel1';
@@ -235,14 +241,39 @@ function calculateSound(numberOfCycles: i32): void {
     // Don't set to zero to catch overflowed cycles
     Sound.downSampleCycleCounter -= Sound.maxDownSampleCycles();
 
-    // Mixe our samples
+    // Mix our samples
     let mixedSample: i32 = mixChannelSamples(channel1Sample, channel2Sample, channel3Sample, channel4Sample);
     let leftChannelSampleUnsignedByte: i32 = splitHighByte(mixedSample);
     let rightChannelSampleUnsignedByte: i32 = splitLowByte(mixedSample);
 
     // Set our volumes in memory
     // +1 so it can not be zero
-    setLeftAndRightOutputForAudioQueue(leftChannelSampleUnsignedByte + 1, rightChannelSampleUnsignedByte + 1, Sound.audioQueueIndex);
+    setLeftAndRightOutputForAudioQueue(leftChannelSampleUnsignedByte + 1, rightChannelSampleUnsignedByte + 1, AUDIO_BUFFER_LOCATION);
+    if (Config.enableAudioDebugging) {
+      // Channel 1
+      mixedSample = mixChannelSamples(channel1Sample, 15, 15, 15);
+      leftChannelSampleUnsignedByte = splitHighByte(mixedSample);
+      rightChannelSampleUnsignedByte = splitLowByte(mixedSample);
+      setLeftAndRightOutputForAudioQueue(leftChannelSampleUnsignedByte + 1, rightChannelSampleUnsignedByte + 1, CHANNEL_1_BUFFER_LOCATION);
+
+      // Channel 2
+      mixedSample = mixChannelSamples(15, channel2Sample, 15, 15);
+      leftChannelSampleUnsignedByte = splitHighByte(mixedSample);
+      rightChannelSampleUnsignedByte = splitLowByte(mixedSample);
+      setLeftAndRightOutputForAudioQueue(leftChannelSampleUnsignedByte + 1, rightChannelSampleUnsignedByte + 1, CHANNEL_2_BUFFER_LOCATION);
+
+      // Channel 3
+      mixedSample = mixChannelSamples(15, 15, channel3Sample, 15);
+      leftChannelSampleUnsignedByte = splitHighByte(mixedSample);
+      rightChannelSampleUnsignedByte = splitLowByte(mixedSample);
+      setLeftAndRightOutputForAudioQueue(leftChannelSampleUnsignedByte + 1, rightChannelSampleUnsignedByte + 1, CHANNEL_3_BUFFER_LOCATION);
+
+      // Channel 4
+      mixedSample = mixChannelSamples(15, 15, 15, channel4Sample);
+      leftChannelSampleUnsignedByte = splitHighByte(mixedSample);
+      rightChannelSampleUnsignedByte = splitLowByte(mixedSample);
+      setLeftAndRightOutputForAudioQueue(leftChannelSampleUnsignedByte + 1, rightChannelSampleUnsignedByte + 1, CHANNEL_4_BUFFER_LOCATION);
+    }
     Sound.audioQueueIndex += 1;
 
     // Don't allow our audioQueueIndex to overflow into other parts of the wasmBoy memory map
@@ -453,9 +484,9 @@ function getSampleAsUnsignedByte(sample: i32, mixerVolume: i32): i32 {
 }
 
 // Function to set our left and right channels at the correct queue index
-export function setLeftAndRightOutputForAudioQueue(leftVolume: i32, rightVolume: i32, audioQueueIndex: i32): void {
+export function setLeftAndRightOutputForAudioQueue(leftVolume: i32, rightVolume: i32, bufferLocation: i32): void {
   // Get our stereo index
-  let audioQueueOffset = AUDIO_BUFFER_LOCATION + audioQueueIndex * 2;
+  let audioQueueOffset = bufferLocation + Sound.audioQueueIndex * 2;
 
   // Store our volumes
   // +1 that way we don't have empty data to ensure that the value is set

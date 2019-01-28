@@ -24,6 +24,7 @@ const getMobileCanvasElement = () => {
 const WasmBoyDefaultOptions = {
   isGbcEnabled: true,
   isAudioEnabled: true,
+  enableAudioDebugging: false,
   frameSkip: 0,
   audioBatchProcessing: false,
   timersBatchProcessing: false,
@@ -83,7 +84,8 @@ const WasmBoyDefaultOptions = {
 };
 
 export const WasmBoyDefaultDesktopOptions = {
-  ...WasmBoyDefaultOptions
+  ...WasmBoyDefaultOptions,
+  enableAudioDebugging: true
 };
 
 export const WasmBoyDefaultMobileOptions = {

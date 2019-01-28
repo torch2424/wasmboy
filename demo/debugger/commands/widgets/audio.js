@@ -9,6 +9,7 @@ import { PUBX_KEYS } from '../../pubx.config';
 import Command from '../command';
 
 import AudioState from '../../components/audio/audioState/audioState';
+import AudioWaveform from '../../components/audio/waveform/waveform';
 
 class AudioStateCommand extends Command {
   constructor() {
@@ -24,5 +25,19 @@ class AudioStateCommand extends Command {
   }
 }
 
-const exportedCommands = [new AudioStateCommand()];
+class AudioWaveformCommand extends Command {
+  constructor() {
+    super('audio:waveform');
+    this.options.label = 'Waveform';
+  }
+
+  execute() {
+    Pubx.get(PUBX_KEYS.WIDGET).addWidget({
+      component: <AudioWaveform />,
+      label: 'Waveform'
+    });
+  }
+}
+
+const exportedCommands = [new AudioStateCommand(), new AudioWaveformCommand()];
 export default exportedCommands;
