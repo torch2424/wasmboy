@@ -19,6 +19,7 @@ import BackgroundMap from './components/graphics/backgroundMap/backgroundMap';
 import TileData from './components/graphics/tileData/tileData';
 import OamViewer from './components/graphics/oamViewer/oamViewer';
 import AudioState from './components/audio/audioState/audioState';
+import AudioWaveform from './components/audio/waveform/waveform';
 import InterruptState from './components/interrupt/interruptState/interruptState';
 import TimerState from './components/timer/timerState/timerState';
 import AboutComponent from './components/other/about/about';
@@ -36,6 +37,7 @@ const components = {
   TileData: <TileData />,
   OamViewer: <OamViewer />,
   AudioState: <AudioState />,
+  AudioWaveform: <AudioWaveform />,
   InterruptState: <InterruptState />,
   TimerState: <TimerState />,
   AboutComponent: <AboutComponent />,
