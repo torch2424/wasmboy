@@ -16,7 +16,7 @@ export default class AudioWaveform extends Component {
     Object.keys(audioChannels).forEach(audioChannelKey => {
       // Add Analyser nodes
       const analyser = audioChannels[audioChannelKey].audioContext.createAnalyser();
-      audioChannels[audioChannelKey].setAdditionalAudioNodes([analyser]);
+      audioChannels[audioChannelKey].additionalAudioNodes.push(analyser);
 
       const waveform = new Float32Array(analyser.frequencyBinCount);
       analyser.getFloatTimeDomainData(waveform);
@@ -43,6 +43,14 @@ export default class AudioWaveform extends Component {
 
   componentWillUnmount() {
     clearInterval(updateInterval);
+
+    Object.keys(audioChannels).forEach(audioChannelKey => {
+      // Remove our analyser nodes
+      audioChannels[audioChannelKey].additionalAudioNodes.splice(
+        audioChannels[audioChannelKey].additionalAudioNodes.indexOf(audioWaveforms[audioChannelKey].analyser),
+        1
+      );
+    });
   }
 
   update() {
