@@ -26,13 +26,14 @@ let updateTask = async () => {
   if (!gbMemoryStart) {
     gbMemoryStart = await WasmBoy._getWasmConstant('DEBUG_GAMEBOY_MEMORY_LOCATION');
     gbMemorySize = await WasmBoy._getWasmConstant('DEBUG_GAMEBOY_MEMORY_SIZE');
-    gbMemoryEnd = gbMemoryStart + gbMemorySize + 1;
+    gbMemoryEnd = gbMemoryStart + gbMemorySize;
   }
 
   const data = [];
 
-  await WasmBoy._runWasmExport('updateDebugGBMemory', []);
+  await WasmBoy._runWasmExport('updateDebugGBMemory');
   gbMemory = await WasmBoy._getWasmMemorySection(gbMemoryStart, gbMemoryEnd);
+  console.log('memory section');
 
   // Build our rows
   let address = 0;
