@@ -58,6 +58,17 @@ export default class AudioWaveform extends Component {
       Object.keys(audioChannels).forEach(audioChannelKey => {
         const audioWaveform = audioWaveforms[audioChannelKey];
 
+        // Check if we are muted
+        // If we are, draw a straight line
+        if (audioChannels.master.muted && audioChannels[audioChannelKey].muted) {
+          audioWaveform.canvasContext.clearRect(0, 0, audioWaveform.canvasElement.width, audioWaveform.canvasElement.height);
+          audioWaveform.canvasContext.beginPath();
+          audioWaveform.canvasContext.moveTo(0, audioWaveform.canvasElement.height / 2);
+          audioWaveform.canvasContext.lineTo(audioWaveform.canvasElement.width, audioWaveform.canvasElement.height / 2);
+          audioWaveform.canvasContext.stroke();
+          return;
+        }
+
         // Update our waveform
         audioWaveform.analyser.getFloatTimeDomainData(audioWaveform.waveform);
 
