@@ -33,7 +33,6 @@ let updateTask = async () => {
 
   await WasmBoy._runWasmExport('updateDebugGBMemory');
   gbMemory = await WasmBoy._getWasmMemorySection(gbMemoryStart, gbMemoryEnd);
-  console.log('memory section');
 
   // Build our rows
   let address = 0;
