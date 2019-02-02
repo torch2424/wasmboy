@@ -24,7 +24,7 @@ export default class AudioControl extends Component {
       <div class="audio-control__control">
         <h3>{label}</h3>
         <div>
-          <b>Muted:</b> {audioChannels.master.muted && audioChannel.muted ? 'true' : 'false'}
+          <b>Muted:</b> {audioChannel.muted ? 'true' : 'false'}
         </div>
         <button onClick={() => audioChannel.mute()}>Mute</button>
         <button onClick={() => audioChannel.unmute()}>Unmute</button>

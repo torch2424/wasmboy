@@ -60,7 +60,7 @@ export default class AudioWaveform extends Component {
 
         // Check if we are muted
         // If we are, draw a straight line
-        if (audioChannels.master.muted && audioChannels[audioChannelKey].muted) {
+        if (audioChannels[audioChannelKey].muted) {
           audioWaveform.canvasContext.clearRect(0, 0, audioWaveform.canvasElement.width, audioWaveform.canvasElement.height);
           audioWaveform.canvasContext.beginPath();
           audioWaveform.canvasContext.moveTo(0, audioWaveform.canvasElement.height / 2);
