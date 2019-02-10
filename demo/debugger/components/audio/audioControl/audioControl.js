@@ -14,7 +14,7 @@ export default class AudioControl extends Component {
   }
 
   componentWillUnmount() {
-    if (updateInerval) {
+    if (updateInterval) {
       clearInterval(updateInterval);
     }
   }
