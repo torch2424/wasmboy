@@ -4,7 +4,7 @@ import './waveform.css';
 
 export default class AudioWaveform extends AudioVisualizer {
   constructor() {
-    super('Waveform', 'getFloatTimeDomainData');
+    super('Waveform', 'waveform', 'getFloatTimeDomainData');
   }
 
   drawVisualization(visualizationChannels) {

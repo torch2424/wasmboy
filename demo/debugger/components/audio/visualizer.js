@@ -7,37 +7,44 @@ import './visualizer.css';
 let updateInterval = undefined;
 
 const audioChannels = WasmBoy._getAudioChannels();
-const audioVisualizations = {};
 
 // https://noisehack.com/build-music-visualizer-web-audio-api/
 // https://github.com/borismus/webaudioapi.com/tree/master/content/posts/visualizer
 // https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Visualizations_with_Web_Audio_API
 // https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode
 export default class AudioVisualizer extends Component {
-  constructor(title, analyserNodeGetDataKey) {
+  constructor(title, key, analyserNodeGetDataKey) {
     super();
     this.title = title;
     this.analyserNodeGetDataKey = analyserNodeGetDataKey;
+    this.audioVisualizations = {};
   }
 
   componentDidMount() {
     // Get all of our channels' canvases, and apply analyser nodes
     Object.keys(audioChannels).forEach(audioChannelKey => {
       // Add Analyser nodes
+      // And configure for a plesant looking result
       const analyser = audioChannels[audioChannelKey].audioContext.createAnalyser();
+      analyser.smoothingTimeConstant = 0.4;
       audioChannels[audioChannelKey].additionalAudioNodes.push(analyser);
 
-      const visualization = new Float32Array(analyser.frequencyBinCount);
+      let visualization;
+      if (this.analyserNodeGetDataKey.includes('Float')) {
+        visualization = new Float32Array(analyser.frequencyBinCount);
+      } else {
+        visualization = new Uint8Array(analyser.frequencyBinCount);
+      }
       analyser[this.analyserNodeGetDataKey](visualization);
 
       // Get our canvas
-      const canvasElement = this.base.querySelector(`.audio-visualizer__${audioChannelKey} canvas`);
+      const canvasElement = this.base.querySelector(`.audio-${this.key}__${audioChannelKey} canvas`);
       canvasElement.width = visualization.length;
       canvasElement.height = 200;
       const canvasContext = canvasElement.getContext('2d');
       canvasContext.lineWidth = 3.0;
 
-      audioVisualizations[audioChannelKey] = {
+      this.audioVisualizations[audioChannelKey] = {
         canvasElement,
         canvasContext,
         analyser,
@@ -56,7 +63,7 @@ export default class AudioVisualizer extends Component {
     Object.keys(audioChannels).forEach(audioChannelKey => {
       // Remove our analyser nodes
       audioChannels[audioChannelKey].additionalAudioNodes.splice(
-        audioChannels[audioChannelKey].additionalAudioNodes.indexOf(audioVisualizations[audioChannelKey].analyser),
+        audioChannels[audioChannelKey].additionalAudioNodes.indexOf(this.audioVisualizations[audioChannelKey].analyser),
         1
       );
     });
@@ -73,8 +80,8 @@ export default class AudioVisualizer extends Component {
             muted: audioChannels[audioChannelKey].muted
           };
 
-          Object.keys(audioVisualizations[audioChannelKey]).forEach(visualizationKey => {
-            visualizationChannels[audioChannelKey][visualizationKey] = audioVisualizations[audioChannelKey][visualizationKey];
+          Object.keys(this.audioVisualizations[audioChannelKey]).forEach(visualizationKey => {
+            visualizationChannels[audioChannelKey][visualizationKey] = this.audioVisualizations[audioChannelKey][visualizationKey];
           });
         });
 
@@ -86,7 +93,7 @@ export default class AudioVisualizer extends Component {
   render() {
     const getAudioChannelElement = (id, name) => {
       return (
-        <div class={'audio-visualizer__' + id + ' audio-visualizer__channel-element'}>
+        <div class={`audio-visualizer__${id} audio-${this.key}__${id} audio-visualizer__channel-element`}>
           <h3>{name}</h3>
           <canvas />
         </div>
