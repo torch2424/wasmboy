@@ -11,6 +11,7 @@ import Command from '../command';
 import AudioState from '../../components/audio/audioState/audioState';
 import AudioControl from '../../components/audio/audioControl/audioControl';
 import AudioWaveform from '../../components/audio/waveform/waveform';
+import AudioFrequency from '../../components/audio/frequency/frequency';
 import AudioRecorder from '../../components/audio/recorder/recorder';
 
 class AudioStateCommand extends Command {
@@ -55,6 +56,20 @@ class AudioWaveformCommand extends Command {
   }
 }
 
+class AudioFrequencyCommand extends Command {
+  constructor() {
+    super('audio:frequency');
+    this.options.label = 'Frequency';
+  }
+
+  execute() {
+    Pubx.get(PUBX_KEYS.WIDGET).addWidget({
+      component: <AudioFrequency />,
+      label: 'Frequency'
+    });
+  }
+}
+
 class AudioRecorderCommand extends Command {
   constructor() {
     super('audio:recorder');
@@ -69,5 +84,11 @@ class AudioRecorderCommand extends Command {
   }
 }
 
-const exportedCommands = [new AudioStateCommand(), new AudioControlCommand(), new AudioWaveformCommand(), new AudioRecorderCommand()];
+const exportedCommands = [
+  new AudioStateCommand(),
+  new AudioControlCommand(),
+  new AudioWaveformCommand(),
+  new AudioFrequencyCommand(),
+  new AudioRecorderCommand()
+];
 export default exportedCommands;
