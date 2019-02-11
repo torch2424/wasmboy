@@ -14,7 +14,7 @@
  (type $iiiii (func (param i32 i32 i32 i32) (result i32)))
  (type $iiiiiiii_ (func (param i32 i32 i32 i32 i32 i32 i32 i32)))
  (type $FUNCSIG$iiiiii (func (param i32 i32 i32 i32 i32) (result i32)))
- (type $FUNCSIG$iiiiiiiiiiiii (func (param i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32) (result i32)))
+ (type $FUNCSIG$iiiiiiiiiiiiii (func (param i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32) (result i32)))
  (type $FUNCSIG$v (func))
  (type $FUNCSIG$iii (func (param i32 i32) (result i32)))
  (memory $0 0)
@@ -2533,14 +2533,14 @@
   end
   local.get $1
  )
- (func $core/graphics/tiles/drawPixelsFromLineOfTile (; 47 ;) (type $FUNCSIG$iiiiiiiiiiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (param $7 i32) (param $8 i32) (param $9 i32) (param $10 i32) (param $11 i32) (result i32)
-  (local $12 i32)
+ (func $core/graphics/tiles/drawPixelsFromLineOfTile (; 47 ;) (type $FUNCSIG$iiiiiiiiiiiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (param $7 i32) (param $8 i32) (param $9 i32) (param $10 i32) (param $11 i32) (param $12 i32) (result i32)
   (local $13 i32)
   (local $14 i32)
   (local $15 i32)
   (local $16 i32)
   (local $17 i32)
   (local $18 i32)
+  (local $19 i32)
   local.get $1
   local.get $0
   call $core/graphics/tiles/getTileDataAddress
@@ -2559,14 +2559,14 @@
   local.tee $1
   i32.add
   i32.load8_u
-  local.set $17
+  local.set $18
   local.get $0
   i32.const -30719
   i32.add
   local.get $1
   i32.add
   i32.load8_u
-  local.set $18
+  local.set $19
   local.get $3
   local.set $0
   loop $repeat|0
@@ -2579,7 +2579,7 @@
     i32.sub
     local.get $6
     i32.add
-    local.tee $13
+    local.tee $14
     local.get $8
     i32.lt_s
     if
@@ -2610,7 +2610,7 @@
       select
       local.tee $1
       i32.shl
-      local.get $18
+      local.get $19
       i32.and
       if
        i32.const 2
@@ -2624,26 +2624,46 @@
      i32.const 1
      local.get $1
      i32.shl
-     local.get $17
+     local.get $18
      i32.and
      select
      local.set $2
      local.get $11
      i32.const 0
      i32.ge_s
+     local.tee $1
+     if (result i32)
+      local.get $1
+     else      
+      local.get $12
+      i32.const 0
+      i32.ge_s
+     end
      if (result i32)
       local.get $11
       i32.const 7
       i32.and
-      local.get $2
+      local.set $5
+      local.get $12
       i32.const 0
+      i32.ge_s
+      local.tee $1
+      if
+       local.get $12
+       i32.const 7
+       i32.and
+       local.set $5
+      end
+      local.get $5
+      local.get $2
+      local.get $1
       call $core/graphics/palette/getRgbColorFromPalette
       local.tee $5
       i32.const 31
       i32.and
       i32.const 3
       i32.shl
-      local.set $14
+      local.set $15
       local.get $5
       i32.const 992
       i32.and
@@ -2662,16 +2682,16 @@
      else      
       local.get $2
       i32.const 65351
-      local.get $15
-      local.get $15
+      local.get $16
+      local.get $16
       i32.const 0
       i32.le_s
       select
-      local.tee $15
+      local.tee $16
       local.get $10
       call $core/graphics/palette/getMonochromeColorFromPalette
       local.tee $5
-      local.set $14
+      local.set $15
       local.get $5
       local.tee $1
      end
@@ -2679,21 +2699,21 @@
      local.get $7
      local.get $8
      i32.mul
-     local.get $13
+     local.get $14
      i32.add
      i32.const 3
      i32.mul
      local.get $9
      i32.add
-     local.tee $16
-     local.get $14
+     local.tee $17
+     local.get $15
      i32.store8
-     local.get $16
+     local.get $17
      i32.const 1
      i32.add
      local.get $1
      i32.store8
-     local.get $16
+     local.get $17
      i32.const 2
      i32.add
      local.get $5
@@ -2701,7 +2721,7 @@
      local.get $7
      i32.const 160
      i32.mul
-     local.get $13
+     local.get $14
      i32.add
      i32.const 67712
      i32.add
@@ -2724,10 +2744,10 @@
      select
      select
      i32.store8
-     local.get $12
+     local.get $13
      i32.const 1
      i32.add
-     local.set $12
+     local.set $13
     end
     local.get $0
     i32.const 1
@@ -2736,7 +2756,7 @@
     br $repeat|0
    end
   end
-  local.get $12
+  local.get $13
  )
  (func $core/graphics/backgroundWindow/drawLineOfTileFromTileId (; 48 ;) (type $iiiiiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (result i32)
   (local $7 i32)
@@ -2806,6 +2826,7 @@
   i32.const 91264
   i32.const 0
   local.get $2
+  i32.const -1
   call $core/graphics/tiles/drawPixelsFromLineOfTile
  )
  (func $core/graphics/backgroundWindow/drawColorPixelFromTileId (; 49 ;) (type $iiiiiii_) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32)
@@ -14451,114 +14472,181 @@
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
-  block $break|0
-   loop $repeat|0
-    local.get $1
-    i32.const 23
-    i32.ge_s
-    br_if $break|0
+  (local $6 i32)
+  (local $7 i32)
+  (local $8 i32)
+  (local $9 i32)
+  (local $10 i32)
+  loop $repeat|0
+   local.get $2
+   i32.const 23
+   i32.ge_s
+   i32.eqz
+   if
     i32.const 0
-    local.set $0
+    local.set $1
     loop $repeat|1
-     block $break|1
-      local.get $0
-      i32.const 31
-      i32.ge_s
-      br_if $break|1
-      i32.const 0
-      local.set $4
+     local.get $1
+     i32.const 31
+     i32.lt_s
+     if
       i32.const 1
       i32.const 0
-      local.get $0
+      local.get $1
       i32.const 15
       i32.gt_s
       select
-      local.set $4
-      local.get $1
-      local.set $2
+      local.set $8
       local.get $2
       i32.const 15
       i32.sub
       local.get $2
-      local.get $1
+      local.get $2
       i32.const 15
       i32.gt_s
       select
       i32.const 4
       i32.shl
-      local.set $2
-      local.get $0
+      local.tee $4
+      local.get $1
       i32.const 15
       i32.sub
-      local.get $2
       i32.add
-      local.get $0
-      local.get $2
+      local.get $1
+      local.get $4
       i32.add
-      local.get $0
-      i32.const 15
-      i32.gt_s
-      select
-      local.set $2
-      i32.const 32768
-      local.set $5
-      i32.const 34816
-      i32.const 32768
       local.get $1
       i32.const 15
       i32.gt_s
       select
+      local.set $4
+      i32.const 34816
+      i32.const 32768
+      local.get $2
+      i32.const 15
+      i32.gt_s
+      select
+      local.set $9
+      i32.const -1
+      local.set $6
+      i32.const 39936
+      i32.const 38912
+      global.get $core/graphics/lcd/Lcd.bgTileMapDisplaySelect
+      select
+      local.set $10
+      i32.const -1
       local.set $5
       i32.const 0
-      local.set $3
+      local.set $0
       loop $repeat|2
-       block $break|2
-        local.get $3
-        i32.const 8
-        i32.ge_s
-        br_if $break|2
-        local.get $2
-        local.get $5
+       local.get $0
+       i32.const 32
+       i32.lt_s
+       if
+        i32.const 0
+        local.set $3
+        loop $repeat|3
+         local.get $3
+         i32.const 32
+         i32.lt_s
+         if
+          local.get $3
+          i32.const 5
+          i32.shl
+          local.get $10
+          i32.add
+          local.get $0
+          i32.add
+          local.tee $7
+          i32.const -30720
+          i32.add
+          i32.load8_u
+          local.get $4
+          i32.eq
+          if
+           i32.const 32
+           local.set $0
+           i32.const 32
+           local.set $3
+           local.get $7
+           local.set $5
+          end
+          local.get $3
+          i32.const 1
+          i32.add
+          local.set $3
+          br $repeat|3
+         end
+        end
+        local.get $0
+        i32.const 1
+        i32.add
+        local.set $0
+        br $repeat|2
+       end
+      end
+      local.get $5
+      i32.const 0
+      i32.ge_s
+      global.get $core/cpu/cpu/Cpu.GBCEnabled
+      local.tee $7
+      local.get $7
+      select
+      if
+       local.get $5
+       i32.const -22528
+       i32.add
+       i32.load8_u
+       local.set $6
+      end
+      i32.const 0
+      local.set $0
+      loop $repeat|4
+       local.get $0
+       i32.const 8
+       i32.lt_s
+       if
         local.get $4
+        local.get $9
+        local.get $8
         i32.const 0
         i32.const 7
-        local.get $3
         local.get $0
-        i32.const 3
-        i32.shl
         local.get $1
         i32.const 3
         i32.shl
-        local.get $3
+        local.get $2
+        i32.const 3
+        i32.shl
+        local.get $0
         i32.add
         i32.const 248
         i32.const 381056
         i32.const 1
+        local.get $6
         i32.const -1
         call $core/graphics/tiles/drawPixelsFromLineOfTile
         drop
-        local.get $3
+        local.get $0
         i32.const 1
         i32.add
-        local.set $3
-        br $repeat|2
+        local.set $0
+        br $repeat|4
        end
       end
-      local.get $0
+      local.get $1
       i32.const 1
       i32.add
-      local.set $0
+      local.set $1
       br $repeat|1
      end
     end
-    local.get $1
+    local.get $2
     i32.const 1
     i32.add
-    local.set $1
+    local.set $2
     br $repeat|0
-    unreachable
    end
-   unreachable
   end
  )
  (func $core/debug/debug-graphics/drawOamToWasmMemory (; 200 ;) (type $_)
@@ -14569,6 +14657,7 @@
   (local $4 i32)
   (local $5 i32)
   (local $6 i32)
+  (local $7 i32)
   loop $repeat|0
    local.get $4
    i32.const 8
@@ -14626,12 +14715,12 @@
       i32.const 65027
       i32.add
       call $core/memory/load/eightBitLoadFromGBMemory
-      local.set $0
+      local.set $7
       i32.const 0
       local.set $6
       i32.const 1
       i32.const 0
-      local.get $0
+      local.get $7
       i32.const 8
       i32.and
       i32.const 0
@@ -14679,6 +14768,7 @@
           i32.const 528512
           i32.const 1
           i32.const -1
+          local.get $7
           call $core/graphics/tiles/drawPixelsFromLineOfTile
           drop
           local.get $3

@@ -81,11 +81,16 @@ export function drawPixelsFromLineOfTile(
       let blue: i32 = 0;
 
       // Check if we should draw color or not
-      if (bgMapAttributes >= 0) {
+      if (bgMapAttributes >= 0 || spriteAttributes >= 0) {
+        let isSprite: boolean = spriteAttributes >= 0;
+
         // Call the helper function to grab the correct color from the palette
         // Get the palette index byte
         let bgPalette: i32 = bgMapAttributes & 0x07;
-        let rgbColorPalette: i32 = getRgbColorFromPalette(bgPalette, paletteColorId, false);
+        if (isSprite) {
+          bgPalette = spriteAttributes & 0x07;
+        }
+        let rgbColorPalette: i32 = getRgbColorFromPalette(bgPalette, paletteColorId, isSprite);
 
         // Split off into red green and blue
         red = getColorComponentFromRgb(0, rgbColorPalette);
