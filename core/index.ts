@@ -1,5 +1,5 @@
 // Public Exports
-export { config, hasCoreStarted, saveState, loadState } from './core';
+export { config, hasCoreStarted, saveState, loadState, isGBC } from './core';
 export {
   getStepsPerStepSet,
   getStepSets,
