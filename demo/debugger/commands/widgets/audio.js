@@ -13,6 +13,7 @@ import AudioControl from '../../components/audio/audioControl/audioControl';
 import AudioWaveform from '../../components/audio/waveform/waveform';
 import AudioFrequency from '../../components/audio/frequency/frequency';
 import AudioRecorder from '../../components/audio/recorder/recorder';
+import AudioWavetable from '../../components/audio/wavetable/wavetable';
 
 class AudioStateCommand extends Command {
   constructor() {
@@ -84,11 +85,26 @@ class AudioRecorderCommand extends Command {
   }
 }
 
+class AudioWavetableCommand extends Command {
+  constructor() {
+    super('audio:wavetable');
+    this.options.label = 'Wavetable';
+  }
+
+  execute() {
+    Pubx.get(PUBX_KEYS.WIDGET).addWidget({
+      component: <AudioWavetable />,
+      label: 'Wavetable'
+    });
+  }
+}
+
 const exportedCommands = [
   new AudioStateCommand(),
   new AudioControlCommand(),
   new AudioWaveformCommand(),
   new AudioFrequencyCommand(),
-  new AudioRecorderCommand()
+  new AudioRecorderCommand(),
+  new AudioWavetableCommand()
 ];
 export default exportedCommands;
