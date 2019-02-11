@@ -42,6 +42,20 @@ const getMonochromeTableCell = colorId => {
   );
 };
 
+const getColorTableCell = (highByte, lowByte) => {
+  // Combine into a 16 bit value
+  const paletteBytes = (highByte << 8) + lowByte;
+
+  // From core/graphics/palette
+  // Goal is to reach 254 for each color, so 255 / 31 (0x1F) ~8 TODO: Make exact
+  // Want 5 bits for each
+  const red = (paletteBytes & 0x1f) * 8;
+  const green = ((paletteBytes >> 5) & 0x1f) * 8;
+  const blue = ((paletteBytes >> 10) & 0x1f) * 8;
+
+  return <td style={`background-color: rgb(${red}, ${green}, ${blue})`} class="palette-table__color" />;
+};
+
 export default class PaletteViewer extends Component {
   componentDidMount() {
     // Update at ~30fps
@@ -75,13 +89,10 @@ export default class PaletteViewer extends Component {
 
   updateMonochrome() {
     const updateTask = async () => {
-      // Get the palette memory
-      // http://gbdev.gg8.se/wiki/articles/Sound_Controller#FF30-FF3F_-_Wave_Pattern_RAM
+      // Get the palette memory registers
       const memoryStart = await WasmBoy._runWasmExport('getWasmBoyOffsetFromGameBoyOffset', [0xff47]);
       const memoryEnd = await WasmBoy._runWasmExport('getWasmBoyOffsetFromGameBoyOffset', [0xff49]);
       const memory = await WasmBoy._getWasmMemorySection(memoryStart, memoryEnd + 1);
-
-      console.log(memory);
 
       // Create our rows
       const paletteRows = [];
@@ -127,7 +138,66 @@ export default class PaletteViewer extends Component {
 
   updateColor() {
     // TODO:
-    const updateTask = async () => {};
+    const updateTask = async () => {
+      // Get the CGB palette memory
+      const memoryStart = await WasmBoy._getWasmConstant('GBC_PALETTE_LOCATION');
+      const memoryEnd = memoryStart + (await WasmBoy._getWasmConstant('GBC_PALETTE_SIZE'));
+      const memory = await WasmBoy._getWasmMemorySection(memoryStart, memoryEnd + 1);
+
+      // Create our rows
+      const paletteRows = [];
+
+      // Function to generate our monochrome row
+      const generateRow = (title, paletteBytes) => {
+        paletteRows.push(
+          <tr>
+            <th>{title}</th>
+            {getColorTableCell(paletteBytes[1], paletteBytes[0])}
+            {getColorTableCell(paletteBytes[3], paletteBytes[2])}
+            {getColorTableCell(paletteBytes[5], paletteBytes[4])}
+            {getColorTableCell(paletteBytes[7], paletteBytes[6])}
+          </tr>
+        );
+      };
+
+      // Generate palette rows
+      // Background
+      for (let i = 0; i < 8; i++) {
+        const title = `BG ${i}`;
+        // 8 bytes per palette
+        const memoryIndex = i * 8;
+        const paletteBytes = memory.slice(memoryIndex, memoryIndex + 8);
+        generateRow(title, paletteBytes);
+      }
+      // Sprites
+      for (let i = 0; i < 8; i++) {
+        const title = `OBJ ${i}`;
+        // 8 bytes per palette
+        // Add 64 for the background palettes
+        const memoryIndex = 64 + i * 8;
+        const paletteBytes = memory.slice(memoryIndex, memoryIndex + 8);
+        generateRow(title, paletteBytes);
+      }
+
+      // Create our table
+      const paletteTable = (
+        <table className="palette-table">
+          <tr>
+            <th>Palette</th>
+            <td>Color 0</td>
+            <td>Color 1</td>
+            <td>Color 2</td>
+            <td>Color 3</td>
+          </tr>
+
+          {paletteRows}
+        </table>
+      );
+
+      this.setState({
+        paletteTable
+      });
+    };
     updateTask();
   }
 

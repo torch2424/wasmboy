@@ -33,37 +33,37 @@
  (global $core/constants/GAMEBOY_INTERNAL_MEMORY_LOCATION i32 (i32.const 2048))
  (global $core/constants/GAMEBOY_INTERNAL_MEMORY_SIZE i32 (i32.const 65536))
  (global $core/constants/GBC_PALETTE_LOCATION i32 (i32.const 67584))
- (global $core/constants/GBC_PALETTE_SIZE i32 (i32.const 512))
- (global $core/constants/BG_PRIORITY_MAP_LOCATION i32 (i32.const 68096))
+ (global $core/constants/GBC_PALETTE_SIZE i32 (i32.const 128))
+ (global $core/constants/BG_PRIORITY_MAP_LOCATION i32 (i32.const 67712))
  (global $core/constants/BG_PRIORITY_MAP_SIZE i32 (i32.const 23552))
- (global $core/constants/FRAME_LOCATION i32 (i32.const 91648))
+ (global $core/constants/FRAME_LOCATION i32 (i32.const 91264))
  (global $core/constants/FRAME_SIZE i32 (i32.const 93184))
- (global $core/constants/BACKGROUND_MAP_LOCATION i32 (i32.const 184832))
+ (global $core/constants/BACKGROUND_MAP_LOCATION i32 (i32.const 184448))
  (global $core/constants/BACKGROUND_MAP_SIZE i32 (i32.const 196608))
- (global $core/constants/TILE_DATA_LOCATION i32 (i32.const 381440))
+ (global $core/constants/TILE_DATA_LOCATION i32 (i32.const 381056))
  (global $core/constants/TILE_DATA_SIZE i32 (i32.const 147456))
- (global $core/constants/OAM_TILES_LOCATION i32 (i32.const 528896))
+ (global $core/constants/OAM_TILES_LOCATION i32 (i32.const 528512))
  (global $core/constants/OAM_TILES_SIZE i32 (i32.const 15360))
  (global $core/constants/GRAPHICS_OUTPUT_LOCATION i32 (i32.const 67584))
- (global $core/constants/GRAPHICS_OUTPUT_SIZE i32 (i32.const 476672))
- (global $core/constants/CHANNEL_1_BUFFER_LOCATION i32 (i32.const 544256))
+ (global $core/constants/GRAPHICS_OUTPUT_SIZE i32 (i32.const 476288))
+ (global $core/constants/CHANNEL_1_BUFFER_LOCATION i32 (i32.const 543872))
  (global $core/constants/CHANNEL_1_BUFFER_SIZE i32 (i32.const 131072))
- (global $core/constants/CHANNEL_2_BUFFER_LOCATION i32 (i32.const 675328))
+ (global $core/constants/CHANNEL_2_BUFFER_LOCATION i32 (i32.const 674944))
  (global $core/constants/CHANNEL_2_BUFFER_SIZE i32 (i32.const 131072))
- (global $core/constants/CHANNEL_3_BUFFER_LOCATION i32 (i32.const 806400))
+ (global $core/constants/CHANNEL_3_BUFFER_LOCATION i32 (i32.const 806016))
  (global $core/constants/CHANNEL_3_BUFFER_SIZE i32 (i32.const 131072))
- (global $core/constants/CHANNEL_4_BUFFER_LOCATION i32 (i32.const 937472))
+ (global $core/constants/CHANNEL_4_BUFFER_LOCATION i32 (i32.const 937088))
  (global $core/constants/CHANNEL_4_BUFFER_SIZE i32 (i32.const 131072))
- (global $core/constants/AUDIO_BUFFER_LOCATION i32 (i32.const 1068544))
+ (global $core/constants/AUDIO_BUFFER_LOCATION i32 (i32.const 1068160))
  (global $core/constants/AUDIO_BUFFER_SIZE i32 (i32.const 131072))
- (global $core/constants/CARTRIDGE_RAM_LOCATION i32 (i32.const 1199616))
+ (global $core/constants/CARTRIDGE_RAM_LOCATION i32 (i32.const 1199232))
  (global $core/constants/CARTRIDGE_RAM_SIZE i32 (i32.const 131072))
- (global $core/constants/CARTRIDGE_ROM_LOCATION i32 (i32.const 1330688))
+ (global $core/constants/CARTRIDGE_ROM_LOCATION i32 (i32.const 1330304))
  (global $core/constants/CARTRIDGE_ROM_SIZE i32 (i32.const 8258560))
- (global $core/constants/DEBUG_GAMEBOY_MEMORY_LOCATION i32 (i32.const 9589248))
+ (global $core/constants/DEBUG_GAMEBOY_MEMORY_LOCATION i32 (i32.const 9588864))
  (global $core/constants/DEBUG_GAMEBOY_MEMORY_SIZE i32 (i32.const 65535))
  (global $core/constants/WASMBOY_MEMORY_LOCATION i32 (i32.const 0))
- (global $core/constants/WASMBOY_MEMORY_SIZE i32 (i32.const 9654784))
+ (global $core/constants/WASMBOY_MEMORY_SIZE i32 (i32.const 9654400))
  (global $core/constants/WASMBOY_WASM_PAGES i32 (i32.const 148))
  (global $core/core/hasStarted (mut i32) (i32.const 0))
  (global $core/config/Config.enableBootRom (mut i32) (i32.const 0))
@@ -287,20 +287,20 @@
  (global $core/execute/Execute.RESPONSE_CONDITION_FRAME (mut i32) (i32.const 0))
  (global $core/execute/Execute.RESPONSE_CONDITION_AUDIO (mut i32) (i32.const 1))
  (global $core/execute/Execute.RESPONSE_CONDITION_BREAKPOINT (mut i32) (i32.const 2))
- (global $core/legacy/wasmMemorySize i32 (i32.const 9654784))
+ (global $core/legacy/wasmMemorySize i32 (i32.const 9654400))
  (global $core/legacy/wasmBoyInternalStateLocation i32 (i32.const 1024))
  (global $core/legacy/wasmBoyInternalStateSize i32 (i32.const 1024))
  (global $core/legacy/gameBoyInternalMemoryLocation i32 (i32.const 2048))
  (global $core/legacy/gameBoyInternalMemorySize i32 (i32.const 65536))
  (global $core/legacy/videoOutputLocation i32 (i32.const 67584))
  (global $core/legacy/gameboyColorPaletteLocation i32 (i32.const 67584))
- (global $core/legacy/gameboyColorPaletteSize i32 (i32.const 512))
- (global $core/legacy/frameInProgressVideoOutputLocation i32 (i32.const 91648))
- (global $core/legacy/backgroundMapLocation i32 (i32.const 184832))
- (global $core/legacy/tileDataMap i32 (i32.const 381440))
- (global $core/legacy/soundOutputLocation i32 (i32.const 1068544))
- (global $core/legacy/gameRamBanksLocation i32 (i32.const 1199616))
- (global $core/legacy/gameBytesLocation i32 (i32.const 1330688))
+ (global $core/legacy/gameboyColorPaletteSize i32 (i32.const 128))
+ (global $core/legacy/frameInProgressVideoOutputLocation i32 (i32.const 91264))
+ (global $core/legacy/backgroundMapLocation i32 (i32.const 184448))
+ (global $core/legacy/tileDataMap i32 (i32.const 381056))
+ (global $core/legacy/soundOutputLocation i32 (i32.const 1068160))
+ (global $core/legacy/gameRamBanksLocation i32 (i32.const 1199232))
+ (global $core/legacy/gameBytesLocation i32 (i32.const 1330304))
  (global $~argc (mut i32) (i32.const 0))
  (export "memory" (memory $0))
  (export "table" (table $0))
@@ -435,7 +435,7 @@
          br $case14|0
         end
         local.get $0
-        i32.const 1330688
+        i32.const 1330304
         i32.add
         return
        end
@@ -456,7 +456,7 @@
        i32.const 14
        i32.shl
        i32.add
-       i32.const 1314304
+       i32.const 1313920
        i32.add
        return
       end
@@ -482,7 +482,7 @@
      i32.const 13
      i32.shl
      i32.add
-     i32.const 1158656
+     i32.const 1158272
      i32.add
      return
     end
@@ -1758,7 +1758,7 @@
     local.set $0
     loop $repeat|0
      local.get $0
-     i32.const 476672
+     i32.const 476288
      i32.ge_s
      br_if $break|0
      local.get $0
@@ -2312,7 +2312,7 @@
       i32.add
       i32.const 3
       i32.mul
-      i32.const 91648
+      i32.const 91264
       i32.add
       local.set $9
       i32.const 0
@@ -2331,7 +2331,7 @@
         i32.add
         i32.const 3
         i32.mul
-        i32.const 91648
+        i32.const 91264
         i32.add
         local.get $6
         i32.add
@@ -2354,14 +2354,14 @@
       i32.const 160
       i32.mul
       i32.add
-      i32.const 68096
+      i32.const 67712
       i32.add
       local.get $1
       i32.const 160
       i32.mul
       local.get $7
       i32.add
-      i32.const 68096
+      i32.const 67712
       i32.add
       i32.load8_u
       local.tee $6
@@ -2703,7 +2703,7 @@
      i32.mul
      local.get $13
      i32.add
-     i32.const 68096
+     i32.const 67712
      i32.add
      local.get $2
      i32.const 3
@@ -2803,7 +2803,7 @@
   local.get $0
   local.get $1
   i32.const 160
-  i32.const 91648
+  i32.const 91264
   i32.const 0
   local.get $2
   call $core/graphics/tiles/drawPixelsFromLineOfTile
@@ -2872,7 +2872,7 @@
   i32.add
   i32.const 3
   i32.mul
-  i32.const 91648
+  i32.const 91264
   i32.add
   local.get $4
   i32.const 7
@@ -2922,7 +2922,7 @@
   i32.add
   i32.const 3
   i32.mul
-  i32.const 91649
+  i32.const 91265
   i32.add
   local.get $3
   i32.const 992
@@ -2939,7 +2939,7 @@
   i32.add
   i32.const 3
   i32.mul
-  i32.const 91650
+  i32.const 91266
   i32.add
   local.get $3
   i32.const 31744
@@ -2954,7 +2954,7 @@
   i32.mul
   local.get $0
   i32.add
-  i32.const 68096
+  i32.const 67712
   i32.add
   local.get $2
   i32.const 3
@@ -2993,7 +2993,7 @@
   i32.add
   i32.const 3
   i32.mul
-  i32.const 91648
+  i32.const 91264
   i32.add
   block (result i32)
    local.get $4
@@ -3037,7 +3037,7 @@
   i32.add
   i32.const 3
   i32.mul
-  i32.const 91649
+  i32.const 91265
   i32.add
   local.get $2
   i32.store8
@@ -3048,7 +3048,7 @@
   i32.add
   i32.const 3
   i32.mul
-  i32.const 91650
+  i32.const 91266
   i32.add
   local.get $2
   i32.store8
@@ -3057,7 +3057,7 @@
   i32.mul
   local.get $0
   i32.add
-  i32.const 68096
+  i32.const 67712
   i32.add
   local.get $3
   i32.const 3
@@ -3473,7 +3473,7 @@
           i32.mul
           local.get $7
           i32.add
-          i32.const 68096
+          i32.const 67712
           i32.add
           i32.load8_u
           local.tee $3
@@ -3537,7 +3537,7 @@
            i32.add
            i32.const 3
            i32.mul
-           i32.const 91648
+           i32.const 91264
            i32.add
            local.get $6
            i32.const 7
@@ -3558,7 +3558,7 @@
            i32.add
            i32.const 3
            i32.mul
-           i32.const 91649
+           i32.const 91265
            i32.add
            local.get $4
            i32.const 992
@@ -3575,7 +3575,7 @@
            i32.add
            i32.const 3
            i32.mul
-           i32.const 91650
+           i32.const 91266
            i32.add
            local.get $4
            i32.const 31744
@@ -3593,7 +3593,7 @@
            i32.add
            i32.const 3
            i32.mul
-           i32.const 91648
+           i32.const 91264
            i32.add
            local.get $8
            i32.const 65353
@@ -3613,7 +3613,7 @@
            i32.add
            i32.const 3
            i32.mul
-           i32.const 91649
+           i32.const 91265
            i32.add
            local.get $3
            i32.store8
@@ -3624,7 +3624,7 @@
            i32.add
            i32.const 3
            i32.mul
-           i32.const 91650
+           i32.const 91266
            i32.add
            local.get $3
            i32.store8
@@ -3737,7 +3737,7 @@
       i32.mul
       local.get $0
       i32.add
-      i32.const 68096
+      i32.const 67712
       i32.add
       i32.const 0
       i32.store8
@@ -5262,7 +5262,7 @@
    local.tee $1
    i32.const 1
    i32.shl
-   i32.const 1068544
+   i32.const 1068160
    i32.add
    local.tee $0
    global.get $core/sound/accumulator/SoundAccumulator.leftChannelSampleUnsignedByte
@@ -5350,7 +5350,7 @@
    global.get $core/sound/sound/Sound.audioQueueIndex
    i32.const 1
    i32.shl
-   i32.const 1068544
+   i32.const 1068160
    i32.add
    local.tee $5
    local.get $0
@@ -5381,7 +5381,7 @@
     global.get $core/sound/sound/Sound.audioQueueIndex
     i32.const 1
     i32.shl
-    i32.const 544256
+    i32.const 543872
     i32.add
     local.tee $2
     local.get $0
@@ -5410,7 +5410,7 @@
     global.get $core/sound/sound/Sound.audioQueueIndex
     i32.const 1
     i32.shl
-    i32.const 675328
+    i32.const 674944
     i32.add
     local.tee $1
     local.get $0
@@ -5439,7 +5439,7 @@
     global.get $core/sound/sound/Sound.audioQueueIndex
     i32.const 1
     i32.shl
-    i32.const 806400
+    i32.const 806016
     i32.add
     local.tee $1
     local.get $0
@@ -5468,7 +5468,7 @@
     global.get $core/sound/sound/Sound.audioQueueIndex
     i32.const 1
     i32.shl
-    i32.const 937472
+    i32.const 937088
     i32.add
     local.tee $1
     local.get $0
@@ -14374,7 +14374,7 @@
        i32.shl
        local.set $3
        local.get $6
-       i32.const 184832
+       i32.const 184448
        i32.add
        local.tee $2
        local.get $3
@@ -14415,7 +14415,7 @@
         i32.lt_s
         if
          local.get $6
-         i32.const 184832
+         i32.const 184448
          i32.add
          local.get $1
          i32.add
@@ -14532,7 +14532,7 @@
         local.get $3
         i32.add
         i32.const 248
-        i32.const 381440
+        i32.const 381056
         i32.const 1
         i32.const -1
         call $core/graphics/tiles/drawPixelsFromLineOfTile
@@ -14676,7 +14676,7 @@
           i32.shl
           i32.add
           i32.const 64
-          i32.const 528896
+          i32.const 528512
           i32.const 1
           i32.const -1
           call $core/graphics/tiles/drawPixelsFromLineOfTile
@@ -14741,7 +14741,7 @@
     i32.ge_s
     br_if $break|0
     local.get $0
-    i32.const 9589248
+    i32.const 9588864
     i32.add
     local.get $0
     call $core/memory/load/eightBitLoadFromGBMemoryWithTraps
