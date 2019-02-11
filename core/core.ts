@@ -172,6 +172,15 @@ function initialize(): void {
   resetSteps();
 }
 
+// Function to return if we are currently playing a GBC ROM
+export function isGBC(): i32 {
+  if (Cpu.GBCEnabled) {
+    return 1;
+  }
+
+  return 0;
+}
+
 // Function to return an address to store into save state memory
 // this is to regulate our 20 slots
 // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing

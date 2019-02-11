@@ -12,6 +12,7 @@ import GraphicsState from '../../components/graphics/graphicsState/graphicsState
 import BackgroundMap from '../../components/graphics/backgroundMap/backgroundMap';
 import TileData from '../../components/graphics/tileData/tileData';
 import OamViewer from '../../components/graphics/oamViewer/oamViewer';
+import PaletteViewer from '../../components/graphics/paletteViewer/paletteViewer';
 
 class GraphicsStateCommand extends Command {
   constructor() {
@@ -69,5 +70,25 @@ class OamViewerCommand extends Command {
   }
 }
 
-const exportedCommands = [new GraphicsStateCommand(), new BackgroundMapCommand(), new TileDataCommand(), new OamViewerCommand()];
+class PaletteViewerCommand extends Command {
+  constructor() {
+    super('graphics:paletteviewer');
+    this.options.label = 'Palette Viewer';
+  }
+
+  execute() {
+    Pubx.get(PUBX_KEYS.WIDGET).addWidget({
+      component: <PaletteViewer />,
+      label: 'Palette Viewer'
+    });
+  }
+}
+
+const exportedCommands = [
+  new GraphicsStateCommand(),
+  new BackgroundMapCommand(),
+  new TileDataCommand(),
+  new OamViewerCommand(),
+  new PaletteViewerCommand()
+];
 export default exportedCommands;

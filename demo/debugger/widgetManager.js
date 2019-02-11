@@ -18,6 +18,7 @@ import GraphicsState from './components/graphics/graphicsState/graphicsState';
 import BackgroundMap from './components/graphics/backgroundMap/backgroundMap';
 import TileData from './components/graphics/tileData/tileData';
 import OamViewer from './components/graphics/oamViewer/oamViewer';
+import PaletteViewer from './components/graphics/paletteViewer/paletteViewer';
 import AudioState from './components/audio/audioState/audioState';
 import AudioControl from './components/audio/audioControl/audioControl';
 import AudioWaveform from './components/audio/waveform/waveform';
@@ -40,6 +41,7 @@ const components = {
   BackgroundMap: <BackgroundMap />,
   TileData: <TileData />,
   OamViewer: <OamViewer />,
+  PaletteViewer: <PaletteViewer />,
   AudioState: <AudioState />,
   AudioControl: <AudioControl />,
   AudioWaveform: <AudioWaveform />,
