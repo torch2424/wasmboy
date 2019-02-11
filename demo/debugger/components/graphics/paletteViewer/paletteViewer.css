@@ -26,3 +26,15 @@
   min-width: 75px;
   max-width: 75px;
 }
+
+.palette-table__color__rendered {
+  width: 100%;
+  height: 15px;
+
+  border: 1px solid black;
+}
+
+.palette-table__color__text {
+  font-size: 10px;
+  width: 100%;
+}

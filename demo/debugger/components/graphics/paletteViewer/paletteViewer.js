@@ -49,11 +49,21 @@ const getColorTableCell = (highByte, lowByte) => {
   // From core/graphics/palette
   // Goal is to reach 254 for each color, so 255 / 31 (0x1F) ~8 TODO: Make exact
   // Want 5 bits for each
-  const red = (paletteBytes & 0x1f) * 8;
-  const green = ((paletteBytes >> 5) & 0x1f) * 8;
-  const blue = ((paletteBytes >> 10) & 0x1f) * 8;
+  const redByte = paletteBytes & 0x1f;
+  const greenByte = (paletteBytes >> 5) & 0x1f;
+  const blueByte = (paletteBytes >> 10) & 0x1f;
+  const red = redByte * 8;
+  const green = greenByte * 8;
+  const blue = blueByte * 8;
 
-  return <td style={`background-color: rgb(${red}, ${green}, ${blue})`} class="palette-table__color" />;
+  return (
+    <td class="palette-table__color">
+      <div style={`background-color: rgb(${red}, ${green}, ${blue})`} class="palette-table__color__rendered" />
+      <div class="palette-table__color__text">R: {`0x${redByte.toString(16).toUpperCase()}`}</div>
+      <div class="palette-table__color__text">G: {`0x${greenByte.toString(16).toUpperCase()}`}</div>
+      <div class="palette-table__color__text">B: {`0x${blueByte.toString(16).toUpperCase()}`}</div>
+    </td>
+  );
 };
 
 export default class PaletteViewer extends Component {
@@ -206,7 +216,14 @@ export default class PaletteViewer extends Component {
       <div class="palette-viewer">
         <h1>Palette Viewer</h1>
         <div>
-          <i>Reminder: Color 0 is Transparent for Object Palettes.</i>
+          <b>NOTE:</b>
+          <i>
+            Color 0 is Transparent for Object Palettes. RGB is Red, Green, Blue.{' '}
+            <a href="http://gbdev.gg8.se/wiki/articles/Video_Display#LCD_Monochrome_Palettes" target="_blank">
+              Game Boy Palette Documentation
+            </a>
+            .
+          </i>
         </div>
         {this.state.paletteTable}
       </div>
