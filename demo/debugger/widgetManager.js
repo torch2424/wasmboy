@@ -23,6 +23,7 @@ import AudioControl from './components/audio/audioControl/audioControl';
 import AudioWaveform from './components/audio/waveform/waveform';
 import AudioFrequency from './components/audio/frequency/frequency';
 import AudioRecorder from './components/audio/recorder/recorder';
+import AudioWavetable from './components/audio/wavetable/wavetable';
 import InterruptState from './components/interrupt/interruptState/interruptState';
 import TimerState from './components/timer/timerState/timerState';
 import AboutComponent from './components/other/about/about';
@@ -44,6 +45,7 @@ const components = {
   AudioWaveform: <AudioWaveform />,
   AudioFrequency: <AudioFrequency />,
   AudioRecorder: <AudioRecorder />,
+  AudioWavetable: <AudioWavetable />,
   InterruptState: <InterruptState />,
   TimerState: <TimerState />,
   AboutComponent: <AboutComponent />,

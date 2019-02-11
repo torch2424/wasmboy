@@ -54,7 +54,7 @@ export default class AudioVisualizer extends Component {
 
     this.update();
     // Update at ~30fps
-    setInterval(() => this.update(), 32);
+    updateInterval = setInterval(() => this.update(), 32);
   }
 
   componentWillUnmount() {
