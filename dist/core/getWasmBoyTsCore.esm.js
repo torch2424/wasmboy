@@ -28,53 +28,63 @@ const abs = value => {
 // Wasmboy Memory Map
 // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
 // ----------------------------------
-// WasmBoy General
+// AssemblyScript
 
-
-var WASMBOY_MEMORY_LOCATION = 0x000000;
-var WASMBOY_MEMORY_SIZE = 0x8c0000;
-var WASMBOY_WASM_PAGES = WASMBOY_MEMORY_SIZE / 1024 / 64; // AssemblyScript
 
 var ASSEMBLYSCRIPT_MEMORY_LOCATION = 0x000000;
 var ASSEMBLYSCRIPT_MEMORY_SIZE = 0x000400; // WasmBoy States
 
-var WASMBOY_STATE_LOCATION = 0x000400;
+var WASMBOY_STATE_LOCATION = ASSEMBLYSCRIPT_MEMORY_LOCATION + ASSEMBLYSCRIPT_MEMORY_SIZE;
 var WASMBOY_STATE_SIZE = 0x000400; // Gameboy Internal Memory
 
-var GAMEBOY_INTERNAL_MEMORY_LOCATION = 0x000800;
-var GAMEBOY_INTERNAL_MEMORY_SIZE = 0x00ffff;
-var VIDEO_RAM_LOCATION = 0x000800;
+var VIDEO_RAM_LOCATION = WASMBOY_STATE_LOCATION + WASMBOY_STATE_SIZE;
 var VIDEO_RAM_SIZE = 0x004000;
-var WORK_RAM_LOCATION = 0x004800;
+var WORK_RAM_LOCATION = VIDEO_RAM_LOCATION + VIDEO_RAM_SIZE;
 var WORK_RAM_SIZE = 0x008000;
-var OTHER_GAMEBOY_INTERNAL_MEMORY_LOCATION = 0x00c800;
-var OTHER_GAMEBOY_INTERNAL_MEMORY_SIZE = 0x004000; // Graphics Output
+var OTHER_GAMEBOY_INTERNAL_MEMORY_LOCATION = WORK_RAM_LOCATION + WORK_RAM_SIZE;
+var OTHER_GAMEBOY_INTERNAL_MEMORY_SIZE = 0x004000; // General Gameboy Internal Memory
 
-var GRAPHICS_OUTPUT_LOCATION = 0x010800;
-var GRAPHICS_OUTPUT_SIZE = 0x07f400;
-var GBC_PALETTE_LOCATION = 0x010800;
-var GBC_PALETTE_SIZE = 0x000200;
-var BG_PRIORITY_MAP_LOCATION = 0x011000;
+var GAMEBOY_INTERNAL_MEMORY_LOCATION = VIDEO_RAM_LOCATION;
+var GAMEBOY_INTERNAL_MEMORY_SIZE = OTHER_GAMEBOY_INTERNAL_MEMORY_LOCATION - VIDEO_RAM_LOCATION + OTHER_GAMEBOY_INTERNAL_MEMORY_SIZE; // Graphics Output
+
+var GBC_PALETTE_LOCATION = OTHER_GAMEBOY_INTERNAL_MEMORY_LOCATION + OTHER_GAMEBOY_INTERNAL_MEMORY_SIZE;
+var GBC_PALETTE_SIZE = 0x000080;
+var BG_PRIORITY_MAP_LOCATION = GBC_PALETTE_LOCATION + GBC_PALETTE_SIZE;
 var BG_PRIORITY_MAP_SIZE = 0x005c00;
-var FRAME_LOCATION = 0x016c00;
+var FRAME_LOCATION = BG_PRIORITY_MAP_LOCATION + BG_PRIORITY_MAP_SIZE;
 var FRAME_SIZE = 0x016c00;
-var BACKGROUND_MAP_LOCATION = 0x038c00;
+var BACKGROUND_MAP_LOCATION = FRAME_LOCATION + FRAME_SIZE;
 var BACKGROUND_MAP_SIZE = 0x030000;
-var TILE_DATA_LOCATION = 0x068c00;
+var TILE_DATA_LOCATION = BACKGROUND_MAP_LOCATION + BACKGROUND_MAP_SIZE;
 var TILE_DATA_SIZE = 0x024000;
-var OAM_TILES_LOCATION = 0x08cc00;
-var OAM_TILES_SIZE = 0x003000; // Audio Output
+var OAM_TILES_LOCATION = TILE_DATA_LOCATION + TILE_DATA_SIZE;
+var OAM_TILES_SIZE = 0x003c00; // General Graphics Output
 
-var AUDIO_BUFFER_LOCATION = 0x08fc00;
+var GRAPHICS_OUTPUT_LOCATION = GBC_PALETTE_LOCATION;
+var GRAPHICS_OUTPUT_SIZE = OAM_TILES_LOCATION - GBC_PALETTE_LOCATION + OAM_TILES_SIZE; // Audio Output
+
+var CHANNEL_1_BUFFER_LOCATION = OAM_TILES_LOCATION + OAM_TILES_SIZE;
+var CHANNEL_1_BUFFER_SIZE = 0x020000;
+var CHANNEL_2_BUFFER_LOCATION = CHANNEL_1_BUFFER_LOCATION + CHANNEL_1_BUFFER_SIZE;
+var CHANNEL_2_BUFFER_SIZE = 0x020000;
+var CHANNEL_3_BUFFER_LOCATION = CHANNEL_2_BUFFER_LOCATION + CHANNEL_2_BUFFER_SIZE;
+var CHANNEL_3_BUFFER_SIZE = 0x020000;
+var CHANNEL_4_BUFFER_LOCATION = CHANNEL_3_BUFFER_LOCATION + CHANNEL_3_BUFFER_SIZE;
+var CHANNEL_4_BUFFER_SIZE = 0x020000;
+var AUDIO_BUFFER_LOCATION = CHANNEL_4_BUFFER_LOCATION + CHANNEL_4_BUFFER_SIZE;
 var AUDIO_BUFFER_SIZE = 0x020000; // Catridge Memory
 
-var CARTRIDGE_RAM_LOCATION = 0x0afc00;
+var CARTRIDGE_RAM_LOCATION = AUDIO_BUFFER_LOCATION + AUDIO_BUFFER_SIZE;
 var CARTRIDGE_RAM_SIZE = 0x020000;
-var CARTRIDGE_ROM_LOCATION = 0x0cfc00;
-var CARTRIDGE_ROM_SIZE = 0x7e0400; // Debug
+var CARTRIDGE_ROM_LOCATION = CARTRIDGE_RAM_LOCATION + CARTRIDGE_RAM_SIZE;
+var CARTRIDGE_ROM_SIZE = 0x7e0400; // Debug Memory
 
-var DEBUG_GAMEBOY_MEMORY_LOCATION = 0x8b0000;
-var DEBUG_GAMEBOY_MEMORY_SIZE = 0xffff;
+var DEBUG_GAMEBOY_MEMORY_LOCATION = CARTRIDGE_ROM_LOCATION + CARTRIDGE_ROM_SIZE;
+var DEBUG_GAMEBOY_MEMORY_SIZE = 0xffff; // Final General Size
+
+var WASMBOY_MEMORY_LOCATION = 0x000000;
+var WASMBOY_MEMORY_SIZE = DEBUG_GAMEBOY_MEMORY_LOCATION + DEBUG_GAMEBOY_MEMORY_SIZE + 1;
+var WASMBOY_WASM_PAGES = ceil(WASMBOY_MEMORY_SIZE / 1024 / 64) + 1;
 
 var Config =
 /** @class */
@@ -95,7 +105,9 @@ function () {
   Config.audioAccumulateSamples = false; // Tile Rednering
 
   Config.tileRendering = false;
-  Config.tileCaching = false;
+  Config.tileCaching = false; // Audio Debugging
+
+  Config.enableAudioDebugging = false;
   return Config;
 }(); // Grouped registers
 // possible overload these later to performace actions
@@ -530,7 +542,7 @@ function resetTileCache() {
   TileCache.nextXIndexToPerformCacheCheck = -1;
 }
 
-function drawPixelsFromLineOfTile(tileId, tileDataMemoryLocation, vramBankId, tileLineXStart, tileLineXEnd, tileLineY, outputLineX, outputLineY, outputWidth, wasmMemoryStart, shouldRepresentMonochromeColorByColorId, paletteLocation, bgMapAttributes) {
+function drawPixelsFromLineOfTile(tileId, tileDataMemoryLocation, vramBankId, tileLineXStart, tileLineXEnd, tileLineY, outputLineX, outputLineY, outputWidth, wasmMemoryStart, shouldRepresentMonochromeColorByColorId, paletteLocation, bgMapAttributes, spriteAttributes) {
   // Get our number of pixels drawn
   var pixelsDrawn = 0; // Get our tile data address
 
@@ -1891,7 +1903,7 @@ function accumulateSound(numberOfCycles) {
     // +1 so it can not be zero
 
 
-    setLeftAndRightOutputForAudioQueue(SoundAccumulator.leftChannelSampleUnsignedByte + 1, SoundAccumulator.rightChannelSampleUnsignedByte + 1, Sound.audioQueueIndex);
+    setLeftAndRightOutputForAudioQueue(SoundAccumulator.leftChannelSampleUnsignedByte + 1, SoundAccumulator.rightChannelSampleUnsignedByte + 1, AUDIO_BUFFER_LOCATION);
     Sound.audioQueueIndex += 1; // Don't allow our audioQueueIndex to overflow into other parts of the wasmBoy memory map
     // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit#gid=0
     // Not 0xFFFF because we need half of 64kb since we store left and right channel
@@ -2147,14 +2159,38 @@ function calculateSound(numberOfCycles) {
   if (Sound.downSampleCycleCounter >= Sound.maxDownSampleCycles()) {
     // Reset the downsample counter
     // Don't set to zero to catch overflowed cycles
-    Sound.downSampleCycleCounter -= Sound.maxDownSampleCycles(); // Mixe our samples
+    Sound.downSampleCycleCounter -= Sound.maxDownSampleCycles(); // Mix our samples
 
     var mixedSample = mixChannelSamples(channel1Sample, channel2Sample, channel3Sample, channel4Sample);
     var leftChannelSampleUnsignedByte = splitHighByte(mixedSample);
     var rightChannelSampleUnsignedByte = splitLowByte(mixedSample); // Set our volumes in memory
     // +1 so it can not be zero
 
-    setLeftAndRightOutputForAudioQueue(leftChannelSampleUnsignedByte + 1, rightChannelSampleUnsignedByte + 1, Sound.audioQueueIndex);
+    setLeftAndRightOutputForAudioQueue(leftChannelSampleUnsignedByte + 1, rightChannelSampleUnsignedByte + 1, AUDIO_BUFFER_LOCATION);
+
+    if (Config.enableAudioDebugging) {
+      // Channel 1
+      mixedSample = mixChannelSamples(channel1Sample, 15, 15, 15);
+      leftChannelSampleUnsignedByte = splitHighByte(mixedSample);
+      rightChannelSampleUnsignedByte = splitLowByte(mixedSample);
+      setLeftAndRightOutputForAudioQueue(leftChannelSampleUnsignedByte + 1, rightChannelSampleUnsignedByte + 1, CHANNEL_1_BUFFER_LOCATION); // Channel 2
+
+      mixedSample = mixChannelSamples(15, channel2Sample, 15, 15);
+      leftChannelSampleUnsignedByte = splitHighByte(mixedSample);
+      rightChannelSampleUnsignedByte = splitLowByte(mixedSample);
+      setLeftAndRightOutputForAudioQueue(leftChannelSampleUnsignedByte + 1, rightChannelSampleUnsignedByte + 1, CHANNEL_2_BUFFER_LOCATION); // Channel 3
+
+      mixedSample = mixChannelSamples(15, 15, channel3Sample, 15);
+      leftChannelSampleUnsignedByte = splitHighByte(mixedSample);
+      rightChannelSampleUnsignedByte = splitLowByte(mixedSample);
+      setLeftAndRightOutputForAudioQueue(leftChannelSampleUnsignedByte + 1, rightChannelSampleUnsignedByte + 1, CHANNEL_3_BUFFER_LOCATION); // Channel 4
+
+      mixedSample = mixChannelSamples(15, 15, 15, channel4Sample);
+      leftChannelSampleUnsignedByte = splitHighByte(mixedSample);
+      rightChannelSampleUnsignedByte = splitLowByte(mixedSample);
+      setLeftAndRightOutputForAudioQueue(leftChannelSampleUnsignedByte + 1, rightChannelSampleUnsignedByte + 1, CHANNEL_4_BUFFER_LOCATION);
+    }
+
     Sound.audioQueueIndex += 1; // Don't allow our audioQueueIndex to overflow into other parts of the wasmBoy memory map
     // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit#gid=0
     // Not 0xFFFF because we need half of 64kb since we store left and right channel
@@ -2374,9 +2410,9 @@ function getSampleAsUnsignedByte(sample, mixerVolume) {
 } // Function to set our left and right channels at the correct queue index
 
 
-function setLeftAndRightOutputForAudioQueue(leftVolume, rightVolume, audioQueueIndex) {
+function setLeftAndRightOutputForAudioQueue(leftVolume, rightVolume, bufferLocation) {
   // Get our stereo index
-  var audioQueueOffset = AUDIO_BUFFER_LOCATION + audioQueueIndex * 2; // Store our volumes
+  var audioQueueOffset = bufferLocation + Sound.audioQueueIndex * 2; // Store our volumes
   // +1 that way we don't have empty data to ensure that the value is set
 
   store(audioQueueOffset, leftVolume + 1);
@@ -4650,7 +4686,7 @@ function drawLineOfTileFromTileId(xPixel, yPixel, pixelXPositionInMap, pixelYPos
   } // Return the number of pixels drawn
 
 
-  return drawPixelsFromLineOfTile(tileIdFromTileMap, tileDataMemoryLocation, vramBankId, tileXStart, tileXEnd, tileLineY, xPixel, yPixel, 160, FRAME_LOCATION, false, 0, bgMapAttributes);
+  return drawPixelsFromLineOfTile(tileIdFromTileMap, tileDataMemoryLocation, vramBankId, tileXStart, tileXEnd, tileLineY, xPixel, yPixel, 160, FRAME_LOCATION, false, 0, bgMapAttributes, -1);
 } // Functions for rendering the sprites
 
 
@@ -4701,7 +4737,8 @@ function renderSprites(scanlineRegister, useLargerSprites) {
       var isSpritePriorityBehindWindowAndBackground = checkBitOnByte(7, spriteAttributes); // Check if we should flip the sprite on the x or y axis
 
       var flipSpriteY = checkBitOnByte(6, spriteAttributes);
-      var flipSpriteX = checkBitOnByte(5, spriteAttributes); // Find which line on the sprite we are on
+      var flipSpriteX = checkBitOnByte(5, spriteAttributes); // TODO: Torch2424 continue here.
+      // Find which line on the sprite we are on
 
       var currentSpriteLine = scanlineRegister - spriteYPosition; // If we fliiped the Y axis on our sprite, need to read from memory backwards to acheive the same effect
 
@@ -9172,7 +9209,7 @@ function hasCoreStarted() {
 } // Function to configure & initialize wasmboy
 
 
-function config(enableBootRom, useGbcWhenAvailable, audioBatchProcessing, graphicsBatchProcessing, timersBatchProcessing, graphicsDisableScanlineRendering, audioAccumulateSamples, tileRendering, tileCaching) {
+function config(enableBootRom, useGbcWhenAvailable, audioBatchProcessing, graphicsBatchProcessing, timersBatchProcessing, graphicsDisableScanlineRendering, audioAccumulateSamples, tileRendering, tileCaching, enableAudioDebugging) {
   // TODO: depending on the boot rom, initialization may be different
   // From: http://www.codeslinger.co.uk/pages/projects/gameboy/hardware.html
   // All values default to zero in memory, so not setting them yet
@@ -9231,6 +9268,12 @@ function config(enableBootRom, useGbcWhenAvailable, audioBatchProcessing, graphi
     Config.tileCaching = false;
   }
 
+  if (enableAudioDebugging > 0) {
+    Config.enableAudioDebugging = true;
+  } else {
+    Config.enableAudioDebugging = false;
+  }
+
   initialize();
 } // Function to initiialize the core
 
@@ -9283,6 +9326,15 @@ function initialize() {
 
   resetCycles();
   resetSteps();
+} // Function to return if we are currently playing a GBC ROM
+
+
+function isGBC() {
+  if (Cpu.GBCEnabled) {
+    return 1;
+  }
+
+  return 0;
 } // Function to return an address to store into save state memory
 // this is to regulate our 20 slots
 // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
@@ -9569,7 +9621,82 @@ function drawTileDataToWasmMemory() {
 
 
       for (var tileLineY = 0; tileLineY < 8; tileLineY++) {
-        drawPixelsFromLineOfTile(tileId, tileDataMemoryLocation, vramBankId, 0, 7, tileLineY, tileDataMapGridX * 8, tileDataMapGridY * 8 + tileLineY, 0x1f * 8, TILE_DATA_LOCATION, true, 0, -1);
+        drawPixelsFromLineOfTile(tileId, // tileId
+        tileDataMemoryLocation, // Graphics.memoryLocationTileDataSelect
+        vramBankId, // Vram Bank
+        0, // Tile Line X Start
+        7, // Tile Line X End
+        tileLineY, // Tile Line Y
+        tileDataMapGridX * 8, // Output line X
+        tileDataMapGridY * 8 + tileLineY, // Output line Y
+        0x1f * 8, // Output Width
+        TILE_DATA_LOCATION, // Wasm Memory Start
+        true, // shouldRepresentMonochromeColorByColorId
+        0, // paletteLocation
+        -1, // bgMapAttributes
+        -1 // spriteAttributes
+        );
+      }
+    }
+  }
+}
+
+function drawOamToWasmMemory() {
+  // Draw all 40 sprites
+  // Going to be like BGB and do 8 x 5 sprites
+  for (var spriteRow = 0; spriteRow < 8; spriteRow++) {
+    for (var spriteColumn = 0; spriteColumn < 5; spriteColumn++) {
+      var spriteIndex = spriteColumn * 8 + spriteRow; // Sprites occupy 4 bytes in the sprite attribute table
+
+      var spriteTableIndex = spriteIndex * 4; // Y positon is offset by 16, X position is offset by 8
+
+      var spriteYPosition = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex);
+      var spriteXPosition = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 1);
+      var spriteTileId = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 2);
+      var tilesToDraw = 1;
+
+      if (Lcd.tallSpriteSize) {
+        // @binji says in 8x16 mode, even tileId always drawn first
+        // This will fix shantae sprites which always uses odd numbered indexes
+        // TODO: Do the actual Pandocs thing:
+        // "In 8x16 mode, the lower bit of the tile number is ignored. Ie. the upper 8x8 tile is "NN AND FEh", and the lower 8x8 tile is "NN OR 01h"."
+        // So just knock off the last bit? :)
+        if (spriteTileId % 2 === 1) {
+          spriteTileId -= 1;
+        }
+
+        tilesToDraw += 1;
+      } // Get our sprite attributes since we know we shall be drawing the tile
+
+
+      var spriteAttributes = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 3); // Find which VRAM Bank to load from
+
+      var vramBankId = 0;
+
+      if (Cpu.GBCEnabled && checkBitOnByte(3, spriteAttributes)) {
+        vramBankId = 1;
+      } // Start Drawing our tiles
+
+
+      for (var i = 0; i < tilesToDraw; i++) {
+        // Draw each Y line of the tile
+        for (var tileLineY = 0; tileLineY < 8; tileLineY++) {
+          drawPixelsFromLineOfTile(spriteTileId + i, // tileId
+          Graphics.memoryLocationTileDataSelectOneStart, // Graphics.memoryLocationTileDataSelect
+          vramBankId, // VRAM Bank
+          0, // Tile Line X Start
+          7, // Tile Line X End
+          tileLineY, // Tile Line Y
+          spriteRow * 8, // Output line X
+          spriteColumn * 16 + tileLineY + i * 8, // Output line Y
+          8 * 8, // Output Width
+          OAM_TILES_LOCATION, // Wasm Memory Start
+          true, // shouldRepresentMonochromeColorByColorId
+          0, // paletteLocation
+          -1, // bgMapAttributes
+          -1 // spriteAttributes
+          );
+        }
       }
     }
   }
@@ -9599,7 +9726,7 @@ function getTAC() {
 
 
 function updateDebugGBMemory() {
-  for (var i = 0; i <= DEBUG_GAMEBOY_MEMORY_SIZE; i++) {
+  for (var i = 0; i < DEBUG_GAMEBOY_MEMORY_SIZE; i++) {
     store(DEBUG_GAMEBOY_MEMORY_LOCATION + i, eightBitLoadFromGBMemoryWithTraps(i));
   }
 } // These are legacy aliases for the original WasmBoy api
@@ -9632,6 +9759,7 @@ var WasmBoyCore = /*#__PURE__*/Object.freeze({
   hasCoreStarted: hasCoreStarted,
   saveState: saveState,
   loadState: loadState,
+  isGBC: isGBC,
   getStepsPerStepSet: getStepsPerStepSet,
   getStepSets: getStepSets,
   getSteps: getSteps,
@@ -9679,6 +9807,14 @@ var WasmBoyCore = /*#__PURE__*/Object.freeze({
   OAM_TILES_SIZE: OAM_TILES_SIZE,
   AUDIO_BUFFER_LOCATION: AUDIO_BUFFER_LOCATION,
   AUDIO_BUFFER_SIZE: AUDIO_BUFFER_SIZE,
+  CHANNEL_1_BUFFER_LOCATION: CHANNEL_1_BUFFER_LOCATION,
+  CHANNEL_1_BUFFER_SIZE: CHANNEL_1_BUFFER_SIZE,
+  CHANNEL_2_BUFFER_LOCATION: CHANNEL_2_BUFFER_LOCATION,
+  CHANNEL_2_BUFFER_SIZE: CHANNEL_2_BUFFER_SIZE,
+  CHANNEL_3_BUFFER_LOCATION: CHANNEL_3_BUFFER_LOCATION,
+  CHANNEL_3_BUFFER_SIZE: CHANNEL_3_BUFFER_SIZE,
+  CHANNEL_4_BUFFER_LOCATION: CHANNEL_4_BUFFER_LOCATION,
+  CHANNEL_4_BUFFER_SIZE: CHANNEL_4_BUFFER_SIZE,
   CARTRIDGE_RAM_LOCATION: CARTRIDGE_RAM_LOCATION,
   CARTRIDGE_RAM_SIZE: CARTRIDGE_RAM_SIZE,
   CARTRIDGE_ROM_LOCATION: CARTRIDGE_ROM_LOCATION,
@@ -9700,6 +9836,7 @@ var WasmBoyCore = /*#__PURE__*/Object.freeze({
   getLY: getLY,
   drawBackgroundMapToWasmMemory: drawBackgroundMapToWasmMemory,
   drawTileDataToWasmMemory: drawTileDataToWasmMemory,
+  drawOamToWasmMemory: drawOamToWasmMemory,
   getDIV: getDIV,
   getTIMA: getTIMA,
   getTMA: getTMA,

@@ -107,7 +107,9 @@
     RUN_WASM_EXPORT: 'RUN_WASM_EXPORT',
     GET_WASM_MEMORY_SECTION: 'GET_WASM_MEMORY_SECTION',
     GET_WASM_CONSTANT: 'GET_WASM_CONSTANT',
-    FORCE_OUTPUT_FRAME: 'FORCE_OUTPUT_FRAME'
+    FORCE_OUTPUT_FRAME: 'FORCE_OUTPUT_FRAME',
+    SET_SPEED: 'SET_SPEED',
+    IS_GBC: 'IS_GBC'
   };
 
   // Web worker for wasmboy lib
@@ -182,16 +184,29 @@
       case WORKER_MESSAGE_TYPE.UPDATED:
         {
           // Process the memory buffer and pass back to the main thread
-          const audioBufferAsArray = new Uint8Array(eventData.message.audioBuffer);
-          const audioChannelBuffers = getAudioChannelBuffersFromBuffer(audioBufferAsArray, eventData.message.numberOfSamples);
-          postMessage(getSmartWorkerMessage({
+          // For Each Possible Buffer
+          const message = {
             type: WORKER_MESSAGE_TYPE.UPDATED,
-            leftChannel: audioChannelBuffers.left,
-            rightChannel: audioChannelBuffers.right,
             numberOfSamples: eventData.message.numberOfSamples,
             fps: eventData.message.fps,
             allowFastSpeedStretching: eventData.message.allowFastSpeedStretching
-          }), [audioChannelBuffers.left, audioChannelBuffers.right]);
+          };
+          const messageTransferables = [];
+          const audioDebuggingChannelBufferKeys = ['audioBuffer', 'channel1Buffer', 'channel2Buffer', 'channel3Buffer', 'channel4Buffer'];
+          audioDebuggingChannelBufferKeys.forEach(channelBufferKey => {
+            if (!eventData.message[channelBufferKey]) {
+              return;
+            }
+
+            const audioBufferAsArray = new Uint8Array(eventData.message[channelBufferKey]);
+            const audioChannelBuffers = getAudioChannelBuffersFromBuffer(audioBufferAsArray, eventData.message.numberOfSamples);
+            message[channelBufferKey] = {};
+            message[channelBufferKey].left = audioChannelBuffers.left;
+            message[channelBufferKey].right = audioChannelBuffers.right;
+            messageTransferables.push(audioChannelBuffers.left);
+            messageTransferables.push(audioChannelBuffers.right);
+          });
+          postMessage(getSmartWorkerMessage(message), messageTransferables);
           return;
         }
     }
