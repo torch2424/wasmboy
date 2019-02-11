@@ -19,6 +19,7 @@ export function getLY(): i32 {
   return Graphics.scanlineRegister;
 }
 
+// TODO: Render by tile, rather than by pixel
 export function drawBackgroundMapToWasmMemory(showColor: i32): void {
   // http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html
   // Bit 7 - LCD Display Enable (0=Off, 1=On)
@@ -208,6 +209,76 @@ export function drawTileDataToWasmMemory(): void {
         tileDataMemoryLocation = Graphics.memoryLocationTileDataSelectZeroStart;
       }
 
+      // Let's see if we have C O L O R
+      // Set the map and sprite attributes to -1
+      // Meaning, we will draw monochrome
+      let paletteLocation: i32 = Graphics.memoryLocationBackgroundPalette;
+      let bgMapAttributes: i32 = -1;
+      let spriteAttributes: i32 = -1;
+
+      // Let's see if the tile is being used by a sprite
+      for (let spriteRow: i32 = 0; spriteRow < 8; spriteRow++) {
+        for (let spriteColumn: i32 = 0; spriteColumn < 5; spriteColumn++) {
+          let spriteIndex = spriteColumn * 8 + spriteRow;
+
+          // Sprites occupy 4 bytes in the sprite attribute table
+          let spriteTableIndex: i32 = spriteIndex * 4;
+          let spriteTileId: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 2);
+
+          if (tileId === spriteTileId) {
+            let currentSpriteAttributes: i32 = eightBitLoadFromGBMemory(
+              Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 3
+            );
+
+            let spriteVramBankId: i32 = 0;
+            if (Cpu.GBCEnabled && checkBitOnByte(3, currentSpriteAttributes)) {
+              spriteVramBankId = 1;
+            }
+
+            if (spriteVramBankId === vramBankId) {
+              spriteAttributes = currentSpriteAttributes;
+              spriteRow = 8;
+              spriteColumn = 5;
+
+              // Set our paletteLocation
+              paletteLocation = Graphics.memoryLocationSpritePaletteOne;
+              if (checkBitOnByte(4, spriteAttributes)) {
+                paletteLocation = Graphics.memoryLocationSpritePaletteTwo;
+              }
+            }
+          }
+        }
+      }
+
+      // If we didn't find a sprite,
+      // Let's see if the tile is on the bg tile map
+      // If so, use that bg map for attributes
+      if (Cpu.GBCEnabled && spriteAttributes < 0) {
+        let tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectZeroStart;
+        if (Lcd.bgTileMapDisplaySelect) {
+          tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectOneStart;
+        }
+        // Loop through the tileMap, and find if we have our current ID
+        let foundTileMapAddress: i32 = -1;
+        for (let x: i32 = 0; x < 32; x++) {
+          for (let y: i32 = 0; y < 32; y++) {
+            let tileMapAddress: i32 = tileMapMemoryLocation + y * 32 + x;
+            let tileIdFromTileMap: i32 = loadFromVramBank(tileMapAddress, 0);
+
+            // Check if we found our tileId
+            if (tileId === tileIdFromTileMap) {
+              foundTileMapAddress = tileMapAddress;
+              x = 32;
+              y = 32;
+            }
+          }
+        }
+
+        if (foundTileMapAddress >= 0) {
+          bgMapAttributes = loadFromVramBank(foundTileMapAddress, 1);
+        }
+      }
+
       // Draw each Y line of the tile
       for (let tileLineY: i32 = 0; tileLineY < 8; tileLineY++) {
         drawPixelsFromLineOfTile(
@@ -221,10 +292,10 @@ export function drawTileDataToWasmMemory(): void {
           tileDataMapGridY * 8 + tileLineY, // Output line Y
           0x1f * 8, // Output Width
           TILE_DATA_LOCATION, // Wasm Memory Start
-          true, // shouldRepresentMonochromeColorByColorId
-          0, // paletteLocation
-          -1, // bgMapAttributes
-          -1 // spriteAttributes
+          false, // shouldRepresentMonochromeColorByColorId
+          paletteLocation, // paletteLocation
+          bgMapAttributes, // bgMapAttributes
+          spriteAttributes // spriteAttributes
         );
       }
     }
@@ -275,6 +346,12 @@ export function drawOamToWasmMemory(): void {
         vramBankId = 1;
       }
 
+      // Find which monochrome palette we should use
+      let paletteLocation: i32 = Graphics.memoryLocationSpritePaletteOne;
+      if (checkBitOnByte(4, spriteAttributes)) {
+        paletteLocation = Graphics.memoryLocationSpritePaletteTwo;
+      }
+
       // Start Drawing our tiles
       for (let i: i32 = 0; i < tilesToDraw; i++) {
         // Draw each Y line of the tile
@@ -290,10 +367,10 @@ export function drawOamToWasmMemory(): void {
             spriteColumn * 16 + tileLineY + i * 8, // Output line Y
             8 * 8, // Output Width
             OAM_TILES_LOCATION, // Wasm Memory Start
-            true, // shouldRepresentMonochromeColorByColorId
-            0, // paletteLocation
+            false, // shouldRepresentMonochromeColorByColorId
+            paletteLocation, // paletteLocation
             -1, // bgMapAttributes
-            -1 // spriteAttributes
+            spriteAttributes // spriteAttributes
           );
         }
       }
