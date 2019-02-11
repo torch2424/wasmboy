@@ -7,6 +7,7 @@ import commands from './commands/commands';
 import openCommands from './commands/open';
 import playbackCommands from './commands/widgets/playback';
 import cpuCommands from './commands/widgets/cpu';
+import memoryCommands from './commands/widgets/memory';
 import graphicsCommands from './commands/widgets/graphics';
 import audioCommands from './commands/widgets/audio';
 import interruptCommands from './commands/widgets/interrupt';
@@ -42,6 +43,12 @@ let cpuSubMenu = new phosphorWidgets.Menu({ commands });
 cpuSubMenu.title.label = 'CPU';
 addCommandsToMenu(cpuCommands, cpuSubMenu);
 widgetMenu.addItem({ type: 'submenu', submenu: cpuSubMenu });
+
+// Memory
+let memorySubMenu = new phosphorWidgets.Menu({ commands });
+memorySubMenu.title.label = 'Memory';
+addCommandsToMenu(memoryCommands, memorySubMenu);
+widgetMenu.addItem({ type: 'submenu', submenu: memorySubMenu });
 
 // Graphics
 let graphicsSubMenu = new phosphorWidgets.Menu({ commands });

@@ -4,6 +4,7 @@ import phosphorCommands from '@phosphor/commands';
 import openCommands from './open';
 import playbackCommands from './widgets/playback';
 import cpuCommands from './widgets/cpu';
+import memoryCommands from './widgets/memory';
 import graphicsCommands from './widgets/graphics';
 import audioCommands from './widgets/audio';
 import interruptCommands from './widgets/interrupt';
@@ -14,6 +15,7 @@ const importedCommands = [
   openCommands,
   playbackCommands,
   cpuCommands,
+  memoryCommands,
   graphicsCommands,
   audioCommands,
   interruptCommands,
