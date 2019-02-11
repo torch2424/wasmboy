@@ -216,32 +216,60 @@ export function drawTileDataToWasmMemory(): void {
       let spriteAttributes: i32 = -1;
 
       // Let's see if the tile is being used by a sprite
-      // TODO:
+      for (let spriteRow: i32 = 0; spriteRow < 8; spriteRow++) {
+        for (let spriteColumn: i32 = 0; spriteColumn < 5; spriteColumn++) {
+          let spriteIndex = spriteColumn * 8 + spriteRow;
 
-      // Let's see if the tile is on the bg tile map
-      // If so, use that bg map for attributes
-      let tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectZeroStart;
-      if (Lcd.bgTileMapDisplaySelect) {
-        tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectOneStart;
-      }
-      // Loop through the tileMap, and find if we have our current ID
-      let foundTileMapAddress: i32 = -1;
-      for (let x: i32 = 0; x < 32; x++) {
-        for (let y: i32 = 0; y < 32; y++) {
-          let tileMapAddress: i32 = tileMapMemoryLocation + y * 32 + x;
-          let tileIdFromTileMap: i32 = loadFromVramBank(tileMapAddress, 0);
+          // Sprites occupy 4 bytes in the sprite attribute table
+          let spriteTableIndex: i32 = spriteIndex * 4;
+          let spriteTileId: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 2);
 
-          // Check if we found our tileId
-          if (tileId === tileIdFromTileMap) {
-            foundTileMapAddress = tileMapAddress;
-            x = 32;
-            y = 32;
+          if (tileId === spriteTileId) {
+            let currentSpriteAttributes: i32 = eightBitLoadFromGBMemory(
+              Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 3
+            );
+
+            let spriteVramBankId: i32 = 0;
+            if (Cpu.GBCEnabled && checkBitOnByte(3, currentSpriteAttributes)) {
+              spriteVramBankId = 1;
+            }
+
+            if (spriteVramBankId === vramBankId) {
+              spriteAttributes = currentSpriteAttributes;
+              spriteRow = 8;
+              spriteColumn = 5;
+            }
           }
         }
       }
 
-      if (Cpu.GBCEnabled && foundTileMapAddress >= 0) {
-        bgMapAttributes = loadFromVramBank(foundTileMapAddress, 1);
+      // If we didn't find a sprite,
+      // Let's see if the tile is on the bg tile map
+      // If so, use that bg map for attributes
+      if (spriteAttributes < 0) {
+        let tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectZeroStart;
+        if (Lcd.bgTileMapDisplaySelect) {
+          tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectOneStart;
+        }
+        // Loop through the tileMap, and find if we have our current ID
+        let foundTileMapAddress: i32 = -1;
+        for (let x: i32 = 0; x < 32; x++) {
+          for (let y: i32 = 0; y < 32; y++) {
+            let tileMapAddress: i32 = tileMapMemoryLocation + y * 32 + x;
+            let tileIdFromTileMap: i32 = loadFromVramBank(tileMapAddress, 0);
+
+            // Check if we found our tileId
+            if (tileId === tileIdFromTileMap) {
+              foundTileMapAddress = tileMapAddress;
+              x = 32;
+              y = 32;
+            }
+          }
+        }
+
+        if (Cpu.GBCEnabled && foundTileMapAddress >= 0) {
+          bgMapAttributes = loadFromVramBank(foundTileMapAddress, 1);
+        }
       }
 
       // Draw each Y line of the tile

@@ -14478,144 +14478,222 @@
   (local $9 i32)
   (local $10 i32)
   loop $repeat|0
-   local.get $2
+   local.get $3
    i32.const 23
    i32.ge_s
    i32.eqz
    if
     i32.const 0
-    local.set $1
+    local.set $2
     loop $repeat|1
-     local.get $1
+     local.get $2
      i32.const 31
      i32.lt_s
      if
       i32.const 1
       i32.const 0
-      local.get $1
-      i32.const 15
-      i32.gt_s
-      select
-      local.set $8
-      local.get $2
-      i32.const 15
-      i32.sub
-      local.get $2
-      local.get $2
-      i32.const 15
-      i32.gt_s
-      select
-      i32.const 4
-      i32.shl
-      local.tee $4
-      local.get $1
-      i32.const 15
-      i32.sub
-      i32.add
-      local.get $1
-      local.get $4
-      i32.add
-      local.get $1
-      i32.const 15
-      i32.gt_s
-      select
-      local.set $4
-      i32.const 34816
-      i32.const 32768
       local.get $2
       i32.const 15
       i32.gt_s
       select
       local.set $9
-      i32.const -1
-      local.set $6
-      i32.const 39936
-      i32.const 38912
-      global.get $core/graphics/lcd/Lcd.bgTileMapDisplaySelect
+      local.get $3
+      i32.const 15
+      i32.sub
+      local.get $3
+      local.get $3
+      i32.const 15
+      i32.gt_s
+      select
+      i32.const 4
+      i32.shl
+      local.tee $7
+      local.get $2
+      i32.const 15
+      i32.sub
+      i32.add
+      local.get $2
+      local.get $7
+      i32.add
+      local.get $2
+      i32.const 15
+      i32.gt_s
+      select
+      local.set $7
+      i32.const 34816
+      i32.const 32768
+      local.get $3
+      i32.const 15
+      i32.gt_s
       select
       local.set $10
       i32.const -1
-      local.set $5
+      local.set $1
+      i32.const -1
+      local.set $8
       i32.const 0
-      local.set $0
+      local.set $4
       loop $repeat|2
-       local.get $0
-       i32.const 32
+       local.get $4
+       i32.const 8
        i32.lt_s
        if
         i32.const 0
-        local.set $3
+        local.set $0
         loop $repeat|3
-         local.get $3
-         i32.const 32
+         local.get $0
+         i32.const 5
          i32.lt_s
          if
-          local.get $3
-          i32.const 5
-          i32.shl
-          local.get $10
-          i32.add
           local.get $0
-          i32.add
-          local.tee $7
-          i32.const -30720
-          i32.add
-          i32.load8_u
+          i32.const 3
+          i32.shl
           local.get $4
+          i32.add
+          i32.const 2
+          i32.shl
+          local.tee $5
+          i32.const 65026
+          i32.add
+          call $core/memory/load/eightBitLoadFromGBMemory
+          local.get $7
           i32.eq
           if
-           i32.const 32
-           local.set $0
-           i32.const 32
-           local.set $3
-           local.get $7
-           local.set $5
+           local.get $5
+           i32.const 65027
+           i32.add
+           call $core/memory/load/eightBitLoadFromGBMemory
+           local.set $6
+           i32.const 1
+           i32.const 0
+           local.get $6
+           i32.const 8
+           i32.and
+           i32.const 0
+           i32.ne
+           global.get $core/cpu/cpu/Cpu.GBCEnabled
+           global.get $core/cpu/cpu/Cpu.GBCEnabled
+           select
+           select
+           local.get $9
+           i32.eq
+           if
+            local.get $6
+            local.set $8
+            i32.const 8
+            local.set $4
+            i32.const 5
+            local.set $0
+           end
           end
-          local.get $3
+          local.get $0
           i32.const 1
           i32.add
-          local.set $3
+          local.set $0
           br $repeat|3
          end
         end
-        local.get $0
+        local.get $4
         i32.const 1
         i32.add
-        local.set $0
+        local.set $4
         br $repeat|2
        end
       end
-      local.get $5
+      local.get $8
       i32.const 0
-      i32.ge_s
-      global.get $core/cpu/cpu/Cpu.GBCEnabled
-      local.tee $7
-      local.get $7
-      select
+      i32.lt_s
       if
-       local.get $5
-       i32.const -22528
-       i32.add
-       i32.load8_u
-       local.set $6
+       i32.const 39936
+       i32.const 38912
+       global.get $core/graphics/lcd/Lcd.bgTileMapDisplaySelect
+       select
+       local.set $4
+       i32.const -1
+       local.set $0
+       i32.const 0
+       local.set $1
+       loop $repeat|4
+        local.get $1
+        i32.const 32
+        i32.lt_s
+        if
+         i32.const 0
+         local.set $5
+         loop $repeat|5
+          local.get $5
+          i32.const 32
+          i32.lt_s
+          if
+           local.get $5
+           i32.const 5
+           i32.shl
+           local.get $4
+           i32.add
+           local.get $1
+           i32.add
+           local.tee $6
+           i32.const -30720
+           i32.add
+           i32.load8_u
+           local.get $7
+           i32.eq
+           if
+            i32.const 32
+            local.set $1
+            i32.const 32
+            local.set $5
+            local.get $6
+            local.set $0
+           end
+           local.get $5
+           i32.const 1
+           i32.add
+           local.set $5
+           br $repeat|5
+          end
+         end
+         local.get $1
+         i32.const 1
+         i32.add
+         local.set $1
+         br $repeat|4
+        end
+       end
+       local.get $0
+       i32.const 0
+       i32.ge_s
+       global.get $core/cpu/cpu/Cpu.GBCEnabled
+       local.tee $6
+       local.get $6
+       select
+       if (result i32)
+        local.get $0
+        i32.const -22528
+        i32.add
+        i32.load8_u
+       else        
+        i32.const -1
+       end
+       local.set $1
       end
       i32.const 0
       local.set $0
-      loop $repeat|4
+      loop $repeat|6
        local.get $0
        i32.const 8
        i32.lt_s
        if
-        local.get $4
+        local.get $7
+        local.get $10
         local.get $9
-        local.get $8
         i32.const 0
         i32.const 7
         local.get $0
-        local.get $1
+        local.get $2
         i32.const 3
         i32.shl
-        local.get $2
+        local.get $3
         i32.const 3
         i32.shl
         local.get $0
@@ -14623,28 +14701,28 @@
         i32.const 248
         i32.const 381056
         i32.const 1
-        local.get $6
-        i32.const -1
+        local.get $1
+        local.get $8
         call $core/graphics/tiles/drawPixelsFromLineOfTile
         drop
         local.get $0
         i32.const 1
         i32.add
         local.set $0
-        br $repeat|4
+        br $repeat|6
        end
       end
-      local.get $1
+      local.get $2
       i32.const 1
       i32.add
-      local.set $1
+      local.set $2
       br $repeat|1
      end
     end
-    local.get $2
+    local.get $3
     i32.const 1
     i32.add
-    local.set $2
+    local.set $3
     br $repeat|0
    end
   end
