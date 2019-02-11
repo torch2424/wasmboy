@@ -4,10 +4,24 @@ import json from 'rollup-plugin-json';
 import url from 'rollup-plugin-url';
 import serve from 'rollup-plugin-serve';
 import copy from 'rollup-plugin-copy-glob';
+import babel from 'rollup-plugin-babel';
+import compiler from '@ampproject/rollup-plugin-closure-compiler';
+import bundleSize from 'rollup-plugin-bundle-size';
 import pkg from './package.json';
+
+const babelPluginConfig = {
+  exclude: ['node_modules/**'],
+  plugins: [
+    ['@babel/plugin-proposal-class-properties'],
+    ['@babel/plugin-proposal-object-rest-spread'],
+    ['@babel/plugin-transform-react-jsx', { pragma: 'h' }],
+    ['@babel/plugin-proposal-export-default-from']
+  ]
+};
 
 let plugins = [
   resolve(),
+  babel(babelPluginConfig),
   commonjs(),
   json(),
   url({
@@ -22,7 +36,7 @@ if (process.env.AMP && process.env.SERVE) {
     ...plugins,
     serve({
       port: 8080,
-      contentBase: ['dist/', 'build/amp/', 'demo/amp/', 'demo/debugger/']
+      contentBase: ['dist/', 'demo/amp/', 'demo/debugger/', 'build/amp']
     })
   ];
 } else {
@@ -37,6 +51,10 @@ if (process.env.AMP && process.env.SERVE) {
   ];
 }
 
+// Plugins for the minified wasmboy-amp
+// To fit in amp-script size restriction
+let minPlugins = [...plugins, compiler(), bundleSize()];
+
 const ampBundles = [
   {
     input: 'demo/amp/index.js',
@@ -46,6 +64,15 @@ const ampBundles = [
       format: 'iife'
     },
     plugins
+  },
+  {
+    input: 'demo/amp/index.js',
+    output: {
+      name: 'WasmBoyAmp',
+      file: 'build/amp/wasmboy-amp.min.js',
+      format: 'iife'
+    },
+    plugins: minPlugins
   }
 ];
 

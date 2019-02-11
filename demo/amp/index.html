@@ -1,93 +1,140 @@
-<!doctype html>
+<!DOCTYPE html>
 <html ⚡>
-<head>
-  <meta charset="utf-8">
-  <link rel="canonical" href="self.html" />
-  <meta name="viewport" content="width=device-width,minimum-scale=1">
-  <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
-  
-  <style amp-custom>
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: Helvetica, Arial, sans-serif;
-      background: #edf0f0;
+  <head>
+    <meta charset="utf-8" />
+    <link rel="canonical" href="self.html" />
+    <meta name="viewport" content="width=device-width,minimum-scale=1" />
+    <style amp-boilerplate>
+      body {
+        -webkit-animation: -amp-start 8s steps(1, end) 0s 1 normal both;
+        -moz-animation: -amp-start 8s steps(1, end) 0s 1 normal both;
+        -ms-animation: -amp-start 8s steps(1, end) 0s 1 normal both;
+        animation: -amp-start 8s steps(1, end) 0s 1 normal both;
+      }
+      @-webkit-keyframes -amp-start {
+        from {
+          visibility: hidden;
+        }
+        to {
+          visibility: visible;
+        }
+      }
+      @-moz-keyframes -amp-start {
+        from {
+          visibility: hidden;
+        }
+        to {
+          visibility: visible;
+        }
+      }
+      @-ms-keyframes -amp-start {
+        from {
+          visibility: hidden;
+        }
+        to {
+          visibility: visible;
+        }
+      }
+      @-o-keyframes -amp-start {
+        from {
+          visibility: hidden;
+        }
+        to {
+          visibility: visible;
+        }
+      }
+      @keyframes -amp-start {
+        from {
+          visibility: hidden;
+        }
+        to {
+          visibility: visible;
+        }
+      }
+    </style>
+    <noscript
+      ><style amp-boilerplate>
+        body {
+          -webkit-animation: none;
+          -moz-animation: none;
+          -ms-animation: none;
+          animation: none;
+        }
+      </style></noscript
+    >
 
-    }
+    <style amp-custom>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Helvetica, Arial, sans-serif;
+        background: #edf0f0;
+      }
 
-    #root {
-      display: flex;
-      position: relative;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
+      #root {
+        display: flex;
+        position: relative;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
 
-      width: 100vw;
-      height: 100vh;  
-      padding: 10px;
-      max-width: 800px;
-    }
+        width: 100vw;
+        height: 100vh;
+        padding: 10px;
+        max-width: 800px;
+      }
 
-    #description {
-      z-index: 2;
-      width: 100%;
-      white-space: pre-line;
-    }
+      #description {
+        z-index: 2;
+        width: 100%;
+        white-space: pre-line;
+      }
 
-    #controls {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: 1;
-      opacity: 0;
-    }
+      #controls {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 1;
+        opacity: 0;
+      }
 
-    #wasmboy-svg-output {
-      display: block;
-      width: 80%;
-      border: solid 1px #000;
-    }
+      #wasmboy-svg-output {
+        display: block;
+        width: 80%;
+        border: solid 1px #000;
+      }
+    </style>
 
-  </style>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+    <script async custom-element="amp-script" src="https://cdn.ampproject.org/v0/amp-script-0.1.js"></script>
+  </head>
 
-  <script async src="https://cdn.ampproject.org/v0.js"></script>
-  <script async custom-element="amp-script" src="https://cdn.ampproject.org/v0/amp-script-0.1.js"></script>
-</head>
+  <body>
+    <!-- need to serve cors because of new amp-script requirement -->
+    <amp-script layout="container" src="https://torch2424-amp-glitch-express.glitch.me/wasmboy-amp.min.js">
+      <div id="root">
+        <h1>⚡wAsMP Boy⚡</h1>
+        <p id="description">
+          <a href="https://github.com/torch2424/wasmBoy" target="_blank">WasmBoy</a> TS Core Running within
+          <a href="https://github.com/ampproject/amphtml/tree/master/extensions/amp-script" target="_blank">amp-script</a> and
+          <a href="https://github.com/ampproject/worker-dom" target="_blank">Worker DOM</a>. Runs slow due to experimenal amp-script /
+          Worker DOM limitations.
 
-<body>
+          <b>NOTE:</b>
+          Play on desktop. You must click the game to control it.
 
-  <amp-script layout="container" src="wasmboy-amp.js">
-    <div id="root">
-      <h1>⚡wAsMP Boy⚡</h1>
-      <p id="description">
-      <a href="https://github.com/torch2424/wasmBoy" target="_blank">WasmBoy</a> TS Core Running within <a href="https://github.com/ampproject/amphtml/tree/master/extensions/amp-script" target="_blank">amp-script</a> and <a href="https://github.com/ampproject/worker-dom" target="_blank">Worker DOM</a>. 
-        Runs slow due to experimenal amp-script / Worker DOM limitations. 
+          <b>You must toggle the amp-script experiment:</b>
+          `AMP.toggleExperiment('amp-script')` in Dev tools console.
 
-        <b>NOTE:</b>
-        Play on desktop.
-        You must click the game to control it.
+          <b>ROM played is: <a href="http://tangramgames.dk/tobutobugirl/" target="_blank">Tobu Tobu Girl</a></b>
 
-        <b>You must toggle the amp-script experiment:</b>
-        `AMP.toggleExperiment('amp-script')` in Dev tools console.
-
-        <b>ROM played is: <a href="http://tangramgames.dk/tobutobugirl/" target="_blank">Tobu Tobu Girl</a></b>
-
-        <b>Controls:</b>
-        Up,Down,Left,Right = Arrow Keys, WASD
-        A = Z
-        B = X
-        Start = Enter
-        Select = Shift 
-        Play/Pause = Space
-      </p>
-
-    </div>
-  </amp-script>
-
-</body>
-
+          <b>Controls:</b>
+          Up,Down,Left,Right = Arrow Keys, WASD A = Z B = X Start = Enter Select = Shift Play/Pause = Space
+        </p>
+      </div>
+    </amp-script>
+  </body>
 </html>
-
