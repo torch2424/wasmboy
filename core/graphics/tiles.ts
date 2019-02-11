@@ -81,7 +81,9 @@ export function drawPixelsFromLineOfTile(
       let blue: i32 = 0;
 
       // Check if we should draw color or not
-      if (bgMapAttributes >= 0 || spriteAttributes >= 0) {
+      if (Cpu.GBCEnabled && (bgMapAttributes >= 0 || spriteAttributes >= 0)) {
+        // Draw C O L O R
+
         let isSprite: boolean = spriteAttributes >= 0;
 
         // Call the helper function to grab the correct color from the palette
@@ -97,9 +99,13 @@ export function drawPixelsFromLineOfTile(
         green = getColorComponentFromRgb(1, rgbColorPalette);
         blue = getColorComponentFromRgb(2, rgbColorPalette);
       } else {
+        // Draw Monochrome
+
+        // Get the default palette if none
         if (paletteLocation <= 0) {
           paletteLocation = Graphics.memoryLocationBackgroundPalette;
         }
+
         let monochromeColor: i32 = getMonochromeColorFromPalette(paletteColorId, paletteLocation, shouldRepresentMonochromeColorByColorId);
         red = monochromeColor;
         green = monochromeColor;
