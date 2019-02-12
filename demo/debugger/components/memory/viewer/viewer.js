@@ -11,6 +11,32 @@ import VirtualList from '../../virtualList';
 
 import './viewer.css';
 
+let gbMemory = [];
+let gbMemoryStart;
+let gbMemorySize;
+let gbMemoryEnd;
+let updateTask = async () => {
+  if (!gbMemoryStart) {
+    gbMemoryStart = await WasmBoy._getWasmConstant('DEBUG_GAMEBOY_MEMORY_LOCATION');
+    gbMemorySize = await WasmBoy._getWasmConstant('DEBUG_GAMEBOY_MEMORY_SIZE');
+    gbMemoryEnd = gbMemoryStart + gbMemorySize;
+  }
+
+  const data = [];
+
+  await WasmBoy._runWasmExport('updateDebugGBMemory');
+  gbMemory = await WasmBoy._getWasmMemorySection(gbMemoryStart, gbMemoryEnd);
+
+  for (let i = 0; i < gbMemory.length; i++) {
+    data[i] = {
+      address: i,
+      value: gbMemory[i]
+    };
+  }
+
+  return data;
+};
+
 // Our unsub
 let unsubLoading = false;
 let unsubWasmBoy = false;
@@ -80,12 +106,95 @@ export default class MemoryViewer extends Component {
     if (!WasmBoy.isReady()) {
       return Promise.resolve();
     }
+
+    return updateTask().then(data => {
+      this.data = data;
+    });
+  }
+
+  renderRow(row) {
+    // Our classes for the row
+    const classes = ['memory-viewer__list__virtual__row'];
+    classes.push(`memory-viewer-row-${row.address}`);
+
+    // The row height needs to be forced, or will mess up virtual list overscan
+    // Height is set in CSS for performance
+    // Can't set background color here, as rows are rendered ahead of time
+    return (
+      <div class={classes.join(' ')}>
+        <div class="memory-viewer__list__virtual__row__actions">
+          <button class="remove-default-button" onClick={() => this.setState({ breakpoint: row.address })}>
+            {this.state.breakpoint === row.address ? <div>🔴</div> : <div>⚪</div>}
+          </button>
+          <button class="remove-default-button" onClick={() => this.showInstructionInfo(row.gbOpcode)}>
+            <div>ℹ️</div>
+          </button>
+        </div>
+        <div class="memory-viewer__list__virtual__row__address">
+          {row.address
+            .toString(16)
+            .toUpperCase()
+            .padStart(4, '0')}
+        </div>
+        <div class="memory-viewer__list__virtual__row__value">
+          {row.value
+            .toString(16)
+            .toUpperCase()
+            .padStart(2, '0')}
+        </div>
+      </div>
+    );
   }
 
   render() {
+    const classes = ['memory-viewer'];
+    if (this.state.wasmboy.ready) {
+      classes.push('memory-viewer--ready');
+    }
+    if (this.state.loading.controlLoading) {
+      classes.push('memory-viewer--control-loading');
+    }
+    if (this.state.running) {
+      classes.push('memory-viewer--running');
+    }
+
     return (
-      <div class="memory-viewer">
+      <div class={classes.join(' ')}>
         <h1>Memory Viewer</h1>
+
+        <div class="memory-viewer__not-ready">
+          <i>Please Load a ROM to view GB Memory.</i>
+        </div>
+
+        <div class="donut" />
+
+        <div class="memory-viewer__control">
+          <InputSubmit
+            class="memory-viewer__control__jump-address"
+            type="text"
+            pattern="[a-fA-F\d]+"
+            initialValue="100"
+            label="Jump To Address: 0x"
+            buttonText="Jump"
+            maxlength="4"
+            onSubmit={value => this.scrollToAddress(parseInt(value, 16))}
+          />
+        </div>
+
+        <div class="memory-viewer__header-list">
+          <div class="memory-viewer__header-list__actions">Actions</div>
+          <div class="memory-viewer__header-list__address">Address (Hex)</div>
+          <div class="memory-viewer__header-list__value">Value (Hex)</div>
+        </div>
+        <div class="memory-viewer__list">
+          <VirtualList
+            class="memory-viewer__list__virtual"
+            data={this.data}
+            rowHeight={this.rowHeight}
+            height={this.height}
+            renderRow={row => this.renderRow(row)}
+          />
+        </div>
       </div>
     );
   }
