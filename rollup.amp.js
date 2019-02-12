@@ -53,7 +53,7 @@ if (process.env.AMP && process.env.SERVE) {
 
 // Plugins for the minified wasmboy-amp
 // To fit in amp-script size restriction
-let minPlugins = [...plugins, compiler(), bundleSize()];
+let minPlugins = [...plugins, bundleSize()];
 
 const ampBundles = [
   {
