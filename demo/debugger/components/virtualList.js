@@ -3,6 +3,8 @@
 
 import { h, Component } from 'preact';
 
+import './virtualListWidget.css';
+
 const STYLE_INNER = 'position:relative; overflow:hidden; width:100%; min-height:100%;';
 
 const STYLE_CONTENT = 'position:absolute; top:0; left:0; height:100%; width:100%; overflow:visible;';

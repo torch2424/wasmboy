@@ -1,0 +1,33 @@
+.memory-viewer {
+}
+
+.memory-viewer__container {
+  min-width: 300px;
+  width: 300px;
+  max-width: 300px;
+}
+
+/* Variables for our psuedo table */
+:root {
+  --memory-viewer-width: 275px;
+  --memory-viewer-breakpoint-width: 125px;
+}
+
+.memory-viewer__header-list {
+  width: var(--memory-viewer-width);
+}
+
+.memory-viewer__list {
+  width: var(--memory-viewer-width);
+}
+
+.memory-viewer__header-list__breakpoint,
+.memory-viewer__list__virtual__row__breakpoint {
+  min-width: var(--memory-viewer-breakpoint-width);
+  width: var(--memory-viewer-breakpoint-width);
+  max-width: var(--memory-viewer-breakpoint-width);
+}
+
+.memory-viewer__list__virtual__row__breakpoint > button {
+  width: 50px !important;
+}
