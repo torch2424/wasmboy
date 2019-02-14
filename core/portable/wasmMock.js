@@ -26,3 +26,7 @@ const store = (offset, value) => {
 const abs = value => {
   return Math.abs(value);
 };
+
+const ceil = value => {
+  return Math.ceil(value);
+};

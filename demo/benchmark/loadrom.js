@@ -50,10 +50,21 @@ export default class LoadROMSelector extends Component {
 
     const loadROMTask = async () => {
       // Fetch the rom
-      const ROM = await fetchROMAsByteArray(ROMUrl);
+      const ROMObject = await fetchROMAsByteArray(ROMUrl);
 
       // Our config params
-      const configParams = [0, 1, 0, 0, 0, 0, 0, 0, 0];
+      const configParams = [
+        0, // enableBootRom
+        1, // useGbcWhenAvailable
+        0, // audioBatchProcessing
+        0, // graphicsBatchProcessing
+        0, // timersBatchProcessing
+        0, // graphicsDisableScanlineRendering
+        0, // audioAccumulateSamples
+        0, // tileRendering
+        0, // tileCaching
+        0 // enableAudioDebugging
+      ];
 
       // Clear Wasm memory
       // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
@@ -63,7 +74,7 @@ export default class LoadROMSelector extends Component {
         }
 
         // Set the ROM in byte memory
-        coreObject.core.byteMemory.set(ROM, coreObject.core.instance.exports.CARTRIDGE_ROM_LOCATION);
+        coreObject.core.byteMemory.set(ROMObject.ROM, coreObject.core.instance.exports.CARTRIDGE_ROM_LOCATION);
 
         // Config the core
         coreObject.core.instance.exports.config.apply(this, configParams);
