@@ -23,7 +23,7 @@ const runTask = async () => {
   WasmBoy.byteMemory.set(ROM, WasmBoy.instance.exports.CARTRIDGE_ROM_LOCATION);
 
   // Config the core
-  const configParams = [0, 1, 0, 0, 0, 0, 0, 0, 0];
+  const configParams = [0, 1, 0, 0, 0, 0, 0, 0, 0, 0];
   WasmBoy.instance.exports.config.apply(WasmBoy.instance, configParams);
 
   const keyMap = {
