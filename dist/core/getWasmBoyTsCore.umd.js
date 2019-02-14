@@ -28,6 +28,10 @@
 
   const abs = value => {
     return Math.abs(value);
+  };
+
+  const ceil = value => {
+    return Math.ceil(value);
   }; // Constants that will be shared by the wasm core of the emulator
   // And libraries built around the wasm (such as the official JS), or @CryZe wasmboy-rs
   // ----------------------------------

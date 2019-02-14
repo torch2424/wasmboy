@@ -27,6 +27,11 @@ const abs = value => {
   return Math.abs(value);
 };
 
+const ceil = value => {
+  return Math.ceil(value);
+};
+
+
 'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
