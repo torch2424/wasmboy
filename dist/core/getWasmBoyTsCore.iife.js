@@ -593,16 +593,25 @@ var WasmBoyTsCore = (function () {
         var green = 0;
         var blue = 0; // Check if we should draw color or not
 
-        if (bgMapAttributes >= 0) {
-          // Call the helper function to grab the correct color from the palette
+        if (Cpu.GBCEnabled && (bgMapAttributes >= 0 || spriteAttributes >= 0)) {
+          // Draw C O L O R
+          var isSprite = spriteAttributes >= 0; // Call the helper function to grab the correct color from the palette
           // Get the palette index byte
+
           var bgPalette = bgMapAttributes & 0x07;
-          var rgbColorPalette = getRgbColorFromPalette(bgPalette, paletteColorId, false); // Split off into red green and blue
+
+          if (isSprite) {
+            bgPalette = spriteAttributes & 0x07;
+          }
+
+          var rgbColorPalette = getRgbColorFromPalette(bgPalette, paletteColorId, isSprite); // Split off into red green and blue
 
           red = getColorComponentFromRgb(0, rgbColorPalette);
           green = getColorComponentFromRgb(1, rgbColorPalette);
           blue = getColorComponentFromRgb(2, rgbColorPalette);
         } else {
+          // Draw Monochrome
+          // Get the default palette if none
           if (paletteLocation <= 0) {
             paletteLocation = Graphics.memoryLocationBackgroundPalette;
           }
@@ -9438,7 +9447,8 @@ var WasmBoyTsCore = (function () {
 
   function getLY() {
     return Graphics.scanlineRegister;
-  }
+  } // TODO: Render by tile, rather than by pixel
+
 
   function drawBackgroundMapToWasmMemory(showColor) {
     // http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html
@@ -9624,6 +9634,74 @@ var WasmBoyTsCore = (function () {
 
         if (tileDataMapGridY > 0x0f) {
           tileDataMemoryLocation = Graphics.memoryLocationTileDataSelectZeroStart;
+        } // Let's see if we have C O L O R
+        // Set the map and sprite attributes to -1
+        // Meaning, we will draw monochrome
+
+
+        var paletteLocation = Graphics.memoryLocationBackgroundPalette;
+        var bgMapAttributes = -1;
+        var spriteAttributes = -1; // Let's see if the tile is being used by a sprite
+
+        for (var spriteRow = 0; spriteRow < 8; spriteRow++) {
+          for (var spriteColumn = 0; spriteColumn < 5; spriteColumn++) {
+            var spriteIndex = spriteColumn * 8 + spriteRow; // Sprites occupy 4 bytes in the sprite attribute table
+
+            var spriteTableIndex = spriteIndex * 4;
+            var spriteTileId = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 2);
+
+            if (tileId === spriteTileId) {
+              var currentSpriteAttributes = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex + 3);
+              var spriteVramBankId = 0;
+
+              if (Cpu.GBCEnabled && checkBitOnByte(3, currentSpriteAttributes)) {
+                spriteVramBankId = 1;
+              }
+
+              if (spriteVramBankId === vramBankId) {
+                spriteAttributes = currentSpriteAttributes;
+                spriteRow = 8;
+                spriteColumn = 5; // Set our paletteLocation
+
+                paletteLocation = Graphics.memoryLocationSpritePaletteOne;
+
+                if (checkBitOnByte(4, spriteAttributes)) {
+                  paletteLocation = Graphics.memoryLocationSpritePaletteTwo;
+                }
+              }
+            }
+          }
+        } // If we didn't find a sprite,
+        // Let's see if the tile is on the bg tile map
+        // If so, use that bg map for attributes
+
+
+        if (Cpu.GBCEnabled && spriteAttributes < 0) {
+          var tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectZeroStart;
+
+          if (Lcd.bgTileMapDisplaySelect) {
+            tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectOneStart;
+          } // Loop through the tileMap, and find if we have our current ID
+
+
+          var foundTileMapAddress = -1;
+
+          for (var x = 0; x < 32; x++) {
+            for (var y = 0; y < 32; y++) {
+              var tileMapAddress = tileMapMemoryLocation + y * 32 + x;
+              var tileIdFromTileMap = loadFromVramBank(tileMapAddress, 0); // Check if we found our tileId
+
+              if (tileId === tileIdFromTileMap) {
+                foundTileMapAddress = tileMapAddress;
+                x = 32;
+                y = 32;
+              }
+            }
+          }
+
+          if (foundTileMapAddress >= 0) {
+            bgMapAttributes = loadFromVramBank(foundTileMapAddress, 1);
+          }
         } // Draw each Y line of the tile
 
 
@@ -9638,10 +9716,10 @@ var WasmBoyTsCore = (function () {
           tileDataMapGridY * 8 + tileLineY, // Output line Y
           0x1f * 8, // Output Width
           TILE_DATA_LOCATION, // Wasm Memory Start
-          true, // shouldRepresentMonochromeColorByColorId
-          0, // paletteLocation
-          -1, // bgMapAttributes
-          -1 // spriteAttributes
+          false, // shouldRepresentMonochromeColorByColorId
+          paletteLocation, // paletteLocation
+          bgMapAttributes, // bgMapAttributes
+          spriteAttributes // spriteAttributes
           );
         }
       }
@@ -9682,6 +9760,13 @@ var WasmBoyTsCore = (function () {
 
         if (Cpu.GBCEnabled && checkBitOnByte(3, spriteAttributes)) {
           vramBankId = 1;
+        } // Find which monochrome palette we should use
+
+
+        var paletteLocation = Graphics.memoryLocationSpritePaletteOne;
+
+        if (checkBitOnByte(4, spriteAttributes)) {
+          paletteLocation = Graphics.memoryLocationSpritePaletteTwo;
         } // Start Drawing our tiles
 
 
@@ -9698,10 +9783,10 @@ var WasmBoyTsCore = (function () {
             spriteColumn * 16 + tileLineY + i * 8, // Output line Y
             8 * 8, // Output Width
             OAM_TILES_LOCATION, // Wasm Memory Start
-            true, // shouldRepresentMonochromeColorByColorId
-            0, // paletteLocation
+            false, // shouldRepresentMonochromeColorByColorId
+            paletteLocation, // paletteLocation
             -1, // bgMapAttributes
-            -1 // spriteAttributes
+            spriteAttributes // spriteAttributes
             );
           }
         }
