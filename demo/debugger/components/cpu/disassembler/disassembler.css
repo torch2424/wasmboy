@@ -1,136 +1,40 @@
 .disassembler {
 }
 
-.disassembler .disassembler__container {
-  display: none;
-}
-
-.disassembler.disassembler--ready .disassembler__not-ready {
-  display: none;
-}
-
-.disassembler.disassembler--ready .disassembler__container {
-  display: block;
-}
-
-.disassembler .donut {
-  display: none;
-
-  position: absolute;
-  top: 25px;
-  right: 25px;
-  text-align: right;
-}
-
-.disassembler--control-loading .donut {
-  display: block;
-}
-
-.disassembler.disassembler--control-loading:not(.disassembler--running) .disassembler__container,
-.disassembler.disassembler--control-loading .disassembler__not-ready {
-  display: none;
-}
-
-.disassembler--running .donut {
-  display: block;
-}
-
-.disassembler.disassembler--running button {
-  opacity: 0.5;
-  pointer-events: none;
-  cursor: not-allowed;
-}
-
 .disassembler__container {
+  min-width: 475px;
   width: 475px;
-  overflow: hidden;
-  margin: 5px;
-}
-
-.disassembler__info {
-  margin: 5px;
-}
-
-.disassembler__control > * {
-  margin: 5px;
-}
-
-.disassembler__control .disassembler__control__jump-address {
-  width: 45px;
-}
-
-.disassembler__control .disassembler__control__run-opcodes {
-  width: 60px;
+  max-width: 475px;
 }
 
 /* Variables for our psuedo table */
-/*NOTE: Height MUST be kept in sync with this.rowHeight, see renderRow()*/
 :root {
   --disassembler-width: 450px;
-  --disassembler-height: 350px;
-  --disassembler-row-height: 30px;
   --disassembler-actions-width: 75px;
   --disassembler-hex-width: 75px;
   --disassembler-mnemonic-width: 75px;
-  --disassembler-column-spacing: 5px;
-  --disassembler-column-border: 1px solid black;
 }
 
 .disassembler__header-list {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-
   width: var(--disassembler-width);
-
-  border-top: 1px solid black;
-  border-left: 1px solid black;
-  border-right: 1px solid black;
-}
-
-.disassembler__header-list > * {
-  height: 50px !important;
 }
 
 .disassembler__list {
   width: var(--disassembler-width);
-  height: var(--disassembler-height);
-
-  border: 1px solid black;
-}
-
-.disassembler__list__virtual {
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-}
-
-.disassembler__list__virtual__row {
-  display: flex;
-  height: var(--disassembler-row-height) !important;
-  overflow: hidden;
-  justify-content: flex-start;
-  align-items: center;
-}
-
-.disassembler__list__virtual__row:hover {
-  background-color: rgba(0, 0, 0, 0.25);
 }
 
 .disassembler__header-list__actions,
 .disassembler__list__virtual__row__actions {
-  text-align: center;
-
+  min-width: var(--disassembler-actions-width);
   width: var(--disassembler-actions-width);
+  max-width: var(--disassembler-actions-width);
 }
 
 .disassembler__header-list__mnemonic,
 .disassembler__list__virtual__row__mnemonic {
-  text-align: center;
-
-  width: 100px;
-  height: var(--disassembler-row-height);
-  border-left: var(--disassembler-column-border);
+  min-width: var(--disassembler-mnemonic-width);
+  width: var(--disassembler-mnemonic-width);
+  max-width: var(--disassembler-mnemonic-width);
 }
 
 .disassembler__header-list__address,
@@ -141,32 +45,11 @@
 .disassembler__list__virtual__row__param,
 .disassembler__header-list__cycles,
 .disassembler__list__virtual__row__cycles {
-  text-align: center;
-
-  width: var(--disassembler-hex-width);
-  height: var(--disassembler-row-height);
-  border-left: var(--disassembler-column-border);
-}
-
-.disassembler__list__virtual__row__actions {
-  display: flex;
-  justify-content: space-evenly;
-  align-items: flex-start;
-
-  height: var(--disassembler-row-height);
+  min-width: var(--virtual-list-widget-hex-width);
+  width: var(--virtual-list-widget-hex-width);
+  max-width: var(--virtual-list-widget-hex-width);
 }
 
 .disassembler__list__virtual__row__actions > button {
-  position: relative;
-  padding: 5px;
-  margin-top: 3px;
-  width: 20px !important;
-  height: 20px !important;
-  cursor: pointer;
-}
-
-.disassembler__list__virtual__row__actions > button > div {
-  position: absolute;
-  top: 0;
-  left: 0;
+  width: 20px;
 }
