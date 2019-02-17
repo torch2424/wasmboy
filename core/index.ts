@@ -7,8 +7,6 @@ export {
   executeMultipleFrames,
   executeFrame,
   executeFrameAndCheckAudio,
-  executeFrameUntilBreakpoint,
-  executeFrameAndCheckAudioUntilBreakpoint,
   executeUntilCondition,
   executeStep
 } from './execute';
@@ -63,6 +61,14 @@ export {
   DEBUG_GAMEBOY_MEMORY_SIZE
 } from './constants';
 export { getWasmBoyOffsetFromGameBoyOffset } from './memory/memoryMap';
+export {
+  setProgramCounterBreakpoint,
+  resetProgramCounterBreakpoint,
+  setReadGbMemoryBreakpoint,
+  resetReadGbMemoryBreakpoint,
+  setWriteGbMemoryBreakpoint,
+  resetWriteGbMemoryBreakpoint
+} from './debug/breakpoints';
 export {
   getRegisterA,
   getRegisterB,

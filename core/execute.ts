@@ -9,6 +9,8 @@ import { Sound, getNumberOfSamplesInAudioBuffer, clearAudioBuffer } from './soun
 import { hexLog, log } from './helpers/index';
 import { u16Portable } from './portable/portable';
 
+import { Breakpoints } from './debug/breakpoints';
+
 export class Execute {
   // An even number bewlow the max 32 bit integer
   static stepsPerStepSet: i32 = 2000000000;
@@ -74,31 +76,18 @@ export function executeMultipleFrames(numberOfFrames: i32): i32 {
 // -1 = error
 // 0 = render a frame
 export function executeFrame(): i32 {
-  return executeUntilCondition(true, -1, -1);
+  return executeUntilCondition(true, -1);
 }
 
 // Public Function to run opcodes until,
 // a frame is ready, audio bufer is filled, or error
 export function executeFrameAndCheckAudio(maxAudioBuffer: i32 = 0): i32 {
-  return executeUntilCondition(true, maxAudioBuffer, -1);
-}
-
-// Public function to run opcodes until,
-// a breakpoint is reached
-export function executeFrameUntilBreakpoint(breakpoint: i32): i32 {
-  return executeUntilCondition(true, -1, breakpoint);
-}
-
-// Public function to run opcodes until,
-// A frame needs to be rendered
-// a breakpoint is reached
-export function executeFrameAndCheckAudioUntilBreakpoint(maxAudioBuffer: i32, breakpoint: i32): i32 {
-  return executeUntilCondition(true, maxAudioBuffer, breakpoint);
+  return executeUntilCondition(true, maxAudioBuffer);
 }
 
 // Base function that executes steps, and checks conditions
 // Return values:
-export function executeUntilCondition(checkMaxCyclesPerFrame: boolean = true, maxAudioBuffer: i32 = -1, breakpoint: i32 = -1): i32 {
+export function executeUntilCondition(checkMaxCyclesPerFrame: boolean = true, maxAudioBuffer: i32 = -1): i32 {
   // Common tracking variables
   let numberOfCycles: i32 = -1;
   let audioBufferSize: i32 = 1024;
@@ -112,9 +101,8 @@ export function executeUntilCondition(checkMaxCyclesPerFrame: boolean = true, ma
   let errorCondition: boolean = false;
   let frameCondition: boolean = false;
   let audioBufferCondition: boolean = false;
-  let breakpointCondition: boolean = false;
 
-  while (!errorCondition && !frameCondition && !audioBufferCondition && !breakpointCondition) {
+  while (!errorCondition && !frameCondition && !audioBufferCondition && !Breakpoints.reachedBreakpoint) {
     numberOfCycles = executeStep();
 
     // Error Condition
@@ -124,8 +112,6 @@ export function executeUntilCondition(checkMaxCyclesPerFrame: boolean = true, ma
       frameCondition = true;
     } else if (audioBufferSize > -1 && getNumberOfSamplesInAudioBuffer() >= audioBufferSize) {
       audioBufferCondition = true;
-    } else if (breakpoint > -1 && Cpu.programCounter === breakpoint) {
-      breakpointCondition = true;
     }
   }
 
@@ -143,7 +129,8 @@ export function executeUntilCondition(checkMaxCyclesPerFrame: boolean = true, ma
     return Execute.RESPONSE_CONDITION_AUDIO;
   }
 
-  if (breakpointCondition) {
+  if (Breakpoints.reachedBreakpoint) {
+    Breakpoints.reachedBreakpoint = false;
     return Execute.RESPONSE_CONDITION_BREAKPOINT;
   }
 
@@ -211,6 +198,11 @@ export function executeStep(): i32 {
 
   // Update our steps
   trackStepsRan(1);
+
+  // Check if we reached the CPU breakpoint
+  if (Cpu.programCounter === Breakpoints.programCounter) {
+    Breakpoints.reachedBreakpoint = true;
+  }
 
   return numberOfCycles;
 }

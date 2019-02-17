@@ -2,12 +2,17 @@
 import { checkWriteTraps } from './writeTraps';
 import { getWasmBoyOffsetFromGameBoyOffset } from './memoryMap';
 import { splitHighByte, splitLowByte, hexLog } from '../helpers/index';
+import { Breakpoints } from '../debug/breakpoints';
 
 export function eightBitStoreIntoGBMemory(gameboyOffset: i32, value: i32): void {
   store<u8>(getWasmBoyOffsetFromGameBoyOffset(gameboyOffset), value);
 }
 
 export function eightBitStoreIntoGBMemoryWithTraps(offset: i32, value: i32): void {
+  if (offset === Breakpoints.writeGbMemory) {
+    Breakpoints.reachedBreakpoint = true;
+  }
+
   if (checkWriteTraps(offset, value)) {
     eightBitStoreIntoGBMemory(offset, value);
   }
