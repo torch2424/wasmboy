@@ -43,6 +43,7 @@
 }
 
 .load-state-container__save-state {
+  position: relative;
   margin-left: 5px;
   margin-right: 5px;
   padding: 10px;
@@ -50,9 +51,21 @@
   word-wrap: break-word;
 
   transition: background-color 0.25s;
+  z-index: 1;
 }
 
 .load-state-container__save-state:hover {
   background-color: rgba(0, 0, 0, 0.25);
   cursor: pointer;
+}
+
+.load-state-container__save-state__delete {
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  cursor: pointer;
+
+  background-color: rgba(0.5, 0.5, 0.5, 0);
+  z-index: 2;
 }

@@ -109,11 +109,26 @@ export default class WasmBoyControls extends Component {
                 Pubx.get(PUBX_KEYS.MODAL).closeModal();
               }}
             >
-              <img src={saveState.screenshotCanvasDataURL} />
-              <h3>Date:</h3>
-              {saveStateDateString}
-              <h3>Auto:</h3>
-              {saveState.isAuto ? 'true' : 'false'}
+              <button
+                class="remove-default-button"
+                onClick={() => {
+                  this.loadState(saveState);
+                  Pubx.get(PUBX_KEYS.MODAL).closeModal();
+                }}
+              >
+                <img src={saveState.screenshotCanvasDataURL} />
+                <h3>Date:</h3>
+                {saveStateDateString}
+                <h3>Auto:</h3>
+                {saveState.isAuto ? 'true' : 'false'}
+              </button>
+
+              <button
+                onClick={event => this.showDeleteState(saveState, saveStateDateString)}
+                class="load-state-container__save-state__delete remove-default-button"
+              >
+                🗑️
+              </button>
             </div>
           );
         });
@@ -127,6 +142,28 @@ export default class WasmBoyControls extends Component {
         Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Error Getting Saving States... 😞');
         console.error(err);
       });
+  }
+
+  showDeleteState(saveState, saveStateDateString) {
+    console.log('yooo');
+
+    const deleteTask = async () => {
+      await WasmBoy.deleteState(saveState);
+    };
+
+    Pubx.get(PUBX_KEYS.MODAL).showModal(() => {
+      return (
+        <div>
+          <h1>Delete State</h1>
+          <img src={saveState.screenshotCanvasDataURL} />
+          <h3>Date:</h3>
+          {saveStateDateString}
+          <h3>Are you sure you want to do this?</h3>
+          <button onClick={() => Pubx.get(PUBX_KEYS.MODAL).closeModal()}>Cancel</button>
+          <button onClick={() => deleteTask()}>Delete</button>
+        </div>
+      );
+    });
   }
 
   loadState(saveState) {
