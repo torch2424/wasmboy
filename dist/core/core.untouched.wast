@@ -14955,8 +14955,8 @@
  )
  (func $core/debug/debug-memory/updateDebugGBMemory (; 209 ;) (type $_)
   (local $0 i32)
-  block $break|0
-   loop $repeat|0
+  loop $repeat|0
+   block $break|0
     local.get $0
     i32.const 65535
     i32.ge_s
@@ -14972,10 +14972,10 @@
     i32.add
     local.set $0
     br $repeat|0
-    unreachable
    end
-   unreachable
   end
+  i32.const 0
+  global.set $core/debug/breakpoints/Breakpoints.reachedBreakpoint
  )
  (func $start (; 210 ;) (type $_)
   current_memory
