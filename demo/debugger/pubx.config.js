@@ -1,4 +1,9 @@
 import { Pubx } from 'pubx';
+
+// re-export our keys
+import PUBX_KEYS_IMPORT from './pubx.keys';
+export const PUBX_KEYS = PUBX_KEYS_IMPORT;
+
 import { WasmBoy, WasmBoyUpdateCanvas } from './wasmboy';
 
 import devtoolsDetect from 'devtools-detect';
@@ -8,33 +13,40 @@ window.addEventListener('devtoolschange', e => {
   Pubx.get(PUBX_KEYS.MOBILE).update(e.detail.open);
 });
 
-export const PUBX_KEYS = {
-  LOADING: 'LOADING',
-  MOBILE: 'MOBILE',
-  MODAL: 'MODAL',
-  NOTIFICATION: 'NOTIFICATION',
-  WASMBOY: 'WASMBOY',
-  WIDGET: 'WIDGET'
-};
-
 export function PUBX_INITIALIZE() {
   // LOADING
   Pubx.publish(PUBX_KEYS.LOADING, {
     controlLoading: false,
+    loadPlayer: false,
     controlPromises: [],
-    addControlPromise: promise => {
-      Pubx.publish(PUBX_KEYS.LOADING, {
+    loadPlayerPromises: [],
+    addControlPromise: (promise, loadPlayer) => {
+      const newLoadingState = {
         controlLoading: true,
         controlPromises: [...Pubx.get(PUBX_KEYS.LOADING).controlPromises, promise]
-      });
+      };
+
+      if (loadPlayer) {
+        newLoadingState.loadPlayer = true;
+        newLoadingState.loadPlayerPromises = [...Pubx.get(PUBX_KEYS.LOADING).loadPlayerPromises, promise];
+      }
+
+      Pubx.publish(PUBX_KEYS.LOADING, newLoadingState);
 
       const finallyCallback = () => {
         const controlPromises = Pubx.get(PUBX_KEYS.LOADING).controlPromises;
+        const loadPlayerPromises = Pubx.get(PUBX_KEYS.LOADING).loadPlayerPromises;
+
         controlPromises.splice(controlPromises.indexOf(promise), 1);
+        if (loadPlayer) {
+          loadPlayerPromises.splice(loadPlayerPromises.indexOf(promise), 1);
+        }
 
         Pubx.publish(PUBX_KEYS.LOADING, {
           controlLoading: controlPromises.length > 0,
-          controlPromises
+          loadPlayer: loadPlayerPromises.length > 0,
+          controlPromises,
+          loadPlayerPromises
         });
       };
 

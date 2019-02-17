@@ -38,5 +38,5 @@ export default function(file, fileName) {
     DebuggerAnalytics.loadROMFail();
   });
 
-  Pubx.get(PUBX_KEYS.LOADING).addControlPromise(loadROMPromise);
+  Pubx.get(PUBX_KEYS.LOADING).addControlPromise(loadROMPromise, true);
 }
