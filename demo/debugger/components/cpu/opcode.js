@@ -43,16 +43,3 @@ export function runNumberOfOpcodes(numberOfOpcodes) {
   };
   return runNumberOfOpcodesTask();
 }
-
-// Function to keep running opcodes until a breakpoint is reached
-export function runUntilBreakPoint(passedBreakPoint) {
-  // Set our opcode breakpoint
-  const breakPoint = passedBreakPoint;
-
-  stepOpcode();
-
-  const breakPointTask = async breakPoint => {
-    await WasmBoy._playUntilBreakpoint(breakPoint);
-  };
-  return breakPointTask(breakPoint);
-}

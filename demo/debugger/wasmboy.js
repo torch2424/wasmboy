@@ -3,6 +3,9 @@
 import { WasmBoy as WasmBoyImport } from '../../dist/wasmboy.wasm.esm';
 export const WasmBoy = WasmBoyImport;
 
+import { Pubx } from 'pubx';
+import PUBX_KEYS from './pubx.keys';
+
 import DebuggerAnalytics from './analytics';
 
 // Variables to tell if our callbacks were ever run
@@ -68,6 +71,9 @@ const WasmBoyDefaultOptions = {
     if (canvasElement) {
       saveStateObject.screenshotCanvasDataURL = canvasElement.toDataURL();
     }
+  },
+  breakpointCallback: () => {
+    Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Reach Breakpoint! 🛑');
   },
   onReady: () => {
     console.log('onReady Callback Called!');

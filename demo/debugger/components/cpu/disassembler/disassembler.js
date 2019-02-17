@@ -13,7 +13,7 @@ import VirtualList from '../../virtualList';
 
 import { virtualListWidgetScrollToAddress } from '../../virtualListWidget';
 
-import { stepOpcode, runNumberOfOpcodes, runUntilBreakPoint } from '../opcode.js';
+import { stepOpcode, runNumberOfOpcodes } from '../opcode.js';
 
 import './disassembler.css';
 
@@ -218,41 +218,28 @@ export default class Disassembler extends Component {
     Pubx.get(PUBX_KEYS.LOADING).addControlPromise(runOpcodesPromise);
   }
 
-  runUntilBreakPoint() {
-    if (!WasmBoy.isReady()) {
-      Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Please load a ROM. 💾');
-      return;
-    }
-
-    const breakPoint = this.state.breakpoint;
-
-    if (!breakPoint || breakPoint < 0) {
-      Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Please enter a valid value. 😄');
-      return;
-    }
-
-    this.setState({
-      running: true
-    });
-
-    const runUntilBreakPointPromise = runUntilBreakPoint(breakPoint);
-    runUntilBreakPointPromise.then(() => {
-      Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification(
-        `Ran until the 0x${breakPoint
-          .toString(16)
-          .toUpperCase()
-          .padStart(4, '0')} break point! 😄`
-      );
-      this.update();
+  async toggleBreakpoint(address) {
+    if (this.state.breakpoint === address) {
+      await WasmBoy._runWasmExport('resetProgramCounterBreakpoint');
       this.setState({
-        running: false
+        breakpoint: -1
       });
-    });
-    Pubx.get(PUBX_KEYS.LOADING).addControlPromise(runUntilBreakPointPromise);
+    } else {
+      await WasmBoy._runWasmExport('setProgramCounterBreakpoint', [address]);
+      this.setState({
+        breakpoint: address
+      });
+    }
   }
 
   scrollToProgramCounter() {
     this.scrollToAddress(this.state.programCounter);
+  }
+
+  scrollToBreakpoint() {
+    if (this.state.breakpoint >= 0) {
+      this.scrollToAddress(this.state.breakpoint);
+    }
   }
 
   scrollToAddress(address) {
@@ -327,7 +314,7 @@ export default class Disassembler extends Component {
     return (
       <div class={classes.join(' ')}>
         <div class="disassembler__list__virtual__row__actions virtual-list-widget__list__virtual__row__button-row virtual-list-widget__list-cell">
-          <button class="remove-default-button" onClick={() => this.setState({ breakpoint: row.address })}>
+          <button class="remove-default-button" onClick={() => this.toggleBreakpoint(row.address)}>
             {this.state.breakpoint === row.address ? <div>🔴</div> : <div>⚪</div>}
           </button>
           <button class="remove-default-button" onClick={() => this.showInstructionInfo(row.gbOpcode)}>
@@ -399,19 +386,23 @@ export default class Disassembler extends Component {
                 .toUpperCase()
                 .padStart(2, '0')}
             </div>
-            <div>
-              Breakpoint: 0x
-              {this.state.breakpoint
-                .toString(16)
-                .toUpperCase()
-                .padStart(4, '0')}
-            </div>
+            {this.state.breakpoint >= 0 ? (
+              <div>
+                Breakpoint: 0x
+                {this.state.breakpoint
+                  .toString(16)
+                  .toUpperCase()
+                  .padStart(4, '0')}
+              </div>
+            ) : (
+              ''
+            )}
           </div>
 
           <div class="virtual-list-widget__control">
             <button onClick={() => this.stepOpcode()}>Step</button>
-            <button onClick={() => this.runUntilBreakPoint()}>Run Until Breakpoint</button>
             <button onClick={() => this.scrollToProgramCounter()}>Scroll To Program Counter</button>
+            {this.state.breakpoint >= 0 ? <button onClick={() => this.scrollToBreakpoint()}>Scroll To Breakpoint</button> : ''}
             <InputSubmit
               class="virtual-list-widget__control__jump-address"
               type="text"

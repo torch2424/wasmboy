@@ -133,6 +133,45 @@ export default class MemoryViewer extends Component {
     );
   }
 
+  scrollToBreakpoint(isRead) {
+    if (isRead && this.state.readBreakpoint >= 0) {
+      this.scrollToAddress(this.state.readBreakpoint);
+    }
+
+    if (!isRead && this.state.writeBreakpoint >= 0) {
+      this.scrollToAddress(this.state.writeBreakpoint);
+    }
+  }
+
+  async toggleBreakpoint(isRead, address) {
+    let breakpointKey = 'writeBreakpoint';
+    if (isRead) {
+      breakpointKey = 'readBreakpoint';
+    }
+
+    if (this.state[breakpointKey] === address) {
+      if (isRead) {
+        await WasmBoy._runWasmExport('resetReadGbMemoryBreakpoint');
+      } else {
+        await WasmBoy._runWasmExport('resetWriteGbMemoryBreakpoint');
+      }
+
+      const newBreakpointState = {};
+      newBreakpointState[breakpointKey] = -1;
+      this.setState(newBreakpointState);
+    } else {
+      if (isRead) {
+        await WasmBoy._runWasmExport('setReadGbMemoryBreakpoint', [address]);
+      } else {
+        await WasmBoy._runWasmExport('setWriteGbMemoryBreakpoint', [address]);
+      }
+
+      const newBreakpointState = {};
+      newBreakpointState[breakpointKey] = address;
+      this.setState(newBreakpointState);
+    }
+  }
+
   renderRow(row) {
     // Our classes for the row
     const classes = ['virtual-list-widget__list__virtual__row'];
@@ -144,10 +183,10 @@ export default class MemoryViewer extends Component {
     return (
       <div class={classes.join(' ')}>
         <div class="memory-viewer__list__virtual__row__breakpoint virtual-list-widget__list__virtual__row__button-row virtual-list-widget__list-cell">
-          <button class="remove-default-button" onClick={() => this.setState({ readBreakpoint: row.address })}>
+          <button class="remove-default-button" onClick={() => this.toggleBreakpoint(true, row.address)}>
             {this.state.readBreakpoint === row.address ? <div>R: 🔴</div> : <div>R: ⚪</div>}
           </button>
-          <button class="remove-default-button" onClick={() => this.setState({ writeBreakpoint: row.address })}>
+          <button class="remove-default-button" onClick={() => this.toggleBreakpoint(false, row.address)}>
             {this.state.writeBreakpoint === row.address ? <div>W: 🔴</div> : <div>W: ⚪</div>}
           </button>
         </div>
@@ -190,7 +229,37 @@ export default class MemoryViewer extends Component {
         <div class="donut" />
 
         <div class="memory-viewer__container virtual-list-widget__container">
+          <div class="virtual-list-widget__info">
+            {this.state.readBreakpoint >= 0 ? (
+              <div>
+                Read Breakpoint: 0x
+                {this.state.readBreakpoint
+                  .toString(16)
+                  .toUpperCase()
+                  .padStart(4, '0')}
+              </div>
+            ) : (
+              ''
+            )}
+            {this.state.writeBreakpoint >= 0 ? (
+              <div>
+                Write Breakpoint: 0x
+                {this.state.writeBreakpoint
+                  .toString(16)
+                  .toUpperCase()
+                  .padStart(4, '0')}
+              </div>
+            ) : (
+              ''
+            )}
+          </div>
           <div class="virtual-list-widget__control">
+            {this.state.readBreakpoint >= 0 ? <button onClick={() => this.scrollToBreakpoint(true)}>Scroll To Read Breakpoint</button> : ''}
+            {this.state.writeBreakpoint >= 0 ? (
+              <button onClick={() => this.scrollToBreakpoint(false)}>Scroll To Write Breakpoint</button>
+            ) : (
+              ''
+            )}
             <InputSubmit
               class="virtual-list-widget__control__jump-address"
               type="text"

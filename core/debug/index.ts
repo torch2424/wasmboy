@@ -14,3 +14,12 @@ export {
 } from './debug-cpu';
 export { getLY, drawBackgroundMapToWasmMemory, drawTileDataToWasmMemory, drawOamToWasmMemory } from './debug-graphics';
 export { getDIV, getTIMA, getTMA, getTAC } from './debug-timer';
+export {
+  Breakpoints,
+  setProgramCounterBreakpoint,
+  resetProgramCounterBreakpoint,
+  setReadGbMemoryBreakpoint,
+  resetReadGbMemoryBreakpoint,
+  setWriteGbMemoryBreakpoint,
+  resetWriteGbMemoryBreakpoint
+} from './breakpoints';

@@ -42,7 +42,7 @@ export function virtualListWidgetScrollToAddress(address, data, base, rowHeight,
       const difference = listRect.y - rowRect.y;
       if (difference > 0) {
         top = virtualListElement.scrollTop - difference;
-        top -= this.rowHeight * rowOffset;
+        top -= rowHeight * rowOffset;
         virtualListElement.scrollTop = top;
       }
     });
