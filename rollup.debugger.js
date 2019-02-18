@@ -25,7 +25,8 @@ const writeIndexHtmlToBuild = bundleName => {
 };
 
 const babelPluginConfig = {
-  exclude: ['node_modules/**'],
+  // https://github.com/webpack/webpack/issues/2031#issuecomment-219040479
+  exclude: [/node_modules\/(?!(shared-gb)\/).*/],
   plugins: [
     ['@babel/plugin-proposal-class-properties'],
     ['@babel/plugin-proposal-object-rest-spread'],

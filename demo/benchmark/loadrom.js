@@ -8,8 +8,8 @@ import { sendAnalyticsEvent } from './analytics';
 import { fetchROMAsByteArray } from '../../lib/wasmboy/fetchrom.js';
 
 // Import our open source roms
-import { openSourceROMS } from '../openSourceROMs';
-import { getOpenSourceROMElements } from '../openSourceROMsPreact';
+import { getOpenSourceROMElements } from 'shared-gb/openSourceROMs/preactComponents';
+import 'shared-gb/openSourceROMs/preactComponents.css';
 
 export default class LoadROMSelector extends Component {
   constructor(props) {
