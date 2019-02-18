@@ -82,7 +82,7 @@ export function getColorizedGbHexColorFromPalette(colorId: i32, paletteMemoryLoc
 
   // Check which palette we got, to apply the right color layer
   let hexColor: i32 = 0;
-  if (paletteMemoryLocation === memoryLocationSpritePaletteOne) {
+  if (paletteMemoryLocation === Palette.memoryLocationSpritePaletteOne) {
     hexColor = Colors.obj0White;
 
     switch (color) {
@@ -98,7 +98,7 @@ export function getColorizedGbHexColorFromPalette(colorId: i32, paletteMemoryLoc
         hexColor = Colors.obj0Black;
         break;
     }
-  } else if (paletteMemoryLocation === memoryLocationSpritePaletteTwo) {
+  } else if (paletteMemoryLocation === Palette.memoryLocationSpritePaletteTwo) {
     hexColor = Colors.obj1White;
 
     switch (color) {

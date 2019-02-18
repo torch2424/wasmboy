@@ -5,22 +5,22 @@ import { DefaultColors, GreenColors } from './colors.constants';
 // Current / exported color
 export class Colors {
   //Bg
-  static readonly bgWhite: i32 = DefaultColors.bgWhite;
-  static readonly bgLightGrey: i32 = DefaultColors.bgLightGrey;
-  static readonly bgDarkGrey: i32 = DefaultColors.bgDarkGrey;
-  static readonly bglack: i32 = DefaultColors.bgBlack;
+  static bgWhite: i32 = DefaultColors.bgWhite;
+  static bgLightGrey: i32 = DefaultColors.bgLightGrey;
+  static bgDarkGrey: i32 = DefaultColors.bgDarkGrey;
+  static bgBlack: i32 = DefaultColors.bgBlack;
 
   // Obj 0
-  static readonly obj0White: i32 = DefaultColors.obj0White;
-  static readonly obj0LightGrey: i32 = DefaultColors.obj0LightGrey;
-  static readonly obj0DarkGrey: i32 = DefaultColors.obj0DarkGrey;
-  static readonly obj0Black: i32 = DefaultColors.obj0Black;
+  static obj0White: i32 = DefaultColors.obj0White;
+  static obj0LightGrey: i32 = DefaultColors.obj0LightGrey;
+  static obj0DarkGrey: i32 = DefaultColors.obj0DarkGrey;
+  static obj0Black: i32 = DefaultColors.obj0Black;
 
   // Obj1
-  static readonly obj1White: i32 = DefaultColors.obj1White;
-  static readonly obj1LightGrey: i32 = DefaultColors.obj1LightGrey;
-  static readonly obj1DarkGrey: i32 = DefaultColors.obj1DarkGrey;
-  static readonly obj1Black: i32 = DefaultColors.obj1Black;
+  static obj1White: i32 = DefaultColors.obj1White;
+  static obj1LightGrey: i32 = DefaultColors.obj1LightGrey;
+  static obj1DarkGrey: i32 = DefaultColors.obj1DarkGrey;
+  static obj1Black: i32 = DefaultColors.obj1Black;
 }
 
 export function initializeColors(): void {

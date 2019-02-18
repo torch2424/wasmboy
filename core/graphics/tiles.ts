@@ -2,7 +2,13 @@
 
 import { Cpu } from '../cpu/index';
 import { Graphics, loadFromVramBank, setPixelOnFrame } from './graphics';
-import { getMonochromeColorFromPalette, getRgbColorFromPalette, getColorComponentFromRgb } from './palette';
+import {
+  getMonochromeColorFromPalette,
+  getColorizedGbHexColorFromPalette,
+  getRgbColorFromPalette,
+  getColorComponentFromRgb
+} from './palette';
+import { getRedFromHexColor, getGreenFromHexColor, getBlueFromHexColor } from './colors';
 import { addPriorityforPixel } from './priority';
 // Assembly script really not feeling the reexport
 // using Skip Traps, because LCD has unrestricted access
@@ -106,10 +112,21 @@ export function drawPixelsFromLineOfTile(
           paletteLocation = Graphics.memoryLocationBackgroundPalette;
         }
 
-        let monochromeColor: i32 = getMonochromeColorFromPalette(paletteColorId, paletteLocation, shouldRepresentMonochromeColorByColorId);
-        red = monochromeColor;
-        green = monochromeColor;
-        blue = monochromeColor;
+        if (shouldRepresentMonochromeColorByColorId) {
+          let monochromeColor: i32 = getMonochromeColorFromPalette(
+            paletteColorId,
+            paletteLocation,
+            shouldRepresentMonochromeColorByColorId
+          );
+          red = monochromeColor;
+          green = monochromeColor;
+          blue = monochromeColor;
+        } else {
+          let hexColor: i32 = getColorizedGbHexColorFromPalette(paletteColorId, paletteLocation);
+          red = getRedFromHexColor(hexColor);
+          green = getGreenFromHexColor(hexColor);
+          blue = getBlueFromHexColor(hexColor);
+        }
       }
 
       // Finally Lets place a pixel in memory
