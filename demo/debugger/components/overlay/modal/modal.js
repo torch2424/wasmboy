@@ -4,7 +4,6 @@ import { h, Component } from 'preact';
 import { Pubx } from 'pubx';
 import { PUBX_KEYS } from '../../../pubx.config';
 import './modal.css';
-import '../../../../openSourceROMs.css';
 
 export default class Modal extends Component {
   constructor() {

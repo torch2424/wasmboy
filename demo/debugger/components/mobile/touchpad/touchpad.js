@@ -7,8 +7,10 @@ import { PUBX_KEYS } from '../../../pubx.config';
 
 import loadROM from '../../../loadROM';
 import DebuggerAnalytics from '../../../analytics';
-import { getOpenSourceROMElements } from '../../../../openSourceROMsPreact';
-import GoogleDrivePicker from '../../../../googleDrivePicker';
+
+import { getOpenSourceROMElements } from 'shared-gb/openSourceROMs/preactComponents';
+import GoogleDrivePicker from 'shared-gb/googleDrivePicker';
+import 'shared-gb/openSourceROMs/preactComponents.css';
 
 import AboutComponent from '../../other/about/about';
 

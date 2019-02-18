@@ -152,6 +152,7 @@
     "rollup-plugin-serve": "^0.6.0",
     "rollup-plugin-typescript": "^1.0.0",
     "rollup-plugin-url": "^2.1.0",
+    "shared-gb": "git+https://github.com/torch2424/shared-gb-js.git",
     "source-map-loader": "^0.2.4",
     "stats-lite": "^2.2.0",
     "traverse": "^0.6.6",

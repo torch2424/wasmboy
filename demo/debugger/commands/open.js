@@ -12,8 +12,9 @@ import DebuggerAnalytics from '../analytics';
 import loadROM from '../loadROM';
 import { PUBX_KEYS } from '../pubx.config';
 
-import { getOpenSourceROMElements } from '../../openSourceROMsPreact';
-import GoogleDrivePicker from '../../googleDrivePicker';
+import { getOpenSourceROMElements } from 'shared-gb/openSourceROMs/preactComponents';
+import GoogleDrivePicker from 'shared-gb/googleDrivePicker';
+import 'shared-gb/openSourceROMs/preactComponents.css';
 
 class OpenLocalFile extends Command {
   constructor() {
