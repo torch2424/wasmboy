@@ -13,7 +13,8 @@ import copy from 'rollup-plugin-copy-glob';
 import pkg from './package.json';
 
 const babelPluginConfig = {
-  exclude: ['node_modules/**'],
+  // https://github.com/webpack/webpack/issues/2031#issuecomment-219040479
+  exclude: [/node_modules\/(?!(shared-gb)\/).*/],
   plugins: [
     ['@babel/plugin-proposal-class-properties'],
     ['@babel/plugin-proposal-object-rest-spread'],
