@@ -3,6 +3,8 @@ import { Cpu } from '../cpu/index';
 import { Memory, eightBitLoadFromGBMemory, eightBitStoreIntoGBMemory } from '../memory/index';
 import { checkBitOnByte, resetBitOnByte, setBitOnByte, concatenateBytes, hexLog } from '../helpers/index';
 
+import { Colors } from './colors';
+
 // Class for GBC Color palletes
 // http://gbdev.gg8.se/wiki/articles/Video_Display#FF68_-_BCPS.2FBGPI_-_CGB_Mode_Only_-_Background_Palette_Index
 export class Palette {
@@ -10,6 +12,11 @@ export class Palette {
   static memoryLocationBackgroundPaletteData: i32 = 0xff69;
   static memoryLocationSpritePaletteIndex: i32 = 0xff6a;
   static memoryLocationSpritePaletteData: i32 = 0xff6b;
+
+  // Palettes
+  static readonly memoryLocationBackgroundPalette: i32 = 0xff47;
+  static readonly memoryLocationSpritePaletteOne: i32 = 0xff48;
+  static readonly memoryLocationSpritePaletteTwo: i32 = 0xff49;
 }
 
 export function initializePalette(): void {
@@ -28,7 +35,7 @@ export function initializePalette(): void {
   }
 }
 
-// Simple get pallete color or monochroime GB
+// Simple get pallete color or monochrome GB
 // shouldRepresentColorByColorId is good for debugging tile data for GBC games that don't have
 // monochromePalettes
 export function getMonochromeColorFromPalette(
@@ -64,6 +71,68 @@ export function getMonochromeColorFromPalette(
   }
 
   return rgbColor;
+}
+
+// Function to returns the Colorized color for a GB games
+export function getColorizedGbHexColorFromPalette(colorId: i32, paletteMemoryLocation: i32): i32 {
+  // Shift our paletteByte, 2 times for each color ID
+  // And off any extra bytes
+  // Return our Color (00 - white, 01 - light grey, 10 Dark grey, or 11 - Black)
+  let color: i32 = ((<i32>eightBitLoadFromGBMemory(paletteMemoryLocation)) >> (colorId * 2)) & 0x03;
+
+  // Check which palette we got, to apply the right color layer
+  let hexColor: i32 = 0;
+  if (paletteMemoryLocation === memoryLocationSpritePaletteOne) {
+    hexColor = Colors.obj0White;
+
+    switch (color) {
+      case 0:
+        break;
+      case 1:
+        hexColor = Colors.obj0LightGrey;
+        break;
+      case 2:
+        hexColor = Colors.obj0DarkGrey;
+        break;
+      case 3:
+        hexColor = Colors.obj0Black;
+        break;
+    }
+  } else if (paletteMemoryLocation === memoryLocationSpritePaletteTwo) {
+    hexColor = Colors.obj1White;
+
+    switch (color) {
+      case 0:
+        break;
+      case 1:
+        hexColor = Colors.obj1LightGrey;
+        break;
+      case 2:
+        hexColor = Colors.obj1DarkGrey;
+        break;
+      case 3:
+        hexColor = Colors.obj1Black;
+        break;
+    }
+  } else {
+    hexColor = Colors.bgWhite;
+
+    switch (color) {
+      case 0:
+        break;
+      case 1:
+        hexColor = Colors.bgLightGrey;
+        break;
+      case 2:
+        hexColor = Colors.bgDarkGrey;
+        break;
+      case 3:
+        hexColor = Colors.bgBlack;
+        break;
+    }
+  }
+
+  return hexColor;
 }
 
 export function writeColorPaletteToMemory(offset: i32, value: i32): void {
