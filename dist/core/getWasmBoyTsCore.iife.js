@@ -4094,6 +4094,43 @@ var WasmBoyTsCore = (function () {
         // 0x6000 For the Extra WRAM Banks
         return gameboyOffset - Memory.echoRamLocation + OTHER_GAMEBOY_INTERNAL_MEMORY_LOCATION;
     }
+  } // Breakpoints for memory / cpu
+
+
+  var Breakpoints =
+  /** @class */
+  function () {
+    function Breakpoints() {}
+
+    Breakpoints.programCounter = -1;
+    Breakpoints.readGbMemory = -1;
+    Breakpoints.writeGbMemory = -1;
+    Breakpoints.reachedBreakpoint = false;
+    return Breakpoints;
+  }();
+
+  function setProgramCounterBreakpoint(breakpoint) {
+    Breakpoints.programCounter = breakpoint;
+  }
+
+  function resetProgramCounterBreakpoint() {
+    Breakpoints.programCounter = -1;
+  }
+
+  function setReadGbMemoryBreakpoint(breakpoint) {
+    Breakpoints.readGbMemory = breakpoint;
+  }
+
+  function resetReadGbMemoryBreakpoint() {
+    Breakpoints.readGbMemory = -1;
+  }
+
+  function setWriteGbMemoryBreakpoint(breakpoint) {
+    Breakpoints.writeGbMemory = breakpoint;
+  }
+
+  function resetWriteGbMemoryBreakpoint() {
+    Breakpoints.writeGbMemory = -1;
   } // Store / Write memory access
 
 
@@ -4102,6 +4139,10 @@ var WasmBoyTsCore = (function () {
   }
 
   function eightBitStoreIntoGBMemoryWithTraps(offset, value) {
+    if (offset === Breakpoints.writeGbMemory) {
+      Breakpoints.reachedBreakpoint = true;
+    }
+
     if (checkWriteTraps(offset, value)) {
       eightBitStoreIntoGBMemory(offset, value);
     }
@@ -5288,6 +5329,10 @@ var WasmBoyTsCore = (function () {
   }
 
   function eightBitLoadFromGBMemoryWithTraps(offset) {
+    if (offset === Breakpoints.readGbMemory) {
+      Breakpoints.reachedBreakpoint = true;
+    }
+
     var readTrapResult = checkReadTraps(offset);
 
     switch (readTrapResult) {
@@ -9056,7 +9101,7 @@ var WasmBoyTsCore = (function () {
 
 
   function executeFrame() {
-    return executeUntilCondition(true, -1, -1);
+    return executeUntilCondition(true, -1);
   } // Public Function to run opcodes until,
   // a frame is ready, audio bufer is filled, or error
 
@@ -9066,35 +9111,18 @@ var WasmBoyTsCore = (function () {
       maxAudioBuffer = 0;
     }
 
-    return executeUntilCondition(true, maxAudioBuffer, -1);
-  } // Public function to run opcodes until,
-  // a breakpoint is reached
-
-
-  function executeFrameUntilBreakpoint(breakpoint) {
-    return executeUntilCondition(true, -1, breakpoint);
-  } // Public function to run opcodes until,
-  // A frame needs to be rendered
-  // a breakpoint is reached
-
-
-  function executeFrameAndCheckAudioUntilBreakpoint(maxAudioBuffer, breakpoint) {
-    return executeUntilCondition(true, maxAudioBuffer, breakpoint);
+    return executeUntilCondition(true, maxAudioBuffer);
   } // Base function that executes steps, and checks conditions
   // Return values:
 
 
-  function executeUntilCondition(checkMaxCyclesPerFrame, maxAudioBuffer, breakpoint) {
+  function executeUntilCondition(checkMaxCyclesPerFrame, maxAudioBuffer) {
     if (checkMaxCyclesPerFrame === void 0) {
       checkMaxCyclesPerFrame = true;
     }
 
     if (maxAudioBuffer === void 0) {
       maxAudioBuffer = -1;
-    }
-
-    if (breakpoint === void 0) {
-      breakpoint = -1;
     } // Common tracking variables
 
 
@@ -9110,9 +9138,8 @@ var WasmBoyTsCore = (function () {
     var errorCondition = false;
     var frameCondition = false;
     var audioBufferCondition = false;
-    var breakpointCondition = false;
 
-    while (!errorCondition && !frameCondition && !audioBufferCondition && !breakpointCondition) {
+    while (!errorCondition && !frameCondition && !audioBufferCondition && !Breakpoints.reachedBreakpoint) {
       numberOfCycles = executeStep(); // Error Condition
 
       if (numberOfCycles < 0) {
@@ -9121,8 +9148,6 @@ var WasmBoyTsCore = (function () {
         frameCondition = true;
       } else if (audioBufferSize > -1 && getNumberOfSamplesInAudioBuffer() >= audioBufferSize) {
         audioBufferCondition = true;
-      } else if (breakpoint > -1 && Cpu.programCounter === breakpoint) {
-        breakpointCondition = true;
       }
     } // Find our exit reason
 
@@ -9138,7 +9163,8 @@ var WasmBoyTsCore = (function () {
       return Execute.RESPONSE_CONDITION_AUDIO;
     }
 
-    if (breakpointCondition) {
+    if (Breakpoints.reachedBreakpoint) {
+      Breakpoints.reachedBreakpoint = false;
       return Execute.RESPONSE_CONDITION_BREAKPOINT;
     } // TODO: Boot ROM handling
     // There was an error, return -1, and push the program counter back to grab the error opcode
@@ -9199,7 +9225,12 @@ var WasmBoyTsCore = (function () {
 
     syncCycles(numberOfCycles); // Update our steps
 
-    trackStepsRan(1);
+    trackStepsRan(1); // Check if we reached the CPU breakpoint
+
+    if (Cpu.programCounter === Breakpoints.programCounter) {
+      Breakpoints.reachedBreakpoint = true;
+    }
+
     return numberOfCycles;
   } // Imports
   // Grow our memory to the specified size
@@ -9820,7 +9851,10 @@ var WasmBoyTsCore = (function () {
   function updateDebugGBMemory() {
     for (var i = 0; i < DEBUG_GAMEBOY_MEMORY_SIZE; i++) {
       store(DEBUG_GAMEBOY_MEMORY_LOCATION + i, eightBitLoadFromGBMemoryWithTraps(i));
-    }
+    } // Since we are debugging, we don't want to be responsible for tripping the breakpoints
+
+
+    Breakpoints.reachedBreakpoint = false;
   } // These are legacy aliases for the original WasmBoy api
   // WasmBoy
 
@@ -9858,8 +9892,6 @@ var WasmBoyTsCore = (function () {
     executeMultipleFrames: executeMultipleFrames,
     executeFrame: executeFrame,
     executeFrameAndCheckAudio: executeFrameAndCheckAudio,
-    executeFrameUntilBreakpoint: executeFrameUntilBreakpoint,
-    executeFrameAndCheckAudioUntilBreakpoint: executeFrameAndCheckAudioUntilBreakpoint,
     executeUntilCondition: executeUntilCondition,
     executeStep: executeStep,
     getCyclesPerCycleSet: getCyclesPerCycleSet,
@@ -9914,6 +9946,12 @@ var WasmBoyTsCore = (function () {
     DEBUG_GAMEBOY_MEMORY_LOCATION: DEBUG_GAMEBOY_MEMORY_LOCATION,
     DEBUG_GAMEBOY_MEMORY_SIZE: DEBUG_GAMEBOY_MEMORY_SIZE,
     getWasmBoyOffsetFromGameBoyOffset: getWasmBoyOffsetFromGameBoyOffset,
+    setProgramCounterBreakpoint: setProgramCounterBreakpoint,
+    resetProgramCounterBreakpoint: resetProgramCounterBreakpoint,
+    setReadGbMemoryBreakpoint: setReadGbMemoryBreakpoint,
+    resetReadGbMemoryBreakpoint: resetReadGbMemoryBreakpoint,
+    setWriteGbMemoryBreakpoint: setWriteGbMemoryBreakpoint,
+    resetWriteGbMemoryBreakpoint: resetWriteGbMemoryBreakpoint,
     getRegisterA: getRegisterA,
     getRegisterB: getRegisterB,
     getRegisterC: getRegisterC,

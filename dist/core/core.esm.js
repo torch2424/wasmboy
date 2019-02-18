@@ -3615,11 +3615,43 @@ function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset) {
     }
 }
 
+// Breakpoints for memory / cpu
+var Breakpoints = /** @class */ (function () {
+    function Breakpoints() {
+    }
+    Breakpoints.programCounter = -1;
+    Breakpoints.readGbMemory = -1;
+    Breakpoints.writeGbMemory = -1;
+    Breakpoints.reachedBreakpoint = false;
+    return Breakpoints;
+}());
+function setProgramCounterBreakpoint(breakpoint) {
+    Breakpoints.programCounter = breakpoint;
+}
+function resetProgramCounterBreakpoint() {
+    Breakpoints.programCounter = -1;
+}
+function setReadGbMemoryBreakpoint(breakpoint) {
+    Breakpoints.readGbMemory = breakpoint;
+}
+function resetReadGbMemoryBreakpoint() {
+    Breakpoints.readGbMemory = -1;
+}
+function setWriteGbMemoryBreakpoint(breakpoint) {
+    Breakpoints.writeGbMemory = breakpoint;
+}
+function resetWriteGbMemoryBreakpoint() {
+    Breakpoints.writeGbMemory = -1;
+}
+
 // Store / Write memory access
 function eightBitStoreIntoGBMemory(gameboyOffset, value) {
     store(getWasmBoyOffsetFromGameBoyOffset(gameboyOffset), value);
 }
 function eightBitStoreIntoGBMemoryWithTraps(offset, value) {
+    if (offset === Breakpoints.writeGbMemory) {
+        Breakpoints.reachedBreakpoint = true;
+    }
     if (checkWriteTraps(offset, value)) {
         eightBitStoreIntoGBMemory(offset, value);
     }
@@ -4688,6 +4720,9 @@ function eightBitLoadFromGBMemory(gameboyOffset) {
     return load(getWasmBoyOffsetFromGameBoyOffset(gameboyOffset));
 }
 function eightBitLoadFromGBMemoryWithTraps(offset) {
+    if (offset === Breakpoints.readGbMemory) {
+        Breakpoints.reachedBreakpoint = true;
+    }
     var readTrapResult = checkReadTraps(offset);
     switch (readTrapResult) {
         case -1:
@@ -8010,31 +8045,19 @@ function executeMultipleFrames(numberOfFrames) {
 // -1 = error
 // 0 = render a frame
 function executeFrame() {
-    return executeUntilCondition(true, -1, -1);
+    return executeUntilCondition(true, -1);
 }
 // Public Function to run opcodes until,
 // a frame is ready, audio bufer is filled, or error
 function executeFrameAndCheckAudio(maxAudioBuffer) {
     if (maxAudioBuffer === void 0) { maxAudioBuffer = 0; }
-    return executeUntilCondition(true, maxAudioBuffer, -1);
-}
-// Public function to run opcodes until,
-// a breakpoint is reached
-function executeFrameUntilBreakpoint(breakpoint) {
-    return executeUntilCondition(true, -1, breakpoint);
-}
-// Public function to run opcodes until,
-// A frame needs to be rendered
-// a breakpoint is reached
-function executeFrameAndCheckAudioUntilBreakpoint(maxAudioBuffer, breakpoint) {
-    return executeUntilCondition(true, maxAudioBuffer, breakpoint);
+    return executeUntilCondition(true, maxAudioBuffer);
 }
 // Base function that executes steps, and checks conditions
 // Return values:
-function executeUntilCondition(checkMaxCyclesPerFrame, maxAudioBuffer, breakpoint) {
+function executeUntilCondition(checkMaxCyclesPerFrame, maxAudioBuffer) {
     if (checkMaxCyclesPerFrame === void 0) { checkMaxCyclesPerFrame = true; }
     if (maxAudioBuffer === void 0) { maxAudioBuffer = -1; }
-    if (breakpoint === void 0) { breakpoint = -1; }
     // Common tracking variables
     var numberOfCycles = -1;
     var audioBufferSize = 1024;
@@ -8047,8 +8070,7 @@ function executeUntilCondition(checkMaxCyclesPerFrame, maxAudioBuffer, breakpoin
     var errorCondition = false;
     var frameCondition = false;
     var audioBufferCondition = false;
-    var breakpointCondition = false;
-    while (!errorCondition && !frameCondition && !audioBufferCondition && !breakpointCondition) {
+    while (!errorCondition && !frameCondition && !audioBufferCondition && !Breakpoints.reachedBreakpoint) {
         numberOfCycles = executeStep();
         // Error Condition
         if (numberOfCycles < 0) {
@@ -8059,9 +8081,6 @@ function executeUntilCondition(checkMaxCyclesPerFrame, maxAudioBuffer, breakpoin
         }
         else if (audioBufferSize > -1 && getNumberOfSamplesInAudioBuffer() >= audioBufferSize) {
             audioBufferCondition = true;
-        }
-        else if (breakpoint > -1 && Cpu.programCounter === breakpoint) {
-            breakpointCondition = true;
         }
     }
     // Find our exit reason
@@ -8074,7 +8093,8 @@ function executeUntilCondition(checkMaxCyclesPerFrame, maxAudioBuffer, breakpoin
     if (audioBufferCondition) {
         return Execute.RESPONSE_CONDITION_AUDIO;
     }
-    if (breakpointCondition) {
+    if (Breakpoints.reachedBreakpoint) {
+        Breakpoints.reachedBreakpoint = false;
         return Execute.RESPONSE_CONDITION_BREAKPOINT;
     }
     // TODO: Boot ROM handling
@@ -8129,6 +8149,10 @@ function executeStep() {
     syncCycles(numberOfCycles);
     // Update our steps
     trackStepsRan(1);
+    // Check if we reached the CPU breakpoint
+    if (Cpu.programCounter === Breakpoints.programCounter) {
+        Breakpoints.reachedBreakpoint = true;
+    }
     return numberOfCycles;
 }
 
@@ -8686,6 +8710,8 @@ function updateDebugGBMemory() {
     for (var i = 0; i < DEBUG_GAMEBOY_MEMORY_SIZE; i++) {
         store(DEBUG_GAMEBOY_MEMORY_LOCATION + i, eightBitLoadFromGBMemoryWithTraps(i));
     }
+    // Since we are debugging, we don't want to be responsible for tripping the breakpoints
+    Breakpoints.reachedBreakpoint = false;
 }
 
 // These are legacy aliases for the original WasmBoy api
@@ -8712,4 +8738,4 @@ var gameBytesLocation = CARTRIDGE_ROM_LOCATION;
 
 // Public Exports
 
-export { config, hasCoreStarted, saveState, loadState, isGBC, getStepsPerStepSet, getStepSets, getSteps, executeMultipleFrames, executeFrame, executeFrameAndCheckAudio, executeFrameUntilBreakpoint, executeFrameAndCheckAudioUntilBreakpoint, executeUntilCondition, executeStep, getCyclesPerCycleSet, getCycleSets, getCycles, setJoypadState, getNumberOfSamplesInAudioBuffer, clearAudioBuffer, WASMBOY_MEMORY_LOCATION, WASMBOY_MEMORY_SIZE, WASMBOY_WASM_PAGES, ASSEMBLYSCRIPT_MEMORY_LOCATION, ASSEMBLYSCRIPT_MEMORY_SIZE, WASMBOY_STATE_LOCATION, WASMBOY_STATE_SIZE, GAMEBOY_INTERNAL_MEMORY_LOCATION, GAMEBOY_INTERNAL_MEMORY_SIZE, VIDEO_RAM_LOCATION, VIDEO_RAM_SIZE, WORK_RAM_LOCATION, WORK_RAM_SIZE, OTHER_GAMEBOY_INTERNAL_MEMORY_LOCATION, OTHER_GAMEBOY_INTERNAL_MEMORY_SIZE, GRAPHICS_OUTPUT_LOCATION, GRAPHICS_OUTPUT_SIZE, GBC_PALETTE_LOCATION, GBC_PALETTE_SIZE, BG_PRIORITY_MAP_LOCATION, BG_PRIORITY_MAP_SIZE, FRAME_LOCATION, FRAME_SIZE, BACKGROUND_MAP_LOCATION, BACKGROUND_MAP_SIZE, TILE_DATA_LOCATION, TILE_DATA_SIZE, OAM_TILES_LOCATION, OAM_TILES_SIZE, AUDIO_BUFFER_LOCATION, AUDIO_BUFFER_SIZE, CHANNEL_1_BUFFER_LOCATION, CHANNEL_1_BUFFER_SIZE, CHANNEL_2_BUFFER_LOCATION, CHANNEL_2_BUFFER_SIZE, CHANNEL_3_BUFFER_LOCATION, CHANNEL_3_BUFFER_SIZE, CHANNEL_4_BUFFER_LOCATION, CHANNEL_4_BUFFER_SIZE, CARTRIDGE_RAM_LOCATION, CARTRIDGE_RAM_SIZE, CARTRIDGE_ROM_LOCATION, CARTRIDGE_ROM_SIZE, DEBUG_GAMEBOY_MEMORY_LOCATION, DEBUG_GAMEBOY_MEMORY_SIZE, getWasmBoyOffsetFromGameBoyOffset, getRegisterA, getRegisterB, getRegisterC, getRegisterD, getRegisterE, getRegisterH, getRegisterL, getRegisterF, getProgramCounter, getStackPointer, getOpcodeAtProgramCounter, getLY, drawBackgroundMapToWasmMemory, drawTileDataToWasmMemory, drawOamToWasmMemory, getDIV, getTIMA, getTMA, getTAC, updateDebugGBMemory, executeFrame as update, executeStep as emulationStep, getNumberOfSamplesInAudioBuffer as getAudioQueueIndex, clearAudioBuffer as resetAudioQueue, wasmMemorySize, wasmBoyInternalStateLocation, wasmBoyInternalStateSize, gameBoyInternalMemoryLocation, gameBoyInternalMemorySize, videoOutputLocation, frameInProgressVideoOutputLocation, gameboyColorPaletteLocation, gameboyColorPaletteSize, backgroundMapLocation, tileDataMap, soundOutputLocation, gameBytesLocation, gameRamBanksLocation };
+export { config, hasCoreStarted, saveState, loadState, isGBC, getStepsPerStepSet, getStepSets, getSteps, executeMultipleFrames, executeFrame, executeFrameAndCheckAudio, executeUntilCondition, executeStep, getCyclesPerCycleSet, getCycleSets, getCycles, setJoypadState, getNumberOfSamplesInAudioBuffer, clearAudioBuffer, WASMBOY_MEMORY_LOCATION, WASMBOY_MEMORY_SIZE, WASMBOY_WASM_PAGES, ASSEMBLYSCRIPT_MEMORY_LOCATION, ASSEMBLYSCRIPT_MEMORY_SIZE, WASMBOY_STATE_LOCATION, WASMBOY_STATE_SIZE, GAMEBOY_INTERNAL_MEMORY_LOCATION, GAMEBOY_INTERNAL_MEMORY_SIZE, VIDEO_RAM_LOCATION, VIDEO_RAM_SIZE, WORK_RAM_LOCATION, WORK_RAM_SIZE, OTHER_GAMEBOY_INTERNAL_MEMORY_LOCATION, OTHER_GAMEBOY_INTERNAL_MEMORY_SIZE, GRAPHICS_OUTPUT_LOCATION, GRAPHICS_OUTPUT_SIZE, GBC_PALETTE_LOCATION, GBC_PALETTE_SIZE, BG_PRIORITY_MAP_LOCATION, BG_PRIORITY_MAP_SIZE, FRAME_LOCATION, FRAME_SIZE, BACKGROUND_MAP_LOCATION, BACKGROUND_MAP_SIZE, TILE_DATA_LOCATION, TILE_DATA_SIZE, OAM_TILES_LOCATION, OAM_TILES_SIZE, AUDIO_BUFFER_LOCATION, AUDIO_BUFFER_SIZE, CHANNEL_1_BUFFER_LOCATION, CHANNEL_1_BUFFER_SIZE, CHANNEL_2_BUFFER_LOCATION, CHANNEL_2_BUFFER_SIZE, CHANNEL_3_BUFFER_LOCATION, CHANNEL_3_BUFFER_SIZE, CHANNEL_4_BUFFER_LOCATION, CHANNEL_4_BUFFER_SIZE, CARTRIDGE_RAM_LOCATION, CARTRIDGE_RAM_SIZE, CARTRIDGE_ROM_LOCATION, CARTRIDGE_ROM_SIZE, DEBUG_GAMEBOY_MEMORY_LOCATION, DEBUG_GAMEBOY_MEMORY_SIZE, getWasmBoyOffsetFromGameBoyOffset, setProgramCounterBreakpoint, resetProgramCounterBreakpoint, setReadGbMemoryBreakpoint, resetReadGbMemoryBreakpoint, setWriteGbMemoryBreakpoint, resetWriteGbMemoryBreakpoint, getRegisterA, getRegisterB, getRegisterC, getRegisterD, getRegisterE, getRegisterH, getRegisterL, getRegisterF, getProgramCounter, getStackPointer, getOpcodeAtProgramCounter, getLY, drawBackgroundMapToWasmMemory, drawTileDataToWasmMemory, drawOamToWasmMemory, getDIV, getTIMA, getTMA, getTAC, updateDebugGBMemory, executeFrame as update, executeStep as emulationStep, getNumberOfSamplesInAudioBuffer as getAudioQueueIndex, clearAudioBuffer as resetAudioQueue, wasmMemorySize, wasmBoyInternalStateLocation, wasmBoyInternalStateSize, gameBoyInternalMemoryLocation, gameBoyInternalMemorySize, videoOutputLocation, frameInProgressVideoOutputLocation, gameboyColorPaletteLocation, gameboyColorPaletteSize, backgroundMapLocation, tileDataMap, soundOutputLocation, gameBytesLocation, gameRamBanksLocation };
