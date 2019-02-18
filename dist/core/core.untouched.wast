@@ -13,9 +13,9 @@
  (type $iiiiiii_ (func (param i32 i32 i32 i32 i32 i32 i32)))
  (type $iiiii (func (param i32 i32 i32 i32) (result i32)))
  (type $iiiiiiii_ (func (param i32 i32 i32 i32 i32 i32 i32 i32)))
+ (type $FUNCSIG$v (func))
  (type $FUNCSIG$iiiiii (func (param i32 i32 i32 i32 i32) (result i32)))
  (type $FUNCSIG$iiiiiiiiiiiiii (func (param i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32) (result i32)))
- (type $FUNCSIG$v (func))
  (type $FUNCSIG$ii (func (param i32) (result i32)))
  (memory $0 0)
  (table $0 1 funcref)
@@ -739,33 +739,60 @@
   i32.const 255
   call $core/memory/store/eightBitStoreIntoGBMemory
  )
- (func $core/graphics/colors/initializeColors (; 6 ;) (type $_)
+ (func $core/graphics/colors/setColorizationPalette (; 6 ;) (type $FUNCSIG$v)
   i32.const 16777215
   global.set $core/graphics/colors/Colors.bgWhite
-  i32.const 5439232
+  i32.const 16745604
   global.set $core/graphics/colors/Colors.bgLightGrey
-  i32.const 16728576
+  i32.const 9714234
   global.set $core/graphics/colors/Colors.bgDarkGrey
   i32.const 0
   global.set $core/graphics/colors/Colors.bgBlack
   i32.const 16777215
   global.set $core/graphics/colors/Colors.obj0White
-  i32.const 5439232
+  i32.const 8126257
   global.set $core/graphics/colors/Colors.obj0LightGrey
-  i32.const 16728576
+  i32.const 33792
   global.set $core/graphics/colors/Colors.obj0DarkGrey
   i32.const 0
   global.set $core/graphics/colors/Colors.obj0Black
   i32.const 16777215
   global.set $core/graphics/colors/Colors.obj1White
-  i32.const 5439232
+  i32.const 6530559
   global.set $core/graphics/colors/Colors.obj1LightGrey
-  i32.const 16728576
+  i32.const 255
   global.set $core/graphics/colors/Colors.obj1DarkGrey
   i32.const 0
   global.set $core/graphics/colors/Colors.obj1Black
  )
- (func $core/graphics/graphics/initializeGraphics (; 7 ;) (type $_)
+ (func $core/graphics/colors/initializeColors (; 7 ;) (type $_)
+  i32.const 15921906
+  global.set $core/graphics/colors/Colors.bgWhite
+  i32.const 10526880
+  global.set $core/graphics/colors/Colors.bgLightGrey
+  i32.const 5789784
+  global.set $core/graphics/colors/Colors.bgDarkGrey
+  i32.const 526344
+  global.set $core/graphics/colors/Colors.bgBlack
+  i32.const 15921906
+  global.set $core/graphics/colors/Colors.obj0White
+  i32.const 10526880
+  global.set $core/graphics/colors/Colors.obj0LightGrey
+  i32.const 5789784
+  global.set $core/graphics/colors/Colors.obj0DarkGrey
+  i32.const 526344
+  global.set $core/graphics/colors/Colors.obj0Black
+  i32.const 15921906
+  global.set $core/graphics/colors/Colors.obj1White
+  i32.const 10526880
+  global.set $core/graphics/colors/Colors.obj1LightGrey
+  i32.const 5789784
+  global.set $core/graphics/colors/Colors.obj1DarkGrey
+  i32.const 526344
+  global.set $core/graphics/colors/Colors.obj1Black
+  call $core/graphics/colors/setColorizationPalette
+ )
+ (func $core/graphics/graphics/initializeGraphics (; 8 ;) (type $_)
   i32.const 0
   global.set $core/graphics/graphics/Graphics.currentCycles
   i32.const 0
@@ -826,7 +853,7 @@
   call $core/memory/store/eightBitStoreIntoGBMemory
   call $core/graphics/colors/initializeColors
  )
- (func $core/graphics/palette/initializePalette (; 8 ;) (type $_)
+ (func $core/graphics/palette/initializePalette (; 9 ;) (type $_)
   global.get $core/cpu/cpu/Cpu.GBCEnabled
   if
    i32.const 65384
@@ -856,7 +883,7 @@
    call $core/memory/store/eightBitStoreIntoGBMemory
   end
  )
- (func $core/sound/channel1/Channel1.initialize (; 9 ;) (type $_)
+ (func $core/sound/channel1/Channel1.initialize (; 10 ;) (type $_)
   i32.const 65296
   i32.const 128
   call $core/memory/store/eightBitStoreIntoGBMemory
@@ -873,7 +900,7 @@
   i32.const 191
   call $core/memory/store/eightBitStoreIntoGBMemory
  )
- (func $core/sound/channel2/Channel2.initialize (; 10 ;) (type $_)
+ (func $core/sound/channel2/Channel2.initialize (; 11 ;) (type $_)
   i32.const 65301
   i32.const 255
   call $core/memory/store/eightBitStoreIntoGBMemory
@@ -890,7 +917,7 @@
   i32.const 184
   call $core/memory/store/eightBitStoreIntoGBMemory
  )
- (func $core/sound/channel3/Channel3.initialize (; 11 ;) (type $_)
+ (func $core/sound/channel3/Channel3.initialize (; 12 ;) (type $_)
   i32.const 65306
   i32.const 127
   call $core/memory/store/eightBitStoreIntoGBMemory
@@ -909,7 +936,7 @@
   i32.const 1
   global.set $core/sound/channel3/Channel3.volumeCodeChanged
  )
- (func $core/sound/channel4/Channel4.initialize (; 12 ;) (type $_)
+ (func $core/sound/channel4/Channel4.initialize (; 13 ;) (type $_)
   i32.const 65311
   i32.const 255
   call $core/memory/store/eightBitStoreIntoGBMemory
@@ -926,7 +953,7 @@
   i32.const 191
   call $core/memory/store/eightBitStoreIntoGBMemory
  )
- (func $core/sound/accumulator/initializeSoundAccumulator (; 13 ;) (type $_)
+ (func $core/sound/accumulator/initializeSoundAccumulator (; 14 ;) (type $_)
   i32.const 15
   global.set $core/sound/accumulator/SoundAccumulator.channel1Sample
   i32.const 15
@@ -954,7 +981,7 @@
   i32.const 0
   global.set $core/sound/accumulator/SoundAccumulator.needToRemixSamples
  )
- (func $core/sound/sound/initializeSound (; 14 ;) (type $_)
+ (func $core/sound/sound/initializeSound (; 15 ;) (type $_)
   i32.const 0
   global.set $core/sound/sound/Sound.currentCycles
   i32.const 0
@@ -1002,7 +1029,7 @@
   call $core/memory/store/eightBitStoreIntoGBMemory
   call $core/sound/accumulator/initializeSoundAccumulator
  )
- (func $core/interrupts/interrupts/Interrupts.updateInterruptEnabled (; 15 ;) (type $i_) (param $0 i32)
+ (func $core/interrupts/interrupts/Interrupts.updateInterruptEnabled (; 16 ;) (type $i_) (param $0 i32)
   local.get $0
   i32.const 1
   i32.and
@@ -1036,7 +1063,7 @@
   local.get $0
   global.set $core/interrupts/interrupts/Interrupts.interruptsEnabledValue
  )
- (func $core/interrupts/interrupts/Interrupts.updateInterruptRequested (; 16 ;) (type $i_) (param $0 i32)
+ (func $core/interrupts/interrupts/Interrupts.updateInterruptRequested (; 17 ;) (type $i_) (param $0 i32)
   local.get $0
   i32.const 1
   i32.and
@@ -1070,7 +1097,7 @@
   local.get $0
   global.set $core/interrupts/interrupts/Interrupts.interruptsRequestedValue
  )
- (func $core/timers/timers/initializeTimers (; 17 ;) (type $_)
+ (func $core/timers/timers/initializeTimers (; 18 ;) (type $_)
   i32.const 0
   global.set $core/timers/timers/Timers.currentCycles
   i32.const 0
@@ -1107,7 +1134,7 @@
   i32.const 248
   global.set $core/timers/timers/Timers.timerInputClock
  )
- (func $core/serial/serial/initializeSerial (; 18 ;) (type $_)
+ (func $core/serial/serial/initializeSerial (; 19 ;) (type $_)
   i32.const 0
   global.set $core/serial/serial/Serial.currentCycles
   i32.const 0
@@ -1135,7 +1162,7 @@
    global.set $core/serial/serial/Serial.transferStartFlag
   end
  )
- (func $core/core/initialize (; 19 ;) (type $_)
+ (func $core/core/initialize (; 20 ;) (type $_)
   (local $0 i32)
   (local $1 i32)
   i32.const 323
@@ -1235,7 +1262,7 @@
   i32.const 0
   global.set $core/execute/Execute.steps
  )
- (func $core/core/config (; 20 ;) (type $iiiiiiiiii_) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (param $7 i32) (param $8 i32) (param $9 i32)
+ (func $core/core/config (; 21 ;) (type $iiiiiiiiii_) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (param $7 i32) (param $8 i32) (param $9 i32)
   local.get $0
   i32.const 0
   i32.gt_s
@@ -1338,7 +1365,7 @@
   end
   call $core/core/initialize
  )
- (func $core/core/hasCoreStarted (; 21 ;) (type $i) (result i32)
+ (func $core/core/hasCoreStarted (; 22 ;) (type $i) (result i32)
   global.get $core/core/hasStarted
   if
    i32.const 1
@@ -1346,7 +1373,7 @@
   end
   i32.const 0
  )
- (func $core/cpu/cpu/Cpu.saveState (; 22 ;) (type $_)
+ (func $core/cpu/cpu/Cpu.saveState (; 23 ;) (type $_)
   i32.const 1024
   global.get $core/cpu/cpu/Cpu.registerA
   i32.store8
@@ -1421,7 +1448,7 @@
    i32.store8
   end
  )
- (func $core/memory/memory/Memory.saveState (; 23 ;) (type $_)
+ (func $core/memory/memory/Memory.saveState (; 24 ;) (type $_)
   i32.const 1224
   global.get $core/memory/memory/Memory.currentRomBank
   i32.store16
@@ -1499,7 +1526,7 @@
    i32.store8
   end
  )
- (func $core/timers/timers/Timers.saveState (; 24 ;) (type $_)
+ (func $core/timers/timers/Timers.saveState (; 25 ;) (type $_)
   i32.const 1274
   global.get $core/timers/timers/Timers.currentCycles
   i32.store
@@ -1530,7 +1557,7 @@
   global.get $core/timers/timers/Timers.timerCounter
   call $core/memory/store/eightBitStoreIntoGBMemory
  )
- (func $core/sound/channel1/Channel1.saveState (; 25 ;) (type $_)
+ (func $core/sound/channel1/Channel1.saveState (; 26 ;) (type $_)
   global.get $core/sound/channel1/Channel1.isEnabled
   if
    i32.const 1374
@@ -1576,7 +1603,7 @@
   global.get $core/sound/channel1/Channel1.sweepShadowFrequency
   i32.store16
  )
- (func $core/sound/channel2/Channel2.saveState (; 26 ;) (type $_)
+ (func $core/sound/channel2/Channel2.saveState (; 27 ;) (type $_)
   global.get $core/sound/channel2/Channel2.isEnabled
   if
    i32.const 1424
@@ -1606,7 +1633,7 @@
   global.get $core/sound/channel2/Channel2.waveFormPositionOnDuty
   i32.store8
  )
- (func $core/sound/channel4/Channel4.saveState (; 27 ;) (type $_)
+ (func $core/sound/channel4/Channel4.saveState (; 28 ;) (type $_)
   global.get $core/sound/channel4/Channel4.isEnabled
   if
    i32.const 1524
@@ -1633,7 +1660,7 @@
   global.get $core/sound/channel4/Channel4.linearFeedbackShiftRegister
   i32.store16
  )
- (func $core/core/saveState (; 28 ;) (type $_)
+ (func $core/core/saveState (; 29 ;) (type $_)
   call $core/cpu/cpu/Cpu.saveState
   i32.const 1074
   global.get $core/graphics/graphics/Graphics.scanlineCycleCounter
@@ -1700,7 +1727,7 @@
   i32.const 0
   global.set $core/core/hasStarted
  )
- (func $core/cpu/cpu/Cpu.loadState (; 29 ;) (type $_)
+ (func $core/cpu/cpu/Cpu.loadState (; 30 ;) (type $_)
   i32.const 1024
   i32.load8_u
   global.set $core/cpu/cpu/Cpu.registerA
@@ -1779,7 +1806,7 @@
   end
   global.set $core/cpu/cpu/Cpu.isStopped
  )
- (func $core/graphics/lcd/resetLcd (; 30 ;) (type $i_) (param $0 i32)
+ (func $core/graphics/lcd/resetLcd (; 31 ;) (type $i_) (param $0 i32)
   (local $1 i32)
   i32.const 0
   global.set $core/graphics/graphics/Graphics.scanlineCycleCounter
@@ -1824,7 +1851,7 @@
    end
   end
  )
- (func $core/graphics/lcd/Lcd.updateLcdControl (; 31 ;) (type $i_) (param $0 i32)
+ (func $core/graphics/lcd/Lcd.updateLcdControl (; 32 ;) (type $i_) (param $0 i32)
   (local $1 i32)
   global.get $core/graphics/lcd/Lcd.enabled
   local.set $1
@@ -1898,7 +1925,7 @@
    call $core/graphics/lcd/resetLcd
   end
  )
- (func $core/interrupts/interrupts/Interrupts.loadState (; 32 ;) (type $_)
+ (func $core/interrupts/interrupts/Interrupts.loadState (; 33 ;) (type $_)
   block $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory (result i32)
    i32.const 1
    i32.const 1124
@@ -1928,7 +1955,7 @@
   call $core/memory/load/eightBitLoadFromGBMemory
   call $core/interrupts/interrupts/Interrupts.updateInterruptRequested
  )
- (func $core/memory/memory/Memory.loadState (; 33 ;) (type $_)
+ (func $core/memory/memory/Memory.loadState (; 34 ;) (type $_)
   i32.const 1224
   i32.load16_u
   global.set $core/memory/memory/Memory.currentRomBank
@@ -2013,7 +2040,7 @@
   end
   global.set $core/memory/memory/Memory.isMBC5
  )
- (func $core/timers/timers/Timers.loadState (; 34 ;) (type $_)
+ (func $core/timers/timers/Timers.loadState (; 35 ;) (type $_)
   i32.const 1274
   i32.load
   global.set $core/timers/timers/Timers.currentCycles
@@ -2052,11 +2079,11 @@
   call $core/memory/load/eightBitLoadFromGBMemory
   global.set $core/timers/timers/Timers.timerInputClock
  )
- (func $core/sound/sound/clearAudioBuffer (; 35 ;) (type $_)
+ (func $core/sound/sound/clearAudioBuffer (; 36 ;) (type $_)
   i32.const 0
   global.set $core/sound/sound/Sound.audioQueueIndex
  )
- (func $core/sound/channel1/Channel1.loadState (; 36 ;) (type $_)
+ (func $core/sound/channel1/Channel1.loadState (; 37 ;) (type $_)
   block $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory (result i32)
    i32.const 1
    i32.const 1374
@@ -2104,7 +2131,7 @@
   i32.load16_u
   global.set $core/sound/channel1/Channel1.sweepShadowFrequency
  )
- (func $core/sound/channel2/Channel2.loadState (; 37 ;) (type $_)
+ (func $core/sound/channel2/Channel2.loadState (; 38 ;) (type $_)
   block $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory (result i32)
    i32.const 1
    i32.const 1424
@@ -2135,7 +2162,7 @@
   i32.load8_u
   global.set $core/sound/channel2/Channel2.waveFormPositionOnDuty
  )
- (func $core/sound/channel4/Channel4.loadState (; 38 ;) (type $_)
+ (func $core/sound/channel4/Channel4.loadState (; 39 ;) (type $_)
   block $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory (result i32)
    i32.const 1
    i32.const 1524
@@ -2163,7 +2190,7 @@
   i32.load16_u
   global.set $core/sound/channel4/Channel4.linearFeedbackShiftRegister
  )
- (func $core/core/loadState (; 39 ;) (type $_)
+ (func $core/core/loadState (; 40 ;) (type $_)
   (local $0 i32)
   call $core/cpu/cpu/Cpu.loadState
   i32.const 1074
@@ -2248,7 +2275,7 @@
   i32.const 0
   global.set $core/execute/Execute.steps
  )
- (func $core/core/isGBC (; 40 ;) (type $i) (result i32)
+ (func $core/core/isGBC (; 41 ;) (type $i) (result i32)
   global.get $core/cpu/cpu/Cpu.GBCEnabled
   if
    i32.const 1
@@ -2256,16 +2283,16 @@
   end
   i32.const 0
  )
- (func $core/execute/getStepsPerStepSet (; 41 ;) (type $i) (result i32)
+ (func $core/execute/getStepsPerStepSet (; 42 ;) (type $i) (result i32)
   global.get $core/execute/Execute.stepsPerStepSet
  )
- (func $core/execute/getStepSets (; 42 ;) (type $i) (result i32)
+ (func $core/execute/getStepSets (; 43 ;) (type $i) (result i32)
   global.get $core/execute/Execute.stepSets
  )
- (func $core/execute/getSteps (; 43 ;) (type $i) (result i32)
+ (func $core/execute/getSteps (; 44 ;) (type $i) (result i32)
   global.get $core/execute/Execute.steps
  )
- (func $core/graphics/backgroundWindow/drawLineOfTileFromTileCache (; 44 ;) (type $FUNCSIG$iiiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (result i32)
+ (func $core/graphics/backgroundWindow/drawLineOfTileFromTileCache (; 45 ;) (type $FUNCSIG$iiiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (result i32)
   (local $5 i32)
   (local $6 i32)
   (local $7 i32)
@@ -2462,7 +2489,7 @@
   end
   local.get $8
  )
- (func $core/graphics/tiles/getTileDataAddress (; 45 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/graphics/tiles/getTileDataAddress (; 46 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   local.get $0
   i32.const 34816
@@ -2494,7 +2521,7 @@
   local.get $0
   i32.add
  )
- (func $core/graphics/palette/getRgbColorFromPalette (; 46 ;) (type $iiii) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $core/graphics/palette/getRgbColorFromPalette (; 47 ;) (type $iiii) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   local.get $0
   i32.const 3
   i32.shl
@@ -2536,7 +2563,7 @@
   i32.shl
   i32.or
  )
- (func $core/graphics/palette/getColorizedGbHexColorFromPalette (; 47 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/graphics/palette/getColorizedGbHexColorFromPalette (; 48 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   local.get $1
   call $core/memory/load/eightBitLoadFromGBMemory
   local.get $0
@@ -2635,7 +2662,7 @@
   end
   local.get $1
  )
- (func $core/graphics/tiles/drawPixelsFromLineOfTile (; 48 ;) (type $FUNCSIG$iiiiiiiiiiiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (param $7 i32) (param $8 i32) (param $9 i32) (param $10 i32) (param $11 i32) (param $12 i32) (result i32)
+ (func $core/graphics/tiles/drawPixelsFromLineOfTile (; 49 ;) (type $FUNCSIG$iiiiiiiiiiiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (param $7 i32) (param $8 i32) (param $9 i32) (param $10 i32) (param $11 i32) (param $12 i32) (result i32)
   (local $13 i32)
   (local $14 i32)
   (local $15 i32)
@@ -2874,7 +2901,7 @@
   end
   local.get $13
  )
- (func $core/graphics/backgroundWindow/drawLineOfTileFromTileId (; 49 ;) (type $iiiiiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (result i32)
+ (func $core/graphics/backgroundWindow/drawLineOfTileFromTileId (; 50 ;) (type $iiiiiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (result i32)
   (local $7 i32)
   (local $8 i32)
   (local $9 i32)
@@ -2945,7 +2972,7 @@
   i32.const -1
   call $core/graphics/tiles/drawPixelsFromLineOfTile
  )
- (func $core/graphics/backgroundWindow/drawColorPixelFromTileId (; 50 ;) (type $iiiiiii_) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32)
+ (func $core/graphics/backgroundWindow/drawColorPixelFromTileId (; 51 ;) (type $iiiiiii_) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32)
   local.get $5
   local.get $6
   call $core/graphics/tiles/getTileDataAddress
@@ -3106,7 +3133,7 @@
   select
   i32.store8
  )
- (func $core/graphics/backgroundWindow/drawMonochromePixelFromTileId (; 51 ;) (type $iiiiii_) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32)
+ (func $core/graphics/backgroundWindow/drawMonochromePixelFromTileId (; 52 ;) (type $iiiiii_) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32)
   local.get $4
   local.get $5
   call $core/graphics/tiles/getTileDataAddress
@@ -3208,7 +3235,7 @@
   i32.and
   i32.store8
  )
- (func $core/graphics/backgroundWindow/drawBackgroundWindowScanline (; 52 ;) (type $iiiiii_) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32)
+ (func $core/graphics/backgroundWindow/drawBackgroundWindowScanline (; 53 ;) (type $iiiiii_) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32)
   (local $6 i32)
   (local $7 i32)
   (local $8 i32)
@@ -3333,7 +3360,7 @@
    end
   end
  )
- (func $core/graphics/backgroundWindow/renderBackground (; 53 ;) (type $iii_) (param $0 i32) (param $1 i32) (param $2 i32)
+ (func $core/graphics/backgroundWindow/renderBackground (; 54 ;) (type $iii_) (param $0 i32) (param $1 i32) (param $2 i32)
   (local $3 i32)
   global.get $core/graphics/graphics/Graphics.scrollX
   local.set $3
@@ -3357,7 +3384,7 @@
   local.get $3
   call $core/graphics/backgroundWindow/drawBackgroundWindowScanline
  )
- (func $core/graphics/backgroundWindow/renderWindow (; 54 ;) (type $iii_) (param $0 i32) (param $1 i32) (param $2 i32)
+ (func $core/graphics/backgroundWindow/renderWindow (; 55 ;) (type $iii_) (param $0 i32) (param $1 i32) (param $2 i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
@@ -3387,7 +3414,7 @@
   local.get $5
   call $core/graphics/backgroundWindow/drawBackgroundWindowScanline
  )
- (func $core/graphics/sprites/renderSprites (; 55 ;) (type $ii_) (param $0 i32) (param $1 i32)
+ (func $core/graphics/sprites/renderSprites (; 56 ;) (type $ii_) (param $0 i32) (param $1 i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -3801,7 +3828,7 @@
    unreachable
   end
  )
- (func $core/graphics/graphics/_drawScanline (; 56 ;) (type $i_) (param $0 i32)
+ (func $core/graphics/graphics/_drawScanline (; 57 ;) (type $i_) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   i32.const 34816
@@ -3845,7 +3872,7 @@
    call $core/graphics/sprites/renderSprites
   end
  )
- (func $core/graphics/graphics/_renderEntireFrame (; 57 ;) (type $_)
+ (func $core/graphics/graphics/_renderEntireFrame (; 58 ;) (type $_)
   (local $0 i32)
   block $break|0
    loop $repeat|0
@@ -3867,7 +3894,7 @@
    unreachable
   end
  )
- (func $core/graphics/priority/clearPriorityMap (; 58 ;) (type $_)
+ (func $core/graphics/priority/clearPriorityMap (; 59 ;) (type $_)
   (local $0 i32)
   (local $1 i32)
   loop $repeat|0
@@ -3907,7 +3934,7 @@
    end
   end
  )
- (func $core/interrupts/interrupts/_requestInterrupt (; 59 ;) (type $i_) (param $0 i32)
+ (func $core/interrupts/interrupts/_requestInterrupt (; 60 ;) (type $i_) (param $0 i32)
   (local $1 i32)
   i32.const 65295
   call $core/memory/load/eightBitLoadFromGBMemory
@@ -3921,13 +3948,13 @@
   local.get $1
   call $core/memory/store/eightBitStoreIntoGBMemory
  )
- (func $core/interrupts/interrupts/requestLcdInterrupt (; 60 ;) (type $_)
+ (func $core/interrupts/interrupts/requestLcdInterrupt (; 61 ;) (type $_)
   i32.const 1
   global.set $core/interrupts/interrupts/Interrupts.isLcdInterruptRequested
   i32.const 1
   call $core/interrupts/interrupts/_requestInterrupt
  )
- (func $core/sound/channel1/Channel1.setFrequency (; 61 ;) (type $i_) (param $0 i32)
+ (func $core/sound/channel1/Channel1.setFrequency (; 62 ;) (type $i_) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   i32.const 65300
@@ -3960,7 +3987,7 @@
   i32.or
   global.set $core/sound/channel1/Channel1.frequency
  )
- (func $core/sound/channel1/calculateSweepAndCheckOverflow (; 62 ;) (type $_)
+ (func $core/sound/channel1/calculateSweepAndCheckOverflow (; 63 ;) (type $_)
   (local $0 i32)
   (local $1 i32)
   global.get $core/sound/channel1/Channel1.sweepShadowFrequency
@@ -4015,7 +4042,7 @@
    global.set $core/sound/channel1/Channel1.isEnabled
   end
  )
- (func $core/sound/channel1/Channel1.updateSweep (; 63 ;) (type $_)
+ (func $core/sound/channel1/Channel1.updateSweep (; 64 ;) (type $_)
   global.get $core/sound/channel1/Channel1.sweepCounter
   i32.const 1
   i32.sub
@@ -4037,7 +4064,7 @@
    end
   end
  )
- (func $core/sound/channel1/Channel1.updateEnvelope (; 64 ;) (type $_)
+ (func $core/sound/channel1/Channel1.updateEnvelope (; 65 ;) (type $_)
   (local $0 i32)
   global.get $core/sound/channel1/Channel1.envelopeCounter
   i32.const 1
@@ -4083,7 +4110,7 @@
    end
   end
  )
- (func $core/sound/channel2/Channel2.updateEnvelope (; 65 ;) (type $_)
+ (func $core/sound/channel2/Channel2.updateEnvelope (; 66 ;) (type $_)
   (local $0 i32)
   global.get $core/sound/channel2/Channel2.envelopeCounter
   i32.const 1
@@ -4129,7 +4156,7 @@
    end
   end
  )
- (func $core/sound/channel4/Channel4.updateEnvelope (; 66 ;) (type $_)
+ (func $core/sound/channel4/Channel4.updateEnvelope (; 67 ;) (type $_)
   (local $0 i32)
   global.get $core/sound/channel4/Channel4.envelopeCounter
   i32.const 1
@@ -4175,7 +4202,7 @@
    end
   end
  )
- (func $core/sound/sound/updateFrameSequencer (; 67 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/sound/sound/updateFrameSequencer (; 68 ;) (type $ii) (param $0 i32) (result i32)
   global.get $core/sound/sound/Sound.frameSequenceCycleCounter
   local.get $0
   i32.add
@@ -4577,7 +4604,7 @@
   end
   i32.const 0
  )
- (func $core/sound/accumulator/didChannelDacChange (; 68 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/sound/accumulator/didChannelDacChange (; 69 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   block $break|0
    block $case3|0
@@ -4652,7 +4679,7 @@
   end
   i32.const 0
  )
- (func $core/sound/duty/isDutyCycleClockPositiveOrNegativeForWaveform (; 69 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/sound/duty/isDutyCycleClockPositiveOrNegativeForWaveform (; 70 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   block $case3|0
    block $case2|0
     block $case1|0
@@ -4705,7 +4732,7 @@
   i32.const 0
   i32.ne
  )
- (func $core/sound/channel1/Channel1.getSample (; 70 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/sound/channel1/Channel1.getSample (; 71 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   global.get $core/sound/channel1/Channel1.frequencyTimer
   local.get $0
@@ -4776,7 +4803,7 @@
   i32.const 15
   i32.add
  )
- (func $core/sound/channel2/Channel2.getSample (; 71 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/sound/channel2/Channel2.getSample (; 72 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   global.get $core/sound/channel2/Channel2.frequencyTimer
   local.get $0
@@ -4847,7 +4874,7 @@
   i32.const 15
   i32.add
  )
- (func $core/sound/channel3/Channel3.getSample (; 72 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/sound/channel3/Channel3.getSample (; 73 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   global.get $core/sound/channel3/Channel3.frequencyTimer
@@ -4999,7 +5026,7 @@
   i32.const 15
   i32.add
  )
- (func $core/sound/channel4/Channel4.getSample (; 73 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/sound/channel4/Channel4.getSample (; 74 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   global.get $core/sound/channel4/Channel4.frequencyTimer
   local.get $0
@@ -5088,7 +5115,7 @@
   i32.const 15
   i32.add
  )
- (func $core/sound/sound/getSampleAsUnsignedByte (; 74 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/sound/sound/getSampleAsUnsignedByte (; 75 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   local.get $0
   i32.const 60
   i32.eq
@@ -5114,7 +5141,7 @@
   i32.const 47244
   i32.div_s
  )
- (func $core/sound/sound/mixChannelSamples (; 75 ;) (type $iiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (result i32)
+ (func $core/sound/sound/mixChannelSamples (; 76 ;) (type $iiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (result i32)
   (local $4 i32)
   i32.const 0
   global.set $core/sound/accumulator/SoundAccumulator.mixerVolumeChanged
@@ -5205,7 +5232,7 @@
   i32.shl
   i32.or
  )
- (func $core/sound/accumulator/accumulateSound (; 76 ;) (type $i_) (param $0 i32)
+ (func $core/sound/accumulator/accumulateSound (; 77 ;) (type $i_) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -5446,7 +5473,7 @@
    end
   end
  )
- (func $core/sound/sound/calculateSound (; 77 ;) (type $i_) (param $0 i32)
+ (func $core/sound/sound/calculateSound (; 78 ;) (type $i_) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -5659,7 +5686,7 @@
    end
   end
  )
- (func $core/sound/sound/updateSound (; 78 ;) (type $i_) (param $0 i32)
+ (func $core/sound/sound/updateSound (; 79 ;) (type $i_) (param $0 i32)
   (local $1 i32)
   local.get $0
   call $core/sound/sound/updateFrameSequencer
@@ -5677,7 +5704,7 @@
    call $core/sound/sound/calculateSound
   end
  )
- (func $core/sound/sound/batchProcessAudio (; 79 ;) (type $_)
+ (func $core/sound/sound/batchProcessAudio (; 80 ;) (type $_)
   global.get $core/sound/sound/Sound.currentCycles
   global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
   if (result i32)
@@ -5719,7 +5746,7 @@
    end
   end
  )
- (func $core/sound/registers/SoundRegisterReadTraps (; 80 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/sound/registers/SoundRegisterReadTraps (; 81 ;) (type $ii) (param $0 i32) (result i32)
   local.get $0
   i32.const 65318
   i32.eq
@@ -5736,7 +5763,7 @@
   end
   i32.const -1
  )
- (func $core/joypad/joypad/getJoypadState (; 81 ;) (type $i) (result i32)
+ (func $core/joypad/joypad/getJoypadState (; 82 ;) (type $i) (result i32)
   (local $0 i32)
   global.get $core/joypad/joypad/Joypad.joypadRegisterFlipped
   local.set $0
@@ -5823,7 +5850,7 @@
   i32.const 240
   i32.or
  )
- (func $core/memory/readTraps/checkReadTraps (; 82 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/memory/readTraps/checkReadTraps (; 83 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   local.get $0
   i32.const 32768
@@ -5999,7 +6026,7 @@
   end
   i32.const -1
  )
- (func $core/memory/load/eightBitLoadFromGBMemoryWithTraps (; 83 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/memory/load/eightBitLoadFromGBMemoryWithTraps (; 84 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   global.get $core/debug/breakpoints/Breakpoints.readGbMemory
   local.get $0
@@ -6022,7 +6049,7 @@
   i32.const 255
   i32.and
  )
- (func $core/memory/banking/handleBanking (; 84 ;) (type $ii_) (param $0 i32) (param $1 i32)
+ (func $core/memory/banking/handleBanking (; 85 ;) (type $ii_) (param $0 i32) (param $1 i32)
   (local $2 i32)
   global.get $core/memory/memory/Memory.isRomOnly
   if
@@ -6204,7 +6231,7 @@
    end
   end
  )
- (func $core/sound/channel1/Channel1.updateNRx2 (; 85 ;) (type $i_) (param $0 i32)
+ (func $core/sound/channel1/Channel1.updateNRx2 (; 86 ;) (type $i_) (param $0 i32)
   local.get $0
   i32.const 4
   i32.shr_s
@@ -6228,7 +6255,7 @@
   i32.gt_s
   global.set $core/sound/channel1/Channel1.isDacEnabled
  )
- (func $core/sound/channel2/Channel2.updateNRx2 (; 86 ;) (type $i_) (param $0 i32)
+ (func $core/sound/channel2/Channel2.updateNRx2 (; 87 ;) (type $i_) (param $0 i32)
   local.get $0
   i32.const 4
   i32.shr_s
@@ -6252,7 +6279,7 @@
   i32.gt_s
   global.set $core/sound/channel2/Channel2.isDacEnabled
  )
- (func $core/sound/channel4/Channel4.updateNRx2 (; 87 ;) (type $i_) (param $0 i32)
+ (func $core/sound/channel4/Channel4.updateNRx2 (; 88 ;) (type $i_) (param $0 i32)
   local.get $0
   i32.const 4
   i32.shr_s
@@ -6276,7 +6303,7 @@
   i32.gt_s
   global.set $core/sound/channel4/Channel4.isDacEnabled
  )
- (func $core/sound/channel4/Channel4.updateNRx3 (; 88 ;) (type $i_) (param $0 i32)
+ (func $core/sound/channel4/Channel4.updateNRx3 (; 89 ;) (type $i_) (param $0 i32)
   (local $1 i32)
   local.get $0
   i32.const 4
@@ -6340,7 +6367,7 @@
    global.set $core/sound/channel4/Channel4.divisor
   end
  )
- (func $core/sound/channel1/Channel1.trigger (; 89 ;) (type $_)
+ (func $core/sound/channel1/Channel1.trigger (; 90 ;) (type $_)
   (local $0 i32)
   i32.const 1
   global.set $core/sound/channel1/Channel1.isEnabled
@@ -6403,7 +6430,7 @@
    global.set $core/sound/channel1/Channel1.isEnabled
   end
  )
- (func $core/sound/channel2/Channel2.trigger (; 90 ;) (type $_)
+ (func $core/sound/channel2/Channel2.trigger (; 91 ;) (type $_)
   i32.const 1
   global.set $core/sound/channel2/Channel2.isEnabled
   global.get $core/sound/channel2/Channel2.lengthCounter
@@ -6436,7 +6463,7 @@
    global.set $core/sound/channel2/Channel2.isEnabled
   end
  )
- (func $core/sound/channel3/Channel3.trigger (; 91 ;) (type $_)
+ (func $core/sound/channel3/Channel3.trigger (; 92 ;) (type $_)
   i32.const 1
   global.set $core/sound/channel3/Channel3.isEnabled
   global.get $core/sound/channel3/Channel3.lengthCounter
@@ -6467,7 +6494,7 @@
    global.set $core/sound/channel3/Channel3.isEnabled
   end
  )
- (func $core/sound/channel4/Channel4.trigger (; 92 ;) (type $_)
+ (func $core/sound/channel4/Channel4.trigger (; 93 ;) (type $_)
   (local $0 i32)
   i32.const 1
   global.set $core/sound/channel4/Channel4.isEnabled
@@ -6500,7 +6527,7 @@
    global.set $core/sound/channel4/Channel4.isEnabled
   end
  )
- (func $core/sound/sound/Sound.updateNR51 (; 93 ;) (type $i_) (param $0 i32)
+ (func $core/sound/sound/Sound.updateNR51 (; 94 ;) (type $i_) (param $0 i32)
   local.get $0
   i32.const 128
   i32.and
@@ -6550,7 +6577,7 @@
   i32.ne
   global.set $core/sound/sound/Sound.NR51IsChannel1EnabledOnRightOutput
  )
- (func $core/sound/registers/SoundRegisterWriteTraps (; 94 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/sound/registers/SoundRegisterWriteTraps (; 95 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   local.get $0
   i32.const 65318
@@ -6875,7 +6902,7 @@
   end
   i32.const 1
  )
- (func $core/memory/dma/startDmaTransfer (; 95 ;) (type $i_) (param $0 i32)
+ (func $core/memory/dma/startDmaTransfer (; 96 ;) (type $i_) (param $0 i32)
   (local $1 i32)
   local.get $0
   i32.const 8
@@ -6907,7 +6934,7 @@
   i32.const 644
   global.set $core/memory/memory/Memory.DMACycles
  )
- (func $core/memory/dma/getHdmaSourceFromMemory (; 96 ;) (type $i) (result i32)
+ (func $core/memory/dma/getHdmaSourceFromMemory (; 97 ;) (type $i) (result i32)
   (local $0 i32)
   global.get $core/memory/memory/Memory.memoryLocationHdmaSourceHigh
   call $core/memory/load/eightBitLoadFromGBMemory
@@ -6925,7 +6952,7 @@
   i32.const 65520
   i32.and
  )
- (func $core/memory/dma/getHdmaDestinationFromMemory (; 97 ;) (type $i) (result i32)
+ (func $core/memory/dma/getHdmaDestinationFromMemory (; 98 ;) (type $i) (result i32)
   (local $0 i32)
   global.get $core/memory/memory/Memory.memoryLocationHdmaDestinationHigh
   call $core/memory/load/eightBitLoadFromGBMemory
@@ -6945,7 +6972,7 @@
   i32.const 32768
   i32.add
  )
- (func $core/memory/dma/startHdmaTransfer (; 98 ;) (type $i_) (param $0 i32)
+ (func $core/memory/dma/startHdmaTransfer (; 99 ;) (type $i_) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -7013,7 +7040,7 @@
    call $core/memory/store/eightBitStoreIntoGBMemory
   end
  )
- (func $core/graphics/palette/writeColorPaletteToMemory (; 99 ;) (type $ii_) (param $0 i32) (param $1 i32)
+ (func $core/graphics/palette/writeColorPaletteToMemory (; 100 ;) (type $ii_) (param $0 i32) (param $1 i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -7069,7 +7096,7 @@
    end
   end
  )
- (func $core/timers/timers/_getTimerCounterMaskBit (; 100 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/timers/timers/_getTimerCounterMaskBit (; 101 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   block $break|0
    block $case3|0
@@ -7106,7 +7133,7 @@
   end
   i32.const 0
  )
- (func $core/timers/timers/_checkDividerRegisterFallingEdgeDetector (; 101 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/timers/timers/_checkDividerRegisterFallingEdgeDetector (; 102 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   i32.const 1
   global.get $core/timers/timers/Timers.timerInputClock
@@ -7134,7 +7161,7 @@
   end
   i32.const 0
  )
- (func $core/timers/timers/updateTimers (; 102 ;) (type $i_) (param $0 i32)
+ (func $core/timers/timers/updateTimers (; 103 ;) (type $i_) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   loop $continue|0
@@ -7204,13 +7231,13 @@
    end
   end
  )
- (func $core/timers/timers/batchProcessTimers (; 103 ;) (type $_)
+ (func $core/timers/timers/batchProcessTimers (; 104 ;) (type $_)
   global.get $core/timers/timers/Timers.currentCycles
   call $core/timers/timers/updateTimers
   i32.const 0
   global.set $core/timers/timers/Timers.currentCycles
  )
- (func $core/timers/timers/Timers.updateDividerRegister (; 104 ;) (type $FUNCSIG$v)
+ (func $core/timers/timers/Timers.updateDividerRegister (; 105 ;) (type $FUNCSIG$v)
   (local $0 i32)
   global.get $core/timers/timers/Timers.dividerRegister
   local.set $0
@@ -7243,7 +7270,7 @@
    end
   end
  )
- (func $core/timers/timers/Timers.updateTimerControl (; 105 ;) (type $i_) (param $0 i32)
+ (func $core/timers/timers/Timers.updateTimerControl (; 106 ;) (type $i_) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   global.get $core/timers/timers/Timers.timerEnabled
@@ -7312,7 +7339,7 @@
   local.get $2
   global.set $core/timers/timers/Timers.timerInputClock
  )
- (func $core/memory/writeTraps/checkWriteTraps (; 106 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/memory/writeTraps/checkWriteTraps (; 107 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   block $folding-inner1
    block $folding-inner0
@@ -7734,7 +7761,7 @@
   end
   i32.const 1
  )
- (func $core/memory/store/eightBitStoreIntoGBMemoryWithTraps (; 107 ;) (type $ii_) (param $0 i32) (param $1 i32)
+ (func $core/memory/store/eightBitStoreIntoGBMemoryWithTraps (; 108 ;) (type $ii_) (param $0 i32) (param $1 i32)
   global.get $core/debug/breakpoints/Breakpoints.writeGbMemory
   local.get $0
   i32.eq
@@ -7751,7 +7778,7 @@
    call $core/memory/store/eightBitStoreIntoGBMemory
   end
  )
- (func $core/memory/dma/hdmaTransfer (; 108 ;) (type $iii_) (param $0 i32) (param $1 i32) (param $2 i32)
+ (func $core/memory/dma/hdmaTransfer (; 109 ;) (type $iii_) (param $0 i32) (param $1 i32) (param $2 i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
@@ -7806,7 +7833,7 @@
   i32.add
   global.set $core/memory/memory/Memory.DMACycles
  )
- (func $core/memory/dma/updateHblankHdma (; 109 ;) (type $_)
+ (func $core/memory/dma/updateHblankHdma (; 110 ;) (type $_)
   (local $0 i32)
   global.get $core/memory/memory/Memory.isHblankHdmaActive
   i32.eqz
@@ -7857,7 +7884,7 @@
    call $core/memory/store/eightBitStoreIntoGBMemory
   end
  )
- (func $core/graphics/lcd/checkCoincidence (; 110 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/graphics/lcd/checkCoincidence (; 111 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
   global.get $core/graphics/lcd/Lcd.coincidenceCompare
@@ -7900,7 +7927,7 @@
   end
   local.get $1
  )
- (func $core/graphics/lcd/setLcdStatus (; 111 ;) (type $_)
+ (func $core/graphics/lcd/setLcdStatus (; 112 ;) (type $_)
   (local $0 i32)
   (local $1 i32)
   (local $2 i32)
@@ -8043,7 +8070,7 @@
    end
   end
  )
- (func $core/graphics/graphics/updateGraphics (; 112 ;) (type $i_) (param $0 i32)
+ (func $core/graphics/graphics/updateGraphics (; 113 ;) (type $i_) (param $0 i32)
   global.get $core/graphics/lcd/Lcd.enabled
   if
    global.get $core/graphics/graphics/Graphics.scanlineCycleCounter
@@ -8142,7 +8169,7 @@
   end
   call $core/graphics/lcd/setLcdStatus
  )
- (func $core/graphics/graphics/batchProcessGraphics (; 113 ;) (type $_)
+ (func $core/graphics/graphics/batchProcessGraphics (; 114 ;) (type $_)
   global.get $core/graphics/graphics/Graphics.currentCycles
   block $__inlined_func$core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE (result i32)
    global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
@@ -8240,7 +8267,7 @@
    end
   end
  )
- (func $core/serial/serial/_checkFallingEdgeDetector (; 114 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/serial/serial/_checkFallingEdgeDetector (; 115 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   i32.const 1
   global.get $core/serial/serial/Serial.isClockSpeedFast
@@ -8272,7 +8299,7 @@
   end
   i32.const 0
  )
- (func $core/serial/serial/updateSerial (; 115 ;) (type $i_) (param $0 i32)
+ (func $core/serial/serial/updateSerial (; 116 ;) (type $i_) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   global.get $core/serial/serial/Serial.transferStartFlag
@@ -8345,7 +8372,7 @@
    end
   end
  )
- (func $core/cycles/syncCycles (; 116 ;) (type $i_) (param $0 i32)
+ (func $core/cycles/syncCycles (; 117 ;) (type $i_) (param $0 i32)
   global.get $core/memory/memory/Memory.DMACycles
   i32.const 0
   i32.gt_s
@@ -8417,13 +8444,13 @@
    global.set $core/cycles/Cycles.cycles
   end
  )
- (func $core/cpu/opcodes/getDataByteOne (; 117 ;) (type $i) (result i32)
+ (func $core/cpu/opcodes/getDataByteOne (; 118 ;) (type $i) (result i32)
   i32.const 4
   call $core/cycles/syncCycles
   global.get $core/cpu/cpu/Cpu.programCounter
   call $core/memory/load/eightBitLoadFromGBMemory
  )
- (func $core/cpu/opcodes/getConcatenatedDataByte (; 118 ;) (type $i) (result i32)
+ (func $core/cpu/opcodes/getConcatenatedDataByte (; 119 ;) (type $i) (result i32)
   (local $0 i32)
   i32.const 4
   call $core/cycles/syncCycles
@@ -8444,14 +8471,14 @@
   i32.shl
   i32.or
  )
- (func $core/cpu/opcodes/eightBitStoreSyncCycles (; 119 ;) (type $ii_) (param $0 i32) (param $1 i32)
+ (func $core/cpu/opcodes/eightBitStoreSyncCycles (; 120 ;) (type $ii_) (param $0 i32) (param $1 i32)
   i32.const 4
   call $core/cycles/syncCycles
   local.get $0
   local.get $1
   call $core/memory/store/eightBitStoreIntoGBMemoryWithTraps
  )
- (func $core/cpu/flags/setFlagBit (; 120 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/cpu/flags/setFlagBit (; 121 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   i32.const 1
   local.get $0
@@ -8479,13 +8506,13 @@
   end
   global.get $core/cpu/cpu/Cpu.registerF
  )
- (func $core/cpu/flags/setHalfCarryFlag (; 121 ;) (type $i_) (param $0 i32)
+ (func $core/cpu/flags/setHalfCarryFlag (; 122 ;) (type $i_) (param $0 i32)
   i32.const 5
   local.get $0
   call $core/cpu/flags/setFlagBit
   drop
  )
- (func $core/cpu/flags/checkAndSetEightBitHalfCarryFlag (; 122 ;) (type $ii_) (param $0 i32) (param $1 i32)
+ (func $core/cpu/flags/checkAndSetEightBitHalfCarryFlag (; 123 ;) (type $ii_) (param $0 i32) (param $1 i32)
   (local $2 i32)
   local.get $1
   i32.const 0
@@ -8531,25 +8558,25 @@
    end
   end
  )
- (func $core/cpu/flags/setZeroFlag (; 123 ;) (type $i_) (param $0 i32)
+ (func $core/cpu/flags/setZeroFlag (; 124 ;) (type $i_) (param $0 i32)
   i32.const 7
   local.get $0
   call $core/cpu/flags/setFlagBit
   drop
  )
- (func $core/cpu/flags/setSubtractFlag (; 124 ;) (type $i_) (param $0 i32)
+ (func $core/cpu/flags/setSubtractFlag (; 125 ;) (type $i_) (param $0 i32)
   i32.const 6
   local.get $0
   call $core/cpu/flags/setFlagBit
   drop
  )
- (func $core/cpu/flags/setCarryFlag (; 125 ;) (type $i_) (param $0 i32)
+ (func $core/cpu/flags/setCarryFlag (; 126 ;) (type $i_) (param $0 i32)
   i32.const 4
   local.get $0
   call $core/cpu/flags/setFlagBit
   drop
  )
- (func $core/memory/store/sixteenBitStoreIntoGBMemoryWithTraps (; 126 ;) (type $ii_) (param $0 i32) (param $1 i32)
+ (func $core/memory/store/sixteenBitStoreIntoGBMemoryWithTraps (; 127 ;) (type $ii_) (param $0 i32) (param $1 i32)
   (local $2 i32)
   (local $3 i32)
   local.get $1
@@ -8582,14 +8609,14 @@
    call $core/memory/store/eightBitStoreIntoGBMemory
   end
  )
- (func $core/cpu/opcodes/sixteenBitStoreSyncCycles (; 127 ;) (type $ii_) (param $0 i32) (param $1 i32)
+ (func $core/cpu/opcodes/sixteenBitStoreSyncCycles (; 128 ;) (type $ii_) (param $0 i32) (param $1 i32)
   i32.const 8
   call $core/cycles/syncCycles
   local.get $0
   local.get $1
   call $core/memory/store/sixteenBitStoreIntoGBMemoryWithTraps
  )
- (func $core/cpu/flags/checkAndSetSixteenBitFlagsAddOverflow (; 128 ;) (type $iii_) (param $0 i32) (param $1 i32) (param $2 i32)
+ (func $core/cpu/flags/checkAndSetSixteenBitFlagsAddOverflow (; 129 ;) (type $iii_) (param $0 i32) (param $1 i32) (param $2 i32)
   local.get $2
   if
    local.get $1
@@ -8656,13 +8683,13 @@
    end
   end
  )
- (func $core/cpu/opcodes/eightBitLoadSyncCycles (; 129 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/eightBitLoadSyncCycles (; 130 ;) (type $ii) (param $0 i32) (result i32)
   i32.const 4
   call $core/cycles/syncCycles
   local.get $0
   call $core/memory/load/eightBitLoadFromGBMemoryWithTraps
  )
- (func $core/cpu/opcodes/handleOpcode0x (; 130 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcode0x (; 131 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   block $folding-inner4
    block $folding-inner3
@@ -9013,7 +9040,7 @@
   global.set $core/cpu/cpu/Cpu.registerC
   i32.const 8
  )
- (func $core/portable/portable/i8Portable (; 131 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/portable/portable/i8Portable (; 132 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   local.get $0
   i32.const 24
@@ -9037,7 +9064,7 @@
   end
   local.get $1
  )
- (func $core/cpu/instructions/relativeJump (; 132 ;) (type $i_) (param $0 i32)
+ (func $core/cpu/instructions/relativeJump (; 133 ;) (type $i_) (param $0 i32)
   (local $1 i32)
   local.get $0
   call $core/portable/portable/i8Portable
@@ -9059,7 +9086,7 @@
   i32.and
   global.set $core/cpu/cpu/Cpu.programCounter
  )
- (func $core/cpu/opcodes/handleOpcode1x (; 133 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcode1x (; 134 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   block $folding-inner3
    block $folding-inner2
@@ -9448,7 +9475,7 @@
   global.set $core/cpu/cpu/Cpu.registerE
   i32.const 8
  )
- (func $core/cpu/opcodes/handleOpcode2x (; 134 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcode2x (; 135 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   block $folding-inner1
    block $folding-inner0
@@ -9892,7 +9919,7 @@
   end
   i32.const 4
  )
- (func $core/cpu/opcodes/handleOpcode3x (; 135 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcode3x (; 136 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   block $folding-inner3
    block $folding-inner2
@@ -10245,7 +10272,7 @@
   end
   i32.const 4
  )
- (func $core/cpu/opcodes/handleOpcode4x (; 136 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcode4x (; 137 ;) (type $ii) (param $0 i32) (result i32)
   block $folding-inner0
    block $break|0
     block $case15|0
@@ -10363,7 +10390,7 @@
   end
   i32.const 4
  )
- (func $core/cpu/opcodes/handleOpcode5x (; 137 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcode5x (; 138 ;) (type $ii) (param $0 i32) (result i32)
   block $folding-inner0
    block $break|0
     block $case15|0
@@ -10478,7 +10505,7 @@
   end
   i32.const 4
  )
- (func $core/cpu/opcodes/handleOpcode6x (; 138 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcode6x (; 139 ;) (type $ii) (param $0 i32) (result i32)
   block $folding-inner0
    block $break|0
     block $case15|0
@@ -10593,7 +10620,7 @@
   end
   i32.const 4
  )
- (func $core/cpu/opcodes/handleOpcode7x (; 139 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcode7x (; 140 ;) (type $ii) (param $0 i32) (result i32)
   block $folding-inner0
    block $break|0
     block $case14|0
@@ -10788,7 +10815,7 @@
   end
   i32.const 4
  )
- (func $core/cpu/flags/checkAndSetEightBitCarryFlag (; 140 ;) (type $ii_) (param $0 i32) (param $1 i32)
+ (func $core/cpu/flags/checkAndSetEightBitCarryFlag (; 141 ;) (type $ii_) (param $0 i32) (param $1 i32)
   (local $2 i32)
   local.get $1
   i32.const 0
@@ -10832,7 +10859,7 @@
    end
   end
  )
- (func $core/cpu/instructions/addARegister (; 141 ;) (type $i_) (param $0 i32)
+ (func $core/cpu/instructions/addARegister (; 142 ;) (type $i_) (param $0 i32)
   (local $1 i32)
   global.get $core/cpu/cpu/Cpu.registerA
   local.get $0
@@ -10860,7 +10887,7 @@
   i32.const 0
   call $core/cpu/flags/setSubtractFlag
  )
- (func $core/cpu/instructions/addAThroughCarryRegister (; 142 ;) (type $i_) (param $0 i32)
+ (func $core/cpu/instructions/addAThroughCarryRegister (; 143 ;) (type $i_) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   global.get $core/cpu/cpu/Cpu.registerA
@@ -10925,7 +10952,7 @@
   i32.const 0
   call $core/cpu/flags/setSubtractFlag
  )
- (func $core/cpu/opcodes/handleOpcode8x (; 143 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcode8x (; 144 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   block $folding-inner0
    block $break|0
@@ -11041,7 +11068,7 @@
   end
   i32.const 4
  )
- (func $core/cpu/instructions/subARegister (; 144 ;) (type $i_) (param $0 i32)
+ (func $core/cpu/instructions/subARegister (; 145 ;) (type $i_) (param $0 i32)
   (local $1 i32)
   global.get $core/cpu/cpu/Cpu.registerA
   local.get $0
@@ -11071,7 +11098,7 @@
   i32.const 1
   call $core/cpu/flags/setSubtractFlag
  )
- (func $core/cpu/instructions/subAThroughCarryRegister (; 145 ;) (type $i_) (param $0 i32)
+ (func $core/cpu/instructions/subAThroughCarryRegister (; 146 ;) (type $i_) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   global.get $core/cpu/cpu/Cpu.registerA
@@ -11136,7 +11163,7 @@
   i32.const 1
   call $core/cpu/flags/setSubtractFlag
  )
- (func $core/cpu/opcodes/handleOpcode9x (; 146 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcode9x (; 147 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   block $folding-inner0
    block $break|0
@@ -11252,7 +11279,7 @@
   end
   i32.const 4
  )
- (func $core/cpu/instructions/andARegister (; 147 ;) (type $i_) (param $0 i32)
+ (func $core/cpu/instructions/andARegister (; 148 ;) (type $i_) (param $0 i32)
   global.get $core/cpu/cpu/Cpu.registerA
   local.get $0
   i32.and
@@ -11272,7 +11299,7 @@
   i32.const 0
   call $core/cpu/flags/setCarryFlag
  )
- (func $core/cpu/instructions/xorARegister (; 148 ;) (type $i_) (param $0 i32)
+ (func $core/cpu/instructions/xorARegister (; 149 ;) (type $i_) (param $0 i32)
   global.get $core/cpu/cpu/Cpu.registerA
   local.get $0
   i32.xor
@@ -11294,7 +11321,7 @@
   i32.const 0
   call $core/cpu/flags/setCarryFlag
  )
- (func $core/cpu/opcodes/handleOpcodeAx (; 149 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcodeAx (; 150 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   block $folding-inner0
    block $break|0
@@ -11410,7 +11437,7 @@
   end
   i32.const 4
  )
- (func $core/cpu/instructions/orARegister (; 150 ;) (type $i_) (param $0 i32)
+ (func $core/cpu/instructions/orARegister (; 151 ;) (type $i_) (param $0 i32)
   global.get $core/cpu/cpu/Cpu.registerA
   local.get $0
   i32.or
@@ -11432,7 +11459,7 @@
   i32.const 0
   call $core/cpu/flags/setCarryFlag
  )
- (func $core/cpu/instructions/cpARegister (; 151 ;) (type $i_) (param $0 i32)
+ (func $core/cpu/instructions/cpARegister (; 152 ;) (type $i_) (param $0 i32)
   (local $1 i32)
   global.get $core/cpu/cpu/Cpu.registerA
   local.get $0
@@ -11458,7 +11485,7 @@
   i32.const 1
   call $core/cpu/flags/setSubtractFlag
  )
- (func $core/cpu/opcodes/handleOpcodeBx (; 152 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcodeBx (; 153 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   block $folding-inner0
    block $break|0
@@ -11574,7 +11601,7 @@
   end
   i32.const 4
  )
- (func $core/memory/load/sixteenBitLoadFromGBMemory (; 153 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/memory/load/sixteenBitLoadFromGBMemory (; 154 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   local.get $0
   call $core/memory/readTraps/checkReadTraps
@@ -11609,13 +11636,13 @@
   i32.shl
   i32.or
  )
- (func $core/cpu/opcodes/sixteenBitLoadSyncCycles (; 154 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/sixteenBitLoadSyncCycles (; 155 ;) (type $ii) (param $0 i32) (result i32)
   i32.const 8
   call $core/cycles/syncCycles
   local.get $0
   call $core/memory/load/sixteenBitLoadFromGBMemory
  )
- (func $core/cpu/instructions/rotateRegisterLeft (; 155 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/instructions/rotateRegisterLeft (; 156 ;) (type $ii) (param $0 i32) (result i32)
   local.get $0
   i32.const 128
   i32.and
@@ -11653,7 +11680,7 @@
   call $core/cpu/flags/setHalfCarryFlag
   local.get $0
  )
- (func $core/cpu/instructions/rotateRegisterRight (; 156 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/instructions/rotateRegisterRight (; 157 ;) (type $ii) (param $0 i32) (result i32)
   local.get $0
   i32.const 1
   i32.and
@@ -11691,7 +11718,7 @@
   call $core/cpu/flags/setHalfCarryFlag
   local.get $0
  )
- (func $core/cpu/instructions/rotateRegisterLeftThroughCarry (; 157 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/instructions/rotateRegisterLeftThroughCarry (; 158 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   i32.const 1
   i32.const 0
@@ -11736,7 +11763,7 @@
   call $core/cpu/flags/setHalfCarryFlag
   local.get $0
  )
- (func $core/cpu/instructions/rotateRegisterRightThroughCarry (; 158 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/instructions/rotateRegisterRightThroughCarry (; 159 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   i32.const 1
   i32.const 0
@@ -11783,7 +11810,7 @@
   call $core/cpu/flags/setHalfCarryFlag
   local.get $0
  )
- (func $core/cpu/instructions/shiftLeftRegister (; 159 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/instructions/shiftLeftRegister (; 160 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   i32.const 1
   i32.const 0
@@ -11822,7 +11849,7 @@
   call $core/cpu/flags/setHalfCarryFlag
   local.get $0
  )
- (func $core/cpu/instructions/shiftRightArithmeticRegister (; 160 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/instructions/shiftRightArithmeticRegister (; 161 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   i32.const 1
@@ -11876,7 +11903,7 @@
   end
   local.get $0
  )
- (func $core/cpu/instructions/swapNibblesOnRegister (; 161 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/instructions/swapNibblesOnRegister (; 162 ;) (type $ii) (param $0 i32) (result i32)
   local.get $0
   i32.const 15
   i32.and
@@ -11904,7 +11931,7 @@
   call $core/cpu/flags/setCarryFlag
   local.get $0
  )
- (func $core/cpu/instructions/shiftRightLogicalRegister (; 162 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/instructions/shiftRightLogicalRegister (; 163 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   i32.const 1
   i32.const 0
@@ -11942,7 +11969,7 @@
   end
   local.get $0
  )
- (func $core/cpu/instructions/testBitOnRegister (; 163 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/cpu/instructions/testBitOnRegister (; 164 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   i32.const 1
   local.get $0
   i32.shl
@@ -11963,7 +11990,7 @@
   call $core/cpu/flags/setHalfCarryFlag
   local.get $1
  )
- (func $core/cpu/cbOpcodes/handleCbOpcode (; 164 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/cbOpcodes/handleCbOpcode (; 165 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -12539,7 +12566,7 @@
   local.get $2
   select
  )
- (func $core/cpu/opcodes/handleOpcodeCx (; 165 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcodeCx (; 166 ;) (type $ii) (param $0 i32) (result i32)
   block $folding-inner5
    block $folding-inner4
     block $folding-inner3
@@ -12796,7 +12823,7 @@
   global.set $core/cpu/cpu/Cpu.programCounter
   i32.const 12
  )
- (func $core/cpu/opcodes/handleOpcodeDx (; 166 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcodeDx (; 167 ;) (type $ii) (param $0 i32) (result i32)
   block $folding-inner4
    block $folding-inner3
     block $folding-inner2
@@ -13038,7 +13065,7 @@
   global.set $core/cpu/cpu/Cpu.programCounter
   i32.const 12
  )
- (func $core/cpu/opcodes/handleOpcodeEx (; 167 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcodeEx (; 168 ;) (type $ii) (param $0 i32) (result i32)
   block $folding-inner0
    block $break|0
     block $case10|0
@@ -13225,7 +13252,7 @@
   global.set $core/cpu/cpu/Cpu.programCounter
   i32.const 4
  )
- (func $core/cpu/opcodes/handleOpcodeFx (; 168 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcodeFx (; 169 ;) (type $ii) (param $0 i32) (result i32)
   block $folding-inner1
    block $folding-inner0
     block $break|0
@@ -13437,7 +13464,7 @@
   end
   i32.const 4
  )
- (func $core/cpu/opcodes/executeOpcode (; 169 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/executeOpcode (; 170 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   global.get $core/cpu/cpu/Cpu.programCounter
   i32.const 1
@@ -13551,7 +13578,7 @@
   local.get $0
   call $core/cpu/opcodes/handleOpcodeFx
  )
- (func $core/interrupts/interrupts/_handleInterrupt (; 170 ;) (type $i_) (param $0 i32)
+ (func $core/interrupts/interrupts/_handleInterrupt (; 171 ;) (type $i_) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   i32.const 0
@@ -13648,7 +13675,7 @@
    global.set $core/cpu/cpu/Cpu.programCounter
   end
  )
- (func $core/interrupts/interrupts/checkInterrupts (; 171 ;) (type $i) (result i32)
+ (func $core/interrupts/interrupts/checkInterrupts (; 172 ;) (type $i) (result i32)
   (local $0 i32)
   (local $1 i32)
   (local $2 i32)
@@ -13786,7 +13813,7 @@
   end
   i32.const 0
  )
- (func $core/execute/executeStep (; 172 ;) (type $i) (result i32)
+ (func $core/execute/executeStep (; 173 ;) (type $i) (result i32)
   (local $0 i32)
   (local $1 i32)
   i32.const 1
@@ -13884,10 +13911,10 @@
   end
   local.get $0
  )
- (func $core/sound/sound/getNumberOfSamplesInAudioBuffer (; 173 ;) (type $i) (result i32)
+ (func $core/sound/sound/getNumberOfSamplesInAudioBuffer (; 174 ;) (type $i) (result i32)
   global.get $core/sound/sound/Sound.audioQueueIndex
  )
- (func $core/execute/executeUntilCondition (; 174 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
+ (func $core/execute/executeUntilCondition (; 175 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -14006,11 +14033,11 @@
   global.set $core/cpu/cpu/Cpu.programCounter
   i32.const -1
  )
- (func $core/execute/executeFrame (; 175 ;) (type $i) (result i32)
+ (func $core/execute/executeFrame (; 176 ;) (type $i) (result i32)
   i32.const -1
   call $core/execute/executeUntilCondition
  )
- (func $core/execute/executeMultipleFrames (; 176 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/execute/executeMultipleFrames (; 177 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -14046,16 +14073,16 @@
   end
   i32.const 0
  )
- (func $core/cycles/getCyclesPerCycleSet (; 177 ;) (type $i) (result i32)
+ (func $core/cycles/getCyclesPerCycleSet (; 178 ;) (type $i) (result i32)
   global.get $core/cycles/Cycles.cyclesPerCycleSet
  )
- (func $core/cycles/getCycleSets (; 178 ;) (type $i) (result i32)
+ (func $core/cycles/getCycleSets (; 179 ;) (type $i) (result i32)
   global.get $core/cycles/Cycles.cycleSets
  )
- (func $core/cycles/getCycles (; 179 ;) (type $i) (result i32)
+ (func $core/cycles/getCycles (; 180 ;) (type $i) (result i32)
   global.get $core/cycles/Cycles.cycles
  )
- (func $core/joypad/joypad/_getJoypadButtonStateFromButtonId (; 180 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/joypad/joypad/_getJoypadButtonStateFromButtonId (; 181 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   block $case8|0
    block $case7|0
@@ -14106,7 +14133,7 @@
   end
   i32.const 0
  )
- (func $core/joypad/joypad/_setJoypadButtonStateFromButtonId (; 181 ;) (type $ii_) (param $0 i32) (param $1 i32)
+ (func $core/joypad/joypad/_setJoypadButtonStateFromButtonId (; 182 ;) (type $ii_) (param $0 i32) (param $1 i32)
   (local $2 i32)
   block $break|0
    block $case7|0
@@ -14179,7 +14206,7 @@
    global.set $core/joypad/joypad/Joypad.start
   end
  )
- (func $core/joypad/joypad/_pressJoypadButton (; 182 ;) (type $i_) (param $0 i32)
+ (func $core/joypad/joypad/_pressJoypadButton (; 183 ;) (type $i_) (param $0 i32)
   (local $1 i32)
   i32.const 0
   global.set $core/cpu/cpu/Cpu.isStopped
@@ -14225,12 +14252,12 @@
    end
   end
  )
- (func $core/joypad/joypad/_releaseJoypadButton (; 183 ;) (type $i_) (param $0 i32)
+ (func $core/joypad/joypad/_releaseJoypadButton (; 184 ;) (type $i_) (param $0 i32)
   local.get $0
   i32.const 0
   call $core/joypad/joypad/_setJoypadButtonStateFromButtonId
  )
- (func $core/joypad/joypad/setJoypadState (; 184 ;) (type $iiiiiiii_) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (param $7 i32)
+ (func $core/joypad/joypad/setJoypadState (; 185 ;) (type $iiiiiiii_) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (param $7 i32)
   local.get $0
   i32.const 0
   i32.gt_s
@@ -14312,68 +14339,68 @@
    call $core/joypad/joypad/_releaseJoypadButton
   end
  )
- (func $core/debug/breakpoints/setProgramCounterBreakpoint (; 185 ;) (type $i_) (param $0 i32)
+ (func $core/debug/breakpoints/setProgramCounterBreakpoint (; 186 ;) (type $i_) (param $0 i32)
   local.get $0
   global.set $core/debug/breakpoints/Breakpoints.programCounter
  )
- (func $core/debug/breakpoints/resetProgramCounterBreakpoint (; 186 ;) (type $_)
+ (func $core/debug/breakpoints/resetProgramCounterBreakpoint (; 187 ;) (type $_)
   i32.const -1
   global.set $core/debug/breakpoints/Breakpoints.programCounter
  )
- (func $core/debug/breakpoints/setReadGbMemoryBreakpoint (; 187 ;) (type $i_) (param $0 i32)
+ (func $core/debug/breakpoints/setReadGbMemoryBreakpoint (; 188 ;) (type $i_) (param $0 i32)
   local.get $0
   global.set $core/debug/breakpoints/Breakpoints.readGbMemory
  )
- (func $core/debug/breakpoints/resetReadGbMemoryBreakpoint (; 188 ;) (type $_)
+ (func $core/debug/breakpoints/resetReadGbMemoryBreakpoint (; 189 ;) (type $_)
   i32.const -1
   global.set $core/debug/breakpoints/Breakpoints.readGbMemory
  )
- (func $core/debug/breakpoints/setWriteGbMemoryBreakpoint (; 189 ;) (type $i_) (param $0 i32)
+ (func $core/debug/breakpoints/setWriteGbMemoryBreakpoint (; 190 ;) (type $i_) (param $0 i32)
   local.get $0
   global.set $core/debug/breakpoints/Breakpoints.writeGbMemory
  )
- (func $core/debug/breakpoints/resetWriteGbMemoryBreakpoint (; 190 ;) (type $_)
+ (func $core/debug/breakpoints/resetWriteGbMemoryBreakpoint (; 191 ;) (type $_)
   i32.const -1
   global.set $core/debug/breakpoints/Breakpoints.writeGbMemory
  )
- (func $core/debug/debug-cpu/getRegisterA (; 191 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterA (; 192 ;) (type $i) (result i32)
   global.get $core/cpu/cpu/Cpu.registerA
  )
- (func $core/debug/debug-cpu/getRegisterB (; 192 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterB (; 193 ;) (type $i) (result i32)
   global.get $core/cpu/cpu/Cpu.registerB
  )
- (func $core/debug/debug-cpu/getRegisterC (; 193 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterC (; 194 ;) (type $i) (result i32)
   global.get $core/cpu/cpu/Cpu.registerC
  )
- (func $core/debug/debug-cpu/getRegisterD (; 194 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterD (; 195 ;) (type $i) (result i32)
   global.get $core/cpu/cpu/Cpu.registerD
  )
- (func $core/debug/debug-cpu/getRegisterE (; 195 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterE (; 196 ;) (type $i) (result i32)
   global.get $core/cpu/cpu/Cpu.registerE
  )
- (func $core/debug/debug-cpu/getRegisterH (; 196 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterH (; 197 ;) (type $i) (result i32)
   global.get $core/cpu/cpu/Cpu.registerH
  )
- (func $core/debug/debug-cpu/getRegisterL (; 197 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterL (; 198 ;) (type $i) (result i32)
   global.get $core/cpu/cpu/Cpu.registerL
  )
- (func $core/debug/debug-cpu/getRegisterF (; 198 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterF (; 199 ;) (type $i) (result i32)
   global.get $core/cpu/cpu/Cpu.registerF
  )
- (func $core/debug/debug-cpu/getProgramCounter (; 199 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getProgramCounter (; 200 ;) (type $i) (result i32)
   global.get $core/cpu/cpu/Cpu.programCounter
  )
- (func $core/debug/debug-cpu/getStackPointer (; 200 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getStackPointer (; 201 ;) (type $i) (result i32)
   global.get $core/cpu/cpu/Cpu.stackPointer
  )
- (func $core/debug/debug-cpu/getOpcodeAtProgramCounter (; 201 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getOpcodeAtProgramCounter (; 202 ;) (type $i) (result i32)
   global.get $core/cpu/cpu/Cpu.programCounter
   call $core/memory/load/eightBitLoadFromGBMemory
  )
- (func $core/debug/debug-graphics/getLY (; 202 ;) (type $i) (result i32)
+ (func $core/debug/debug-graphics/getLY (; 203 ;) (type $i) (result i32)
   global.get $core/graphics/graphics/Graphics.scanlineRegister
  )
- (func $core/debug/debug-graphics/drawBackgroundMapToWasmMemory (; 203 ;) (type $i_) (param $0 i32)
+ (func $core/debug/debug-graphics/drawBackgroundMapToWasmMemory (; 204 ;) (type $i_) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -14620,7 +14647,7 @@
    end
   end
  )
- (func $core/debug/debug-graphics/drawTileDataToWasmMemory (; 204 ;) (type $_)
+ (func $core/debug/debug-graphics/drawTileDataToWasmMemory (; 205 ;) (type $_)
   (local $0 i32)
   (local $1 i32)
   (local $2 i32)
@@ -14893,7 +14920,7 @@
    end
   end
  )
- (func $core/debug/debug-graphics/drawOamToWasmMemory (; 205 ;) (type $_)
+ (func $core/debug/debug-graphics/drawOamToWasmMemory (; 206 ;) (type $_)
   (local $0 i32)
   (local $1 i32)
   (local $2 i32)
@@ -15054,16 +15081,16 @@
    end
   end
  )
- (func $core/debug/debug-timer/getDIV (; 206 ;) (type $i) (result i32)
+ (func $core/debug/debug-timer/getDIV (; 207 ;) (type $i) (result i32)
   global.get $core/timers/timers/Timers.dividerRegister
  )
- (func $core/debug/debug-timer/getTIMA (; 207 ;) (type $i) (result i32)
+ (func $core/debug/debug-timer/getTIMA (; 208 ;) (type $i) (result i32)
   global.get $core/timers/timers/Timers.timerCounter
  )
- (func $core/debug/debug-timer/getTMA (; 208 ;) (type $i) (result i32)
+ (func $core/debug/debug-timer/getTMA (; 209 ;) (type $i) (result i32)
   global.get $core/timers/timers/Timers.timerModulo
  )
- (func $core/debug/debug-timer/getTAC (; 209 ;) (type $i) (result i32)
+ (func $core/debug/debug-timer/getTAC (; 210 ;) (type $i) (result i32)
   (local $0 i32)
   global.get $core/timers/timers/Timers.timerInputClock
   local.set $0
@@ -15076,7 +15103,7 @@
   end
   local.get $0
  )
- (func $core/debug/debug-memory/updateDebugGBMemory (; 210 ;) (type $_)
+ (func $core/debug/debug-memory/updateDebugGBMemory (; 211 ;) (type $_)
   (local $0 i32)
   loop $repeat|0
    block $break|0
@@ -15100,7 +15127,7 @@
   i32.const 0
   global.set $core/debug/breakpoints/Breakpoints.reachedBreakpoint
  )
- (func $start (; 211 ;) (type $_)
+ (func $start (; 212 ;) (type $_)
   current_memory
   i32.const 148
   i32.lt_s
@@ -15136,10 +15163,10 @@
   i32.const 526344
   global.set $core/graphics/colors/Colors.obj1Black
  )
- (func $null (; 212 ;) (type $_)
+ (func $null (; 213 ;) (type $_)
   nop
  )
- (func $core/execute/executeFrameAndCheckAudio|trampoline (; 213 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/execute/executeFrameAndCheckAudio|trampoline (; 214 ;) (type $ii) (param $0 i32) (result i32)
   block $1of1
    block $0of1
     block $outOfRange
@@ -15154,11 +15181,11 @@
   local.get $0
   call $core/execute/executeUntilCondition
  )
- (func $~setargc (; 214 ;) (type $i_) (param $0 i32)
+ (func $~setargc (; 215 ;) (type $i_) (param $0 i32)
   local.get $0
   global.set $~argc
  )
- (func $core/execute/executeUntilCondition|trampoline (; 215 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/execute/executeUntilCondition|trampoline (; 216 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   block $2of2
    block $1of2
     block $0of2
