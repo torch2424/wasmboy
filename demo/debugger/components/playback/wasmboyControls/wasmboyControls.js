@@ -102,18 +102,27 @@ export default class WasmBoyControls extends Component {
           let saveStateDateString = new Date(saveState.date);
           saveStateDateString = saveStateDateString.toLocaleString();
           saveStateElements.unshift(
-            <div
-              class="load-state-container__save-state"
-              onClick={() => {
-                this.loadState(saveState);
-                Pubx.get(PUBX_KEYS.MODAL).closeModal();
-              }}
-            >
-              <img src={saveState.screenshotCanvasDataURL} />
-              <h3>Date:</h3>
-              {saveStateDateString}
-              <h3>Auto:</h3>
-              {saveState.isAuto ? 'true' : 'false'}
+            <div class="load-state-container__save-state">
+              <button
+                class="remove-default-button"
+                onClick={() => {
+                  this.loadState(saveState);
+                  Pubx.get(PUBX_KEYS.MODAL).closeModal();
+                }}
+              >
+                <img src={saveState.screenshotCanvasDataURL} />
+                <h3>Date:</h3>
+                {saveStateDateString}
+                <h3>Auto:</h3>
+                {saveState.isAuto ? 'true' : 'false'}
+              </button>
+
+              <button
+                onClick={() => this.showDeleteState(saveState, saveStateDateString)}
+                class="load-state-container__save-state__delete remove-default-button"
+              >
+                🚮
+              </button>
             </div>
           );
         });
@@ -127,6 +136,35 @@ export default class WasmBoyControls extends Component {
         Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Error Getting Saving States... 😞');
         console.error(err);
       });
+  }
+
+  showDeleteState(saveState, saveStateDateString) {
+    const deleteTask = async () => {
+      await WasmBoy.deleteState(saveState);
+      Pubx.get(PUBX_KEYS.MODAL).closeModal();
+      this.showLoadStateModal();
+    };
+
+    Pubx.get(PUBX_KEYS.MODAL).showModal(() => {
+      return (
+        <div class="load-state-container__delete-state">
+          <h1>Delete State</h1>
+          <img src={saveState.screenshotCanvasDataURL} />
+          <h3>Date:</h3>
+          {saveStateDateString}
+          <h3>Are you sure you want to do this?</h3>
+          <button
+            onClick={() => {
+              Pubx.get(PUBX_KEYS.MODAL).closeModal();
+              this.showLoadStateModal();
+            }}
+          >
+            Cancel
+          </button>
+          <button onClick={() => deleteTask()}>Delete</button>
+        </div>
+      );
+    });
   }
 
   loadState(saveState) {
