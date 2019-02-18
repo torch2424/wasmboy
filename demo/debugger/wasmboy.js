@@ -37,6 +37,7 @@ const WasmBoyDefaultOptions = {
   tileRendering: false,
   tileCaching: false,
   gameboyFrameRate: 60,
+  maxNumberOfAutoSaveStates: 3,
   updateGraphicsCallback: imageDataArray => {
     if (!graphicsCallbackCalled) {
       console.log('Graphics Callback Called! Only Logging this once... imageDataArray:', imageDataArray);
