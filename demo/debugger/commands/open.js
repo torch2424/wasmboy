@@ -55,10 +55,7 @@ class OpenRecentROM extends Command {
     Pubx.get(PUBX_KEYS.MODAL).closeModal();
   }
 
-  execute() {
-    // Allow autoplaying audio to work
-    WasmBoy.resumeAudioContext();
-
+  showLoader() {
     // Show a loading spinner
     Pubx.get(PUBX_KEYS.MODAL).showModal(() => {
       return (
@@ -68,6 +65,39 @@ class OpenRecentROM extends Command {
         </div>
       );
     }, true);
+  }
+
+  showDeleteROM(cartridge) {
+    const deleteROM = async () => {
+      this.showLoader();
+      await WasmBoy.deleteSavedCartridge(cartridge);
+      this.execute();
+    };
+
+    Pubx.get(PUBX_KEYS.MODAL).closeModal();
+    Pubx.get(PUBX_KEYS.MODAL).showModal(() => {
+      const ROMdate = new Date(cartridge.cartridgeRom.date).toLocaleDateString();
+      return (
+        <div class="recent-rom-container__delete">
+          <h1>Delete ROM</h1>
+          <h3>{cartridge.cartridgeRom.fileName}</h3>
+          <h4>{ROMdate}</h4>
+          <h3>Are you sure you want to do this?</h3>
+          <button onClick={() => this.execute()}>Cancel</button>
+          <button onClick={() => deleteROM()}>Delete</button>
+        </div>
+      );
+    });
+  }
+
+  execute() {
+    // Allow autoplaying audio to work
+    WasmBoy.resumeAudioContext();
+
+    Pubx.get(PUBX_KEYS.MODAL).closeModal();
+
+    // Show a loading spinner
+    this.showLoader();
 
     const recentROMTask = async () => {
       const wasmboyCartridges = await WasmBoy.getSavedMemory();
@@ -88,6 +118,9 @@ class OpenRecentROM extends Command {
             <li>
               <button class="remove-default-button" onClick={() => this.loadROM(cartridge)}>
                 <b>{cartridge.cartridgeRom.fileName}</b> - {ROMdate}
+              </button>
+              <button class="remove-default-button recent-rom-container__delete-rom" onClick={() => this.showDeleteROM(cartridge)}>
+                🚮
               </button>
             </li>
           );
