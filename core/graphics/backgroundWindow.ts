@@ -3,7 +3,13 @@ import { FRAME_LOCATION } from '../constants';
 import { Cpu } from '../cpu/index';
 import { Config } from '../config';
 import { Graphics, loadFromVramBank, setPixelOnFrame, getRgbPixelStart } from './graphics';
-import { getMonochromeColorFromPalette, getRgbColorFromPalette, getColorComponentFromRgb } from './palette';
+import {
+  getMonochromeColorFromPalette,
+  getColorizedGbHexColorFromPalette,
+  getRgbColorFromPalette,
+  getColorComponentFromRgb
+} from './palette';
+import { getRedFromHexColor, getGreenFromHexColor, getBlueFromHexColor } from './colors';
 import { addPriorityforPixel, getPriorityforPixel } from './priority';
 import { TileCache, drawPixelsFromLineOfTile, getTileDataAddress } from './tiles';
 // Assembly script really not feeling the reexport
@@ -238,11 +244,11 @@ function drawMonochromePixelFromTileId(
 
   // FINALLY, RENDER THAT PIXEL!
   // Only rendering camera for now, so coordinates are for the camera.
-  // Get the rgb value for the color Id, will be repeated into R, G, B
-  let monochromeColor: i32 = getMonochromeColorFromPalette(paletteColorId, Graphics.memoryLocationBackgroundPalette);
-  setPixelOnFrame(xPixel, yPixel, 0, monochromeColor);
-  setPixelOnFrame(xPixel, yPixel, 1, monochromeColor);
-  setPixelOnFrame(xPixel, yPixel, 2, monochromeColor);
+  // Get the rgb value for the color Id, will be repeated into R, G, B. if not colorized
+  let hexColor: i32 = getColorizedGbHexColorFromPalette(paletteColorId, Graphics.memoryLocationBackgroundPalette);
+  setPixelOnFrame(xPixel, yPixel, 0, getRedFromHexColor(hexColor));
+  setPixelOnFrame(xPixel, yPixel, 1, getGreenFromHexColor(hexColor));
+  setPixelOnFrame(xPixel, yPixel, 2, getBlueFromHexColor(hexColor));
 
   // Lastly, add the pixel to our background priority map
   // https://github.com/torch2424/wasmBoy/issues/51

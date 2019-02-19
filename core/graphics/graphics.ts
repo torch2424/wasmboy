@@ -6,6 +6,7 @@ import { renderBackground, renderWindow } from './backgroundWindow';
 import { renderSprites } from './sprites';
 import { clearPriorityMap } from './priority';
 import { resetTileCache } from './tiles';
+import { initializeColors } from './colors';
 import { Cpu } from '../cpu/index';
 import { Config } from '../config';
 import {
@@ -178,6 +179,8 @@ export function initializeGraphics(): void {
     eightBitStoreIntoGBMemory(0xff4f, 0x00);
     eightBitStoreIntoGBMemory(0xff70, 0x01);
   }
+
+  initializeColors();
 }
 
 export function updateGraphics(numberOfCycles: i32): void {

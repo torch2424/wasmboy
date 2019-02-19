@@ -3,7 +3,13 @@ import { Graphics, loadFromVramBank, setPixelOnFrame } from './graphics';
 import { Lcd } from './lcd';
 import { Cpu } from '../cpu/index';
 import { getTileDataAddress } from './tiles';
-import { getMonochromeColorFromPalette, getRgbColorFromPalette, getColorComponentFromRgb } from './palette';
+import {
+  getMonochromeColorFromPalette,
+  getColorizedGbHexColorFromPalette,
+  getRgbColorFromPalette,
+  getColorComponentFromRgb
+} from './palette';
+import { getRedFromHexColor, getGreenFromHexColor, getBlueFromHexColor } from './colors';
 import { getPriorityforPixel } from './priority';
 // Assembly script really not feeling the reexport
 // using Skip Traps, because LCD has unrestricted access
@@ -165,12 +171,13 @@ export function renderSprites(scanlineRegister: i32, useLargerSprites: boolean):
                 if (checkBitOnByte(4, spriteAttributes)) {
                   spritePaletteLocation = Graphics.memoryLocationSpritePaletteTwo;
                 }
-                let spritePixelColorFromPalette: i32 = getMonochromeColorFromPalette(spriteColorId, spritePaletteLocation);
+
+                let hexColor: i32 = getColorizedGbHexColorFromPalette(spriteColorId, spritePaletteLocation);
 
                 // Finally set the pixel!
-                setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, 0, spritePixelColorFromPalette);
-                setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, 1, spritePixelColorFromPalette);
-                setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, 2, spritePixelColorFromPalette);
+                setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, 0, getRedFromHexColor(hexColor));
+                setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, 1, getGreenFromHexColor(hexColor));
+                setPixelOnFrame(spriteXPixelLocationInCameraView, scanlineRegister, 2, getBlueFromHexColor(hexColor));
               } else {
                 // Get our RGB Color
 

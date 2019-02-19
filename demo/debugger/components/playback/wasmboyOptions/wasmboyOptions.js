@@ -106,6 +106,34 @@ export default class WasmBoyOptions extends Component {
 
         <div class="wasmboy__options__inputs">{options}</div>
 
+        {/* Colorization Select*/}
+        <div>
+          <label>
+            <a href="https://i.redd.it/0rl8fp5qkz2z.png" target="_blank">
+              GB Colorization Palette
+            </a>
+            :
+            <select
+              value={this.state['gbcColorizationPalette']}
+              onChange={() => this.setStateKey('gbcColorizationPalette', event.target.value)}
+            >
+              <option value="wasmboygb">WasmBoy GB</option>
+              <option value="brown">Brown</option>
+              <option value="red">Red</option>
+              <option value="darkbrown">Dark Brown</option>
+              <option value="pastelmix">Pastel Mix</option>
+              <option value="orange">Orange</option>
+              <option value="yellow">Yellow</option>
+              <option value="blue">Blue</option>
+              <option value="darkblue">Dark Blue</option>
+              <option value="grayscale">Grayscale</option>
+              <option value="green">Green</option>
+              <option value="darkgreen">Dark Green</option>
+              <option value="inverted">Inverted</option>
+            </select>
+          </label>
+        </div>
+
         <button
           class="wasmboy__options__apply button"
           onClick={() => {

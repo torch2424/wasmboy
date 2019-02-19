@@ -26,6 +26,8 @@ const getMobileCanvasElement = () => {
 // WasmBoy Options
 const WasmBoyDefaultOptions = {
   isGbcEnabled: true,
+  isGbcColorizationEnabled: true,
+  gbcColorizationPalette: undefined,
   isAudioEnabled: true,
   enableAudioDebugging: false,
   frameSkip: 0,
