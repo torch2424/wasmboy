@@ -86,23 +86,3 @@ export {
 export { getLY, drawBackgroundMapToWasmMemory, drawTileDataToWasmMemory, drawOamToWasmMemory } from './debug/debug-graphics';
 export { getDIV, getTIMA, getTMA, getTAC } from './debug/debug-timer';
 export { updateDebugGBMemory } from './debug/debug-memory';
-export {
-  update,
-  emulationStep,
-  getAudioQueueIndex,
-  resetAudioQueue,
-  wasmMemorySize,
-  wasmBoyInternalStateLocation,
-  wasmBoyInternalStateSize,
-  gameBoyInternalMemoryLocation,
-  gameBoyInternalMemorySize,
-  videoOutputLocation,
-  frameInProgressVideoOutputLocation,
-  gameboyColorPaletteLocation,
-  gameboyColorPaletteSize,
-  backgroundMapLocation,
-  tileDataMap,
-  soundOutputLocation,
-  gameBytesLocation,
-  gameRamBanksLocation
-} from './legacy';
