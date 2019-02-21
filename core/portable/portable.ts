@@ -13,14 +13,7 @@ export function u16Portable(param: u16): u16 {
 }
 
 export function i8Portable(param: i8): i8 {
-  // JS ints are all i32, therefore, get the sign bit, and then convert accordingly
-  // Example: https://blog.michaelyin.info/convert-8bit-byte-to-signed-int/
-  let response: i32 = param;
-  if (checkBitOnByte(7, response)) {
-    response = (256 - <i32>param) * -1;
-  }
-
-  return <i8>response;
+  return (param << 24) >> 24;
 }
 
 export function i32Portable(param: i32): i32 {
