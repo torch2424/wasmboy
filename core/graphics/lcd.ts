@@ -109,6 +109,7 @@ function resetLcd(shouldBlankScreen: boolean): void {
 }
 
 // Pass in the lcd status for performance
+// Inlined because closure compiler inlines
 export function setLcdStatus(): void {
   // Check if the Lcd was disabled
   if (!Lcd.enabled) {

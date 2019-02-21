@@ -38,13 +38,39 @@ if (!process.env.ES_NEXT) {
 }
 
 if (process.env.GET_CORE_CLOSURE) {
-  plugins = [...plugins, compiler()];
+  let closureCompilerOptions = {};
+
+  if (process.env.CLOSURE_DEBUG) {
+    console.log('Yoooo');
+    closureCompilerOptions = {
+      ...closureCompilerOptions,
+      debug: true
+    };
+  }
+
+  plugins = [...plugins, compiler(closureCompilerOptions)];
 }
 
 plugins = [...plugins, bundleSize()];
 
 // Array of bundles to make
 const bundleMap = [];
+
+const addDotIdentifiers = output => {
+  if (process.env.ES_NEXT) {
+    output += '.esnext';
+  }
+
+  if (process.env.GET_CORE_CLOSURE) {
+    output += '.closure';
+
+    if (process.env.CLOSURE_DEBUG) {
+      output += '.closuredebug';
+    }
+  }
+
+  return output;
+};
 
 if (process.env.WASM) {
   let bundleMapObject = {
@@ -53,13 +79,7 @@ if (process.env.WASM) {
     output: 'dist/core/getWasmBoyWasmCore'
   };
 
-  if (process.env.ES_NEXT) {
-    bundleMapObject.output += '.esnext';
-  }
-
-  if (process.env.GET_CORE_CLOSURE) {
-    bundleMapObject.output += '.closure';
-  }
+  bundleMapObject.output = addDotIdentifiers(bundleMapObject.output);
 
   bundleMap.push(bundleMapObject);
 }
@@ -71,13 +91,7 @@ if (process.env.TS) {
     output: 'dist/core/getWasmBoyTsCore'
   };
 
-  if (process.env.ES_NEXT) {
-    bundleMapObject.output = 'dist/core/getWasmBoyTsCore.esnext';
-  }
-
-  if (process.env.GET_CORE_CLOSURE) {
-    bundleMapObject.output += '.closure';
-  }
+  bundleMapObject.output = addDotIdentifiers(bundleMapObject.output);
 
   bundleMap.push(bundleMapObject);
 }

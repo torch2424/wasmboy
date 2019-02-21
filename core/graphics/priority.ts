@@ -14,10 +14,12 @@ export function addPriorityforPixel(x: i32, y: i32, colorId: i32 = 0, hasGbcBgPr
   store<u8>(BG_PRIORITY_MAP_LOCATION + getPixelStart(x, y), <u8>bgPriorityByte);
 }
 
+// Inlined because closure compiler inlines
 export function getPriorityforPixel(x: i32, y: i32): u8 {
   return load<u8>(BG_PRIORITY_MAP_LOCATION + getPixelStart(x, y));
 }
 
+// Inlined because closure compiler inlines
 export function clearPriorityMap(): void {
   for (let y: i32 = 0; y < 144; y++) {
     for (let x: i32 = 0; x < 160; x++) {
@@ -26,6 +28,7 @@ export function clearPriorityMap(): void {
   }
 }
 
+// Inlined because closure compiler inlines
 function getPixelStart(x: i32, y: i32): i32 {
   // Get the pixel number
   return y * 160 + x;

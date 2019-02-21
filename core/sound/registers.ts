@@ -12,6 +12,7 @@ import { eightBitLoadFromGBMemory, eightBitStoreIntoGBMemory } from '../memory/i
 import { checkBitOnByte, setBitOnByte, resetBitOnByte, hexLog } from '../helpers/index';
 
 // Function to check and handle writes to sound registers
+// Inlined because closure compiler inlines
 export function SoundRegisterWriteTraps(offset: i32, value: i32): boolean {
   if (offset !== Sound.memoryLocationNR52 && !Sound.NR52IsSoundEnabled) {
     // Block all writes to any sound register EXCEPT NR52!
@@ -123,6 +124,7 @@ export function SoundRegisterWriteTraps(offset: i32, value: i32): boolean {
 }
 
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
+// Inlined because closure compiler inlines
 export function SoundRegisterReadTraps(offset: i32): i32 {
   // TODO: OR All Registers
 

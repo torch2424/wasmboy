@@ -23,6 +23,7 @@ import { u8Portable, i32Portable } from '../portable/portable';
 // NOTE: i32Portable wraps modulo here as somehow it gets converted to a double:
 // https://github.com/torch2424/wasmboy/issues/216
 
+// Inlined because closure compiler inlines
 export function renderBackground(scanlineRegister: i32, tileDataMemoryLocation: i32, tileMapMemoryLocation: i32): void {
   // NOTE: Camera is reffering to what you can see inside the 160x144 viewport of the entire rendered 256x256 map.
 
@@ -48,6 +49,7 @@ export function renderBackground(scanlineRegister: i32, tileDataMemoryLocation: 
   drawBackgroundWindowScanline(scanlineRegister, tileDataMemoryLocation, tileMapMemoryLocation, pixelYPositionInMap, 0, scrollX);
 }
 
+// Inlined because closure compiler inlines
 export function renderWindow(scanlineRegister: i32, tileDataMemoryLocation: i32, tileMapMemoryLocation: i32): void {
   // Get our windowX and windowY
   // let windowX: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationWindowX);
@@ -183,6 +185,7 @@ function drawBackgroundWindowScanline(
 }
 
 // Function to draw a pixel for the standard GB
+// Inlined because closure compiler inlines
 function drawMonochromePixelFromTileId(
   xPixel: i32,
   yPixel: i32,
@@ -264,6 +267,7 @@ function drawMonochromePixelFromTileId(
 
 // Function to draw a pixel from a tile in C O L O R
 // See above for more context on some variables
+// Inlined because closure compiler inlines
 function drawColorPixelFromTileId(
   xPixel: i32,
   yPixel: i32,
@@ -353,6 +357,7 @@ function drawColorPixelFromTileId(
 }
 
 // Function to attempt to draw the tile from the tile cache
+// Inlined because closure compiler inlines
 function drawLineOfTileFromTileCache(
   xPixel: i32,
   yPixel: i32,
@@ -422,6 +427,7 @@ function drawLineOfTileFromTileCache(
 
 // Function to draw a line of a tile in Color
 // This is for tile rendering shortcuts
+// Inlined because closure compiler inlines
 function drawLineOfTileFromTileId(
   xPixel: i32,
   yPixel: i32,
