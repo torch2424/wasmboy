@@ -18,7 +18,10 @@ import { TileCache, drawPixelsFromLineOfTile, getTileDataAddress } from './tiles
 import { eightBitLoadFromGBMemory } from '../memory/load';
 import { Memory } from '../memory/memory';
 import { hexLog, checkBitOnByte, setBitOnByte, resetBitOnByte } from '../helpers/index';
-import { u8Portable } from '../portable/portable';
+import { u8Portable, i32Portable } from '../portable/portable';
+
+// NOTE: i32Portable wraps modulo here as somehow it gets converted to a double:
+// https://github.com/torch2424/wasmboy/issues/216
 
 export function renderBackground(scanlineRegister: i32, tileDataMemoryLocation: i32, tileMapMemoryLocation: i32): void {
   // NOTE: Camera is reffering to what you can see inside the 160x144 viewport of the entire rendered 256x256 map.
@@ -67,7 +70,9 @@ export function renderWindow(scanlineRegister: i32, tileDataMemoryLocation: i32,
   let pixelYPositionInMap: i32 = scanlineRegister - windowY;
 
   // xOffset is simply a neagative window x
-  let xOffset: i32 = -1 * windowX;
+  // NOTE: This can become negative zero?
+  // https://github.com/torch2424/wasmboy/issues/216
+  let xOffset: i32 = i32Portable(-1 * windowX);
 
   // Draw the Background scanline
   drawBackgroundWindowScanline(scanlineRegister, tileDataMemoryLocation, tileMapMemoryLocation, pixelYPositionInMap, windowX, xOffset);
@@ -203,7 +208,7 @@ function drawMonochromePixelFromTileId(
   // yPixel = 144. 144 % 8 = 0.
   // 0 Represents last line of pixels in a tile, 1 represents first. 1 2 3 4 5 6 7 0.
   // Because remember, we are counting lines on the display NOT including zero
-  let pixelYInTile: i32 = pixelYPositionInMap % 8;
+  let pixelYInTile: i32 = i32Portable(pixelYPositionInMap % 8);
 
   // Remember to represent a single line of 8 pixels on a tile, we need two bytes.
   // Therefore, we need to times our modulo by 2, to get the correct line of pixels on the tile.
@@ -217,7 +222,7 @@ function drawMonochromePixelFromTileId(
   // Therefore, is pixelX was 2, then really is need to be 5
   // So 2 - 7 = -5, * 1 = 5
   // Or to simplify, 7 - 2 = 5 haha!
-  let pixelXInTile: i32 = pixelXPositionInMap % 8;
+  let pixelXInTile: i32 = i32Portable(pixelXPositionInMap % 8);
   pixelXInTile = 7 - pixelXInTile;
 
   // Now we can get the color for that pixel
@@ -284,7 +289,7 @@ function drawColorPixelFromTileId(
   let bgMapAttributes: i32 = loadFromVramBank(tileMapAddress, 1);
 
   // See above for explanation
-  let pixelYInTile: i32 = pixelYPositionInMap % 8;
+  let pixelYInTile: i32 = i32Portable(pixelYPositionInMap % 8);
   if (checkBitOnByte(6, bgMapAttributes)) {
     // We are mirroring the tile, therefore, we need to opposite byte
     // So if our pixel was 0 our of 8, it wild become 7 :)
@@ -303,7 +308,7 @@ function drawColorPixelFromTileId(
 
   // Get our X pixel. Need to NOT reverse it if it was flipped.
   // See above, you have to reverse this normally
-  let pixelXInTile: i32 = pixelXPositionInMap % 8;
+  let pixelXInTile: i32 = i32Portable(pixelXPositionInMap % 8);
   if (!checkBitOnByte(5, bgMapAttributes)) {
     pixelXInTile = 7 - pixelXInTile;
   }
@@ -406,7 +411,7 @@ function drawLineOfTileFromTileCache(
   // Calculate when we should do the tileCache calculation again
   if (xPixel >= TileCache.nextXIndexToPerformCacheCheck) {
     TileCache.nextXIndexToPerformCacheCheck = xPixel + 8;
-    let xOffsetTileWidthRemainder: i32 = pixelXPositionInMap % 8;
+    let xOffsetTileWidthRemainder: i32 = i32Portable(pixelXPositionInMap % 8);
     if (xPixel < xOffsetTileWidthRemainder) {
       TileCache.nextXIndexToPerformCacheCheck += xOffsetTileWidthRemainder;
     }
@@ -427,7 +432,7 @@ function drawLineOfTileFromTileId(
   tileIdFromTileMap: i32
 ): i32 {
   // Get the which line of the tile we are rendering
-  let tileLineY: i32 = pixelYPositionInMap % 8;
+  let tileLineY: i32 = i32Portable(pixelYPositionInMap % 8);
 
   // Now lets find our tileX start and end
   // This is for the case where i = 0, but scroll X was 3.
