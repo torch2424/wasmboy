@@ -16,6 +16,10 @@ import { log, hexLog } from '../helpers/index';
 // Everything Static as class instances just aren't quite there yet
 // https://github.com/AssemblyScript/assemblyscript/blob/master/tests/compiler/showcase.ts
 export class Cpu {
+  // Status to track if we are currently executing the boot rom
+  static readonly memoryLocationBootROMSwitch: u16 = 0xff50;
+  static BootROMEnabled: boolean = false;
+
   // Status to track if we are in Gameboy Color Mode, and GBC State
   static GBCEnabled: boolean = false;
 
@@ -126,6 +130,10 @@ export class Cpu {
     storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x12, Cpu.saveStateSlot), Cpu.isHaltNoJump);
     storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x13, Cpu.saveStateSlot), Cpu.isHaltBug);
     storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x14, Cpu.saveStateSlot), Cpu.isStopped);
+
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x15, Cpu.saveStateSlot), Cpu.BootROMEnabled);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x16, Cpu.saveStateSlot), Cpu.GBCEnabled);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x17, Cpu.saveStateSlot), Cpu.GBCDoubleSpeed);
   }
 
   // Function to load the save state from memory
@@ -149,6 +157,10 @@ export class Cpu {
     Cpu.isHaltNoJump = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x12, Cpu.saveStateSlot));
     Cpu.isHaltBug = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x13, Cpu.saveStateSlot));
     Cpu.isStopped = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x14, Cpu.saveStateSlot));
+
+    Cpu.BootROMEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x15, Cpu.saveStateSlot));
+    Cpu.GBCEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x16, Cpu.saveStateSlot));
+    Cpu.GBCDoubleSpeed = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x17, Cpu.saveStateSlot));
   }
 }
 

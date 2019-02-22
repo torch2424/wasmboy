@@ -25,6 +25,12 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
     return false;
   }
 
+  // Handle Boot ROM Switch
+  if (Cpu.BootROMEnabled && offset === Cpu.memoryLocationBootROMSwitch) {
+    Cpu.BootROMEnabled = false;
+    return true;
+  }
+
   // Graphics
   // Cache globals used multiple times for performance
   let videoRamLocation: i32 = Memory.videoRamLocation;

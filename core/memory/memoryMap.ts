@@ -17,6 +17,7 @@ import {
   OAM_TILES_LOCATION,
   AUDIO_BUFFER_LOCATION,
   CARTRIDGE_RAM_LOCATION,
+  BOOT_ROM_LOCATION,
   CARTRIDGE_ROM_LOCATION
 } from '../constants';
 import { Memory } from './memory';
@@ -40,6 +41,11 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
     case 0x03:
       // Cartridge ROM - Bank 0 (fixed)
       // 0x0000 -> 0x0D2400
+
+      // Check if we are currently executing the boot rom
+      if (Cpu.BootROMEnabled) {
+        return gameboyOffset + BOOT_ROM_LOCATION;
+      }
       return gameboyOffset + CARTRIDGE_ROM_LOCATION;
     case 0x04:
     case 0x05:

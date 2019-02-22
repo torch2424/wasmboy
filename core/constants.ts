@@ -68,11 +68,18 @@ export const CHANNEL_4_BUFFER_SIZE: i32 = 0x020000;
 export const AUDIO_BUFFER_LOCATION: i32 = CHANNEL_4_BUFFER_LOCATION + CHANNEL_4_BUFFER_SIZE;
 export const AUDIO_BUFFER_SIZE: i32 = 0x020000;
 
-// Catridge Memory
+// Catridge Ram
 export const CARTRIDGE_RAM_LOCATION: i32 = AUDIO_BUFFER_LOCATION + AUDIO_BUFFER_SIZE;
 export const CARTRIDGE_RAM_SIZE: i32 = 0x020000;
 
-export const CARTRIDGE_ROM_LOCATION: i32 = CARTRIDGE_RAM_LOCATION + CARTRIDGE_RAM_SIZE;
+// Boot ROM
+// http://gbdev.gg8.se/files/roms/bootroms/
+// Largest Boot rom is GBC, at 2.5KB
+export const BOOT_ROM_LOCATION: i32 = CARTRIDGE_RAM_LOCATION + CARTRIDGE_RAM_SIZE;
+export const BOOT_ROM_SIZE: i32 = 0x000a00;
+
+// Cartridge ROM
+export const CARTRIDGE_ROM_LOCATION: i32 = BOOT_ROM_LOCATION + BOOT_ROM_SIZE;
 export const CARTRIDGE_ROM_SIZE: i32 = 0x7e0400;
 
 // Debug Memory
