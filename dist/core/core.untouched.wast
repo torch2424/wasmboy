@@ -7904,42 +7904,40 @@
   else   
    local.get $0
   end
-  if
-   i32.const 1
-   return
-  end
-  i32.const 0
  )
  (func $core/timers/timers/updateTimers (; 105 ;) (type $i_) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
+  (local $3 i32)
+  (local $4 i32)
   loop $continue|0
-   local.get $1
+   local.get $3
    local.get $0
    i32.lt_s
    if
-    local.get $1
+    local.get $3
     i32.const 4
     i32.add
-    local.set $1
+    local.set $3
     global.get $core/timers/timers/Timers.dividerRegister
-    local.tee $2
+    local.tee $4
     i32.const 4
     i32.add
-    global.set $core/timers/timers/Timers.dividerRegister
-    global.get $core/timers/timers/Timers.dividerRegister
+    local.tee $1
     i32.const 65535
     i32.gt_s
     if
-     global.get $core/timers/timers/Timers.dividerRegister
+     local.get $1
      i32.const 65536
      i32.sub
-     global.set $core/timers/timers/Timers.dividerRegister
+     local.set $1
     end
     global.get $core/timers/timers/Timers.timerEnabled
     if
+     global.get $core/timers/timers/Timers.timerCounterWasReset
+     local.set $2
      global.get $core/timers/timers/Timers.timerCounterOverflowDelay
-     if
+     if (result i32)
       global.get $core/timers/timers/Timers.timerModulo
       global.set $core/timers/timers/Timers.timerCounter
       i32.const 1
@@ -7949,32 +7947,34 @@
       i32.const 0
       global.set $core/timers/timers/Timers.timerCounterOverflowDelay
       i32.const 1
-      global.set $core/timers/timers/Timers.timerCounterWasReset
      else      
-      global.get $core/timers/timers/Timers.timerCounterWasReset
-      if
-       i32.const 0
-       global.set $core/timers/timers/Timers.timerCounterWasReset
-      end
+      i32.const 0
+      local.get $2
+      local.get $2
+      select
      end
-     local.get $2
-     global.get $core/timers/timers/Timers.dividerRegister
+     global.set $core/timers/timers/Timers.timerCounterWasReset
+     local.get $4
+     local.get $1
      call $core/timers/timers/_checkDividerRegisterFallingEdgeDetector
      if
       global.get $core/timers/timers/Timers.timerCounter
       i32.const 1
       i32.add
-      global.set $core/timers/timers/Timers.timerCounter
-      global.get $core/timers/timers/Timers.timerCounter
+      local.tee $2
       i32.const 255
       i32.gt_s
       if
        i32.const 1
        global.set $core/timers/timers/Timers.timerCounterOverflowDelay
        i32.const 0
-       global.set $core/timers/timers/Timers.timerCounter
+       local.set $2
       end
+      local.get $2
+      global.set $core/timers/timers/Timers.timerCounter
      end
+     local.get $1
+     global.set $core/timers/timers/Timers.dividerRegister
     end
     br $continue|0
    end
@@ -7988,8 +7988,6 @@
  )
  (func $core/timers/timers/Timers.updateDividerRegister (; 107 ;) (type $FUNCSIG$v)
   (local $0 i32)
-  global.get $core/timers/timers/Timers.dividerRegister
-  local.set $0
   i32.const 0
   global.set $core/timers/timers/Timers.dividerRegister
   i32.const 65284
@@ -7997,8 +7995,8 @@
   call $core/memory/store/eightBitStoreIntoGBMemory
   global.get $core/timers/timers/Timers.timerEnabled
   if (result i32)
-   local.get $0
    global.get $core/timers/timers/Timers.dividerRegister
+   i32.const 0
    call $core/timers/timers/_checkDividerRegisterFallingEdgeDetector
   else   
    global.get $core/timers/timers/Timers.timerEnabled
@@ -8007,21 +8005,23 @@
    global.get $core/timers/timers/Timers.timerCounter
    i32.const 1
    i32.add
-   global.set $core/timers/timers/Timers.timerCounter
-   global.get $core/timers/timers/Timers.timerCounter
+   local.tee $0
    i32.const 255
    i32.gt_s
    if
     i32.const 1
     global.set $core/timers/timers/Timers.timerCounterOverflowDelay
     i32.const 0
-    global.set $core/timers/timers/Timers.timerCounter
+    local.set $0
    end
+   local.get $0
+   global.set $core/timers/timers/Timers.timerCounter
   end
  )
  (func $core/timers/timers/Timers.updateTimerControl (; 108 ;) (type $i_) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
+  (local $3 i32)
   global.get $core/timers/timers/Timers.timerEnabled
   local.set $1
   local.get $0
@@ -8042,28 +8042,30 @@
    local.set $0
    local.get $2
    call $core/timers/timers/_getTimerCounterMaskBit
+   local.set $3
+   global.get $core/timers/timers/Timers.dividerRegister
    local.set $1
    global.get $core/timers/timers/Timers.timerEnabled
    if (result i32)
-    global.get $core/timers/timers/Timers.dividerRegister
     i32.const 1
     local.get $0
     i32.shl
+    local.get $1
     i32.and
    else    
-    global.get $core/timers/timers/Timers.dividerRegister
     i32.const 1
     local.get $0
     i32.shl
+    local.get $1
     i32.and
     i32.const 0
     i32.ne
     local.tee $0
     if (result i32)
-     global.get $core/timers/timers/Timers.dividerRegister
      i32.const 1
-     local.get $1
+     local.get $3
      i32.shl
+     local.get $1
      i32.and
     else     
      local.get $0
@@ -8073,16 +8075,17 @@
     global.get $core/timers/timers/Timers.timerCounter
     i32.const 1
     i32.add
-    global.set $core/timers/timers/Timers.timerCounter
-    global.get $core/timers/timers/Timers.timerCounter
+    local.tee $0
     i32.const 255
     i32.gt_s
     if
      i32.const 1
      global.set $core/timers/timers/Timers.timerCounterOverflowDelay
      i32.const 0
-     global.set $core/timers/timers/Timers.timerCounter
+     local.set $0
     end
+    local.get $0
+    global.set $core/timers/timers/Timers.timerCounter
    end
   end
   local.get $2
@@ -8432,11 +8435,8 @@
          if
           global.get $core/timers/timers/Timers.timerCounterWasReset
           br_if $__inlined_func$core/timers/timers/Timers.updateTimerCounter
-          global.get $core/timers/timers/Timers.timerCounterOverflowDelay
-          if
-           i32.const 0
-           global.set $core/timers/timers/Timers.timerCounterOverflowDelay
-          end
+          i32.const 0
+          global.set $core/timers/timers/Timers.timerCounterOverflowDelay
          end
          local.get $1
          global.set $core/timers/timers/Timers.timerCounter
@@ -8451,7 +8451,7 @@
        local.get $0
        select
        if
-        global.get $core/timers/timers/Timers.timerModulo
+        local.get $1
         global.set $core/timers/timers/Timers.timerCounter
         i32.const 0
         global.set $core/timers/timers/Timers.timerCounterWasReset

@@ -30,7 +30,8 @@ export class Timers {
   // DIV will increment TIMA, whenever there is a falling edge, see below for that.
   static readonly memoryLocationDividerRegister: i32 = 0xff04; // DIV
   static dividerRegister: i32 = 0;
-  static updateDividerRegister(value: i32): void { // value is unused. Is it correct?
+  static updateDividerRegister(value: i32): void {
+    // value is unused. Is it correct?
     Timers.dividerRegister = 0;
     eightBitStoreIntoGBMemory(Timers.memoryLocationDividerRegister, 0);
 
@@ -117,8 +118,7 @@ export class Timers {
         shouldIncrementTimerCounter = checkBitOnByte(oldTimerCounterMaskBit, dividerRegister);
       } else {
         shouldIncrementTimerCounter =
-          checkBitOnByte(oldTimerCounterMaskBit, dividerRegister) &&
-          checkBitOnByte(newTimerCounterMaskBit, dividerRegister);
+          checkBitOnByte(oldTimerCounterMaskBit, dividerRegister) && checkBitOnByte(newTimerCounterMaskBit, dividerRegister);
       }
 
       if (shouldIncrementTimerCounter) {
@@ -261,10 +261,7 @@ function _checkDividerRegisterFallingEdgeDetector(oldDividerRegister: i32, newDi
 
   // If the old register's watched bit was zero,
   // but after adding the new registers wastch bit is now 1
-  return (
-     checkBitOnByte(timerCounterMaskBit, oldDividerRegister) &&
-    !checkBitOnByte(timerCounterMaskBit, newDividerRegister)
-  );
+  return checkBitOnByte(timerCounterMaskBit, oldDividerRegister) && !checkBitOnByte(timerCounterMaskBit, newDividerRegister);
 }
 
 // Function to get our current tima mask bit
