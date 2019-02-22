@@ -40,6 +40,7 @@ export class Serial {
 }
 
 // Function to initialize our serial values
+// Inlined because closure compiler inlines
 export function initializeSerial(): void {
   Serial.currentCycles = 0x00;
   Serial.numberOfBitsTransferred = 0;
@@ -57,6 +58,7 @@ export function initializeSerial(): void {
 
 // TODO: Finish serial
 // See minimal serial: https://github.com/binji/binjgb/commit/64dece05c4ef5a052c4b9b75eb3ddbbfc6677cbe
+// Inlined because closure compiler inlines
 export function updateSerial(numberOfCycles: i32): void {
   // If we aren't starting our transfer, or transferring,
   // return
@@ -97,6 +99,7 @@ export function updateSerial(numberOfCycles: i32): void {
   }
 }
 
+// Inlined because closure compiler inlines
 function _checkFallingEdgeDetector(oldCycles: i32, newCycles: i32): boolean {
   // Get our mask
   let maskBit = _getFallingEdgeMaskBit();
@@ -113,6 +116,7 @@ function _checkFallingEdgeDetector(oldCycles: i32, newCycles: i32): boolean {
 // Function to get our current tima mask bit
 // used for our falling edge detector
 // See The docs linked above, or TCAGB for this bit mapping
+// Inlined because closure compiler inlines
 function _getFallingEdgeMaskBit(): i32 {
   if (Serial.isClockSpeedFast) {
     return 2;

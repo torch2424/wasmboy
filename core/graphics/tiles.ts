@@ -23,6 +23,7 @@ export class TileCache {
   static nextXIndexToPerformCacheCheck: i32 = -1;
 }
 
+// Inlined because closure compiler inlines
 export function resetTileCache(): void {
   TileCache.tileId = -1;
   TileCache.nextXIndexToPerformCacheCheck = -1;
@@ -155,6 +156,7 @@ export function drawPixelsFromLineOfTile(
   return pixelsDrawn;
 }
 
+// Inlined because closure compiler inlines
 export function getTilePixelStart(outputLineX: i32, outputLineY: i32, outputWidth: i32): i32 {
   // Finally Lets place a pixel in memory
   let pixelStart: i32 = outputLineY * outputWidth + outputLineX;

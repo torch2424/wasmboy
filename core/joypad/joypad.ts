@@ -61,6 +61,7 @@ export class Joypad {
   }
 }
 
+// Inlined because closure compiler inlines
 export function getJoypadState(): i32 {
   // Get the joypad register
   let joypadRegister: i32 = Joypad.joypadRegisterFlipped;
@@ -224,6 +225,7 @@ function _pressJoypadButton(buttonId: i32): void {
   }
 }
 
+// Inlined because closure compiler inlines
 function _releaseJoypadButton(buttonId: i32): void {
   // Set our joypad state
   _setJoypadButtonStateFromButtonId(buttonId, false);

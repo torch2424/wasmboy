@@ -26,6 +26,7 @@ export class SoundAccumulator {
   static needToRemixSamples: boolean = false;
 }
 
+// Inlined because closure compiler inlines
 export function initializeSoundAccumulator(): void {
   SoundAccumulator.channel1Sample = 15;
   SoundAccumulator.channel2Sample = 15;
@@ -42,6 +43,7 @@ export function initializeSoundAccumulator(): void {
   SoundAccumulator.needToRemixSamples = false;
 }
 
+// Inlined because closure compiler inlines
 export function accumulateSound(numberOfCycles: i32): void {
   // Check if any of the individual channels will update
   let channel1WillUpdate: boolean = Channel1.willChannelUpdate(numberOfCycles) || didChannelDacChange(Channel1.channelNumber);

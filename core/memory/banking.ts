@@ -2,6 +2,7 @@
 import { Memory } from './memory';
 import { concatenateBytes, checkBitOnByte, splitLowByte, hexLog } from '../helpers/index';
 
+// Inlined because closure compiler inlines
 export function handleBanking(offset: i32, value: i32): void {
   // Is rom Only does not bank
   if (Memory.isRomOnly) {
@@ -99,6 +100,7 @@ export function handleBanking(offset: i32, value: i32): void {
   }
 }
 
+// Inlined because closure compiler inlines
 export function getRomBankAddress(gameboyOffset: i32): i32 {
   let currentRomBank: i32 = Memory.currentRomBank;
   if (!Memory.isMBC5 && currentRomBank === 0) {
@@ -109,6 +111,7 @@ export function getRomBankAddress(gameboyOffset: i32): i32 {
   return <i32>(0x4000 * currentRomBank + (gameboyOffset - Memory.switchableCartridgeRomLocation));
 }
 
+// Inlined because closure compiler inlines
 export function getRamBankAddress(gameboyOffset: i32): i32 {
   // Adjust our gameboy offset relative to zero for the gameboy memory map
   return <i32>(0x2000 * Memory.currentRamBank + (gameboyOffset - Memory.cartridgeRamLocation));

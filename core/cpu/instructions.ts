@@ -165,6 +165,7 @@ export function cpARegister(register: u8): void {
   setSubtractFlag(1);
 }
 
+// Inlined because closure compiler inlines
 export function rotateRegisterLeft(register: u8): u8 {
   // RLC register 8-bit
   // Z 0 0 C
@@ -188,6 +189,7 @@ export function rotateRegisterLeft(register: u8): u8 {
   return register;
 }
 
+// Inlined because closure compiler inlines
 export function rotateRegisterRight(register: u8): u8 {
   // RLC register 8-bit
   // Z 0 0 C
@@ -212,6 +214,7 @@ export function rotateRegisterRight(register: u8): u8 {
   return register;
 }
 
+// Inlined because closure compiler inlines
 export function rotateRegisterLeftThroughCarry(register: u8): u8 {
   // RL register 8-bit
   // Z 0 0 C
@@ -240,6 +243,7 @@ export function rotateRegisterLeftThroughCarry(register: u8): u8 {
   return register;
 }
 
+// Inlined because closure compiler inlines
 export function rotateRegisterRightThroughCarry(register: u8): u8 {
   // RR register 8-bit
   // Z 0 0 C
@@ -267,6 +271,7 @@ export function rotateRegisterRightThroughCarry(register: u8): u8 {
   return register;
 }
 
+// Inlined because closure compiler inlines
 export function shiftLeftRegister(register: u8): u8 {
   // SLA register 8-bit
   // Z 0 0 C
@@ -295,6 +300,7 @@ export function shiftLeftRegister(register: u8): u8 {
   return register;
 }
 
+// Inlined because closure compiler inlines
 export function shiftRightArithmeticRegister(register: u8): u8 {
   // SRA register 8-bit
   // Z 0 0 C
@@ -334,6 +340,7 @@ export function shiftRightArithmeticRegister(register: u8): u8 {
   return register;
 }
 
+// Inlined because closure compiler inlines
 export function swapNibblesOnRegister(register: u8): u8 {
   // SWAP register 8-bit
   // Z 0 0 0
@@ -354,6 +361,7 @@ export function swapNibblesOnRegister(register: u8): u8 {
   return register;
 }
 
+// Inlined because closure compiler inlines
 export function shiftRightLogicalRegister(register: u8): u8 {
   // SRA register 8-bit
   // Z 0 0 C

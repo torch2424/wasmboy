@@ -31,6 +31,7 @@ export function getCycles(): i32 {
   return Cycles.cycles;
 }
 
+// Inlined because closure compiler inlines
 function trackCyclesRan(numberOfCycles: i32): void {
   Cycles.cycles += numberOfCycles;
   if (Cycles.cycles >= Cycles.cyclesPerCycleSet) {
@@ -39,6 +40,7 @@ function trackCyclesRan(numberOfCycles: i32): void {
   }
 }
 
+// Inlined because closure compiler inlines
 export function resetCycles(): void {
   Cycles.cyclesPerCycleSet = 2000000000;
   Cycles.cycleSets = 0;
