@@ -7,7 +7,7 @@ import {
   storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
 import { requestTimerInterrupt } from '../interrupts/index';
-import { checkBitOnByte, setBitOnByte, hexLog } from '../helpers/index';
+import { checkBitOnByte } from '../helpers/index';
 
 export class Timers {
   // Current cycles
@@ -30,13 +30,11 @@ export class Timers {
   // DIV will increment TIMA, whenever there is a falling edge, see below for that.
   static readonly memoryLocationDividerRegister: i32 = 0xff04; // DIV
   static dividerRegister: i32 = 0;
-  static updateDividerRegister(value: i32): void {
-    let oldDividerRegister: i32 = Timers.dividerRegister;
-
+  static updateDividerRegister(value: i32): void { // value is unused. Is it correct?
     Timers.dividerRegister = 0;
     eightBitStoreIntoGBMemory(Timers.memoryLocationDividerRegister, 0);
 
-    if (Timers.timerEnabled && _checkDividerRegisterFallingEdgeDetector(oldDividerRegister, Timers.dividerRegister)) {
+    if (Timers.timerEnabled && _checkDividerRegisterFallingEdgeDetector(Timers.dividerRegister, 0)) {
       _incrementTimerCounter();
     }
   }
@@ -50,6 +48,7 @@ export class Timers {
   static timerCounterOverflowDelay: boolean = false;
   static timerCounterWasReset: boolean = false;
   static timerCounterMask: i32 = 0;
+
   static updateTimerCounter(value: i32): void {
     if (Timers.timerEnabled) {
       // From binjgb, dont write TIMA if we were just reset
@@ -60,9 +59,7 @@ export class Timers {
       // Mooneye Test, tima_write_reloading
       // Writing in this strange delay cycle, will cancel
       // Both the interrupt and the TMA reload
-      if (Timers.timerCounterOverflowDelay) {
-        Timers.timerCounterOverflowDelay = false;
-      }
+      Timers.timerCounterOverflowDelay = false;
     }
 
     Timers.timerCounter = value;
@@ -82,7 +79,7 @@ export class Timers {
     // Mooneye Test, tma_write_reloading
     // Don't update if we were reloading
     if (Timers.timerEnabled && Timers.timerCounterWasReset) {
-      Timers.timerCounter = Timers.timerModulo;
+      Timers.timerCounter = value;
       Timers.timerCounterWasReset = false;
     }
   }
@@ -101,24 +98,27 @@ export class Timers {
   //            11:  16384 Hz   (~16780 Hz SGB) (256 cycles)
   static timerEnabled: boolean = false;
   static timerInputClock: i32 = 0;
+
   static updateTimerControl(value: i32): void {
     // Get some initial values
-    let oldTimerEnabled: boolean = Timers.timerEnabled;
+    let oldTimerEnabled = Timers.timerEnabled;
     Timers.timerEnabled = checkBitOnByte(2, value);
-    let newTimerInputClock: i32 = value & 0x03;
+    let newTimerInputClock = value & 0x03;
 
     // Do some obscure behavior for if we should increment TIMA
     // This does the timer increments from rapid_toggle mooneye tests
     if (!oldTimerEnabled) {
-      let oldTimerCounterMaskBit: i32 = _getTimerCounterMaskBit(Timers.timerInputClock);
-      let newTimerCounterMaskBit: i32 = _getTimerCounterMaskBit(newTimerInputClock);
-      let shouldIncrementTimerCounter: boolean = false;
+      let oldTimerCounterMaskBit = _getTimerCounterMaskBit(Timers.timerInputClock);
+      let newTimerCounterMaskBit = _getTimerCounterMaskBit(newTimerInputClock);
+      let shouldIncrementTimerCounter = false;
+      let dividerRegister = Timers.dividerRegister;
 
       if (Timers.timerEnabled) {
-        shouldIncrementTimerCounter = checkBitOnByte(oldTimerCounterMaskBit, Timers.dividerRegister);
+        shouldIncrementTimerCounter = checkBitOnByte(oldTimerCounterMaskBit, dividerRegister);
       } else {
         shouldIncrementTimerCounter =
-          checkBitOnByte(oldTimerCounterMaskBit, Timers.dividerRegister) && checkBitOnByte(newTimerCounterMaskBit, Timers.dividerRegister);
+          checkBitOnByte(oldTimerCounterMaskBit, dividerRegister) &&
+          checkBitOnByte(newTimerCounterMaskBit, dividerRegister);
       }
 
       if (shouldIncrementTimerCounter) {
@@ -135,20 +135,22 @@ export class Timers {
   // Function to save the state of the class
   // TODO: Save state for new properties on Timers
   static saveState(): void {
-    store<i32>(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot), Timers.currentCycles);
-    store<i32>(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot), Timers.dividerRegister);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x08, Timers.saveStateSlot), Timers.timerCounterOverflowDelay);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0b, Timers.saveStateSlot), Timers.timerCounterWasReset);
+    var saveStateSlot = Timers.saveStateSlot;
+    store<i32>(getSaveStateMemoryOffset(0x00, saveStateSlot), Timers.currentCycles);
+    store<i32>(getSaveStateMemoryOffset(0x04, saveStateSlot), Timers.dividerRegister);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x08, saveStateSlot), Timers.timerCounterOverflowDelay);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0b, saveStateSlot), Timers.timerCounterWasReset);
 
     eightBitStoreIntoGBMemory(Timers.memoryLocationTimerCounter, Timers.timerCounter);
   }
 
   // Function to load the save state from memory
   static loadState(): void {
-    Timers.currentCycles = load<i32>(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot));
-    Timers.dividerRegister = load<i32>(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot));
-    Timers.timerCounterOverflowDelay = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x08, Timers.saveStateSlot));
-    Timers.timerCounterWasReset = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0b, Timers.saveStateSlot));
+    var saveStateSlot = Timers.saveStateSlot;
+    Timers.currentCycles = load<i32>(getSaveStateMemoryOffset(0x00, saveStateSlot));
+    Timers.dividerRegister = load<i32>(getSaveStateMemoryOffset(0x04, saveStateSlot));
+    Timers.timerCounterOverflowDelay = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x08, saveStateSlot));
+    Timers.timerCounterWasReset = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0b, saveStateSlot));
 
     Timers.timerCounter = eightBitLoadFromGBMemory(Timers.memoryLocationTimerCounter);
     Timers.timerModulo = eightBitLoadFromGBMemory(Timers.memoryLocationTimerModulo);
@@ -203,30 +205,34 @@ export function batchProcessTimers(): void {
 
 export function updateTimers(numberOfCycles: i32): void {
   // Want to increment 4 cycles at a time like an actual GB would
-  let cyclesIncreased: i32 = 0;
+  let cyclesIncreased = 0;
   while (cyclesIncreased < numberOfCycles) {
-    let oldDividerRegister: i32 = Timers.dividerRegister;
+    let oldDividerRegister = Timers.dividerRegister;
+    let curDividerRegister = oldDividerRegister;
     cyclesIncreased += 4;
-    Timers.dividerRegister += 4;
+    curDividerRegister += 4;
 
-    if (Timers.dividerRegister > 0xffff) {
-      Timers.dividerRegister -= 0x10000;
+    if (curDividerRegister > 0xffff) {
+      curDividerRegister -= 0x10000;
     }
 
     if (Timers.timerEnabled) {
+      let timerCounterWasReset = Timers.timerCounterWasReset;
       if (Timers.timerCounterOverflowDelay) {
         Timers.timerCounter = Timers.timerModulo;
         // Fire off timer interrupt
         requestTimerInterrupt();
         Timers.timerCounterOverflowDelay = false;
-        Timers.timerCounterWasReset = true;
-      } else if (Timers.timerCounterWasReset) {
-        Timers.timerCounterWasReset = false;
+        timerCounterWasReset = true;
+      } else if (timerCounterWasReset) {
+        timerCounterWasReset = false;
       }
+      Timers.timerCounterWasReset = timerCounterWasReset;
 
-      if (_checkDividerRegisterFallingEdgeDetector(oldDividerRegister, Timers.dividerRegister)) {
+      if (_checkDividerRegisterFallingEdgeDetector(oldDividerRegister, curDividerRegister)) {
         _incrementTimerCounter();
       }
+      Timers.dividerRegister = curDividerRegister;
     }
   }
 }
@@ -234,14 +240,15 @@ export function updateTimers(numberOfCycles: i32): void {
 // Function to increment our Timer Counter
 // This fires off interrupts once we overflow
 function _incrementTimerCounter(): void {
-  Timers.timerCounter += 1;
-  if (Timers.timerCounter > 255) {
+  var counter = Timers.timerCounter;
+  if (++counter > 255) {
     // Whenever the timer overflows, there is a slight delay (4 cycles)
     // Of when TIMA gets TMA's value, and the interrupt is fired.
     // Thus we will set the delay, which can be handled in the update timer or write trap
     Timers.timerCounterOverflowDelay = true;
-    Timers.timerCounter = 0;
+    counter = 0;
   }
+  Timers.timerCounter = counter;
 }
 
 // Function to act as our falling edge detector
@@ -254,11 +261,10 @@ function _checkDividerRegisterFallingEdgeDetector(oldDividerRegister: i32, newDi
 
   // If the old register's watched bit was zero,
   // but after adding the new registers wastch bit is now 1
-  if (checkBitOnByte(timerCounterMaskBit, oldDividerRegister) && !checkBitOnByte(timerCounterMaskBit, newDividerRegister)) {
-    return true;
-  }
-
-  return false;
+  return (
+     checkBitOnByte(timerCounterMaskBit, oldDividerRegister) &&
+    !checkBitOnByte(timerCounterMaskBit, newDividerRegister)
+  );
 }
 
 // Function to get our current tima mask bit
