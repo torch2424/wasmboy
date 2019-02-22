@@ -476,22 +476,25 @@
          i32.const 12
          i32.shr_s
          local.tee $1
-         i32.eqz
-         br_if $case3|0
-         block $tablify|0
+         if
           local.get $1
           i32.const 1
           i32.sub
-          br_table $case3|0 $case3|0 $case3|0 $case7|0 $case7|0 $case7|0 $case7|0 $case9|0 $case9|0 $case11|0 $case11|0 $case12|0 $case13|0 $tablify|0
+          br_table $case3|0 $case3|0 $case3|0 $case7|0 $case7|0 $case7|0 $case7|0 $case9|0 $case9|0 $case11|0 $case11|0 $case12|0 $case13|0 $case14|0
          end
-         br $case14|0
-        end
-        global.get $core/cpu/cpu/Cpu.BootROMEnabled
-        if
          local.get $0
-         i32.const 1330304
-         i32.add
-         return
+         i32.const 256
+         i32.lt_s
+         global.get $core/cpu/cpu/Cpu.BootROMEnabled
+         local.tee $1
+         local.get $1
+         select
+         if
+          local.get $0
+          i32.const 1330304
+          i32.add
+          return
+         end
         end
         local.get $0
         i32.const 1332864
@@ -8229,6 +8232,8 @@
     if
      i32.const 0
      global.set $core/cpu/cpu/Cpu.BootROMEnabled
+     i32.const 255
+     global.set $core/cpu/cpu/Cpu.programCounter
      br $folding-inner1
     end
     local.get $0

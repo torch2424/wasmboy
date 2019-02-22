@@ -36,16 +36,17 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
   let gameboyOffsetHighByte: i32 = gameboyOffset >> 12;
   switch (gameboyOffsetHighByte) {
     case 0x00:
+      // Check if we are currently executing the boot rom
+      // Otherwise, bottom 0x0000 -> 0x03FF is Cartridge ROM Ram Bank 1
+      // TODO: Handle GBC Boot ROM
+      if (Cpu.BootROMEnabled && gameboyOffset < 0x0100) {
+        return gameboyOffset + BOOT_ROM_LOCATION;
+      }
     case 0x01:
     case 0x02:
     case 0x03:
       // Cartridge ROM - Bank 0 (fixed)
       // 0x0000 -> 0x0D2400
-
-      // Check if we are currently executing the boot rom
-      if (Cpu.BootROMEnabled) {
-        return gameboyOffset + BOOT_ROM_LOCATION;
-      }
       return gameboyOffset + CARTRIDGE_ROM_LOCATION;
     case 0x04:
     case 0x05:

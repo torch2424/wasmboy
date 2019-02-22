@@ -27,7 +27,13 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
 
   // Handle Boot ROM Switch
   if (Cpu.BootROMEnabled && offset === Cpu.memoryLocationBootROMSwitch) {
+    // Disable the boot rom
     Cpu.BootROMEnabled = false;
+
+    // Set the program counter to be incremented after this command
+    Cpu.programCounter = 0x00ff;
+
+    // Allow the write
     return true;
   }
 

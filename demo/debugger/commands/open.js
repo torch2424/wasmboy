@@ -10,6 +10,7 @@ import Command from './command';
 import { WasmBoy } from '../wasmboy';
 import DebuggerAnalytics from '../analytics';
 import loadROM from '../loadROM';
+import loadBootROM from '../loadBootROM';
 import { PUBX_KEYS } from '../pubx.config';
 
 import { getOpenSourceROMElements } from 'shared-gb/openSourceROMs/preactComponents';
@@ -25,7 +26,7 @@ class OpenLocalFile extends Command {
     const hiddenInput = document.createElement('input');
     hiddenInput.classList.add('hidden-rom-input');
     hiddenInput.setAttribute('type', 'file');
-    hiddenInput.setAttribute('accept', '.gb, .gbc, .zip');
+    hiddenInput.setAttribute('accept', '.gb, .gbc, .zip, .bin');
     hiddenInput.setAttribute('hidden', true);
     hiddenInput.addEventListener('change', this.onChange.bind(this));
     document.body.appendChild(hiddenInput);
@@ -40,7 +41,15 @@ class OpenLocalFile extends Command {
   }
 
   onChange(event) {
-    loadROM(event.target.files[0], event.target.files[0].name);
+    const file = event.target.files[0];
+    const name = event.target.files[0].name;
+
+    if (name.includes('.bin')) {
+      // It's a normal game
+      loadBootROM(file);
+    } else {
+      loadROM(file, name);
+    }
   }
 }
 
