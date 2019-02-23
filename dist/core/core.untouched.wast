@@ -1986,112 +1986,47 @@
   local.get $0
   i32.const 0
   i32.gt_s
-  if
-   i32.const 1
-   global.set $core/config/Config.enableBootRom
-  else   
-   i32.const 0
-   global.set $core/config/Config.enableBootRom
-  end
+  global.set $core/config/Config.enableBootRom
   local.get $1
   i32.const 0
   i32.gt_s
-  if
-   i32.const 1
-   global.set $core/config/Config.useGbcWhenAvailable
-  else   
-   i32.const 0
-   global.set $core/config/Config.useGbcWhenAvailable
-  end
+  global.set $core/config/Config.useGbcWhenAvailable
   local.get $2
   i32.const 0
   i32.gt_s
-  if
-   i32.const 1
-   global.set $core/config/Config.audioBatchProcessing
-  else   
-   i32.const 0
-   global.set $core/config/Config.audioBatchProcessing
-  end
+  global.set $core/config/Config.audioBatchProcessing
   local.get $3
   i32.const 0
   i32.gt_s
-  if
-   i32.const 1
-   global.set $core/config/Config.graphicsBatchProcessing
-  else   
-   i32.const 0
-   global.set $core/config/Config.graphicsBatchProcessing
-  end
+  global.set $core/config/Config.graphicsBatchProcessing
   local.get $4
   i32.const 0
   i32.gt_s
-  if
-   i32.const 1
-   global.set $core/config/Config.timersBatchProcessing
-  else   
-   i32.const 0
-   global.set $core/config/Config.timersBatchProcessing
-  end
+  global.set $core/config/Config.timersBatchProcessing
   local.get $5
   i32.const 0
   i32.gt_s
-  if
-   i32.const 1
-   global.set $core/config/Config.graphicsDisableScanlineRendering
-  else   
-   i32.const 0
-   global.set $core/config/Config.graphicsDisableScanlineRendering
-  end
+  global.set $core/config/Config.graphicsDisableScanlineRendering
   local.get $6
   i32.const 0
   i32.gt_s
-  if
-   i32.const 1
-   global.set $core/config/Config.audioAccumulateSamples
-  else   
-   i32.const 0
-   global.set $core/config/Config.audioAccumulateSamples
-  end
+  global.set $core/config/Config.audioAccumulateSamples
   local.get $7
   i32.const 0
   i32.gt_s
-  if
-   i32.const 1
-   global.set $core/config/Config.tileRendering
-  else   
-   i32.const 0
-   global.set $core/config/Config.tileRendering
-  end
+  global.set $core/config/Config.tileRendering
   local.get $8
   i32.const 0
   i32.gt_s
-  if
-   i32.const 1
-   global.set $core/config/Config.tileCaching
-  else   
-   i32.const 0
-   global.set $core/config/Config.tileCaching
-  end
+  global.set $core/config/Config.tileCaching
   local.get $9
   i32.const 0
   i32.gt_s
-  if
-   i32.const 1
-   global.set $core/config/Config.enableAudioDebugging
-  else   
-   i32.const 0
-   global.set $core/config/Config.enableAudioDebugging
-  end
+  global.set $core/config/Config.enableAudioDebugging
   call $core/core/initialize
  )
  (func $core/core/hasCoreStarted (; 24 ;) (type $i) (result i32)
   global.get $core/core/hasStarted
-  if
-   i32.const 1
-   return
-  end
-  i32.const 0
  )
  (func $core/cpu/cpu/Cpu.saveState (; 25 ;) (type $_)
   i32.const 1024
@@ -2777,11 +2712,6 @@
  )
  (func $core/core/isGBC (; 43 ;) (type $i) (result i32)
   global.get $core/cpu/cpu/Cpu.GBCEnabled
-  if
-   i32.const 1
-   return
-  end
-  i32.const 0
  )
  (func $core/execute/getStepsPerStepSet (; 44 ;) (type $i) (result i32)
   global.get $core/execute/Execute.stepsPerStepSet
@@ -8925,8 +8855,7 @@
   global.get $core/cycles/Cycles.cycles
   local.get $0
   i32.add
-  global.set $core/cycles/Cycles.cycles
-  global.get $core/cycles/Cycles.cycles
+  local.tee $0
   global.get $core/cycles/Cycles.cyclesPerCycleSet
   i32.ge_s
   if
@@ -8934,11 +8863,13 @@
    i32.const 1
    i32.add
    global.set $core/cycles/Cycles.cycleSets
-   global.get $core/cycles/Cycles.cycles
+   local.get $0
    global.get $core/cycles/Cycles.cyclesPerCycleSet
    i32.sub
-   global.set $core/cycles/Cycles.cycles
+   local.set $0
   end
+  local.get $0
+  global.set $core/cycles/Cycles.cycles
  )
  (func $core/cpu/opcodes/getDataByteOne (; 119 ;) (type $i) (result i32)
   i32.const 4
@@ -14047,27 +13978,27 @@
    global.set $core/cpu/cpu/Cpu.isStopped
   end
   call $core/interrupts/interrupts/checkInterrupts
-  local.tee $1
+  local.tee $0
   i32.const 0
   i32.gt_s
   if
-   local.get $1
+   local.get $0
    call $core/cycles/syncCycles
   end
   i32.const 4
-  local.set $0
+  local.set $1
   global.get $core/cpu/cpu/Cpu.isHaltNormal
-  local.tee $1
+  local.tee $0
   global.get $core/cpu/cpu/Cpu.isHaltNoJump
-  local.get $1
+  local.get $0
   select
   i32.eqz
-  local.tee $1
+  local.tee $0
   if (result i32)
    global.get $core/cpu/cpu/Cpu.isStopped
    i32.eqz
   else   
-   local.get $1
+   local.get $0
   end
   if
    global.get $core/cpu/cpu/Cpu.programCounter
@@ -14075,38 +14006,39 @@
    i32.const 255
    i32.and
    call $core/cpu/opcodes/executeOpcode
-   local.set $0
+   local.set $1
   end
   global.get $core/cpu/cpu/Cpu.registerF
   i32.const 240
   i32.and
   global.set $core/cpu/cpu/Cpu.registerF
-  local.get $0
+  local.get $1
   i32.const 0
   i32.le_s
   if
-   local.get $0
+   local.get $1
    return
   end
-  local.get $0
+  local.get $1
   call $core/cycles/syncCycles
   global.get $core/execute/Execute.steps
   i32.const 1
   i32.add
-  global.set $core/execute/Execute.steps
-  global.get $core/execute/Execute.steps
+  local.tee $0
   global.get $core/execute/Execute.stepsPerStepSet
   i32.ge_s
-  if
+  if (result i32)
    global.get $core/execute/Execute.stepSets
    i32.const 1
    i32.add
    global.set $core/execute/Execute.stepSets
-   global.get $core/execute/Execute.steps
+   local.get $0
    global.get $core/execute/Execute.stepsPerStepSet
    i32.sub
-   global.set $core/execute/Execute.steps
+  else   
+   local.get $0
   end
+  global.set $core/execute/Execute.steps
   global.get $core/cpu/cpu/Cpu.programCounter
   global.get $core/debug/breakpoints/Breakpoints.programCounter
   i32.eq
@@ -14114,7 +14046,7 @@
    i32.const 1
    global.set $core/debug/breakpoints/Breakpoints.reachedBreakpoint
   end
-  local.get $0
+  local.get $1
  )
  (func $core/sound/sound/getNumberOfSamplesInAudioBuffer (; 173 ;) (type $i) (result i32)
   global.get $core/sound/sound/Sound.audioQueueIndex
