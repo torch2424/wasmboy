@@ -2727,7 +2727,6 @@
   (local $6 i32)
   (local $7 i32)
   (local $8 i32)
-  (local $9 i32)
   block (result i32)
    block (result i32)
     local.get $1
@@ -2798,74 +2797,64 @@
      local.tee $3
      local.get $0
      i32.add
+     local.tee $6
      i32.const 160
      i32.le_s
      if
-      local.get $0
-      i32.const 8
-      local.get $3
-      i32.sub
-      i32.sub
-      local.set $7
-      local.get $0
-      local.get $3
-      i32.add
       local.get $1
       i32.const 160
       i32.mul
+      local.get $6
       i32.add
       i32.const 3
       i32.mul
       i32.const 91264
       i32.add
-      local.set $9
-      i32.const 0
-      local.set $6
-      loop $repeat|1
-       local.get $6
-       i32.const 3
-       i32.lt_s
-       if
-        local.get $0
-        local.get $3
-        i32.add
-        local.get $1
-        i32.const 160
-        i32.mul
-        i32.add
-        i32.const 3
-        i32.mul
-        i32.const 91264
-        i32.add
-        local.get $6
-        i32.add
-        local.get $6
-        local.get $9
-        i32.add
-        i32.load8_u
-        i32.store8
-        local.get $6
-        i32.const 1
-        i32.add
-        local.set $6
-        br $repeat|1
-       end
-      end
-      local.get $0
-      local.get $3
-      i32.add
-      local.get $1
-      i32.const 160
-      i32.mul
-      i32.add
-      i32.const 67712
-      i32.add
-      local.get $1
-      i32.const 160
-      i32.mul
+      local.tee $7
       local.get $7
+      i32.load8_u
+      i32.store8
+      local.get $1
+      i32.const 160
+      i32.mul
+      local.get $6
+      i32.add
+      i32.const 3
+      i32.mul
+      i32.const 91265
+      i32.add
+      local.get $7
+      i32.load8_u offset=1
+      i32.store8
+      local.get $1
+      i32.const 160
+      i32.mul
+      local.get $6
+      i32.add
+      i32.const 3
+      i32.mul
+      i32.const 91266
+      i32.add
+      local.get $7
+      i32.load8_u offset=2
+      i32.store8
+      local.get $1
+      i32.const 160
+      i32.mul
+      local.get $6
       i32.add
       i32.const 67712
+      i32.add
+      local.get $0
+      i32.const 0
+      local.get $3
+      i32.sub
+      i32.sub
+      local.get $1
+      i32.const 160
+      i32.mul
+      i32.add
+      i32.const 67704
       i32.add
       i32.load8_u
       local.tee $6
@@ -3402,10 +3391,11 @@
   call $core/graphics/tiles/drawPixelsFromLineOfTile
  )
  (func $core/graphics/backgroundWindow/drawColorPixelFromTileId (; 53 ;) (type $iiiiiii_) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32)
+  (local $7 i32)
   local.get $5
   local.get $6
   call $core/graphics/tiles/getTileDataAddress
-  local.set $6
+  local.set $5
   local.get $3
   i32.const 8
   i32.rem_s
@@ -3426,22 +3416,19 @@
   end
   i32.const 1
   i32.shl
-  local.get $6
+  local.get $5
   i32.add
   local.tee $3
   i32.const -30720
   i32.add
-  i32.const 1
-  i32.const 0
   local.get $4
   i32.const 8
   i32.and
-  select
-  i32.const 1
-  i32.and
+  i32.const 0
+  i32.ne
+  local.tee $5
   i32.const 13
   i32.shl
-  local.tee $5
   i32.add
   i32.load8_u
   local.set $6
@@ -3449,6 +3436,10 @@
   i32.const -30719
   i32.add
   local.get $5
+  i32.const 1
+  i32.and
+  i32.const 13
+  i32.shl
   i32.add
   i32.load8_u
   local.set $5
@@ -3552,10 +3543,10 @@
   local.get $2
   i32.const 3
   i32.and
-  local.tee $0
+  local.tee $7
   i32.const 4
   i32.or
-  local.get $0
+  local.get $7
   local.get $4
   i32.const 128
   i32.and
@@ -3826,12 +3817,12 @@
   if
    return
   end
+  i32.const 0
   local.get $3
   i32.const 7
   i32.sub
   local.tee $3
-  i32.const -1
-  i32.mul
+  i32.sub
   local.set $5
   local.get $0
   local.get $1

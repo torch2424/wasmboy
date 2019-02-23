@@ -63,12 +63,12 @@ export function renderWindow(scanlineRegister: i32, tileDataMemoryLocation: i32,
   windowX = windowX - 7;
 
   // Get our current pixel y positon on the 160x144 camera (Row that the scanline draws across)
-  let pixelYPositionInMap: i32 = scanlineRegister - windowY;
+  let pixelYPositionInMap = scanlineRegister - windowY;
 
   // xOffset is simply a neagative window x
   // NOTE: This can become negative zero?
   // https://github.com/torch2424/wasmboy/issues/216
-  let xOffset = i32Portable(-1 * windowX);
+  let xOffset = i32Portable(-windowX);
 
   // Draw the Background scanline
   drawBackgroundWindowScanline(scanlineRegister, tileDataMemoryLocation, tileMapMemoryLocation, pixelYPositionInMap, windowX, xOffset);
@@ -84,7 +84,7 @@ function drawBackgroundWindowScanline(
   xOffset: i32
 ): void {
   // Get our tile Y position in the map
-  let tileYPositionInMap: i32 = pixelYPositionInMap >> 3;
+  let tileYPositionInMap = pixelYPositionInMap >> 3;
 
   // Loop through x to draw the line like a CRT
   for (let i = iStart; i < 160; ++i) {
@@ -118,7 +118,7 @@ function drawBackgroundWindowScanline(
     let tileIdFromTileMap: i32 = loadFromVramBank(tileMapAddress, 0);
 
     // Now that we have our Tile Id, let's check our Tile Cache
-    let usedTileCache: boolean = false;
+    let usedTileCache = false;
     if (Config.tileCaching) {
       let pixelsDrawn: i32 = drawLineOfTileFromTileCache(
         i,
@@ -219,7 +219,7 @@ function drawMonochromePixelFromTileId(
   // Therefore, is pixelX was 2, then really is need to be 5
   // So 2 - 7 = -5, * 1 = 5
   // Or to simplify, 7 - 2 = 5 haha!
-  let pixelXInTile: i32 = i32Portable(pixelXPositionInMap % 8);
+  let pixelXInTile = i32Portable(pixelXPositionInMap % 8);
   pixelXInTile = 7 - pixelXInTile;
 
   // Now we can get the color for that pixel
@@ -297,16 +297,13 @@ function drawColorPixelFromTileId(
   // Remember to represent a single line of 8 pixels on a tile, we need two bytes.
   // Therefore, we need to times our modulo by 2, to get the correct line of pixels on the tile.
   // But we need to load the time from a specific Vram bank
-  let vramBankId = 0;
-  if (checkBitOnByte(3, bgMapAttributes)) {
-    vramBankId = 1;
-  }
+  let vramBankId = i32(checkBitOnByte(3, bgMapAttributes));
   let byteOneForLineOfTilePixels: i32 = loadFromVramBank(tileDataAddress + pixelYInTile * 2, vramBankId);
   let byteTwoForLineOfTilePixels: i32 = loadFromVramBank(tileDataAddress + pixelYInTile * 2 + 1, vramBankId);
 
   // Get our X pixel. Need to NOT reverse it if it was flipped.
   // See above, you have to reverse this normally
-  let pixelXInTile: i32 = i32Portable(pixelXPositionInMap % 8);
+  let pixelXInTile = i32Portable(pixelXPositionInMap % 8);
   if (!checkBitOnByte(5, bgMapAttributes)) {
     pixelXInTile = 7 - pixelXInTile;
   }
@@ -384,20 +381,25 @@ function drawLineOfTileFromTileCache(
         tileCacheIndex = 7 - tileCacheIndex;
       }
 
+      let xPos = xPixel + tileCacheIndex;
       // First check for overflow
-      if (xPixel + tileCacheIndex <= 160) {
+      if (xPos <= 160) {
         // Get the pixel location in memory of the tile
         let previousXPixel = xPixel - (8 - tileCacheIndex);
-        let previousTilePixelLocation = FRAME_LOCATION + getRgbPixelStart(xPixel + tileCacheIndex, yPixel);
+        let previousTilePixelLocation = FRAME_LOCATION + getRgbPixelStart(xPos, yPixel);
 
         // Cycle through the RGB
-        for (let tileCacheRgb = 0; tileCacheRgb < 3; ++tileCacheRgb) {
-          setPixelOnFrame(xPixel + tileCacheIndex, yPixel, tileCacheRgb, load<u8>(previousTilePixelLocation + tileCacheRgb));
-        }
+        // for (let tileCacheRgb = 0; tileCacheRgb < 3; ++tileCacheRgb) {
+        //  setPixelOnFrame(xPixel + tileCacheIndex, yPixel, tileCacheRgb, load<u8>(previousTilePixelLocation + tileCacheRgb));
+        // }
+        // unroll
+        setPixelOnFrame(xPos, yPixel, 0, load<u8>(previousTilePixelLocation, 0));
+        setPixelOnFrame(xPos, yPixel, 1, load<u8>(previousTilePixelLocation, 1));
+        setPixelOnFrame(xPos, yPixel, 2, load<u8>(previousTilePixelLocation, 2));
 
         // Copy the priority for the pixel
         let pixelPriority: i32 = getPriorityforPixel(previousXPixel, yPixel);
-        addPriorityforPixel(xPixel + tileCacheIndex, yPixel, resetBitOnByte(2, pixelPriority), checkBitOnByte(2, pixelPriority));
+        addPriorityforPixel(xPos, yPixel, resetBitOnByte(2, pixelPriority), checkBitOnByte(2, pixelPriority));
 
         pixelsDrawn++;
       }
