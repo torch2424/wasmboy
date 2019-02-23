@@ -87,6 +87,10 @@
  (global $core/graphics/colors/Colors.obj1LightGrey (mut i32) (i32.const 0))
  (global $core/graphics/colors/Colors.obj1DarkGrey (mut i32) (i32.const 0))
  (global $core/graphics/colors/Colors.obj1Black (mut i32) (i32.const 0))
+ (global $core/debug/breakpoints/Breakpoints.programCounter (mut i32) (i32.const -1))
+ (global $core/debug/breakpoints/Breakpoints.readGbMemory (mut i32) (i32.const -1))
+ (global $core/debug/breakpoints/Breakpoints.writeGbMemory (mut i32) (i32.const -1))
+ (global $core/debug/breakpoints/Breakpoints.reachedBreakpoint (mut i32) (i32.const 0))
  (global $core/graphics/palette/Palette.memoryLocationBackgroundPaletteIndex (mut i32) (i32.const 65384))
  (global $core/graphics/palette/Palette.memoryLocationBackgroundPaletteData (mut i32) (i32.const 65385))
  (global $core/graphics/palette/Palette.memoryLocationSpritePaletteData (mut i32) (i32.const 65387))
@@ -234,10 +238,6 @@
  (global $core/joypad/joypad/Joypad.joypadRegisterFlipped (mut i32) (i32.const 0))
  (global $core/joypad/joypad/Joypad.isDpadType (mut i32) (i32.const 0))
  (global $core/joypad/joypad/Joypad.isButtonType (mut i32) (i32.const 0))
- (global $core/debug/breakpoints/Breakpoints.programCounter (mut i32) (i32.const -1))
- (global $core/debug/breakpoints/Breakpoints.readGbMemory (mut i32) (i32.const -1))
- (global $core/debug/breakpoints/Breakpoints.writeGbMemory (mut i32) (i32.const -1))
- (global $core/debug/breakpoints/Breakpoints.reachedBreakpoint (mut i32) (i32.const 0))
  (global $core/graphics/lcd/Lcd.currentLcdMode (mut i32) (i32.const 0))
  (global $core/graphics/lcd/Lcd.coincidenceCompare (mut i32) (i32.const 0))
  (global $core/graphics/lcd/Lcd.enabled (mut i32) (i32.const 1))
@@ -2581,11 +2581,11 @@
     local.set $0
     loop $repeat|0
      local.get $0
-     i32.const 476288
+     i32.const 93184
      i32.ge_s
      br_if $break|0
      local.get $0
-     i32.const 67584
+     i32.const 91264
      i32.add
      i32.const 255
      i32.store8
