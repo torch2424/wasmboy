@@ -9410,37 +9410,77 @@
  )
  (func $core/cpu/opcodes/handleOpcode0x (; 132 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
-  block $folding-inner4
-   block $folding-inner3
-    block $folding-inner2
-     block $folding-inner1
-      block $folding-inner0
-       block $break|0
-        block $case15|0
-         block $case14|0
-          block $case13|0
-           block $case12|0
-            block $case11|0
-             block $case10|0
-              block $case9|0
-               block $case8|0
-                block $case7|0
-                 block $case6|0
-                  block $case5|0
-                   block $case4|0
-                    block $case3|0
-                     block $case2|0
-                      block $case1|0
-                       local.get $0
-                       if
+  block $folding-inner6
+   block $folding-inner5
+    block $folding-inner4
+     block $folding-inner3
+      block $folding-inner2
+       block $folding-inner1
+        block $folding-inner0
+         block $break|0
+          block $case15|0
+           block $case14|0
+            block $case13|0
+             block $case12|0
+              block $case11|0
+               block $case10|0
+                block $case9|0
+                 block $case8|0
+                  block $case7|0
+                   block $case6|0
+                    block $case5|0
+                     block $case4|0
+                      block $case3|0
+                       block $case2|0
+                        block $case1|0
+                         local.get $0
+                         if
+                          local.get $0
+                          i32.const 1
+                          i32.sub
+                          br_table $case1|0 $case2|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $case9|0 $case10|0 $case11|0 $case12|0 $case13|0 $case14|0 $case15|0 $break|0
+                         end
+                         br $folding-inner5
+                        end
+                        call $core/cpu/opcodes/getConcatenatedDataByte
+                        i32.const 65535
+                        i32.and
+                        local.tee $0
+                        i32.const 65280
+                        i32.and
+                        i32.const 8
+                        i32.shr_s
+                        global.set $core/cpu/cpu/Cpu.registerB
                         local.get $0
-                        i32.const 1
-                        i32.sub
-                        br_table $case1|0 $case2|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $case9|0 $case10|0 $case11|0 $case12|0 $case13|0 $case14|0 $case15|0 $break|0
+                        i32.const 255
+                        i32.and
+                        global.set $core/cpu/cpu/Cpu.registerC
+                        br $folding-inner0
                        end
-                       br $folding-inner3
+                       global.get $core/cpu/cpu/Cpu.registerC
+                       i32.const 255
+                       i32.and
+                       global.get $core/cpu/cpu/Cpu.registerB
+                       i32.const 255
+                       i32.and
+                       i32.const 8
+                       i32.shl
+                       i32.or
+                       global.get $core/cpu/cpu/Cpu.registerA
+                       call $core/cpu/opcodes/eightBitStoreSyncCycles
+                       br $folding-inner5
                       end
-                      call $core/cpu/opcodes/getConcatenatedDataByte
+                      global.get $core/cpu/cpu/Cpu.registerC
+                      i32.const 255
+                      i32.and
+                      global.get $core/cpu/cpu/Cpu.registerB
+                      i32.const 255
+                      i32.and
+                      i32.const 8
+                      i32.shl
+                      i32.or
+                      i32.const 1
+                      i32.add
                       i32.const 65535
                       i32.and
                       local.tee $0
@@ -9449,138 +9489,125 @@
                       i32.const 8
                       i32.shr_s
                       global.set $core/cpu/cpu/Cpu.registerB
-                      local.get $0
-                      i32.const 255
-                      i32.and
-                      global.set $core/cpu/cpu/Cpu.registerC
-                      br $folding-inner0
+                      br $folding-inner6
                      end
-                     global.get $core/cpu/cpu/Cpu.registerC
-                     i32.const 255
-                     i32.and
                      global.get $core/cpu/cpu/Cpu.registerB
+                     local.tee $0
+                     i32.const 1
+                     call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
+                     local.get $0
+                     i32.const 1
+                     i32.add
                      i32.const 255
                      i32.and
-                     i32.const 8
-                     i32.shl
-                     i32.or
-                     global.get $core/cpu/cpu/Cpu.registerA
-                     call $core/cpu/opcodes/eightBitStoreSyncCycles
-                     br $folding-inner3
+                     local.tee $0
+                     global.set $core/cpu/cpu/Cpu.registerB
+                     br $folding-inner1
                     end
-                    global.get $core/cpu/cpu/Cpu.registerC
-                    i32.const 255
-                    i32.and
                     global.get $core/cpu/cpu/Cpu.registerB
-                    i32.const 255
-                    i32.and
-                    i32.const 8
-                    i32.shl
-                    i32.or
+                    local.tee $0
+                    i32.const -1
+                    call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
+                    local.get $0
                     i32.const 1
-                    i32.add
-                    i32.const 65535
+                    i32.sub
+                    i32.const 255
                     i32.and
                     local.tee $0
-                    i32.const 65280
-                    i32.and
-                    i32.const 8
-                    i32.shr_s
                     global.set $core/cpu/cpu/Cpu.registerB
-                    br $folding-inner4
+                    br $folding-inner2
                    end
-                   global.get $core/cpu/cpu/Cpu.registerB
-                   i32.const 1
-                   call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
-                   global.get $core/cpu/cpu/Cpu.registerB
-                   i32.const 1
-                   i32.add
+                   call $core/cpu/opcodes/getDataByteOne
                    i32.const 255
                    i32.and
                    global.set $core/cpu/cpu/Cpu.registerB
-                   global.get $core/cpu/cpu/Cpu.registerB
-                   if
-                    i32.const 0
-                    call $core/cpu/flags/setZeroFlag
-                   else                    
-                    i32.const 1
-                    call $core/cpu/flags/setZeroFlag
-                   end
-                   i32.const 0
-                   call $core/cpu/flags/setSubtractFlag
                    br $folding-inner3
                   end
-                  global.get $core/cpu/cpu/Cpu.registerB
-                  i32.const -1
-                  call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
-                  global.get $core/cpu/cpu/Cpu.registerB
+                  global.get $core/cpu/cpu/Cpu.registerA
+                  local.tee $0
+                  i32.const 128
+                  i32.and
+                  i32.const 128
+                  i32.eq
+                  call $core/cpu/flags/setCarryFlag
+                  local.get $0
                   i32.const 1
-                  i32.sub
+                  i32.shl
+                  local.get $0
                   i32.const 255
                   i32.and
-                  global.set $core/cpu/cpu/Cpu.registerB
-                  global.get $core/cpu/cpu/Cpu.registerB
-                  if
-                   i32.const 0
-                   call $core/cpu/flags/setZeroFlag
-                  else                   
-                   i32.const 1
-                   call $core/cpu/flags/setZeroFlag
-                  end
-                  i32.const 1
-                  call $core/cpu/flags/setSubtractFlag
-                  br $folding-inner3
+                  i32.const 7
+                  i32.shr_u
+                  i32.or
+                  i32.const 255
+                  i32.and
+                  global.set $core/cpu/cpu/Cpu.registerA
+                  br $folding-inner4
                  end
-                 call $core/cpu/opcodes/getDataByteOne
-                 i32.const 255
+                 call $core/cpu/opcodes/getConcatenatedDataByte
+                 i32.const 65535
                  i32.and
-                 global.set $core/cpu/cpu/Cpu.registerB
-                 br $folding-inner1
+                 global.get $core/cpu/cpu/Cpu.stackPointer
+                 call $core/cpu/opcodes/sixteenBitStoreSyncCycles
+                 br $folding-inner0
                 end
-                global.get $core/cpu/cpu/Cpu.registerA
-                i32.const 128
+                global.get $core/cpu/cpu/Cpu.registerL
+                i32.const 255
                 i32.and
-                i32.const 128
-                i32.eq
-                if
-                 i32.const 1
-                 call $core/cpu/flags/setCarryFlag
-                else                 
-                 i32.const 0
-                 call $core/cpu/flags/setCarryFlag
-                end
-                global.get $core/cpu/cpu/Cpu.registerA
-                local.tee $0
-                i32.const 1
+                global.get $core/cpu/cpu/Cpu.registerH
+                i32.const 255
+                i32.and
+                i32.const 8
                 i32.shl
+                i32.or
+                local.tee $0
+                global.get $core/cpu/cpu/Cpu.registerC
+                i32.const 255
+                i32.and
+                global.get $core/cpu/cpu/Cpu.registerB
+                i32.const 255
+                i32.and
+                i32.const 8
+                i32.shl
+                i32.or
+                local.tee $1
+                i32.const 0
+                call $core/cpu/flags/checkAndSetSixteenBitFlagsAddOverflow
+                local.get $0
+                local.get $1
+                i32.add
+                i32.const 65535
+                i32.and
+                local.tee $0
+                i32.const 65280
+                i32.and
+                i32.const 8
+                i32.shr_s
+                global.set $core/cpu/cpu/Cpu.registerH
                 local.get $0
                 i32.const 255
                 i32.and
-                i32.const 7
-                i32.shr_u
-                i32.or
-                i32.const 255
-                i32.and
-                global.set $core/cpu/cpu/Cpu.registerA
-                br $folding-inner2
+                global.set $core/cpu/cpu/Cpu.registerL
+                i32.const 0
+                call $core/cpu/flags/setSubtractFlag
+                i32.const 8
+                return
                end
-               call $core/cpu/opcodes/getConcatenatedDataByte
-               i32.const 65535
+               global.get $core/cpu/cpu/Cpu.registerC
+               i32.const 255
                i32.and
-               global.get $core/cpu/cpu/Cpu.stackPointer
-               call $core/cpu/opcodes/sixteenBitStoreSyncCycles
-               br $folding-inner0
+               global.get $core/cpu/cpu/Cpu.registerB
+               i32.const 255
+               i32.and
+               i32.const 8
+               i32.shl
+               i32.or
+               call $core/cpu/opcodes/eightBitLoadSyncCycles
+               i32.const 255
+               i32.and
+               global.set $core/cpu/cpu/Cpu.registerA
+               br $folding-inner5
               end
-              global.get $core/cpu/cpu/Cpu.registerL
-              i32.const 255
-              i32.and
-              global.get $core/cpu/cpu/Cpu.registerH
-              i32.const 255
-              i32.and
-              i32.const 8
-              i32.shl
-              i32.or
-              local.tee $0
               global.get $core/cpu/cpu/Cpu.registerC
               i32.const 255
               i32.and
@@ -9590,12 +9617,8 @@
               i32.const 8
               i32.shl
               i32.or
-              local.tee $1
-              i32.const 0
-              call $core/cpu/flags/checkAndSetSixteenBitFlagsAddOverflow
-              local.get $0
-              local.get $1
-              i32.add
+              i32.const 1
+              i32.sub
               i32.const 65535
               i32.and
               local.tee $0
@@ -9603,137 +9626,92 @@
               i32.and
               i32.const 8
               i32.shr_s
-              global.set $core/cpu/cpu/Cpu.registerH
-              local.get $0
-              i32.const 255
-              i32.and
-              global.set $core/cpu/cpu/Cpu.registerL
-              i32.const 0
-              call $core/cpu/flags/setSubtractFlag
-              i32.const 8
-              return
+              global.set $core/cpu/cpu/Cpu.registerB
+              br $folding-inner6
              end
              global.get $core/cpu/cpu/Cpu.registerC
+             local.tee $0
+             i32.const 1
+             call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
+             local.get $0
+             i32.const 1
+             i32.add
              i32.const 255
              i32.and
-             global.get $core/cpu/cpu/Cpu.registerB
-             i32.const 255
-             i32.and
-             i32.const 8
-             i32.shl
-             i32.or
-             call $core/cpu/opcodes/eightBitLoadSyncCycles
-             i32.const 255
-             i32.and
-             global.set $core/cpu/cpu/Cpu.registerA
-             br $folding-inner3
+             local.tee $0
+             global.set $core/cpu/cpu/Cpu.registerC
+             br $folding-inner1
             end
             global.get $core/cpu/cpu/Cpu.registerC
-            i32.const 255
-            i32.and
-            global.get $core/cpu/cpu/Cpu.registerB
-            i32.const 255
-            i32.and
-            i32.const 8
-            i32.shl
-            i32.or
+            local.tee $0
+            i32.const -1
+            call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
+            local.get $0
             i32.const 1
             i32.sub
-            i32.const 65535
+            i32.const 255
             i32.and
             local.tee $0
-            i32.const 65280
-            i32.and
-            i32.const 8
-            i32.shr_s
-            global.set $core/cpu/cpu/Cpu.registerB
-            br $folding-inner4
+            global.set $core/cpu/cpu/Cpu.registerC
+            br $folding-inner2
            end
-           global.get $core/cpu/cpu/Cpu.registerC
-           i32.const 1
-           call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
-           global.get $core/cpu/cpu/Cpu.registerC
-           i32.const 1
-           i32.add
+           call $core/cpu/opcodes/getDataByteOne
            i32.const 255
            i32.and
            global.set $core/cpu/cpu/Cpu.registerC
-           global.get $core/cpu/cpu/Cpu.registerC
-           if
-            i32.const 0
-            call $core/cpu/flags/setZeroFlag
-           else            
-            i32.const 1
-            call $core/cpu/flags/setZeroFlag
-           end
-           i32.const 0
-           call $core/cpu/flags/setSubtractFlag
            br $folding-inner3
           end
-          global.get $core/cpu/cpu/Cpu.registerC
-          i32.const -1
-          call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
-          global.get $core/cpu/cpu/Cpu.registerC
+          global.get $core/cpu/cpu/Cpu.registerA
           i32.const 1
-          i32.sub
+          i32.and
+          i32.const 0
+          i32.gt_u
+          if
+           i32.const 1
+           call $core/cpu/flags/setCarryFlag
+          else           
+           i32.const 0
+           call $core/cpu/flags/setCarryFlag
+          end
+          global.get $core/cpu/cpu/Cpu.registerA
+          local.tee $0
+          i32.const 7
+          i32.shl
+          local.get $0
           i32.const 255
           i32.and
-          global.set $core/cpu/cpu/Cpu.registerC
-          global.get $core/cpu/cpu/Cpu.registerC
-          if
-           i32.const 0
-           call $core/cpu/flags/setZeroFlag
-          else           
-           i32.const 1
-           call $core/cpu/flags/setZeroFlag
-          end
           i32.const 1
-          call $core/cpu/flags/setSubtractFlag
-          br $folding-inner3
+          i32.shr_u
+          i32.or
+          i32.const 255
+          i32.and
+          global.set $core/cpu/cpu/Cpu.registerA
+          br $folding-inner4
          end
-         call $core/cpu/opcodes/getDataByteOne
-         i32.const 255
-         i32.and
-         global.set $core/cpu/cpu/Cpu.registerC
-         br $folding-inner1
+         i32.const -1
+         return
         end
-        global.get $core/cpu/cpu/Cpu.registerA
-        i32.const 1
+        global.get $core/cpu/cpu/Cpu.programCounter
+        i32.const 2
+        i32.add
+        i32.const 65535
         i32.and
-        i32.const 0
-        i32.gt_u
-        if
-         i32.const 1
-         call $core/cpu/flags/setCarryFlag
-        else         
-         i32.const 0
-         call $core/cpu/flags/setCarryFlag
-        end
-        global.get $core/cpu/cpu/Cpu.registerA
-        local.tee $0
-        i32.const 7
-        i32.shl
-        local.get $0
-        i32.const 255
-        i32.and
-        i32.const 1
-        i32.shr_u
-        i32.or
-        i32.const 255
-        i32.and
-        global.set $core/cpu/cpu/Cpu.registerA
-        br $folding-inner2
+        global.set $core/cpu/cpu/Cpu.programCounter
+        br $folding-inner5
        end
-       i32.const -1
-       return
+       local.get $0
+       i32.eqz
+       call $core/cpu/flags/setZeroFlag
+       i32.const 0
+       call $core/cpu/flags/setSubtractFlag
+       br $folding-inner5
       end
-      global.get $core/cpu/cpu/Cpu.programCounter
-      i32.const 2
-      i32.add
-      i32.const 65535
-      i32.and
-      global.set $core/cpu/cpu/Cpu.programCounter
-      br $folding-inner3
+      local.get $0
+      i32.eqz
+      call $core/cpu/flags/setZeroFlag
+      i32.const 1
+      call $core/cpu/flags/setSubtractFlag
+      br $folding-inner5
      end
      global.get $core/cpu/cpu/Cpu.programCounter
      i32.const 1
@@ -9741,7 +9719,7 @@
      i32.const 65535
      i32.and
      global.set $core/cpu/cpu/Cpu.programCounter
-     br $folding-inner3
+     br $folding-inner5
     end
     i32.const 0
     call $core/cpu/flags/setZeroFlag
@@ -14043,16 +14021,18 @@
   i32.add
   i32.const 65535
   i32.and
-  global.set $core/cpu/cpu/Cpu.programCounter
+  local.set $1
   global.get $core/cpu/cpu/Cpu.isHaltBug
   if
-   global.get $core/cpu/cpu/Cpu.programCounter
+   local.get $1
    i32.const 1
    i32.sub
    i32.const 65535
    i32.and
-   global.set $core/cpu/cpu/Cpu.programCounter
+   local.set $1
   end
+  local.get $1
+  global.set $core/cpu/cpu/Cpu.programCounter
   block $case15|0
    block $case14|0
     block $case13|0

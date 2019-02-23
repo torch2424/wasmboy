@@ -10,7 +10,6 @@ import {
   getHalfCarryFlag,
   setCarryFlag,
   getCarryFlag,
-  checkAndSetEightBitCarryFlag,
   checkAndSetEightBitHalfCarryFlag,
   checkAndSetSixteenBitFlagsAddOverflow
 } from './flags';
@@ -26,11 +25,7 @@ import {
   relativeJump
 } from './instructions';
 import { syncCycles } from '../cycles';
-import { Config } from '../config';
 import {
-  log,
-  hexLog,
-  performanceTimestamp,
   rotateByteLeft,
   rotateByteLeftThroughCarry,
   rotateByteRight,
@@ -50,10 +45,7 @@ import {
   eightBitLoadFromGBMemory,
   sixteenBitLoadFromGBMemory
 } from '../memory/index';
-import { Timers, batchProcessTimers, updateTimers } from '../timers/index';
-import { Interrupts, setInterrupts, checkInterrupts } from '../interrupts/index';
-import { Graphics, updateGraphics, batchProcessGraphics } from '../graphics/index';
-import { Sound, updateSound } from '../sound/index';
+import { setInterrupts } from '../interrupts/index';
 import { u8Portable, u16Portable, i8Portable } from '../portable/portable';
 
 // Take in any opcode, and decode it, and return the number of cycles
@@ -62,13 +54,10 @@ import { u8Portable, u16Portable, i8Portable } from '../portable/portable';
 // https://rednex.github.io/rgbds/gbz80.7.html
 // http://pastraiser.com/cpu/gameboy/gameboyopcodes.html
 export function executeOpcode(opcode: i32): i32 {
-  // Initialize our number of cycles
-  // Return -1 if no opcode was found, representing an error
-  let numberOfCycles: i32 = -1;
-
   // Always implement the program counter by one
   // Any other value can just subtract or add however much offset before reaching this line
-  Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
+  let programCounter = Cpu.programCounter;
+  programCounter = u16Portable(programCounter + 1);
 
   // Check if we are in the halt bug
   if (Cpu.isHaltBug) {
@@ -81,12 +70,13 @@ export function executeOpcode(opcode: i32): i32 {
     // Becomes
     // FA FA 34 ld a,(34FA)
     // 12 ld (de),a
-    Cpu.programCounter = u16Portable(Cpu.programCounter - 1);
+    programCounter = u16Portable(programCounter - 1);
   }
+  Cpu.programCounter = programCounter;
 
   // Split our opcode into a high nibble to speed up performance
   // Running 255 if statements is slow, even in wasm haha!
-  let opcodeHighNibble: i32 = opcode & 0xf0;
+  let opcodeHighNibble = opcode & 0xf0;
   opcodeHighNibble = opcodeHighNibble >> 4;
 
   // NOTE: @binji rule of thumb: it takes 4 cpu cycles to read one byte
@@ -177,7 +167,7 @@ function handleOpcode0x(opcode: i32): i32 {
       // 1  4
       // No Operation
       return 4;
-    case 0x01:
+    case 0x01: {
       // LD BC,d16
       // 3  12
 
@@ -189,16 +179,17 @@ function handleOpcode0x(opcode: i32): i32 {
       Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
 
       return 4;
-    case 0x02:
+    }
+    case 0x02: {
       // LD (BC),A
       // 1  8
       // () means load into address pointed by BC
 
       // 4 cycles
       eightBitStoreSyncCycles(concatenateBytes(Cpu.registerB, Cpu.registerC), Cpu.registerA);
-
       return 4;
-    case 0x03:
+    }
+    case 0x03: {
       // INC BC
       // 1  8
       let registerBC3: u16 = <u16>concatenateBytes(Cpu.registerB, Cpu.registerC);
@@ -206,33 +197,32 @@ function handleOpcode0x(opcode: i32): i32 {
       Cpu.registerB = <u8>splitHighByte(registerBC3);
       Cpu.registerC = <u8>splitLowByte(registerBC3);
       return 8;
-    case 0x04:
+    }
+    case 0x04: {
       // INC B
       // 1  4
       // Z 0 H -
-      checkAndSetEightBitHalfCarryFlag(Cpu.registerB, 1);
-      Cpu.registerB = u8Portable(Cpu.registerB + 1);
-      if (Cpu.registerB === 0) {
-        setZeroFlag(1);
-      } else {
-        setZeroFlag(0);
-      }
+      let registerB = Cpu.registerB;
+      checkAndSetEightBitHalfCarryFlag(registerB, 1);
+      registerB = u8Portable(registerB + 1);
+      Cpu.registerB = registerB;
+      setZeroFlag(i32(registerB === 0));
       setSubtractFlag(0);
       return 4;
-    case 0x05:
+    }
+    case 0x05: {
       // DEC B
       // 1  4
       // Z 1 H -
-      checkAndSetEightBitHalfCarryFlag(Cpu.registerB, -1);
-      Cpu.registerB = u8Portable(Cpu.registerB - 1);
-      if (Cpu.registerB === 0) {
-        setZeroFlag(1);
-      } else {
-        setZeroFlag(0);
-      }
+      let registerB = Cpu.registerB;
+      checkAndSetEightBitHalfCarryFlag(registerB, -1);
+      registerB = u8Portable(registerB - 1);
+      Cpu.registerB = registerB;
+      setZeroFlag(i32(registerB === 0));
       setSubtractFlag(1);
       return 4;
-    case 0x06:
+    }
+    case 0x06: {
       // LD B,d8
       // 2  8
 
@@ -241,23 +231,22 @@ function handleOpcode0x(opcode: i32): i32 {
       Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
 
       return 4;
-    case 0x07:
+    }
+    case 0x07: {
       // RLCA
       // 1  4
       // 0 0 0 C
       // Check for the carry
-      if ((Cpu.registerA & 0x80) === 0x80) {
-        setCarryFlag(1);
-      } else {
-        setCarryFlag(0);
-      }
-      Cpu.registerA = rotateByteLeft(Cpu.registerA);
+      let registerA = Cpu.registerA;
+      setCarryFlag(i32((registerA & 0x80) === 0x80));
+      Cpu.registerA = rotateByteLeft(registerA);
       // Set all other flags to zero
       setZeroFlag(0);
       setSubtractFlag(0);
       setHalfCarryFlag(0);
       return 4;
-    case 0x08:
+    }
+    case 0x08: {
       // LD (a16),SP
       // 3  20
       // Load the stack pointer into the 16 bit address represented by the two data bytes
@@ -267,7 +256,8 @@ function handleOpcode0x(opcode: i32): i32 {
       Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
 
       return 4;
-    case 0x09:
+    }
+    case 0x09: {
       // ADD HL,BC
       // 1 8
       // - 0 H C
@@ -279,15 +269,16 @@ function handleOpcode0x(opcode: i32): i32 {
       Cpu.registerL = <u8>splitLowByte(<u16>result);
       setSubtractFlag(0);
       return 8;
-    case 0x0a:
+    }
+    case 0x0a: {
       // LD A,(BC)
       // 1 8
 
       // 4 cycles from load
       Cpu.registerA = <u8>eightBitLoadSyncCycles(concatenateBytes(Cpu.registerB, Cpu.registerC));
-
       return 4;
-    case 0x0b:
+    }
+    case 0x0b: {
       // DEC BC
       // 1  8
       let registerBCB: u16 = <u16>concatenateBytes(Cpu.registerB, Cpu.registerC);
@@ -295,33 +286,32 @@ function handleOpcode0x(opcode: i32): i32 {
       Cpu.registerB = <u8>splitHighByte(registerBCB);
       Cpu.registerC = <u8>splitLowByte(registerBCB);
       return 8;
-    case 0x0c:
+    }
+    case 0x0c: {
       // INC C
       // 1  4
       // Z 0 H -
-      checkAndSetEightBitHalfCarryFlag(Cpu.registerC, 1);
-      Cpu.registerC = u8Portable(Cpu.registerC + 1);
-      if (Cpu.registerC === 0) {
-        setZeroFlag(1);
-      } else {
-        setZeroFlag(0);
-      }
+      let registerC = Cpu.registerC;
+      checkAndSetEightBitHalfCarryFlag(registerC, 1);
+      registerC = u8Portable(registerC + 1);
+      Cpu.registerC = registerC;
+      setZeroFlag(i32(registerC === 0));
       setSubtractFlag(0);
       return 4;
-    case 0x0d:
+    }
+    case 0x0d: {
       // DEC C
       // 1  4
       // Z 1 H -
-      checkAndSetEightBitHalfCarryFlag(Cpu.registerC, -1);
-      Cpu.registerC = u8Portable(Cpu.registerC - 1);
-      if (Cpu.registerC === 0) {
-        setZeroFlag(1);
-      } else {
-        setZeroFlag(0);
-      }
+      let registerC = Cpu.registerC;
+      checkAndSetEightBitHalfCarryFlag(registerC, -1);
+      registerC = u8Portable(registerC - 1);
+      Cpu.registerC = registerC;
+      setZeroFlag(i32(registerC === 0));
       setSubtractFlag(1);
       return 4;
-    case 0x0e:
+    }
+    case 0x0e: {
       // LD C,d8
       // 2 8
 
@@ -330,6 +320,7 @@ function handleOpcode0x(opcode: i32): i32 {
       Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
 
       return 4;
+    }
     case 0x0f:
       // RRCA
       // 1 4
