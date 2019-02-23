@@ -205,7 +205,7 @@ function drawMonochromePixelFromTileId(
   // yPixel = 144. 144 % 8 = 0.
   // 0 Represents last line of pixels in a tile, 1 represents first. 1 2 3 4 5 6 7 0.
   // Because remember, we are counting lines on the display NOT including zero
-  let pixelYInTile = i32Portable(pixelYPositionInMap % 8);
+  let pixelYInTile = i32Portable(pixelYPositionInMap & 7);
 
   // Remember to represent a single line of 8 pixels on a tile, we need two bytes.
   // Therefore, we need to times our modulo by 2, to get the correct line of pixels on the tile.
@@ -219,7 +219,7 @@ function drawMonochromePixelFromTileId(
   // Therefore, is pixelX was 2, then really is need to be 5
   // So 2 - 7 = -5, * 1 = 5
   // Or to simplify, 7 - 2 = 5 haha!
-  let pixelXInTile = i32Portable(pixelXPositionInMap % 8);
+  let pixelXInTile = i32Portable(pixelXPositionInMap & 7);
   pixelXInTile = 7 - pixelXInTile;
 
   // Now we can get the color for that pixel
@@ -287,7 +287,7 @@ function drawColorPixelFromTileId(
   let bgMapAttributes: i32 = loadFromVramBank(tileMapAddress, 1);
 
   // See above for explanation
-  let pixelYInTile = i32Portable(pixelYPositionInMap % 8);
+  let pixelYInTile = i32Portable(pixelYPositionInMap & 7);
   if (checkBitOnByte(6, bgMapAttributes)) {
     // We are mirroring the tile, therefore, we need to opposite byte
     // So if our pixel was 0 our of 8, it wild become 7 :)
@@ -303,7 +303,7 @@ function drawColorPixelFromTileId(
 
   // Get our X pixel. Need to NOT reverse it if it was flipped.
   // See above, you have to reverse this normally
-  let pixelXInTile = i32Portable(pixelXPositionInMap % 8);
+  let pixelXInTile = i32Portable(pixelXPositionInMap & 7);
   if (!checkBitOnByte(5, bgMapAttributes)) {
     pixelXInTile = 7 - pixelXInTile;
   }
@@ -407,7 +407,7 @@ function drawLineOfTileFromTileCache(
   // Calculate when we should do the tileCache calculation again
   if (xPixel >= nextXIndexToPerformCacheCheck) {
     nextXIndexToPerformCacheCheck = xPixel + 8;
-    let xOffsetTileWidthRemainder = i32Portable(pixelXPositionInMap % 8);
+    let xOffsetTileWidthRemainder = i32Portable(pixelXPositionInMap & 7);
     if (xPixel < xOffsetTileWidthRemainder) {
       nextXIndexToPerformCacheCheck += xOffsetTileWidthRemainder;
     }
@@ -430,7 +430,7 @@ function drawLineOfTileFromTileId(
   tileIdFromTileMap: i32
 ): i32 {
   // Get the which line of the tile we are rendering
-  let tileLineY: i32 = i32Portable(pixelYPositionInMap % 8);
+  let tileLineY: i32 = i32Portable(pixelYPositionInMap & 7);
 
   // Now lets find our tileX start and end
   // This is for the case where i = 0, but scroll X was 3.

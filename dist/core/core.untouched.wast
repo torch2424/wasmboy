@@ -2892,8 +2892,8 @@
    local.set $6
    local.get $0
    local.get $2
-   i32.const 8
-   i32.rem_s
+   i32.const 7
+   i32.and
    local.tee $8
    i32.lt_s
    if
@@ -3324,8 +3324,8 @@
   (local $8 i32)
   (local $9 i32)
   local.get $3
-  i32.const 8
-  i32.rem_s
+  i32.const 7
+  i32.and
   local.set $3
   i32.const 0
   local.get $2
@@ -3390,14 +3390,13 @@
  )
  (func $core/graphics/backgroundWindow/drawColorPixelFromTileId (; 53 ;) (type $iiiiiii_) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32)
   (local $7 i32)
+  local.get $3
+  i32.const 7
+  i32.and
+  local.set $3
   local.get $5
   local.get $6
   call $core/graphics/tiles/getTileDataAddress
-  local.set $5
-  local.get $3
-  i32.const 8
-  i32.rem_s
-  local.set $3
   local.get $4
   i32.const -22528
   i32.add
@@ -3414,7 +3413,6 @@
   end
   i32.const 1
   i32.shl
-  local.get $5
   i32.add
   local.tee $3
   i32.const -30720
@@ -3442,8 +3440,8 @@
   i32.load8_u
   local.set $5
   local.get $2
-  i32.const 8
-  i32.rem_s
+  i32.const 7
+  i32.and
   local.set $3
   i32.const 0
   local.set $2
@@ -3556,8 +3554,8 @@
   local.get $5
   call $core/graphics/tiles/getTileDataAddress
   local.get $3
-  i32.const 8
-  i32.rem_s
+  i32.const 7
+  i32.and
   i32.const 1
   i32.shl
   i32.add
@@ -3585,8 +3583,8 @@
    i32.const 1
    i32.const 7
    local.get $2
-   i32.const 8
-   i32.rem_s
+   i32.const 7
+   i32.and
    i32.sub
    local.tee $2
    i32.shl
