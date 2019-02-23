@@ -1,17 +1,6 @@
-import { Config } from '../config';
 import { getSaveStateMemoryOffset } from '../core';
-import {
-  eightBitStoreIntoGBMemoryWithTraps,
-  eightBitStoreIntoGBMemory,
-  eightBitLoadFromGBMemoryWithTraps,
-  eightBitLoadFromGBMemory,
-  initializeCartridge,
-  initializeDma,
-  loadBooleanDirectlyFromWasmMemory,
-  storeBooleanDirectlyToWasmMemory
-} from '../memory/index';
+import { loadBooleanDirectlyFromWasmMemory, storeBooleanDirectlyToWasmMemory } from '../memory/index';
 import { Interrupts } from '../interrupts/index';
-import { log, hexLog } from '../helpers/index';
 
 // Everything Static as class instances just aren't quite there yet
 // https://github.com/AssemblyScript/assemblyscript/blob/master/tests/compiler/showcase.ts
@@ -42,22 +31,16 @@ export class Cpu {
   // Current number of cycles, shouldn't execeed max number of cycles
   static currentCycles: i32 = 0;
   static CLOCK_SPEED(): i32 {
-    if (Cpu.GBCDoubleSpeed) {
-      // 2^23, thanks binji!
-      return 8388608;
-    }
-
-    return 4194304;
+    // 2^23, thanks binji!
+    // return Cpu.GBCDoubleSpeed ? 8388608 : 4194304;
+    return 4194304 << (<i32>Cpu.GBCDoubleSpeed);
   }
 
   // Cycles Per Frame = Clock Speed / fps
   // So: 4194304 / 59.73
   static MAX_CYCLES_PER_FRAME(): i32 {
-    if (Cpu.GBCDoubleSpeed) {
-      return 140448;
-    }
-
-    return 70224;
+    // return Cpu.GBCDoubleSpeed ? 140448 : 70224;
+    return 70224 << (<i32>Cpu.GBCDoubleSpeed);
   }
 
   // HALT and STOP instructions need to stop running opcodes, but simply check timers
@@ -77,7 +60,7 @@ export class Cpu {
       return;
     }
 
-    let haltTypeValue: i32 = Interrupts.interruptsEnabledValue & Interrupts.interruptsRequestedValue & 0x1f;
+    let haltTypeValue = Interrupts.interruptsEnabledValue & Interrupts.interruptsRequestedValue & 0x1f;
 
     if (haltTypeValue === 0) {
       Cpu.isHaltNoJump = true;
@@ -95,11 +78,7 @@ export class Cpu {
   }
 
   static isHalted(): boolean {
-    if (Cpu.isHaltNormal || Cpu.isHaltNoJump) {
-      return true;
-    }
-
-    return false;
+    return Cpu.isHaltNormal || Cpu.isHaltNoJump;
   }
 
   // Save States
@@ -183,10 +162,6 @@ export function initializeCpu(): void {
     Cpu.registerE = 0x56;
     Cpu.registerH = 0x00;
     Cpu.registerL = 0x0d;
-
-    // Cpu Control Flow
-    Cpu.programCounter = 0x100;
-    Cpu.stackPointer = 0xfffe;
   } else {
     // Cpu Registers
     Cpu.registerA = 0x01;
@@ -197,9 +172,9 @@ export function initializeCpu(): void {
     Cpu.registerE = 0xd8;
     Cpu.registerH = 0x01;
     Cpu.registerL = 0x4d;
-
-    // Cpu Control Flow
-    Cpu.programCounter = 0x100;
-    Cpu.stackPointer = 0xfffe;
   }
+
+  // Cpu Control Flow
+  Cpu.programCounter = 0x100;
+  Cpu.stackPointer = 0xfffe;
 }

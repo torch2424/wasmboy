@@ -6152,17 +6152,15 @@
   i32.add
   global.set $core/sound/sound/Sound.downSampleCycleCounter
   global.get $core/sound/sound/Sound.downSampleCycleCounter
-  i32.const 8388608
   i32.const 4194304
   global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
-  select
+  i32.shl
   i32.ge_s
   if
    global.get $core/sound/sound/Sound.downSampleCycleCounter
-   i32.const 8388608
    i32.const 4194304
    global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
-   select
+   i32.shl
    i32.sub
    global.set $core/sound/sound/Sound.downSampleCycleCounter
    global.get $core/sound/accumulator/SoundAccumulator.needToRemixSamples
@@ -6255,17 +6253,15 @@
   i32.add
   global.set $core/sound/sound/Sound.downSampleCycleCounter
   global.get $core/sound/sound/Sound.downSampleCycleCounter
-  i32.const 8388608
   i32.const 4194304
   global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
-  select
+  i32.shl
   i32.ge_s
   if
    global.get $core/sound/sound/Sound.downSampleCycleCounter
-   i32.const 8388608
    i32.const 4194304
    global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
-   select
+   i32.shl
    i32.sub
    global.set $core/sound/sound/Sound.downSampleCycleCounter
    local.get $2
@@ -9278,13 +9274,9 @@
    i32.add
    i32.const 16
    i32.and
-   if
-    i32.const 1
-    call $core/cpu/flags/setHalfCarryFlag
-   else    
-    i32.const 0
-    call $core/cpu/flags/setHalfCarryFlag
-   end
+   i32.const 0
+   i32.ne
+   call $core/cpu/flags/setHalfCarryFlag
   else   
    local.get $1
    i32.const 31
@@ -9300,13 +9292,7 @@
    i32.const 15
    i32.and
    i32.gt_u
-   if
-    i32.const 1
-    call $core/cpu/flags/setHalfCarryFlag
-   else    
-    i32.const 0
-    call $core/cpu/flags/setHalfCarryFlag
-   end
+   call $core/cpu/flags/setHalfCarryFlag
   end
  )
  (func $core/cpu/flags/setZeroFlag (; 125 ;) (type $i_) (param $0 i32)
@@ -9383,23 +9369,15 @@
    local.tee $2
    i32.const 16
    i32.and
-   if
-    i32.const 1
-    call $core/cpu/flags/setHalfCarryFlag
-   else    
-    i32.const 0
-    call $core/cpu/flags/setHalfCarryFlag
-   end
+   i32.const 0
+   i32.ne
+   call $core/cpu/flags/setHalfCarryFlag
    local.get $2
    i32.const 256
    i32.and
-   if
-    i32.const 1
-    call $core/cpu/flags/setCarryFlag
-   else    
-    i32.const 0
-    call $core/cpu/flags/setCarryFlag
-   end
+   i32.const 0
+   i32.ne
+   call $core/cpu/flags/setCarryFlag
   else   
    local.get $0
    local.get $1
@@ -9411,13 +9389,7 @@
    i32.const 65535
    i32.and
    i32.lt_u
-   if
-    i32.const 1
-    call $core/cpu/flags/setCarryFlag
-   else    
-    i32.const 0
-    call $core/cpu/flags/setCarryFlag
-   end
+   call $core/cpu/flags/setCarryFlag
    local.get $0
    local.get $1
    i32.xor
@@ -9425,13 +9397,9 @@
    i32.xor
    i32.const 4096
    i32.and
-   if
-    i32.const 1
-    call $core/cpu/flags/setHalfCarryFlag
-   else    
-    i32.const 0
-    call $core/cpu/flags/setHalfCarryFlag
-   end
+   i32.const 0
+   i32.ne
+   call $core/cpu/flags/setHalfCarryFlag
   end
  )
  (func $core/cpu/opcodes/eightBitLoadSyncCycles (; 131 ;) (type $ii) (param $0 i32) (result i32)
@@ -11590,13 +11558,7 @@
    i32.const 255
    i32.and
    i32.gt_u
-   if
-    i32.const 1
-    call $core/cpu/flags/setCarryFlag
-   else    
-    i32.const 0
-    call $core/cpu/flags/setCarryFlag
-   end
+   call $core/cpu/flags/setCarryFlag
   else   
    local.get $1
    i32.const 31
@@ -11610,13 +11572,7 @@
    i32.const 255
    i32.and
    i32.gt_s
-   if
-    i32.const 1
-    call $core/cpu/flags/setCarryFlag
-   else    
-    i32.const 0
-    call $core/cpu/flags/setCarryFlag
-   end
+   call $core/cpu/flags/setCarryFlag
   end
  )
  (func $core/cpu/instructions/addARegister (; 141 ;) (type $i_) (param $0 i32)
@@ -14363,14 +14319,6 @@
   i32.const 65535
   i32.and
   global.set $core/cpu/cpu/Cpu.stackPointer
-  block $__inlined_func$core/cpu/cpu/Cpu.isHalted
-   global.get $core/cpu/cpu/Cpu.isHaltNormal
-   local.tee $1
-   global.get $core/cpu/cpu/Cpu.isHaltNoJump
-   local.get $1
-   select
-   br_if $__inlined_func$core/cpu/cpu/Cpu.isHalted
-  end
   global.get $core/cpu/cpu/Cpu.stackPointer
   local.tee $1
   global.get $core/cpu/cpu/Cpu.programCounter
@@ -14522,17 +14470,11 @@
     i32.const 0
    end
    if
-    block $__inlined_func$core/cpu/cpu/Cpu.isHalted (result i32)
-     i32.const 1
-     global.get $core/cpu/cpu/Cpu.isHaltNormal
-     local.tee $0
-     global.get $core/cpu/cpu/Cpu.isHaltNoJump
-     local.get $0
-     select
-     br_if $__inlined_func$core/cpu/cpu/Cpu.isHalted
-     drop
-     i32.const 0
-    end
+    global.get $core/cpu/cpu/Cpu.isHaltNormal
+    local.tee $0
+    global.get $core/cpu/cpu/Cpu.isHaltNoJump
+    local.get $0
+    select
     if (result i32)
      i32.const 0
      global.set $core/cpu/cpu/Cpu.isHaltNoJump
@@ -14548,17 +14490,11 @@
     end
     local.set $1
    end
-   block $__inlined_func$core/cpu/cpu/Cpu.isHalted0 (result i32)
-    i32.const 1
-    global.get $core/cpu/cpu/Cpu.isHaltNormal
-    local.tee $0
-    global.get $core/cpu/cpu/Cpu.isHaltNoJump
-    local.get $0
-    select
-    br_if $__inlined_func$core/cpu/cpu/Cpu.isHalted0
-    drop
-    i32.const 0
-   end
+   global.get $core/cpu/cpu/Cpu.isHaltNormal
+   local.tee $0
+   global.get $core/cpu/cpu/Cpu.isHaltNoJump
+   local.get $0
+   select
    if
     i32.const 0
     global.set $core/cpu/cpu/Cpu.isHaltNoJump
@@ -14606,17 +14542,11 @@
   end
   i32.const 4
   local.set $0
-  block $__inlined_func$core/cpu/cpu/Cpu.isHalted (result i32)
-   i32.const 1
-   global.get $core/cpu/cpu/Cpu.isHaltNormal
-   local.tee $1
-   global.get $core/cpu/cpu/Cpu.isHaltNoJump
-   local.get $1
-   select
-   br_if $__inlined_func$core/cpu/cpu/Cpu.isHalted
-   drop
-   i32.const 0
-  end
+  global.get $core/cpu/cpu/Cpu.isHaltNormal
+  local.tee $1
+  global.get $core/cpu/cpu/Cpu.isHaltNoJump
+  local.get $1
+  select
   i32.eqz
   local.tee $1
   if (result i32)
@@ -14729,12 +14659,9 @@
      local.set $4
     else     
      global.get $core/cpu/cpu/Cpu.currentCycles
+     i32.const 70224
      global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
-     if (result i32)
-      i32.const 140448
-     else      
-      i32.const 70224
-     end
+     i32.shl
      i32.ge_s
      if
       i32.const 1
@@ -14763,12 +14690,9 @@
   local.get $0
   if
    global.get $core/cpu/cpu/Cpu.currentCycles
+   i32.const 70224
    global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
-   if (result i32)
-    i32.const 140448
-   else    
-    i32.const 70224
-   end
+   i32.shl
    i32.sub
    global.set $core/cpu/cpu/Cpu.currentCycles
    global.get $core/execute/Execute.RESPONSE_CONDITION_FRAME
