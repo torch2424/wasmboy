@@ -9967,8 +9967,6 @@
               i32.add
               i32.const 65535
               i32.and
-              global.set $core/cpu/cpu/Cpu.programCounter
-              global.get $core/cpu/cpu/Cpu.programCounter
               i32.const 1
               i32.add
               i32.const 65535
@@ -10198,8 +10196,14 @@
                     i32.shr_u
                     i32.const 1
                     i32.and
-                    i32.eqz
                     if
+                     global.get $core/cpu/cpu/Cpu.programCounter
+                     i32.const 1
+                     i32.add
+                     i32.const 65535
+                     i32.and
+                     global.set $core/cpu/cpu/Cpu.programCounter
+                    else                     
                      call $core/cpu/opcodes/getDataByteOne
                      local.set $0
                      global.get $core/cpu/cpu/Cpu.programCounter
@@ -10211,14 +10215,12 @@
                      i32.add
                      i32.const 65535
                      i32.and
+                     i32.const 1
+                     i32.add
+                     i32.const 65535
+                     i32.and
                      global.set $core/cpu/cpu/Cpu.programCounter
                     end
-                    global.get $core/cpu/cpu/Cpu.programCounter
-                    i32.const 1
-                    i32.add
-                    i32.const 65535
-                    i32.and
-                    global.set $core/cpu/cpu/Cpu.programCounter
                     i32.const 8
                     return
                    end
@@ -10453,14 +10455,19 @@
              i32.add
              i32.const 65535
              i32.and
+             i32.const 1
+             i32.add
+             i32.const 65535
+             i32.and
+             global.set $core/cpu/cpu/Cpu.programCounter
+            else             
+             global.get $core/cpu/cpu/Cpu.programCounter
+             i32.const 1
+             i32.add
+             i32.const 65535
+             i32.and
              global.set $core/cpu/cpu/Cpu.programCounter
             end
-            global.get $core/cpu/cpu/Cpu.programCounter
-            i32.const 1
-            i32.add
-            i32.const 65535
-            i32.and
-            global.set $core/cpu/cpu/Cpu.programCounter
             i32.const 8
             return
            end
@@ -10664,8 +10671,14 @@
                       i32.shr_u
                       i32.const 1
                       i32.and
-                      i32.eqz
                       if
+                       global.get $core/cpu/cpu/Cpu.programCounter
+                       i32.const 1
+                       i32.add
+                       i32.const 65535
+                       i32.and
+                       global.set $core/cpu/cpu/Cpu.programCounter
+                      else                       
                        call $core/cpu/opcodes/getDataByteOne
                        local.set $0
                        global.get $core/cpu/cpu/Cpu.programCounter
@@ -10677,14 +10690,12 @@
                        i32.add
                        i32.const 65535
                        i32.and
+                       i32.const 1
+                       i32.add
+                       i32.const 65535
+                       i32.and
                        global.set $core/cpu/cpu/Cpu.programCounter
                       end
-                      global.get $core/cpu/cpu/Cpu.programCounter
-                      i32.const 1
-                      i32.add
-                      i32.const 65535
-                      i32.and
-                      global.set $core/cpu/cpu/Cpu.programCounter
                       i32.const 8
                       return
                      end
@@ -10827,14 +10838,19 @@
                i32.add
                i32.const 65535
                i32.and
+               i32.const 1
+               i32.add
+               i32.const 65535
+               i32.and
+               global.set $core/cpu/cpu/Cpu.programCounter
+              else               
+               global.get $core/cpu/cpu/Cpu.programCounter
+               i32.const 1
+               i32.add
+               i32.const 65535
+               i32.and
                global.set $core/cpu/cpu/Cpu.programCounter
               end
-              global.get $core/cpu/cpu/Cpu.programCounter
-              i32.const 1
-              i32.add
-              i32.const 65535
-              i32.and
-              global.set $core/cpu/cpu/Cpu.programCounter
               i32.const 8
               return
              end
@@ -11577,29 +11593,26 @@
  )
  (func $core/cpu/instructions/addARegister (; 141 ;) (type $i_) (param $0 i32)
   (local $1 i32)
+  (local $2 i32)
   global.get $core/cpu/cpu/Cpu.registerA
+  local.tee $1
   local.get $0
   i32.const 255
   i32.and
-  local.tee $1
+  local.tee $2
   call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
-  global.get $core/cpu/cpu/Cpu.registerA
   local.get $1
+  local.get $2
   call $core/cpu/flags/checkAndSetEightBitCarryFlag
-  global.get $core/cpu/cpu/Cpu.registerA
   local.get $0
+  local.get $1
   i32.add
   i32.const 255
   i32.and
   global.set $core/cpu/cpu/Cpu.registerA
   global.get $core/cpu/cpu/Cpu.registerA
-  if
-   i32.const 0
-   call $core/cpu/flags/setZeroFlag
-  else   
-   i32.const 1
-   call $core/cpu/flags/setZeroFlag
-  end
+  i32.eqz
+  call $core/cpu/flags/setZeroFlag
   i32.const 0
   call $core/cpu/flags/setSubtractFlag
  )
@@ -11607,6 +11620,7 @@
   (local $1 i32)
   (local $2 i32)
   global.get $core/cpu/cpu/Cpu.registerA
+  local.tee $1
   local.get $0
   i32.add
   global.get $core/cpu/cpu/Cpu.registerF
@@ -11617,26 +11631,20 @@
   i32.add
   i32.const 255
   i32.and
-  local.tee $1
-  local.set $2
-  global.get $core/cpu/cpu/Cpu.registerA
+  local.tee $2
   local.get $0
-  i32.xor
   local.get $1
+  i32.xor
   i32.xor
   i32.const 16
   i32.and
-  if
-   i32.const 1
-   call $core/cpu/flags/setHalfCarryFlag
-  else   
-   i32.const 0
-   call $core/cpu/flags/setHalfCarryFlag
-  end
-  global.get $core/cpu/cpu/Cpu.registerA
+  i32.const 0
+  i32.ne
+  call $core/cpu/flags/setHalfCarryFlag
   local.get $0
   i32.const 255
   i32.and
+  local.get $1
   i32.add
   global.get $core/cpu/cpu/Cpu.registerF
   i32.const 4
@@ -11648,23 +11656,12 @@
   i32.and
   i32.const 0
   i32.gt_u
-  if
-   i32.const 1
-   call $core/cpu/flags/setCarryFlag
-  else   
-   i32.const 0
-   call $core/cpu/flags/setCarryFlag
-  end
+  call $core/cpu/flags/setCarryFlag
   local.get $2
   global.set $core/cpu/cpu/Cpu.registerA
-  global.get $core/cpu/cpu/Cpu.registerA
-  if
-   i32.const 0
-   call $core/cpu/flags/setZeroFlag
-  else   
-   i32.const 1
-   call $core/cpu/flags/setZeroFlag
-  end
+  local.get $2
+  i32.eqz
+  call $core/cpu/flags/setZeroFlag
   i32.const 0
   call $core/cpu/flags/setSubtractFlag
  )
@@ -11786,31 +11783,29 @@
  )
  (func $core/cpu/instructions/subARegister (; 144 ;) (type $i_) (param $0 i32)
   (local $1 i32)
+  (local $2 i32)
   global.get $core/cpu/cpu/Cpu.registerA
+  local.tee $1
   local.get $0
   i32.const 255
   i32.and
   i32.const -1
   i32.mul
-  local.tee $1
+  local.tee $2
   call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
-  global.get $core/cpu/cpu/Cpu.registerA
   local.get $1
+  local.get $2
   call $core/cpu/flags/checkAndSetEightBitCarryFlag
-  global.get $core/cpu/cpu/Cpu.registerA
+  local.get $1
   local.get $0
   i32.sub
   i32.const 255
   i32.and
+  local.tee $1
   global.set $core/cpu/cpu/Cpu.registerA
-  global.get $core/cpu/cpu/Cpu.registerA
-  if
-   i32.const 0
-   call $core/cpu/flags/setZeroFlag
-  else   
-   i32.const 1
-   call $core/cpu/flags/setZeroFlag
-  end
+  local.get $1
+  i32.eqz
+  call $core/cpu/flags/setZeroFlag
   i32.const 1
   call $core/cpu/flags/setSubtractFlag
  )
@@ -11818,6 +11813,7 @@
   (local $1 i32)
   (local $2 i32)
   global.get $core/cpu/cpu/Cpu.registerA
+  local.tee $1
   local.get $0
   i32.sub
   global.get $core/cpu/cpu/Cpu.registerF
@@ -11828,23 +11824,17 @@
   i32.sub
   i32.const 255
   i32.and
-  local.tee $1
-  local.set $2
-  global.get $core/cpu/cpu/Cpu.registerA
+  local.tee $2
   local.get $0
-  i32.xor
   local.get $1
+  i32.xor
   i32.xor
   i32.const 16
   i32.and
-  if
-   i32.const 1
-   call $core/cpu/flags/setHalfCarryFlag
-  else   
-   i32.const 0
-   call $core/cpu/flags/setHalfCarryFlag
-  end
-  global.get $core/cpu/cpu/Cpu.registerA
+  i32.const 0
+  i32.ne
+  call $core/cpu/flags/setHalfCarryFlag
+  local.get $1
   local.get $0
   i32.const 255
   i32.and
@@ -11859,23 +11849,12 @@
   i32.and
   i32.const 0
   i32.gt_u
-  if
-   i32.const 1
-   call $core/cpu/flags/setCarryFlag
-  else   
-   i32.const 0
-   call $core/cpu/flags/setCarryFlag
-  end
+  call $core/cpu/flags/setCarryFlag
   local.get $2
   global.set $core/cpu/cpu/Cpu.registerA
-  global.get $core/cpu/cpu/Cpu.registerA
-  if
-   i32.const 0
-   call $core/cpu/flags/setZeroFlag
-  else   
-   i32.const 1
-   call $core/cpu/flags/setZeroFlag
-  end
+  local.get $2
+  i32.eqz
+  call $core/cpu/flags/setZeroFlag
   i32.const 1
   call $core/cpu/flags/setSubtractFlag
  )
@@ -11996,18 +11975,15 @@
   i32.const 4
  )
  (func $core/cpu/instructions/andARegister (; 147 ;) (type $i_) (param $0 i32)
+  (local $1 i32)
   global.get $core/cpu/cpu/Cpu.registerA
   local.get $0
   i32.and
+  local.tee $1
   global.set $core/cpu/cpu/Cpu.registerA
-  global.get $core/cpu/cpu/Cpu.registerA
-  if
-   i32.const 0
-   call $core/cpu/flags/setZeroFlag
-  else   
-   i32.const 1
-   call $core/cpu/flags/setZeroFlag
-  end
+  local.get $1
+  i32.eqz
+  call $core/cpu/flags/setZeroFlag
   i32.const 0
   call $core/cpu/flags/setSubtractFlag
   i32.const 1
@@ -12016,20 +11992,17 @@
   call $core/cpu/flags/setCarryFlag
  )
  (func $core/cpu/instructions/xorARegister (; 148 ;) (type $i_) (param $0 i32)
+  (local $1 i32)
   global.get $core/cpu/cpu/Cpu.registerA
   local.get $0
   i32.xor
   i32.const 255
   i32.and
+  local.tee $1
   global.set $core/cpu/cpu/Cpu.registerA
-  global.get $core/cpu/cpu/Cpu.registerA
-  if
-   i32.const 0
-   call $core/cpu/flags/setZeroFlag
-  else   
-   i32.const 1
-   call $core/cpu/flags/setZeroFlag
-  end
+  local.get $1
+  i32.eqz
+  call $core/cpu/flags/setZeroFlag
   i32.const 0
   call $core/cpu/flags/setSubtractFlag
   i32.const 0
@@ -12159,15 +12132,11 @@
   i32.or
   i32.const 255
   i32.and
+  local.tee $0
   global.set $core/cpu/cpu/Cpu.registerA
-  global.get $core/cpu/cpu/Cpu.registerA
-  if
-   i32.const 0
-   call $core/cpu/flags/setZeroFlag
-  else   
-   i32.const 1
-   call $core/cpu/flags/setZeroFlag
-  end
+  local.get $0
+  i32.eqz
+  call $core/cpu/flags/setZeroFlag
   i32.const 0
   call $core/cpu/flags/setSubtractFlag
   i32.const 0
@@ -12178,26 +12147,22 @@
  (func $core/cpu/instructions/cpARegister (; 151 ;) (type $i_) (param $0 i32)
   (local $1 i32)
   global.get $core/cpu/cpu/Cpu.registerA
+  local.tee $1
   local.get $0
   i32.const 255
   i32.and
   i32.const -1
   i32.mul
-  local.tee $1
+  local.tee $0
   call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
-  global.get $core/cpu/cpu/Cpu.registerA
   local.get $1
+  local.get $0
   call $core/cpu/flags/checkAndSetEightBitCarryFlag
-  global.get $core/cpu/cpu/Cpu.registerA
+  local.get $0
   local.get $1
   i32.add
-  if
-   i32.const 0
-   call $core/cpu/flags/setZeroFlag
-  else   
-   i32.const 1
-   call $core/cpu/flags/setZeroFlag
-  end
+  i32.eqz
+  call $core/cpu/flags/setZeroFlag
   i32.const 1
   call $core/cpu/flags/setSubtractFlag
  )
@@ -12364,13 +12329,7 @@
   i32.and
   i32.const 128
   i32.eq
-  if
-   i32.const 1
-   call $core/cpu/flags/setCarryFlag
-  else   
-   i32.const 0
-   call $core/cpu/flags/setCarryFlag
-  end
+  call $core/cpu/flags/setCarryFlag
   local.get $0
   i32.const 1
   i32.shl
@@ -12383,13 +12342,8 @@
   i32.const 255
   i32.and
   local.tee $0
-  if
-   i32.const 0
-   call $core/cpu/flags/setZeroFlag
-  else   
-   i32.const 1
-   call $core/cpu/flags/setZeroFlag
-  end
+  i32.eqz
+  call $core/cpu/flags/setZeroFlag
   i32.const 0
   call $core/cpu/flags/setSubtractFlag
   i32.const 0
@@ -12402,13 +12356,7 @@
   i32.and
   i32.const 0
   i32.gt_u
-  if
-   i32.const 1
-   call $core/cpu/flags/setCarryFlag
-  else   
-   i32.const 0
-   call $core/cpu/flags/setCarryFlag
-  end
+  call $core/cpu/flags/setCarryFlag
   local.get $0
   i32.const 7
   i32.shl
@@ -12421,13 +12369,8 @@
   i32.const 255
   i32.and
   local.tee $0
-  if
-   i32.const 0
-   call $core/cpu/flags/setZeroFlag
-  else   
-   i32.const 1
-   call $core/cpu/flags/setZeroFlag
-  end
+  i32.eqz
+  call $core/cpu/flags/setZeroFlag
   i32.const 0
   call $core/cpu/flags/setSubtractFlag
   i32.const 0
@@ -12436,15 +12379,6 @@
  )
  (func $core/cpu/instructions/rotateRegisterLeftThroughCarry (; 157 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
-  i32.const 1
-  i32.const 0
-  local.get $0
-  i32.const 128
-  i32.and
-  i32.const 128
-  i32.eq
-  select
-  local.set $1
   global.get $core/cpu/cpu/Cpu.registerF
   i32.const 4
   i32.shr_u
@@ -12456,23 +12390,17 @@
   i32.or
   i32.const 255
   i32.and
-  local.set $0
-  local.get $1
-  if
-   i32.const 1
-   call $core/cpu/flags/setCarryFlag
-  else   
-   i32.const 0
-   call $core/cpu/flags/setCarryFlag
-  end
+  local.set $1
   local.get $0
-  if
-   i32.const 0
-   call $core/cpu/flags/setZeroFlag
-  else   
-   i32.const 1
-   call $core/cpu/flags/setZeroFlag
-  end
+  i32.const 128
+  i32.and
+  i32.const 128
+  i32.eq
+  call $core/cpu/flags/setCarryFlag
+  local.get $1
+  local.tee $0
+  i32.eqz
+  call $core/cpu/flags/setZeroFlag
   i32.const 0
   call $core/cpu/flags/setSubtractFlag
   i32.const 0
@@ -12481,15 +12409,6 @@
  )
  (func $core/cpu/instructions/rotateRegisterRightThroughCarry (; 158 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
-  i32.const 1
-  i32.const 0
-  local.get $0
-  i32.const 1
-  i32.and
-  i32.const 1
-  i32.eq
-  select
-  local.set $1
   global.get $core/cpu/cpu/Cpu.registerF
   i32.const 4
   i32.shr_u
@@ -12503,23 +12422,17 @@
   i32.const 1
   i32.shr_u
   i32.or
-  local.set $0
-  local.get $1
-  if
-   i32.const 1
-   call $core/cpu/flags/setCarryFlag
-  else   
-   i32.const 0
-   call $core/cpu/flags/setCarryFlag
-  end
+  local.set $1
   local.get $0
-  if
-   i32.const 0
-   call $core/cpu/flags/setZeroFlag
-  else   
-   i32.const 1
-   call $core/cpu/flags/setZeroFlag
-  end
+  i32.const 1
+  i32.and
+  i32.const 1
+  i32.eq
+  call $core/cpu/flags/setCarryFlag
+  local.get $1
+  local.tee $0
+  i32.eqz
+  call $core/cpu/flags/setZeroFlag
   i32.const 0
   call $core/cpu/flags/setSubtractFlag
   i32.const 0
@@ -12527,38 +12440,20 @@
   local.get $0
  )
  (func $core/cpu/instructions/shiftLeftRegister (; 159 ;) (type $ii) (param $0 i32) (result i32)
-  (local $1 i32)
-  i32.const 1
-  i32.const 0
   local.get $0
   i32.const 128
   i32.and
   i32.const 128
   i32.eq
-  select
-  local.set $1
+  call $core/cpu/flags/setCarryFlag
   local.get $0
   i32.const 1
   i32.shl
   i32.const 255
   i32.and
-  local.set $0
-  local.get $1
-  if
-   i32.const 1
-   call $core/cpu/flags/setCarryFlag
-  else   
-   i32.const 0
-   call $core/cpu/flags/setCarryFlag
-  end
-  local.get $0
-  if
-   i32.const 0
-   call $core/cpu/flags/setZeroFlag
-  else   
-   i32.const 1
-   call $core/cpu/flags/setZeroFlag
-  end
+  local.tee $0
+  i32.eqz
+  call $core/cpu/flags/setZeroFlag
   i32.const 0
   call $core/cpu/flags/setSubtractFlag
   i32.const 0
@@ -12568,23 +12463,17 @@
  (func $core/cpu/instructions/shiftRightArithmeticRegister (; 160 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
-  i32.const 1
-  i32.const 0
   local.get $0
   i32.const 1
   i32.and
   i32.const 1
   i32.eq
-  select
   local.set $1
-  i32.const 1
-  i32.const 0
   local.get $0
   i32.const 128
   i32.and
   i32.const 128
   i32.eq
-  select
   local.set $2
   local.get $0
   i32.const 255
@@ -12598,25 +12487,14 @@
   local.get $2
   select
   local.tee $0
-  if
-   i32.const 0
-   call $core/cpu/flags/setZeroFlag
-  else   
-   i32.const 1
-   call $core/cpu/flags/setZeroFlag
-  end
+  i32.eqz
+  call $core/cpu/flags/setZeroFlag
   i32.const 0
   call $core/cpu/flags/setSubtractFlag
   i32.const 0
   call $core/cpu/flags/setHalfCarryFlag
   local.get $1
-  if
-   i32.const 1
-   call $core/cpu/flags/setCarryFlag
-  else   
-   i32.const 0
-   call $core/cpu/flags/setCarryFlag
-  end
+  call $core/cpu/flags/setCarryFlag
   local.get $0
  )
  (func $core/cpu/instructions/swapNibblesOnRegister (; 161 ;) (type $ii) (param $0 i32) (result i32)
@@ -12632,13 +12510,8 @@
   i32.shr_u
   i32.or
   local.tee $0
-  if
-   i32.const 0
-   call $core/cpu/flags/setZeroFlag
-  else   
-   i32.const 1
-   call $core/cpu/flags/setZeroFlag
-  end
+  i32.eqz
+  call $core/cpu/flags/setZeroFlag
   i32.const 0
   call $core/cpu/flags/setSubtractFlag
   i32.const 0
@@ -12649,14 +12522,11 @@
  )
  (func $core/cpu/instructions/shiftRightLogicalRegister (; 162 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
-  i32.const 1
-  i32.const 0
   local.get $0
   i32.const 1
   i32.and
   i32.const 1
   i32.eq
-  select
   local.set $1
   local.get $0
   i32.const 255
@@ -12664,25 +12534,14 @@
   i32.const 1
   i32.shr_u
   local.tee $0
-  if
-   i32.const 0
-   call $core/cpu/flags/setZeroFlag
-  else   
-   i32.const 1
-   call $core/cpu/flags/setZeroFlag
-  end
+  i32.eqz
+  call $core/cpu/flags/setZeroFlag
   i32.const 0
   call $core/cpu/flags/setSubtractFlag
   i32.const 0
   call $core/cpu/flags/setHalfCarryFlag
   local.get $1
-  if
-   i32.const 1
-   call $core/cpu/flags/setCarryFlag
-  else   
-   i32.const 0
-   call $core/cpu/flags/setCarryFlag
-  end
+  call $core/cpu/flags/setCarryFlag
   local.get $0
  )
  (func $core/cpu/instructions/testBitOnRegister (; 163 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
@@ -12693,13 +12552,8 @@
   i32.and
   i32.const 255
   i32.and
-  if
-   i32.const 0
-   call $core/cpu/flags/setZeroFlag
-  else   
-   i32.const 1
-   call $core/cpu/flags/setZeroFlag
-  end
+  i32.eqz
+  call $core/cpu/flags/setZeroFlag
   i32.const 0
   call $core/cpu/flags/setSubtractFlag
   i32.const 1
