@@ -6,6 +6,10 @@ export class Breakpoints {
   static reachedBreakpoint: boolean = false;
 }
 
+export function breakpoint(): void {
+  Breakpoints.reachedBreakpoint = true;
+}
+
 export function setProgramCounterBreakpoint(breakpoint: i32): void {
   Breakpoints.programCounter = breakpoint;
 }

@@ -1,6 +1,7 @@
 import { GBC_PALETTE_LOCATION } from '../constants';
 import { Cpu } from '../cpu/index';
 import { Memory, eightBitLoadFromGBMemory, eightBitStoreIntoGBMemory } from '../memory/index';
+import { breakpoint } from '../debug/breakpoints';
 import { checkBitOnByte, resetBitOnByte, setBitOnByte, concatenateBytes, hexLog } from '../helpers/index';
 
 import { Colors } from './colors';
