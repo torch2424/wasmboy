@@ -20,6 +20,7 @@ export class Palette {
   static readonly memoryLocationSpritePaletteTwo: i32 = 0xff49;
 }
 
+// Inlined because closure compiler inlines
 export function initializePalette(): void {
   if (Cpu.GBCEnabled) {
     // GBC Palettes
@@ -39,6 +40,7 @@ export function initializePalette(): void {
 // Simple get pallete color or monochrome GB
 // shouldRepresentColorByColorId is good for debugging tile data for GBC games that don't have
 // monochromePalettes
+// Inlined because closure compiler inlines
 export function getMonochromeColorFromPalette(
   colorId: i32,
   paletteMemoryLocation: i32,
@@ -136,6 +138,7 @@ export function getColorizedGbHexColorFromPalette(colorId: i32, paletteMemoryLoc
   return hexColor;
 }
 
+// Inlined because closure compiler inlines
 export function writeColorPaletteToMemory(offset: i32, value: i32): void {
   // FF68
   //  Bit 0-5   Index (00-3F)
@@ -161,6 +164,7 @@ export function writeColorPaletteToMemory(offset: i32, value: i32): void {
 // Functions to Handle Write to pallete data registers
 // http://gbdev.gg8.se/wiki/articles/Video_Display#FF68_-_BCPS.2FBGPI_-_CGB_Mode_Only_-_Background_Palette_Index
 // Function to handle incrementing the pallete index if required
+// Inlined because closure compiler inlines
 function incrementPaletteIndexIfSet(paletteIndex: i32, offset: i32): void {
   // Check ther auto increment box
   if (checkBitOnByte(7, paletteIndex)) {
@@ -218,6 +222,7 @@ export function loadPaletteByteFromWasmMemory(paletteIndexByte: i32, isSprite: b
 }
 
 // Function to store a byte to our Gbc Palette memory
+// Inlined because closure compiler inlines
 export function storePaletteByteInWasmMemory(paletteIndexByte: i32, value: i32, isSprite: boolean): void {
   // Clear the top two bits to just get the bottom palette Index
   let paletteIndex: i32 = paletteIndexByte & 0x3f;

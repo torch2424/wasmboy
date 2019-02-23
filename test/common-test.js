@@ -16,7 +16,7 @@ const GAMEBOY_CAMERA_HEIGHT = 144;
 // Function to get our RGB image data array from our frame
 const getImageDataFromFrame = async () => {
   // Get our output frame
-  const frameInProgressVideoOutputLocation = await WasmBoy._getWasmConstant('frameInProgressVideoOutputLocation');
+  const frameInProgressVideoOutputLocation = await WasmBoy._getWasmConstant('FRAME_LOCATION');
   const frameInProgressMemory = await WasmBoy._getWasmMemorySection(
     frameInProgressVideoOutputLocation,
     frameInProgressVideoOutputLocation + GAMEBOY_CAMERA_HEIGHT * GAMEBOY_CAMERA_WIDTH * 3 + 1

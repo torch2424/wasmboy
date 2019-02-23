@@ -16,7 +16,7 @@ const updateCanvasTask = async (canvasElement, canvasContext, canvasImageData) =
   const rgbColor = new Uint8ClampedArray(3);
 
   // Get our background map location constant
-  const tileDataMapLocation = await WasmBoy._getWasmConstant('tileDataMap');
+  const tileDataMapLocation = await WasmBoy._getWasmConstant('TILE_DATA_LOCATION');
   const tileDataMapMemory = await WasmBoy._getWasmMemorySection(
     tileDataMapLocation,
     tileDataMapLocation + tileDataYPixels * tileDataXPixels * 3
