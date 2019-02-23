@@ -13,7 +13,7 @@ export function initializeDma(): void {
     eightBitStoreIntoGBMemory(0xff54, 0xff);
     eightBitStoreIntoGBMemory(0xff55, 0xff);
   } else {
-    // GBC DMA
+    // GB DMA
     eightBitStoreIntoGBMemory(0xff51, 0xff);
     eightBitStoreIntoGBMemory(0xff52, 0xff);
     eightBitStoreIntoGBMemory(0xff53, 0xff);

@@ -33,6 +33,13 @@ export function initializePalette(): void {
     eightBitStoreIntoGBMemory(0xff6a, 0xff);
     eightBitStoreIntoGBMemory(0xff6b, 0xff);
   }
+
+  // Override some values if using the bootrom
+  if (Cpu.BootROMEnabled && Cpu.GBCEnabled) {
+    // GBC Palettes
+    eightBitStoreIntoGBMemory(0xff69, 0x20);
+    eightBitStoreIntoGBMemory(0xff6b, 0x8a);
+  }
 }
 
 // Simple get pallete color or monochrome GB

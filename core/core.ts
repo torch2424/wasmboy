@@ -45,11 +45,6 @@ export function config(
   tileCaching: i32,
   enableAudioDebugging: i32
 ): void {
-  // TODO: depending on the boot rom, initialization may be different
-  // From: http://www.codeslinger.co.uk/pages/projects/gameboy/hardware.html
-  // All values default to zero in memory, so not setting them yet
-  // log('initializing (includeBootRom=$0)', 1, enableBootRom);
-
   if (enableBootRom > 0) {
     Config.enableBootRom = true;
   } else {

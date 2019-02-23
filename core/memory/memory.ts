@@ -160,4 +160,8 @@ export function initializeCartridge(): void {
 
   Memory.currentRomBank = 0x01;
   Memory.currentRamBank = 0x00;
+
+  // Set our GBC Banks
+  eightBitStoreIntoGBMemory(Memory.memoryLocationGBCVRAMBank, 0x00);
+  eightBitStoreIntoGBMemory(Memory.memoryLocationGBCWRAMBank, 0x01);
 }

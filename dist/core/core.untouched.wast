@@ -465,124 +465,151 @@
  )
  (func $core/memory/memoryMap/getWasmBoyOffsetFromGameBoyOffset (; 1 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
-  block $case14|0
-   block $case13|0
-    block $case12|0
-     block $case11|0
-      block $case9|0
-       block $case7|0
-        block $case3|0
-         local.get $0
-         i32.const 12
-         i32.shr_s
-         local.tee $1
-         if
-          local.get $1
-          i32.const 1
-          i32.sub
-          br_table $case3|0 $case3|0 $case3|0 $case7|0 $case7|0 $case7|0 $case7|0 $case9|0 $case9|0 $case11|0 $case11|0 $case12|0 $case13|0 $case14|0
-         end
-         local.get $0
-         i32.const 256
-         i32.lt_s
-         global.get $core/cpu/cpu/Cpu.BootROMEnabled
-         local.tee $1
-         local.get $1
-         select
-         if
+  block $folding-inner0
+   block $case14|0
+    block $case13|0
+     block $case12|0
+      block $case11|0
+       block $case9|0
+        block $case7|0
+         block $case3|0
           local.get $0
-          i32.const 1330304
-          i32.add
-          return
+          i32.const 12
+          i32.shr_s
+          local.tee $1
+          if
+           local.get $1
+           i32.const 1
+           i32.sub
+           br_table $case3|0 $case3|0 $case3|0 $case7|0 $case7|0 $case7|0 $case7|0 $case9|0 $case9|0 $case11|0 $case11|0 $case12|0 $case13|0 $case14|0
+          end
+          global.get $core/cpu/cpu/Cpu.BootROMEnabled
+          if
+           global.get $core/cpu/cpu/Cpu.GBCEnabled
+           if
+            local.get $0
+            i32.const 256
+            i32.lt_s
+            br_if $folding-inner0
+            local.get $0
+            i32.const 511
+            i32.gt_s
+            local.tee $1
+            if (result i32)
+             local.get $0
+             i32.const 2304
+             i32.lt_s
+            else             
+             local.get $1
+            end
+            br_if $folding-inner0
+           else            
+            global.get $core/cpu/cpu/Cpu.GBCEnabled
+            i32.eqz
+            local.tee $1
+            if (result i32)
+             local.get $0
+             i32.const 256
+             i32.lt_s
+            else             
+             local.get $1
+            end
+            br_if $folding-inner0
+           end
+          end
          end
+         local.get $0
+         i32.const 1332864
+         i32.add
+         return
         end
         local.get $0
-        i32.const 1332864
+        i32.const 1
+        global.get $core/memory/memory/Memory.currentRomBank
+        local.tee $0
+        global.get $core/memory/memory/Memory.isMBC5
+        i32.eqz
+        local.tee $1
+        if (result i32)
+         local.get $0
+         i32.eqz
+        else         
+         local.get $1
+        end
+        select
+        i32.const 14
+        i32.shl
+        i32.add
+        i32.const 1316480
         i32.add
         return
        end
        local.get $0
-       i32.const 1
-       global.get $core/memory/memory/Memory.currentRomBank
-       local.tee $0
-       global.get $core/memory/memory/Memory.isMBC5
-       i32.eqz
-       local.tee $1
-       if (result i32)
-        local.get $0
-        i32.eqz
-       else        
-        local.get $1
-       end
-       select
-       i32.const 14
-       i32.shl
+       i32.const -30720
        i32.add
-       i32.const 1316480
+       global.get $core/cpu/cpu/Cpu.GBCEnabled
+       if (result i32)
+        global.get $core/memory/memory/Memory.memoryLocationGBCVRAMBank
+        call $core/memory/load/eightBitLoadFromGBMemory
+        i32.const 1
+        i32.and
+       else        
+        i32.const 0
+       end
+       i32.const 13
+       i32.shl
        i32.add
        return
       end
       local.get $0
-      i32.const -30720
-      i32.add
-      global.get $core/cpu/cpu/Cpu.GBCEnabled
-      if (result i32)
-       global.get $core/memory/memory/Memory.memoryLocationGBCVRAMBank
-       call $core/memory/load/eightBitLoadFromGBMemory
-       i32.const 1
-       i32.and
-      else       
-       i32.const 0
-      end
+      global.get $core/memory/memory/Memory.currentRamBank
       i32.const 13
       i32.shl
+      i32.add
+      i32.const 1158272
       i32.add
       return
      end
      local.get $0
-     global.get $core/memory/memory/Memory.currentRamBank
-     i32.const 13
-     i32.shl
-     i32.add
-     i32.const 1158272
+     i32.const -30720
      i32.add
      return
     end
-    local.get $0
-    i32.const -30720
-    i32.add
-    return
-   end
-   i32.const 0
-   local.set $1
-   block (result i32)
-    global.get $core/cpu/cpu/Cpu.GBCEnabled
+    i32.const 0
+    local.set $1
+    block (result i32)
+     global.get $core/cpu/cpu/Cpu.GBCEnabled
+     if
+      global.get $core/memory/memory/Memory.memoryLocationGBCWRAMBank
+      call $core/memory/load/eightBitLoadFromGBMemory
+      i32.const 7
+      i32.and
+      local.set $1
+     end
+     local.get $1
+     i32.const 1
+     i32.lt_s
+    end
     if
-     global.get $core/memory/memory/Memory.memoryLocationGBCWRAMBank
-     call $core/memory/load/eightBitLoadFromGBMemory
-     i32.const 7
-     i32.and
+     i32.const 1
      local.set $1
     end
     local.get $1
-    i32.const 1
-    i32.lt_s
+    i32.const 12
+    i32.shl
+    local.get $0
+    i32.add
+    i32.const -34816
+    i32.add
+    return
    end
-   if
-    i32.const 1
-    local.set $1
-   end
-   local.get $1
-   i32.const 12
-   i32.shl
    local.get $0
-   i32.add
-   i32.const -34816
+   i32.const -6144
    i32.add
    return
   end
   local.get $0
-  i32.const -6144
+  i32.const 1330304
   i32.add
  )
  (func $core/memory/load/eightBitLoadFromGBMemory (; 2 ;) (type $ii) (param $0 i32) (result i32)
@@ -668,7 +695,13 @@
   i32.const 65534
   global.set $core/cpu/cpu/Cpu.stackPointer
  )
- (func $core/memory/memory/initializeCartridge (; 4 ;) (type $_)
+ (func $core/memory/store/eightBitStoreIntoGBMemory (; 4 ;) (type $ii_) (param $0 i32) (param $1 i32)
+  local.get $0
+  call $core/memory/memoryMap/getWasmBoyOffsetFromGameBoyOffset
+  local.get $1
+  i32.store8
+ )
+ (func $core/memory/memory/initializeCartridge (; 5 ;) (type $_)
   (local $0 i32)
   (local $1 i32)
   i32.const 0
@@ -761,12 +794,12 @@
   global.set $core/memory/memory/Memory.currentRomBank
   i32.const 0
   global.set $core/memory/memory/Memory.currentRamBank
- )
- (func $core/memory/store/eightBitStoreIntoGBMemory (; 5 ;) (type $ii_) (param $0 i32) (param $1 i32)
-  local.get $0
-  call $core/memory/memoryMap/getWasmBoyOffsetFromGameBoyOffset
-  local.get $1
-  i32.store8
+  global.get $core/memory/memory/Memory.memoryLocationGBCVRAMBank
+  i32.const 0
+  call $core/memory/store/eightBitStoreIntoGBMemory
+  global.get $core/memory/memory/Memory.memoryLocationGBCWRAMBank
+  i32.const 1
+  call $core/memory/store/eightBitStoreIntoGBMemory
  )
  (func $core/memory/dma/initializeDma (; 6 ;) (type $_)
   i32.const 65361
@@ -1657,17 +1690,22 @@
    i32.const 255
    call $core/memory/store/eightBitStoreIntoGBMemory
   end
-  i32.const 65359
-  i32.const 0
-  call $core/memory/store/eightBitStoreIntoGBMemory
-  i32.const 65392
-  i32.const 1
-  call $core/memory/store/eightBitStoreIntoGBMemory
   global.get $core/cpu/cpu/Cpu.BootROMEnabled
   if
    global.get $core/cpu/cpu/Cpu.GBCEnabled
-   i32.eqz
    if
+    i32.const 0
+    global.set $core/graphics/graphics/Graphics.scanlineRegister
+    i32.const 65344
+    i32.const 0
+    call $core/memory/store/eightBitStoreIntoGBMemory
+    i32.const 65345
+    i32.const 128
+    call $core/memory/store/eightBitStoreIntoGBMemory
+    i32.const 65348
+    i32.const 0
+    call $core/memory/store/eightBitStoreIntoGBMemory
+   else    
     i32.const 0
     global.set $core/graphics/graphics/Graphics.scanlineRegister
     i32.const 65344
@@ -1709,6 +1747,18 @@
    i32.const 255
    call $core/memory/store/eightBitStoreIntoGBMemory
   end
+  global.get $core/cpu/cpu/Cpu.GBCEnabled
+  global.get $core/cpu/cpu/Cpu.BootROMEnabled
+  global.get $core/cpu/cpu/Cpu.BootROMEnabled
+  select
+  if
+   i32.const 65385
+   i32.const 32
+   call $core/memory/store/eightBitStoreIntoGBMemory
+   i32.const 65387
+   i32.const 138
+   call $core/memory/store/eightBitStoreIntoGBMemory
+  end
  )
  (func $core/sound/channel1/Channel1.initialize (; 12 ;) (type $_)
   i32.const 65296
@@ -1728,22 +1778,18 @@
   call $core/memory/store/eightBitStoreIntoGBMemory
   global.get $core/cpu/cpu/Cpu.BootROMEnabled
   if
-   global.get $core/cpu/cpu/Cpu.GBCEnabled
-   i32.eqz
-   if
-    i32.const 65297
-    i32.const 63
-    call $core/memory/store/eightBitStoreIntoGBMemory
-    i32.const 65298
-    i32.const 0
-    call $core/memory/store/eightBitStoreIntoGBMemory
-    i32.const 65299
-    i32.const 0
-    call $core/memory/store/eightBitStoreIntoGBMemory
-    i32.const 65300
-    i32.const 184
-    call $core/memory/store/eightBitStoreIntoGBMemory
-   end
+   i32.const 65297
+   i32.const 63
+   call $core/memory/store/eightBitStoreIntoGBMemory
+   i32.const 65298
+   i32.const 0
+   call $core/memory/store/eightBitStoreIntoGBMemory
+   i32.const 65299
+   i32.const 0
+   call $core/memory/store/eightBitStoreIntoGBMemory
+   i32.const 65300
+   i32.const 184
+   call $core/memory/store/eightBitStoreIntoGBMemory
   end
  )
  (func $core/sound/channel2/Channel2.initialize (; 13 ;) (type $_)
@@ -1933,27 +1979,23 @@
   global.set $core/sound/sound/Sound.NR52IsSoundEnabled
   global.get $core/cpu/cpu/Cpu.BootROMEnabled
   if
-   global.get $core/cpu/cpu/Cpu.GBCEnabled
-   i32.eqz
-   if
-    i32.const 65316
-    i32.const 0
-    call $core/memory/store/eightBitStoreIntoGBMemory
-    i32.const 0
-    global.set $core/sound/sound/Sound.NR50LeftMixerVolume
-    i32.const 0
-    global.set $core/sound/sound/Sound.NR50RightMixerVolume
-    i32.const 65317
-    i32.const 0
-    call $core/memory/store/eightBitStoreIntoGBMemory
-    i32.const 0
-    call $core/sound/sound/Sound.updateNR51
-    i32.const 65318
-    i32.const 112
-    call $core/memory/store/eightBitStoreIntoGBMemory
-    i32.const 0
-    global.set $core/sound/sound/Sound.NR52IsSoundEnabled
-   end
+   i32.const 65316
+   i32.const 0
+   call $core/memory/store/eightBitStoreIntoGBMemory
+   i32.const 0
+   global.set $core/sound/sound/Sound.NR50LeftMixerVolume
+   i32.const 0
+   global.set $core/sound/sound/Sound.NR50RightMixerVolume
+   i32.const 65317
+   i32.const 0
+   call $core/memory/store/eightBitStoreIntoGBMemory
+   i32.const 0
+   call $core/sound/sound/Sound.updateNR51
+   i32.const 65318
+   i32.const 112
+   call $core/memory/store/eightBitStoreIntoGBMemory
+   i32.const 0
+   global.set $core/sound/sound/Sound.NR52IsSoundEnabled
   end
   call $core/sound/accumulator/initializeSoundAccumulator
  )

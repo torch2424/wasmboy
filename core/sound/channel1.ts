@@ -150,16 +150,12 @@ export class Channel1 {
     eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx4, 0xbf);
 
     // Override/reset some variables if the boot ROM is enabled
+    // For GBC and GB
     if (Cpu.BootROMEnabled) {
-      if (Cpu.GBCEnabled) {
-        // GBC
-      } else {
-        // GB
-        eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx1, 0x3f);
-        eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx2, 0x00);
-        eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx3, 0x00);
-        eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx4, 0xb8);
-      }
+      eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx1, 0x3f);
+      eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx2, 0x00);
+      eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx3, 0x00);
+      eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx4, 0xb8);
     }
   }
 
