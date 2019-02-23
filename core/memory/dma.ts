@@ -2,7 +2,7 @@ import { Cpu } from '../cpu/index';
 import { Memory } from './memory';
 import { eightBitLoadFromGBMemoryWithTraps, eightBitLoadFromGBMemory } from './load';
 import { eightBitStoreIntoGBMemoryWithTraps, eightBitStoreIntoGBMemory } from './store';
-import { concatenateBytes, checkBitOnByte, setBitOnByte, resetBitOnByte, hexLog } from '../helpers/index';
+import { concatenateBytes, checkBitOnByte, setBitOnByte, resetBitOnByte } from '../helpers/index';
 
 // Inlined because closure compiler inlines
 export function initializeDma(): void {
@@ -25,12 +25,12 @@ export function initializeDma(): void {
 
 // Inlined because closure compiler inlines
 export function startDmaTransfer(sourceAddressOffset: i32): void {
-  let sourceAddress: i32 = sourceAddressOffset;
+  let sourceAddress = sourceAddressOffset;
   sourceAddress = sourceAddress << 8;
 
-  for (let i: i32 = 0; i <= 0x9f; i++) {
-    let spriteInformationByte: i32 = eightBitLoadFromGBMemory(sourceAddress + i);
-    let spriteInformationAddress: i32 = Memory.spriteInformationTableLocation + i;
+  for (let i = 0; i <= 0x9f; i++) {
+    let spriteInformationByte = eightBitLoadFromGBMemory(sourceAddress + i);
+    let spriteInformationAddress = Memory.spriteInformationTableLocation + i;
     eightBitStoreIntoGBMemory(spriteInformationAddress, spriteInformationByte);
   }
 
@@ -64,8 +64,8 @@ export function startHdmaTransfer(hdmaTriggerByteToBeWritten: i32): void {
   // Get the length from the trigger
   // Lower 7 bits, Add 1, times 16
   // https://gist.github.com/drhelius/3394856
-  let transferLength: i32 = resetBitOnByte(7, hdmaTriggerByteToBeWritten);
-  transferLength = (transferLength + 1) * 16;
+  let transferLength = resetBitOnByte(7, hdmaTriggerByteToBeWritten);
+  transferLength = (transferLength + 1) << 4;
 
   // Get bit 7 of the trigger for the HDMA type
   if (checkBitOnByte(7, hdmaTriggerByteToBeWritten)) {
@@ -96,7 +96,7 @@ export function updateHblankHdma(): void {
   }
 
   // Get our amount of bytes to transfer (Only 0x10 bytes at a time)
-  let bytesToTransfer: i32 = 0x10;
+  let bytesToTransfer = 0x10;
   if (Memory.hblankHdmaTransferLengthRemaining < bytesToTransfer) {
     // Set to the difference
     bytesToTransfer = Memory.hblankHdmaTransferLengthRemaining;
@@ -120,7 +120,7 @@ export function updateHblankHdma(): void {
     // Set our new transfer length, make sure it is in the weird format,
     // and make sure bit 7 is 0, to show that the HDMA is Active
     let remainingTransferLength: i32 = Memory.hblankHdmaTransferLengthRemaining;
-    let transferLengthAsByte: i32 = remainingTransferLength / 16 - 1;
+    let transferLengthAsByte: i32 = (remainingTransferLength >> 4) - 1;
     eightBitStoreIntoGBMemory(Memory.memoryLocationHdmaTrigger, resetBitOnByte(7, transferLengthAsByte));
   }
 }
@@ -144,11 +144,12 @@ function hdmaTransfer(hdmaSource: i32, hdmaDestination: i32, transferLength: i32
   // And HDMA takes 8 micro seconds per 0x10 bytes in GBC Double Speed mode (and GBC Normal Mode)
   // Will assume (644 / 10) cycles for GBC Double Speed Mode,
   // and (644 / 10 / 2) for GBC Normal Mode
-  let hdmaCycles: i32 = 32;
+  /*let hdmaCycles = 32;
   if (Cpu.GBCDoubleSpeed) {
     hdmaCycles = 64;
-  }
-  hdmaCycles = hdmaCycles * (transferLength / 0x10);
+  }*/
+  let hdmaCycles = 32 << (<i32>Cpu.GBCDoubleSpeed);
+  hdmaCycles = hdmaCycles * (transferLength >> 4);
   Memory.DMACycles += hdmaCycles;
 }
 
@@ -173,10 +174,10 @@ function getHdmaSourceFromMemory(): i32 {
 // Follows the poan docs
 // Inlined because closure compiler inlines
 function getHdmaDestinationFromMemory(): i32 {
-  let hdmaDestinationHigh: i32 = eightBitLoadFromGBMemory(Memory.memoryLocationHdmaDestinationHigh);
-  let hdmaDestinationLow: i32 = eightBitLoadFromGBMemory(Memory.memoryLocationHdmaDestinationLow);
+  let hdmaDestinationHigh = eightBitLoadFromGBMemory(Memory.memoryLocationHdmaDestinationHigh);
+  let hdmaDestinationLow = eightBitLoadFromGBMemory(Memory.memoryLocationHdmaDestinationLow);
 
-  let hdmaDestination: i32 = concatenateBytes(hdmaDestinationHigh, hdmaDestinationLow);
+  let hdmaDestination = concatenateBytes(hdmaDestinationHigh, hdmaDestinationLow);
 
   // Can only be in VRAM, 0x8000 -> 0x9FF0
   // Pan docs says to knock off upper 3 bits, and lower 4 bits

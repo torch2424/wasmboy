@@ -1,29 +1,8 @@
 // WasmBoy memory map:
 // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
-import {
-  WASMBOY_MEMORY_LOCATION,
-  ASSEMBLYSCRIPT_MEMORY_LOCATION,
-  WASMBOY_STATE_LOCATION,
-  GAMEBOY_INTERNAL_MEMORY_LOCATION,
-  VIDEO_RAM_LOCATION,
-  WORK_RAM_LOCATION,
-  OTHER_GAMEBOY_INTERNAL_MEMORY_LOCATION,
-  GRAPHICS_OUTPUT_LOCATION,
-  GBC_PALETTE_LOCATION,
-  BG_PRIORITY_MAP_LOCATION,
-  FRAME_LOCATION,
-  BACKGROUND_MAP_LOCATION,
-  TILE_DATA_LOCATION,
-  OAM_TILES_LOCATION,
-  AUDIO_BUFFER_LOCATION,
-  CARTRIDGE_RAM_LOCATION,
-  CARTRIDGE_ROM_LOCATION
-} from '../constants';
 import { getSaveStateMemoryOffset } from '../core';
 import { eightBitLoadFromGBMemory, loadBooleanDirectlyFromWasmMemory } from './load';
-import { eightBitStoreIntoGBMemory, storeBooleanDirectlyToWasmMemory } from './store';
-import { handleBanking } from './banking';
-import { checkBitOnByte, resetBitOnByte, hexLog } from '../helpers/index';
+import { storeBooleanDirectlyToWasmMemory } from './store';
 
 export class Memory {
   // ----------------------------------
@@ -138,26 +117,14 @@ export function initializeCartridge(): void {
 
   // Get our game MBC type from the cartridge header
   // http://gbdev.gg8.se/wiki/articles/The_Cartridge_Header
-  let cartridgeType: i32 = eightBitLoadFromGBMemory(0x0147);
+  let cartridgeType = eightBitLoadFromGBMemory(0x0147);
 
   // Reset our Cartridge types
-  Memory.isRomOnly = false;
-  Memory.isMBC1 = false;
-  Memory.isMBC2 = false;
-  Memory.isMBC3 = false;
-  Memory.isMBC5 = false;
-
-  if (cartridgeType === 0x00) {
-    Memory.isRomOnly = true;
-  } else if (cartridgeType >= 0x01 && cartridgeType <= 0x03) {
-    Memory.isMBC1 = true;
-  } else if (cartridgeType >= 0x05 && cartridgeType <= 0x06) {
-    Memory.isMBC2 = true;
-  } else if (cartridgeType >= 0x0f && cartridgeType <= 0x13) {
-    Memory.isMBC3 = true;
-  } else if (cartridgeType >= 0x19 && cartridgeType <= 0x1e) {
-    Memory.isMBC5 = true;
-  }
+  Memory.isRomOnly = cartridgeType === 0x00;
+  Memory.isMBC1 = cartridgeType >= 0x01 && cartridgeType <= 0x03;
+  Memory.isMBC2 = cartridgeType >= 0x05 && cartridgeType <= 0x06;
+  Memory.isMBC3 = cartridgeType >= 0x0f && cartridgeType <= 0x13;
+  Memory.isMBC5 = cartridgeType >= 0x19 && cartridgeType <= 0x1e;
 
   Memory.currentRomBank = 0x01;
   Memory.currentRamBank = 0x00;

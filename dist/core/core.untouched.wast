@@ -626,86 +626,57 @@
   global.set $core/memory/memory/Memory.isMBC1RomModeEnabled
   i32.const 327
   call $core/memory/load/eightBitLoadFromGBMemory
-  local.set $1
-  i32.const 0
+  local.tee $1
+  i32.eqz
   global.set $core/memory/memory/Memory.isRomOnly
-  i32.const 0
-  global.set $core/memory/memory/Memory.isMBC1
-  i32.const 0
-  global.set $core/memory/memory/Memory.isMBC2
-  i32.const 0
-  global.set $core/memory/memory/Memory.isMBC3
-  i32.const 0
-  global.set $core/memory/memory/Memory.isMBC5
   local.get $1
+  i32.const 1
+  i32.ge_s
+  local.tee $0
   if
    local.get $1
-   i32.const 1
-   i32.ge_s
-   local.tee $0
-   if
-    local.get $1
-    i32.const 3
-    i32.le_s
-    local.set $0
-   end
-   local.get $0
-   if
-    i32.const 1
-    global.set $core/memory/memory/Memory.isMBC1
-   else    
-    local.get $1
-    i32.const 5
-    i32.ge_s
-    local.tee $0
-    if
-     local.get $1
-     i32.const 6
-     i32.le_s
-     local.set $0
-    end
-    local.get $0
-    if
-     i32.const 1
-     global.set $core/memory/memory/Memory.isMBC2
-    else     
-     local.get $1
-     i32.const 15
-     i32.ge_s
-     local.tee $0
-     if
-      local.get $1
-      i32.const 19
-      i32.le_s
-      local.set $0
-     end
-     local.get $0
-     if
-      i32.const 1
-      global.set $core/memory/memory/Memory.isMBC3
-     else      
-      local.get $1
-      i32.const 25
-      i32.ge_s
-      local.tee $0
-      if
-       local.get $1
-       i32.const 30
-       i32.le_s
-       local.set $0
-      end
-      local.get $0
-      if
-       i32.const 1
-       global.set $core/memory/memory/Memory.isMBC5
-      end
-     end
-    end
-   end
-  else   
-   i32.const 1
-   global.set $core/memory/memory/Memory.isRomOnly
+   i32.const 3
+   i32.le_s
+   local.set $0
   end
+  local.get $0
+  global.set $core/memory/memory/Memory.isMBC1
+  local.get $1
+  i32.const 5
+  i32.ge_s
+  local.tee $0
+  if
+   local.get $1
+   i32.const 6
+   i32.le_s
+   local.set $0
+  end
+  local.get $0
+  global.set $core/memory/memory/Memory.isMBC2
+  local.get $1
+  i32.const 15
+  i32.ge_s
+  local.tee $0
+  if
+   local.get $1
+   i32.const 19
+   i32.le_s
+   local.set $0
+  end
+  local.get $0
+  global.set $core/memory/memory/Memory.isMBC3
+  local.get $1
+  i32.const 25
+  i32.ge_s
+  local.tee $0
+  if
+   local.get $1
+   i32.const 30
+   i32.le_s
+   local.set $0
+  end
+  local.get $0
+  global.set $core/memory/memory/Memory.isMBC5
   i32.const 1
   global.set $core/memory/memory/Memory.currentRomBank
   i32.const 0
@@ -2156,46 +2127,26 @@
   i32.const 1036
   global.get $core/cpu/cpu/Cpu.currentCycles
   i32.store
+  i32.const 1041
   global.get $core/cpu/cpu/Cpu.isHaltNormal
-  if
-   i32.const 1041
-   i32.const 1
-   i32.store8
-  else   
-   i32.const 1041
-   i32.const 0
-   i32.store8
-  end
+  i32.const 0
+  i32.ne
+  i32.store8
+  i32.const 1042
   global.get $core/cpu/cpu/Cpu.isHaltNoJump
-  if
-   i32.const 1042
-   i32.const 1
-   i32.store8
-  else   
-   i32.const 1042
-   i32.const 0
-   i32.store8
-  end
+  i32.const 0
+  i32.ne
+  i32.store8
+  i32.const 1043
   global.get $core/cpu/cpu/Cpu.isHaltBug
-  if
-   i32.const 1043
-   i32.const 1
-   i32.store8
-  else   
-   i32.const 1043
-   i32.const 0
-   i32.store8
-  end
+  i32.const 0
+  i32.ne
+  i32.store8
+  i32.const 1044
   global.get $core/cpu/cpu/Cpu.isStopped
-  if
-   i32.const 1044
-   i32.const 1
-   i32.store8
-  else   
-   i32.const 1044
-   i32.const 0
-   i32.store8
-  end
+  i32.const 0
+  i32.ne
+  i32.store8
  )
  (func $core/memory/memory/Memory.saveState (; 26 ;) (type $_)
   i32.const 1224
@@ -2204,76 +2155,41 @@
   i32.const 1226
   global.get $core/memory/memory/Memory.currentRamBank
   i32.store16
+  i32.const 1228
   global.get $core/memory/memory/Memory.isRamBankingEnabled
-  if
-   i32.const 1228
-   i32.const 1
-   i32.store8
-  else   
-   i32.const 1228
-   i32.const 0
-   i32.store8
-  end
+  i32.const 0
+  i32.ne
+  i32.store8
+  i32.const 1229
   global.get $core/memory/memory/Memory.isMBC1RomModeEnabled
-  if
-   i32.const 1229
-   i32.const 1
-   i32.store8
-  else   
-   i32.const 1229
-   i32.const 0
-   i32.store8
-  end
+  i32.const 0
+  i32.ne
+  i32.store8
+  i32.const 1230
   global.get $core/memory/memory/Memory.isRomOnly
-  if
-   i32.const 1230
-   i32.const 1
-   i32.store8
-  else   
-   i32.const 1230
-   i32.const 0
-   i32.store8
-  end
+  i32.const 0
+  i32.ne
+  i32.store8
+  i32.const 1231
   global.get $core/memory/memory/Memory.isMBC1
-  if
-   i32.const 1231
-   i32.const 1
-   i32.store8
-  else   
-   i32.const 1231
-   i32.const 0
-   i32.store8
-  end
+  i32.const 0
+  i32.ne
+  i32.store8
+  i32.const 1232
   global.get $core/memory/memory/Memory.isMBC2
-  if
-   i32.const 1232
-   i32.const 1
-   i32.store8
-  else   
-   i32.const 1232
-   i32.const 0
-   i32.store8
-  end
+  i32.const 0
+  i32.ne
+  i32.store8
+  i32.const 1233
   global.get $core/memory/memory/Memory.isMBC3
-  if
-   i32.const 1233
-   i32.const 1
-   i32.store8
-  else   
-   i32.const 1233
-   i32.const 0
-   i32.store8
-  end
+  i32.const 0
+  i32.ne
+  i32.store8
+  i32.const 1234
   global.get $core/memory/memory/Memory.isMBC5
-  if
-   i32.const 1234
-   i32.const 1
-   i32.store8
-  else   
-   i32.const 1234
-   i32.const 0
-   i32.store8
-  end
+  i32.const 0
+  i32.ne
+  i32.store8
  )
  (func $core/timers/timers/Timers.saveState (; 27 ;) (type $_)
   i32.const 1274
@@ -2282,41 +2198,26 @@
   i32.const 1278
   global.get $core/timers/timers/Timers.dividerRegister
   i32.store
+  i32.const 1282
   global.get $core/timers/timers/Timers.timerCounterOverflowDelay
-  if
-   i32.const 1282
-   i32.const 1
-   i32.store8
-  else   
-   i32.const 1282
-   i32.const 0
-   i32.store8
-  end
+  i32.const 0
+  i32.ne
+  i32.store8
+  i32.const 1285
   global.get $core/timers/timers/Timers.timerCounterWasReset
-  if
-   i32.const 1285
-   i32.const 1
-   i32.store8
-  else   
-   i32.const 1285
-   i32.const 0
-   i32.store8
-  end
+  i32.const 0
+  i32.ne
+  i32.store8
   i32.const 65285
   global.get $core/timers/timers/Timers.timerCounter
   call $core/memory/store/eightBitStoreIntoGBMemory
  )
  (func $core/sound/channel1/Channel1.saveState (; 28 ;) (type $_)
+  i32.const 1374
   global.get $core/sound/channel1/Channel1.isEnabled
-  if
-   i32.const 1374
-   i32.const 1
-   i32.store8
-  else   
-   i32.const 1374
-   i32.const 0
-   i32.store8
-  end
+  i32.const 0
+  i32.ne
+  i32.store8
   i32.const 1375
   global.get $core/sound/channel1/Channel1.frequencyTimer
   i32.store
@@ -2335,16 +2236,11 @@
   i32.const 1394
   global.get $core/sound/channel1/Channel1.waveFormPositionOnDuty
   i32.store8
+  i32.const 1399
   global.get $core/sound/channel1/Channel1.isSweepEnabled
-  if
-   i32.const 1399
-   i32.const 1
-   i32.store8
-  else   
-   i32.const 1399
-   i32.const 0
-   i32.store8
-  end
+  i32.const 0
+  i32.ne
+  i32.store8
   i32.const 1400
   global.get $core/sound/channel1/Channel1.sweepCounter
   i32.store
@@ -2353,16 +2249,11 @@
   i32.store16
  )
  (func $core/sound/channel2/Channel2.saveState (; 29 ;) (type $_)
+  i32.const 1424
   global.get $core/sound/channel2/Channel2.isEnabled
-  if
-   i32.const 1424
-   i32.const 1
-   i32.store8
-  else   
-   i32.const 1424
-   i32.const 0
-   i32.store8
-  end
+  i32.const 0
+  i32.ne
+  i32.store8
   i32.const 1425
   global.get $core/sound/channel2/Channel2.frequencyTimer
   i32.store
@@ -2383,16 +2274,11 @@
   i32.store8
  )
  (func $core/sound/channel4/Channel4.saveState (; 30 ;) (type $_)
+  i32.const 1524
   global.get $core/sound/channel4/Channel4.isEnabled
-  if
-   i32.const 1524
-   i32.const 1
-   i32.store8
-  else   
-   i32.const 1524
-   i32.const 0
-   i32.store8
-  end
+  i32.const 0
+  i32.ne
+  i32.store8
   i32.const 1525
   global.get $core/sound/channel4/Channel4.frequencyTimer
   i32.store
@@ -2420,26 +2306,16 @@
   i32.const 65348
   global.get $core/graphics/graphics/Graphics.scanlineRegister
   call $core/memory/store/eightBitStoreIntoGBMemory
+  i32.const 1124
   global.get $core/interrupts/interrupts/Interrupts.masterInterruptSwitch
-  if
-   i32.const 1124
-   i32.const 1
-   i32.store8
-  else   
-   i32.const 1124
-   i32.const 0
-   i32.store8
-  end
+  i32.const 0
+  i32.ne
+  i32.store8
+  i32.const 1125
   global.get $core/interrupts/interrupts/Interrupts.masterInterruptSwitchDelay
-  if
-   i32.const 1125
-   i32.const 1
-   i32.store8
-  else   
-   i32.const 1125
-   i32.const 0
-   i32.store8
-  end
+  i32.const 0
+  i32.ne
+  i32.store8
   call $core/memory/memory/Memory.saveState
   call $core/timers/timers/Timers.saveState
   i32.const 1324
@@ -2453,16 +2329,11 @@
   i32.store8
   call $core/sound/channel1/Channel1.saveState
   call $core/sound/channel2/Channel2.saveState
+  i32.const 1474
   global.get $core/sound/channel3/Channel3.isEnabled
-  if
-   i32.const 1474
-   i32.const 1
-   i32.store8
-  else   
-   i32.const 1474
-   i32.const 0
-   i32.store8
-  end
+  i32.const 0
+  i32.ne
+  i32.store8
   i32.const 1475
   global.get $core/sound/channel3/Channel3.frequencyTimer
   i32.store
@@ -2510,49 +2381,25 @@
   i32.const 1036
   i32.load
   global.set $core/cpu/cpu/Cpu.currentCycles
-  block $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory (result i32)
-   i32.const 1
-   i32.const 1041
-   i32.load8_u
-   i32.const 0
-   i32.gt_s
-   br_if $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory
-   drop
-   i32.const 0
-  end
+  i32.const 1041
+  i32.load8_u
+  i32.const 0
+  i32.gt_s
   global.set $core/cpu/cpu/Cpu.isHaltNormal
-  block $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory11 (result i32)
-   i32.const 1
-   i32.const 1042
-   i32.load8_u
-   i32.const 0
-   i32.gt_s
-   br_if $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory11
-   drop
-   i32.const 0
-  end
+  i32.const 1042
+  i32.load8_u
+  i32.const 0
+  i32.gt_s
   global.set $core/cpu/cpu/Cpu.isHaltNoJump
-  block $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory13 (result i32)
-   i32.const 1
-   i32.const 1043
-   i32.load8_u
-   i32.const 0
-   i32.gt_s
-   br_if $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory13
-   drop
-   i32.const 0
-  end
+  i32.const 1043
+  i32.load8_u
+  i32.const 0
+  i32.gt_s
   global.set $core/cpu/cpu/Cpu.isHaltBug
-  block $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory15 (result i32)
-   i32.const 1
-   i32.const 1044
-   i32.load8_u
-   i32.const 0
-   i32.gt_s
-   br_if $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory15
-   drop
-   i32.const 0
-  end
+  i32.const 1044
+  i32.load8_u
+  i32.const 0
+  i32.gt_s
   global.set $core/cpu/cpu/Cpu.isStopped
  )
  (func $core/graphics/lcd/resetLcd (; 33 ;) (type $i_) (param $0 i32)
@@ -2675,27 +2522,15 @@
   end
  )
  (func $core/interrupts/interrupts/Interrupts.loadState (; 35 ;) (type $_)
-  block $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory (result i32)
-   i32.const 1
-   i32.const 1124
-   i32.load8_u
-   i32.const 0
-   i32.gt_s
-   br_if $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory
-   drop
-   i32.const 0
-  end
+  i32.const 1124
+  i32.load8_u
+  i32.const 0
+  i32.gt_s
   global.set $core/interrupts/interrupts/Interrupts.masterInterruptSwitch
-  block $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory0 (result i32)
-   i32.const 1
-   i32.const 1125
-   i32.load8_u
-   i32.const 0
-   i32.gt_s
-   br_if $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory0
-   drop
-   i32.const 0
-  end
+  i32.const 1125
+  i32.load8_u
+  i32.const 0
+  i32.gt_s
   global.set $core/interrupts/interrupts/Interrupts.masterInterruptSwitchDelay
   i32.const 65535
   call $core/memory/load/eightBitLoadFromGBMemory
@@ -2711,82 +2546,40 @@
   i32.const 1226
   i32.load16_u
   global.set $core/memory/memory/Memory.currentRamBank
-  block $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory (result i32)
-   i32.const 1
-   i32.const 1228
-   i32.load8_u
-   i32.const 0
-   i32.gt_s
-   br_if $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory
-   drop
-   i32.const 0
-  end
+  i32.const 1228
+  i32.load8_u
+  i32.const 0
+  i32.gt_s
   global.set $core/memory/memory/Memory.isRamBankingEnabled
-  block $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory2 (result i32)
-   i32.const 1
-   i32.const 1229
-   i32.load8_u
-   i32.const 0
-   i32.gt_s
-   br_if $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory2
-   drop
-   i32.const 0
-  end
+  i32.const 1229
+  i32.load8_u
+  i32.const 0
+  i32.gt_s
   global.set $core/memory/memory/Memory.isMBC1RomModeEnabled
-  block $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory4 (result i32)
-   i32.const 1
-   i32.const 1230
-   i32.load8_u
-   i32.const 0
-   i32.gt_s
-   br_if $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory4
-   drop
-   i32.const 0
-  end
+  i32.const 1230
+  i32.load8_u
+  i32.const 0
+  i32.gt_s
   global.set $core/memory/memory/Memory.isRomOnly
-  block $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory6 (result i32)
-   i32.const 1
-   i32.const 1231
-   i32.load8_u
-   i32.const 0
-   i32.gt_s
-   br_if $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory6
-   drop
-   i32.const 0
-  end
+  i32.const 1231
+  i32.load8_u
+  i32.const 0
+  i32.gt_s
   global.set $core/memory/memory/Memory.isMBC1
-  block $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory8 (result i32)
-   i32.const 1
-   i32.const 1232
-   i32.load8_u
-   i32.const 0
-   i32.gt_s
-   br_if $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory8
-   drop
-   i32.const 0
-  end
+  i32.const 1232
+  i32.load8_u
+  i32.const 0
+  i32.gt_s
   global.set $core/memory/memory/Memory.isMBC2
-  block $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory10 (result i32)
-   i32.const 1
-   i32.const 1233
-   i32.load8_u
-   i32.const 0
-   i32.gt_s
-   br_if $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory10
-   drop
-   i32.const 0
-  end
+  i32.const 1233
+  i32.load8_u
+  i32.const 0
+  i32.gt_s
   global.set $core/memory/memory/Memory.isMBC3
-  block $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory12 (result i32)
-   i32.const 1
-   i32.const 1234
-   i32.load8_u
-   i32.const 0
-   i32.gt_s
-   br_if $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory12
-   drop
-   i32.const 0
-  end
+  i32.const 1234
+  i32.load8_u
+  i32.const 0
+  i32.gt_s
   global.set $core/memory/memory/Memory.isMBC5
  )
  (func $core/timers/timers/Timers.loadState (; 37 ;) (type $_)
@@ -2796,27 +2589,15 @@
   i32.const 1278
   i32.load
   global.set $core/timers/timers/Timers.dividerRegister
-  block $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory (result i32)
-   i32.const 1
-   i32.const 1282
-   i32.load8_u
-   i32.const 0
-   i32.gt_s
-   br_if $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory
-   drop
-   i32.const 0
-  end
+  i32.const 1282
+  i32.load8_u
+  i32.const 0
+  i32.gt_s
   global.set $core/timers/timers/Timers.timerCounterOverflowDelay
-  block $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory2 (result i32)
-   i32.const 1
-   i32.const 1285
-   i32.load8_u
-   i32.const 0
-   i32.gt_s
-   br_if $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory2
-   drop
-   i32.const 0
-  end
+  i32.const 1285
+  i32.load8_u
+  i32.const 0
+  i32.gt_s
   global.set $core/timers/timers/Timers.timerCounterWasReset
   i32.const 65285
   call $core/memory/load/eightBitLoadFromGBMemory
@@ -2833,16 +2614,10 @@
   global.set $core/sound/sound/Sound.audioQueueIndex
  )
  (func $core/sound/channel1/Channel1.loadState (; 39 ;) (type $_)
-  block $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory (result i32)
-   i32.const 1
-   i32.const 1374
-   i32.load8_u
-   i32.const 0
-   i32.gt_s
-   br_if $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory
-   drop
-   i32.const 0
-  end
+  i32.const 1374
+  i32.load8_u
+  i32.const 0
+  i32.gt_s
   global.set $core/sound/channel1/Channel1.isEnabled
   i32.const 1375
   i32.load
@@ -2862,16 +2637,10 @@
   i32.const 1394
   i32.load8_u
   global.set $core/sound/channel1/Channel1.waveFormPositionOnDuty
-  block $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory6 (result i32)
-   i32.const 1
-   i32.const 1399
-   i32.load8_u
-   i32.const 0
-   i32.gt_s
-   br_if $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory6
-   drop
-   i32.const 0
-  end
+  i32.const 1399
+  i32.load8_u
+  i32.const 0
+  i32.gt_s
   global.set $core/sound/channel1/Channel1.isSweepEnabled
   i32.const 1400
   i32.load
@@ -2881,16 +2650,10 @@
   global.set $core/sound/channel1/Channel1.sweepShadowFrequency
  )
  (func $core/sound/channel2/Channel2.loadState (; 40 ;) (type $_)
-  block $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory (result i32)
-   i32.const 1
-   i32.const 1424
-   i32.load8_u
-   i32.const 0
-   i32.gt_s
-   br_if $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory
-   drop
-   i32.const 0
-  end
+  i32.const 1424
+  i32.load8_u
+  i32.const 0
+  i32.gt_s
   global.set $core/sound/channel2/Channel2.isEnabled
   i32.const 1425
   i32.load
@@ -2912,16 +2675,10 @@
   global.set $core/sound/channel2/Channel2.waveFormPositionOnDuty
  )
  (func $core/sound/channel4/Channel4.loadState (; 41 ;) (type $_)
-  block $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory (result i32)
-   i32.const 1
-   i32.const 1524
-   i32.load8_u
-   i32.const 0
-   i32.gt_s
-   br_if $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory
-   drop
-   i32.const 0
-  end
+  i32.const 1524
+  i32.load8_u
+  i32.const 0
+  i32.gt_s
   global.set $core/sound/channel4/Channel4.isEnabled
   i32.const 1525
   i32.load
@@ -2988,16 +2745,10 @@
   global.set $core/sound/sound/Sound.audioQueueIndex
   call $core/sound/channel1/Channel1.loadState
   call $core/sound/channel2/Channel2.loadState
-  block $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory (result i32)
-   i32.const 1
-   i32.const 1474
-   i32.load8_u
-   i32.const 0
-   i32.gt_s
-   br_if $__inlined_func$core/memory/load/loadBooleanDirectlyFromWasmMemory
-   drop
-   i32.const 0
-  end
+  i32.const 1474
+  i32.load8_u
+  i32.const 0
+  i32.gt_s
   global.set $core/sound/channel3/Channel3.isEnabled
   i32.const 1475
   i32.load
@@ -6796,31 +6547,38 @@
  )
  (func $core/memory/banking/handleBanking (; 87 ;) (type $ii_) (param $0 i32) (param $1 i32)
   (local $2 i32)
+  (local $3 i32)
+  (local $4 i32)
+  (local $5 i32)
   global.get $core/memory/memory/Memory.isRomOnly
   if
    return
   end
+  global.get $core/memory/memory/Memory.isMBC1
+  local.set $5
+  global.get $core/memory/memory/Memory.isMBC2
+  local.set $3
   local.get $0
   i32.const 8191
   i32.le_s
   if
-   global.get $core/memory/memory/Memory.isMBC2
+   local.get $3
    if (result i32)
     local.get $1
     i32.const 16
     i32.and
     i32.eqz
    else    
-    global.get $core/memory/memory/Memory.isMBC2
+    local.get $3
    end
    i32.eqz
    if
     local.get $1
     i32.const 15
     i32.and
-    local.tee $2
+    local.tee $4
     if
-     local.get $2
+     local.get $4
      i32.const 10
      i32.eq
      if
@@ -6838,6 +6596,7 @@
    i32.le_s
    if
     global.get $core/memory/memory/Memory.isMBC5
+    local.tee $4
     i32.eqz
     local.tee $2
     if (result i32)
@@ -6848,46 +6607,44 @@
      i32.le_s
     end
     if
-     global.get $core/memory/memory/Memory.isMBC2
-     if
-      local.get $1
-      i32.const 15
-      i32.and
-      global.set $core/memory/memory/Memory.currentRomBank
-     end
      local.get $1
+     i32.const 15
+     i32.and
+     global.get $core/memory/memory/Memory.currentRomBank
+     local.get $3
+     select
      local.set $2
-     global.get $core/memory/memory/Memory.isMBC1
-     if
-      local.get $2
+     local.get $1
+     local.set $0
+     local.get $5
+     if (result i32)
+      local.get $0
       i32.const 31
       i32.and
-      local.set $2
-      global.get $core/memory/memory/Memory.currentRomBank
+      local.set $0
+      local.get $2
       i32.const 224
       i32.and
-      global.set $core/memory/memory/Memory.currentRomBank
      else      
       global.get $core/memory/memory/Memory.isMBC3
-      if
-       local.get $2
+      if (result i32)
+       local.get $0
        i32.const 127
        i32.and
-       local.set $2
-       global.get $core/memory/memory/Memory.currentRomBank
+       local.set $0
+       local.get $2
        i32.const 128
        i32.and
-       global.set $core/memory/memory/Memory.currentRomBank
       else       
-       global.get $core/memory/memory/Memory.isMBC5
-       if
-        i32.const 0
-        global.set $core/memory/memory/Memory.currentRomBank
-       end
+       i32.const 0
+       local.get $2
+       local.get $4
+       select
       end
      end
-     global.get $core/memory/memory/Memory.currentRomBank
-     local.get $2
+     local.set $1
+     local.get $0
+     local.get $1
      i32.or
      global.set $core/memory/memory/Memory.currentRomBank
     else     
@@ -6908,28 +6665,25 @@
      global.set $core/memory/memory/Memory.currentRomBank
     end
    else    
-    global.get $core/memory/memory/Memory.isMBC2
+    local.get $3
     i32.eqz
-    local.tee $2
+    local.tee $4
     if (result i32)
      local.get $0
      i32.const 24575
      i32.le_s
     else     
-     local.get $2
+     local.get $4
     end
     if
      global.get $core/memory/memory/Memory.isMBC1RomModeEnabled
-     global.get $core/memory/memory/Memory.isMBC1
-     local.tee $0
-     local.get $0
+     local.get $5
+     local.get $5
      select
      if
       global.get $core/memory/memory/Memory.currentRomBank
       i32.const 31
       i32.and
-      global.set $core/memory/memory/Memory.currentRomBank
-      global.get $core/memory/memory/Memory.currentRomBank
       local.get $1
       i32.const 224
       i32.and
@@ -6947,7 +6701,7 @@
      select
      global.set $core/memory/memory/Memory.currentRamBank
     else     
-     global.get $core/memory/memory/Memory.isMBC2
+     local.get $3
      i32.eqz
      local.tee $2
      if (result i32)
@@ -6958,18 +6712,14 @@
       local.get $2
      end
      if
-      global.get $core/memory/memory/Memory.isMBC1
+      local.get $5
       if
        local.get $1
        i32.const 1
        i32.and
-       if
-        i32.const 1
-        global.set $core/memory/memory/Memory.isMBC1RomModeEnabled
-       else        
-        i32.const 0
-        global.set $core/memory/memory/Memory.isMBC1RomModeEnabled
-       end
+       i32.const 0
+       i32.ne
+       global.set $core/memory/memory/Memory.isMBC1RomModeEnabled
       end
      end
     end
@@ -8094,6 +7844,7 @@
  )
  (func $core/memory/writeTraps/checkWriteTraps (; 109 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
+  (local $3 i32)
   block $folding-inner1
    block $folding-inner0
     local.get $0
@@ -8356,31 +8107,32 @@
      if
       block (result i32)
        global.get $core/memory/memory/Memory.hblankHdmaSource
+       local.tee $2
        i32.const 16384
        i32.ge_s
-       local.tee $2
+       local.tee $3
        if
-        global.get $core/memory/memory/Memory.hblankHdmaSource
+        local.get $2
         i32.const 32767
         i32.le_s
-        local.set $2
+        local.set $3
        end
-       local.get $2
+       local.get $3
        i32.eqz
       end
       if
-       global.get $core/memory/memory/Memory.hblankHdmaSource
+       local.get $2
        i32.const 53248
        i32.ge_s
-       local.tee $2
+       local.tee $3
        if
-        global.get $core/memory/memory/Memory.hblankHdmaSource
+        local.get $2
         i32.const 57343
         i32.le_s
-        local.set $2
+        local.set $3
        end
       end
-      local.get $2
+      local.get $3
       br_if $folding-inner0
      end
     end
@@ -8572,16 +8324,13 @@
     br $repeat|0
    end
   end
-  i32.const 32
-  local.set $3
   global.get $core/memory/memory/Memory.DMACycles
-  local.get $2
-  i32.const 16
-  i32.div_s
-  i32.const 64
   i32.const 32
   global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
-  select
+  i32.shl
+  local.get $2
+  i32.const 4
+  i32.shr_s
   i32.mul
   i32.add
   global.set $core/memory/memory/Memory.DMACycles
@@ -8628,8 +8377,8 @@
   else   
    global.get $core/memory/memory/Memory.memoryLocationHdmaTrigger
    global.get $core/memory/memory/Memory.hblankHdmaTransferLengthRemaining
-   i32.const 16
-   i32.div_s
+   i32.const 4
+   i32.shr_s
    i32.const 1
    i32.sub
    i32.const -129
