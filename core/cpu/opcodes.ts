@@ -758,7 +758,7 @@ function handleOpcode2x(opcode: i32): i32 {
 
 function handleOpcode3x(opcode: i32): i32 {
   switch (opcode) {
-    case 0x30:
+    case 0x30: {
       // JR NC,r8
       // 2 12 / 8
       if (getCarryFlag() === 0) {
@@ -769,35 +769,39 @@ function handleOpcode3x(opcode: i32): i32 {
         Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
       }
       return 8;
-    case 0x31:
+    }
+    case 0x31: {
       // LD SP,d16
       // 3 12
       // 8 cycles
       Cpu.stackPointer = getConcatenatedDataByte();
       Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
       return 4;
-    case 0x32:
+    }
+    case 0x32: {
       // LD (HL-),A
       // 1 8
-      let registerHL2: u16 = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
+      let registerHL2 = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
       // 4 cycles
       eightBitStoreSyncCycles(registerHL2, Cpu.registerA);
       registerHL2 = u16Portable(registerHL2 - 1);
       Cpu.registerH = <u8>splitHighByte(registerHL2);
       Cpu.registerL = <u8>splitLowByte(registerHL2);
       return 4;
-    case 0x33:
+    }
+    case 0x33: {
       // INC SP
       // 1 8
       Cpu.stackPointer = u16Portable(Cpu.stackPointer + 1);
       return 8;
-    case 0x34:
+    }
+    case 0x34: {
       // INC (HL)
       // 1  12
       // Z 0 H -
-      let registerHL4: u16 = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
+      let registerHL4 = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
       // 4 cycles
-      let valueAtHL4: u8 = <u8>eightBitLoadSyncCycles(registerHL4);
+      let valueAtHL4 = <u8>eightBitLoadSyncCycles(registerHL4);
       // Creating a varible for this to fix assemblyscript overflow bug
       // Requires explicit casting
       // https://github.com/AssemblyScript/assemblyscript/issues/26
@@ -805,43 +809,38 @@ function handleOpcode3x(opcode: i32): i32 {
       checkAndSetEightBitHalfCarryFlag(<u8>valueAtHL4, <i16>incrementer);
       valueAtHL4 = u8Portable(<u8>valueAtHL4 + <u8>incrementer);
 
-      if (valueAtHL4 === 0) {
-        setZeroFlag(1);
-      } else {
-        setZeroFlag(0);
-      }
+      setZeroFlag(i32(valueAtHL4 === 0));
       setSubtractFlag(0);
       // 4 cycles
       eightBitStoreSyncCycles(registerHL4, <u8>valueAtHL4);
       return 4;
-    case 0x35:
+    }
+    case 0x35: {
       // DEC (HL)
       // 1  12
       // Z 1 H -
-      let registerHL5: u16 = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
+      let registerHL5 = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
       // 4 cycles
-      let valueAtHL5: u8 = <u8>eightBitLoadSyncCycles(registerHL5);
+      let valueAtHL5 = <u8>eightBitLoadSyncCycles(registerHL5);
       // NOTE: This opcode may not overflow correctly,
       // Please see previous opcode
-      checkAndSetEightBitHalfCarryFlag(<u8>valueAtHL5, -1);
-      valueAtHL5 = u8Portable(valueAtHL5 - <u8>1);
-      if (valueAtHL5 === 0) {
-        setZeroFlag(1);
-      } else {
-        setZeroFlag(0);
-      }
+      checkAndSetEightBitHalfCarryFlag(valueAtHL5, -1);
+      valueAtHL5 = u8Portable(valueAtHL5 - 1);
+      setZeroFlag(i32(valueAtHL5 === 0));
       setSubtractFlag(1);
       // 4 cycles
-      eightBitStoreSyncCycles(registerHL5, <u8>valueAtHL5);
+      eightBitStoreSyncCycles(registerHL5, valueAtHL5);
       return 4;
-    case 0x36:
+    }
+    case 0x36: {
       // LD (HL),d8
       // 2  12
       // 8 cycles, 4 from store, 4 from data byte
       eightBitStoreSyncCycles(<u16>concatenateBytes(Cpu.registerH, Cpu.registerL), getDataByteOne());
       Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
       return 4;
-    case 0x37:
+    }
+    case 0x37: {
       // SCF
       // 1  4
       // - 0 0 1
@@ -850,7 +849,8 @@ function handleOpcode3x(opcode: i32): i32 {
       setHalfCarryFlag(0);
       setCarryFlag(1);
       return 4;
-    case 0x38:
+    }
+    case 0x38: {
       // JR C,r8
       // 2 12/8
       if (getCarryFlag() === 1) {
@@ -861,77 +861,77 @@ function handleOpcode3x(opcode: i32): i32 {
         Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
       }
       return 8;
-    case 0x39:
+    }
+    case 0x39: {
       // ADD HL,SP
       // 1 8
       // - 0 H C
-      let registerHL9: u16 = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
+      let registerHL9 = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
       checkAndSetSixteenBitFlagsAddOverflow(<u16>registerHL9, Cpu.stackPointer, false);
-      let result: u16 = u16Portable(<u16>(registerHL9 + Cpu.stackPointer));
+      let result = u16Portable(<u16>(registerHL9 + Cpu.stackPointer));
       Cpu.registerH = <u8>splitHighByte(<u16>result);
       Cpu.registerL = <u8>splitLowByte(<u16>result);
       setSubtractFlag(0);
       return 8;
-    case 0x3a:
+    }
+    case 0x3a: {
       // LD A,(HL-)
       // 1 8
-      let registerHLA: u16 = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
+      let registerHLA = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
       // 4 cycles
       Cpu.registerA = <u8>eightBitLoadSyncCycles(registerHLA);
       registerHLA = u16Portable(registerHLA - 1);
       Cpu.registerH = <u8>splitHighByte(registerHLA);
       Cpu.registerL = <u8>splitLowByte(registerHLA);
       return 4;
-    case 0x3b:
+    }
+    case 0x3b: {
       // DEC SP
       // 1 8
       Cpu.stackPointer = u16Portable(Cpu.stackPointer - 1);
       return 8;
-    case 0x3c:
+    }
+    case 0x3c: {
       // INC A
       // 1  4
       // Z 0 H -
-      checkAndSetEightBitHalfCarryFlag(Cpu.registerA, 1);
-      Cpu.registerA = u8Portable(Cpu.registerA + 1);
-      if (Cpu.registerA === 0) {
-        setZeroFlag(1);
-      } else {
-        setZeroFlag(0);
-      }
+      let registerA = Cpu.registerA;
+      checkAndSetEightBitHalfCarryFlag(registerA, 1);
+      registerA = u8Portable(registerA + 1);
+      Cpu.registerA = registerA;
+      setZeroFlag(i32(registerA === 0));
       setSubtractFlag(0);
       return 4;
-    case 0x3d:
+    }
+    case 0x3d: {
       // DEC A
       // 1  4
       // Z 1 H -
-      checkAndSetEightBitHalfCarryFlag(Cpu.registerA, -1);
-      Cpu.registerA = u8Portable(Cpu.registerA - 1);
-      if (Cpu.registerA === 0) {
-        setZeroFlag(1);
-      } else {
-        setZeroFlag(0);
-      }
+      let registerA = Cpu.registerA;
+      checkAndSetEightBitHalfCarryFlag(registerA, -1);
+      registerA = u8Portable(registerA - 1);
+      Cpu.registerA = registerA;
+      setZeroFlag(i32(registerA === 0));
       setSubtractFlag(1);
       return 4;
-    case 0x3e:
+    }
+    case 0x3e: {
       // LD A,d8
       // 2 8
       // 4 cycles
       Cpu.registerA = getDataByteOne();
       Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
       return 4;
-    case 0x3f:
+    }
+    case 0x3f: {
       // CCF
       // 1 4
       // - 0 0 C
       setSubtractFlag(0);
       setHalfCarryFlag(0);
-      if (getCarryFlag() > 0) {
-        setCarryFlag(0);
-      } else {
-        setCarryFlag(1);
-      }
+      setCarryFlag(i32(getCarryFlag() <= 0));
       return 4;
+    }
   }
   return -1;
 }
@@ -1730,18 +1730,20 @@ function handleOpcodeBx(opcode: i32): i32 {
 
 function handleOpcodeCx(opcode: i32): i32 {
   switch (opcode) {
-    case 0xc0:
+    case 0xc0: {
       // RET NZ
       // 1  20/8
       if (getZeroFlag() === 0) {
         // 8 cycles
-        Cpu.programCounter = <u16>sixteenBitLoadSyncCycles(Cpu.stackPointer);
-        Cpu.stackPointer = u16Portable(Cpu.stackPointer + 2);
+        let stackPointer = Cpu.stackPointer;
+        Cpu.programCounter = <u16>sixteenBitLoadSyncCycles(stackPointer);
+        Cpu.stackPointer = u16Portable(stackPointer + 2);
         return 12;
       } else {
         return 8;
       }
-    case 0xc1:
+    }
+    case 0xc1: {
       // POP BC
       // 1  12
       // 8 cycles
@@ -1750,7 +1752,8 @@ function handleOpcodeCx(opcode: i32): i32 {
       Cpu.registerB = <u8>splitHighByte(registerBC1);
       Cpu.registerC = <u8>splitLowByte(registerBC1);
       return 4;
-    case 0xc2:
+    }
+    case 0xc2: {
       // JP NZ,a16
       // 3  16/12
       if (getZeroFlag() === 0) {
@@ -1761,19 +1764,22 @@ function handleOpcodeCx(opcode: i32): i32 {
         Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
         return 12;
       }
-    case 0xc3:
+    }
+    case 0xc3: {
       // JP a16
       // 3  16
       // 8 cycles
       Cpu.programCounter = getConcatenatedDataByte();
       return 8;
-    case 0xc4:
+    }
+    case 0xc4: {
       // CALL NZ,a16
       // 3  24/12
       if (getZeroFlag() === 0) {
-        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
+        let stackPointer = u16Portable(Cpu.stackPointer - 2);
+        Cpu.stackPointer = stackPointer;
         // 8 cycles
-        sixteenBitStoreSyncCycles(Cpu.stackPointer, u16Portable(Cpu.programCounter + 2));
+        sixteenBitStoreSyncCycles(stackPointer, u16Portable(Cpu.programCounter + 2));
         // 8 cycles
         Cpu.programCounter = getConcatenatedDataByte();
         return 8;
@@ -1781,14 +1787,17 @@ function handleOpcodeCx(opcode: i32): i32 {
         Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
         return 12;
       }
-    case 0xc5:
+    }
+    case 0xc5: {
       // PUSH BC
       // 1  16
-      Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
+      let stackPointer = u16Portable(Cpu.stackPointer - 2);
+      Cpu.stackPointer = stackPointer;
       // 8 cycles
-      sixteenBitStoreSyncCycles(Cpu.stackPointer, concatenateBytes(Cpu.registerB, Cpu.registerC));
+      sixteenBitStoreSyncCycles(stackPointer, concatenateBytes(Cpu.registerB, Cpu.registerC));
       return 8;
-    case 0xc6:
+    }
+    case 0xc6: {
       // ADD A,d8
       // 2 8
       // Z 0 H C
@@ -1796,33 +1805,40 @@ function handleOpcodeCx(opcode: i32): i32 {
       addARegister(getDataByteOne());
       Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
       return 4;
-    case 0xc7:
+    }
+    case 0xc7: {
       // RST 00H
       // 1 16
-      Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
+      let stackPointer = u16Portable(Cpu.stackPointer - 2);
+      Cpu.stackPointer = stackPointer;
       // 8 cycles
-      sixteenBitStoreSyncCycles(Cpu.stackPointer, Cpu.programCounter);
+      sixteenBitStoreSyncCycles(stackPointer, Cpu.programCounter);
       Cpu.programCounter = 0x00;
       return 8;
-    case 0xc8:
+    }
+    case 0xc8: {
       // RET Z
       // 1  20/8
       if (getZeroFlag() === 1) {
         // 8 cycles
-        Cpu.programCounter = <u16>sixteenBitLoadSyncCycles(Cpu.stackPointer);
-        Cpu.stackPointer = u16Portable(Cpu.stackPointer + 2);
+        let stackPointer = Cpu.stackPointer;
+        Cpu.programCounter = <u16>sixteenBitLoadSyncCycles(stackPointer);
+        Cpu.stackPointer = u16Portable(stackPointer + 2);
         return 12;
       } else {
         return 8;
       }
-    case 0xc9:
+    }
+    case 0xc9: {
       // RET
       // 1 16
       // 8 cycles
-      Cpu.programCounter = <u16>sixteenBitLoadSyncCycles(Cpu.stackPointer);
-      Cpu.stackPointer = u16Portable(Cpu.stackPointer + 2);
+      let stackPointer = Cpu.stackPointer;
+      Cpu.programCounter = <u16>sixteenBitLoadSyncCycles(stackPointer);
+      Cpu.stackPointer = u16Portable(stackPointer + 2);
       return 8;
-    case 0xca:
+    }
+    case 0xca: {
       // JP Z,a16
       // 3 16/12
       if (getZeroFlag() === 1) {
@@ -1833,20 +1849,23 @@ function handleOpcodeCx(opcode: i32): i32 {
         Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
         return 12;
       }
-    case 0xcb:
+    }
+    case 0xcb: {
       // PREFIX CB
       // 1  4
       // 4 cycles
       let cbCycles: i32 = handleCbOpcode(getDataByteOne());
       Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
       return cbCycles;
-    case 0xcc:
+    }
+    case 0xcc: {
       // CALL Z,a16
       // 3  24/12
       if (getZeroFlag() === 1) {
-        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
+        let stackPointer = u16Portable(Cpu.stackPointer - 2);
+        Cpu.stackPointer = stackPointer;
         // 8 cycles
-        sixteenBitStoreSyncCycles(Cpu.stackPointer, Cpu.programCounter + 2);
+        sixteenBitStoreSyncCycles(stackPointer, Cpu.programCounter + 2);
         // 8 cycles
         Cpu.programCounter = getConcatenatedDataByte();
         return 8;
@@ -1854,16 +1873,19 @@ function handleOpcodeCx(opcode: i32): i32 {
         Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
         return 12;
       }
-    case 0xcd:
+    }
+    case 0xcd: {
       // CALL a16
       // 3  24
-      Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
+      let stackPointer = u16Portable(Cpu.stackPointer - 2);
+      Cpu.stackPointer = stackPointer;
       // 8 cycles
-      sixteenBitStoreSyncCycles(Cpu.stackPointer, u16Portable(Cpu.programCounter + 2));
+      sixteenBitStoreSyncCycles(stackPointer, u16Portable(Cpu.programCounter + 2));
       // 8 cycles
       Cpu.programCounter = getConcatenatedDataByte();
       return 8;
-    case 0xce:
+    }
+    case 0xce: {
       // ADC A,d8
       // 2  8
       // Z 0 H C
@@ -1871,41 +1893,48 @@ function handleOpcodeCx(opcode: i32): i32 {
       addAThroughCarryRegister(getDataByteOne());
       Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
       return 4;
-    case 0xcf:
+    }
+    case 0xcf: {
       // RST 08H
       // 1 16
-      Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
+      let stackPointer = u16Portable(Cpu.stackPointer - 2);
+      Cpu.stackPointer = stackPointer;
       // 8 cycles
-      sixteenBitStoreSyncCycles(Cpu.stackPointer, Cpu.programCounter);
+      sixteenBitStoreSyncCycles(stackPointer, Cpu.programCounter);
       Cpu.programCounter = 0x08;
       return 8;
+    }
   }
   return -1;
 }
 
 function handleOpcodeDx(opcode: i32): i32 {
   switch (opcode) {
-    case 0xd0:
+    case 0xd0: {
       // RET NC
       // 1  20/8
       if (getCarryFlag() === 0) {
         // 8 cycles
-        Cpu.programCounter = <u16>sixteenBitLoadSyncCycles(Cpu.stackPointer);
-        Cpu.stackPointer = u16Portable(Cpu.stackPointer + 2);
+        let stackPointer = Cpu.stackPointer;
+        Cpu.programCounter = <u16>sixteenBitLoadSyncCycles(stackPointer);
+        Cpu.stackPointer = u16Portable(stackPointer + 2);
         return 12;
       } else {
         return 8;
       }
-    case 0xd1:
+    }
+    case 0xd1: {
       // POP DE
       // 1  12
       // 8 cycles
-      let registerDE1: i32 = sixteenBitLoadSyncCycles(Cpu.stackPointer);
-      Cpu.stackPointer = u16Portable(Cpu.stackPointer + 2);
+      let stackPointer = Cpu.stackPointer;
+      let registerDE1: i32 = sixteenBitLoadSyncCycles(stackPointer);
+      Cpu.stackPointer = u16Portable(stackPointer + 2);
       Cpu.registerD = <u8>splitHighByte(registerDE1);
       Cpu.registerE = <u8>splitLowByte(registerDE1);
       return 4;
-    case 0xd2:
+    }
+    case 0xd2: {
       // JP NC,a16
       // 3  16/12
       if (getCarryFlag() === 0) {
@@ -1916,14 +1945,16 @@ function handleOpcodeDx(opcode: i32): i32 {
         Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
         return 12;
       }
+    }
     /* No Opcode for: 0xD3 */
-    case 0xd4:
+    case 0xd4: {
       // CALL NC,a16
       // 3  24/12
       if (getCarryFlag() === 0) {
-        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
+        let stackPointer = u16Portable(Cpu.stackPointer - 2);
+        Cpu.stackPointer = stackPointer;
         // 8 cycles
-        sixteenBitStoreSyncCycles(Cpu.stackPointer, Cpu.programCounter + 2);
+        sixteenBitStoreSyncCycles(stackPointer, Cpu.programCounter + 2);
         // 8 cycles
         Cpu.programCounter = getConcatenatedDataByte();
         return 8;
@@ -1931,14 +1962,17 @@ function handleOpcodeDx(opcode: i32): i32 {
         Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
         return 12;
       }
-    case 0xd5:
+    }
+    case 0xd5: {
       // PUSH DE
       // 1 16
-      Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
+      let stackPointer = u16Portable(Cpu.stackPointer - 2);
+      Cpu.stackPointer = stackPointer;
       // 8 cycles
-      sixteenBitStoreSyncCycles(Cpu.stackPointer, concatenateBytes(Cpu.registerD, Cpu.registerE));
+      sixteenBitStoreSyncCycles(stackPointer, concatenateBytes(Cpu.registerD, Cpu.registerE));
       return 8;
-    case 0xd6:
+    }
+    case 0xd6: {
       // SUB d8
       // 2  8
       // Z 1 H C
@@ -1946,36 +1980,42 @@ function handleOpcodeDx(opcode: i32): i32 {
       subARegister(getDataByteOne());
       Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
       return 4;
-    case 0xd7:
+    }
+    case 0xd7: {
       // RST 10H
       // 1 16
-      Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
+      let stackPointer = u16Portable(Cpu.stackPointer - 2);
+      Cpu.stackPointer = stackPointer;
       // 8 cycles
-      sixteenBitStoreSyncCycles(Cpu.stackPointer, Cpu.programCounter);
+      sixteenBitStoreSyncCycles(stackPointer, Cpu.programCounter);
       Cpu.programCounter = 0x10;
       return 8;
-    case 0xd8:
+    }
+    case 0xd8: {
       // RET C
       // 1  20/8
       if (getCarryFlag() === 1) {
+        let stackPointer = Cpu.stackPointer;
         // 8 cycles
-        Cpu.programCounter = <u16>sixteenBitLoadSyncCycles(Cpu.stackPointer);
-        Cpu.stackPointer = u16Portable(Cpu.stackPointer + 2);
+        Cpu.programCounter = <u16>sixteenBitLoadSyncCycles(stackPointer);
+        Cpu.stackPointer = u16Portable(stackPointer + 2);
         return 12;
       } else {
         return 8;
       }
-    case 0xd9:
+    }
+    case 0xd9: {
       // RETI
       // 1  16
-
+      let stackPointer = Cpu.stackPointer;
       // 8 cycles
-      Cpu.programCounter = <u16>sixteenBitLoadSyncCycles(Cpu.stackPointer);
+      Cpu.programCounter = <u16>sixteenBitLoadSyncCycles(stackPointer);
       // Enable interrupts
       setInterrupts(true);
-      Cpu.stackPointer = u16Portable(Cpu.stackPointer + 2);
+      Cpu.stackPointer = u16Portable(stackPointer + 2);
       return 8;
-    case 0xda:
+    }
+    case 0xda: {
       // JP C,a16
       // 3 16/12
       if (getCarryFlag() === 1) {
@@ -1986,14 +2026,16 @@ function handleOpcodeDx(opcode: i32): i32 {
         Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
         return 12;
       }
+    }
     /* No Opcode for: 0xDB */
-    case 0xdc:
+    case 0xdc: {
       // CALL C,a16
       // 3  24/12
       if (getCarryFlag() === 1) {
-        Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
+        let stackPointer = u16Portable(Cpu.stackPointer - 2);
+        Cpu.stackPointer = stackPointer;
         // 8 cycles
-        sixteenBitStoreSyncCycles(Cpu.stackPointer, u16Portable(Cpu.programCounter + 2));
+        sixteenBitStoreSyncCycles(stackPointer, u16Portable(Cpu.programCounter + 2));
         // 8 cycles
         Cpu.programCounter = getConcatenatedDataByte();
         return 8;
@@ -2001,8 +2043,9 @@ function handleOpcodeDx(opcode: i32): i32 {
         Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
         return 12;
       }
+    }
     /* No Opcode for: 0xDD */
-    case 0xde:
+    case 0xde: {
       // SBC A,d8
       // 2 8
       // Z 1 H C
@@ -2010,21 +2053,24 @@ function handleOpcodeDx(opcode: i32): i32 {
       subAThroughCarryRegister(getDataByteOne());
       Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
       return 4;
-    case 0xdf:
+    }
+    case 0xdf: {
       // RST 18H
       // 1 16
-      Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
+      let stackPointer = u16Portable(Cpu.stackPointer - 2);
+      Cpu.stackPointer = stackPointer;
       // 8 cycles
-      sixteenBitStoreSyncCycles(Cpu.stackPointer, Cpu.programCounter);
+      sixteenBitStoreSyncCycles(stackPointer, Cpu.programCounter);
       Cpu.programCounter = 0x18;
       return 8;
+    }
   }
   return -1;
 }
 
 function handleOpcodeEx(opcode: i32): i32 {
   switch (opcode) {
-    case 0xe0:
+    case 0xe0: {
       // LDH (a8),A
       // 2  12
 
@@ -2035,16 +2081,19 @@ function handleOpcodeEx(opcode: i32): i32 {
       eightBitStoreSyncCycles(0xff00 + largeDataByteOne, Cpu.registerA);
       Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
       return 4;
-    case 0xe1:
+    }
+    case 0xe1: {
       // POP HL
       // 1  12
       // 8 cycles
-      let registerHL1: i32 = sixteenBitLoadSyncCycles(Cpu.stackPointer);
-      Cpu.stackPointer = u16Portable(Cpu.stackPointer + 2);
+      let stackPointer = Cpu.stackPointer;
+      let registerHL1: i32 = sixteenBitLoadSyncCycles(stackPointer);
+      Cpu.stackPointer = u16Portable(stackPointer + 2);
       Cpu.registerH = <u8>splitHighByte(registerHL1);
       Cpu.registerL = <u8>splitLowByte(registerHL1);
       return 4;
-    case 0xe2:
+    }
+    case 0xe2: {
       // LD (C),A
       // 1  8
       // NOTE: Table says 2 Program counter,
@@ -2055,15 +2104,18 @@ function handleOpcodeEx(opcode: i32): i32 {
       // 4 cycles
       eightBitStoreSyncCycles(0xff00 + <i32>Cpu.registerC, Cpu.registerA);
       return 4;
+    }
     /* No Opcode for: 0xE3, 0xE4 */
-    case 0xe5:
+    case 0xe5: {
       // PUSH HL
       // 1 16
-      Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
+      let stackPointer = u16Portable(Cpu.stackPointer - 2);
+      Cpu.stackPointer = stackPointer;
       // 8 cycles
-      sixteenBitStoreSyncCycles(Cpu.stackPointer, concatenateBytes(Cpu.registerH, Cpu.registerL));
+      sixteenBitStoreSyncCycles(stackPointer, concatenateBytes(Cpu.registerH, Cpu.registerL));
       return 8;
-    case 0xe6:
+    }
+    case 0xe6: {
       // AND d8
       // 2  8
       // Z 0 1 0
@@ -2071,21 +2123,24 @@ function handleOpcodeEx(opcode: i32): i32 {
       andARegister(getDataByteOne());
       Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
       return 4;
-    case 0xe7:
+    }
+    case 0xe7: {
       // RST 20H
       // 1 16
-      Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
+      let stackPointer = u16Portable(Cpu.stackPointer - 2);
+      Cpu.stackPointer = stackPointer;
       // 8 cycles
-      sixteenBitStoreSyncCycles(Cpu.stackPointer, Cpu.programCounter);
+      sixteenBitStoreSyncCycles(stackPointer, Cpu.programCounter);
       Cpu.programCounter = 0x20;
       return 8;
-    case 0xe8:
+    }
+    case 0xe8: {
       // ADD SP, r8
       // 2 16
       // 0 0 H C
       // NOTE: Discoved dataByte is signed
       // 4 cycles
-      let signedDataByteOne: i8 = i8Portable(<i8>getDataByteOne());
+      let signedDataByteOne = i8Portable(<i8>getDataByteOne());
 
       checkAndSetSixteenBitFlagsAddOverflow(Cpu.stackPointer, signedDataByteOne, true);
       Cpu.stackPointer = u16Portable(Cpu.stackPointer + signedDataByteOne);
@@ -2093,20 +2148,23 @@ function handleOpcodeEx(opcode: i32): i32 {
       setSubtractFlag(0);
       Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
       return 12;
-    case 0xe9:
+    }
+    case 0xe9: {
       // JP HL
       // 1 4
       Cpu.programCounter = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
       return 4;
-    case 0xea:
+    }
+    case 0xea: {
       // LD (a16),A
       // 3 16
       // 12 cycles, 4 from store, 8 from concatenated data byte
       eightBitStoreSyncCycles(getConcatenatedDataByte(), Cpu.registerA);
       Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
       return 4;
+    }
     /* No Opcode for: 0xEB, 0xEC, 0xED */
-    case 0xee:
+    case 0xee: {
       // XOR d8
       // 2 8
       // Z 0 0 0
@@ -2114,21 +2172,24 @@ function handleOpcodeEx(opcode: i32): i32 {
       xorARegister(getDataByteOne());
       Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
       return 4;
-    case 0xef:
+    }
+    case 0xef: {
       // RST 28H
       // 1 16
-      Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
+      let stackPointer = u16Portable(Cpu.stackPointer - 2);
+      Cpu.stackPointer = stackPointer;
       // 8 cycles
-      sixteenBitStoreSyncCycles(Cpu.stackPointer, Cpu.programCounter);
+      sixteenBitStoreSyncCycles(stackPointer, Cpu.programCounter);
       Cpu.programCounter = 0x28;
       return 8;
+    }
   }
   return -1;
 }
 
 function handleOpcodeFx(opcode: i32): i32 {
   switch (opcode) {
-    case 0xf0:
+    case 0xf0: {
       // LDH A,(a8)
       // 2 12
       // 4 cycles
@@ -2137,36 +2198,43 @@ function handleOpcodeFx(opcode: i32): i32 {
       Cpu.registerA = u8Portable(<u8>eightBitLoadSyncCycles(0xff00 + largeDataByteOne));
       Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
       return 4;
-    case 0xf1:
+    }
+    case 0xf1: {
       // POP AF
       // 1 12
       // Z N H C (But No work require, flags are already set)
       // 8 cycles
-      let registerAF1: i32 = <u16>sixteenBitLoadSyncCycles(Cpu.stackPointer);
-      Cpu.stackPointer = u16Portable(Cpu.stackPointer + 2);
+      let stackPointer = Cpu.stackPointer;
+      let registerAF1: i32 = <u16>sixteenBitLoadSyncCycles(stackPointer);
+      Cpu.stackPointer = u16Portable(stackPointer + 2);
       Cpu.registerA = <u8>splitHighByte(registerAF1);
       Cpu.registerF = <u8>splitLowByte(registerAF1);
       return 4;
-    case 0xf2:
+    }
+    case 0xf2: {
       // LD A,(C)
       // 1 8
       // 4 cycles
       Cpu.registerA = u8Portable(<u8>eightBitLoadSyncCycles(0xff00 + <i32>Cpu.registerC));
       return 4;
-    case 0xf3:
+    }
+    case 0xf3: {
       // DI
       // 1 4
       setInterrupts(false);
       return 4;
+    }
     /* No Opcode for: 0xF4 */
-    case 0xf5:
+    case 0xf5: {
       // PUSH AF
       // 1 16
-      Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
+      let stackPointer = u16Portable(Cpu.stackPointer - 2);
+      Cpu.stackPointer = stackPointer;
       // 8 cycles
-      sixteenBitStoreSyncCycles(Cpu.stackPointer, concatenateBytes(Cpu.registerA, Cpu.registerF));
+      sixteenBitStoreSyncCycles(stackPointer, concatenateBytes(Cpu.registerA, Cpu.registerF));
       return 8;
-    case 0xf6:
+    }
+    case 0xf6: {
       // OR d8
       // 2 8
       // Z 0 0 0
@@ -2174,50 +2242,58 @@ function handleOpcodeFx(opcode: i32): i32 {
       orARegister(getDataByteOne());
       Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
       return 4;
-    case 0xf7:
+    }
+    case 0xf7: {
       // RST 30H
       // 1 16
-      Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
+      let stackPointer = u16Portable(Cpu.stackPointer - 2);
+      Cpu.stackPointer = stackPointer;
       // 8 cycles
-      sixteenBitStoreSyncCycles(Cpu.stackPointer, Cpu.programCounter);
+      sixteenBitStoreSyncCycles(stackPointer, Cpu.programCounter);
       Cpu.programCounter = 0x30;
       return 8;
-    case 0xf8:
+    }
+    case 0xf8: {
       // LD HL,SP+r8
       // 2 12
       // 0 0 H C
       // NOTE: Discoved dataByte is signed
       // 4 cycles
-      let signedDataByteOne: i8 = i8Portable(<i8>getDataByteOne());
+      let signedDataByteOne = i8Portable(<i8>getDataByteOne());
+      let stackPointer = Cpu.stackPointer;
 
       // First, let's handle flags
       setZeroFlag(0);
       setSubtractFlag(0);
-      checkAndSetSixteenBitFlagsAddOverflow(Cpu.stackPointer, signedDataByteOne, true);
-      let registerHL = u16Portable(Cpu.stackPointer + signedDataByteOne);
+      checkAndSetSixteenBitFlagsAddOverflow(stackPointer, signedDataByteOne, true);
+      let registerHL = u16Portable(stackPointer + signedDataByteOne);
       Cpu.registerH = <u8>splitHighByte(registerHL);
       Cpu.registerL = <u8>splitLowByte(registerHL);
       Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
       return 8;
-    case 0xf9:
+    }
+    case 0xf9: {
       // LD SP,HL
       // 1 8
       Cpu.stackPointer = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
       return 8;
-    case 0xfa:
+    }
+    case 0xfa: {
       // LD A,(a16)
       // 3 16
       // 12 cycles, 4 from load, 8 from concatenated data byte
       Cpu.registerA = <u8>eightBitLoadSyncCycles(getConcatenatedDataByte());
       Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
       return 4;
-    case 0xfb:
+    }
+    case 0xfb: {
       // EI
       // 1 4
       setInterrupts(true);
       return 4;
+    }
     /* No Opcode for: 0xFC, 0xFD */
-    case 0xfe:
+    case 0xfe: {
       // CP d8
       // 2 8
       // Z 1 H C
@@ -2225,14 +2301,17 @@ function handleOpcodeFx(opcode: i32): i32 {
       cpARegister(getDataByteOne());
       Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
       return 4;
-    case 0xff:
+    }
+    case 0xff: {
       // RST 38H
       // 1 16
-      Cpu.stackPointer = u16Portable(Cpu.stackPointer - 2);
+      let stackPointer = u16Portable(Cpu.stackPointer - 2);
+      Cpu.stackPointer = stackPointer;
       // 8 cycles
-      sixteenBitStoreSyncCycles(Cpu.stackPointer, Cpu.programCounter);
+      sixteenBitStoreSyncCycles(stackPointer, Cpu.programCounter);
       Cpu.programCounter = 0x38;
       return 8;
+    }
   }
   return -1;
 }
