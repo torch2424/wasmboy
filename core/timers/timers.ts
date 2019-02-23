@@ -229,7 +229,7 @@ export function updateTimers(numberOfCycles: i32): void {
         Timers.timerCounterWasReset = false;
       }
 
-      if (_checkDividerRegisterFallingEdgeDetector(oldDividerRegister, Timers.dividerRegister)) {
+      if (_checkDividerRegisterFallingEdgeDetector(oldDividerRegister, curDividerRegister)) {
         _incrementTimerCounter();
       }
     }
