@@ -287,7 +287,7 @@ function drawColorPixelFromTileId(
   let bgMapAttributes: i32 = loadFromVramBank(tileMapAddress, 1);
 
   // See above for explanation
-  let pixelYInTile: i32 = i32Portable(pixelYPositionInMap % 8);
+  let pixelYInTile = i32Portable(pixelYPositionInMap % 8);
   if (checkBitOnByte(6, bgMapAttributes)) {
     // We are mirroring the tile, therefore, we need to opposite byte
     // So if our pixel was 0 our of 8, it wild become 7 :)
@@ -363,16 +363,11 @@ function drawLineOfTileFromTileCache(
 
   // Check if the current tile matches our tileId
   // TODO: Allow the first line to use the tile cache, for some odd reason it doesn't work when scanline is 0
-  if (yPixel > 0 && xPixel > 8 && <i32>tileIdFromTileMap === TileCache.tileId && xPixel === TileCache.nextXIndexToPerformCacheCheck) {
+  let nextXIndexToPerformCacheCheck = TileCache.nextXIndexToPerformCacheCheck;
+  if (yPixel > 0 && xPixel > 8 && <i32>tileIdFromTileMap === TileCache.tileId && xPixel === nextXIndexToPerformCacheCheck) {
     // Was last tile flipped
-    let wasLastTileHorizontallyFlipped = false;
-    let isCurrentTileHorizontallyFlipped = false;
-    if (checkBitOnByte(5, eightBitLoadFromGBMemory(tileMapAddress - 1))) {
-      wasLastTileHorizontallyFlipped = true;
-    }
-    if (checkBitOnByte(5, eightBitLoadFromGBMemory(tileMapAddress))) {
-      isCurrentTileHorizontallyFlipped = true;
-    }
+    let wasLastTileHorizontallyFlipped = checkBitOnByte(5, eightBitLoadFromGBMemory(tileMapAddress - 1));
+    let isCurrentTileHorizontallyFlipped = checkBitOnByte(5, eightBitLoadFromGBMemory(tileMapAddress));
 
     // Simply copy the last 8 pixels from memory to copy the line from the tile
     for (let tileCacheIndex = 0; tileCacheIndex < 8; ++tileCacheIndex) {
@@ -410,13 +405,14 @@ function drawLineOfTileFromTileCache(
   }
 
   // Calculate when we should do the tileCache calculation again
-  if (xPixel >= TileCache.nextXIndexToPerformCacheCheck) {
-    TileCache.nextXIndexToPerformCacheCheck = xPixel + 8;
+  if (xPixel >= nextXIndexToPerformCacheCheck) {
+    nextXIndexToPerformCacheCheck = xPixel + 8;
     let xOffsetTileWidthRemainder = i32Portable(pixelXPositionInMap % 8);
     if (xPixel < xOffsetTileWidthRemainder) {
-      TileCache.nextXIndexToPerformCacheCheck += xOffsetTileWidthRemainder;
+      nextXIndexToPerformCacheCheck += xOffsetTileWidthRemainder;
     }
   }
+  TileCache.nextXIndexToPerformCacheCheck = nextXIndexToPerformCacheCheck;
 
   return pixelsDrawn;
 }
@@ -454,9 +450,7 @@ function drawLineOfTileFromTileId(
   if (Cpu.GBCEnabled) {
     // Get Our GBC properties
     bgMapAttributes = loadFromVramBank(tileMapAddress, 1);
-    if (checkBitOnByte(3, <u8>bgMapAttributes)) {
-      vramBankId = 1;
-    }
+    vramBankId = i32(checkBitOnByte(3, <u8>bgMapAttributes));
 
     if (checkBitOnByte(6, bgMapAttributes)) {
       // We are mirroring the tile, therefore, we need to opposite byte

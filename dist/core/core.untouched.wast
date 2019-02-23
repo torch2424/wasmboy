@@ -2727,6 +2727,9 @@
   (local $6 i32)
   (local $7 i32)
   (local $8 i32)
+  (local $9 i32)
+  global.get $core/graphics/tiles/TileCache.nextXIndexToPerformCacheCheck
+  local.set $6
   block (result i32)
    block (result i32)
     local.get $1
@@ -2750,35 +2753,29 @@
    local.get $5
   end
   if (result i32)
-   global.get $core/graphics/tiles/TileCache.nextXIndexToPerformCacheCheck
    local.get $0
+   local.get $6
    i32.eq
   else   
    local.get $5
   end
   if
-   i32.const 0
-   local.set $5
-   i32.const 0
-   local.set $4
    local.get $3
    i32.const 1
    i32.sub
    call $core/memory/load/eightBitLoadFromGBMemory
    i32.const 32
    i32.and
-   if
-    i32.const 1
-    local.set $5
-   end
+   i32.const 0
+   i32.ne
+   local.set $5
    local.get $3
    call $core/memory/load/eightBitLoadFromGBMemory
    i32.const 32
    i32.and
-   if
-    i32.const 1
-    local.set $4
-   end
+   i32.const 0
+   i32.ne
+   local.set $8
    i32.const 0
    local.set $3
    loop $repeat|0
@@ -2790,21 +2787,21 @@
      local.get $3
      i32.sub
      local.get $3
-     local.get $4
      local.get $5
+     local.get $8
      i32.ne
      select
      local.tee $3
      local.get $0
      i32.add
-     local.tee $6
+     local.tee $4
      i32.const 160
      i32.le_s
      if
       local.get $1
       i32.const 160
       i32.mul
-      local.get $6
+      local.get $4
       i32.add
       i32.const 3
       i32.mul
@@ -2817,7 +2814,7 @@
       local.get $1
       i32.const 160
       i32.mul
-      local.get $6
+      local.get $4
       i32.add
       i32.const 3
       i32.mul
@@ -2829,7 +2826,7 @@
       local.get $1
       i32.const 160
       i32.mul
-      local.get $6
+      local.get $4
       i32.add
       i32.const 3
       i32.mul
@@ -2841,7 +2838,7 @@
       local.get $1
       i32.const 160
       i32.mul
-      local.get $6
+      local.get $4
       i32.add
       i32.const 67712
       i32.add
@@ -2857,22 +2854,22 @@
       i32.const 67704
       i32.add
       i32.load8_u
-      local.tee $6
+      local.tee $4
       i32.const 3
       i32.and
       local.tee $7
       i32.const 4
       i32.or
       local.get $7
-      local.get $6
+      local.get $4
       i32.const 4
       i32.and
       select
       i32.store8
-      local.get $8
+      local.get $9
       i32.const 1
       i32.add
-      local.set $8
+      local.set $9
      end
      local.get $3
      i32.const 1
@@ -2886,27 +2883,29 @@
    global.set $core/graphics/tiles/TileCache.tileId
   end
   local.get $0
-  global.get $core/graphics/tiles/TileCache.nextXIndexToPerformCacheCheck
+  local.get $6
   i32.ge_s
   if
    local.get $0
    i32.const 8
    i32.add
-   global.set $core/graphics/tiles/TileCache.nextXIndexToPerformCacheCheck
+   local.set $6
    local.get $0
    local.get $2
    i32.const 8
    i32.rem_s
-   local.tee $4
+   local.tee $8
    i32.lt_s
    if
-    global.get $core/graphics/tiles/TileCache.nextXIndexToPerformCacheCheck
-    local.get $4
+    local.get $6
+    local.get $8
     i32.add
-    global.set $core/graphics/tiles/TileCache.nextXIndexToPerformCacheCheck
+    local.set $6
    end
   end
-  local.get $8
+  local.get $6
+  global.set $core/graphics/tiles/TileCache.nextXIndexToPerformCacheCheck
+  local.get $9
  )
  (func $core/graphics/tiles/getTileDataAddress (; 48 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
@@ -3338,7 +3337,7 @@
   i32.sub
   local.get $0
   select
-  local.set $8
+  local.set $7
   i32.const 160
   local.get $0
   i32.sub
@@ -3349,7 +3348,7 @@
   i32.const 160
   i32.gt_s
   select
-  local.set $9
+  local.set $8
   i32.const -1
   local.set $2
   global.get $core/cpu/cpu/Cpu.GBCEnabled
@@ -3361,10 +3360,9 @@
    local.tee $2
    i32.const 8
    i32.and
-   if
-    i32.const 1
-    local.set $7
-   end
+   i32.const 0
+   i32.ne
+   local.set $9
    local.get $2
    i32.const 64
    i32.and
@@ -3377,9 +3375,9 @@
   end
   local.get $6
   local.get $5
+  local.get $9
   local.get $7
   local.get $8
-  local.get $9
   local.get $3
   local.get $0
   local.get $1
