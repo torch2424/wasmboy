@@ -321,29 +321,27 @@ function handleOpcode0x(opcode: i32): i32 {
 
       return 4;
     }
-    case 0x0f:
+    case 0x0f: {
       // RRCA
       // 1 4
       // 0 0 0 C
       // Check for the last bit, to see if it will be carried
-      if ((Cpu.registerA & 0x01) > 0) {
-        setCarryFlag(1);
-      } else {
-        setCarryFlag(0);
-      }
-      Cpu.registerA = rotateByteRight(Cpu.registerA);
+      let registerA = Cpu.registerA;
+      setCarryFlag(i32((registerA & 0x01) > 0));
+      Cpu.registerA = rotateByteRight(registerA);
       // Set all other flags to zero
       setZeroFlag(0);
       setSubtractFlag(0);
       setHalfCarryFlag(0);
       return 4;
+    }
   }
   return -1;
 }
 
 function handleOpcode1x(opcode: i32): i32 {
   switch (opcode) {
-    case 0x10:
+    case 0x10: {
       // STOP 0
       // 2 4
       // Enter CPU very low power mode. Also used to switch between double and normal speed CPU modes in GBC.
@@ -381,25 +379,28 @@ function handleOpcode1x(opcode: i32): i32 {
       Cpu.isStopped = true;
       Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
       return 4;
-    case 0x11:
+    }
+    case 0x11: {
       // LD DE,d16
       // 3  12
 
       // 8 cycles
-      let concatenatedDataByte: i32 = getConcatenatedDataByte();
+      let concatenatedDataByte = getConcatenatedDataByte();
 
       Cpu.registerD = <u8>splitHighByte(concatenatedDataByte);
       Cpu.registerE = <u8>splitLowByte(concatenatedDataByte);
       Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
       return 4;
-    case 0x12:
+    }
+    case 0x12: {
       // LD (DE),A
       // 1 8
 
       // 4 cycles
       eightBitStoreSyncCycles(concatenateBytes(Cpu.registerD, Cpu.registerE), Cpu.registerA);
       return 4;
-    case 0x13:
+    }
+    case 0x13: {
       // INC DE
       // 1 8
       let registerDE3 = <u16>concatenateBytes(Cpu.registerD, Cpu.registerE);
@@ -407,33 +408,32 @@ function handleOpcode1x(opcode: i32): i32 {
       Cpu.registerD = <u8>splitHighByte(registerDE3);
       Cpu.registerE = <u8>splitLowByte(registerDE3);
       return 8;
-    case 0x14:
+    }
+    case 0x14: {
       // INC D
       // 1  4
       // Z 0 H -
-      checkAndSetEightBitHalfCarryFlag(Cpu.registerD, 1);
-      Cpu.registerD = u8Portable(Cpu.registerD + 1);
-      if (Cpu.registerD === 0) {
-        setZeroFlag(1);
-      } else {
-        setZeroFlag(0);
-      }
+      let registerD = Cpu.registerD;
+      checkAndSetEightBitHalfCarryFlag(registerD, 1);
+      registerD = u8Portable(registerD + 1);
+      Cpu.registerD = registerD;
+      setZeroFlag(i32(Cpu.registerD === 0));
       setSubtractFlag(0);
       return 4;
-    case 0x15:
+    }
+    case 0x15: {
       // DEC D
       // 1  4
       // Z 1 H -
-      checkAndSetEightBitHalfCarryFlag(Cpu.registerD, -1);
-      Cpu.registerD = u8Portable(Cpu.registerD - 1);
-      if (Cpu.registerD === 0) {
-        setZeroFlag(1);
-      } else {
-        setZeroFlag(0);
-      }
+      let registerD = Cpu.registerD;
+      checkAndSetEightBitHalfCarryFlag(registerD, -1);
+      registerD = u8Portable(registerD - 1);
+      Cpu.registerD = registerD;
+      setZeroFlag(i32(Cpu.registerD === 0));
       setSubtractFlag(1);
       return 4;
-    case 0x16:
+    }
+    case 0x16: {
       // LD D,d8
       // 2 8
 
@@ -441,29 +441,24 @@ function handleOpcode1x(opcode: i32): i32 {
       Cpu.registerD = getDataByteOne();
       Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
       return 4;
-    case 0x17:
+    }
+    case 0x17: {
       // RLA
       // 1 4
       // 0 0 0 C
       // Check for the carry
       // setting has first bit since we need to use carry
-      let hasHighbit = false;
-      if ((Cpu.registerA & 0x80) === 0x80) {
-        hasHighbit = true;
-      }
+      let hasHighbit = (Cpu.registerA & 0x80) === 0x80;
       Cpu.registerA = rotateByteLeftThroughCarry(Cpu.registerA);
       // OR the carry flag to the end
-      if (hasHighbit) {
-        setCarryFlag(1);
-      } else {
-        setCarryFlag(0);
-      }
+      setCarryFlag(i32(hasHighbit));
       // Set all other flags to zero
       setZeroFlag(0);
       setSubtractFlag(0);
       setHalfCarryFlag(0);
       return 4;
-    case 0x18:
+    }
+    case 0x18: {
       // JR r8
       // 2  12
       // NOTE: Discoved dataByte is signed
@@ -472,61 +467,63 @@ function handleOpcode1x(opcode: i32): i32 {
       // 4 cycles
       relativeJump(getDataByteOne());
       return 8;
+    }
     // Relative Jump Function Handles program counter
-    case 0x19:
+    case 0x19: {
       // ADD HL,DE
       // 1  8
       // - 0 H C
-      let registerHL: u16 = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
-      let registerDE9: u16 = <u16>concatenateBytes(Cpu.registerD, Cpu.registerE);
+      let registerHL = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
+      let registerDE9 = <u16>concatenateBytes(Cpu.registerD, Cpu.registerE);
       checkAndSetSixteenBitFlagsAddOverflow(<u16>registerHL, <u16>registerDE9, false);
-      let result: u16 = u16Portable(<u16>(registerHL + registerDE9));
+      let result = u16Portable(<u16>(registerHL + registerDE9));
       Cpu.registerH = <u8>splitHighByte(<u16>result);
       Cpu.registerL = <u8>splitLowByte(<u16>result);
       setSubtractFlag(0);
       return 8;
-    case 0x1a:
+    }
+    case 0x1a: {
       // LD A,(DE)
       // 1 8
-      let registerDEA: u16 = <u16>concatenateBytes(Cpu.registerD, Cpu.registerE);
+      let registerDEA = <u16>concatenateBytes(Cpu.registerD, Cpu.registerE);
       // 4 cycles
       Cpu.registerA = <u8>eightBitLoadSyncCycles(registerDEA);
       return 4;
-    case 0x1b:
+    }
+    case 0x1b: {
       // DEC DE
       // 1 8
-      let registerDEB: u16 = <u16>concatenateBytes(Cpu.registerD, Cpu.registerE);
+      let registerDEB = <u16>concatenateBytes(Cpu.registerD, Cpu.registerE);
       registerDEB = u16Portable(registerDEB - 1);
       Cpu.registerD = <u8>splitHighByte(registerDEB);
       Cpu.registerE = <u8>splitLowByte(registerDEB);
       return 8;
-    case 0x1c:
+    }
+    case 0x1c: {
       // INC E
       // 1  4
       // Z 0 H -
-      checkAndSetEightBitHalfCarryFlag(Cpu.registerE, 1);
-      Cpu.registerE = u8Portable(Cpu.registerE + 1);
-      if (Cpu.registerE === 0) {
-        setZeroFlag(1);
-      } else {
-        setZeroFlag(0);
-      }
+      let registerE = Cpu.registerE;
+      checkAndSetEightBitHalfCarryFlag(registerE, 1);
+      registerE = u8Portable(registerE + 1);
+      Cpu.registerE = registerE;
+      setZeroFlag(i32(registerE === 0));
       setSubtractFlag(0);
       return 4;
-    case 0x1d:
+    }
+    case 0x1d: {
       // DEC E
       // 1  4
       // Z 1 H -
-      checkAndSetEightBitHalfCarryFlag(Cpu.registerE, -1);
-      Cpu.registerE = u8Portable(Cpu.registerE - 1);
-      if (Cpu.registerE === 0) {
-        setZeroFlag(1);
-      } else {
-        setZeroFlag(0);
-      }
+      let registerE = Cpu.registerE;
+      checkAndSetEightBitHalfCarryFlag(registerE, -1);
+      registerE = u8Portable(registerE - 1);
+      Cpu.registerE = registerE;
+      setZeroFlag(i32(registerE === 0));
       setSubtractFlag(1);
       return 4;
-    case 0x1e:
+    }
+    case 0x1e: {
       // LD E,d8
       // 2 8
 
@@ -534,28 +531,23 @@ function handleOpcode1x(opcode: i32): i32 {
       Cpu.registerE = getDataByteOne();
       Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
       return 4;
-    case 0x1f:
+    }
+    case 0x1f: {
       // RRA
       // 1 4
       // 0 0 0 C
       // Check for the carry
       // setting has low bit since we need to use carry
-      let hasLowBit = false;
-      if ((Cpu.registerA & 0x01) === 0x01) {
-        hasLowBit = true;
-      }
+      let hasLowBit = (Cpu.registerA & 0x01) === 0x01;
       Cpu.registerA = rotateByteRightThroughCarry(Cpu.registerA);
 
-      if (hasLowBit) {
-        setCarryFlag(1);
-      } else {
-        setCarryFlag(0);
-      }
+      setCarryFlag(i32(hasLowBit));
       // Set all other flags to zero
       setZeroFlag(0);
       setSubtractFlag(0);
       setHalfCarryFlag(0);
       return 4;
+    }
   }
 
   return -1;
@@ -563,7 +555,7 @@ function handleOpcode1x(opcode: i32): i32 {
 
 function handleOpcode2x(opcode: i32): i32 {
   switch (opcode) {
-    case 0x20:
+    case 0x20: {
       // JR NZ,r8
       // 2  12/8
       // NOTE: NZ stands for not [flag], so in this case, not zero flag
@@ -576,7 +568,8 @@ function handleOpcode2x(opcode: i32): i32 {
         Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
       }
       return 8;
-    case 0x21:
+    }
+    case 0x21: {
       // LD HL,d16
       // 3  12
       // 8 cycles
@@ -585,17 +578,19 @@ function handleOpcode2x(opcode: i32): i32 {
       Cpu.registerL = <u8>splitLowByte(sixteenBitDataByte);
       Cpu.programCounter = u16Portable(Cpu.programCounter + 2);
       return 4;
-    case 0x22:
+    }
+    case 0x22: {
       // LD (HL+),A
       // 1 8
-      let registerHL2: u16 = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
+      let registerHL2 = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
       // 4 cycles
       eightBitStoreSyncCycles(registerHL2, Cpu.registerA);
       registerHL2 = u16Portable(registerHL2 + 1);
       Cpu.registerH = <u8>splitHighByte(registerHL2);
       Cpu.registerL = <u8>splitLowByte(registerHL2);
       return 4;
-    case 0x23:
+    }
+    case 0x23: {
       // INC HL
       // 1  8
       let registerHL3 = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
@@ -603,33 +598,32 @@ function handleOpcode2x(opcode: i32): i32 {
       Cpu.registerH = <u8>splitHighByte(registerHL3);
       Cpu.registerL = <u8>splitLowByte(registerHL3);
       return 8;
-    case 0x24:
+    }
+    case 0x24: {
       // INC H
       // 1  4
       // Z 0 H -
-      checkAndSetEightBitHalfCarryFlag(Cpu.registerH, 1);
-      Cpu.registerH = u8Portable(Cpu.registerH + 1);
-      if (Cpu.registerH === 0) {
-        setZeroFlag(1);
-      } else {
-        setZeroFlag(0);
-      }
+      let registerH = Cpu.registerH;
+      checkAndSetEightBitHalfCarryFlag(registerH, 1);
+      registerH = u8Portable(registerH + 1);
+      Cpu.registerH = registerH;
+      setZeroFlag(i32(registerH === 0));
       setSubtractFlag(0);
       return 4;
-    case 0x25:
+    }
+    case 0x25: {
       // DEC H
       // 1  4
       // Z 1 H -
-      checkAndSetEightBitHalfCarryFlag(Cpu.registerH, -1);
-      Cpu.registerH = u8Portable(Cpu.registerH - 1);
-      if (Cpu.registerH === 0) {
-        setZeroFlag(1);
-      } else {
-        setZeroFlag(0);
-      }
+      let registerH = Cpu.registerH;
+      checkAndSetEightBitHalfCarryFlag(registerH, -1);
+      registerH = u8Portable(registerH - 1);
+      Cpu.registerH = registerH;
+      setZeroFlag(i32(registerH === 0));
       setSubtractFlag(1);
       return 4;
-    case 0x26:
+    }
+    case 0x26: {
       // LD H,d8
       // 2 8
 
@@ -637,7 +631,8 @@ function handleOpcode2x(opcode: i32): i32 {
       Cpu.registerH = getDataByteOne();
       Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
       return 4;
-    case 0x27:
+    }
+    case 0x27: {
       // DAA
       // 1 4
       // Z - 0 C
@@ -651,34 +646,28 @@ function handleOpcode2x(opcode: i32): i32 {
         adjustment = adjustment | 0x60;
       }
 
+      let registerA = Cpu.registerA;
       if (getSubtractFlag() > 0) {
-        adjustedRegister = u8Portable(Cpu.registerA - <u8>adjustment);
+        adjustedRegister = u8Portable(registerA - <u8>adjustment);
       } else {
-        if ((Cpu.registerA & 0x0f) > 0x09) {
+        if ((registerA & 0x0f) > 0x09) {
           adjustment = adjustment | 0x06;
         }
-        if (Cpu.registerA > 0x99) {
+        if (registerA > 0x99) {
           adjustment = adjustment | 0x60;
         }
-        adjustedRegister = u8Portable(Cpu.registerA + <u8>adjustment);
+        adjustedRegister = u8Portable(registerA + <u8>adjustment);
       }
 
       // Now set our flags to the correct values
-      if (adjustedRegister === 0) {
-        setZeroFlag(1);
-      } else {
-        setZeroFlag(0);
-      }
-      if ((adjustment & 0x60) !== 0) {
-        setCarryFlag(1);
-      } else {
-        setCarryFlag(0);
-      }
+      setZeroFlag(i32(adjustedRegister === 0));
+      setCarryFlag(i32((adjustment & 0x60) !== 0));
       setHalfCarryFlag(0);
 
       Cpu.registerA = <u8>adjustedRegister;
       return 4;
-    case 0x28:
+    }
+    case 0x28: {
       // JR Z,r8
       // 2  12/8
       if (getZeroFlag() > 0) {
@@ -689,28 +678,31 @@ function handleOpcode2x(opcode: i32): i32 {
         Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
       }
       return 8;
-    case 0x29:
+    }
+    case 0x29: {
       // ADD HL,HL
       // 1  8
       // - 0 H C
-      let registerHL9: u16 = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
+      let registerHL9 = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
       checkAndSetSixteenBitFlagsAddOverflow(registerHL9, registerHL9, false);
       registerHL9 = u16Portable(registerHL9 * 2);
       Cpu.registerH = <u8>splitHighByte(registerHL9);
       Cpu.registerL = <u8>splitLowByte(registerHL9);
       setSubtractFlag(0);
       return 8;
-    case 0x2a:
+    }
+    case 0x2a: {
       // LD A,(HL+)
       // 1  8
-      let registerHLA: u16 = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
+      let registerHLA = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
       // 4 cycles
       Cpu.registerA = <u8>eightBitLoadSyncCycles(registerHLA);
       registerHLA = u16Portable(registerHLA + 1);
       Cpu.registerH = <u8>splitHighByte(registerHLA);
       Cpu.registerL = <u8>splitLowByte(registerHLA);
       return 4;
-    case 0x2b:
+    }
+    case 0x2b: {
       // DEC HL
       // 1 8
       let registerHLB = <u16>concatenateBytes(Cpu.registerH, Cpu.registerL);
@@ -718,40 +710,40 @@ function handleOpcode2x(opcode: i32): i32 {
       Cpu.registerH = <u8>splitHighByte(registerHLB);
       Cpu.registerL = <u8>splitLowByte(registerHLB);
       return 8;
-    case 0x2c:
+    }
+    case 0x2c: {
       // INC L
       // 1  4
       // Z 0 H -
-      checkAndSetEightBitHalfCarryFlag(Cpu.registerL, 1);
-      Cpu.registerL = u8Portable(Cpu.registerL + 1);
-      if (Cpu.registerL === 0) {
-        setZeroFlag(1);
-      } else {
-        setZeroFlag(0);
-      }
+      let registerL = Cpu.registerL;
+      checkAndSetEightBitHalfCarryFlag(registerL, 1);
+      registerL = u8Portable(registerL + 1);
+      Cpu.registerL = registerL;
+      setZeroFlag(i32(registerL === 0));
       setSubtractFlag(0);
       return 4;
-    case 0x2d:
+    }
+    case 0x2d: {
       // DEC L
       // 1  4
       // Z 1 H -
-      checkAndSetEightBitHalfCarryFlag(Cpu.registerL, -1);
-      Cpu.registerL = u8Portable(Cpu.registerL - 1);
-      if (Cpu.registerL === 0) {
-        setZeroFlag(1);
-      } else {
-        setZeroFlag(0);
-      }
+      let registerL = Cpu.registerL;
+      checkAndSetEightBitHalfCarryFlag(registerL, -1);
+      registerL = u8Portable(registerL - 1);
+      Cpu.registerL = registerL;
+      setZeroFlag(i32(registerL === 0));
       setSubtractFlag(1);
       return 4;
-    case 0x2e:
+    }
+    case 0x2e: {
       // LD L,d8
       // 2  8
       // 4 cycles
       Cpu.registerL = getDataByteOne();
       Cpu.programCounter = u16Portable(Cpu.programCounter + 1);
       return 4;
-    case 0x2f:
+    }
+    case 0x2f: {
       // CPL
       // 1 4
       // - 1 1 -
@@ -759,6 +751,7 @@ function handleOpcode2x(opcode: i32): i32 {
       setSubtractFlag(1);
       setHalfCarryFlag(1);
       return 4;
+    }
   }
   return -1;
 }
