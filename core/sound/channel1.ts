@@ -70,8 +70,7 @@ export class Channel1 {
     Channel1.NRx3FrequencyLSB = value;
 
     // Update Channel Frequency
-    let frequency: i32 = (Channel1.NRx4FrequencyMSB << 8) | Channel1.NRx3FrequencyLSB;
-    Channel1.frequency = frequency;
+    Channel1.frequency = (Channel1.NRx4FrequencyMSB << 8) | value;
   }
 
   // NR14 -> Frequency hi (R/W)
@@ -81,11 +80,11 @@ export class Channel1 {
   static NRx4FrequencyMSB: i32 = 0;
   static updateNRx4(value: i32): void {
     Channel1.NRx4LengthEnabled = checkBitOnByte(6, value);
-    Channel1.NRx4FrequencyMSB = value & 0x07;
+    value &= 0x07;
+    Channel1.NRx4FrequencyMSB = value;
 
     // Update Channel Frequency
-    let frequency: i32 = (Channel1.NRx4FrequencyMSB << 8) | Channel1.NRx3FrequencyLSB;
-    Channel1.frequency = frequency;
+    Channel1.frequency = (value << 8) | Channel1.NRx3FrequencyLSB;
   }
 
   // Channel Properties
@@ -152,7 +151,7 @@ export class Channel1 {
 
   // Function to get a sample using the cycle counter on the channel
   static getSampleFromCycleCounter(): i32 {
-    let accumulatedCycles: i32 = Channel1.cycleCounter;
+    let accumulatedCycles = Channel1.cycleCounter;
     Channel1.cycleCounter = 0;
     return Channel1.getSample(accumulatedCycles);
   }
@@ -195,7 +194,7 @@ export class Channel1 {
     }
 
     // Get our ourput volume
-    let outputVolume: i32 = 0;
+    let outputVolume = 0;
 
     // Finally to set our output volume, the channel must be enabled,
     // Our channel DAC must be enabled, and we must be in an active state
@@ -209,9 +208,9 @@ export class Channel1 {
     }
 
     // Get the current sampleValue
-    let sample: i32 = 1;
+    let sample = 1;
     if (!isDutyCycleClockPositiveOrNegativeForWaveform(Channel1.NRx1Duty, Channel1.waveFormPositionOnDuty)) {
-      sample = sample * -1;
+      sample = -sample;
     }
 
     sample = sample * outputVolume;
@@ -245,11 +244,7 @@ export class Channel1 {
     Channel1.sweepCounter = Channel1.NRx0SweepPeriod;
 
     // The internal enabled flag is set if either the sweep period or shift are non-zero, cleared otherwise.
-    if (Channel1.NRx0SweepPeriod > 0 && Channel1.NRx0SweepShift > 0) {
-      Channel1.isSweepEnabled = true;
-    } else {
-      Channel1.isSweepEnabled = false;
-    }
+    Channel1.isSweepEnabled = Channel1.NRx0SweepPeriod > 0 && Channel1.NRx0SweepShift > 0;
 
     // If the sweep shift is non-zero, frequency calculation and the overflow check are performed immediately.
     if (Channel1.NRx0SweepShift > 0) {
@@ -330,7 +325,7 @@ export class Channel1 {
     let passedFrequencyLowBits = frequency & 0xff;
 
     // Get the new register 4
-    let register4: i32 = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx4);
+    let register4 = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx4);
     // Knock off lower 3 bits, and Or on our high bits
     let newRegister4 = register4 & 0xf8;
     newRegister4 = newRegister4 | passedFrequencyHighBits;
@@ -349,7 +344,7 @@ export class Channel1 {
 
 // Sweep Specific functions
 function calculateSweepAndCheckOverflow(): void {
-  let newFrequency: i32 = getNewFrequencyFromSweep();
+  let newFrequency = getNewFrequencyFromSweep();
   // 7FF is the highest value of the frequency: 111 1111 1111
   if (newFrequency <= 0x7ff && Channel1.NRx0SweepShift > 0) {
     // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
@@ -374,14 +369,15 @@ function calculateSweepAndCheckOverflow(): void {
 // Function to determing a new sweep in the current context
 function getNewFrequencyFromSweep(): i32 {
   // Start our new frequency, by making it equal to the "shadow frequency"
-  let newFrequency: i32 = Channel1.sweepShadowFrequency;
+  let oldFrequency = Channel1.sweepShadowFrequency;
+  let newFrequency = oldFrequency;
   newFrequency = newFrequency >> Channel1.NRx0SweepShift;
 
   // Check for sweep negation
   if (Channel1.NRx0Negate) {
-    newFrequency = Channel1.sweepShadowFrequency - newFrequency;
+    newFrequency = oldFrequency - newFrequency;
   } else {
-    newFrequency = Channel1.sweepShadowFrequency + newFrequency;
+    newFrequency = oldFrequency + newFrequency;
   }
 
   return newFrequency;

@@ -136,10 +136,12 @@ export class Channel3 {
 
   static getSample(numberOfCycles: i32): i32 {
     // Decrement our channel timer
-    Channel3.frequencyTimer -= numberOfCycles;
-    if (Channel3.frequencyTimer <= 0) {
+    let frequencyTimer = Channel3.frequencyTimer;
+    frequencyTimer -= numberOfCycles;
+    if (frequencyTimer <= 0) {
       // Get the amount that overflowed so we don't drop cycles
-      let overflowAmount = abs(Channel3.frequencyTimer);
+      let overflowAmount = abs(frequencyTimer);
+      Channel3.frequencyTimer = frequencyTimer;
 
       // Reset our timer
       // A wave channel's frequency timer period is set to (2048-frequency) * 2.
@@ -154,6 +156,8 @@ export class Channel3 {
         waveTablePosition = 0;
       }
       Channel3.waveTablePosition = waveTablePosition;
+    } else {
+      Channel3.frequencyTimer = frequencyTimer;
     }
 
     // Get our ourput volume
@@ -219,12 +223,7 @@ export class Channel3 {
     }
 
     // Spply out output volume
-    if (outputVolume > 0) {
-      sample = sample / outputVolume;
-    } else {
-      sample = 0;
-    }
-
+    sample = outputVolume > 0 ? sample / outputVolume : 0;
     // Square Waves Can range from -15 - 15. Therefore simply add 15
     sample = sample + 15;
     return sample;

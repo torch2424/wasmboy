@@ -49,10 +49,10 @@ export class Channel4 {
   static NRx3WidthMode: boolean = false;
   static NRx3DivisorCode: i32 = 0;
   static updateNRx3(value: i32): void {
+    let divisorCode = value & 0x07;
     Channel4.NRx3ClockShift = value >> 4;
     Channel4.NRx3WidthMode = checkBitOnByte(3, value);
-    Channel4.NRx3DivisorCode = value & 0x07;
-
+    Channel4.NRx3DivisorCode = divisorCode;
     // Also, get our divisor
     /*
     switch (Channel4.NRx3DivisorCode) {
@@ -81,8 +81,8 @@ export class Channel4 {
         Channel4.divisor = 112;
         return;
     }*/
-    if (Channel4.NRx3DivisorCode <= 7) {
-      Channel4.divisor = max<i32>(1, Channel4.NRx3DivisorCode << 1) << 3;
+    if (divisorCode <= 7) {
+      Channel4.divisor = max<i32>(1, divisorCode << 1) << 3;
     }
   }
 
@@ -154,7 +154,7 @@ export class Channel4 {
 
     if (frequencyTimer <= 0) {
       // Get the amount that overflowed so we don't drop cycles
-      let overflowAmount = abs(Channel4.frequencyTimer);
+      let overflowAmount = abs(frequencyTimer);
 
       // Reset our timer
       frequencyTimer = Channel4.getNoiseChannelFrequencyPeriod();
@@ -187,7 +187,7 @@ export class Channel4 {
     Channel4.frequencyTimer = frequencyTimer;
 
     // Get our ourput volume, set to zero for silence
-    let outputVolume: i32 = 0;
+    let outputVolume = 0;
 
     // Finally to set our output volume, the channel must be enabled,
     // Our channel DAC must be enabled, and we must be in an active state
@@ -242,43 +242,38 @@ export class Channel4 {
     Channel4.cycleCounter += numberOfCycles;
 
     // Dac enabled status cached by accumulator
-    if (Channel4.frequencyTimer - Channel4.cycleCounter > 0) {
-      return false;
-    }
-
-    return true;
+    return !(Channel4.frequencyTimer - Channel4.cycleCounter > 0);
   }
 
   static getNoiseChannelFrequencyPeriod(): i32 {
     // Get our divisor from the divisor code, and shift by the clock shift
-    let response: i32 = Channel4.divisor << Channel4.NRx3ClockShift;
-    if (Cpu.GBCDoubleSpeed) {
-      response = response * 2;
-    }
-    return response;
+    let response = Channel4.divisor << Channel4.NRx3ClockShift;
+    return response << (<i32>Cpu.GBCDoubleSpeed);
   }
 
   static updateLength(): void {
-    if (Channel4.lengthCounter > 0 && Channel4.NRx4LengthEnabled) {
-      Channel4.lengthCounter -= 1;
+    let lengthCounter = Channel4.lengthCounter;
+    if (lengthCounter > 0 && Channel4.NRx4LengthEnabled) {
+      lengthCounter -= 1;
     }
 
-    if (Channel4.lengthCounter === 0) {
+    if (lengthCounter === 0) {
       Channel4.isEnabled = false;
     }
+    Channel4.lengthCounter = lengthCounter;
   }
 
   static updateEnvelope(): void {
     // Obscure behavior
     // TODO: The volume envelope and sweep timers treat a period of 0 as 8.
-
-    Channel4.envelopeCounter -= 1;
-    if (Channel4.envelopeCounter <= 0) {
-      Channel4.envelopeCounter = Channel4.NRx2EnvelopePeriod;
+    let envelopeCounter = Channel4.envelopeCounter;
+    envelopeCounter -= 1;
+    if (envelopeCounter <= 0) {
+      envelopeCounter = Channel4.NRx2EnvelopePeriod;
 
       // When the timer generates a clock and the envelope period is NOT zero, a new volume is calculated
       // NOTE: There is some weiirrdd obscure behavior where zero can equal 8, so watch out for that
-      if (Channel4.envelopeCounter !== 0) {
+      if (envelopeCounter !== 0) {
         let volume = Channel4.volume;
         if (Channel4.NRx2EnvelopeAddMode && volume < 15) {
           volume += 1;
@@ -288,6 +283,7 @@ export class Channel4 {
         Channel4.volume = volume;
       }
     }
+    Channel4.envelopeCounter = envelopeCounter;
   }
   // Done!
 }
