@@ -1527,10 +1527,10 @@
   global.set $core/graphics/graphics/Graphics.windowX
   i32.const 0
   global.set $core/graphics/graphics/Graphics.windowY
+  i32.const 144
+  global.set $core/graphics/graphics/Graphics.scanlineRegister
   global.get $core/cpu/cpu/Cpu.GBCEnabled
   if
-   i32.const 144
-   global.set $core/graphics/graphics/Graphics.scanlineRegister
    i32.const 65344
    i32.const 145
    call $core/memory/store/eightBitStoreIntoGBMemory
@@ -1544,8 +1544,6 @@
    i32.const 252
    call $core/memory/store/eightBitStoreIntoGBMemory
   else   
-   i32.const 144
-   global.set $core/graphics/graphics/Graphics.scanlineRegister
    i32.const 65344
    i32.const 145
    call $core/memory/store/eightBitStoreIntoGBMemory
@@ -8066,12 +8064,9 @@
    i32.const 1
   else   
    global.get $core/graphics/graphics/Graphics.scanlineCycleCounter
+   i32.const 376
    global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
-   if (result i32)
-    i32.const 752
-   else    
-    i32.const 376
-   end
+   i32.shl
    i32.ge_s
    if (result i32)
     i32.const 2
@@ -8079,12 +8074,9 @@
     i32.const 3
     i32.const 0
     global.get $core/graphics/graphics/Graphics.scanlineCycleCounter
+    i32.const 249
     global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
-    if (result i32)
-     i32.const 498
-    else     
-     i32.const 249
-    end
+    i32.shl
     i32.ge_s
     select
    end
@@ -8201,49 +8193,31 @@
    local.set $1
    loop $continue|0
     global.get $core/graphics/graphics/Graphics.scanlineCycleCounter
-    block $__inlined_func$core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE (result i32)
-     global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
-     if
-      i32.const 8
-      global.get $core/graphics/graphics/Graphics.scanlineRegister
-      i32.const 153
-      i32.eq
-      br_if $__inlined_func$core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE
-      drop
-      i32.const 912
-      br $__inlined_func$core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE
-     end
-     i32.const 4
-     global.get $core/graphics/graphics/Graphics.scanlineRegister
-     i32.const 153
-     i32.eq
-     br_if $__inlined_func$core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE
-     drop
-     i32.const 456
-    end
+    i32.const 4
+    global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
+    local.tee $0
+    i32.shl
+    i32.const 456
+    local.get $0
+    i32.shl
+    global.get $core/graphics/graphics/Graphics.scanlineRegister
+    i32.const 153
+    i32.eq
+    select
     i32.ge_s
     if
      global.get $core/graphics/graphics/Graphics.scanlineCycleCounter
-     block $__inlined_func$core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE0 (result i32)
-      global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
-      if
-       i32.const 8
-       global.get $core/graphics/graphics/Graphics.scanlineRegister
-       i32.const 153
-       i32.eq
-       br_if $__inlined_func$core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE0
-       drop
-       i32.const 912
-       br $__inlined_func$core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE0
-      end
-      i32.const 4
-      global.get $core/graphics/graphics/Graphics.scanlineRegister
-      i32.const 153
-      i32.eq
-      br_if $__inlined_func$core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE0
-      drop
-      i32.const 456
-     end
+     i32.const 4
+     global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
+     local.tee $0
+     i32.shl
+     i32.const 456
+     local.get $0
+     i32.shl
+     global.get $core/graphics/graphics/Graphics.scanlineRegister
+     i32.const 153
+     i32.eq
+     select
      i32.sub
      global.set $core/graphics/graphics/Graphics.scanlineCycleCounter
      global.get $core/graphics/graphics/Graphics.scanlineRegister
@@ -8292,97 +8266,28 @@
   call $core/graphics/lcd/setLcdStatus
  )
  (func $core/graphics/graphics/batchProcessGraphics (; 120 ;) (type $_)
-  global.get $core/graphics/graphics/Graphics.currentCycles
-  block $__inlined_func$core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE (result i32)
-   global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
-   if
-    i32.const 8
-    global.get $core/graphics/graphics/Graphics.scanlineRegister
-    i32.const 153
-    i32.eq
-    br_if $__inlined_func$core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE
-    drop
-    i32.const 912
-    br $__inlined_func$core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE
-   end
-   i32.const 4
-   global.get $core/graphics/graphics/Graphics.scanlineRegister
-   i32.const 153
-   i32.eq
-   br_if $__inlined_func$core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE
-   drop
-   i32.const 456
-  end
-  i32.lt_s
-  if
-   return
-  end
+  (local $0 i32)
+  i32.const 4
+  global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
+  local.tee $0
+  i32.shl
+  i32.const 456
+  local.get $0
+  i32.shl
+  global.get $core/graphics/graphics/Graphics.scanlineRegister
+  i32.const 153
+  i32.eq
+  select
+  local.set $0
   loop $continue|0
    global.get $core/graphics/graphics/Graphics.currentCycles
-   block $__inlined_func$core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE1 (result i32)
-    global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
-    if
-     i32.const 8
-     global.get $core/graphics/graphics/Graphics.scanlineRegister
-     i32.const 153
-     i32.eq
-     br_if $__inlined_func$core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE1
-     drop
-     i32.const 912
-     br $__inlined_func$core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE1
-    end
-    i32.const 4
-    global.get $core/graphics/graphics/Graphics.scanlineRegister
-    i32.const 153
-    i32.eq
-    br_if $__inlined_func$core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE1
-    drop
-    i32.const 456
-   end
+   local.get $0
    i32.ge_s
    if
-    block $__inlined_func$core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE3 (result i32)
-     global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
-     if
-      i32.const 8
-      global.get $core/graphics/graphics/Graphics.scanlineRegister
-      i32.const 153
-      i32.eq
-      br_if $__inlined_func$core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE3
-      drop
-      i32.const 912
-      br $__inlined_func$core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE3
-     end
-     i32.const 4
-     global.get $core/graphics/graphics/Graphics.scanlineRegister
-     i32.const 153
-     i32.eq
-     br_if $__inlined_func$core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE3
-     drop
-     i32.const 456
-    end
+    local.get $0
     call $core/graphics/graphics/updateGraphics
     global.get $core/graphics/graphics/Graphics.currentCycles
-    block $__inlined_func$core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE5 (result i32)
-     global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
-     if
-      i32.const 8
-      global.get $core/graphics/graphics/Graphics.scanlineRegister
-      i32.const 153
-      i32.eq
-      br_if $__inlined_func$core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE5
-      drop
-      i32.const 912
-      br $__inlined_func$core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE5
-     end
-     i32.const 4
-     global.get $core/graphics/graphics/Graphics.scanlineRegister
-     i32.const 153
-     i32.eq
-     br_if $__inlined_func$core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE5
-     drop
-     i32.const 456
-    end
+    local.get $0
     i32.sub
     global.set $core/graphics/graphics/Graphics.currentCycles
     br $continue|0

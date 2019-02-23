@@ -31,36 +31,33 @@ export class Graphics {
 
   // TCAGBD says 456 per scanline, but 153 only a handful
   static MAX_CYCLES_PER_SCANLINE(): i32 {
-    if (Cpu.GBCDoubleSpeed) {
-      if (Graphics.scanlineRegister === 153) {
-        return 8;
-      }
-
-      return 912;
-    }
-
     if (Graphics.scanlineRegister === 153) {
-      return 4;
+      return 4 << (<i32>Cpu.GBCDoubleSpeed);
+    } else {
+      return 456 << (<i32>Cpu.GBCDoubleSpeed);
     }
-
-    return 456;
   }
 
   static MIN_CYCLES_SPRITES_LCD_MODE(): i32 {
-    if (Cpu.GBCDoubleSpeed) {
+    /*if (Cpu.GBCDoubleSpeed) {
       // TODO: Confirm these clock cyles, double similar to scanline, which TCAGBD did
       return 752;
     }
 
-    return 376;
+    return 376;*/
+    return 376 << (<i32>Cpu.GBCDoubleSpeed);
   }
+
   static MIN_CYCLES_TRANSFER_DATA_LCD_MODE(): i32 {
+    /*
     if (Cpu.GBCDoubleSpeed) {
       // TODO: Confirm these clock cyles, double similar to scanline, which TCAGBD did
       return 498;
     }
 
     return 249;
+    */
+    return 249 << (<i32>Cpu.GBCDoubleSpeed);
   }
 
   // LCD
@@ -123,13 +120,10 @@ export class Graphics {
 // Function to batch process our graphics after we skipped so many cycles
 // This is not currently checked in memory read/write
 export function batchProcessGraphics(): void {
-  if (Graphics.currentCycles < Graphics.batchProcessCycles()) {
-    return;
-  }
-
-  while (Graphics.currentCycles >= Graphics.batchProcessCycles()) {
-    updateGraphics(Graphics.batchProcessCycles());
-    Graphics.currentCycles = Graphics.currentCycles - Graphics.batchProcessCycles();
+  var batchProcessCycles = Graphics.batchProcessCycles();
+  while (Graphics.currentCycles >= batchProcessCycles) {
+    updateGraphics(batchProcessCycles);
+    Graphics.currentCycles -= batchProcessCycles;
   }
 }
 
@@ -144,9 +138,10 @@ export function initializeGraphics(): void {
   Graphics.windowX = 0;
   Graphics.windowY = 0;
 
+  Graphics.scanlineRegister = 0x90;
+
   if (Cpu.GBCEnabled) {
     // Bgb says LY is 90 on boot
-    Graphics.scanlineRegister = 0x90;
     eightBitStoreIntoGBMemory(0xff40, 0x91);
     eightBitStoreIntoGBMemory(0xff41, 0x81);
     // 0xFF42 -> 0xFF43 = 0x00
@@ -154,12 +149,7 @@ export function initializeGraphics(): void {
     // 0xFF45 -> 0xFF46 = 0x00
     eightBitStoreIntoGBMemory(0xff47, 0xfc);
     // 0xFF48 -> 0xFF4B = 0x00
-
-    // GBC VRAM Banks
-    eightBitStoreIntoGBMemory(0xff4f, 0x00);
-    eightBitStoreIntoGBMemory(0xff70, 0x01);
   } else {
-    Graphics.scanlineRegister = 0x90;
     eightBitStoreIntoGBMemory(0xff40, 0x91);
     eightBitStoreIntoGBMemory(0xff41, 0x85);
     // 0xFF42 -> 0xFF45 = 0x00
@@ -168,11 +158,11 @@ export function initializeGraphics(): void {
     eightBitStoreIntoGBMemory(0xff48, 0xff);
     eightBitStoreIntoGBMemory(0xff49, 0xff);
     // 0xFF4A -> 0xFF4B = 0x00
-
-    // GBC VRAM Banks
-    eightBitStoreIntoGBMemory(0xff4f, 0x00);
-    eightBitStoreIntoGBMemory(0xff70, 0x01);
   }
+
+  // GBC VRAM Banks
+  eightBitStoreIntoGBMemory(0xff4f, 0x00);
+  eightBitStoreIntoGBMemory(0xff70, 0x01);
 
   initializeColors();
 }
@@ -238,7 +228,7 @@ export function updateGraphics(numberOfCycles: i32): void {
 // TODO: Make this a _drawPixelOnScanline, as values can be updated while drawing a scanline
 function _drawScanline(scanlineRegister: i32): void {
   // Get our seleted tile data memory location
-  let tileDataMemoryLocation: i32 = Graphics.memoryLocationTileDataSelectZeroStart;
+  let tileDataMemoryLocation = Graphics.memoryLocationTileDataSelectZeroStart;
   if (Lcd.bgWindowTileDataSelect) {
     tileDataMemoryLocation = Graphics.memoryLocationTileDataSelectOneStart;
   }
@@ -252,7 +242,7 @@ function _drawScanline(scanlineRegister: i32): void {
   // TODO: Enable this different feature for GBC
   if (Cpu.GBCEnabled || Lcd.bgDisplayEnabled) {
     // Get our map memory location
-    let tileMapMemoryLocation: i32 = Graphics.memoryLocationTileMapSelectZeroStart;
+    let tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectZeroStart;
     if (Lcd.bgTileMapDisplaySelect) {
       tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectOneStart;
     }
@@ -265,7 +255,7 @@ function _drawScanline(scanlineRegister: i32): void {
   // Drawing lines on the window
   if (Lcd.windowDisplayEnabled) {
     // Get our map memory location
-    let tileMapMemoryLocation: i32 = Graphics.memoryLocationTileMapSelectZeroStart;
+    let tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectZeroStart;
     if (Lcd.windowTileMapDisplaySelect) {
       tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectOneStart;
     }
@@ -309,6 +299,6 @@ export function setPixelOnFrame(x: i32, y: i32, colorId: i32, color: i32): void 
 
 // Function to shortcut the memory map, and load directly from the VRAM Bank
 export function loadFromVramBank(gameboyOffset: i32, vramBankId: i32): u8 {
-  let wasmBoyAddress: i32 = gameboyOffset - Memory.videoRamLocation + GAMEBOY_INTERNAL_MEMORY_LOCATION + 0x2000 * (vramBankId & 0x01);
+  let wasmBoyAddress = gameboyOffset - Memory.videoRamLocation + GAMEBOY_INTERNAL_MEMORY_LOCATION + 0x2000 * (vramBankId & 0x01);
   return load<u8>(wasmBoyAddress);
 }
