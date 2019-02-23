@@ -87,10 +87,6 @@
  (global $core/graphics/colors/Colors.obj1LightGrey (mut i32) (i32.const 0))
  (global $core/graphics/colors/Colors.obj1DarkGrey (mut i32) (i32.const 0))
  (global $core/graphics/colors/Colors.obj1Black (mut i32) (i32.const 0))
- (global $core/debug/breakpoints/Breakpoints.programCounter (mut i32) (i32.const -1))
- (global $core/debug/breakpoints/Breakpoints.readGbMemory (mut i32) (i32.const -1))
- (global $core/debug/breakpoints/Breakpoints.writeGbMemory (mut i32) (i32.const -1))
- (global $core/debug/breakpoints/Breakpoints.reachedBreakpoint (mut i32) (i32.const 0))
  (global $core/graphics/palette/Palette.memoryLocationBackgroundPaletteIndex (mut i32) (i32.const 65384))
  (global $core/graphics/palette/Palette.memoryLocationBackgroundPaletteData (mut i32) (i32.const 65385))
  (global $core/graphics/palette/Palette.memoryLocationSpritePaletteData (mut i32) (i32.const 65387))
@@ -238,6 +234,10 @@
  (global $core/joypad/joypad/Joypad.joypadRegisterFlipped (mut i32) (i32.const 0))
  (global $core/joypad/joypad/Joypad.isDpadType (mut i32) (i32.const 0))
  (global $core/joypad/joypad/Joypad.isButtonType (mut i32) (i32.const 0))
+ (global $core/debug/breakpoints/Breakpoints.programCounter (mut i32) (i32.const -1))
+ (global $core/debug/breakpoints/Breakpoints.readGbMemory (mut i32) (i32.const -1))
+ (global $core/debug/breakpoints/Breakpoints.writeGbMemory (mut i32) (i32.const -1))
+ (global $core/debug/breakpoints/Breakpoints.reachedBreakpoint (mut i32) (i32.const 0))
  (global $core/graphics/lcd/Lcd.currentLcdMode (mut i32) (i32.const 0))
  (global $core/graphics/lcd/Lcd.coincidenceCompare (mut i32) (i32.const 0))
  (global $core/graphics/lcd/Lcd.enabled (mut i32) (i32.const 1))
@@ -3339,18 +3339,17 @@
   i32.const 8
   i32.rem_s
   local.set $3
+  i32.const 0
+  local.get $2
+  local.get $2
+  i32.const 3
+  i32.shr_s
+  i32.const 3
+  i32.shl
+  i32.sub
   local.get $0
-  i32.eqz
-  if
-   local.get $2
-   local.get $2
-   i32.const 8
-   i32.div_s
-   i32.const 3
-   i32.shl
-   i32.sub
-   local.set $7
-  end
+  select
+  local.set $8
   i32.const 160
   local.get $0
   i32.sub
@@ -3375,7 +3374,7 @@
    i32.and
    if
     i32.const 1
-    local.set $8
+    local.set $7
    end
    local.get $2
    i32.const 64
@@ -3389,8 +3388,8 @@
   end
   local.get $6
   local.get $5
-  local.get $8
   local.get $7
+  local.get $8
   local.get $9
   local.get $3
   local.get $0
@@ -3901,17 +3900,15 @@
      i32.const 16
      local.set $5
      local.get $3
-     i32.const 2
-     i32.rem_s
+     i32.const 1
+     i32.sub
+     local.get $3
+     local.get $3
+     i32.const 1
+     i32.and
      i32.const 1
      i32.eq
-     if (result i32)
-      local.get $3
-      i32.const 1
-      i32.sub
-     else      
-      local.get $3
-     end
+     select
      local.set $3
     end
     local.get $0
@@ -4308,7 +4305,7 @@
    loop $repeat|0
     local.get $0
     i32.const 144
-    i32.gt_u
+    i32.gt_s
     br_if $break|0
     local.get $0
     i32.const 255
@@ -7469,14 +7466,17 @@
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
+  (local $5 i32)
+  global.get $core/graphics/palette/Palette.memoryLocationSpritePaletteData
+  local.set $3
   global.get $core/graphics/palette/Palette.memoryLocationBackgroundPaletteData
   local.get $0
   i32.eq
   local.tee $2
   i32.eqz
   if
-   global.get $core/graphics/palette/Palette.memoryLocationSpritePaletteData
    local.get $0
+   local.get $3
    i32.eq
    local.set $2
   end
@@ -7485,23 +7485,20 @@
    local.get $0
    i32.const 1
    i32.sub
-   local.tee $3
+   local.tee $4
    call $core/memory/load/eightBitLoadFromGBMemory
    i32.const -65
    i32.and
    local.tee $2
    i32.const 63
    i32.and
-   local.tee $4
+   local.tee $5
    i32.const -64
    i32.sub
-   local.get $4
-   i32.const 1
-   i32.const 0
-   global.get $core/graphics/palette/Palette.memoryLocationSpritePaletteData
+   local.get $5
    local.get $0
+   local.get $3
    i32.eq
-   select
    select
    i32.const 67584
    i32.add
@@ -7511,7 +7508,7 @@
    i32.const 128
    i32.and
    if
-    local.get $3
+    local.get $4
     local.get $2
     i32.const 1
     i32.add
@@ -8503,12 +8500,15 @@
   end
  )
  (func $core/graphics/graphics/updateGraphics (; 115 ;) (type $i_) (param $0 i32)
+  (local $1 i32)
   global.get $core/graphics/lcd/Lcd.enabled
   if
    global.get $core/graphics/graphics/Graphics.scanlineCycleCounter
    local.get $0
    i32.add
    global.set $core/graphics/graphics/Graphics.scanlineCycleCounter
+   global.get $core/config/Config.graphicsDisableScanlineRendering
+   local.set $1
    loop $continue|0
     global.get $core/graphics/graphics/Graphics.scanlineCycleCounter
     block $__inlined_func$core/graphics/graphics/Graphics.MAX_CYCLES_PER_SCANLINE (result i32)
@@ -8561,7 +8561,7 @@
      i32.const 144
      i32.eq
      if
-      global.get $core/config/Config.graphicsDisableScanlineRendering
+      local.get $1
       if
        call $core/graphics/graphics/_renderEntireFrame
       else       
@@ -8578,7 +8578,7 @@
       i32.const 144
       i32.lt_s
       if
-       global.get $core/config/Config.graphicsDisableScanlineRendering
+       local.get $1
        i32.eqz
        if
         local.get $0

@@ -3,28 +3,23 @@ import { Graphics, loadFromVramBank, setPixelOnFrame } from './graphics';
 import { Lcd } from './lcd';
 import { Cpu } from '../cpu/index';
 import { getTileDataAddress } from './tiles';
-import {
-  getMonochromeColorFromPalette,
-  getColorizedGbHexColorFromPalette,
-  getRgbColorFromPalette,
-  getColorComponentFromRgb
-} from './palette';
+import { getColorizedGbHexColorFromPalette, getRgbColorFromPalette, getColorComponentFromRgb } from './palette';
 import { getRedFromHexColor, getGreenFromHexColor, getBlueFromHexColor } from './colors';
 import { getPriorityforPixel } from './priority';
 // Assembly script really not feeling the reexport
 // using Skip Traps, because LCD has unrestricted access
 // http://gbdev.gg8.se/wiki/articles/Video_Display#LCD_OAM_DMA_Transfers
 import { eightBitLoadFromGBMemory } from '../memory/load';
-import { checkBitOnByte, setBitOnByte, resetBitOnByte, hexLog } from '../helpers/index';
+import { checkBitOnByte } from '../helpers/index';
 
 // Inlined because closure compiler inlines
 export function renderSprites(scanlineRegister: i32, useLargerSprites: boolean): void {
   // Need to loop through all 40 sprites to check their status
   // Going backwards since lower sprites draw over higher ones
   // Will fix dragon warrior 3 intro
-  for (let i: i32 = 39; i >= 0; i--) {
+  for (let i = 39; i >= 0; i--) {
     // Sprites occupy 4 bytes in the sprite attribute table
-    let spriteTableIndex: i32 = i * 4;
+    let spriteTableIndex = i * 4;
     // Y positon is offset by 16, X position is offset by 8
 
     let spriteYPosition: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex);
@@ -46,7 +41,7 @@ export function renderSprites(scanlineRegister: i32, useLargerSprites: boolean):
     spriteXPosition -= 8;
 
     // Find our sprite height
-    let spriteHeight: i32 = 8;
+    let spriteHeight = 8;
     if (useLargerSprites) {
       spriteHeight = 16;
       // @binji says in 8x16 mode, even tileId always drawn first
@@ -55,7 +50,7 @@ export function renderSprites(scanlineRegister: i32, useLargerSprites: boolean):
       // TODO: Do the actual Pandocs thing:
       // "In 8x16 mode, the lower bit of the tile number is ignored. Ie. the upper 8x8 tile is "NN AND FEh", and the lower 8x8 tile is "NN OR 01h"."
       // So just knock off the last bit? :)
-      if (spriteTileId % 2 === 1) {
+      if ((spriteTileId & 1) === 1) {
         spriteTileId -= 1;
       }
     }

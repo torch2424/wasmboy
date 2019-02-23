@@ -1,8 +1,7 @@
 import { GBC_PALETTE_LOCATION } from '../constants';
 import { Cpu } from '../cpu/index';
-import { Memory, eightBitLoadFromGBMemory, eightBitStoreIntoGBMemory } from '../memory/index';
-import { breakpoint } from '../debug/breakpoints';
-import { checkBitOnByte, resetBitOnByte, setBitOnByte, concatenateBytes, hexLog } from '../helpers/index';
+import { eightBitLoadFromGBMemory, eightBitStoreIntoGBMemory } from '../memory/index';
+import { checkBitOnByte, resetBitOnByte, setBitOnByte, concatenateBytes } from '../helpers/index';
 
 import { Colors } from './colors';
 
@@ -49,15 +48,15 @@ export function getMonochromeColorFromPalette(
   // Shift our paletteByte, 2 times for each color ID
   // And off any extra bytes
   // Return our Color (00 - white, 01 - light grey, 10 Dark grey, or 11 - Black)
-  let color: i32 = colorId;
+  let color = colorId;
   if (!shouldRepresentColorByColorId) {
-    color = ((<i32>eightBitLoadFromGBMemory(paletteMemoryLocation)) >> (colorId * 2)) & 0x03;
+    color = ((<i32>eightBitLoadFromGBMemory(paletteMemoryLocation)) >> (colorId << 1)) & 0x03;
   }
 
   // Since our max is 254, and max is 3.
   // monochrome color palette is modified from bgb
   // TODO: Make these colors into a constant
-  let rgbColor: i32 = 242;
+  let rgbColor = 242;
 
   switch (color) {
     case 0:
@@ -81,10 +80,10 @@ export function getColorizedGbHexColorFromPalette(colorId: i32, paletteMemoryLoc
   // Shift our paletteByte, 2 times for each color ID
   // And off any extra bytes
   // Return our Color (00 - white, 01 - light grey, 10 Dark grey, or 11 - Black)
-  let color: i32 = ((<i32>eightBitLoadFromGBMemory(paletteMemoryLocation)) >> (colorId * 2)) & 0x03;
+  let color = ((<i32>eightBitLoadFromGBMemory(paletteMemoryLocation)) >> (colorId * 2)) & 0x03;
 
   // Check which palette we got, to apply the right color layer
-  let hexColor: i32 = 0;
+  let hexColor = 0;
   if (paletteMemoryLocation === Palette.memoryLocationSpritePaletteOne) {
     hexColor = Colors.obj0White;
 
@@ -142,7 +141,8 @@ export function getColorizedGbHexColorFromPalette(colorId: i32, paletteMemoryLoc
 export function writeColorPaletteToMemory(offset: i32, value: i32): void {
   // FF68
   //  Bit 0-5   Index (00-3F)
-  if (offset === Palette.memoryLocationBackgroundPaletteData || offset === Palette.memoryLocationSpritePaletteData) {
+  let memoryLocationSpritePaletteData = Palette.memoryLocationSpritePaletteData;
+  if (offset === Palette.memoryLocationBackgroundPaletteData || offset === memoryLocationSpritePaletteData) {
     // Get the palette index
     let paletteIndex: i32 = eightBitLoadFromGBMemory(offset - 1);
 
@@ -150,13 +150,8 @@ export function writeColorPaletteToMemory(offset: i32, value: i32): void {
     paletteIndex = resetBitOnByte(6, paletteIndex);
 
     // Check if we are changing the sprite pallete data
-    let isSprite: boolean = false;
-    if (offset === Palette.memoryLocationSpritePaletteData) {
-      isSprite = true;
-    }
-
+    let isSprite = offset === memoryLocationSpritePaletteData;
     storePaletteByteInWasmMemory(paletteIndex, value, isSprite);
-
     incrementPaletteIndexIfSet(paletteIndex, offset - 1);
   }
 }
@@ -186,7 +181,7 @@ function incrementPaletteIndexIfSet(paletteIndex: i32, offset: i32): void {
 export function getRgbColorFromPalette(paletteId: i32, colorId: i32, isSprite: boolean): i32 {
   // Each Pallete takes 8 bytes, so multiply by 8 to get the pallete
   // And Each color takes 2 bytes, therefore, multiple by 2 for the correct color bytes in the palette
-  let paletteIndex: i32 = paletteId * 8 + colorId * 2;
+  let paletteIndex = paletteId * 8 + colorId * 2;
 
   // Load the Color that is seperated into two bytes
   let paletteHighByte: i32 = loadPaletteByteFromWasmMemory(paletteIndex + 1, isSprite);
@@ -200,8 +195,9 @@ export function getRgbColorFromPalette(paletteId: i32, colorId: i32, isSprite: b
 export function getColorComponentFromRgb(colorId: i32, colorRgb: i32): i32 {
   // Get our bitmask for the color ID
   // bit mask tested good :)
-  let bitMask: i32 = 0x1f << (colorId * 5);
-  let colorValue: i32 = (colorRgb & bitMask) >> (colorId * 5);
+  colorId *= 5;
+  let bitMask = 0x1f << colorId;
+  let colorValue = (colorRgb & bitMask) >> colorId;
 
   // Goal is to reach 254 for each color, so 255 / 31 (0x1F) ~8 TODO: Make exact
   // Want 5 bits for each
@@ -211,7 +207,7 @@ export function getColorComponentFromRgb(colorId: i32, colorRgb: i32): i32 {
 // Function to load a byte from our Gbc Palette memory
 export function loadPaletteByteFromWasmMemory(paletteIndexByte: i32, isSprite: boolean): u8 {
   // Clear the top two bits to just get the bottom palette Index
-  let paletteIndex: i32 = paletteIndexByte & 0x3f;
+  let paletteIndex = paletteIndexByte & 0x3f;
 
   // Move over the palette index to not overlap the background has 0x3F, so Zero for Sprites is 0x40)
   if (isSprite) {
@@ -225,7 +221,7 @@ export function loadPaletteByteFromWasmMemory(paletteIndexByte: i32, isSprite: b
 // Inlined because closure compiler inlines
 export function storePaletteByteInWasmMemory(paletteIndexByte: i32, value: i32, isSprite: boolean): void {
   // Clear the top two bits to just get the bottom palette Index
-  let paletteIndex: i32 = paletteIndexByte & 0x3f;
+  let paletteIndex = paletteIndexByte & 0x3f;
 
   // Move over the palette index to not overlap the background (has 0x3F, so Zero for Sprites is 0x40)
   if (isSprite) {

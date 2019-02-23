@@ -9,14 +9,7 @@ import { resetTileCache } from './tiles';
 import { initializeColors } from './colors';
 import { Cpu } from '../cpu/index';
 import { Config } from '../config';
-import {
-  Memory,
-  eightBitLoadFromGBMemory,
-  eightBitStoreIntoGBMemory,
-  loadBooleanDirectlyFromWasmMemory,
-  storeBooleanDirectlyToWasmMemory
-} from '../memory/index';
-import { checkBitOnByte, setBitOnByte, resetBitOnByte, performanceTimestamp, hexLog } from '../helpers/index';
+import { Memory, eightBitLoadFromGBMemory, eightBitStoreIntoGBMemory } from '../memory/index';
 
 export class Graphics {
   // Current cycles
@@ -188,6 +181,8 @@ export function updateGraphics(numberOfCycles: i32): void {
   if (Lcd.enabled) {
     Graphics.scanlineCycleCounter += numberOfCycles;
 
+    let graphicsDisableScanlineRendering = Config.graphicsDisableScanlineRendering;
+
     while (Graphics.scanlineCycleCounter >= Graphics.MAX_CYCLES_PER_SCANLINE()) {
       // Reset the scanlineCycleCounter
       // Don't set to zero to catch extra cycles
@@ -195,12 +190,12 @@ export function updateGraphics(numberOfCycles: i32): void {
 
       // Move to next scanline
       // let scanlineRegister: i32 = eightBitLoadFromGBMemory(Graphics.memoryLocationScanlineRegister);
-      let scanlineRegister: i32 = Graphics.scanlineRegister;
+      let scanlineRegister = Graphics.scanlineRegister;
 
       // Check if we've reached the last scanline
       if (scanlineRegister === 144) {
         // Draw the scanline
-        if (!Config.graphicsDisableScanlineRendering) {
+        if (!graphicsDisableScanlineRendering) {
           _drawScanline(scanlineRegister);
         } else {
           _renderEntireFrame();
@@ -213,7 +208,7 @@ export function updateGraphics(numberOfCycles: i32): void {
         resetTileCache();
       } else if (scanlineRegister < 144) {
         // Draw the scanline
-        if (!Config.graphicsDisableScanlineRendering) {
+        if (!graphicsDisableScanlineRendering) {
           _drawScanline(scanlineRegister);
         }
       }
@@ -290,8 +285,8 @@ function _drawScanline(scanlineRegister: i32): void {
 // See above for comments on how things are donw
 function _renderEntireFrame(): void {
   // Scanline needs to be in sync while we draw, thus, we can't shortcut anymore than here
-  for (let i: u8 = 0; i <= 144; i++) {
-    _drawScanline(i);
+  for (let i = 0; i <= 144; ++i) {
+    _drawScanline(<u8>i);
   }
 }
 

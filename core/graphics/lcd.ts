@@ -5,7 +5,7 @@ import { eightBitLoadFromGBMemory } from '../memory/load';
 import { eightBitStoreIntoGBMemory } from '../memory/store';
 import { updateHblankHdma } from '../memory/index';
 import { requestLcdInterrupt, requestVBlankInterrupt } from '../interrupts/index';
-import { checkBitOnByte, setBitOnByte, resetBitOnByte, hexLog } from '../helpers/index';
+import { checkBitOnByte, setBitOnByte, resetBitOnByte } from '../helpers/index';
 import { FRAME_LOCATION, FRAME_SIZE } from '../constants';
 
 export class Lcd {
