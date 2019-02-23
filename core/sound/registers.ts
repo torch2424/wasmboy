@@ -9,7 +9,7 @@ import { Channel2 } from './channel2';
 import { Channel3 } from './channel3';
 import { Channel4 } from './channel4';
 import { eightBitLoadFromGBMemory, eightBitStoreIntoGBMemory } from '../memory/index';
-import { checkBitOnByte, setBitOnByte, resetBitOnByte, hexLog } from '../helpers/index';
+import { checkBitOnByte, setBitOnByte, resetBitOnByte } from '../helpers/index';
 
 // Function to check and handle writes to sound registers
 // Inlined because closure compiler inlines
@@ -112,7 +112,7 @@ export function SoundRegisterWriteTraps(offset: i32, value: i32): boolean {
       // Reset all registers except NR52
       Sound.updateNR52(value);
       if (!checkBitOnByte(7, value)) {
-        for (let i: i32 = 0xff10; i < 0xff26; i++) {
+        for (let i = 0xff10; i < 0xff26; ++i) {
           eightBitStoreIntoGBMemory(i, 0x00);
         }
       }

@@ -11,7 +11,7 @@ import {
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
-import { checkBitOnByte, hexLog } from '../helpers/index';
+import { checkBitOnByte } from '../helpers/index';
 
 export class Channel2 {
   // Cycle Counter for our sound accumulator

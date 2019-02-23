@@ -23,13 +23,8 @@ import { Channel3 } from './channel3';
 import { Channel4 } from './channel4';
 import { Cpu } from '../cpu/index';
 import { Config } from '../config';
-import {
-  eightBitLoadFromGBMemory,
-  eightBitStoreIntoGBMemory,
-  loadBooleanDirectlyFromWasmMemory,
-  storeBooleanDirectlyToWasmMemory
-} from '../memory/index';
-import { checkBitOnByte, concatenateBytes, splitLowByte, splitHighByte, hexLog, performanceTimestamp } from '../helpers/index';
+import { eightBitStoreIntoGBMemory } from '../memory/index';
+import { checkBitOnByte, concatenateBytes, splitLowByte, splitHighByte } from '../helpers/index';
 import { i32Portable } from '../portable/portable';
 
 export class Sound {
@@ -44,11 +39,8 @@ export class Sound {
   // and does not exceed the minimum number of cyles for either down sampling, or
   // How often we change the frame, or a channel's update process
   static batchProcessCycles(): i32 {
-    if (Cpu.GBCDoubleSpeed) {
-      return 174;
-    }
-
-    return 87;
+    // return Cpu.GBCDoubleSpeed ? 174 : 87;
+    return 87 << (<i32>Cpu.GBCDoubleSpeed);
   }
 
   // Channel control / On-OFF / Volume (RW)
@@ -95,11 +87,8 @@ export class Sound {
   // Which you can read about below
   static frameSequenceCycleCounter: i32 = 0x0000;
   static maxFrameSequenceCycles(): i32 {
-    if (Cpu.GBCDoubleSpeed) {
-      return 16384;
-    }
-
-    return 8192;
+    // return Cpu.GBCDoubleSpeed ? 16384 : 8192;
+    return 8192 << (<i32>Cpu.GBCDoubleSpeed);
   }
 
   // Also need to downsample our audio to average audio qualty
@@ -195,7 +184,7 @@ export function batchProcessAudio(): void {
 // Function for updating sound
 export function updateSound(numberOfCycles: i32): void {
   // Check if our frameSequencer updated
-  let frameSequencerUpdated: boolean = updateFrameSequencer(numberOfCycles);
+  let frameSequencerUpdated = updateFrameSequencer(numberOfCycles);
 
   if (Config.audioAccumulateSamples && !frameSequencerUpdated) {
     accumulateSound(numberOfCycles);
@@ -220,10 +209,10 @@ function calculateSound(numberOfCycles: i32): void {
   // All samples will be returned as 0 to 30
   // 0 being -1.0, and 30 being 1.0
   // (see blurb at top)
-  let channel1Sample: i32 = i32Portable(Channel1.getSample(numberOfCycles));
-  let channel2Sample: i32 = i32Portable(Channel2.getSample(numberOfCycles));
-  let channel3Sample: i32 = i32Portable(Channel3.getSample(numberOfCycles));
-  let channel4Sample: i32 = i32Portable(Channel4.getSample(numberOfCycles));
+  let channel1Sample = i32Portable(Channel1.getSample(numberOfCycles));
+  let channel2Sample = i32Portable(Channel2.getSample(numberOfCycles));
+  let channel3Sample = i32Portable(Channel3.getSample(numberOfCycles));
+  let channel4Sample = i32Portable(Channel4.getSample(numberOfCycles));
   // TODO: Allow individual channels to be muted
   // let channel1Sample: i32 = 15;
   // let channel2Sample: i32 = 15;
@@ -281,7 +270,7 @@ function calculateSound(numberOfCycles: i32): void {
     // Don't allow our audioQueueIndex to overflow into other parts of the wasmBoy memory map
     // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit#gid=0
     // Not 0xFFFF because we need half of 64kb since we store left and right channel
-    let maxIndex: i32 = i32Portable(Sound.wasmBoyMemoryMaxBufferSize / 2) - 1;
+    let maxIndex = i32Portable(Sound.wasmBoyMemoryMaxBufferSize >> 1) - 1;
     if (Sound.audioQueueIndex >= maxIndex) {
       Sound.audioQueueIndex -= 1;
     }
@@ -379,8 +368,8 @@ export function mixChannelSamples(
   SoundAccumulator.mixerVolumeChanged = false;
 
   // Get our channel volume for left/right
-  let leftChannelSample: i32 = 0;
-  let rightChannelSample: i32 = 0;
+  let leftChannelSample = 0;
+  let rightChannelSample = 0;
 
   // Find the sample for the left if enabled
   // other wise add silence (15) for the channel
@@ -459,12 +448,12 @@ function getSampleAsUnsignedByte(sample: i32, mixerVolume: i32): i32 {
 
   // convert to a signed, precise scale of -6000 to 6000 (cheap way of -1.0 to 1.0)
   // Multiply by the mixer volume fraction (to find the actual volume)
-  let precision: i32 = 100000;
-  let convertedSample: i32 = sample - 60;
+  let precision = 100000;
+  let convertedSample = sample - 60;
   convertedSample = convertedSample * precision;
 
   // Multiply by the mixer volume fraction (to find the actual volume)
-  convertedSample = i32Portable((convertedSample * mixerVolume) / 8);
+  convertedSample = i32Portable((convertedSample * mixerVolume) >> 3);
 
   // Convert back to scale of 0 to 120
   convertedSample = i32Portable(convertedSample / precision);
@@ -489,10 +478,10 @@ function getSampleAsUnsignedByte(sample: i32, mixerVolume: i32): i32 {
 // Function to set our left and right channels at the correct queue index
 export function setLeftAndRightOutputForAudioQueue(leftVolume: i32, rightVolume: i32, bufferLocation: i32): void {
   // Get our stereo index
-  let audioQueueOffset = bufferLocation + Sound.audioQueueIndex * 2;
+  let audioQueueOffset = bufferLocation + (Sound.audioQueueIndex << 1);
 
   // Store our volumes
   // +1 that way we don't have empty data to ensure that the value is set
-  store<u8>(audioQueueOffset, <u8>(leftVolume + 1));
+  store<u8>(audioQueueOffset + 0, <u8>(leftVolume + 1));
   store<u8>(audioQueueOffset + 1, <u8>(rightVolume + 1));
 }
