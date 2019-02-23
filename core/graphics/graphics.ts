@@ -153,7 +153,7 @@ export function initializeGraphics(): void {
   if (Cpu.GBCEnabled) {
     // Bgb says LY is 90 on boot
     Graphics.scanlineRegister = 0x90;
-    eightBitStoreIntoGBMemory(0xff40, 0x91);
+    eightBitStoreIntoGBMemory(0xff40, 0x90);
     eightBitStoreIntoGBMemory(0xff41, 0x81);
     // 0xFF42 -> 0xFF43 = 0x00
     eightBitStoreIntoGBMemory(0xff44, 0x90);
@@ -166,7 +166,7 @@ export function initializeGraphics(): void {
     eightBitStoreIntoGBMemory(0xff70, 0x01);
   } else {
     Graphics.scanlineRegister = 0x90;
-    eightBitStoreIntoGBMemory(0xff40, 0x91);
+    eightBitStoreIntoGBMemory(0xff40, 0x90);
     eightBitStoreIntoGBMemory(0xff41, 0x85);
     // 0xFF42 -> 0xFF45 = 0x00
     eightBitStoreIntoGBMemory(0xff46, 0xff);
@@ -178,6 +178,18 @@ export function initializeGraphics(): void {
     // GBC VRAM Banks
     eightBitStoreIntoGBMemory(0xff4f, 0x00);
     eightBitStoreIntoGBMemory(0xff70, 0x01);
+  }
+
+  // Override/reset some variables if the boot ROM is enabled
+  if (Cpu.BootROMEnabled) {
+    if (Cpu.GBCEnabled) {
+      // GBC
+    } else {
+      // GB
+      Graphics.scanlineRegister = 0x00;
+      eightBitStoreIntoGBMemory(0xff40, 0x00);
+      eightBitStoreIntoGBMemory(0xff41, 0x84);
+    }
   }
 
   initializeColors();

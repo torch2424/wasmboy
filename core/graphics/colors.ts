@@ -27,6 +27,7 @@ import {
   Table05Entry14Colors,
   Table05Entry15Colors
 } from './colors.constants';
+import { Cpu } from '../cpu/cpu';
 import { eightBitLoadFromGBMemory } from '../memory/index';
 
 // Current / exported color
@@ -52,6 +53,18 @@ export class Colors {
 
 export function initializeColors(): void {
   setManualColorizationPalette(0);
+
+  if (Cpu.GBCEnabled) {
+    // Don't need to continue this if a GBC game
+    return;
+  }
+
+  if (Cpu.BootROMEnabled) {
+    if (!Cpu.GBCEnabled) {
+      // GB
+      return;
+    }
+  }
 
   // Do some automatic color palette swapping if we have a loaded ROM
   let titleChecksum: i32 = 0x00;

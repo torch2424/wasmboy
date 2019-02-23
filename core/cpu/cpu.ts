@@ -184,6 +184,11 @@ export function initializeCpu(): void {
   Cpu.isHaltBug = false;
   Cpu.isStopped = false;
 
+  // Everything is done by Boot ROM is enabled.
+  if (Cpu.BootROMEnabled) {
+    return;
+  }
+
   if (Cpu.GBCEnabled) {
     // CPU Registers
     Cpu.registerA = 0x11;

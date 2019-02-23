@@ -138,13 +138,13 @@ function initialize(): void {
 
   if (Config.enableBootRom) {
     Cpu.BootROMEnabled = true;
-    // Return, as boot rom will handle initilization
-    return;
   } else {
     Cpu.BootROMEnabled = false;
   }
 
   // Call our respective classes intialization
+  // NOTE: Boot ROM Only handles some initialization, thus we need to check in each one
+  // respecitvely :p
   initializeCpu();
   initializeCartridge();
   initializeDma();
@@ -154,7 +154,10 @@ function initialize(): void {
   initializeInterrupts();
   initializeTimers();
   initializeSerial();
+  initializeVarious();
+}
 
+function initializeVarious(): void {
   // Various Other Registers
   if (Cpu.GBCEnabled) {
     // Various other registers

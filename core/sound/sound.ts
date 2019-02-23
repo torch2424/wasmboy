@@ -173,8 +173,26 @@ export function initializeSound(): void {
 
   // Other Sound Registers
   eightBitStoreIntoGBMemory(Sound.memoryLocationNR50, 0x77);
+  Sound.updateNR50(0x77);
   eightBitStoreIntoGBMemory(Sound.memoryLocationNR51, 0xf3);
+  Sound.updateNR51(0xf3);
   eightBitStoreIntoGBMemory(Sound.memoryLocationNR52, 0xf1);
+  Sound.updateNR52(0xf1);
+
+  // Override/reset some variables if the boot ROM is enabled
+  if (Cpu.BootROMEnabled) {
+    if (Cpu.GBCEnabled) {
+      // GBC
+    } else {
+      // GB
+      eightBitStoreIntoGBMemory(Sound.memoryLocationNR50, 0x00);
+      Sound.updateNR50(0x00);
+      eightBitStoreIntoGBMemory(Sound.memoryLocationNR51, 0x00);
+      Sound.updateNR51(0x00);
+      eightBitStoreIntoGBMemory(Sound.memoryLocationNR52, 0x70);
+      Sound.updateNR52(0x70);
+    }
+  }
 
   initializeSoundAccumulator();
 }
