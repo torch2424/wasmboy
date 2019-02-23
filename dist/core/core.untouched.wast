@@ -11609,8 +11609,9 @@
   i32.add
   i32.const 255
   i32.and
+  local.tee $1
   global.set $core/cpu/cpu/Cpu.registerA
-  global.get $core/cpu/cpu/Cpu.registerA
+  local.get $1
   i32.eqz
   call $core/cpu/flags/setZeroFlag
   i32.const 0

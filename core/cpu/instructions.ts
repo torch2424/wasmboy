@@ -20,8 +20,9 @@ export function addARegister(register: u8): void {
   let registerA = Cpu.registerA;
   checkAndSetEightBitHalfCarryFlag(registerA, register);
   checkAndSetEightBitCarryFlag(registerA, register);
-  Cpu.registerA = u8Portable(registerA + register);
-  setZeroFlag(i32(Cpu.registerA === 0));
+  registerA = u8Portable(registerA + register);
+  Cpu.registerA = registerA;
+  setZeroFlag(i32(registerA === 0));
   setSubtractFlag(0);
 }
 
