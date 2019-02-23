@@ -7909,18 +7909,17 @@
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
-  (local $4 i32)
   loop $continue|0
-   local.get $3
+   local.get $2
    local.get $0
    i32.lt_s
    if
-    local.get $3
+    local.get $2
     i32.const 4
     i32.add
-    local.set $3
+    local.set $2
     global.get $core/timers/timers/Timers.dividerRegister
-    local.tee $4
+    local.tee $3
     i32.const 4
     i32.add
     local.tee $1
@@ -7932,12 +7931,14 @@
      i32.sub
      local.set $1
     end
+    local.get $1
+    global.set $core/timers/timers/Timers.dividerRegister
     global.get $core/timers/timers/Timers.timerEnabled
     if
      global.get $core/timers/timers/Timers.timerCounterWasReset
-     local.set $2
+     local.set $1
      global.get $core/timers/timers/Timers.timerCounterOverflowDelay
-     if (result i32)
+     if
       global.get $core/timers/timers/Timers.timerModulo
       global.set $core/timers/timers/Timers.timerCounter
       i32.const 1
@@ -7947,34 +7948,33 @@
       i32.const 0
       global.set $core/timers/timers/Timers.timerCounterOverflowDelay
       i32.const 1
+      global.set $core/timers/timers/Timers.timerCounterWasReset
      else      
-      i32.const 0
-      local.get $2
-      local.get $2
-      select
+      local.get $1
+      if
+       i32.const 0
+       global.set $core/timers/timers/Timers.timerCounterWasReset
+      end
      end
-     global.set $core/timers/timers/Timers.timerCounterWasReset
-     local.get $4
-     local.get $1
+     local.get $3
+     global.get $core/timers/timers/Timers.dividerRegister
      call $core/timers/timers/_checkDividerRegisterFallingEdgeDetector
      if
       global.get $core/timers/timers/Timers.timerCounter
       i32.const 1
       i32.add
-      local.tee $2
+      local.tee $1
       i32.const 255
       i32.gt_s
       if
        i32.const 1
        global.set $core/timers/timers/Timers.timerCounterOverflowDelay
        i32.const 0
-       local.set $2
+       local.set $1
       end
-      local.get $2
+      local.get $1
       global.set $core/timers/timers/Timers.timerCounter
      end
-     local.get $1
-     global.set $core/timers/timers/Timers.dividerRegister
     end
     br $continue|0
    end
@@ -7988,6 +7988,8 @@
  )
  (func $core/timers/timers/Timers.updateDividerRegister (; 107 ;) (type $FUNCSIG$v)
   (local $0 i32)
+  global.get $core/timers/timers/Timers.dividerRegister
+  local.set $0
   i32.const 0
   global.set $core/timers/timers/Timers.dividerRegister
   i32.const 65284
@@ -7995,7 +7997,7 @@
   call $core/memory/store/eightBitStoreIntoGBMemory
   global.get $core/timers/timers/Timers.timerEnabled
   if (result i32)
-   global.get $core/timers/timers/Timers.dividerRegister
+   local.get $0
    i32.const 0
    call $core/timers/timers/_checkDividerRegisterFallingEdgeDetector
   else   
@@ -8435,8 +8437,11 @@
          if
           global.get $core/timers/timers/Timers.timerCounterWasReset
           br_if $__inlined_func$core/timers/timers/Timers.updateTimerCounter
-          i32.const 0
-          global.set $core/timers/timers/Timers.timerCounterOverflowDelay
+          global.get $core/timers/timers/Timers.timerCounterOverflowDelay
+          if
+           i32.const 0
+           global.set $core/timers/timers/Timers.timerCounterOverflowDelay
+          end
          end
          local.get $1
          global.set $core/timers/timers/Timers.timerCounter

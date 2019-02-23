@@ -31,11 +31,11 @@ export class Timers {
   static readonly memoryLocationDividerRegister: i32 = 0xff04; // DIV
   static dividerRegister: i32 = 0;
   static updateDividerRegister(value: i32): void {
-    // value is unused. Is it correct?
+    let oldDividerRegister: i32 = Timers.dividerRegister;
     Timers.dividerRegister = 0;
     eightBitStoreIntoGBMemory(Timers.memoryLocationDividerRegister, 0);
 
-    if (Timers.timerEnabled && _checkDividerRegisterFallingEdgeDetector(Timers.dividerRegister, 0)) {
+    if (Timers.timerEnabled && _checkDividerRegisterFallingEdgeDetector(oldDividerRegister, 0)) {
       _incrementTimerCounter();
     }
   }
@@ -60,7 +60,9 @@ export class Timers {
       // Mooneye Test, tima_write_reloading
       // Writing in this strange delay cycle, will cancel
       // Both the interrupt and the TMA reload
-      Timers.timerCounterOverflowDelay = false;
+      if (Timers.timerCounterOverflowDelay) {
+        Timers.timerCounterOverflowDelay = false;
+      }
     }
 
     Timers.timerCounter = value;
@@ -135,22 +137,20 @@ export class Timers {
   // Function to save the state of the class
   // TODO: Save state for new properties on Timers
   static saveState(): void {
-    var saveStateSlot = Timers.saveStateSlot;
-    store<i32>(getSaveStateMemoryOffset(0x00, saveStateSlot), Timers.currentCycles);
-    store<i32>(getSaveStateMemoryOffset(0x04, saveStateSlot), Timers.dividerRegister);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x08, saveStateSlot), Timers.timerCounterOverflowDelay);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0b, saveStateSlot), Timers.timerCounterWasReset);
+    store<i32>(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot), Timers.currentCycles);
+    store<i32>(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot), Timers.dividerRegister);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x08, Timers.saveStateSlot), Timers.timerCounterOverflowDelay);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0b, Timers.saveStateSlot), Timers.timerCounterWasReset);
 
     eightBitStoreIntoGBMemory(Timers.memoryLocationTimerCounter, Timers.timerCounter);
   }
 
   // Function to load the save state from memory
   static loadState(): void {
-    var saveStateSlot = Timers.saveStateSlot;
-    Timers.currentCycles = load<i32>(getSaveStateMemoryOffset(0x00, saveStateSlot));
-    Timers.dividerRegister = load<i32>(getSaveStateMemoryOffset(0x04, saveStateSlot));
-    Timers.timerCounterOverflowDelay = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x08, saveStateSlot));
-    Timers.timerCounterWasReset = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0b, saveStateSlot));
+    Timers.currentCycles = load<i32>(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot));
+    Timers.dividerRegister = load<i32>(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot));
+    Timers.timerCounterOverflowDelay = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x08, Timers.saveStateSlot));
+    Timers.timerCounterWasReset = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0b, Timers.saveStateSlot));
 
     Timers.timerCounter = eightBitLoadFromGBMemory(Timers.memoryLocationTimerCounter);
     Timers.timerModulo = eightBitLoadFromGBMemory(Timers.memoryLocationTimerModulo);
@@ -215,6 +215,7 @@ export function updateTimers(numberOfCycles: i32): void {
     if (curDividerRegister > 0xffff) {
       curDividerRegister -= 0x10000;
     }
+    Timers.dividerRegister = curDividerRegister;
 
     if (Timers.timerEnabled) {
       let timerCounterWasReset = Timers.timerCounterWasReset;
@@ -223,16 +224,14 @@ export function updateTimers(numberOfCycles: i32): void {
         // Fire off timer interrupt
         requestTimerInterrupt();
         Timers.timerCounterOverflowDelay = false;
-        timerCounterWasReset = true;
+        Timers.timerCounterWasReset = true;
       } else if (timerCounterWasReset) {
-        timerCounterWasReset = false;
+        Timers.timerCounterWasReset = false;
       }
-      Timers.timerCounterWasReset = timerCounterWasReset;
 
-      if (_checkDividerRegisterFallingEdgeDetector(oldDividerRegister, curDividerRegister)) {
+      if (_checkDividerRegisterFallingEdgeDetector(oldDividerRegister, Timers.dividerRegister)) {
         _incrementTimerCounter();
       }
-      Timers.dividerRegister = curDividerRegister;
     }
   }
 }
