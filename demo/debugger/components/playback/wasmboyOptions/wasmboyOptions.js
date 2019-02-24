@@ -32,18 +32,29 @@ export default class WasmBoyOptions extends Component {
     document.body.appendChild(hiddenInput);
 
     this.hiddenInput = hiddenInput;
+
+    // Exerytime WasmBoy gets updated, simply re-render
+    Pubx.subscribe(PUBX_KEYS.WASMBOY, () => this.update());
+    Pubx.subscribe(PUBX_KEYS.MOBILE, () => this.update());
   }
 
   componentDidMount() {
-    // Add all of our default options from the props to our component state
-    const newState = Object.assign({}, this.state);
-    const wasmboyConfig = WasmBoy.getConfig();
-    Object.keys(WasmBoyDefaultDesktopOptions).forEach(optionKey => {
-      newState[optionKey] = wasmboyConfig[optionKey];
-    });
-    this.setState(newState);
+    this.update();
+  }
 
-    this.updateBootROMs();
+  update() {
+    // Set timeout to allow dependant state to change
+    setTimeout(() => {
+      // Add all of our default options from the props to our component state
+      const newState = Object.assign({}, this.state);
+      const wasmboyConfig = WasmBoy.getConfig();
+      Object.keys(WasmBoyDefaultDesktopOptions).forEach(optionKey => {
+        newState[optionKey] = wasmboyConfig[optionKey];
+      });
+      this.setState(newState);
+
+      this.updateBootROMs();
+    }, 50);
   }
 
   setStateKey(stateKey, value) {
