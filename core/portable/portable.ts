@@ -8,6 +8,10 @@ export function u8Portable(param: u8): u8 {
   return param & 0xff;
 }
 
+export function i16Portable(param: i16): i16 {
+  return (param << 16) >> 16;
+}
+
 export function u16Portable(param: u16): u16 {
   return param & 0xffff;
 }
