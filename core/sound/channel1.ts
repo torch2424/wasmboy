@@ -169,8 +169,7 @@ export class Channel1 {
 
   static getSample(numberOfCycles: i32): i32 {
     // Decrement our channel timer
-    let frequencyTimer = Channel1.frequencyTimer;
-    frequencyTimer -= numberOfCycles;
+    let frequencyTimer = Channel1.frequencyTimer - numberOfCycles;
     if (frequencyTimer <= 0) {
       // Get the amount that overflowed so we don't drop cycles
       let overflowAmount = abs(frequencyTimer);
@@ -210,10 +209,10 @@ export class Channel1 {
       sample = -sample;
     }
 
-    sample = sample * outputVolume;
+    sample *= outputVolume;
 
     // Square Waves Can range from -15 - 15. Therefore simply add 15
-    sample = sample + 15;
+    sample += 15;
     return sample;
   }
 

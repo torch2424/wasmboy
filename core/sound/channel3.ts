@@ -149,10 +149,7 @@ export class Channel3 {
       Channel3.frequencyTimer -= overflowAmount;
 
       // Advance the wave table position, and loop back if needed
-      let waveTablePosition = Channel3.waveTablePosition;
-      waveTablePosition += 1;
-      waveTablePosition &= 31;
-      Channel3.waveTablePosition = waveTablePosition;
+      Channel3.waveTablePosition = (Channel3.waveTablePosition + 1) & 31;
     } else {
       Channel3.frequencyTimer = frequencyTimer;
     }
@@ -190,32 +187,26 @@ export class Channel3 {
     sample = eightBitLoadFromGBMemory(memoryLocationWaveSample);
 
     // Need to grab the top or lower half for the correct sample
-    if ((waveTablePosition & 1) === 0) {
-      // First sample
-      sample = sample >> 4;
-      sample = sample & 0x0f;
-    } else {
-      // Second Samples
-      sample = sample & 0x0f;
-    }
+    sample >>= (<i32>((waveTablePosition & 1) === 0)) << 2;
+    sample &= 0x0f;
 
     // Shift our sample and set our volume depending on the volume code
     // Since we can't multiply by float, simply divide by 4, 2, 1
     // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Wave_Channel
     switch (volumeCode) {
       case 0:
-        sample = sample >> 4;
+        sample >>= 4;
         break;
       case 1:
         // Dont Shift sample
         outputVolume = 1;
         break;
       case 2:
-        sample = sample >> 1;
+        sample >>= 1;
         outputVolume = 2;
         break;
       default:
-        sample = sample >> 2;
+        sample >>= 2;
         outputVolume = 4;
         break;
     }
@@ -223,7 +214,7 @@ export class Channel3 {
     // Spply out output volume
     sample = outputVolume > 0 ? sample / outputVolume : 0;
     // Square Waves Can range from -15 - 15. Therefore simply add 15
-    sample = sample + 15;
+    sample += 15;
     return sample;
   }
 

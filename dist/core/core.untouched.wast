@@ -5020,14 +5020,8 @@
    global.get $core/sound/channel2/Channel2.waveFormPositionOnDuty
    i32.const 1
    i32.add
-   local.tee $0
-   i32.const 8
-   i32.ge_s
-   if
-    i32.const 0
-    local.set $0
-   end
-   local.get $0
+   i32.const 7
+   i32.and
    global.set $core/sound/channel2/Channel2.waveFormPositionOnDuty
   end
   global.get $core/sound/channel2/Channel2.isDacEnabled
@@ -5056,7 +5050,6 @@
  (func $core/sound/channel3/Channel3.getSample (; 79 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
-  (local $3 i32)
   global.get $core/sound/channel3/Channel3.frequencyTimer
   local.get $0
   i32.sub
@@ -5095,10 +5088,8 @@
    local.get $0
    global.set $core/sound/channel3/Channel3.frequencyTimer
   end
-  i32.const 0
-  local.set $1
   global.get $core/sound/channel3/Channel3.volumeCode
-  local.set $2
+  local.set $1
   global.get $core/sound/channel3/Channel3.isDacEnabled
   global.get $core/sound/channel3/Channel3.isEnabled
   local.tee $0
@@ -5113,7 +5104,7 @@
     i32.shr_s
     i32.const 15
     i32.and
-    local.tee $2
+    local.tee $1
     global.set $core/sound/channel3/Channel3.volumeCode
     i32.const 0
     global.set $core/sound/channel3/Channel3.volumeCodeChanged
@@ -5123,36 +5114,33 @@
    return
   end
   global.get $core/sound/channel3/Channel3.waveTablePosition
-  local.tee $3
+  local.tee $0
   i32.const 1
   i32.shr_s
   i32.const 65328
   i32.add
   call $core/memory/load/eightBitLoadFromGBMemory
-  local.tee $0
-  i32.const 15
-  i32.and
   local.get $0
-  i32.const 4
+  i32.const 1
+  i32.and
+  i32.eqz
+  i32.const 2
+  i32.shl
   i32.shr_s
   i32.const 15
   i32.and
-  local.get $3
-  i32.const 1
-  i32.and
-  select
   local.set $0
   block $break|0
    block $case3|0
     block $case2|0
      block $case1|0
-      local.get $2
+      local.get $1
       if
-       local.get $2
+       local.get $1
        i32.const 1
        i32.eq
        br_if $case1|0
-       local.get $2
+       local.get $1
        i32.const 2
        i32.eq
        br_if $case2|0
@@ -5165,7 +5153,7 @@
       br $break|0
      end
      i32.const 1
-     local.set $1
+     local.set $2
      br $break|0
     end
     local.get $0
@@ -5173,7 +5161,7 @@
     i32.shr_s
     local.set $0
     i32.const 2
-    local.set $1
+    local.set $2
     br $break|0
    end
    local.get $0
@@ -5181,14 +5169,14 @@
    i32.shr_s
    local.set $0
    i32.const 4
-   local.set $1
+   local.set $2
   end
-  local.get $1
+  local.get $2
   i32.const 0
   i32.gt_s
   if (result i32)
    local.get $0
-   local.get $1
+   local.get $2
    i32.div_s
   else   
    i32.const 0

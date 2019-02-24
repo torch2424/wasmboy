@@ -158,12 +158,7 @@ export class Channel2 {
       // Also increment our duty cycle
       // What is duty? https://en.wikipedia.org/wiki/Duty_cycle
       // Duty cycle for square wave: http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
-      let waveFormPositionOnDuty = Channel2.waveFormPositionOnDuty;
-      waveFormPositionOnDuty += 1;
-      if (waveFormPositionOnDuty >= 8) {
-        waveFormPositionOnDuty = 0;
-      }
-      Channel2.waveFormPositionOnDuty = waveFormPositionOnDuty;
+      Channel2.waveFormPositionOnDuty = (Channel2.waveFormPositionOnDuty + 1) & 7;
     }
 
     // Get our ourput volume
@@ -189,7 +184,7 @@ export class Channel2 {
     sample = sample * outputVolume;
 
     // Square Waves Can range from -15 - 15. Therefore simply add 15
-    sample = sample + 15;
+    sample += 15;
     return sample;
   }
 
@@ -241,8 +236,7 @@ export class Channel2 {
   static updateEnvelope(): void {
     // Obscure behavior
     // TODO: The volume envelope and sweep timers treat a period of 0 as 8.
-    let envelopeCounter = Channel2.envelopeCounter;
-    envelopeCounter -= 1;
+    let envelopeCounter = Channel2.envelopeCounter - 1;
     if (envelopeCounter <= 0) {
       envelopeCounter = Channel2.NRx2EnvelopePeriod;
 

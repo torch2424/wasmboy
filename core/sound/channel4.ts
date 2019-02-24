@@ -239,8 +239,7 @@ export class Channel4 {
   static updateEnvelope(): void {
     // Obscure behavior
     // TODO: The volume envelope and sweep timers treat a period of 0 as 8.
-    let envelopeCounter = Channel4.envelopeCounter;
-    envelopeCounter -= 1;
+    let envelopeCounter = Channel4.envelopeCounter - 1;
     if (envelopeCounter <= 0) {
       envelopeCounter = Channel4.NRx2EnvelopePeriod;
 
