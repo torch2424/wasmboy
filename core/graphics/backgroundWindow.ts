@@ -35,9 +35,7 @@ export function renderBackground(scanlineRegister: i32, tileDataMemoryLocation: 
   // Gameboy camera will "wrap" around the background map,
   // meaning that if the pixelValue is 350, then we need to subtract 256 (decimal) to get it's actual value
   // pixel values (scrollX and scrollY) range from 0x00 - 0xFF
-  if (pixelYPositionInMap >= 0x100) {
-    pixelYPositionInMap -= 0x100;
-  }
+  pixelYPositionInMap &= 0x100 - 1;
 
   // Draw the Background scanline
   drawBackgroundWindowScanline(scanlineRegister, tileDataMemoryLocation, tileMapMemoryLocation, pixelYPositionInMap, 0, scrollX);
@@ -60,7 +58,7 @@ export function renderWindow(scanlineRegister: i32, tileDataMemoryLocation: i32,
   }
 
   // WindowX is offset by 7
-  windowX = windowX - 7;
+  windowX -= 7;
 
   // Get our current pixel y positon on the 160x144 camera (Row that the scanline draws across)
   let pixelYPositionInMap = scanlineRegister - windowY;
@@ -328,12 +326,12 @@ function drawColorPixelFromTileId(
   let bgPalette = bgMapAttributes & 0x07;
 
   // Call the helper function to grab the correct color from the palette
-  let rgbColorPalette: i32 = getRgbColorFromPalette(bgPalette, paletteColorId, false);
+  let rgbColorPalette = getRgbColorFromPalette(bgPalette, paletteColorId, false);
 
   // Split off into red green and blue
-  let red: i32 = getColorComponentFromRgb(0, rgbColorPalette);
-  let green: i32 = getColorComponentFromRgb(1, rgbColorPalette);
-  let blue: i32 = getColorComponentFromRgb(2, rgbColorPalette);
+  let red = getColorComponentFromRgb(0, rgbColorPalette);
+  let green = getColorComponentFromRgb(1, rgbColorPalette);
+  let blue = getColorComponentFromRgb(2, rgbColorPalette);
 
   // Finally Place our colors on the things
   setPixelOnFrame(xPixel, yPixel, 0, red);

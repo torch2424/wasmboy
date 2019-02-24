@@ -169,8 +169,7 @@ export class Channel1 {
 
   static getSample(numberOfCycles: i32): i32 {
     // Decrement our channel timer
-    let frequencyTimer = Channel1.frequencyTimer;
-    frequencyTimer -= numberOfCycles;
+    let frequencyTimer = Channel1.frequencyTimer - numberOfCycles;
     if (frequencyTimer <= 0) {
       // Get the amount that overflowed so we don't drop cycles
       let overflowAmount = abs(frequencyTimer);
@@ -185,10 +184,7 @@ export class Channel1 {
       // Also increment our duty cycle
       // What is duty? https://en.wikipedia.org/wiki/Duty_cycle
       // Duty cycle for square wave: http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
-      Channel1.waveFormPositionOnDuty += 1;
-      if (Channel1.waveFormPositionOnDuty >= 8) {
-        Channel1.waveFormPositionOnDuty = 0;
-      }
+      Channel1.waveFormPositionOnDuty = (Channel1.waveFormPositionOnDuty + 1) & 7;
     } else {
       Channel1.frequencyTimer = frequencyTimer;
     }
@@ -213,10 +209,10 @@ export class Channel1 {
       sample = -sample;
     }
 
-    sample = sample * outputVolume;
+    sample *= outputVolume;
 
     // Square Waves Can range from -15 - 15. Therefore simply add 15
-    sample = sample + 15;
+    sample += 15;
     return sample;
   }
 
@@ -261,19 +257,19 @@ export class Channel1 {
   // This is used to accumulate samples
   static willChannelUpdate(numberOfCycles: i32): boolean {
     //Increment our cycle counter
-    Channel1.cycleCounter += numberOfCycles;
+    let cycleCounter = Channel1.cycleCounter + numberOfCycles;
+    Channel1.cycleCounter = cycleCounter;
 
     // Dac enabled status cached by accumulator
-    return !(Channel1.frequencyTimer - Channel1.cycleCounter > 0);
+    return !(Channel1.frequencyTimer - cycleCounter > 0);
   }
 
   static updateSweep(): void {
     // Obscure behavior
     // TODO: The volume envelope and sweep timers treat a period of 0 as 8.
     // Decrement the sweep counter
-    Channel1.sweepCounter -= 1;
-
-    if (Channel1.sweepCounter <= 0) {
+    let sweepCounter = Channel1.sweepCounter - 1;
+    if (sweepCounter <= 0) {
       // Reset back to the sweep period
       Channel1.sweepCounter = Channel1.NRx0SweepPeriod;
 
@@ -283,6 +279,8 @@ export class Channel1 {
       if (Channel1.isSweepEnabled && Channel1.NRx0SweepPeriod > 0) {
         calculateSweepAndCheckOverflow();
       }
+    } else {
+      Channel1.sweepCounter = sweepCounter;
     }
   }
 
@@ -301,21 +299,24 @@ export class Channel1 {
   static updateEnvelope(): void {
     // Obscure behavior
     // TODO: The volume envelope and sweep timers treat a period of 0 as 8.
-
-    Channel1.envelopeCounter -= 1;
-    if (Channel1.envelopeCounter <= 0) {
+    let envelopeCounter = Channel1.envelopeCounter - 1;
+    if (envelopeCounter <= 0) {
       Channel1.envelopeCounter = Channel1.NRx2EnvelopePeriod;
 
       // When the timer generates a clock and the envelope period is NOT zero, a new volume is calculated
       // NOTE: There is some weiirrdd obscure behavior where zero can equal 8, so watch out for that
       // If notes are sustained for too long, this is probably why
-      if (Channel1.envelopeCounter !== 0) {
-        if (Channel1.NRx2EnvelopeAddMode && Channel1.volume < 15) {
-          Channel1.volume += 1;
-        } else if (!Channel1.NRx2EnvelopeAddMode && Channel1.volume > 0) {
-          Channel1.volume -= 1;
+      if (envelopeCounter !== 0) {
+        let volume = Channel1.volume;
+        if (Channel1.NRx2EnvelopeAddMode && volume < 15) {
+          volume += 1;
+        } else if (!Channel1.NRx2EnvelopeAddMode && volume > 0) {
+          volume -= 1;
         }
+        Channel1.volume = volume;
       }
+    } else {
+      Channel1.envelopeCounter = envelopeCounter;
     }
   }
 

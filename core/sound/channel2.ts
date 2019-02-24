@@ -58,8 +58,7 @@ export class Channel2 {
     Channel2.NRx3FrequencyLSB = value;
 
     // Update Channel Frequency
-    let frequency: i32 = (Channel2.NRx4FrequencyMSB << 8) | Channel2.NRx3FrequencyLSB;
-    Channel2.frequency = frequency;
+    Channel2.frequency = (Channel2.NRx4FrequencyMSB << 8) | value;
   }
 
   // NR24 -> Frequency hi (R/W)
@@ -69,11 +68,11 @@ export class Channel2 {
   static NRx4FrequencyMSB: i32 = 0;
   static updateNRx4(value: i32): void {
     Channel2.NRx4LengthEnabled = checkBitOnByte(6, value);
-    Channel2.NRx4FrequencyMSB = value & 0x07;
+    value &= 0x07;
+    Channel2.NRx4FrequencyMSB = value;
 
     // Update Channel Frequency
-    let frequency: i32 = (Channel2.NRx4FrequencyMSB << 8) | Channel2.NRx3FrequencyLSB;
-    Channel2.frequency = frequency;
+    Channel2.frequency = (value << 8) | Channel2.NRx3FrequencyLSB;
   }
 
   // Channel Properties
@@ -135,20 +134,19 @@ export class Channel2 {
 
   // Function to reset our timer, useful for GBC double speed mode
   static resetTimer(): void {
-    Channel2.frequencyTimer = (2048 - Channel2.frequency) << 2;
+    let frequencyTimer = (2048 - Channel2.frequency) << 2;
 
     // TODO: Ensure this is correct for GBC Double Speed Mode
-    if (Cpu.GBCDoubleSpeed) {
-      Channel2.frequencyTimer = Channel2.frequencyTimer << 1;
-    }
+    Channel2.frequencyTimer = frequencyTimer << (<i32>Cpu.GBCDoubleSpeed);
   }
 
   static getSample(numberOfCycles: i32): i32 {
     // Decrement our channel timer
-    Channel2.frequencyTimer -= numberOfCycles;
-    if (Channel2.frequencyTimer <= 0) {
+    let frequencyTimer = Channel2.frequencyTimer - numberOfCycles;
+    Channel2.frequencyTimer = frequencyTimer;
+    if (frequencyTimer <= 0) {
       // Get the amount that overflowed so we don't drop cycles
-      let overflowAmount = abs(Channel2.frequencyTimer);
+      let overflowAmount = abs(frequencyTimer);
 
       // Reset our timer
       // A square channel's frequency timer period is set to (2048-frequency)*4.
@@ -159,10 +157,7 @@ export class Channel2 {
       // Also increment our duty cycle
       // What is duty? https://en.wikipedia.org/wiki/Duty_cycle
       // Duty cycle for square wave: http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
-      Channel2.waveFormPositionOnDuty += 1;
-      if (Channel2.waveFormPositionOnDuty >= 8) {
-        Channel2.waveFormPositionOnDuty = 0;
-      }
+      Channel2.waveFormPositionOnDuty = (Channel2.waveFormPositionOnDuty + 1) & 7;
     }
 
     // Get our ourput volume
@@ -188,7 +183,7 @@ export class Channel2 {
     sample = sample * outputVolume;
 
     // Square Waves Can range from -15 - 15. Therefore simply add 15
-    sample = sample + 15;
+    sample += 15;
     return sample;
   }
 
@@ -218,10 +213,11 @@ export class Channel2 {
   // This is used to accumulate samples
   static willChannelUpdate(numberOfCycles: i32): boolean {
     //Increment our cycle counter
-    Channel2.cycleCounter += numberOfCycles;
+    let cycleCounter = Channel2.cycleCounter + numberOfCycles;
+    Channel2.cycleCounter = cycleCounter;
 
     // Dac enabled status cached by accumulator
-    return !(Channel2.frequencyTimer - Channel2.cycleCounter > 0);
+    return !(Channel2.frequencyTimer - cycleCounter > 0);
   }
 
   static updateLength(): void {
@@ -239,8 +235,7 @@ export class Channel2 {
   static updateEnvelope(): void {
     // Obscure behavior
     // TODO: The volume envelope and sweep timers treat a period of 0 as 8.
-    let envelopeCounter = Channel2.envelopeCounter;
-    envelopeCounter -= 1;
+    let envelopeCounter = Channel2.envelopeCounter - 1;
     if (envelopeCounter <= 0) {
       envelopeCounter = Channel2.NRx2EnvelopePeriod;
 

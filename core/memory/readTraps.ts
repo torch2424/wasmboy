@@ -47,14 +47,15 @@ export function checkReadTraps(offset: i32): i32 {
   if (offset >= Memory.spriteInformationTableLocation && offset <= Memory.spriteInformationTableLocationEnd) {
     // Can only read/write from OAM During Mode 2
     // See graphics/lcd.ts
-    if (Lcd.currentLcdMode < 2) {
-      return 0xff;
-    }
+    // if (Lcd.currentLcdMode < 2) {
+    // return 0xff;
+    // }
 
     // Not batch processing here for performance
     // batchProcessGraphics();
 
-    return -1;
+    // return -1;
+    return Lcd.currentLcdMode < 2 ? 0xff : -1;
   }
 
   // CPU
@@ -104,6 +105,7 @@ export function checkReadTraps(offset: i32): i32 {
     eightBitStoreIntoGBMemory(offset, upperDividerRegisterBits);
     return upperDividerRegisterBits;
   }
+
   if (offset === Timers.memoryLocationTimerCounter) {
     eightBitStoreIntoGBMemory(offset, Timers.timerCounter);
     return Timers.timerCounter;

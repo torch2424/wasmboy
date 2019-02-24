@@ -209,12 +209,11 @@ export function updateTimers(numberOfCycles: i32): void {
   while (cyclesIncreased < numberOfCycles) {
     let oldDividerRegister = Timers.dividerRegister;
     let curDividerRegister = oldDividerRegister;
+
     cyclesIncreased += 4;
     curDividerRegister += 4;
+    curDividerRegister &= 0xffff;
 
-    if (curDividerRegister > 0xffff) {
-      curDividerRegister -= 0x10000;
-    }
     Timers.dividerRegister = curDividerRegister;
 
     if (Timers.timerEnabled) {

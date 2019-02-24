@@ -55,11 +55,8 @@ export function handleBanking(offset: i32, value: i32): void {
       return;
     } else {
       // TODO: MBC5 High bits Rom bank, check if this works, not sure about the value
-      let highByte: i32 = 0;
-      let lowByte: i32 = splitLowByte(Memory.currentRomBank);
-      if (value > 0) {
-        highByte = 1;
-      }
+      let lowByte = splitLowByte(Memory.currentRomBank);
+      let highByte = <i32>(value > 0);
       Memory.currentRomBank = concatenateBytes(highByte, lowByte);
     }
   } else if (!isMBC2 && offset <= 0x5fff) {
@@ -67,9 +64,7 @@ export function handleBanking(offset: i32, value: i32): void {
     if (isMBC1 && Memory.isMBC1RomModeEnabled) {
       // Do an upper bit rom bank for MBC 1
       // Remove upper bits of currentRomBank
-      let currentRomBank = Memory.currentRomBank;
-      currentRomBank &= 0x1f;
-
+      let currentRomBank = Memory.currentRomBank & 0x1f;
       let romBankHigherBits = value & 0xe0;
 
       currentRomBank |= romBankHigherBits;
