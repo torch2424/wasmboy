@@ -54,9 +54,9 @@ export class Channel4 {
     Channel4.NRx3WidthMode = checkBitOnByte(3, value);
     Channel4.NRx3DivisorCode = divisorCode;
     // Also, get our divisor
-    if (divisorCode <= 7) {
-      Channel4.divisor = max<i32>(1, divisorCode << 1) << 3;
-    }
+    divisorCode <<= 1;
+    if (divisorCode < 1) divisorCode = 1;
+    Channel4.divisor = divisorCode << 3;
   }
 
   // NR44 -> Trigger, Length Enable

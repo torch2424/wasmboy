@@ -46,5 +46,5 @@ export function sixteenBitStoreIntoGBMemory(offset: i32, value: i32): void {
 }
 
 export function storeBooleanDirectlyToWasmMemory(offset: i32, value: boolean): void {
-  store<u8>(offset, i32(value));
+  store<u8>(offset, <i32>value);
 }

@@ -55,20 +55,20 @@ export function checkAndSetEightBitHalfCarryFlag(value: u8, amountToAdd: i32): v
   if (amountToAdd >= 0) {
     // https://robdor.com/2016/08/10/gameboy-emulator-half-carry-flag/
     let result = u8Portable(((<u8>value) & 0x0f) + ((<u8>amountToAdd) & 0x0f)) & 0x10;
-    setHalfCarryFlag(i32(result !== 0x00));
+    setHalfCarryFlag(<i32>(result !== 0x00));
   } else {
     // From: https://github.com/djhworld/gomeboycolor/blob/master/src/cpu/index.go
     // CTRL+F "subBytes(a, b byte)"
-    setHalfCarryFlag(i32(<u8>(abs(amountToAdd) & 0x0f) > (value & 0x0f)));
+    setHalfCarryFlag(<i32>(<u8>(abs(amountToAdd) & 0x0f) > (value & 0x0f)));
   }
 }
 
 export function checkAndSetEightBitCarryFlag(value: u8, amountToAdd: i32): void {
   if (amountToAdd >= 0) {
     let result = u8Portable(value + <u8>amountToAdd);
-    setCarryFlag(i32(value > result));
+    setCarryFlag(<i32>(value > result));
   } else {
-    setCarryFlag(i32(abs(amountToAdd) > <i32>value));
+    setCarryFlag(<i32>(abs(amountToAdd) > <i32>value));
   }
 }
 
@@ -85,8 +85,8 @@ export function checkAndSetSixteenBitFlagsAddOverflow(valueOne: u16, valueTwo: i
     let result = signedValueOne + valueTwo;
     let flagXor = signedValueOne ^ valueTwo ^ result;
 
-    setHalfCarryFlag(i32((flagXor & 0x10) !== 0));
-    setCarryFlag(i32((flagXor & 0x100) !== 0));
+    setHalfCarryFlag(<i32>((flagXor & 0x10) !== 0));
+    setCarryFlag(<i32>((flagXor & 0x100) !== 0));
   } else {
     // Logic from: https://github.com/djhworld/gomeboycolor/blob/master/src/cpu/index.go
     // CTRL+F addWords
@@ -94,11 +94,11 @@ export function checkAndSetSixteenBitFlagsAddOverflow(valueOne: u16, valueTwo: i
     let result = u16Portable(valueOne + <u16>valueTwo);
 
     // Check the carry flag by allowing the overflow
-    setCarryFlag(i32(result < valueOne));
+    setCarryFlag(<i32>(result < valueOne));
 
     // To check for half carry flag (bit 15), by XOR'ing valyes, and and'ing the bit in question
     let halfCarryXor: u16 = valueOne ^ (<u16>valueTwo) ^ (<u16>result);
     let halfCarryAnd = u16Portable(halfCarryXor & 0x1000);
-    setHalfCarryFlag(i32(halfCarryAnd !== 0x00));
+    setHalfCarryFlag(<i32>(halfCarryAnd !== 0x00));
   }
 }
