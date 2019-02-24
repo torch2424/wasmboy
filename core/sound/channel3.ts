@@ -154,8 +154,7 @@ export class Channel3 {
       Channel3.frequencyTimer = frequencyTimer;
     }
 
-    // Get our ourput volume
-    let outputVolume = 0;
+    // Get our output volume
     let volumeCode = Channel3.volumeCode;
 
     // Finally to set our output volume, the channel must be enabled,
@@ -193,6 +192,7 @@ export class Channel3 {
     // Shift our sample and set our volume depending on the volume code
     // Since we can't multiply by float, simply divide by 4, 2, 1
     // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Wave_Channel
+    let outputVolume = 0;
     switch (volumeCode) {
       case 0:
         sample >>= 4;

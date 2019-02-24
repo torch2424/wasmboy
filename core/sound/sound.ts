@@ -420,11 +420,10 @@ function getSampleAsUnsignedByte(sample: i32, mixerVolume: i32): i32 {
   convertedSample = convertedSample * precision;
 
   // Multiply by the mixer volume fraction (to find the actual volume)
-  convertedSample = i32Portable((convertedSample * mixerVolume) >> 3);
+  convertedSample = (convertedSample * mixerVolume) >> 3;
 
   // Convert back to scale of 0 to 120
-  convertedSample = i32Portable(convertedSample / precision);
-  convertedSample = convertedSample + 60;
+  convertedSample = i32Portable(convertedSample / precision) + 60;
 
   // Finally, convert to an unsigned byte scale
   // With Four Channels (0 to 30) and no global volume. Max is 120

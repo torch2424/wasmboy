@@ -5053,11 +5053,11 @@
   global.get $core/sound/channel3/Channel3.frequencyTimer
   local.get $0
   i32.sub
-  local.tee $0
+  local.tee $1
   i32.const 0
   i32.le_s
   if
-   local.get $0
+   local.get $1
    global.set $core/sound/channel3/Channel3.frequencyTimer
    i32.const 2048
    global.get $core/sound/channel3/Channel3.frequency
@@ -5068,10 +5068,10 @@
    i32.shl
    global.set $core/sound/channel3/Channel3.frequencyTimer
    global.get $core/sound/channel3/Channel3.frequencyTimer
-   local.get $0
+   local.get $1
    i32.const 31
    i32.shr_s
-   local.tee $1
+   local.tee $0
    local.get $0
    local.get $1
    i32.add
@@ -5085,7 +5085,7 @@
    i32.and
    global.set $core/sound/channel3/Channel3.waveTablePosition
   else   
-   local.get $0
+   local.get $1
    global.set $core/sound/channel3/Channel3.frequencyTimer
   end
   global.get $core/sound/channel3/Channel3.volumeCode
@@ -5114,13 +5114,13 @@
    return
   end
   global.get $core/sound/channel3/Channel3.waveTablePosition
-  local.tee $0
+  local.tee $2
   i32.const 1
   i32.shr_s
   i32.const 65328
   i32.add
   call $core/memory/load/eightBitLoadFromGBMemory
-  local.get $0
+  local.get $2
   i32.const 1
   i32.and
   i32.eqz
@@ -5130,6 +5130,8 @@
   i32.const 15
   i32.and
   local.set $0
+  i32.const 0
+  local.set $2
   block $break|0
    block $case3|0
     block $case2|0
@@ -6767,10 +6769,10 @@
              end
              local.get $1
              global.set $core/sound/channel2/Channel2.NRx3FrequencyLSB
-             global.get $core/sound/channel2/Channel2.NRx3FrequencyLSB
              global.get $core/sound/channel2/Channel2.NRx4FrequencyMSB
              i32.const 8
              i32.shl
+             local.get $1
              i32.or
              global.set $core/sound/channel2/Channel2.frequency
              br $folding-inner0
@@ -6827,9 +6829,10 @@
           local.get $1
           i32.const 7
           i32.and
+          local.tee $0
           global.set $core/sound/channel2/Channel2.NRx4FrequencyMSB
           global.get $core/sound/channel2/Channel2.NRx3FrequencyLSB
-          global.get $core/sound/channel2/Channel2.NRx4FrequencyMSB
+          local.get $0
           i32.const 8
           i32.shl
           i32.or

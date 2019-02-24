@@ -58,8 +58,7 @@ export class Channel2 {
     Channel2.NRx3FrequencyLSB = value;
 
     // Update Channel Frequency
-    let frequency: i32 = (Channel2.NRx4FrequencyMSB << 8) | Channel2.NRx3FrequencyLSB;
-    Channel2.frequency = frequency;
+    Channel2.frequency = (Channel2.NRx4FrequencyMSB << 8) | value;
   }
 
   // NR24 -> Frequency hi (R/W)
@@ -69,11 +68,11 @@ export class Channel2 {
   static NRx4FrequencyMSB: i32 = 0;
   static updateNRx4(value: i32): void {
     Channel2.NRx4LengthEnabled = checkBitOnByte(6, value);
-    Channel2.NRx4FrequencyMSB = value & 0x07;
+    value &= 0x07;
+    Channel2.NRx4FrequencyMSB = value;
 
     // Update Channel Frequency
-    let frequency: i32 = (Channel2.NRx4FrequencyMSB << 8) | Channel2.NRx3FrequencyLSB;
-    Channel2.frequency = frequency;
+    Channel2.frequency = (value << 8) | Channel2.NRx3FrequencyLSB;
   }
 
   // Channel Properties
