@@ -13,6 +13,7 @@ import packageJson from '../../package.json';
 import getWasmBoyWasmCore from '../../dist/core/getWasmBoyWasmCore.esm';
 import getWasmBoyTsCore from '../../dist/core/getWasmBoyTsCore.esm';
 import getWasmBoyTsClosureCore from '../../dist/core/getWasmBoyTsCore.closure.esm';
+import getBinjgbCore from './binjgb/0.1.3/getcore';
 
 import LoadROMSelector from './loadrom';
 import BenchmarkRunner from './benchmarkRunner';
@@ -49,21 +50,36 @@ class WasmBoyBenchmarkApp extends Component {
       let wasmboyWasmCore = await getWasmBoyWasmCore();
       let wasmboyTsCore = await getWasmBoyTsCore();
       let wasmboyTsClosureCore = await getWasmBoyTsClosureCore();
+      let binjgbCore = await getBinjgbCore();
 
       console.log('WasmBoy Wasm Core:', wasmboyWasmCore);
       console.log('WasmBoy TS Core:', wasmboyTsCore);
       console.log('WasmBoy TS Closure Core:', wasmboyTsClosureCore);
+      console.log('Binjgb Core:', binjgbCore);
 
       // Set up our times
       const wasmTimes = valoo([]);
       const tsTimes = valoo([]);
       const tsClosureTimes = valoo([]);
+      const binjgbTimes = valoo([]);
 
       wasmTimes.on(dummyCallback);
       tsTimes.on(dummyCallback);
       tsClosureTimes.on(dummyCallback);
+      binjgbTimes.on(dummyCallback);
 
       wasmboyCoreObjects = [
+        {
+          label: 'Binjgb',
+          subLabel: 'Web Assembly',
+          canvasId: 'binjgb-canvas',
+          color: '#4fffc2',
+          core: binjgbCore,
+          times: binjgbTimes,
+          resultTimes: [],
+          timesStartIndexes: [],
+          data: []
+        },
         {
           label: 'AssemblyScript',
           subLabel: 'Web Assembly',
