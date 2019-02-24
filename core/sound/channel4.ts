@@ -115,7 +115,7 @@ export class Channel4 {
 
   // Function to get a sample using the cycle counter on the channel
   static getSampleFromCycleCounter(): i32 {
-    let accumulatedCycles: i32 = Channel4.cycleCounter;
+    let accumulatedCycles = Channel4.cycleCounter;
     Channel4.cycleCounter = 0;
     return Channel4.getSample(accumulatedCycles);
   }
@@ -174,7 +174,7 @@ export class Channel4 {
     }
 
     // Declare our sample
-    let sample: i32 = 0;
+    let sample = 0;
 
     // Wave form output is bit zero of lfsr, INVERTED
     sample = !checkBitOnByte(0, Channel4.linearFeedbackShiftRegister) ? 1 : -1;
@@ -239,8 +239,7 @@ export class Channel4 {
   static updateEnvelope(): void {
     // Obscure behavior
     // TODO: The volume envelope and sweep timers treat a period of 0 as 8.
-    let envelopeCounter = Channel4.envelopeCounter;
-    envelopeCounter -= 1;
+    let envelopeCounter = Channel4.envelopeCounter - 1;
     if (envelopeCounter <= 0) {
       envelopeCounter = Channel4.NRx2EnvelopePeriod;
 

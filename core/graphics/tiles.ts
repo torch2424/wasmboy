@@ -14,6 +14,7 @@ import { addPriorityforPixel } from './priority';
 // using Skip Traps, because LCD has unrestricted access
 // http://gbdev.gg8.se/wiki/articles/Video_Display#LCD_OAM_DMA_Transfers
 import { checkBitOnByte } from '../helpers/index';
+import { i8Portable } from '../portable/portable';
 
 export class TileCache {
   static tileId: i32 = -1;
@@ -44,14 +45,14 @@ export function drawPixelsFromLineOfTile(
   spriteAttributes: i32
 ): i32 {
   // Get our number of pixels drawn
-  let pixelsDrawn: i32 = 0;
+  let pixelsDrawn = 0;
 
   // Get our tile data address
-  let tileDataAddress: i32 = getTileDataAddress(tileDataMemoryLocation, tileId);
+  let tileDataAddress = getTileDataAddress(tileDataMemoryLocation, tileId);
 
   // Get the bytes for our tile
-  let byteOneForLineOfTilePixels: i32 = loadFromVramBank(tileDataAddress + tileLineY * 2, vramBankId);
-  let byteTwoForLineOfTilePixels: i32 = loadFromVramBank(tileDataAddress + tileLineY * 2 + 1, vramBankId);
+  let byteOneForLineOfTilePixels = loadFromVramBank(tileDataAddress + tileLineY * 2, vramBankId);
+  let byteTwoForLineOfTilePixels = loadFromVramBank(tileDataAddress + tileLineY * 2 + 1, vramBankId);
 
   // Loop through our X values to draw
   for (let x = tileLineXStart; x <= tileLineXEnd; ++x) {
@@ -97,7 +98,7 @@ export function drawPixelsFromLineOfTile(
         if (isSprite) {
           bgPalette = spriteAttributes & 0x07;
         }
-        let rgbColorPalette: i32 = getRgbColorFromPalette(bgPalette, paletteColorId, isSprite);
+        let rgbColorPalette = getRgbColorFromPalette(bgPalette, paletteColorId, isSprite);
 
         // Split off into red green and blue
         red = getColorComponentFromRgb(0, rgbColorPalette);
@@ -112,16 +113,12 @@ export function drawPixelsFromLineOfTile(
         }
 
         if (shouldRepresentMonochromeColorByColorId) {
-          let monochromeColor: i32 = getMonochromeColorFromPalette(
-            paletteColorId,
-            paletteLocation,
-            shouldRepresentMonochromeColorByColorId
-          );
+          let monochromeColor = getMonochromeColorFromPalette(paletteColorId, paletteLocation, shouldRepresentMonochromeColorByColorId);
           red = monochromeColor;
           green = monochromeColor;
           blue = monochromeColor;
         } else {
-          let hexColor: i32 = getColorizedGbHexColorFromPalette(paletteColorId, paletteLocation);
+          let hexColor = getColorizedGbHexColorFromPalette(paletteColorId, paletteLocation);
           red = getRedFromHexColor(hexColor);
           green = getGreenFromHexColor(hexColor);
           blue = getBlueFromHexColor(hexColor);
@@ -130,11 +127,12 @@ export function drawPixelsFromLineOfTile(
 
       // Finally Lets place a pixel in memory
       // Find where our tile line would start
-      let pixelStart: i32 = getTilePixelStart(iteratedOutputX, outputLineY, outputWidth);
+      let pixelStart = getTilePixelStart(iteratedOutputX, outputLineY, outputWidth);
+      wasmMemoryStart += pixelStart;
 
-      store<u8>(wasmMemoryStart + pixelStart + 0, <u8>red);
-      store<u8>(wasmMemoryStart + pixelStart + 1, <u8>green);
-      store<u8>(wasmMemoryStart + pixelStart + 2, <u8>blue);
+      store<u8>(wasmMemoryStart + 0, <u8>red);
+      store<u8>(wasmMemoryStart + 1, <u8>green);
+      store<u8>(wasmMemoryStart + 2, <u8>blue);
 
       let gbcBgPriority: boolean = false;
       if (bgMapAttributes >= 0) {
@@ -177,12 +175,11 @@ export function getTileDataAddress(tileDataMemoryLocation: i32, tileIdFromTileMa
   if (tileDataMemoryLocation === Graphics.memoryLocationTileDataSelectZeroStart) {
     // Treat the tile Id as a signed int, subtract an offset of 128
     // if the tileId was 0 then the tile would be in memory region 0x9000-0x900F
-    // NOTE: Assemblyscript, Can't cast to i16, need to make negative manually
-    let signedTileId = tileIdFromTileMap + 128;
     if (checkBitOnByte(7, tileIdFromTileMap)) {
-      signedTileId = tileIdFromTileMap - 128;
+      tileIdFromTileMap -= 128;
+    } else {
+      tileIdFromTileMap += 128;
     }
-    return tileDataMemoryLocation + signedTileId * 16;
   }
 
   // if the background layout gave us the tileId 0, then the tile data would be between 0x8000-0x800F.
