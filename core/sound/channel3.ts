@@ -56,7 +56,7 @@ export class Channel3 {
     Channel3.NRx3FrequencyLSB = value;
 
     // Update Channel Frequency
-    Channel3.frequency = (Channel3.NRx4FrequencyMSB << 8) | Channel3.NRx3FrequencyLSB;
+    Channel3.frequency = (Channel3.NRx4FrequencyMSB << 8) | value;
   }
 
   // NR34 -> Frequency higher data (R/W)
@@ -66,10 +66,11 @@ export class Channel3 {
   static NRx4FrequencyMSB: i32 = 0;
   static updateNRx4(value: i32): void {
     Channel3.NRx4LengthEnabled = checkBitOnByte(6, value);
-    Channel3.NRx4FrequencyMSB = value & 0x07;
+    value &= 0x07;
+    Channel3.NRx4FrequencyMSB = value;
 
     // Update Channel Frequency
-    Channel3.frequency = (Channel3.NRx4FrequencyMSB << 8) | Channel3.NRx3FrequencyLSB;
+    Channel3.frequency = (value << 8) | Channel3.NRx3FrequencyLSB;
   }
 
   // Our wave table location
@@ -119,19 +120,17 @@ export class Channel3 {
 
   // Function to get a sample using the cycle counter on the channel
   static getSampleFromCycleCounter(): i32 {
-    let accumulatedCycles: i32 = Channel3.cycleCounter;
+    let accumulatedCycles = Channel3.cycleCounter;
     Channel3.cycleCounter = 0;
     return Channel3.getSample(accumulatedCycles);
   }
 
   // Function to reset our timer, useful for GBC double speed mode
   static resetTimer(): void {
-    Channel3.frequencyTimer = (2048 - Channel3.frequency) << 1;
+    let frequencyTimer = (2048 - Channel3.frequency) << 1;
 
     // TODO: Ensure this is correct for GBC Double Speed Mode
-    if (Cpu.GBCDoubleSpeed) {
-      Channel3.frequencyTimer = Channel3.frequencyTimer << 1;
-    }
+    Channel3.frequencyTimer = frequencyTimer << (<i32>Cpu.GBCDoubleSpeed);
   }
 
   static getSample(numberOfCycles: i32): i32 {
@@ -152,9 +151,7 @@ export class Channel3 {
       // Advance the wave table position, and loop back if needed
       let waveTablePosition = Channel3.waveTablePosition;
       waveTablePosition += 1;
-      if (waveTablePosition >= 32) {
-        waveTablePosition = 0;
-      }
+      waveTablePosition &= 31;
       Channel3.waveTablePosition = waveTablePosition;
     } else {
       Channel3.frequencyTimer = frequencyTimer;
@@ -186,13 +183,14 @@ export class Channel3 {
     let sample = 0;
 
     // Will Find the position, and knock off any remainder
-    let positionIndexToAdd = i32Portable(Channel3.waveTablePosition >> 1);
+    let waveTablePosition = Channel3.waveTablePosition;
+    let positionIndexToAdd = i32Portable(waveTablePosition >> 1);
     let memoryLocationWaveSample = Channel3.memoryLocationWaveTable + positionIndexToAdd;
 
     sample = eightBitLoadFromGBMemory(memoryLocationWaveSample);
 
     // Need to grab the top or lower half for the correct sample
-    if ((Channel3.waveTablePosition & 1) === 0) {
+    if ((waveTablePosition & 1) === 0) {
       // First sample
       sample = sample >> 4;
       sample = sample & 0x0f;

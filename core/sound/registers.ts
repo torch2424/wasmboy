@@ -131,7 +131,7 @@ export function SoundRegisterReadTraps(offset: i32): i32 {
   // This will fix bugs in orcale of ages :)
   if (offset === Sound.memoryLocationNR52) {
     // Get our registerNR52
-    let registerNR52: i32 = eightBitLoadFromGBMemory(Sound.memoryLocationNR52);
+    let registerNR52 = eightBitLoadFromGBMemory(Sound.memoryLocationNR52);
 
     // Knock off lower 7 bits
     registerNR52 = registerNR52 & 0x80;

@@ -4562,11 +4562,11 @@
   end
  )
  (func $core/sound/channel1/Channel1.updateSweep (; 70 ;) (type $_)
+  (local $0 i32)
   global.get $core/sound/channel1/Channel1.sweepCounter
   i32.const 1
   i32.sub
-  global.set $core/sound/channel1/Channel1.sweepCounter
-  global.get $core/sound/channel1/Channel1.sweepCounter
+  local.tee $0
   i32.const 0
   i32.le_s
   if
@@ -4581,52 +4581,59 @@
    if
     call $core/sound/channel1/calculateSweepAndCheckOverflow
    end
+  else   
+   local.get $0
+   global.set $core/sound/channel1/Channel1.sweepCounter
   end
  )
  (func $core/sound/channel1/Channel1.updateEnvelope (; 71 ;) (type $_)
   (local $0 i32)
+  (local $1 i32)
   global.get $core/sound/channel1/Channel1.envelopeCounter
   i32.const 1
   i32.sub
-  global.set $core/sound/channel1/Channel1.envelopeCounter
-  global.get $core/sound/channel1/Channel1.envelopeCounter
+  local.tee $0
   i32.const 0
   i32.le_s
   if
    global.get $core/sound/channel1/Channel1.NRx2EnvelopePeriod
    global.set $core/sound/channel1/Channel1.envelopeCounter
-   global.get $core/sound/channel1/Channel1.envelopeCounter
+   local.get $0
    if
     global.get $core/sound/channel1/Channel1.volume
+    local.set $1
+    local.get $1
     i32.const 15
     i32.lt_s
     global.get $core/sound/channel1/Channel1.NRx2EnvelopeAddMode
     global.get $core/sound/channel1/Channel1.NRx2EnvelopeAddMode
     select
-    if
-     global.get $core/sound/channel1/Channel1.volume
+    if (result i32)
+     local.get $1
      i32.const 1
      i32.add
-     global.set $core/sound/channel1/Channel1.volume
     else     
      global.get $core/sound/channel1/Channel1.NRx2EnvelopeAddMode
      i32.eqz
      local.tee $0
      if
-      global.get $core/sound/channel1/Channel1.volume
+      local.get $1
       i32.const 0
       i32.gt_s
       local.set $0
      end
+     local.get $1
+     i32.const 1
+     i32.sub
+     local.get $1
      local.get $0
-     if
-      global.get $core/sound/channel1/Channel1.volume
-      i32.const 1
-      i32.sub
-      global.set $core/sound/channel1/Channel1.volume
-     end
+     select
     end
+    global.set $core/sound/channel1/Channel1.volume
    end
+  else   
+   local.get $0
+   global.set $core/sound/channel1/Channel1.envelopeCounter
   end
  )
  (func $core/sound/channel2/Channel2.updateEnvelope (; 72 ;) (type $_)
@@ -4729,20 +4736,21 @@
  )
  (func $core/sound/sound/updateFrameSequencer (; 74 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
-  global.get $core/sound/sound/Sound.frameSequenceCycleCounter
-  local.get $0
-  i32.add
-  global.set $core/sound/sound/Sound.frameSequenceCycleCounter
-  global.get $core/sound/sound/Sound.frameSequenceCycleCounter
+  (local $2 i32)
   i32.const 8192
   global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
   i32.shl
+  local.tee $1
+  local.set $2
+  global.get $core/sound/sound/Sound.frameSequenceCycleCounter
+  local.get $0
+  i32.add
+  local.tee $0
+  local.get $1
   i32.ge_s
   if
-   global.get $core/sound/sound/Sound.frameSequenceCycleCounter
-   i32.const 8192
-   global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
-   i32.shl
+   local.get $0
+   local.get $2
    i32.sub
    global.set $core/sound/sound/Sound.frameSequenceCycleCounter
    block $break|0
@@ -4751,9 +4759,9 @@
       block $case2|0
        block $case1|0
         global.get $core/sound/sound/Sound.frameSequencer
-        local.tee $1
+        local.tee $0
         if
-         local.get $1
+         local.get $0
          i32.const 2
          i32.sub
          br_table $case1|0 $break|0 $case2|0 $break|0 $case3|0 $case4|0 $break|0
@@ -4791,16 +4799,14 @@
    global.get $core/sound/sound/Sound.frameSequencer
    i32.const 1
    i32.add
+   i32.const 7
+   i32.and
    global.set $core/sound/sound/Sound.frameSequencer
-   global.get $core/sound/sound/Sound.frameSequencer
-   i32.const 8
-   i32.ge_s
-   if
-    i32.const 0
-    global.set $core/sound/sound/Sound.frameSequencer
-   end
    i32.const 1
    return
+  else   
+   local.get $0
+   global.set $core/sound/sound/Sound.frameSequenceCycleCounter
   end
   i32.const 0
  )
@@ -4815,66 +4821,48 @@
       i32.ne
       if
        local.get $0
-       local.tee $1
        i32.const 2
-       i32.eq
-       br_if $case1|0
-       local.get $1
-       i32.const 3
-       i32.eq
-       br_if $case2|0
-       local.get $1
-       i32.const 4
-       i32.eq
-       br_if $case3|0
-       br $break|0
+       i32.sub
+       br_table $case1|0 $case2|0 $case3|0 $break|0
       end
-      global.get $core/sound/accumulator/SoundAccumulator.channel1DacEnabled
       global.get $core/sound/channel1/Channel1.isDacEnabled
+      local.tee $0
+      global.get $core/sound/accumulator/SoundAccumulator.channel1DacEnabled
       i32.ne
-      if
-       global.get $core/sound/channel1/Channel1.isDacEnabled
-       global.set $core/sound/accumulator/SoundAccumulator.channel1DacEnabled
-       i32.const 1
-       return
-      end
-      i32.const 0
+      local.set $1
+      local.get $0
+      global.set $core/sound/accumulator/SoundAccumulator.channel1DacEnabled
+      local.get $1
       return
      end
-     global.get $core/sound/accumulator/SoundAccumulator.channel2DacEnabled
      global.get $core/sound/channel2/Channel2.isDacEnabled
+     local.tee $1
+     global.get $core/sound/accumulator/SoundAccumulator.channel2DacEnabled
      i32.ne
-     if
-      global.get $core/sound/channel2/Channel2.isDacEnabled
-      global.set $core/sound/accumulator/SoundAccumulator.channel2DacEnabled
-      i32.const 1
-      return
-     end
-     i32.const 0
+     local.set $0
+     local.get $1
+     global.set $core/sound/accumulator/SoundAccumulator.channel2DacEnabled
+     local.get $0
      return
     end
-    global.get $core/sound/accumulator/SoundAccumulator.channel3DacEnabled
     global.get $core/sound/channel3/Channel3.isDacEnabled
+    local.tee $0
+    global.get $core/sound/accumulator/SoundAccumulator.channel3DacEnabled
     i32.ne
-    if
-     global.get $core/sound/channel3/Channel3.isDacEnabled
-     global.set $core/sound/accumulator/SoundAccumulator.channel3DacEnabled
-     i32.const 1
-     return
-    end
-    i32.const 0
+    local.set $1
+    local.get $0
+    global.set $core/sound/accumulator/SoundAccumulator.channel3DacEnabled
+    local.get $1
     return
    end
-   global.get $core/sound/accumulator/SoundAccumulator.channel4DacEnabled
    global.get $core/sound/channel4/Channel4.isDacEnabled
+   local.tee $1
+   global.get $core/sound/accumulator/SoundAccumulator.channel4DacEnabled
    i32.ne
-   if
-    global.get $core/sound/channel4/Channel4.isDacEnabled
-    global.set $core/sound/accumulator/SoundAccumulator.channel4DacEnabled
-    i32.const 1
-    return
-   end
-   i32.const 0
+   local.set $0
+   local.get $1
+   global.set $core/sound/accumulator/SoundAccumulator.channel4DacEnabled
+   local.get $0
    return
   end
   i32.const 0
@@ -4969,14 +4957,15 @@
    global.get $core/sound/channel1/Channel1.waveFormPositionOnDuty
    i32.const 1
    i32.add
-   global.set $core/sound/channel1/Channel1.waveFormPositionOnDuty
-   global.get $core/sound/channel1/Channel1.waveFormPositionOnDuty
+   local.tee $0
    i32.const 8
    i32.ge_s
    if
     i32.const 0
-    global.set $core/sound/channel1/Channel1.waveFormPositionOnDuty
+    local.set $0
    end
+   local.get $0
+   global.set $core/sound/channel1/Channel1.waveFormPositionOnDuty
   else   
    local.get $1
    global.set $core/sound/channel1/Channel1.frequencyTimer
@@ -5009,48 +4998,43 @@
   global.get $core/sound/channel2/Channel2.frequencyTimer
   local.get $0
   i32.sub
+  local.tee $1
   global.set $core/sound/channel2/Channel2.frequencyTimer
-  global.get $core/sound/channel2/Channel2.frequencyTimer
+  local.get $1
   i32.const 0
   i32.le_s
   if
-   global.get $core/sound/channel2/Channel2.frequencyTimer
-   local.tee $1
-   i32.const 31
-   i32.shr_s
-   local.set $0
    i32.const 2048
    global.get $core/sound/channel2/Channel2.frequency
    i32.sub
    i32.const 2
    i32.shl
-   global.set $core/sound/channel2/Channel2.frequencyTimer
    global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
-   if
-    global.get $core/sound/channel2/Channel2.frequencyTimer
-    i32.const 1
-    i32.shl
-    global.set $core/sound/channel2/Channel2.frequencyTimer
-   end
+   i32.shl
+   global.set $core/sound/channel2/Channel2.frequencyTimer
    global.get $core/sound/channel2/Channel2.frequencyTimer
+   local.get $1
+   i32.const 31
+   i32.shr_s
+   local.tee $0
    local.get $0
    local.get $1
    i32.add
-   local.get $0
    i32.xor
    i32.sub
    global.set $core/sound/channel2/Channel2.frequencyTimer
    global.get $core/sound/channel2/Channel2.waveFormPositionOnDuty
    i32.const 1
    i32.add
-   global.set $core/sound/channel2/Channel2.waveFormPositionOnDuty
-   global.get $core/sound/channel2/Channel2.waveFormPositionOnDuty
+   local.tee $0
    i32.const 8
    i32.ge_s
    if
     i32.const 0
-    global.set $core/sound/channel2/Channel2.waveFormPositionOnDuty
+    local.set $0
    end
+   local.get $0
+   global.set $core/sound/channel2/Channel2.waveFormPositionOnDuty
   end
   global.get $core/sound/channel2/Channel2.isDacEnabled
   global.get $core/sound/channel2/Channel2.isEnabled
@@ -5078,6 +5062,7 @@
  (func $core/sound/channel3/Channel3.getSample (; 79 ;) (type $ii) (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
+  (local $3 i32)
   global.get $core/sound/channel3/Channel3.frequencyTimer
   local.get $0
   i32.sub
@@ -5092,14 +5077,9 @@
    i32.sub
    i32.const 1
    i32.shl
-   global.set $core/sound/channel3/Channel3.frequencyTimer
    global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
-   if
-    global.get $core/sound/channel3/Channel3.frequencyTimer
-    i32.const 1
-    i32.shl
-    global.set $core/sound/channel3/Channel3.frequencyTimer
-   end
+   i32.shl
+   global.set $core/sound/channel3/Channel3.frequencyTimer
    global.get $core/sound/channel3/Channel3.frequencyTimer
    local.get $0
    i32.const 31
@@ -5114,14 +5094,8 @@
    global.get $core/sound/channel3/Channel3.waveTablePosition
    i32.const 1
    i32.add
-   local.tee $1
-   i32.const 32
-   i32.ge_s
-   if
-    i32.const 0
-    local.set $1
-   end
-   local.get $1
+   i32.const 31
+   i32.and
    global.set $core/sound/channel3/Channel3.waveTablePosition
   else   
    local.get $0
@@ -5155,6 +5129,7 @@
    return
   end
   global.get $core/sound/channel3/Channel3.waveTablePosition
+  local.tee $3
   i32.const 1
   i32.shr_s
   i32.const 65328
@@ -5168,7 +5143,7 @@
   i32.shr_s
   i32.const 15
   i32.and
-  global.get $core/sound/channel3/Channel3.waveTablePosition
+  local.get $3
   i32.const 1
   i32.and
   select
@@ -5337,83 +5312,68 @@
   i32.const 15
   global.get $core/sound/sound/Sound.NR51IsChannel1EnabledOnLeftOutput
   select
-  local.tee $4
   local.get $1
-  i32.add
-  local.get $4
   i32.const 15
-  i32.add
   global.get $core/sound/sound/Sound.NR51IsChannel2EnabledOnLeftOutput
   select
-  local.tee $4
+  i32.add
   local.get $2
-  i32.add
-  local.get $4
   i32.const 15
-  i32.add
   global.get $core/sound/sound/Sound.NR51IsChannel3EnabledOnLeftOutput
   select
-  local.set $4
+  i32.add
   local.get $3
-  local.get $2
-  local.get $1
+  i32.const 15
+  global.get $core/sound/sound/Sound.NR51IsChannel4EnabledOnLeftOutput
+  select
+  i32.add
+  local.set $4
   local.get $0
   i32.const 15
   global.get $core/sound/sound/Sound.NR51IsChannel1EnabledOnRightOutput
   select
-  local.tee $0
-  i32.add
-  local.get $0
+  local.get $1
   i32.const 15
-  i32.add
   global.get $core/sound/sound/Sound.NR51IsChannel2EnabledOnRightOutput
   select
-  local.tee $0
   i32.add
-  local.get $0
+  local.get $2
   i32.const 15
-  i32.add
   global.get $core/sound/sound/Sound.NR51IsChannel3EnabledOnRightOutput
   select
-  local.tee $0
   i32.add
-  local.get $0
+  local.set $1
+  local.get $3
   i32.const 15
-  i32.add
   global.get $core/sound/sound/Sound.NR51IsChannel4EnabledOnRightOutput
   select
-  local.set $0
+  local.set $3
   i32.const 0
   global.set $core/sound/accumulator/SoundAccumulator.mixerEnabledChanged
   i32.const 0
   global.set $core/sound/accumulator/SoundAccumulator.needToRemixSamples
-  local.get $3
   local.get $4
-  i32.add
-  local.get $4
-  i32.const 15
-  i32.add
-  global.get $core/sound/sound/Sound.NR51IsChannel4EnabledOnLeftOutput
-  select
   global.get $core/sound/sound/Sound.NR50LeftMixerVolume
+  i32.const 1
+  i32.add
+  call $core/sound/sound/getSampleAsUnsignedByte
+  local.set $0
+  local.get $1
+  local.get $3
+  i32.add
+  global.get $core/sound/sound/Sound.NR50RightMixerVolume
   i32.const 1
   i32.add
   call $core/sound/sound/getSampleAsUnsignedByte
   local.set $1
   local.get $0
-  global.get $core/sound/sound/Sound.NR50RightMixerVolume
-  i32.const 1
-  i32.add
-  call $core/sound/sound/getSampleAsUnsignedByte
-  local.set $0
-  local.get $1
   global.set $core/sound/accumulator/SoundAccumulator.leftChannelSampleUnsignedByte
-  local.get $0
+  local.get $1
   global.set $core/sound/accumulator/SoundAccumulator.rightChannelSampleUnsignedByte
-  local.get $0
+  local.get $1
   i32.const 255
   i32.and
-  local.get $1
+  local.get $0
   i32.const 255
   i32.and
   i32.const 8
@@ -5429,9 +5389,10 @@
   global.get $core/sound/channel1/Channel1.cycleCounter
   local.get $0
   i32.add
+  local.tee $1
   global.set $core/sound/channel1/Channel1.cycleCounter
   global.get $core/sound/channel1/Channel1.frequencyTimer
-  global.get $core/sound/channel1/Channel1.cycleCounter
+  local.get $1
   i32.sub
   i32.const 0
   i32.le_s
@@ -5445,9 +5406,10 @@
   global.get $core/sound/channel2/Channel2.cycleCounter
   local.get $0
   i32.add
+  local.tee $4
   global.set $core/sound/channel2/Channel2.cycleCounter
   global.get $core/sound/channel2/Channel2.frequencyTimer
-  global.get $core/sound/channel2/Channel2.cycleCounter
+  local.get $4
   i32.sub
   i32.const 0
   i32.le_s
@@ -5622,20 +5584,21 @@
    local.get $1
    i32.const 1
    i32.add
-   global.set $core/sound/sound/Sound.audioQueueIndex
-   global.get $core/sound/sound/Sound.audioQueueIndex
+   local.tee $0
    global.get $core/sound/sound/Sound.wasmBoyMemoryMaxBufferSize
    i32.const 1
    i32.shr_s
    i32.const 1
    i32.sub
    i32.ge_s
-   if
-    global.get $core/sound/sound/Sound.audioQueueIndex
+   if (result i32)
+    local.get $0
     i32.const 1
     i32.sub
-    global.set $core/sound/sound/Sound.audioQueueIndex
+   else    
+    local.get $0
    end
+   global.set $core/sound/sound/Sound.audioQueueIndex
   end
  )
  (func $core/sound/sound/calculateSound (; 84 ;) (type $i_) (param $0 i32)
@@ -5833,20 +5796,21 @@
    global.get $core/sound/sound/Sound.audioQueueIndex
    i32.const 1
    i32.add
-   global.set $core/sound/sound/Sound.audioQueueIndex
-   global.get $core/sound/sound/Sound.audioQueueIndex
+   local.tee $0
    global.get $core/sound/sound/Sound.wasmBoyMemoryMaxBufferSize
    i32.const 1
    i32.shr_s
    i32.const 1
    i32.sub
    i32.ge_s
-   if
-    global.get $core/sound/sound/Sound.audioQueueIndex
+   if (result i32)
+    local.get $0
     i32.const 1
     i32.sub
-    global.set $core/sound/sound/Sound.audioQueueIndex
+   else    
+    local.get $0
    end
+   global.set $core/sound/sound/Sound.audioQueueIndex
   end
  )
  (func $core/sound/sound/updateSound (; 85 ;) (type $i_) (param $0 i32)
@@ -6554,14 +6518,9 @@
   i32.sub
   i32.const 2
   i32.shl
-  global.set $core/sound/channel2/Channel2.frequencyTimer
   global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
-  if
-   global.get $core/sound/channel2/Channel2.frequencyTimer
-   i32.const 1
-   i32.shl
-   global.set $core/sound/channel2/Channel2.frequencyTimer
-  end
+  i32.shl
+  global.set $core/sound/channel2/Channel2.frequencyTimer
   global.get $core/sound/channel2/Channel2.NRx2EnvelopePeriod
   global.set $core/sound/channel2/Channel2.envelopeCounter
   global.get $core/sound/channel2/Channel2.NRx2StartingVolume
@@ -6587,14 +6546,9 @@
   i32.sub
   i32.const 1
   i32.shl
-  global.set $core/sound/channel3/Channel3.frequencyTimer
   global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
-  if
-   global.get $core/sound/channel3/Channel3.frequencyTimer
-   i32.const 1
-   i32.shl
-   global.set $core/sound/channel3/Channel3.frequencyTimer
-  end
+  i32.shl
+  global.set $core/sound/channel3/Channel3.frequencyTimer
   i32.const 0
   global.set $core/sound/channel3/Channel3.waveTablePosition
   global.get $core/sound/channel3/Channel3.isDacEnabled
@@ -6850,10 +6804,10 @@
             end
             local.get $1
             global.set $core/sound/channel3/Channel3.NRx3FrequencyLSB
-            global.get $core/sound/channel3/Channel3.NRx3FrequencyLSB
             global.get $core/sound/channel3/Channel3.NRx4FrequencyMSB
             i32.const 8
             i32.shl
+            local.get $1
             i32.or
             global.set $core/sound/channel3/Channel3.frequency
             br $folding-inner0
@@ -6924,9 +6878,10 @@
          local.get $1
          i32.const 7
          i32.and
+         local.tee $0
          global.set $core/sound/channel3/Channel3.NRx4FrequencyMSB
          global.get $core/sound/channel3/Channel3.NRx3FrequencyLSB
-         global.get $core/sound/channel3/Channel3.NRx4FrequencyMSB
+         local.get $0
          i32.const 8
          i32.shl
          i32.or

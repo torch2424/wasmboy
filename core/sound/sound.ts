@@ -265,15 +265,16 @@ function calculateSound(numberOfCycles: i32): void {
       rightChannelSampleUnsignedByte = splitLowByte(mixedSample);
       setLeftAndRightOutputForAudioQueue(leftChannelSampleUnsignedByte + 1, rightChannelSampleUnsignedByte + 1, CHANNEL_4_BUFFER_LOCATION);
     }
-    Sound.audioQueueIndex += 1;
+    let audioQueueIndex = Sound.audioQueueIndex + 1;
 
     // Don't allow our audioQueueIndex to overflow into other parts of the wasmBoy memory map
     // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit#gid=0
     // Not 0xFFFF because we need half of 64kb since we store left and right channel
     let maxIndex = i32Portable(Sound.wasmBoyMemoryMaxBufferSize >> 1) - 1;
-    if (Sound.audioQueueIndex >= maxIndex) {
-      Sound.audioQueueIndex -= 1;
+    if (audioQueueIndex >= maxIndex) {
+      audioQueueIndex -= 1;
     }
+    Sound.audioQueueIndex = audioQueueIndex;
   }
 }
 
@@ -282,11 +283,14 @@ function updateFrameSequencer(numberOfCycles: i32): boolean {
   // APU runs at 4194304 / 512
   // Or Cpu.clockSpeed / 512
   // Which means, we need to update once every 8192 cycles :)
-  Sound.frameSequenceCycleCounter += numberOfCycles;
-  if (Sound.frameSequenceCycleCounter >= Sound.maxFrameSequenceCycles()) {
+  let maxFrameSequenceCycles = Sound.maxFrameSequenceCycles();
+  let frameSequenceCycleCounter = Sound.frameSequenceCycleCounter;
+  frameSequenceCycleCounter += numberOfCycles;
+  if (frameSequenceCycleCounter >= maxFrameSequenceCycles) {
     // Reset the frameSequenceCycleCounter
     // Not setting to zero as we do not want to drop cycles
-    Sound.frameSequenceCycleCounter -= Sound.maxFrameSequenceCycles();
+    frameSequenceCycleCounter -= maxFrameSequenceCycles;
+    Sound.frameSequenceCycleCounter = frameSequenceCycleCounter;
 
     // Check our frame sequencer
     // https://gist.github.com/drhelius/3652407
@@ -335,12 +339,10 @@ function updateFrameSequencer(numberOfCycles: i32): boolean {
     }
 
     // Update our frame sequencer
-    Sound.frameSequencer += 1;
-    if (Sound.frameSequencer >= 8) {
-      Sound.frameSequencer = 0;
-    }
-
+    Sound.frameSequencer = (Sound.frameSequencer + 1) & 7;
     return true;
+  } else {
+    Sound.frameSequenceCycleCounter = frameSequenceCycleCounter;
   }
 
   return false;
@@ -373,49 +375,17 @@ export function mixChannelSamples(
 
   // Find the sample for the left if enabled
   // other wise add silence (15) for the channel
-  if (Sound.NR51IsChannel1EnabledOnLeftOutput) {
-    leftChannelSample += channel1Sample;
-  } else {
-    leftChannelSample += 15;
-  }
-  if (Sound.NR51IsChannel2EnabledOnLeftOutput) {
-    leftChannelSample += channel2Sample;
-  } else {
-    leftChannelSample += 15;
-  }
-  if (Sound.NR51IsChannel3EnabledOnLeftOutput) {
-    leftChannelSample += channel3Sample;
-  } else {
-    leftChannelSample += 15;
-  }
-  if (Sound.NR51IsChannel4EnabledOnLeftOutput) {
-    leftChannelSample += channel4Sample;
-  } else {
-    leftChannelSample += 15;
-  }
+  leftChannelSample += Sound.NR51IsChannel1EnabledOnLeftOutput ? channel1Sample : 15;
+  leftChannelSample += Sound.NR51IsChannel2EnabledOnLeftOutput ? channel2Sample : 15;
+  leftChannelSample += Sound.NR51IsChannel3EnabledOnLeftOutput ? channel3Sample : 15;
+  leftChannelSample += Sound.NR51IsChannel4EnabledOnLeftOutput ? channel4Sample : 15;
 
   // Find the sample for the right if enabled
   // other wise add silence (15) for the channel
-  if (Sound.NR51IsChannel1EnabledOnRightOutput) {
-    rightChannelSample += channel1Sample;
-  } else {
-    rightChannelSample += 15;
-  }
-  if (Sound.NR51IsChannel2EnabledOnRightOutput) {
-    rightChannelSample += channel2Sample;
-  } else {
-    rightChannelSample += 15;
-  }
-  if (Sound.NR51IsChannel3EnabledOnRightOutput) {
-    rightChannelSample += channel3Sample;
-  } else {
-    rightChannelSample += 15;
-  }
-  if (Sound.NR51IsChannel4EnabledOnRightOutput) {
-    rightChannelSample += channel4Sample;
-  } else {
-    rightChannelSample += 15;
-  }
+  rightChannelSample += Sound.NR51IsChannel1EnabledOnRightOutput ? channel1Sample : 15;
+  rightChannelSample += Sound.NR51IsChannel2EnabledOnRightOutput ? channel2Sample : 15;
+  rightChannelSample += Sound.NR51IsChannel3EnabledOnRightOutput ? channel3Sample : 15;
+  rightChannelSample += Sound.NR51IsChannel4EnabledOnRightOutput ? channel4Sample : 15;
 
   // Update our accumulator
   SoundAccumulator.mixerEnabledChanged = false;
@@ -466,7 +436,7 @@ function getSampleAsUnsignedByte(sample: i32, mixerVolume: i32): i32 {
   // For example, 120 / 254 = 0.47244094488188976
   // Multiply by 1000 to increase the float into an int
   // so, 120 * 1000 / (0.47244094488188976 * 1000) should give approximate answer for max mixer volume
-  let maxDivider: i32 = i32Portable((120 * precision) / 254);
+  let maxDivider = i32Portable((120 * precision) / 254);
   convertedSample = i32Portable((convertedSample * precision) / maxDivider);
 
   // Ensure we have an i32 and not a float for JS builds

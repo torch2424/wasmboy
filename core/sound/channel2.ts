@@ -135,20 +135,19 @@ export class Channel2 {
 
   // Function to reset our timer, useful for GBC double speed mode
   static resetTimer(): void {
-    Channel2.frequencyTimer = (2048 - Channel2.frequency) << 2;
+    let frequencyTimer = (2048 - Channel2.frequency) << 2;
 
     // TODO: Ensure this is correct for GBC Double Speed Mode
-    if (Cpu.GBCDoubleSpeed) {
-      Channel2.frequencyTimer = Channel2.frequencyTimer << 1;
-    }
+    Channel2.frequencyTimer = frequencyTimer << (<i32>Cpu.GBCDoubleSpeed);
   }
 
   static getSample(numberOfCycles: i32): i32 {
     // Decrement our channel timer
-    Channel2.frequencyTimer -= numberOfCycles;
-    if (Channel2.frequencyTimer <= 0) {
+    let frequencyTimer = Channel2.frequencyTimer - numberOfCycles;
+    Channel2.frequencyTimer = frequencyTimer;
+    if (frequencyTimer <= 0) {
       // Get the amount that overflowed so we don't drop cycles
-      let overflowAmount = abs(Channel2.frequencyTimer);
+      let overflowAmount = abs(frequencyTimer);
 
       // Reset our timer
       // A square channel's frequency timer period is set to (2048-frequency)*4.
@@ -159,10 +158,12 @@ export class Channel2 {
       // Also increment our duty cycle
       // What is duty? https://en.wikipedia.org/wiki/Duty_cycle
       // Duty cycle for square wave: http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
-      Channel2.waveFormPositionOnDuty += 1;
-      if (Channel2.waveFormPositionOnDuty >= 8) {
-        Channel2.waveFormPositionOnDuty = 0;
+      let waveFormPositionOnDuty = Channel2.waveFormPositionOnDuty;
+      waveFormPositionOnDuty += 1;
+      if (waveFormPositionOnDuty >= 8) {
+        waveFormPositionOnDuty = 0;
       }
+      Channel2.waveFormPositionOnDuty = waveFormPositionOnDuty;
     }
 
     // Get our ourput volume
@@ -218,10 +219,11 @@ export class Channel2 {
   // This is used to accumulate samples
   static willChannelUpdate(numberOfCycles: i32): boolean {
     //Increment our cycle counter
-    Channel2.cycleCounter += numberOfCycles;
+    let cycleCounter = Channel2.cycleCounter + numberOfCycles;
+    Channel2.cycleCounter = cycleCounter;
 
     // Dac enabled status cached by accumulator
-    return !(Channel2.frequencyTimer - Channel2.cycleCounter > 0);
+    return !(Channel2.frequencyTimer - cycleCounter > 0);
   }
 
   static updateLength(): void {
