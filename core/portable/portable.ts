@@ -2,8 +2,6 @@
 // https://github.com/AssemblyScript/assemblyscript/wiki/Writing-portable-code
 // https://github.com/AssemblyScript/assemblyscript/blob/master/std/portable/index.js
 
-import { checkBitOnByte, resetBitOnByte, setBitOnByte } from '../helpers/index';
-
 export function u8Portable(param: u8): u8 {
   return param & 0xff;
 }

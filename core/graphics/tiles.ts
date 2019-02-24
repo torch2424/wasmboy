@@ -14,7 +14,7 @@ import { addPriorityforPixel } from './priority';
 // using Skip Traps, because LCD has unrestricted access
 // http://gbdev.gg8.se/wiki/articles/Video_Display#LCD_OAM_DMA_Transfers
 import { checkBitOnByte } from '../helpers/index';
-import { i16Portable } from '../portable/portable';
+import { i8Portable } from '../portable/portable';
 
 export class TileCache {
   static tileId: i32 = -1;
@@ -175,7 +175,11 @@ export function getTileDataAddress(tileDataMemoryLocation: i32, tileIdFromTileMa
   if (tileDataMemoryLocation === Graphics.memoryLocationTileDataSelectZeroStart) {
     // Treat the tile Id as a signed int, subtract an offset of 128
     // if the tileId was 0 then the tile would be in memory region 0x9000-0x900F
-    tileIdFromTileMap = <i32>i16Portable(<i16>(tileIdFromTileMap + 128));
+    if (checkBitOnByte(7, tileIdFromTileMap)) {
+      tileIdFromTileMap -= 128;
+    } else {
+      tileIdFromTileMap += 128;
+    }
   }
 
   // if the background layout gave us the tileId 0, then the tile data would be between 0x8000-0x800F.
