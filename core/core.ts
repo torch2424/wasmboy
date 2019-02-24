@@ -11,8 +11,6 @@ import { Memory, initializeCartridge, initializeDma, eightBitStoreIntoGBMemory, 
 import { Timers, initializeTimers } from './timers/index';
 import { Sound, initializeSound, Channel1, Channel2, Channel3, Channel4 } from './sound/index';
 import { initializeSerial } from './serial/serial';
-import { hexLog, log } from './helpers/index';
-import { u16Portable } from './portable/portable';
 
 // Grow our memory to the specified size
 if (memory.size() < WASMBOY_WASM_PAGES) {
@@ -24,12 +22,9 @@ let hasStarted: boolean = false;
 export function setHasCoreStarted(value: boolean): void {
   hasStarted = value;
 }
-export function hasCoreStarted(): i32 {
-  if (hasStarted) {
-    return 1;
-  }
 
-  return 0;
+export function hasCoreStarted(): i32 {
+  return <i32>hasStarted;
 }
 
 // Function to configure & initialize wasmboy
@@ -50,65 +45,16 @@ export function config(
   // All values default to zero in memory, so not setting them yet
   // log('initializing (includeBootRom=$0)', 1, enableBootRom);
 
-  if (enableBootRom > 0) {
-    Config.enableBootRom = true;
-  } else {
-    Config.enableBootRom = false;
-  }
-
-  if (useGbcWhenAvailable > 0) {
-    Config.useGbcWhenAvailable = true;
-  } else {
-    Config.useGbcWhenAvailable = false;
-  }
-
-  if (audioBatchProcessing > 0) {
-    Config.audioBatchProcessing = true;
-  } else {
-    Config.audioBatchProcessing = false;
-  }
-
-  if (graphicsBatchProcessing > 0) {
-    Config.graphicsBatchProcessing = true;
-  } else {
-    Config.graphicsBatchProcessing = false;
-  }
-
-  if (timersBatchProcessing > 0) {
-    Config.timersBatchProcessing = true;
-  } else {
-    Config.timersBatchProcessing = false;
-  }
-
-  if (graphicsDisableScanlineRendering > 0) {
-    Config.graphicsDisableScanlineRendering = true;
-  } else {
-    Config.graphicsDisableScanlineRendering = false;
-  }
-
-  if (audioAccumulateSamples > 0) {
-    Config.audioAccumulateSamples = true;
-  } else {
-    Config.audioAccumulateSamples = false;
-  }
-
-  if (tileRendering > 0) {
-    Config.tileRendering = true;
-  } else {
-    Config.tileRendering = false;
-  }
-
-  if (tileCaching > 0) {
-    Config.tileCaching = true;
-  } else {
-    Config.tileCaching = false;
-  }
-
-  if (enableAudioDebugging > 0) {
-    Config.enableAudioDebugging = true;
-  } else {
-    Config.enableAudioDebugging = false;
-  }
+  Config.enableBootRom = enableBootRom > 0;
+  Config.useGbcWhenAvailable = useGbcWhenAvailable > 0;
+  Config.audioBatchProcessing = audioBatchProcessing > 0;
+  Config.graphicsBatchProcessing = graphicsBatchProcessing > 0;
+  Config.timersBatchProcessing = timersBatchProcessing > 0;
+  Config.graphicsDisableScanlineRendering = graphicsDisableScanlineRendering > 0;
+  Config.audioAccumulateSamples = audioAccumulateSamples > 0;
+  Config.tileRendering = tileRendering > 0;
+  Config.tileCaching = tileCaching > 0;
+  Config.enableAudioDebugging = enableAudioDebugging > 0;
 
   initialize();
 }
@@ -120,7 +66,7 @@ function initialize(): void {
   // First, try to switch to Gameboy Color Mode
   // Get our GBC support from the cartridge header
   // http://gbdev.gg8.se/wiki/articles/The_Cartridge_Header
-  let gbcType: i32 = eightBitLoadFromGBMemory(0x0143);
+  let gbcType = eightBitLoadFromGBMemory(0x0143);
 
   // Detecting GBC http://bgb.bircd.org/pandocs.htm#cgbregisters
   if (gbcType === 0xc0 || (Config.useGbcWhenAvailable && gbcType === 0x80)) {
@@ -174,11 +120,7 @@ function initialize(): void {
 
 // Function to return if we are currently playing a GBC ROM
 export function isGBC(): i32 {
-  if (Cpu.GBCEnabled) {
-    return 1;
-  }
-
-  return 0;
+  return <i32>Cpu.GBCEnabled;
 }
 
 // Function to return an address to store into save state memory

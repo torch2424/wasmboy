@@ -1,6 +1,6 @@
 import { Memory } from './memory';
 import { Cpu } from '../cpu/index';
-import { Graphics, batchProcessGraphics } from '../graphics/graphics';
+import { Graphics } from '../graphics/graphics';
 import { Palette, writeColorPaletteToMemory, Lcd } from '../graphics/index';
 import { batchProcessAudio, SoundRegisterWriteTraps } from '../sound/index';
 import { Timers, batchProcessTimers } from '../timers/index';
@@ -8,10 +8,8 @@ import { Serial } from '../serial/serial';
 import { Interrupts } from '../interrupts/index';
 import { Joypad } from '../joypad/index';
 import { handleBanking } from './banking';
-import { eightBitStoreIntoGBMemory, sixteenBitStoreIntoGBMemory } from './store';
-import { eightBitLoadFromGBMemoryWithTraps, eightBitLoadFromGBMemory, sixteenBitLoadFromGBMemory } from './load';
+import { eightBitStoreIntoGBMemory } from './store';
 import { startDmaTransfer, startHdmaTransfer } from './dma';
-import { checkBitOnByte, hexLog } from '../helpers/index';
 
 // Internal function to trap any modify data trying to be written to Gameboy memory
 // Follows the Gameboy memory map
@@ -58,7 +56,7 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
   // Codeslinger: The ECHO memory region (0xE000-0xFDFF) is quite different because any data written here is also written in the equivelent ram memory region 0xC000-0xDDFF.
   // Hence why it is called echo
   if (offset >= Memory.echoRamLocation && offset < spriteInformationTableLocation) {
-    let wramOffset: i32 = offset - 0x2000;
+    let wramOffset = offset - 0x2000;
     eightBitStoreIntoGBMemory(wramOffset, value);
 
     // Allow the original write, and return since we dont need to look anymore
@@ -174,10 +172,8 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
   // https://gist.github.com/drhelius/3394856
   if (offset === Memory.memoryLocationGBCWRAMBank || offset === Memory.memoryLocationGBCVRAMBank) {
     if (Memory.isHblankHdmaActive) {
-      if (
-        (Memory.hblankHdmaSource >= 0x4000 && Memory.hblankHdmaSource <= 0x7fff) ||
-        (Memory.hblankHdmaSource >= 0xd000 && Memory.hblankHdmaSource <= 0xdfff)
-      ) {
+      let hblankHdmaSource = Memory.hblankHdmaSource;
+      if ((hblankHdmaSource >= 0x4000 && hblankHdmaSource <= 0x7fff) || (hblankHdmaSource >= 0xd000 && hblankHdmaSource <= 0xdfff)) {
         return false;
       }
     }
@@ -197,7 +193,7 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
 
     switch (offset) {
       case Timers.memoryLocationDividerRegister:
-        Timers.updateDividerRegister(value);
+        Timers.updateDividerRegister();
         return false;
       case Timers.memoryLocationTimerCounter:
         Timers.updateTimerCounter(value);

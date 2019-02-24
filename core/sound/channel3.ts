@@ -3,7 +3,6 @@
 // Wave Channel
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Wave_Channel
 import { getSaveStateMemoryOffset } from '../core';
-import { isDutyCycleClockPositiveOrNegativeForWaveform } from './duty';
 import { Cpu } from '../cpu/index';
 import {
   eightBitLoadFromGBMemory,
@@ -11,7 +10,7 @@ import {
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
-import { checkBitOnByte, hexLog } from '../helpers/index';
+import { checkBitOnByte } from '../helpers/index';
 import { i32Portable } from '../portable/portable';
 
 export class Channel3 {
@@ -57,8 +56,7 @@ export class Channel3 {
     Channel3.NRx3FrequencyLSB = value;
 
     // Update Channel Frequency
-    let frequency: i32 = (Channel3.NRx4FrequencyMSB << 8) | Channel3.NRx3FrequencyLSB;
-    Channel3.frequency = frequency;
+    Channel3.frequency = (Channel3.NRx4FrequencyMSB << 8) | Channel3.NRx3FrequencyLSB;
   }
 
   // NR34 -> Frequency higher data (R/W)
@@ -71,8 +69,7 @@ export class Channel3 {
     Channel3.NRx4FrequencyMSB = value & 0x07;
 
     // Update Channel Frequency
-    let frequency: i32 = (Channel3.NRx4FrequencyMSB << 8) | Channel3.NRx3FrequencyLSB;
-    Channel3.frequency = frequency;
+    Channel3.frequency = (Channel3.NRx4FrequencyMSB << 8) | Channel3.NRx3FrequencyLSB;
   }
 
   // Our wave table location
@@ -129,20 +126,22 @@ export class Channel3 {
 
   // Function to reset our timer, useful for GBC double speed mode
   static resetTimer(): void {
-    Channel3.frequencyTimer = (2048 - Channel3.frequency) * 2;
+    Channel3.frequencyTimer = (2048 - Channel3.frequency) << 1;
 
     // TODO: Ensure this is correct for GBC Double Speed Mode
     if (Cpu.GBCDoubleSpeed) {
-      Channel3.frequencyTimer = Channel3.frequencyTimer * 2;
+      Channel3.frequencyTimer = Channel3.frequencyTimer << 1;
     }
   }
 
   static getSample(numberOfCycles: i32): i32 {
     // Decrement our channel timer
-    Channel3.frequencyTimer -= numberOfCycles;
-    if (Channel3.frequencyTimer <= 0) {
+    let frequencyTimer = Channel3.frequencyTimer;
+    frequencyTimer -= numberOfCycles;
+    if (frequencyTimer <= 0) {
       // Get the amount that overflowed so we don't drop cycles
-      let overflowAmount: i32 = abs(Channel3.frequencyTimer);
+      let overflowAmount = abs(frequencyTimer);
+      Channel3.frequencyTimer = frequencyTimer;
 
       // Reset our timer
       // A wave channel's frequency timer period is set to (2048-frequency) * 2.
@@ -151,15 +150,19 @@ export class Channel3 {
       Channel3.frequencyTimer -= overflowAmount;
 
       // Advance the wave table position, and loop back if needed
-      Channel3.waveTablePosition += 1;
-      if (Channel3.waveTablePosition >= 32) {
-        Channel3.waveTablePosition = 0;
+      let waveTablePosition = Channel3.waveTablePosition;
+      waveTablePosition += 1;
+      if (waveTablePosition >= 32) {
+        waveTablePosition = 0;
       }
+      Channel3.waveTablePosition = waveTablePosition;
+    } else {
+      Channel3.frequencyTimer = frequencyTimer;
     }
 
     // Get our ourput volume
-    let outputVolume: i32 = 0;
-    let volumeCode: i32 = Channel3.volumeCode;
+    let outputVolume = 0;
+    let volumeCode = Channel3.volumeCode;
 
     // Finally to set our output volume, the channel must be enabled,
     // Our channel DAC must be enabled, and we must be in an active state
@@ -180,16 +183,16 @@ export class Channel3 {
     }
 
     // Get the current sample
-    let sample: i32 = 0;
+    let sample = 0;
 
     // Will Find the position, and knock off any remainder
-    let positionIndexToAdd: i32 = i32Portable(Channel3.waveTablePosition / 2);
-    let memoryLocationWaveSample: i32 = Channel3.memoryLocationWaveTable + positionIndexToAdd;
+    let positionIndexToAdd = i32Portable(Channel3.waveTablePosition >> 1);
+    let memoryLocationWaveSample = Channel3.memoryLocationWaveTable + positionIndexToAdd;
 
     sample = eightBitLoadFromGBMemory(memoryLocationWaveSample);
 
     // Need to grab the top or lower half for the correct sample
-    if (Channel3.waveTablePosition % 2 === 0) {
+    if ((Channel3.waveTablePosition & 1) === 0) {
       // First sample
       sample = sample >> 4;
       sample = sample & 0x0f;
@@ -220,12 +223,7 @@ export class Channel3 {
     }
 
     // Spply out output volume
-    if (outputVolume > 0) {
-      sample = sample / outputVolume;
-    } else {
-      sample = 0;
-    }
-
+    sample = outputVolume > 0 ? sample / outputVolume : 0;
     // Square Waves Can range from -15 - 15. Therefore simply add 15
     sample = sample + 15;
     return sample;
@@ -258,20 +256,18 @@ export class Channel3 {
     Channel3.cycleCounter += numberOfCycles;
 
     // Dac enabled status cached by accumulator
-    if (Channel3.frequencyTimer - Channel3.cycleCounter > 0 && !Channel3.volumeCodeChanged) {
-      return false;
-    }
-
-    return true;
+    return !(!Channel3.volumeCodeChanged && Channel3.frequencyTimer - Channel3.cycleCounter > 0);
   }
 
   static updateLength(): void {
-    if (Channel3.lengthCounter > 0 && Channel3.NRx4LengthEnabled) {
-      Channel3.lengthCounter -= 1;
+    let lengthCounter = Channel3.lengthCounter;
+    if (lengthCounter > 0 && Channel3.NRx4LengthEnabled) {
+      lengthCounter -= 1;
     }
 
-    if (Channel3.lengthCounter === 0) {
+    if (lengthCounter === 0) {
       Channel3.isEnabled = false;
     }
+    Channel3.lengthCounter = lengthCounter;
   }
 }

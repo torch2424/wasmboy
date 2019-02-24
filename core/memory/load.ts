@@ -1,7 +1,7 @@
 // Load/Read functionality for memory
 import { checkReadTraps } from './readTraps';
 import { getWasmBoyOffsetFromGameBoyOffset } from './memoryMap';
-import { concatenateBytes, performanceTimestamp } from '../helpers/index';
+import { concatenateBytes } from '../helpers/index';
 import { Breakpoints } from '../debug/breakpoints';
 
 export function eightBitLoadFromGBMemory(gameboyOffset: i32): i32 {
@@ -13,7 +13,7 @@ export function eightBitLoadFromGBMemoryWithTraps(offset: i32): i32 {
     Breakpoints.reachedBreakpoint = true;
   }
 
-  let readTrapResult: i32 = checkReadTraps(offset);
+  let readTrapResult = checkReadTraps(offset);
   switch (readTrapResult) {
     case -1:
       return eightBitLoadFromGBMemory(offset);
@@ -26,8 +26,8 @@ export function eightBitLoadFromGBMemoryWithTraps(offset: i32): i32 {
 // Inlined because closure compiler inlines
 export function sixteenBitLoadFromGBMemory(offset: i32): i32 {
   // Get our low byte
-  let lowByte: i32 = 0;
-  let lowByteReadTrapResult: i32 = checkReadTraps(offset);
+  let lowByte = 0;
+  let lowByteReadTrapResult = checkReadTraps(offset);
   switch (lowByteReadTrapResult) {
     case -1:
       lowByte = eightBitLoadFromGBMemory(offset);
@@ -38,11 +38,11 @@ export function sixteenBitLoadFromGBMemory(offset: i32): i32 {
   }
 
   // Get the next offset for the second byte
-  let nextOffset: i32 = offset + 1;
+  let nextOffset = offset + 1;
 
   // Get our high byte
-  let highByte: i32 = 0;
-  let highByteReadTrapResult: i32 = checkReadTraps(nextOffset);
+  let highByte = 0;
+  let highByteReadTrapResult = checkReadTraps(nextOffset);
   switch (highByteReadTrapResult) {
     case -1:
       highByte = eightBitLoadFromGBMemory(nextOffset);
@@ -57,9 +57,6 @@ export function sixteenBitLoadFromGBMemory(offset: i32): i32 {
 }
 
 export function loadBooleanDirectlyFromWasmMemory(offset: i32): boolean {
-  let booleanAsInt: i32 = load<u8>(offset);
-  if (booleanAsInt > 0) {
-    return true;
-  }
-  return false;
+  let booleanAsInt = <i32>load<u8>(offset);
+  return booleanAsInt > 0;
 }

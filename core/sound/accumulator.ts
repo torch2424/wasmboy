@@ -46,10 +46,10 @@ export function initializeSoundAccumulator(): void {
 // Inlined because closure compiler inlines
 export function accumulateSound(numberOfCycles: i32): void {
   // Check if any of the individual channels will update
-  let channel1WillUpdate: boolean = Channel1.willChannelUpdate(numberOfCycles) || didChannelDacChange(Channel1.channelNumber);
-  let channel2WillUpdate: boolean = Channel2.willChannelUpdate(numberOfCycles) || didChannelDacChange(Channel2.channelNumber);
-  let channel3WillUpdate: boolean = Channel3.willChannelUpdate(numberOfCycles) || didChannelDacChange(Channel3.channelNumber);
-  let channel4WillUpdate: boolean = Channel4.willChannelUpdate(numberOfCycles) || didChannelDacChange(Channel4.channelNumber);
+  let channel1WillUpdate = Channel1.willChannelUpdate(numberOfCycles) || didChannelDacChange(Channel1.channelNumber);
+  let channel2WillUpdate = Channel2.willChannelUpdate(numberOfCycles) || didChannelDacChange(Channel2.channelNumber);
+  let channel3WillUpdate = Channel3.willChannelUpdate(numberOfCycles) || didChannelDacChange(Channel3.channelNumber);
+  let channel4WillUpdate = Channel4.willChannelUpdate(numberOfCycles) || didChannelDacChange(Channel4.channelNumber);
 
   if (channel1WillUpdate) {
     SoundAccumulator.channel1Sample = Channel1.getSampleFromCycleCounter();
@@ -70,11 +70,14 @@ export function accumulateSound(numberOfCycles: i32): void {
   }
 
   // Do Some downsampling magic
-  Sound.downSampleCycleCounter += numberOfCycles * Sound.downSampleCycleMultiplier;
-  if (Sound.downSampleCycleCounter >= Sound.maxDownSampleCycles()) {
+  let downSampleCycleCounter = Sound.downSampleCycleCounter;
+  downSampleCycleCounter += numberOfCycles * Sound.downSampleCycleMultiplier;
+  let maxDownSampleCycles = Sound.maxDownSampleCycles();
+  if (downSampleCycleCounter >= maxDownSampleCycles) {
     // Reset the downsample counter
     // Don't set to zero to catch overflowed cycles
-    Sound.downSampleCycleCounter -= Sound.maxDownSampleCycles();
+    downSampleCycleCounter -= maxDownSampleCycles;
+    Sound.downSampleCycleCounter = downSampleCycleCounter;
 
     if (SoundAccumulator.needToRemixSamples || SoundAccumulator.mixerVolumeChanged || SoundAccumulator.mixerEnabledChanged) {
       mixChannelSamples(
@@ -83,6 +86,8 @@ export function accumulateSound(numberOfCycles: i32): void {
         SoundAccumulator.channel3Sample,
         SoundAccumulator.channel4Sample
       );
+    } else {
+      Sound.downSampleCycleCounter = downSampleCycleCounter;
     }
 
     // Finally Simply place the accumulated sample in memory
@@ -98,7 +103,7 @@ export function accumulateSound(numberOfCycles: i32): void {
     // Don't allow our audioQueueIndex to overflow into other parts of the wasmBoy memory map
     // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit#gid=0
     // Not 0xFFFF because we need half of 64kb since we store left and right channel
-    let maxIndex: i32 = i32Portable(Sound.wasmBoyMemoryMaxBufferSize / 2) - 1;
+    let maxIndex = i32Portable(Sound.wasmBoyMemoryMaxBufferSize >> 1) - 1;
     if (Sound.audioQueueIndex >= maxIndex) {
       Sound.audioQueueIndex -= 1;
     }

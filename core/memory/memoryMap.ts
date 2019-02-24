@@ -1,21 +1,9 @@
 // WasmBoy memory map:
 // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
 import {
-  WASMBOY_MEMORY_LOCATION,
-  ASSEMBLYSCRIPT_MEMORY_LOCATION,
-  WASMBOY_STATE_LOCATION,
-  GAMEBOY_INTERNAL_MEMORY_LOCATION,
   VIDEO_RAM_LOCATION,
   WORK_RAM_LOCATION,
   OTHER_GAMEBOY_INTERNAL_MEMORY_LOCATION,
-  GRAPHICS_OUTPUT_LOCATION,
-  GBC_PALETTE_LOCATION,
-  BG_PRIORITY_MAP_LOCATION,
-  FRAME_LOCATION,
-  BACKGROUND_MAP_LOCATION,
-  TILE_DATA_LOCATION,
-  OAM_TILES_LOCATION,
-  AUDIO_BUFFER_LOCATION,
   CARTRIDGE_RAM_LOCATION,
   CARTRIDGE_ROM_LOCATION
 } from '../constants';
@@ -23,7 +11,6 @@ import { Memory } from './memory';
 import { eightBitLoadFromGBMemory } from './load';
 import { getRomBankAddress, getRamBankAddress } from './banking';
 import { Cpu } from '../cpu/index';
-import { hexLog } from '../helpers/index';
 
 // Private function to translate a offset meant for the gameboy memory map
 // To the wasmboy memory map
@@ -32,7 +19,7 @@ import { hexLog } from '../helpers/index';
 // Performance help from @dcodeIO, and awesome-gbdev
 export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
   // Get the top byte and switch
-  let gameboyOffsetHighByte: i32 = gameboyOffset >> 12;
+  let gameboyOffsetHighByte = gameboyOffset >> 12;
   switch (gameboyOffsetHighByte) {
     case 0x00:
     case 0x01:
@@ -80,7 +67,7 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
       // Bank 1-7 can be selected into the address space at D000-DFFF.
       // http://gbdev.gg8.se/wiki/articles/CGB_Registers#FF70_-_SVBK_-_CGB_Mode_Only_-_WRAM_Bank
       // Get the last 3 bits to find our wram ID
-      let wramBankId: i32 = 0;
+      let wramBankId = 0;
       if (Cpu.GBCEnabled) {
         wramBankId = eightBitLoadFromGBMemory(Memory.memoryLocationGBCWRAMBank) & 0x07;
       }
