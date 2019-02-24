@@ -146,6 +146,7 @@ export class Sound {
 
 // Initialize sound registers
 // From: https://emu-docs.org/Game%20Boy/gb_sound.txt
+// Inlined because closure compiler inlines
 export function initializeSound(): void {
   // Reset Stateful variables
   Sound.currentCycles = 0;
@@ -227,6 +228,7 @@ export function clearAudioBuffer(): void {
   Sound.audioQueueIndex = 0;
 }
 
+// Inlined because closure compiler inlines
 function calculateSound(numberOfCycles: i32): void {
   // Update all of our channels
   // All samples will be returned as 0 to 30
@@ -300,6 +302,7 @@ function calculateSound(numberOfCycles: i32): void {
   }
 }
 
+// Inlined because closure compiler inlines
 function updateFrameSequencer(numberOfCycles: i32): boolean {
   // APU runs at 4194304 / 512
   // Or Cpu.clockSpeed / 512

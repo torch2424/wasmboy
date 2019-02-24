@@ -36,6 +36,7 @@ export function getSteps(): i32 {
   return Execute.steps;
 }
 
+// Inlined because closure compiler inlines
 function trackStepsRan(steps: i32): void {
   Execute.steps += steps;
   if (Execute.steps >= Execute.stepsPerStepSet) {
@@ -44,6 +45,7 @@ function trackStepsRan(steps: i32): void {
   }
 }
 
+// Inlined because closure compiler inlines
 export function resetSteps(): void {
   Execute.stepsPerStepSet = 2000000000;
   Execute.stepSets = 0;

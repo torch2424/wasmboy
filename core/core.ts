@@ -190,6 +190,7 @@ export function isGBC(): i32 {
 // Function to return an address to store into save state memory
 // this is to regulate our 20 slots
 // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
+// Inlined because closure compiler inlines
 export function getSaveStateMemoryOffset(offset: i32, saveStateSlot: i32): i32 {
   // 50 bytes per save state memory partiton sli32
   return WASMBOY_STATE_LOCATION + offset + 50 * saveStateSlot;

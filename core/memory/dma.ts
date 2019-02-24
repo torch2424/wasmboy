@@ -4,6 +4,7 @@ import { eightBitLoadFromGBMemoryWithTraps, eightBitLoadFromGBMemory } from './l
 import { eightBitStoreIntoGBMemoryWithTraps, eightBitStoreIntoGBMemory } from './store';
 import { concatenateBytes, checkBitOnByte, setBitOnByte, resetBitOnByte, hexLog } from '../helpers/index';
 
+// Inlined because closure compiler inlines
 export function initializeDma(): void {
   if (Cpu.GBCEnabled) {
     // GBC DMA
@@ -22,6 +23,7 @@ export function initializeDma(): void {
   }
 }
 
+// Inlined because closure compiler inlines
 export function startDmaTransfer(sourceAddressOffset: i32): void {
   let sourceAddress: i32 = sourceAddressOffset;
   sourceAddress = sourceAddress << 8;
@@ -39,6 +41,7 @@ export function startDmaTransfer(sourceAddressOffset: i32): void {
 
 // https://gist.github.com/drhelius/3394856
 // http://bgb.bircd.org/pandocs.htm
+// Inlined because closure compiler inlines
 export function startHdmaTransfer(hdmaTriggerByteToBeWritten: i32): void {
   // Check if we are Gbc
   if (!Cpu.GBCEnabled) {
@@ -86,6 +89,7 @@ export function startHdmaTransfer(hdmaTriggerByteToBeWritten: i32): void {
   }
 }
 
+// Inlined because closure compiler inlines
 export function updateHblankHdma(): void {
   if (!Memory.isHblankHdmaActive) {
     return;
@@ -150,6 +154,7 @@ function hdmaTransfer(hdmaSource: i32, hdmaDestination: i32, transferLength: i32
 
 // Function to get our HDMA Source
 // Follows the poan docs
+// Inlined because closure compiler inlines
 function getHdmaSourceFromMemory(): i32 {
   // Get our source for the HDMA
   let hdmaSourceHigh: i32 = eightBitLoadFromGBMemory(Memory.memoryLocationHdmaSourceHigh);
@@ -166,6 +171,7 @@ function getHdmaSourceFromMemory(): i32 {
 
 // Function to get our HDMA Destination
 // Follows the poan docs
+// Inlined because closure compiler inlines
 function getHdmaDestinationFromMemory(): i32 {
   let hdmaDestinationHigh: i32 = eightBitLoadFromGBMemory(Memory.memoryLocationHdmaDestinationHigh);
   let hdmaDestinationLow: i32 = eightBitLoadFromGBMemory(Memory.memoryLocationHdmaDestinationLow);

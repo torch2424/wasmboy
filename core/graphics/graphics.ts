@@ -140,6 +140,7 @@ export function batchProcessGraphics(): void {
   }
 }
 
+// Inlined because closure compiler inlines
 export function initializeGraphics(): void {
   // Reset Stateful Variables
   Graphics.currentCycles = 0;
@@ -307,6 +308,7 @@ function _renderEntireFrame(): void {
 }
 
 // Function to get the start of a RGB pixel (R, G, B)
+// Inlined because closure compiler inlines
 export function getRgbPixelStart(x: i32, y: i32): i32 {
   // Get the pixel number
   // let pixelNumber: i32 = (y * 160) + x;

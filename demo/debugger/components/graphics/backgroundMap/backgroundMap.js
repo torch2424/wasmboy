@@ -13,7 +13,7 @@ const updateBackgroundMapTask = async (canvasElement, canvasContext, canvasImage
   await WasmBoy._runWasmExport('drawBackgroundMapToWasmMemory', [1]);
 
   // Get our background map location constant
-  const backgroundMapLocation = await WasmBoy._getWasmConstant('backgroundMapLocation');
+  const backgroundMapLocation = await WasmBoy._getWasmConstant('BACKGROUND_MAP_LOCATION');
   const backgroundMapMemory = await WasmBoy._getWasmMemorySection(backgroundMapLocation, backgroundMapLocation + 256 * 256 * 3);
 
   const imageDataArray = new Uint8ClampedArray(256 * 256 * 4);

@@ -130,6 +130,7 @@ export class Memory {
   }
 }
 
+// Inlined because closure compiler inlines
 export function initializeCartridge(): void {
   // Reset stateful variables
   Memory.isRamBankingEnabled = false;

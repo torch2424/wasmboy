@@ -85,6 +85,7 @@ export class Interrupts {
   }
 }
 
+// Inlined because closure compiler inlines
 export function initializeInterrupts(): void {
   // Values from BGB
 
@@ -98,6 +99,7 @@ export function initializeInterrupts(): void {
 }
 
 // NOTE: Interrupts should be handled before reading an opcode
+// Inlined because closure compiler inlines
 export function checkInterrupts(): i32 {
   // First check for our delay was enabled
   if (Interrupts.masterInterruptSwitchDelay) {
@@ -227,26 +229,31 @@ export function setInterrupts(value: boolean): void {
   }
 }
 
+// Inlined because closure compiler inlines
 export function requestVBlankInterrupt(): void {
   Interrupts.isVBlankInterruptRequested = true;
   _requestInterrupt(Interrupts.bitPositionVBlankInterrupt);
 }
 
+// Inlined because closure compiler inlines
 export function requestLcdInterrupt(): void {
   Interrupts.isLcdInterruptRequested = true;
   _requestInterrupt(Interrupts.bitPositionLcdInterrupt);
 }
 
+// Inlined because closure compiler inlines
 export function requestTimerInterrupt(): void {
   Interrupts.isTimerInterruptRequested = true;
   _requestInterrupt(Interrupts.bitPositionTimerInterrupt);
 }
 
+// Inlined because closure compiler inlines
 export function requestJoypadInterrupt(): void {
   Interrupts.isJoypadInterruptRequested = true;
   _requestInterrupt(Interrupts.bitPositionJoypadInterrupt);
 }
 
+// Inlined because closure compiler inlines
 export function requestSerialInterrupt(): void {
   Interrupts.isSerialInterruptRequested = true;
   _requestInterrupt(Interrupts.bitPositionSerialInterrupt);

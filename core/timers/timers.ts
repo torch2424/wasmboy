@@ -156,6 +156,7 @@ export class Timers {
   }
 }
 
+// Inlined because closure compiler inlines
 export function initializeTimers(): void {
   // Reset stateful Variables
   Timers.currentCycles = 0;

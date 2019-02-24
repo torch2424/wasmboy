@@ -6,7 +6,7 @@ import { eightBitStoreIntoGBMemory } from '../memory/store';
 import { updateHblankHdma } from '../memory/index';
 import { requestLcdInterrupt, requestVBlankInterrupt } from '../interrupts/index';
 import { checkBitOnByte, setBitOnByte, resetBitOnByte, hexLog } from '../helpers/index';
-import { GRAPHICS_OUTPUT_LOCATION, GRAPHICS_OUTPUT_SIZE } from '../constants';
+import { FRAME_LOCATION, FRAME_SIZE } from '../constants';
 
 export class Lcd {
   // Memory Locations
@@ -102,13 +102,14 @@ function resetLcd(shouldBlankScreen: boolean): void {
 
   // Blank the screen
   if (shouldBlankScreen) {
-    for (let i = 0; i < GRAPHICS_OUTPUT_SIZE; i++) {
-      store<u8>(GRAPHICS_OUTPUT_LOCATION + i, 255);
+    for (let i = 0; i < FRAME_SIZE; i++) {
+      store<u8>(FRAME_LOCATION + i, 255);
     }
   }
 }
 
 // Pass in the lcd status for performance
+// Inlined because closure compiler inlines
 export function setLcdStatus(): void {
   // Check if the Lcd was disabled
   if (!Lcd.enabled) {

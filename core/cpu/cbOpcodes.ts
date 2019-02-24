@@ -19,6 +19,7 @@ import { u8Portable, u16Portable } from '../portable/portable';
 // Handle CB Opcodes
 // NOTE: Program stpes and cycles are standardized depending on the register type
 // NOTE: Doing some funny stuff to get around not having arrays or objects
+// Inlined because closure compiler inlines.
 export function handleCbOpcode(cbOpcode: i32): i32 {
   let numberOfCycles: i32 = -1;
   let handledOpcode: boolean = false;

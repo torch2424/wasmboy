@@ -51,6 +51,7 @@ export class Colors {
   static obj1Black: i32 = WasmBoyGBColors.obj1Black;
 }
 
+// Inlined because closure compiler inlines
 export function initializeColors(): void {
   setManualColorizationPalette(0);
 
@@ -323,6 +324,7 @@ export function setManualColorizationPalette(colorizationId: i32): void {
 // By checksum of the title
 // https://forums.nesdev.com/viewtopic.php?f=20&t=10226
 // TODO: torch2424 need to find how to get the "disambiguation"
+// Inlined because closure compiler inlines
 export function setHashColorizationPalette(hash: i32): void {
   switch (hash) {
     case 0x88:

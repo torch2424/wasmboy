@@ -17,6 +17,7 @@ import { getPriorityforPixel } from './priority';
 import { eightBitLoadFromGBMemory } from '../memory/load';
 import { checkBitOnByte, setBitOnByte, resetBitOnByte, hexLog } from '../helpers/index';
 
+// Inlined because closure compiler inlines
 export function renderSprites(scanlineRegister: i32, useLargerSprites: boolean): void {
   // Need to loop through all 40 sprites to check their status
   // Going backwards since lower sprites draw over higher ones

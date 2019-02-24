@@ -164,6 +164,7 @@ export class Cpu {
   }
 }
 
+// Inlined because closure compiler does so
 export function initializeCpu(): void {
   // Reset all stateful Cpu variables
   // Cpu.GBCEnabled is done by core/initialize
