@@ -456,15 +456,15 @@
        local.get $0
        i32.const 1
        global.get $core/memory/memory/Memory.currentRomBank
-       local.tee $0
+       local.tee $1
        global.get $core/memory/memory/Memory.isMBC5
        i32.eqz
-       local.tee $1
+       local.tee $0
        if (result i32)
-        local.get $0
+        local.get $1
         i32.eqz
        else        
-        local.get $1
+        local.get $0
        end
        select
        i32.const 14
@@ -520,11 +520,11 @@
     i32.const 1
     i32.lt_s
    end
-   if
+   if (result i32)
     i32.const 1
-    local.set $1
+   else    
+    local.get $1
    end
-   local.get $1
    i32.const 12
    i32.shl
    local.get $0
@@ -6470,22 +6470,19 @@
   local.tee $0
   global.set $core/sound/channel4/Channel4.NRx3DivisorCode
   local.get $0
-  i32.const 7
-  i32.le_s
+  i32.const 1
+  i32.shl
+  local.tee $0
+  i32.const 1
+  i32.lt_s
   if
    i32.const 1
-   local.get $0
-   i32.const 1
-   i32.shl
-   local.tee $0
-   i32.const 1
-   local.get $0
-   i32.gt_s
-   select
-   i32.const 3
-   i32.shl
-   global.set $core/sound/channel4/Channel4.divisor
+   local.set $0
   end
+  local.get $0
+  i32.const 3
+  i32.shl
+  global.set $core/sound/channel4/Channel4.divisor
  )
  (func $core/sound/channel1/Channel1.trigger (; 96 ;) (type $_)
   (local $0 i32)

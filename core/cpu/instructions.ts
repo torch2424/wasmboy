@@ -22,7 +22,7 @@ export function addARegister(register: u8): void {
   checkAndSetEightBitCarryFlag(registerA, register);
   registerA = u8Portable(registerA + register);
   Cpu.registerA = registerA;
-  setZeroFlag(i32(registerA === 0));
+  setZeroFlag(<i32>(registerA === 0));
   setSubtractFlag(0);
 }
 
@@ -32,13 +32,13 @@ export function addAThroughCarryRegister(register: u8): void {
   // CTRL+F adc
   let registerA = Cpu.registerA;
   let result = u8Portable(registerA + register + getCarryFlag());
-  setHalfCarryFlag(i32((u8Portable(registerA ^ register ^ result) & 0x10) != 0));
+  setHalfCarryFlag(<i32>((u8Portable(registerA ^ register ^ result) & 0x10) != 0));
 
   let overflowedResult = u16Portable(<u16>registerA + <u16>register + <u16>getCarryFlag());
-  setCarryFlag(i32((overflowedResult & 0x100) > 0));
+  setCarryFlag(<i32>((overflowedResult & 0x100) > 0));
 
   Cpu.registerA = result;
-  setZeroFlag(i32(result === 0));
+  setZeroFlag(<i32>(result === 0));
   setSubtractFlag(0);
 }
 
@@ -52,7 +52,7 @@ export function subARegister(register: u8): void {
   checkAndSetEightBitCarryFlag(registerA, negativeRegister);
   registerA = u8Portable(registerA - register);
   Cpu.registerA = registerA;
-  setZeroFlag(i32(registerA === 0));
+  setZeroFlag(<i32>(registerA === 0));
   setSubtractFlag(1);
 }
 
@@ -64,20 +64,20 @@ export function subAThroughCarryRegister(register: u8): void {
   let result = u8Portable(registerA - register - getCarryFlag());
 
   let carryRegisterCheck = u8Portable((registerA ^ register ^ result) & 0x10);
-  setHalfCarryFlag(i32(carryRegisterCheck != 0));
+  setHalfCarryFlag(<i32>(carryRegisterCheck != 0));
 
   let overflowedResult = u16Portable(<u16>registerA - <u16>register - <u16>getCarryFlag());
-  setCarryFlag(i32((overflowedResult & 0x100) > 0));
+  setCarryFlag(<i32>((overflowedResult & 0x100) > 0));
 
   Cpu.registerA = result;
-  setZeroFlag(i32(result === 0));
+  setZeroFlag(<i32>(result === 0));
   setSubtractFlag(1);
 }
 
 export function andARegister(register: u8): void {
   let registerA = Cpu.registerA & register;
   Cpu.registerA = registerA;
-  setZeroFlag(i32(registerA === 0));
+  setZeroFlag(<i32>(registerA === 0));
   setSubtractFlag(0);
   setHalfCarryFlag(1);
   setCarryFlag(0);
@@ -86,7 +86,7 @@ export function andARegister(register: u8): void {
 export function xorARegister(register: u8): void {
   let registerA = u8Portable(Cpu.registerA ^ register);
   Cpu.registerA = registerA;
-  setZeroFlag(i32(registerA === 0));
+  setZeroFlag(<i32>(registerA === 0));
   setSubtractFlag(0);
   setHalfCarryFlag(0);
   setCarryFlag(0);
@@ -95,7 +95,7 @@ export function xorARegister(register: u8): void {
 export function orARegister(register: u8): void {
   let registerA = Cpu.registerA | register;
   Cpu.registerA = registerA;
-  setZeroFlag(i32(registerA === 0));
+  setZeroFlag(<i32>(registerA === 0));
   setSubtractFlag(0);
   setHalfCarryFlag(0);
   setCarryFlag(0);
@@ -112,7 +112,7 @@ export function cpARegister(register: u8): void {
   checkAndSetEightBitHalfCarryFlag(registerA, negativeRegister);
   checkAndSetEightBitCarryFlag(registerA, negativeRegister);
   let tempResult = <i32>registerA + negativeRegister;
-  setZeroFlag(i32(tempResult === 0));
+  setZeroFlag(<i32>(tempResult === 0));
   setSubtractFlag(1);
 }
 
@@ -120,10 +120,10 @@ export function cpARegister(register: u8): void {
 export function rotateRegisterLeft(register: u8): u8 {
   // RLC register 8-bit
   // Z 0 0 C
-  setCarryFlag(i32((register & 0x80) === 0x80));
+  setCarryFlag(<i32>((register & 0x80) === 0x80));
 
   register = rotateByteLeft(register);
-  setZeroFlag(i32(register === 0));
+  setZeroFlag(<i32>(register === 0));
 
   // Set all other flags to zero
   setSubtractFlag(0);
@@ -138,10 +138,10 @@ export function rotateRegisterRight(register: u8): u8 {
   // RLC register 8-bit
   // Z 0 0 C
   // Check for the last bit, to see if it will be carried
-  setCarryFlag(i32((register & 0x01) > 0));
+  setCarryFlag(<i32>((register & 0x01) > 0));
   register = rotateByteRight(register);
 
-  setZeroFlag(i32(register === 0));
+  setZeroFlag(<i32>(register === 0));
   setSubtractFlag(0);
   setHalfCarryFlag(0);
 
@@ -157,8 +157,8 @@ export function rotateRegisterLeftThroughCarry(register: u8): u8 {
   let hasHighbit = (register & 0x80) === 0x80;
   register = rotateByteLeftThroughCarry(register);
 
-  setCarryFlag(i32(hasHighbit));
-  setZeroFlag(i32(register === 0));
+  setCarryFlag(<i32>hasHighbit);
+  setZeroFlag(<i32>(register === 0));
 
   setSubtractFlag(0);
   setHalfCarryFlag(0);
@@ -173,8 +173,8 @@ export function rotateRegisterRightThroughCarry(register: u8): u8 {
   let hasLowBit = (register & 0x01) === 0x01;
   register = rotateByteRightThroughCarry(register);
 
-  setCarryFlag(i32(hasLowBit));
-  setZeroFlag(i32(register === 0));
+  setCarryFlag(<i32>hasLowBit);
+  setZeroFlag(<i32>(register === 0));
 
   setSubtractFlag(0);
   setHalfCarryFlag(0);
@@ -189,8 +189,8 @@ export function shiftLeftRegister(register: u8): u8 {
   let hasHighbit = (register & 0x80) === 0x80;
   register = u8Portable(register << 1);
 
-  setCarryFlag(i32(hasHighbit));
-  setZeroFlag(i32(register === 0));
+  setCarryFlag(<i32>hasHighbit);
+  setZeroFlag(<i32>(register === 0));
 
   setSubtractFlag(0);
   setHalfCarryFlag(0);
@@ -213,10 +213,10 @@ export function shiftRightArithmeticRegister(register: u8): u8 {
     register = register | 0x80;
   }
 
-  setZeroFlag(i32(register === 0));
+  setZeroFlag(<i32>(register === 0));
   setSubtractFlag(0);
   setHalfCarryFlag(0);
-  setCarryFlag(i32(hasLowbit));
+  setCarryFlag(<i32>hasLowbit);
 
   return register;
 }
@@ -229,7 +229,7 @@ export function swapNibblesOnRegister(register: u8): u8 {
   let lowNibble = register & 0x0f;
   register = u8Portable((lowNibble << 4) | (highNibble >> 4));
 
-  setZeroFlag(i32(register === 0));
+  setZeroFlag(<i32>(register === 0));
   setSubtractFlag(0);
   setHalfCarryFlag(0);
   setCarryFlag(0);
@@ -247,10 +247,10 @@ export function shiftRightLogicalRegister(register: u8): u8 {
   let hasLowbit = (register & 0x01) === 0x01;
   register = u8Portable(register >> 1);
 
-  setZeroFlag(i32(register === 0));
+  setZeroFlag(<i32>(register === 0));
   setSubtractFlag(0);
   setHalfCarryFlag(0);
-  setCarryFlag(i32(hasLowbit));
+  setCarryFlag(<i32>hasLowbit);
 
   return register;
 }
@@ -262,7 +262,7 @@ export function testBitOnRegister(bitPosition: u8, register: u8): u8 {
   let testByte: u8 = 0x01 << bitPosition;
   let result = register & testByte;
 
-  setZeroFlag(i32(result === 0x00));
+  setZeroFlag(<i32>(result === 0x00));
   setSubtractFlag(0);
   setHalfCarryFlag(1);
 
