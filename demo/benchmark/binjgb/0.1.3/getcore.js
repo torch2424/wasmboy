@@ -25,6 +25,9 @@ function makeWasmBuffer(module, ptr, size) {
   return new Uint8Array(module.buffer, ptr, size);
 }
 
+const CPU_TICKS_PER_FRAME = 70224;
+let framesRun = 0;
+
 export default async function getBinjgbCore() {
   // Get our binjgb module
   const module = await Binjgb();
@@ -41,8 +44,6 @@ export default async function getBinjgbCore() {
 
   // set a placehodler for our graphics memory
   let graphicsByteMemory;
-  let rewindBufferPtr;
-  let audioBufferPtr;
 
   // Create an array for our RGB buffer, that wasmboy will convert to rgba
   const rgbMemory = new Uint8ClampedArray(SCREEN_HEIGHT * SCREEN_WIDTH * 3);
@@ -66,23 +67,13 @@ export default async function getBinjgbCore() {
 
           graphicsByteMemory = makeWasmBuffer(module, module._get_frame_buffer_ptr(e), module._get_frame_buffer_size(e));
 
-          // Need to create all other buffer
-          rewindBufferPtr = module._rewind_new_simple(e, REWIND_FRAMES_PER_BASE_STATE, REWIND_BUFFER_CAPACITY);
-          audioBufferPtr = makeWasmBuffer(module, module._get_audio_buffer_ptr(e), module._get_audio_buffer_capacity(e));
-
           // Now that we have our rom loaded, simply swap the byte memory for our purposes ;)
           core.byteMemory = rgbMemory;
         },
         executeFrame: () => {
-          // console.log('EXECUTE');
           while (true) {
-            const event = module._emulator_run_until_f64(e, CPU_TICKS_PER_SECOND);
+            const event = module._emulator_run_until_f64(e, CPU_TICKS_PER_FRAME * framesRun);
             if (event & EVENT_NEW_FRAME) {
-              // console.log('new frame');
-
-              // Push Rewind Buffer
-              module._rewind_append(rewindBufferPtr, e);
-
               // Output Graphics (normally here, but doing later for perf)
               // Convert the graphics memory to our rgb Memory
               for (let i = 0; i < SCREEN_HEIGHT * SCREEN_WIDTH; i++) {
@@ -95,12 +86,9 @@ export default async function getBinjgbCore() {
               }
             }
             if (event & EVENT_AUDIO_BUFFER_FULL) {
-              // Push the audio buffer
-              // this.audio.pushBuffer();
-              // console.log('audio')
             }
             if (event & EVENT_UNTIL_TICKS) {
-              // console.log('ticks');
+              framesRun++;
               break;
             }
           }
