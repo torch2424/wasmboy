@@ -223,16 +223,17 @@ function calculateSound(numberOfCycles: i32): void {
   SoundAccumulator.channel4Sample = channel4Sample;
 
   // Do Some downsampling magic
-  Sound.downSampleCycleCounter += numberOfCycles * Sound.downSampleCycleMultiplier;
-  if (Sound.downSampleCycleCounter >= Sound.maxDownSampleCycles()) {
+  let downSampleCycleCounter = Sound.downSampleCycleCounter + numberOfCycles * Sound.downSampleCycleMultiplier;
+  if (downSampleCycleCounter >= Sound.maxDownSampleCycles()) {
     // Reset the downsample counter
     // Don't set to zero to catch overflowed cycles
-    Sound.downSampleCycleCounter -= Sound.maxDownSampleCycles();
+    downSampleCycleCounter -= Sound.maxDownSampleCycles();
+    Sound.downSampleCycleCounter = downSampleCycleCounter;
 
     // Mix our samples
-    let mixedSample: i32 = mixChannelSamples(channel1Sample, channel2Sample, channel3Sample, channel4Sample);
-    let leftChannelSampleUnsignedByte: i32 = splitHighByte(mixedSample);
-    let rightChannelSampleUnsignedByte: i32 = splitLowByte(mixedSample);
+    let mixedSample = mixChannelSamples(channel1Sample, channel2Sample, channel3Sample, channel4Sample);
+    let leftChannelSampleUnsignedByte = splitHighByte(mixedSample);
+    let rightChannelSampleUnsignedByte = splitLowByte(mixedSample);
 
     // Set our volumes in memory
     // +1 so it can not be zero
@@ -281,8 +282,7 @@ function updateFrameSequencer(numberOfCycles: i32): boolean {
   // Or Cpu.clockSpeed / 512
   // Which means, we need to update once every 8192 cycles :)
   let maxFrameSequenceCycles = Sound.maxFrameSequenceCycles();
-  let frameSequenceCycleCounter = Sound.frameSequenceCycleCounter;
-  frameSequenceCycleCounter += numberOfCycles;
+  let frameSequenceCycleCounter = Sound.frameSequenceCycleCounter + numberOfCycles;
   if (frameSequenceCycleCounter >= maxFrameSequenceCycles) {
     // Reset the frameSequenceCycleCounter
     // Not setting to zero as we do not want to drop cycles
@@ -291,7 +291,8 @@ function updateFrameSequencer(numberOfCycles: i32): boolean {
 
     // Check our frame sequencer
     // https://gist.github.com/drhelius/3652407
-    switch (Sound.frameSequencer) {
+    let frameSequencer = Sound.frameSequencer;
+    switch (frameSequencer) {
       case 0:
         // Update Length on Channels
         Channel1.updateLength();
@@ -336,7 +337,7 @@ function updateFrameSequencer(numberOfCycles: i32): boolean {
     }
 
     // Update our frame sequencer
-    Sound.frameSequencer = (Sound.frameSequencer + 1) & 7;
+    Sound.frameSequencer = (frameSequencer + 1) & 7;
     return true;
   } else {
     Sound.frameSequenceCycleCounter = frameSequenceCycleCounter;

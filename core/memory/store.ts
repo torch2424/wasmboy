@@ -23,12 +23,12 @@ export function sixteenBitStoreIntoGBMemoryWithTraps(offset: i32, value: i32): v
   // Split the value into two seperate bytes
   let highByte = splitHighByte(value);
   let lowByte = splitLowByte(value);
-  let nextOffset = offset + 1;
 
   if (checkWriteTraps(offset, lowByte)) {
     eightBitStoreIntoGBMemory(offset, lowByte);
   }
 
+  let nextOffset = offset + 1;
   if (checkWriteTraps(nextOffset, highByte)) {
     eightBitStoreIntoGBMemory(nextOffset, highByte);
   }
@@ -39,10 +39,9 @@ export function sixteenBitStoreIntoGBMemory(offset: i32, value: i32): void {
   // Split the value into two seperate bytes
   let highByte = splitHighByte(value);
   let lowByte = splitLowByte(value);
-  let nextOffset = offset + 1;
 
-  eightBitStoreIntoGBMemory(offset, lowByte);
-  eightBitStoreIntoGBMemory(nextOffset, highByte);
+  eightBitStoreIntoGBMemory(offset + 0, lowByte);
+  eightBitStoreIntoGBMemory(offset + 1, highByte);
 }
 
 export function storeBooleanDirectlyToWasmMemory(offset: i32, value: boolean): void {
