@@ -8003,9 +8003,6 @@
  )
  (func $core/graphics/lcd/checkCoincidence (; 117 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
-  (local $3 i32)
-  global.get $core/graphics/lcd/Lcd.coincidenceCompare
-  local.set $3
   block (result i32)
    local.get $0
    i32.eqz
@@ -8021,7 +8018,7 @@
   end
   if (result i32)
    global.get $core/graphics/graphics/Graphics.scanlineRegister
-   local.get $3
+   global.get $core/graphics/lcd/Lcd.coincidenceCompare
    i32.eq
   else   
    local.get $2
@@ -8048,35 +8045,37 @@
   (local $0 i32)
   (local $1 i32)
   (local $2 i32)
+  (local $3 i32)
+  (local $4 i32)
   global.get $core/graphics/lcd/Lcd.enabled
   i32.eqz
   if
    return
   end
   global.get $core/graphics/lcd/Lcd.currentLcdMode
-  local.set $0
-  local.get $0
+  local.set $3
+  local.get $3
   global.get $core/graphics/graphics/Graphics.scanlineRegister
-  local.tee $2
+  local.tee $4
   i32.const 144
   i32.ge_s
   if (result i32)
    i32.const 1
   else   
    global.get $core/graphics/graphics/Graphics.scanlineCycleCounter
+   local.tee $2
    i32.const 376
    global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
    i32.shl
+   local.tee $0
    i32.ge_s
    if (result i32)
     i32.const 2
    else    
     i32.const 3
     i32.const 0
-    global.get $core/graphics/graphics/Graphics.scanlineCycleCounter
-    i32.const 249
-    global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
-    i32.shl
+    local.get $2
+    local.get $0
     i32.ge_s
     select
    end
@@ -8168,7 +8167,7 @@
    call $core/graphics/lcd/checkCoincidence
    call $core/memory/store/eightBitStoreIntoGBMemory
   else   
-   local.get $2
+   local.get $4
    i32.const 153
    i32.eq
    if

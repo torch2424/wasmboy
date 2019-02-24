@@ -25,8 +25,8 @@ export class Lcd {
   static updateLcdStatus(value: i32): void {
     // Bottom three bits are read only
     let currentLcdStatus: i32 = eightBitLoadFromGBMemory(Lcd.memoryLocationLcdStatus);
-    let valueNoBottomBits: i32 = value & 0xf8;
-    let lcdStatusOnlyBottomBits: i32 = currentLcdStatus & 0x07;
+    let valueNoBottomBits = value & 0xf8;
+    let lcdStatusOnlyBottomBits = currentLcdStatus & 0x07;
     value = valueNoBottomBits | lcdStatusOnlyBottomBits;
 
     // Top bit is always 1
@@ -102,7 +102,7 @@ function resetLcd(shouldBlankScreen: boolean): void {
 
   // Blank the screen
   if (shouldBlankScreen) {
-    for (let i = 0; i < FRAME_SIZE; i++) {
+    for (let i = 0; i < FRAME_SIZE; ++i) {
       store<u8>(FRAME_LOCATION + i, 255);
     }
   }
@@ -121,17 +121,19 @@ export function setLcdStatus(): void {
   let lcdMode: i32 = Lcd.currentLcdMode;
 
   // Default to  H-Blank
-  let newLcdMode: i32 = 0;
+  let newLcdMode = 0;
 
   // Find our newLcd mode
   if (scanlineRegister >= 144) {
     // VBlank mode
     newLcdMode = 1;
   } else {
-    if (Graphics.scanlineCycleCounter >= Graphics.MIN_CYCLES_SPRITES_LCD_MODE()) {
+    let scanlineCycleCounter = Graphics.scanlineCycleCounter;
+    let MIN_CYCLES_SPRITES_LCD_MODE = Graphics.MIN_CYCLES_SPRITES_LCD_MODE();
+    if (scanlineCycleCounter >= MIN_CYCLES_SPRITES_LCD_MODE) {
       // Searching Sprites Atts
       newLcdMode = 2;
-    } else if (Graphics.scanlineCycleCounter >= Graphics.MIN_CYCLES_TRANSFER_DATA_LCD_MODE()) {
+    } else if (scanlineCycleCounter >= MIN_CYCLES_SPRITES_LCD_MODE) {
       // Transferring data to lcd
       newLcdMode = 3;
     }
@@ -144,7 +146,7 @@ export function setLcdStatus(): void {
     // Save our lcd mode
     Lcd.currentLcdMode = newLcdMode;
 
-    let shouldRequestInterrupt: boolean = false;
+    let shouldRequestInterrupt = false;
 
     // Set our LCD Status accordingly
     switch (newLcdMode) {
@@ -202,8 +204,7 @@ export function setLcdStatus(): void {
 function checkCoincidence(lcdMode: i32, lcdStatus: i32): i32 {
   // Check for the coincidence flag
   // Need to check on every mode, and not just HBLANK, as checking on hblank breaks shantae, which checks on vblank
-  let coincidenceCompare: i32 = Lcd.coincidenceCompare;
-  if ((lcdMode === 0 || lcdMode === 1) && Graphics.scanlineRegister === coincidenceCompare) {
+  if ((lcdMode === 0 || lcdMode === 1) && Graphics.scanlineRegister === Lcd.coincidenceCompare) {
     lcdStatus = setBitOnByte(2, lcdStatus);
     if (checkBitOnByte(6, lcdStatus)) {
       requestLcdInterrupt();
