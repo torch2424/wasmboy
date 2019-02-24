@@ -30,8 +30,8 @@ export class Timers {
   // DIV will increment TIMA, whenever there is a falling edge, see below for that.
   static readonly memoryLocationDividerRegister: i32 = 0xff04; // DIV
   static dividerRegister: i32 = 0;
-  static updateDividerRegister(value: i32): void {
-    let oldDividerRegister: i32 = Timers.dividerRegister;
+  static updateDividerRegister(): void {
+    let oldDividerRegister = Timers.dividerRegister;
     Timers.dividerRegister = 0;
     eightBitStoreIntoGBMemory(Timers.memoryLocationDividerRegister, 0);
 

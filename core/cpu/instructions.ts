@@ -75,7 +75,7 @@ export function subAThroughCarryRegister(register: u8): void {
 }
 
 export function andARegister(register: u8): void {
-  var registerA = Cpu.registerA & register;
+  let registerA = Cpu.registerA & register;
   Cpu.registerA = registerA;
   setZeroFlag(i32(registerA === 0));
   setSubtractFlag(0);
@@ -84,7 +84,7 @@ export function andARegister(register: u8): void {
 }
 
 export function xorARegister(register: u8): void {
-  var registerA = u8Portable(Cpu.registerA ^ register);
+  let registerA = u8Portable(Cpu.registerA ^ register);
   Cpu.registerA = registerA;
   setZeroFlag(i32(registerA === 0));
   setSubtractFlag(0);
@@ -93,7 +93,7 @@ export function xorARegister(register: u8): void {
 }
 
 export function orARegister(register: u8): void {
-  var registerA = Cpu.registerA | register;
+  let registerA = Cpu.registerA | register;
   Cpu.registerA = registerA;
   setZeroFlag(i32(registerA === 0));
   setSubtractFlag(0);

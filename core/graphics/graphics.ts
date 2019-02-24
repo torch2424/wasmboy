@@ -39,24 +39,12 @@ export class Graphics {
   }
 
   static MIN_CYCLES_SPRITES_LCD_MODE(): i32 {
-    /*if (Cpu.GBCDoubleSpeed) {
-      // TODO: Confirm these clock cyles, double similar to scanline, which TCAGBD did
-      return 752;
-    }
-
-    return 376;*/
+    // TODO: Confirm these clock cyles, double similar to scanline, which TCAGBD did
     return 376 << (<i32>Cpu.GBCDoubleSpeed);
   }
 
   static MIN_CYCLES_TRANSFER_DATA_LCD_MODE(): i32 {
-    /*
-    if (Cpu.GBCDoubleSpeed) {
-      // TODO: Confirm these clock cyles, double similar to scanline, which TCAGBD did
-      return 498;
-    }
-
-    return 249;
-    */
+    // TODO: Confirm these clock cyles, double similar to scanline, which TCAGBD did
     return 249 << (<i32>Cpu.GBCDoubleSpeed);
   }
 

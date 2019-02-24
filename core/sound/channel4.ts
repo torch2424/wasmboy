@@ -54,33 +54,6 @@ export class Channel4 {
     Channel4.NRx3WidthMode = checkBitOnByte(3, value);
     Channel4.NRx3DivisorCode = divisorCode;
     // Also, get our divisor
-    /*
-    switch (Channel4.NRx3DivisorCode) {
-      case 0:
-        Channel4.divisor = 8;
-        return;
-      case 1:
-        Channel4.divisor = 16;
-        return;
-      case 2:
-        Channel4.divisor = 32;
-        return;
-      case 3:
-        Channel4.divisor = 48;
-        return;
-      case 4:
-        Channel4.divisor = 64;
-        return;
-      case 5:
-        Channel4.divisor = 80;
-        return;
-      case 6:
-        Channel4.divisor = 96;
-        return;
-      case 7:
-        Channel4.divisor = 112;
-        return;
-    }*/
     if (divisorCode <= 7) {
       Channel4.divisor = max<i32>(1, divisorCode << 1) << 3;
     }

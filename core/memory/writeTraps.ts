@@ -193,7 +193,7 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
 
     switch (offset) {
       case Timers.memoryLocationDividerRegister:
-        Timers.updateDividerRegister(value);
+        Timers.updateDividerRegister();
         return false;
       case Timers.memoryLocationTimerCounter:
         Timers.updateTimerCounter(value);

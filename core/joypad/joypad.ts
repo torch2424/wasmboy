@@ -203,8 +203,6 @@ function _pressJoypadButton(buttonId: i32): void {
     }
 
     // Determine if we should request an interrupt
-    // let joypadRegister: i32 = Joypad.joypadRegisterFlipped; // not used
-
     let shouldRequestInterrupt = false;
 
     // Check if the game is looking for a dpad type button press

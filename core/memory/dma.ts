@@ -144,10 +144,6 @@ function hdmaTransfer(hdmaSource: i32, hdmaDestination: i32, transferLength: i32
   // And HDMA takes 8 micro seconds per 0x10 bytes in GBC Double Speed mode (and GBC Normal Mode)
   // Will assume (644 / 10) cycles for GBC Double Speed Mode,
   // and (644 / 10 / 2) for GBC Normal Mode
-  /*let hdmaCycles = 32;
-  if (Cpu.GBCDoubleSpeed) {
-    hdmaCycles = 64;
-  }*/
   let hdmaCycles = 32 << (<i32>Cpu.GBCDoubleSpeed);
   hdmaCycles = hdmaCycles * (transferLength >> 4);
   Memory.DMACycles += hdmaCycles;
