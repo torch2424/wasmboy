@@ -7,6 +7,7 @@ import { PUBX_KEYS } from '../../../pubx.config';
 
 import DebuggerAnalytics from '../../../analytics';
 import { WasmBoy, WasmBoyDefaultDesktopOptions } from '../../../wasmboy';
+import loadBootROM from '../../../loadBootROM';
 
 import './wasmboyOptions.css';
 
@@ -14,7 +15,23 @@ export default class WasmBoyOptions extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {
+      bootROMs: []
+    };
+
+    this.bootRomType = 'gb';
+
+    // Create a hidden input on the page for opening files
+    const hiddenInput = document.createElement('input');
+    hiddenInput.id = 'hidden-boot-rom-input';
+    hiddenInput.classList.add('hidden-rom-input');
+    hiddenInput.setAttribute('type', 'file');
+    hiddenInput.setAttribute('accept', '.bin, .zip');
+    hiddenInput.setAttribute('hidden', true);
+    hiddenInput.addEventListener('change', this.onBootRomChange.bind(this));
+    document.body.appendChild(hiddenInput);
+
+    this.hiddenInput = hiddenInput;
   }
 
   componentDidMount() {
@@ -25,6 +42,8 @@ export default class WasmBoyOptions extends Component {
       newState[optionKey] = wasmboyConfig[optionKey];
     });
     this.setState(newState);
+
+    this.updateBootROMs();
   }
 
   setStateKey(stateKey, value) {
@@ -45,6 +64,45 @@ export default class WasmBoyOptions extends Component {
       .catch(error => {
         Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Options Error! 😞');
       });
+  }
+
+  async updateBootROMs() {
+    const bootROMs = await WasmBoy.getBootROMs();
+    this.setState({
+      bootROMs
+    });
+  }
+
+  getBootROMOfType(type) {
+    if (!this.state.bootROMs) {
+      return;
+    }
+
+    let bootROM;
+    this.state.bootROMs.some(bootROMObject => {
+      if (bootROMObject.type === type.toUpperCase()) {
+        bootROM = bootROMObject;
+        return true;
+      }
+
+      return false;
+    });
+
+    return bootROM;
+  }
+
+  clickBootRom(bootRomType) {
+    this.bootRomType = bootRomType;
+    this.hiddenInput.click();
+  }
+
+  async onBootRomChange(event) {
+    const file = event.target.files[0];
+    const name = event.target.files[0].name;
+
+    await loadBootROM(file, this.bootRomType, name);
+
+    this.updateBootROMs();
   }
 
   render() {
@@ -93,7 +151,7 @@ export default class WasmBoyOptions extends Component {
 
     return (
       <div class="wasmboy__options animated fadeIn">
-        <h1>Options:</h1>
+        <h1>WasmBoy Options:</h1>
         <div class="wasmboy__options__info">
           <i>
             Applying options will reset any currently running game without saving. It is reccomended you apply your options before loading
@@ -142,6 +200,27 @@ export default class WasmBoyOptions extends Component {
         >
           Apply Options
         </button>
+
+        {/* Upload a Boot ROM */}
+        <h2>Add Boot ROM:</h2>
+        {[{ name: 'Game Boy', type: 'GB' }, { name: 'Game Boy Color', type: 'GBC' }].map(bootRomRenderObject => {
+          const bootRom = this.getBootROMOfType(bootRomRenderObject.type);
+
+          return (
+            <div class="wasmboy-options__boot-rom-select">
+              <div>{bootRomRenderObject.name}</div>
+              {bootRom ? (
+                <div>
+                  <div>File name: {bootRom.filename}</div>
+                  <div>Added: {new Date(bootRom.date).toLocaleDateString()}</div>
+                </div>
+              ) : (
+                <div>None Uploaded</div>
+              )}
+              <button onClick={() => this.clickBootRom(bootRomRenderObject.type)}>Upload {bootRomRenderObject.name} Boot ROM</button>
+            </div>
+          );
+        })}
       </div>
     );
   }

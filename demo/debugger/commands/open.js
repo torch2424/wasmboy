@@ -24,9 +24,10 @@ class OpenLocalFile extends Command {
 
     // Create a hidden input on the page for opening files
     const hiddenInput = document.createElement('input');
+    hiddenInput.id = 'hidden-rom-input';
     hiddenInput.classList.add('hidden-rom-input');
     hiddenInput.setAttribute('type', 'file');
-    hiddenInput.setAttribute('accept', '.gb, .gbc, .zip, .bin');
+    hiddenInput.setAttribute('accept', '.gb, .gbc, .zip');
     hiddenInput.setAttribute('hidden', true);
     hiddenInput.addEventListener('change', this.onChange.bind(this));
     document.body.appendChild(hiddenInput);
@@ -44,12 +45,7 @@ class OpenLocalFile extends Command {
     const file = event.target.files[0];
     const name = event.target.files[0].name;
 
-    if (name.includes('.bin')) {
-      // It's a normal game
-      loadBootROM(file);
-    } else {
-      loadROM(file, name);
-    }
+    loadROM(file, name);
   }
 }
 

@@ -3,29 +3,30 @@ import { PUBX_KEYS } from './pubx.config';
 import { WasmBoy } from './wasmboy';
 import DebuggerAnalytics from './analytics';
 
-export default function(file) {
+export default function(file, type, name) {
   const loadROMTask = async () => {
     await WasmBoy.pause();
-    await WasmBoy.loadBootROM(file);
+    await WasmBoy.addBootROM(type, file, undefined, {
+      filename: name
+    });
 
-    // Save the loaded cartridge
-    await WasmBoy.saveLoadedBootROM();
-
-    Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Boot ROM Loaded! 🎉');
+    Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Boot ROM Added! 🎉');
 
     // Fire off Analytics
-    //DebuggerAnalytics.loadROMSuccess();
+    DebuggerAnalytics.addBootROMSuccess();
   };
 
   const loadROMPromise = loadROMTask();
 
   loadROMPromise.catch(error => {
-    console.log('Boot ROM Game Error:', error);
-    Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Boot ROM Load Error! 😞');
+    console.log('Boot ROM Error:', error);
+    Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Boot ROM Add Error! 😞');
 
     // Fire off Analytics
-    // DebuggerAnalytics.loadROMFail();
+    DebuggerAnalytics.addBootROMFail();
   });
 
   Pubx.get(PUBX_KEYS.LOADING).addControlPromise(loadROMPromise, true);
+
+  return loadROMPromise;
 }

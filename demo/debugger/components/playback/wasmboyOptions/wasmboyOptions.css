@@ -15,3 +15,13 @@
 .wasmboy-options__apply {
   margin-top: 10px;
 }
+
+.wasmboy-options__boot-rom-select {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.wasmboy-options__boot-rom-select div {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
