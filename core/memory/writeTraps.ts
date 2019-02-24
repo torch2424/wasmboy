@@ -25,8 +25,8 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
 
   // Graphics
   // Cache globals used multiple times for performance
-  let videoRamLocation: i32 = Memory.videoRamLocation;
-  let spriteInformationTableLocation: i32 = Memory.spriteInformationTableLocation;
+  let videoRamLocation = Memory.videoRamLocation;
+  let spriteInformationTableLocation = Memory.spriteInformationTableLocation;
 
   // Handle banking
   if (offset < videoRamLocation) {
@@ -69,14 +69,15 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
   if (offset >= spriteInformationTableLocation && offset <= Memory.spriteInformationTableLocationEnd) {
     // Can only read/write from OAM During Mode 2
     // See graphics/lcd.ts
-    if (Lcd.currentLcdMode < 2) {
-      return false;
-    }
+    // if (Lcd.currentLcdMode < 2) {
+    // return false;
+    // }
     // Not batch processing here for performance
     // batchProcessGraphics();
 
     // Allow the original write, and return since we dont need to look anymore
-    return true;
+    // return true;
+    return Lcd.currentLcdMode >= 2;
   }
 
   if (offset >= Memory.unusableMemoryLocation && offset <= Memory.unusableMemoryEndLocation) {

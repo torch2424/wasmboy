@@ -5994,14 +5994,12 @@
    local.get $1
   end
   if
+   i32.const 255
+   i32.const -1
    global.get $core/graphics/lcd/Lcd.currentLcdMode
    i32.const 2
    i32.lt_s
-   if
-    i32.const 255
-    return
-   end
-   i32.const -1
+   select
    return
   end
   local.get $0
@@ -6130,14 +6128,14 @@
   local.tee $1
   i32.const -1
   i32.eq
-  if
+  if (result i32)
    local.get $0
    call $core/memory/load/eightBitLoadFromGBMemory
-   return
+  else   
+   local.get $1
+   i32.const 255
+   i32.and
   end
-  local.get $1
-  i32.const 255
-  i32.and
  )
  (func $core/memory/banking/handleBanking (; 91 ;) (type $ii_) (param $0 i32) (param $1 i32)
   (local $2 i32)
@@ -6208,24 +6206,22 @@
      local.get $3
      select
      local.set $2
-     local.get $1
-     local.set $0
      local.get $5
      if (result i32)
-      local.get $0
+      local.get $1
       i32.const 31
       i32.and
-      local.set $0
+      local.set $1
       local.get $2
       i32.const 224
       i32.and
      else      
       global.get $core/memory/memory/Memory.isMBC3
       if (result i32)
-       local.get $0
+       local.get $1
        i32.const 127
        i32.and
-       local.set $0
+       local.set $1
        local.get $2
        i32.const 128
        i32.and
@@ -6236,7 +6232,7 @@
        select
       end
      end
-     local.set $1
+     local.set $0
      local.get $0
      local.get $1
      i32.or
@@ -6245,14 +6241,9 @@
      global.get $core/memory/memory/Memory.currentRomBank
      i32.const 255
      i32.and
-     i32.const 1
-     i32.const 0
      local.get $1
      i32.const 0
      i32.gt_s
-     select
-     i32.const 255
-     i32.and
      i32.const 8
      i32.shl
      i32.or
@@ -7454,9 +7445,8 @@
     if
      global.get $core/graphics/lcd/Lcd.currentLcdMode
      i32.const 2
-     i32.lt_s
-     br_if $folding-inner0
-     br $folding-inner1
+     i32.ge_s
+     return
     end
     local.get $0
     i32.const 65184
@@ -7879,21 +7869,27 @@
  )
  (func $core/memory/dma/updateHblankHdma (; 116 ;) (type $_)
   (local $0 i32)
+  (local $1 i32)
   global.get $core/memory/memory/Memory.isHblankHdmaActive
   i32.eqz
   if
    return
   end
+  i32.const 16
+  local.set $0
   global.get $core/memory/memory/Memory.hblankHdmaSource
   global.get $core/memory/memory/Memory.hblankHdmaDestination
-  global.get $core/memory/memory/Memory.hblankHdmaTransferLengthRemaining
-  local.tee $0
-  i32.const 16
-  local.get $0
-  i32.const 16
-  i32.lt_s
-  select
-  local.tee $0
+  block (result i32)
+   global.get $core/memory/memory/Memory.hblankHdmaTransferLengthRemaining
+   local.tee $1
+   i32.const 16
+   i32.lt_s
+   if
+    local.get $1
+    local.set $0
+   end
+   local.get $0
+  end
   call $core/memory/dma/hdmaTransfer
   global.get $core/memory/memory/Memory.hblankHdmaSource
   local.get $0
@@ -7903,22 +7899,25 @@
   local.get $0
   i32.add
   global.set $core/memory/memory/Memory.hblankHdmaDestination
-  global.get $core/memory/memory/Memory.hblankHdmaTransferLengthRemaining
+  local.get $1
   local.get $0
   i32.sub
+  local.tee $1
   global.set $core/memory/memory/Memory.hblankHdmaTransferLengthRemaining
-  global.get $core/memory/memory/Memory.hblankHdmaTransferLengthRemaining
+  global.get $core/memory/memory/Memory.memoryLocationHdmaTrigger
+  local.set $0
+  local.get $1
   i32.const 0
   i32.le_s
   if
    i32.const 0
    global.set $core/memory/memory/Memory.isHblankHdmaActive
-   global.get $core/memory/memory/Memory.memoryLocationHdmaTrigger
+   local.get $0
    i32.const 255
    call $core/memory/store/eightBitStoreIntoGBMemory
   else   
-   global.get $core/memory/memory/Memory.memoryLocationHdmaTrigger
-   global.get $core/memory/memory/Memory.hblankHdmaTransferLengthRemaining
+   local.get $0
+   local.get $1
    i32.const 4
    i32.shr_s
    i32.const 1

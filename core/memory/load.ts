@@ -14,49 +14,27 @@ export function eightBitLoadFromGBMemoryWithTraps(offset: i32): i32 {
   }
 
   let readTrapResult = checkReadTraps(offset);
-  switch (readTrapResult) {
-    case -1:
-      return eightBitLoadFromGBMemory(offset);
-    default:
-      return <u8>readTrapResult;
-  }
+  return readTrapResult === -1 ? eightBitLoadFromGBMemory(offset) : <u8>readTrapResult;
 }
 
 // TODO: Rename this to sixteenBitLoadFromGBMemoryWithTraps
 // Inlined because closure compiler inlines
 export function sixteenBitLoadFromGBMemory(offset: i32): i32 {
   // Get our low byte
-  let lowByte = 0;
   let lowByteReadTrapResult = checkReadTraps(offset);
-  switch (lowByteReadTrapResult) {
-    case -1:
-      lowByte = eightBitLoadFromGBMemory(offset);
-      break;
-    default:
-      lowByte = lowByteReadTrapResult;
-      break;
-  }
+  let lowByte = lowByteReadTrapResult === -1 ? eightBitLoadFromGBMemory(offset) : lowByteReadTrapResult;
 
   // Get the next offset for the second byte
   let nextOffset = offset + 1;
 
   // Get our high byte
-  let highByte = 0;
   let highByteReadTrapResult = checkReadTraps(nextOffset);
-  switch (highByteReadTrapResult) {
-    case -1:
-      highByte = eightBitLoadFromGBMemory(nextOffset);
-      break;
-    default:
-      highByte = highByteReadTrapResult;
-      break;
-  }
+  let highByte = highByteReadTrapResult === -1 ? eightBitLoadFromGBMemory(nextOffset) : highByteReadTrapResult;
 
   // Concatenate the bytes and return
   return concatenateBytes(highByte, lowByte);
 }
 
 export function loadBooleanDirectlyFromWasmMemory(offset: i32): boolean {
-  let booleanAsInt = <i32>load<u8>(offset);
-  return booleanAsInt > 0;
+  return <i32>load<u8>(offset) > 0;
 }
