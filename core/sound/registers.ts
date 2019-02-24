@@ -134,7 +134,7 @@ export function SoundRegisterReadTraps(offset: i32): i32 {
     let registerNR52 = eightBitLoadFromGBMemory(Sound.memoryLocationNR52);
 
     // Knock off lower 7 bits
-    registerNR52 = registerNR52 & 0x80;
+    registerNR52 &= 0x80;
 
     // Set our lower 4 bits to our channel isEnabled statuses
     if (Channel1.isEnabled) {
@@ -162,8 +162,7 @@ export function SoundRegisterReadTraps(offset: i32): i32 {
     }
 
     // Or from the table
-    registerNR52 = registerNR52 | 0x70;
-
+    registerNR52 |= 0x70;
     return registerNR52;
   }
 

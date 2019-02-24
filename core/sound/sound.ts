@@ -415,7 +415,7 @@ function getSampleAsUnsignedByte(sample: i32, mixerVolume: i32): i32 {
 
   // convert to a signed, precise scale of -6000 to 6000 (cheap way of -1.0 to 1.0)
   // Multiply by the mixer volume fraction (to find the actual volume)
-  let precision = 100000;
+  const precision = 100000;
   let convertedSample = sample - 60;
   convertedSample = convertedSample * precision;
 

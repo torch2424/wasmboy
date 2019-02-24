@@ -39,7 +39,7 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
     case 0x09:
       // Video RAM
       // 0x8000 -> 0x000400
-      let vramBankId: i32 = 0;
+      let vramBankId = 0;
       if (Cpu.GBCEnabled) {
         // Find our current VRAM Bank
         vramBankId = eightBitLoadFromGBMemory(Memory.memoryLocationGBCVRAMBank) & 0x01;
