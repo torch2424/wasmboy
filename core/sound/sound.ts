@@ -171,13 +171,10 @@ export function initializeSound(): void {
 
 // Function to batch process our audio after we skipped so many cycles
 export function batchProcessAudio(): void {
-  if (Sound.currentCycles < Sound.batchProcessCycles()) {
-    return;
-  }
-
-  while (Sound.currentCycles >= Sound.batchProcessCycles()) {
-    updateSound(Sound.batchProcessCycles());
-    Sound.currentCycles = Sound.currentCycles - Sound.batchProcessCycles();
+  let batchProcessCycles = Sound.batchProcessCycles();
+  while (Sound.currentCycles >= batchProcessCycles) {
+    updateSound(batchProcessCycles);
+    Sound.currentCycles -= batchProcessCycles;
   }
 }
 

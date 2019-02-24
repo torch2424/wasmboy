@@ -185,12 +185,7 @@ export class Channel1 {
       // Also increment our duty cycle
       // What is duty? https://en.wikipedia.org/wiki/Duty_cycle
       // Duty cycle for square wave: http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
-      let waveFormPositionOnDuty = Channel1.waveFormPositionOnDuty;
-      waveFormPositionOnDuty += 1;
-      if (waveFormPositionOnDuty >= 8) {
-        waveFormPositionOnDuty = 0;
-      }
-      Channel1.waveFormPositionOnDuty = waveFormPositionOnDuty;
+      Channel1.waveFormPositionOnDuty = (Channel1.waveFormPositionOnDuty + 1) & 7;
     } else {
       Channel1.frequencyTimer = frequencyTimer;
     }

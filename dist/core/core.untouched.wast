@@ -4957,14 +4957,8 @@
    global.get $core/sound/channel1/Channel1.waveFormPositionOnDuty
    i32.const 1
    i32.add
-   local.tee $0
-   i32.const 8
-   i32.ge_s
-   if
-    i32.const 0
-    local.set $0
-   end
-   local.get $0
+   i32.const 7
+   i32.and
    global.set $core/sound/channel1/Channel1.waveFormPositionOnDuty
   else   
    local.get $1
@@ -5832,29 +5826,20 @@
   end
  )
  (func $core/sound/sound/batchProcessAudio (; 86 ;) (type $_)
-  global.get $core/sound/sound/Sound.currentCycles
+  (local $0 i32)
   i32.const 87
   global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
   i32.shl
-  i32.lt_s
-  if
-   return
-  end
+  local.set $0
   loop $continue|0
    global.get $core/sound/sound/Sound.currentCycles
-   i32.const 87
-   global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
-   i32.shl
+   local.get $0
    i32.ge_s
    if
-    i32.const 87
-    global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
-    i32.shl
+    local.get $0
     call $core/sound/sound/updateSound
     global.get $core/sound/sound/Sound.currentCycles
-    i32.const 87
-    global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
-    i32.shl
+    local.get $0
     i32.sub
     global.set $core/sound/sound/Sound.currentCycles
     br $continue|0
