@@ -456,15 +456,15 @@
        local.get $0
        i32.const 1
        global.get $core/memory/memory/Memory.currentRomBank
-       local.tee $0
+       local.tee $1
        global.get $core/memory/memory/Memory.isMBC5
        i32.eqz
-       local.tee $1
+       local.tee $0
        if (result i32)
-        local.get $0
+        local.get $1
         i32.eqz
        else        
-        local.get $1
+        local.get $0
        end
        select
        i32.const 14
@@ -520,11 +520,11 @@
     i32.const 1
     i32.lt_s
    end
-   if
+   if (result i32)
     i32.const 1
-    local.set $1
+   else    
+    local.get $1
    end
-   local.get $1
    i32.const 12
    i32.shl
    local.get $0
@@ -2837,10 +2837,8 @@
       i32.mul
       local.get $4
       i32.add
-      i32.const 67712
-      i32.add
       local.get $0
-      i32.const 0
+      i32.const 8
       local.get $3
       i32.sub
       i32.sub
@@ -2848,9 +2846,7 @@
       i32.const 160
       i32.mul
       i32.add
-      i32.const 67704
-      i32.add
-      i32.load8_u
+      i32.load8_u offset=67712
       local.tee $4
       i32.const 3
       i32.and
@@ -2862,7 +2858,7 @@
       i32.const 4
       i32.and
       select
-      i32.store8
+      i32.store8 offset=67712
       local.get $9
       i32.const 1
       i32.add
@@ -3281,8 +3277,6 @@
      i32.mul
      local.get $14
      i32.add
-     i32.const 67712
-     i32.add
      local.get $2
      i32.const 3
      i32.and
@@ -3301,7 +3295,7 @@
      i32.ge_s
      select
      select
-     i32.store8
+     i32.store8 offset=67712
      local.get $13
      i32.const 1
      i32.add
@@ -3531,8 +3525,6 @@
   i32.mul
   local.get $0
   i32.add
-  i32.const 67712
-  i32.add
   local.get $2
   i32.const 3
   i32.and
@@ -3544,7 +3536,7 @@
   i32.const 128
   i32.and
   select
-  i32.store8
+  i32.store8 offset=67712
  )
  (func $core/graphics/backgroundWindow/drawMonochromePixelFromTileId (; 54 ;) (type $iiiiii_) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32)
   local.get $4
@@ -3641,12 +3633,10 @@
   i32.mul
   local.get $0
   i32.add
-  i32.const 67712
-  i32.add
   local.get $3
   i32.const 3
   i32.and
-  i32.store8
+  i32.store8 offset=67712
  )
  (func $core/graphics/backgroundWindow/drawBackgroundWindowScanline (; 55 ;) (type $iiiiii_) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32)
   (local $6 i32)
@@ -4055,9 +4045,7 @@
           i32.mul
           local.get $7
           i32.add
-          i32.const 67712
-          i32.add
-          i32.load8_u
+          i32.load8_u offset=67712
           local.tee $3
           i32.const 3
           i32.and
@@ -4326,10 +4314,8 @@
       i32.mul
       local.get $0
       i32.add
-      i32.const 67712
-      i32.add
       i32.const 0
-      i32.store8
+      i32.store8 offset=67712
       local.get $0
       i32.const 1
       i32.add
@@ -6470,22 +6456,19 @@
   local.tee $0
   global.set $core/sound/channel4/Channel4.NRx3DivisorCode
   local.get $0
-  i32.const 7
-  i32.le_s
+  i32.const 1
+  i32.shl
+  local.tee $0
+  i32.const 1
+  i32.lt_s
   if
    i32.const 1
-   local.get $0
-   i32.const 1
-   i32.shl
-   local.tee $0
-   i32.const 1
-   local.get $0
-   i32.gt_s
-   select
-   i32.const 3
-   i32.shl
-   global.set $core/sound/channel4/Channel4.divisor
+   local.set $0
   end
+  local.get $0
+  i32.const 3
+  i32.shl
+  global.set $core/sound/channel4/Channel4.divisor
  )
  (func $core/sound/channel1/Channel1.trigger (; 96 ;) (type $_)
   (local $0 i32)

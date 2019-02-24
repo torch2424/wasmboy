@@ -297,7 +297,7 @@ function drawColorPixelFromTileId(
   // Remember to represent a single line of 8 pixels on a tile, we need two bytes.
   // Therefore, we need to times our modulo by 2, to get the correct line of pixels on the tile.
   // But we need to load the time from a specific Vram bank
-  let vramBankId = i32(checkBitOnByte(3, bgMapAttributes));
+  let vramBankId = i32Portable(<i32>checkBitOnByte(3, bgMapAttributes));
   let byteOneForLineOfTilePixels: i32 = loadFromVramBank(tileDataAddress + pixelYInTile * 2, vramBankId);
   let byteTwoForLineOfTilePixels: i32 = loadFromVramBank(tileDataAddress + pixelYInTile * 2 + 1, vramBankId);
 
@@ -450,7 +450,7 @@ function drawLineOfTileFromTileId(
   if (Cpu.GBCEnabled) {
     // Get Our GBC properties
     bgMapAttributes = loadFromVramBank(tileMapAddress, 1);
-    vramBankId = i32(checkBitOnByte(3, <u8>bgMapAttributes));
+    vramBankId = i32Portable(<i32>checkBitOnByte(3, <u8>bgMapAttributes));
 
     if (checkBitOnByte(6, bgMapAttributes)) {
       // We are mirroring the tile, therefore, we need to opposite byte
