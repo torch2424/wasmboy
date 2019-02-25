@@ -56,11 +56,11 @@ export default class LoadROMSelector extends Component {
       const configParams = [
         0, // enableBootRom
         1, // useGbcWhenAvailable
-        0, // audioBatchProcessing
+        1, // audioBatchProcessing
         0, // graphicsBatchProcessing
         0, // timersBatchProcessing
         0, // graphicsDisableScanlineRendering
-        0, // audioAccumulateSamples
+        1, // audioAccumulateSamples
         0, // tileRendering
         0, // tileCaching
         0 // enableAudioDebugging

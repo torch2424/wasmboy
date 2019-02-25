@@ -14,6 +14,7 @@ import getWasmBoyWasmCore from '../../dist/core/getWasmBoyWasmCore.esm';
 import getWasmBoyTsCore from '../../dist/core/getWasmBoyTsCore.esm';
 import getWasmBoyTsClosureCore from '../../dist/core/getWasmBoyTsCore.closure.esm';
 import getBinjgbCore from './binjgb/0.1.3/getcore';
+import getGameBoyOnlineCore from './gameboyOnline/getcore';
 
 import LoadROMSelector from './loadrom';
 import BenchmarkRunner from './benchmarkRunner';
@@ -51,27 +52,42 @@ class WasmBoyBenchmarkApp extends Component {
       let wasmboyTsCore = await getWasmBoyTsCore();
       let wasmboyTsClosureCore = await getWasmBoyTsClosureCore();
       let binjgbCore = await getBinjgbCore();
+      let gameboyOnlineCore = await getGameBoyOnlineCore();
 
       console.log('WasmBoy Wasm Core:', wasmboyWasmCore);
       console.log('WasmBoy TS Core:', wasmboyTsCore);
       console.log('WasmBoy TS Closure Core:', wasmboyTsClosureCore);
       console.log('Binjgb Core:', binjgbCore);
+      console.log('GameBoy Online Core:', gameboyOnlineCore);
 
       // Set up our times
       const wasmTimes = valoo([]);
       const tsTimes = valoo([]);
       const tsClosureTimes = valoo([]);
       const binjgbTimes = valoo([]);
+      const gameboyOnlineTimes = valoo([]);
 
       wasmTimes.on(dummyCallback);
       tsTimes.on(dummyCallback);
       tsClosureTimes.on(dummyCallback);
       binjgbTimes.on(dummyCallback);
+      gameboyOnlineTimes.on(dummyCallback);
 
       wasmboyCoreObjects = [
         {
+          label: 'GameBoy Online',
+          subLabel: 'Javascript',
+          canvasId: 'gameboy-online-canvas',
+          color: '#c83232',
+          core: gameboyOnlineCore,
+          times: gameboyOnlineTimes,
+          resultTimes: [],
+          timesStartIndexes: [],
+          data: []
+        },
+        {
           label: 'Binjgb',
-          subLabel: 'Web Assembly',
+          subLabel: 'Web Assembly, Emscripten',
           canvasId: 'binjgb-canvas',
           color: '#4fffc2',
           core: binjgbCore,
@@ -81,8 +97,8 @@ class WasmBoyBenchmarkApp extends Component {
           data: []
         },
         {
-          label: 'AssemblyScript',
-          subLabel: 'Web Assembly',
+          label: 'WasmBoy',
+          subLabel: 'Web Assembly, Assemblyscript',
           canvasId: 'wasm-canvas',
           color: '#6447f4',
           core: wasmboyWasmCore,
@@ -92,7 +108,7 @@ class WasmBoyBenchmarkApp extends Component {
           data: []
         },
         {
-          label: 'Javascript',
+          label: 'WasmBoy',
           subLabel: 'Typescript',
           canvasId: 'ts-canvas',
           color: '#f7a800',
@@ -103,7 +119,7 @@ class WasmBoyBenchmarkApp extends Component {
           data: []
         },
         {
-          label: 'Javascript',
+          label: 'WasmBoy',
           subLabel: 'Typescript, Closure Compiled',
           canvasId: 'closure-canvas',
           color: '#009588',
