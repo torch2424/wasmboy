@@ -82,6 +82,30 @@ export default class BenchmarkRunner extends Component {
             })}
           </tr>
           <tr>
+            <td>Fastest Frame Time</td>
+            {this.getInfoFromCoreObjects(WasmBoyCoreObjects, coreObject => {
+              const sortedTimes = [...coreObject.resultTimes];
+              sortedTimes.sort((a, b) => {
+                if (a < b) return -1;
+                if (a > b) return 1;
+                return;
+              });
+              return <td>{sortedTimes[0]}</td>;
+            })}
+          </tr>
+          <tr>
+            <td>Slowest Frame Time</td>
+            {this.getInfoFromCoreObjects(WasmBoyCoreObjects, coreObject => {
+              const sortedTimes = [...coreObject.resultTimes];
+              sortedTimes.sort((a, b) => {
+                if (a < b) return -1;
+                if (a > b) return 1;
+                return;
+              });
+              return <td>{sortedTimes[sortedTimes.length - 1]}</td>;
+            })}
+          </tr>
+          <tr>
             <td>Sum</td>
             {this.getInfoFromCoreObjects(WasmBoyCoreObjects, coreObject => {
               return <td>{stats.sum(coreObject.resultTimes)}</td>;
