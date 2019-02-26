@@ -103,25 +103,26 @@
 
       #wasmboy-svg-output {
         display: block;
-        width: 80%;
+        width: 100%;
+        max-width: 400px;
         border: solid 1px #000;
       }
     </style>
 
     <script async src="https://cdn.ampproject.org/v0.js"></script>
-    <script async custom-element="amp-script" src="https://torch2424-amp-glitch-express.glitch.me/amp-script.js"></script>
+    <script async src="https://torch2424-amp-glitch-express.glitch.me/amp-script.js"></script>
   </head>
 
   <body>
     <!-- need to serve cors because of new amp-script requirement -->
-    <amp-script layout="container" src="https://torch2424-amp-glitch-express.glitch.me/wasmboy-amp.min.js">
+    <amp-script layout="container" src="<%BUNDLE%>">
       <div id="root">
         <h1>⚡wAsMP Boy⚡</h1>
         <p id="description">
           <a href="https://github.com/torch2424/wasmBoy" target="_blank">WasmBoy</a> TS Core Running within
           <a href="https://github.com/ampproject/amphtml/tree/master/extensions/amp-script" target="_blank">amp-script</a> and
           <a href="https://github.com/ampproject/worker-dom" target="_blank">Worker DOM</a>. Runs slow due to experimenal amp-script /
-          Worker DOM limitations.
+          Worker DOM limitations. Which is worked around using a Pixel-by-pixel RGBA to SVG solution.
 
           <b>NOTE:</b>
           Play on desktop. You must click the game to control it.

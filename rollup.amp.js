@@ -9,6 +9,14 @@ import compiler from '@ampproject/rollup-plugin-closure-compiler';
 import bundleSize from 'rollup-plugin-bundle-size';
 import pkg from './package.json';
 
+const fs = require('fs');
+
+const writeIndexHtmlToBuild = bundleName => {
+  let indexHtml = fs.readFileSync('demo/amp/index.html', 'utf8');
+  indexHtml = indexHtml.replace('<%BUNDLE%>', bundleName.replace('build/', ''));
+  fs.writeFileSync('build/amp/index.html', indexHtml, 'utf8');
+};
+
 const babelPluginConfig = {
   exclude: ['node_modules/**'],
   plugins: [
@@ -36,8 +44,15 @@ if (process.env.AMP && process.env.SERVE) {
     ...plugins,
     serve({
       port: 8080,
-      contentBase: ['dist/', 'demo/amp/', 'demo/debugger/', 'build/amp']
-    })
+      contentBase: ['dist/', 'build/amp'],
+      headers: {
+        'Access-Control-Allow-Origin': 'http://localhost:8080',
+        'AMP-Access-Control-Allow-Source-Origin': 'http://localhost:8080',
+        'Access-Control-Allow-Credentials': true,
+        'Access-Control-Expose-Headers': 'Access-Control-Expose-Headers'
+      }
+    }),
+    writeIndexHtmlToBuild('wasmboy-amp.js')
   ];
 } else {
   plugins = [
@@ -49,6 +64,7 @@ if (process.env.AMP && process.env.SERVE) {
       }
     ])
   ];
+  writeIndexHtmlToBuild('https://torch2424-amp-glitch-express.glitch.me/wasmboy-amp.min.js');
 }
 
 // Plugins for the minified wasmboy-amp
