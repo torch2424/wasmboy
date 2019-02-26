@@ -1,8 +1,7 @@
 import { Cpu } from '../cpu/index';
-import { eightBitStoreIntoGBMemory } from '../memory/store';
 import { eightBitLoadFromGBMemory } from '../memory/load';
 import { requestJoypadInterrupt } from '../interrupts/index';
-import { checkBitOnByte, setBitOnByte, resetBitOnByte, hexLog } from '../helpers/index';
+import { checkBitOnByte, setBitOnByte, resetBitOnByte } from '../helpers/index';
 
 // http://www.codeslinger.co.uk/pages/projects/gameboy/joypad.html
 // Joypad Register
@@ -61,6 +60,7 @@ export class Joypad {
   }
 }
 
+// Inlined because closure compiler inlines
 export function getJoypadState(): i32 {
   // Get the joypad register
   let joypadRegister: i32 = Joypad.joypadRegisterFlipped;
@@ -203,8 +203,6 @@ function _pressJoypadButton(buttonId: i32): void {
     }
 
     // Determine if we should request an interrupt
-    let joypadRegister: i32 = Joypad.joypadRegisterFlipped;
-
     let shouldRequestInterrupt = false;
 
     // Check if the game is looking for a dpad type button press
@@ -224,6 +222,7 @@ function _pressJoypadButton(buttonId: i32): void {
   }
 }
 
+// Inlined because closure compiler inlines
 function _releaseJoypadButton(buttonId: i32): void {
   // Set our joypad state
   _setJoypadButtonStateFromButtonId(buttonId, false);

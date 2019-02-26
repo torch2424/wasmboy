@@ -6,6 +6,10 @@ import {
   getTileDataAddress,
   drawPixelsFromLineOfTile,
   getMonochromeColorFromPalette,
+  getColorizedGbHexColorFromPalette,
+  getRedFromHexColor,
+  getGreenFromHexColor,
+  getBlueFromHexColor,
   getRgbColorFromPalette,
   getColorComponentFromRgb,
   loadFromVramBank
@@ -170,13 +174,17 @@ export function drawBackgroundMapToWasmMemory(showColor: i32): void {
         store<u8>(offset + 2, <u8>blue);
       } else {
         // Only rendering camera for now, so coordinates are for the camera.
-        // Get the rgb value for the color Id, will be repeated into R, G, B
-        let monochromeColor: i32 = getMonochromeColorFromPalette(paletteColorId, Graphics.memoryLocationBackgroundPalette);
+        // Get the rgb value for the color Id, will be repeated into R, G, B (if not colorized)
+        let hexColor: i32 = getColorizedGbHexColorFromPalette(paletteColorId, Graphics.memoryLocationBackgroundPalette);
 
-        for (let i: i32 = 0; i < 3; i++) {
-          let offset: i32 = BACKGROUND_MAP_LOCATION + pixelStart + i;
-          store<u8>(offset, <u8>monochromeColor);
-        }
+        let offset: i32 = BACKGROUND_MAP_LOCATION + pixelStart;
+
+        // Red
+        store<u8>(offset + 0, <u8>getRedFromHexColor(hexColor));
+        // Green
+        store<u8>(offset + 1, <u8>getGreenFromHexColor(hexColor));
+        // Blue
+        store<u8>(offset + 2, <u8>getBlueFromHexColor(hexColor));
       }
     }
   }

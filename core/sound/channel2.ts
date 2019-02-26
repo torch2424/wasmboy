@@ -11,7 +11,7 @@ import {
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
-import { checkBitOnByte, hexLog } from '../helpers/index';
+import { checkBitOnByte } from '../helpers/index';
 
 export class Channel2 {
   // Cycle Counter for our sound accumulator
@@ -58,8 +58,7 @@ export class Channel2 {
     Channel2.NRx3FrequencyLSB = value;
 
     // Update Channel Frequency
-    let frequency: i32 = (Channel2.NRx4FrequencyMSB << 8) | Channel2.NRx3FrequencyLSB;
-    Channel2.frequency = frequency;
+    Channel2.frequency = (Channel2.NRx4FrequencyMSB << 8) | value;
   }
 
   // NR24 -> Frequency hi (R/W)
@@ -69,11 +68,11 @@ export class Channel2 {
   static NRx4FrequencyMSB: i32 = 0;
   static updateNRx4(value: i32): void {
     Channel2.NRx4LengthEnabled = checkBitOnByte(6, value);
-    Channel2.NRx4FrequencyMSB = value & 0x07;
+    value &= 0x07;
+    Channel2.NRx4FrequencyMSB = value;
 
     // Update Channel Frequency
-    let frequency: i32 = (Channel2.NRx4FrequencyMSB << 8) | Channel2.NRx3FrequencyLSB;
-    Channel2.frequency = frequency;
+    Channel2.frequency = (value << 8) | Channel2.NRx3FrequencyLSB;
   }
 
   // Channel Properties
@@ -128,27 +127,26 @@ export class Channel2 {
 
   // Function to get a sample using the cycle counter on the channel
   static getSampleFromCycleCounter(): i32 {
-    let accumulatedCycles: i32 = Channel2.cycleCounter;
+    let accumulatedCycles = Channel2.cycleCounter;
     Channel2.cycleCounter = 0;
     return Channel2.getSample(accumulatedCycles);
   }
 
   // Function to reset our timer, useful for GBC double speed mode
   static resetTimer(): void {
-    Channel2.frequencyTimer = (2048 - Channel2.frequency) * 4;
+    let frequencyTimer = (2048 - Channel2.frequency) << 2;
 
     // TODO: Ensure this is correct for GBC Double Speed Mode
-    if (Cpu.GBCDoubleSpeed) {
-      Channel2.frequencyTimer = Channel2.frequencyTimer * 2;
-    }
+    Channel2.frequencyTimer = frequencyTimer << (<i32>Cpu.GBCDoubleSpeed);
   }
 
   static getSample(numberOfCycles: i32): i32 {
     // Decrement our channel timer
-    Channel2.frequencyTimer -= numberOfCycles;
-    if (Channel2.frequencyTimer <= 0) {
+    let frequencyTimer = Channel2.frequencyTimer - numberOfCycles;
+    Channel2.frequencyTimer = frequencyTimer;
+    if (frequencyTimer <= 0) {
       // Get the amount that overflowed so we don't drop cycles
-      let overflowAmount: i32 = abs(Channel2.frequencyTimer);
+      let overflowAmount = abs(frequencyTimer);
 
       // Reset our timer
       // A square channel's frequency timer period is set to (2048-frequency)*4.
@@ -159,14 +157,11 @@ export class Channel2 {
       // Also increment our duty cycle
       // What is duty? https://en.wikipedia.org/wiki/Duty_cycle
       // Duty cycle for square wave: http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
-      Channel2.waveFormPositionOnDuty += 1;
-      if (Channel2.waveFormPositionOnDuty >= 8) {
-        Channel2.waveFormPositionOnDuty = 0;
-      }
+      Channel2.waveFormPositionOnDuty = (Channel2.waveFormPositionOnDuty + 1) & 7;
     }
 
     // Get our ourput volume
-    let outputVolume: i32 = 0;
+    let outputVolume = 0;
 
     // Finally to set our output volume, the channel must be enabled,
     // Our channel DAC must be enabled, and we must be in an active state
@@ -180,15 +175,15 @@ export class Channel2 {
     }
 
     // Get the current sampleValue
-    let sample: i32 = 1;
+    let sample = 1;
     if (!isDutyCycleClockPositiveOrNegativeForWaveform(Channel2.NRx1Duty, Channel2.waveFormPositionOnDuty)) {
-      sample = sample * -1;
+      sample = -sample;
     }
 
     sample = sample * outputVolume;
 
     // Square Waves Can range from -15 - 15. Therefore simply add 15
-    sample = sample + 15;
+    sample += 15;
     return sample;
   }
 
@@ -218,55 +213,56 @@ export class Channel2 {
   // This is used to accumulate samples
   static willChannelUpdate(numberOfCycles: i32): boolean {
     //Increment our cycle counter
-    Channel2.cycleCounter += numberOfCycles;
+    let cycleCounter = Channel2.cycleCounter + numberOfCycles;
+    Channel2.cycleCounter = cycleCounter;
 
     // Dac enabled status cached by accumulator
-    if (Channel2.frequencyTimer - Channel2.cycleCounter > 0) {
-      return false;
-    }
-
-    return true;
+    return !(Channel2.frequencyTimer - cycleCounter > 0);
   }
 
   static updateLength(): void {
-    if (Channel2.lengthCounter > 0 && Channel2.NRx4LengthEnabled) {
-      Channel2.lengthCounter -= 1;
+    let lengthCounter = Channel2.lengthCounter;
+    if (lengthCounter > 0 && Channel2.NRx4LengthEnabled) {
+      lengthCounter -= 1;
     }
 
-    if (Channel2.lengthCounter === 0) {
+    if (lengthCounter === 0) {
       Channel2.isEnabled = false;
     }
+    Channel2.lengthCounter = lengthCounter;
   }
 
   static updateEnvelope(): void {
     // Obscure behavior
     // TODO: The volume envelope and sweep timers treat a period of 0 as 8.
-
-    Channel2.envelopeCounter -= 1;
-    if (Channel2.envelopeCounter <= 0) {
-      Channel2.envelopeCounter = Channel2.NRx2EnvelopePeriod;
+    let envelopeCounter = Channel2.envelopeCounter - 1;
+    if (envelopeCounter <= 0) {
+      envelopeCounter = Channel2.NRx2EnvelopePeriod;
 
       // When the timer generates a clock and the envelope period is NOT zero, a new volume is calculated
       // NOTE: There is some weiirrdd obscure behavior where zero can equal 8, so watch out for that
-      if (Channel2.envelopeCounter !== 0) {
-        if (Channel2.NRx2EnvelopeAddMode && Channel2.volume < 15) {
-          Channel2.volume += 1;
-        } else if (!Channel2.NRx2EnvelopeAddMode && Channel2.volume > 0) {
-          Channel2.volume -= 1;
+      if (envelopeCounter !== 0) {
+        let volume = Channel2.volume;
+        if (Channel2.NRx2EnvelopeAddMode && volume < 15) {
+          volume += 1;
+        } else if (!Channel2.NRx2EnvelopeAddMode && volume > 0) {
+          volume -= 1;
         }
+        Channel2.volume = volume;
       }
     }
+    Channel2.envelopeCounter = envelopeCounter;
   }
 
   static setFrequency(frequency: i32): void {
     // Get the high and low bits
-    let passedFrequencyHighBits: i32 = frequency >> 8;
-    let passedFrequencyLowBits: i32 = frequency & 0xff;
+    let passedFrequencyHighBits = frequency >> 8;
+    let passedFrequencyLowBits = frequency & 0xff;
 
     // Get the new register 4
-    let register4: i32 = eightBitLoadFromGBMemory(Channel2.memoryLocationNRx4);
+    let register4 = eightBitLoadFromGBMemory(Channel2.memoryLocationNRx4);
     // Knock off lower 3 bits, and Or on our high bits
-    let newRegister4: i32 = register4 & 0xf8;
+    let newRegister4 = register4 & 0xf8;
     newRegister4 = newRegister4 | passedFrequencyHighBits;
 
     // Set the registers
@@ -276,7 +272,7 @@ export class Channel2 {
     // Save the frequency for ourselves without triggering memory traps
     Channel2.NRx3FrequencyLSB = passedFrequencyLowBits;
     Channel2.NRx4FrequencyMSB = passedFrequencyHighBits;
-    Channel2.frequency = (Channel2.NRx4FrequencyMSB << 8) | Channel2.NRx3FrequencyLSB;
+    Channel2.frequency = (passedFrequencyHighBits << 8) | passedFrequencyLowBits;
   }
   // Done!
 }

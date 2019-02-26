@@ -7,14 +7,13 @@ export {
   executeMultipleFrames,
   executeFrame,
   executeFrameAndCheckAudio,
-  executeFrameUntilBreakpoint,
-  executeFrameAndCheckAudioUntilBreakpoint,
   executeUntilCondition,
   executeStep
 } from './execute';
 export { getCyclesPerCycleSet, getCycleSets, getCycles } from './cycles';
 export { setJoypadState } from './joypad/joypad';
 export { getNumberOfSamplesInAudioBuffer, clearAudioBuffer } from './sound/sound';
+export { setManualColorizationPalette } from './graphics/colors';
 export {
   WASMBOY_MEMORY_LOCATION,
   WASMBOY_MEMORY_SIZE,
@@ -64,6 +63,14 @@ export {
 } from './constants';
 export { getWasmBoyOffsetFromGameBoyOffset } from './memory/memoryMap';
 export {
+  setProgramCounterBreakpoint,
+  resetProgramCounterBreakpoint,
+  setReadGbMemoryBreakpoint,
+  resetReadGbMemoryBreakpoint,
+  setWriteGbMemoryBreakpoint,
+  resetWriteGbMemoryBreakpoint
+} from './debug/breakpoints';
+export {
   getRegisterA,
   getRegisterB,
   getRegisterC,
@@ -79,23 +86,3 @@ export {
 export { getLY, drawBackgroundMapToWasmMemory, drawTileDataToWasmMemory, drawOamToWasmMemory } from './debug/debug-graphics';
 export { getDIV, getTIMA, getTMA, getTAC } from './debug/debug-timer';
 export { updateDebugGBMemory } from './debug/debug-memory';
-export {
-  update,
-  emulationStep,
-  getAudioQueueIndex,
-  resetAudioQueue,
-  wasmMemorySize,
-  wasmBoyInternalStateLocation,
-  wasmBoyInternalStateSize,
-  gameBoyInternalMemoryLocation,
-  gameBoyInternalMemorySize,
-  videoOutputLocation,
-  frameInProgressVideoOutputLocation,
-  gameboyColorPaletteLocation,
-  gameboyColorPaletteSize,
-  backgroundMapLocation,
-  tileDataMap,
-  soundOutputLocation,
-  gameBytesLocation,
-  gameRamBanksLocation
-} from './legacy';

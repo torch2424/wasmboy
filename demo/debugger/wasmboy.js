@@ -3,6 +3,9 @@
 import { WasmBoy as WasmBoyImport } from '../../dist/wasmboy.wasm.esm';
 export const WasmBoy = WasmBoyImport;
 
+import { Pubx } from 'pubx';
+import PUBX_KEYS from './pubx.keys';
+
 import DebuggerAnalytics from './analytics';
 
 // Variables to tell if our callbacks were ever run
@@ -23,6 +26,8 @@ const getMobileCanvasElement = () => {
 // WasmBoy Options
 const WasmBoyDefaultOptions = {
   isGbcEnabled: true,
+  isGbcColorizationEnabled: true,
+  gbcColorizationPalette: undefined,
   isAudioEnabled: true,
   enableAudioDebugging: false,
   frameSkip: 0,
@@ -34,6 +39,7 @@ const WasmBoyDefaultOptions = {
   tileRendering: false,
   tileCaching: false,
   gameboyFrameRate: 60,
+  maxNumberOfAutoSaveStates: 3,
   updateGraphicsCallback: imageDataArray => {
     if (!graphicsCallbackCalled) {
       console.log('Graphics Callback Called! Only Logging this once... imageDataArray:', imageDataArray);
@@ -68,6 +74,9 @@ const WasmBoyDefaultOptions = {
     if (canvasElement) {
       saveStateObject.screenshotCanvasDataURL = canvasElement.toDataURL();
     }
+  },
+  breakpointCallback: () => {
+    Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Reach Breakpoint! 🛑');
   },
   onReady: () => {
     console.log('onReady Callback Called!');

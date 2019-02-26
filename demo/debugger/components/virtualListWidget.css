@@ -1,0 +1,157 @@
+/* Extension of the virtual list component. Common styles shared amongst widgets using a virtual list*/
+
+.virtual-list-widget {
+}
+
+.virtual-list-widget .virtual-list-widget__container {
+  display: none;
+}
+
+.virtual-list-widget.virtual-list-widget--ready .virtual-list-widget__not-ready {
+  display: none;
+}
+
+.virtual-list-widget.virtual-list-widget--ready .virtual-list-widget__container {
+  display: block;
+}
+
+.virtual-list-widget .donut {
+  display: none;
+
+  position: absolute;
+  top: 25px;
+  right: 25px;
+  text-align: right;
+}
+
+.virtual-list-widget--control-loading .donut {
+  display: block;
+}
+
+.virtual-list-widget.virtual-list-widget--control-loading:not(.virtual-list-widget--running) .virtual-list-widget__container,
+.virtual-list-widget.virtual-list-widget--control-loading .virtual-list-widget__not-ready {
+  display: none;
+}
+
+.virtual-list-widget--running .donut {
+  display: block;
+}
+
+.virtual-list-widget.virtual-list-widget--running button {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.virtual-list-widget__container {
+  overflow: hidden;
+  margin: 5px;
+}
+
+.virtual-list-widget__info {
+  margin: 5px;
+}
+
+.virtual-list-widget__control > * {
+  margin: 5px;
+}
+
+.virtual-list-widget__control .virtual-list-widget__control__jump-address {
+  width: 45px;
+}
+
+.virtual-list-widget__control .virtual-list-widget__control__run-opcodes {
+  width: 60px;
+}
+
+/* Variables for our psuedo table */
+/*NOTE: Height MUST be kept in sync with this.rowHeight, see renderRow()*/
+:root {
+  --virtual-list-widget-height: 350px;
+  --virtual-list-widget-row-height: 30px;
+  --virtual-list-widget-column-spacing: 5px;
+  --virtual-list-widget-column-border: 1px solid black;
+
+  --virtual-list-widget-hex-width: 75px;
+}
+
+.virtual-list-widget__header-list {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
+  border-top: 1px solid black;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+}
+
+.virtual-list-widget__header-list > * {
+  height: 50px !important;
+}
+
+.virtual-list-widget__list {
+  height: var(--virtual-list-widget-height);
+
+  border: 1px solid black;
+}
+
+.virtual-list-widget__header-list > *:first-child,
+.virtual-list-widget__list__virtual__row > *:first-child {
+  border-left: none;
+}
+
+.virtual-list-widget__list__virtual {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+
+.virtual-list-widget__list__virtual__row {
+  display: flex;
+  height: var(--virtual-list-widget-row-height) !important;
+  overflow: hidden;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.virtual-list-widget__list__virtual__row:hover {
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
+.virtual-list-widget__list-cell {
+  text-align: center;
+
+  height: var(--virtual-list-widget-row-height);
+  border-left: var(--virtual-list-widget-column-border);
+}
+
+.virtual-list-widget__header-list__hex,
+.virtual-list-widget__list__virtual__row__hex {
+  text-align: center;
+
+  min-width: var(--virtual-list-widget-hex-width);
+  width: var(--virtual-list-widget-hex-width);
+  max-width: var(--virtual-list-widget-hex-width);
+}
+
+.virtual-list-widget__list__virtual__row__actions {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: flex-start;
+
+  height: var(--virtual-list-widget-row-height);
+}
+
+.virtual-list-widget__list__virtual__row__button-row > button {
+  position: relative;
+  padding: 5px;
+  margin-top: 3px;
+  height: 20px !important;
+  cursor: pointer;
+}
+
+.virtual-list-widget__list__virtual__row__button-row > button > div {
+  position: absolute;
+  top: 0;
+  left: 0;
+}

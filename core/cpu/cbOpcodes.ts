@@ -12,16 +12,16 @@ import {
   testBitOnRegister,
   setBitOnRegister
 } from './instructions';
-import { eightBitLoadSyncCycles, eightBitStoreSyncCycles, sixteenBitLoadSyncCycles, sixteenBitStoreSyncCycles } from './opcodes';
-import { concatenateBytes, performanceTimestamp } from '../helpers/index';
-import { u8Portable, u16Portable } from '../portable/portable';
+import { eightBitLoadSyncCycles, eightBitStoreSyncCycles } from './opcodes';
+import { concatenateBytes } from '../helpers/index';
 
 // Handle CB Opcodes
 // NOTE: Program stpes and cycles are standardized depending on the register type
 // NOTE: Doing some funny stuff to get around not having arrays or objects
+// Inlined because closure compiler inlines.
 export function handleCbOpcode(cbOpcode: i32): i32 {
-  let numberOfCycles: i32 = -1;
-  let handledOpcode: boolean = false;
+  let numberOfCycles = -1;
+  let handledOpcode = false;
 
   // The result of our cb logic instruction
   let instructionRegisterValue: u8 = 0;
@@ -29,7 +29,7 @@ export function handleCbOpcode(cbOpcode: i32): i32 {
 
   // Get our register number by modulo 0x08 (number of registers)
   // cbOpcode % 0x08
-  let registerNumber = cbOpcode % 0x08;
+  let registerNumber = cbOpcode & 0x07;
 
   // NOTE: registerNumber = register on CB table. Cpu.registerB = 0, Cpu.registerC = 1....Cpu.registerA = 7
   switch (registerNumber) {

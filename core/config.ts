@@ -2,7 +2,7 @@ export class Config {
   // Boot Rom
   static enableBootRom: boolean = false;
 
-  // GBC Preference
+  // GBC Options
   static useGbcWhenAvailable: boolean = true;
 
   // Batch Processing

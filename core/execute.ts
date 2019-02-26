@@ -3,11 +3,12 @@
 import { setHasCoreStarted } from './core';
 import { syncCycles } from './cycles';
 import { Cpu, executeOpcode } from './cpu/index';
-import { Interrupts, checkInterrupts } from './interrupts/index';
-import { eightBitStoreIntoGBMemory, eightBitLoadFromGBMemory } from './memory/index';
-import { Sound, getNumberOfSamplesInAudioBuffer, clearAudioBuffer } from './sound/index';
-import { hexLog, log } from './helpers/index';
+import { checkInterrupts } from './interrupts/index';
+import { eightBitLoadFromGBMemory } from './memory/index';
+import { getNumberOfSamplesInAudioBuffer } from './sound/index';
 import { u16Portable } from './portable/portable';
+
+import { Breakpoints } from './debug/breakpoints';
 
 export class Execute {
   // An even number bewlow the max 32 bit integer
@@ -34,14 +35,18 @@ export function getSteps(): i32 {
   return Execute.steps;
 }
 
+// Inlined because closure compiler inlines
 function trackStepsRan(steps: i32): void {
-  Execute.steps += steps;
-  if (Execute.steps >= Execute.stepsPerStepSet) {
+  let esteps = Execute.steps;
+  esteps += steps;
+  if (esteps >= Execute.stepsPerStepSet) {
     Execute.stepSets += 1;
-    Execute.steps -= Execute.stepsPerStepSet;
+    esteps -= Execute.stepsPerStepSet;
   }
+  Execute.steps = esteps;
 }
 
+// Inlined because closure compiler inlines
 export function resetSteps(): void {
   Execute.stepsPerStepSet = 2000000000;
   Execute.stepSets = 0;
@@ -54,8 +59,8 @@ export function resetSteps(): void {
 // -1 = error
 // 0 = render a frame
 export function executeMultipleFrames(numberOfFrames: i32): i32 {
-  let frameResponse: i32 = 0;
-  let framesRun: i32 = 0;
+  let frameResponse = 0;
+  let framesRun = 0;
   while (framesRun < numberOfFrames && frameResponse >= 0) {
     frameResponse = executeFrame();
     framesRun += 1;
@@ -74,34 +79,21 @@ export function executeMultipleFrames(numberOfFrames: i32): i32 {
 // -1 = error
 // 0 = render a frame
 export function executeFrame(): i32 {
-  return executeUntilCondition(true, -1, -1);
+  return executeUntilCondition(true, -1);
 }
 
 // Public Function to run opcodes until,
 // a frame is ready, audio bufer is filled, or error
 export function executeFrameAndCheckAudio(maxAudioBuffer: i32 = 0): i32 {
-  return executeUntilCondition(true, maxAudioBuffer, -1);
-}
-
-// Public function to run opcodes until,
-// a breakpoint is reached
-export function executeFrameUntilBreakpoint(breakpoint: i32): i32 {
-  return executeUntilCondition(true, -1, breakpoint);
-}
-
-// Public function to run opcodes until,
-// A frame needs to be rendered
-// a breakpoint is reached
-export function executeFrameAndCheckAudioUntilBreakpoint(maxAudioBuffer: i32, breakpoint: i32): i32 {
-  return executeUntilCondition(true, maxAudioBuffer, breakpoint);
+  return executeUntilCondition(true, maxAudioBuffer);
 }
 
 // Base function that executes steps, and checks conditions
 // Return values:
-export function executeUntilCondition(checkMaxCyclesPerFrame: boolean = true, maxAudioBuffer: i32 = -1, breakpoint: i32 = -1): i32 {
+export function executeUntilCondition(checkMaxCyclesPerFrame: boolean = true, maxAudioBuffer: i32 = -1): i32 {
   // Common tracking variables
-  let numberOfCycles: i32 = -1;
-  let audioBufferSize: i32 = 1024;
+  let numberOfCycles = -1;
+  let audioBufferSize = 1024;
 
   if (maxAudioBuffer > 0) {
     audioBufferSize = maxAudioBuffer;
@@ -112,9 +104,8 @@ export function executeUntilCondition(checkMaxCyclesPerFrame: boolean = true, ma
   let errorCondition: boolean = false;
   let frameCondition: boolean = false;
   let audioBufferCondition: boolean = false;
-  let breakpointCondition: boolean = false;
 
-  while (!errorCondition && !frameCondition && !audioBufferCondition && !breakpointCondition) {
+  while (!errorCondition && !frameCondition && !audioBufferCondition && !Breakpoints.reachedBreakpoint) {
     numberOfCycles = executeStep();
 
     // Error Condition
@@ -124,8 +115,6 @@ export function executeUntilCondition(checkMaxCyclesPerFrame: boolean = true, ma
       frameCondition = true;
     } else if (audioBufferSize > -1 && getNumberOfSamplesInAudioBuffer() >= audioBufferSize) {
       audioBufferCondition = true;
-    } else if (breakpoint > -1 && Cpu.programCounter === breakpoint) {
-      breakpointCondition = true;
     }
   }
 
@@ -143,7 +132,8 @@ export function executeUntilCondition(checkMaxCyclesPerFrame: boolean = true, ma
     return Execute.RESPONSE_CONDITION_AUDIO;
   }
 
-  if (breakpointCondition) {
+  if (Breakpoints.reachedBreakpoint) {
+    Breakpoints.reachedBreakpoint = false;
     return Execute.RESPONSE_CONDITION_BREAKPOINT;
   }
 
@@ -188,8 +178,8 @@ export function executeStep(): i32 {
 
   // Get the opcode, and additional bytes to be handled
   // Number of cycles defaults to 4, because while we're halted, we run 4 cycles (according to matt :))
-  let numberOfCycles: i32 = 4;
-  let opcode: i32 = 0;
+  let numberOfCycles = 4;
+  let opcode = 0;
 
   // If we are not halted or stopped, run instructions
   // If we are halted, this will be skipped and just sync the 4 cycles
@@ -211,6 +201,11 @@ export function executeStep(): i32 {
 
   // Update our steps
   trackStepsRan(1);
+
+  // Check if we reached the CPU breakpoint
+  if (Cpu.programCounter === Breakpoints.programCounter) {
+    Breakpoints.reachedBreakpoint = true;
+  }
 
   return numberOfCycles;
 }

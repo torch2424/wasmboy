@@ -8,8 +8,8 @@ import { sendAnalyticsEvent } from './analytics';
 import { fetchROMAsByteArray } from '../../lib/wasmboy/fetchrom.js';
 
 // Import our open source roms
-import { openSourceROMS } from '../openSourceROMs';
-import { getOpenSourceROMElements } from '../openSourceROMsPreact';
+import { getOpenSourceROMElements } from 'shared-gb/openSourceROMs/preactComponents';
+import 'shared-gb/openSourceROMs/preactComponents.css';
 
 export default class LoadROMSelector extends Component {
   constructor(props) {
@@ -50,20 +50,30 @@ export default class LoadROMSelector extends Component {
 
     const loadROMTask = async () => {
       // Fetch the rom
-      const ROM = await fetchROMAsByteArray(ROMUrl);
+      const ROMObject = await fetchROMAsByteArray(ROMUrl);
 
       // Our config params
-      const configParams = [0, 1, 0, 0, 0, 0, 0, 0, 0];
+      const configParams = [
+        0, // enableBootRom
+        1, // useGbcWhenAvailable
+        0, // audioBatchProcessing
+        0, // graphicsBatchProcessing
+        0, // timersBatchProcessing
+        0, // graphicsDisableScanlineRendering
+        0, // audioAccumulateSamples
+        0, // tileRendering
+        0, // tileCaching
+        0 // enableAudioDebugging
+      ];
 
       // Clear Wasm memory
       // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
       coreObjects.forEach(coreObject => {
-        for (let i = 0; i <= coreObject.core.byteMemory.length; i++) {
-          coreObject.core.byteMemory[i] = 0;
-        }
+        // Reset the byte memory to zero at all indexes
+        coreObject.core.byteMemory.fill(0);
 
         // Set the ROM in byte memory
-        coreObject.core.byteMemory.set(ROM, coreObject.core.instance.exports.CARTRIDGE_ROM_LOCATION);
+        coreObject.core.byteMemory.set(ROMObject.ROM, coreObject.core.instance.exports.CARTRIDGE_ROM_LOCATION);
 
         // Config the core
         coreObject.core.instance.exports.config.apply(this, configParams);

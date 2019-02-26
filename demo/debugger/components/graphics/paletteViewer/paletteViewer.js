@@ -81,7 +81,7 @@ export default class PaletteViewer extends Component {
   }
 
   update() {
-    if (!WasmBoy.isPlaying()) {
+    if (!WasmBoy.isReady()) {
       return;
     }
 
@@ -147,7 +147,6 @@ export default class PaletteViewer extends Component {
   }
 
   updateColor() {
-    // TODO:
     const updateTask = async () => {
       // Get the CGB palette memory
       const memoryStart = await WasmBoy._getWasmConstant('GBC_PALETTE_LOCATION');

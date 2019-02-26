@@ -11,7 +11,7 @@
     "gameboy-color"
   ],
   "author": "Aaron Turner",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "license": "GPL-3.0-or-later",
   "homepage": "https://wasmboy.app",
   "repository": {
@@ -44,6 +44,7 @@
     "core:watch": "npx watch \"npm run core:build\" core",
     "core:build": "npx run-s core:build:asc core:build:dist core:build:done",
     "core:build:asc": "npx asc core/index.ts -b dist/core/core.untouched.wasm -t dist/core/core.untouched.wast -O3 --validate --sourceMap core/dist/core.untouched.wasm.map --memoryBase 0",
+    "core:build:ts": "npx rollup -c --environment TS",
     "core:build:asc:measure": "npm run core:build:asc -- --measure --noEmit",
     "core:build:ts:measure": "npx tsc --project core/tsconfig.json --noEmit --extendedDiagnostics",
     "core:build:dist": "npx run-s core:build:dist:mkdir core:build:dist:cp",
@@ -57,6 +58,7 @@
     "lib:build:ts": "npx rollup -c --environment PROD,TS",
     "lib:build:ts:esnext": "npx rollup -c --environment PROD,TS,ES_NEXT",
     "lib:build:ts:getcoreclosure": "npx rollup -c --environment PROD,TS,GET_CORE_CLOSURE",
+    "lib:build:ts:getcoreclosure:closuredebug": "npx rollup -c --environment PROD,TS,GET_CORE_CLOSURE,CLOSURE_DEBUG",
     "lib:deploy": "npx run-s core:build lib:build:wasm lib:build:ts lib:deploy:np",
     "lib:deploy:np": "npx np",
     "test": "npm run test:accuracy",
@@ -151,6 +153,7 @@
     "rollup-plugin-serve": "^0.6.0",
     "rollup-plugin-typescript": "^1.0.0",
     "rollup-plugin-url": "^2.1.0",
+    "shared-gb": "git+https://github.com/torch2424/shared-gb-js.git",
     "source-map-loader": "^0.2.4",
     "stats-lite": "^2.2.0",
     "traverse": "^0.6.6",

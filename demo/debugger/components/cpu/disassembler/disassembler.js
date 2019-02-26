@@ -11,7 +11,9 @@ import InputSubmit from '../../inputSubmit';
 
 import VirtualList from '../../virtualList';
 
-import { stepOpcode, runNumberOfOpcodes, runUntilBreakPoint } from '../opcode.js';
+import { virtualListWidgetScrollToAddress } from '../../virtualListWidget';
+
+import { stepOpcode, runNumberOfOpcodes } from '../opcode.js';
 
 import './disassembler.css';
 
@@ -83,6 +85,9 @@ let updateTask = async () => {
     }
   }
 
+  // Free up gbMemory
+  gbMemory = [];
+
   // Get our program Counter
   return data;
 };
@@ -103,7 +108,7 @@ export default class Disassembler extends Component {
     this.updateTimeout = false;
 
     this.state.programCounter = 0;
-    this.state.breakpoint = 0;
+    this.state.breakpoint = -1;
     this.state.wasmboy = {};
     this.state.loading = {};
 
@@ -213,90 +218,38 @@ export default class Disassembler extends Component {
     Pubx.get(PUBX_KEYS.LOADING).addControlPromise(runOpcodesPromise);
   }
 
-  runUntilBreakPoint() {
-    if (!WasmBoy.isReady()) {
-      Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Please load a ROM. 💾');
-      return;
-    }
-
-    const breakPoint = this.state.breakpoint;
-
-    if (!breakPoint || breakPoint < 0) {
-      Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Please enter a valid value. 😄');
-      return;
-    }
-
-    this.setState({
-      running: true
-    });
-
-    const runUntilBreakPointPromise = runUntilBreakPoint(breakPoint);
-    runUntilBreakPointPromise.then(() => {
-      Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification(
-        `Ran until the 0x${breakPoint
-          .toString(16)
-          .toUpperCase()
-          .padStart(4, '0')} break point! 😄`
-      );
-      this.update();
+  async toggleBreakpoint(address) {
+    if (this.state.breakpoint === address) {
+      await WasmBoy._runWasmExport('resetProgramCounterBreakpoint');
       this.setState({
-        running: false
+        breakpoint: -1
       });
-    });
-    Pubx.get(PUBX_KEYS.LOADING).addControlPromise(runUntilBreakPointPromise);
+    } else {
+      await WasmBoy._runWasmExport('setProgramCounterBreakpoint', [address]);
+      this.setState({
+        breakpoint: address
+      });
+    }
   }
 
   scrollToProgramCounter() {
     this.scrollToAddress(this.state.programCounter);
   }
 
-  scrollToAddress(address) {
-    const virtualListElement = this.base.querySelector('.disassembler__list__virtual');
-
-    if (virtualListElement) {
-      // We need to find which row the address is closest to.
-      let rowIndex = 0;
-      for (let i = address; i > 0; i--) {
-        if (this.data[i] && (this.data[i].address === address || address > this.data[i].address)) {
-          rowIndex = i;
-          i = 0;
-        }
-      }
-
-      // Get a row offset
-      let rowOffset = 2;
-      if (rowIndex < rowOffset || address >= 0xffd0) {
-        rowOffset = 0;
-      }
-
-      // Set the scrolltop
-      let top = this.rowHeight * rowIndex;
-      top -= this.rowHeight * rowOffset;
-      virtualListElement.scrollTop = top;
-
-      // Now the virtual list is weird, so this will now render the rows
-      // So now let's find the element, and figure out how far out of view it is
-      setTimeout(() => {
-        let row = this.base.querySelector(`.disassembler__list__virtual .disassembler-row-${address}`);
-        if (!row) {
-          row = this.base.querySelector(`.disassembler__list__virtual > div > div > div[id]`);
-        }
-
-        if (!row) {
-          return;
-        }
-
-        const listRect = virtualListElement.getBoundingClientRect();
-        const rowRect = row.getBoundingClientRect();
-
-        const difference = listRect.y - rowRect.y;
-        if (difference > 0) {
-          top = virtualListElement.scrollTop - difference;
-          top -= this.rowHeight * rowOffset;
-          virtualListElement.scrollTop = top;
-        }
-      });
+  scrollToBreakpoint() {
+    if (this.state.breakpoint >= 0) {
+      this.scrollToAddress(this.state.breakpoint);
     }
+  }
+
+  scrollToAddress(address) {
+    virtualListWidgetScrollToAddress(
+      address, // address,
+      this.data, // data
+      this.base, // Base
+      this.rowHeight, // rowHeight
+      'disassembler' // classRowNumberPrefix
+    );
   }
 
   showInstructionInfo(gbOpcode) {
@@ -305,7 +258,7 @@ export default class Disassembler extends Component {
       const flags = gbOpcode.instruction.flags;
 
       return (
-        <div class="disassembler__opcode-info">
+        <div class="virtual-list-widget__opcode-info">
           <h1>
             {gbOpcode.instruction.mnemonic} ({gbOpcode.value})
           </h1>
@@ -331,7 +284,7 @@ export default class Disassembler extends Component {
   }
 
   renderRow(row) {
-    let paramColumn = <div class="disassembler__list__virtual__row__param" />;
+    let paramColumn = <div class="virtual-list-widget__list__virtual__row__hex virtual-list-widget__list-cell" />;
     if (row.params && row.params.length > 0) {
       let paramValue = row.params[0];
       if (row.params[1]) {
@@ -339,7 +292,7 @@ export default class Disassembler extends Component {
       }
 
       paramColumn = (
-        <div class="disassembler__list__virtual__row__param">
+        <div class="virtual-list-widget__list__virtual__row__hex virtual-list-widget__list-cell">
           {paramValue
             .toString(16)
             .toUpperCase()
@@ -349,7 +302,7 @@ export default class Disassembler extends Component {
     }
 
     // Our classes for the row
-    const classes = ['disassembler__list__virtual__row'];
+    const classes = ['virtual-list-widget__list__virtual__row'];
     classes.push(`disassembler-row-${row.address}`);
     for (let i = 1; i <= row.params.length; i++) {
       classes.push(`disassembler-row-${row.address + i}`);
@@ -360,23 +313,23 @@ export default class Disassembler extends Component {
     // Can't set background color here, as rows are rendered ahead of time
     return (
       <div class={classes.join(' ')}>
-        <div class="disassembler__list__virtual__row__actions">
-          <button class="remove-default-button" onClick={() => this.setState({ breakpoint: row.address })}>
+        <div class="disassembler__list__virtual__row__actions virtual-list-widget__list__virtual__row__button-row virtual-list-widget__list-cell">
+          <button class="remove-default-button" onClick={() => this.toggleBreakpoint(row.address)}>
             {this.state.breakpoint === row.address ? <div>🔴</div> : <div>⚪</div>}
           </button>
           <button class="remove-default-button" onClick={() => this.showInstructionInfo(row.gbOpcode)}>
             <div>ℹ️</div>
           </button>
         </div>
-        <div class="disassembler__list__virtual__row__mnemonic">{row.mnemonic}</div>
-        <div class="disassembler__list__virtual__row__cycles">{row.cycles}</div>
-        <div class="disassembler__list__virtual__row__address">
+        <div class="disassembler__list__virtual__row__mnemonic virtual-list-widget__list-cell">{row.mnemonic}</div>
+        <div class="disassembler__list__virtual__row__cycles virtual-list-widget__list-cell">{row.cycles}</div>
+        <div class="virtual-list-widget__list__virtual__row__hex virtual-list-widget__list-cell">
           {row.address
             .toString(16)
             .toUpperCase()
             .padStart(4, '0')}
         </div>
-        <div class="disassembler__list__virtual__row__value">
+        <div class="virtual-list-widget__list__virtual__row__hex virtual-list-widget__list-cell">
           {row.data
             .toString(16)
             .toUpperCase()
@@ -388,15 +341,15 @@ export default class Disassembler extends Component {
   }
 
   render() {
-    const classes = ['disassembler'];
+    const classes = ['virtual-list-widget'];
     if (this.state.wasmboy.ready) {
-      classes.push('disassembler--ready');
+      classes.push('virtual-list-widget--ready');
     }
     if (this.state.loading.controlLoading) {
-      classes.push('disassembler--control-loading');
+      classes.push('virtual-list-widget--control-loading');
     }
     if (this.state.running) {
-      classes.push('disassembler--running');
+      classes.push('virtual-list-widget--running');
     }
 
     return (
@@ -407,7 +360,7 @@ export default class Disassembler extends Component {
           <i>ROMs will not autoplay while this widget is open.</i>
         </div>
 
-        <div class="disassembler__not-ready">
+        <div class="virtual-list-widget__not-ready">
           <i>Please Load a ROM to be disassmbled.</i>
         </div>
 
@@ -424,8 +377,8 @@ export default class Disassembler extends Component {
           }}
         />
 
-        <div class="disassembler__container">
-          <div class="disassembler__info">
+        <div class="disassembler__container virtual-list-widget__container">
+          <div class="virtual-list-widget__info">
             <div>
               Program Counter: 0x
               {this.state.programCounter
@@ -433,21 +386,25 @@ export default class Disassembler extends Component {
                 .toUpperCase()
                 .padStart(2, '0')}
             </div>
-            <div>
-              Breakpoint: 0x
-              {this.state.breakpoint
-                .toString(16)
-                .toUpperCase()
-                .padStart(4, '0')}
-            </div>
+            {this.state.breakpoint >= 0 ? (
+              <div>
+                Breakpoint: 0x
+                {this.state.breakpoint
+                  .toString(16)
+                  .toUpperCase()
+                  .padStart(4, '0')}
+              </div>
+            ) : (
+              ''
+            )}
           </div>
 
-          <div class="disassembler__control">
+          <div class="virtual-list-widget__control">
             <button onClick={() => this.stepOpcode()}>Step</button>
-            <button onClick={() => this.runUntilBreakPoint()}>Run Until Breakpoint</button>
             <button onClick={() => this.scrollToProgramCounter()}>Scroll To Program Counter</button>
+            {this.state.breakpoint >= 0 ? <button onClick={() => this.scrollToBreakpoint()}>Scroll To Breakpoint</button> : ''}
             <InputSubmit
-              class="disassembler__control__jump-address"
+              class="virtual-list-widget__control__jump-address"
               type="text"
               pattern="[a-fA-F\d]+"
               initialValue="100"
@@ -457,7 +414,7 @@ export default class Disassembler extends Component {
               onSubmit={value => this.scrollToAddress(parseInt(value, 16))}
             />
             <InputSubmit
-              class="disassembler__control__run-opcodes"
+              class="virtual-list-widget__control__run-opcodes"
               type="number"
               initialValue="100"
               label="Run Number of Opcodes:"
@@ -467,17 +424,17 @@ export default class Disassembler extends Component {
             />
           </div>
 
-          <div class="disassembler__header-list">
-            <div class="disassembler__header-list__actions">Actions</div>
-            <div class="disassembler__header-list__mnemonic">Instruction</div>
-            <div class="disassembler__header-list__cycles">Cycles</div>
-            <div class="disassembler__header-list__address">Address (Hex)</div>
-            <div class="disassembler__header-list__value">Opcode (Hex)</div>
-            <div class="disassembler__header-list__param">Constant (Hex)</div>
+          <div class="disassembler__header-list virtual-list-widget__header-list">
+            <div class="disassembler__header-list__actions virtual-list-widget__list-cell">Actions</div>
+            <div class="disassembler__header-list__mnemonic virtual-list-widget__list-cell">Instruction</div>
+            <div class="disassembler__header-list__cycles virtual-list-widget__list-cell">Cycles</div>
+            <div class="virtual-list-widget__header-list__hex virtual-list-widget__list-cell">Address (Hex)</div>
+            <div class="virtual-list-widget__header-list__hex virtual-list-widget__list-cell">Opcode (Hex)</div>
+            <div class="virtual-list-widget__header-list__hex virtual-list-widget__list-cell">Constant (Hex)</div>
           </div>
-          <div class="disassembler__list">
+          <div class="disassembler__list virtual-list-widget__list">
             <VirtualList
-              class="disassembler__list__virtual"
+              class="virtual-list-widget__list__virtual"
               data={this.data}
               rowHeight={this.rowHeight}
               height={this.height}
