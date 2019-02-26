@@ -78,11 +78,7 @@
         justify-content: center;
         align-items: center;
         flex-wrap: wrap;
-
-        width: 100vw;
-        height: 100vh;
         padding: 10px;
-        max-width: 800px;
       }
 
       #description {
@@ -101,11 +97,24 @@
         opacity: 0;
       }
 
+      #fps {
+        text-align: center;
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+
       #wasmboy-svg-output {
         display: block;
+
         width: 100%;
         max-width: 400px;
         border: solid 1px #000;
+
+        text-align: center;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        margin-left: auto;
+        margin-right: auto;
       }
     </style>
 
@@ -122,7 +131,7 @@
           <a href="https://github.com/torch2424/wasmBoy" target="_blank">WasmBoy</a> TS Core Running within
           <a href="https://github.com/ampproject/amphtml/tree/master/extensions/amp-script" target="_blank">amp-script</a> and
           <a href="https://github.com/ampproject/worker-dom" target="_blank">Worker DOM</a>. Runs slow due to experimenal amp-script /
-          Worker DOM limitations. Which is worked around using a Pixel-by-pixel RGBA to SVG solution.
+          Worker DOM limitations. Which is worked around using a Pixel-by-pixel RGBA ImageData Array to SVG solution.
 
           <b>NOTE:</b>
           Play on desktop. You must click the game to control it.
