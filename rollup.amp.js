@@ -45,7 +45,8 @@ const ampBundles = [
       file: 'build/amp/wasmboy-amp.js',
       format: 'iife'
     },
-    plugins
+    plugins,
+    sourcemap: true
   }
 ];
 
