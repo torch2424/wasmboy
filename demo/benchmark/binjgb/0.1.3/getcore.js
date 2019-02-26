@@ -35,7 +35,7 @@ export default async function getBinjgbCore() {
   // Create our byteMemory
 
   // Let's assume 8MB ROM
-  const romBufferByteLength = 262144;
+  const romBufferByteLength = 262144 * 10;
   const romDataPtr = module._malloc(romBufferByteLength);
   const romByteMemory = makeWasmBuffer(module, romDataPtr, romBufferByteLength);
 

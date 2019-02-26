@@ -82,7 +82,8 @@ const benchmarkBundles = [
       sourcemap: sourcemap
     },
     context: 'window',
-    plugins: plugins
+    plugins: plugins,
+    sourcemap: true
   }
 ];
 

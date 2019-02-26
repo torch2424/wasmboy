@@ -120,7 +120,8 @@ const debuggerBundles = [
     },
     external: ['crypto'],
     context: 'window',
-    plugins: plugins
+    plugins: plugins,
+    sourcemap: true
   }
 ];
 

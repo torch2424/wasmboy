@@ -47,20 +47,19 @@ export default class BenchmarkRunner extends Component {
     return responses;
   }
 
-  generateTable(WasmBoyCoreObjects) {
-    if (!WasmBoyCoreObjects || WasmBoyCoreObjects <= 0) {
+  generateTable(coreObjects) {
+    if (!coreObjects || coreObjects.length <= 0) {
       return <table />;
     }
 
-    const shouldReturnEmptyTable = WasmBoyCoreObjects.some(wasmboyCoreObject => {
-      if (!wasmboyCoreObject.resultTimes || wasmboyCoreObject.resultTimes.length <= 0) {
-        return true;
+    const WasmBoyCoreObjects = [];
+    coreObjects.forEach(coreObject => {
+      if (coreObject.resultTimes && coreObject.resultTimes.length > 0) {
+        WasmBoyCoreObjects.push(coreObject);
       }
-
-      return false;
     });
 
-    if (shouldReturnEmptyTable) {
+    if (WasmBoyCoreObjects.length === 0) {
       return <table />;
     }
 

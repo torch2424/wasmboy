@@ -73,7 +73,11 @@ export default class LoadROMSelector extends Component {
         coreObject.core.byteMemory.fill(0);
 
         // Set the ROM in byte memory
-        coreObject.core.byteMemory.set(ROMObject.ROM, coreObject.core.instance.exports.CARTRIDGE_ROM_LOCATION);
+        // Not using .set to avoid source is too large error
+        for (let i = 0; i < ROMObject.ROM.length; i++) {
+          const byteMemoryLocation = coreObject.core.instance.exports.CARTRIDGE_ROM_LOCATION + i;
+          coreObject.core.byteMemory[byteMemoryLocation] = ROMObject.ROM[i];
+        }
 
         // Config the core
         coreObject.core.instance.exports.config.apply(this, configParams);
