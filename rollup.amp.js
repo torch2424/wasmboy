@@ -58,7 +58,6 @@ if (process.env.AMP && process.env.SERVE) {
     writeIndexHtmlToBuild('wasmboy-amp.js')
   ];
 } else {
-  console.log('Hi');
   plugins = [
     ...plugins,
     copy([
