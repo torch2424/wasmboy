@@ -14,6 +14,9 @@ const fs = require('fs');
 const writeIndexHtmlToBuild = bundleName => {
   let indexHtml = fs.readFileSync('demo/amp/index.html', 'utf8');
   indexHtml = indexHtml.replace('<%BUNDLE%>', bundleName);
+  if (!fs.existsSync('build/amp')) {
+    fs.mkdirSync('build/amp');
+  }
   fs.writeFileSync('build/amp/index.html', indexHtml, 'utf8');
 };
 
