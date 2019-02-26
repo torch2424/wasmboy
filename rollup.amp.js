@@ -13,7 +13,7 @@ const fs = require('fs');
 
 const writeIndexHtmlToBuild = bundleName => {
   let indexHtml = fs.readFileSync('demo/amp/index.html', 'utf8');
-  indexHtml = indexHtml.replace('<%BUNDLE%>', bundleName.replace('build/', ''));
+  indexHtml = indexHtml.replace('<%BUNDLE%>', bundleName);
   fs.writeFileSync('build/amp/index.html', indexHtml, 'utf8');
 };
 
@@ -55,6 +55,7 @@ if (process.env.AMP && process.env.SERVE) {
     writeIndexHtmlToBuild('wasmboy-amp.js')
   ];
 } else {
+  console.log('Hi');
   plugins = [
     ...plugins,
     copy([
@@ -62,9 +63,14 @@ if (process.env.AMP && process.env.SERVE) {
         files: 'demo/amp/index.html',
         dest: 'build/amp/'
       }
-    ])
+    ]),
+    {
+      name: 'callback-plugin',
+      generateBundle: () => {
+        writeIndexHtmlToBuild('https://torch2424-amp-glitch-express.glitch.me/wasmboy-amp.min.js');
+      }
+    }
   ];
-  writeIndexHtmlToBuild('https://torch2424-amp-glitch-express.glitch.me/wasmboy-amp.min.js');
 }
 
 // Plugins for the minified wasmboy-amp
