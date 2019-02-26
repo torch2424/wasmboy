@@ -47,20 +47,19 @@ export default class BenchmarkRunner extends Component {
     return responses;
   }
 
-  generateTable(WasmBoyCoreObjects) {
-    if (!WasmBoyCoreObjects || WasmBoyCoreObjects <= 0) {
+  generateTable(coreObjects) {
+    if (!coreObjects || coreObjects.length <= 0) {
       return <table />;
     }
 
-    const shouldReturnEmptyTable = WasmBoyCoreObjects.some(wasmboyCoreObject => {
-      if (!wasmboyCoreObject.resultTimes || wasmboyCoreObject.resultTimes.length <= 0) {
-        return true;
+    const WasmBoyCoreObjects = [];
+    coreObjects.forEach(coreObject => {
+      if (coreObject.resultTimes && coreObject.resultTimes.length > 0) {
+        WasmBoyCoreObjects.push(coreObject);
       }
-
-      return false;
     });
 
-    if (shouldReturnEmptyTable) {
+    if (WasmBoyCoreObjects.length === 0) {
       return <table />;
     }
 
@@ -79,6 +78,30 @@ export default class BenchmarkRunner extends Component {
             <td>Total Used Frame Times</td>
             {this.getInfoFromCoreObjects(WasmBoyCoreObjects, coreObject => {
               return <td>{coreObject.resultTimes.length}</td>;
+            })}
+          </tr>
+          <tr>
+            <td>Fastest Frame Time</td>
+            {this.getInfoFromCoreObjects(WasmBoyCoreObjects, coreObject => {
+              const sortedTimes = [...coreObject.resultTimes];
+              sortedTimes.sort((a, b) => {
+                if (a < b) return -1;
+                if (a > b) return 1;
+                return;
+              });
+              return <td>{sortedTimes[0]}</td>;
+            })}
+          </tr>
+          <tr>
+            <td>Slowest Frame Time</td>
+            {this.getInfoFromCoreObjects(WasmBoyCoreObjects, coreObject => {
+              const sortedTimes = [...coreObject.resultTimes];
+              sortedTimes.sort((a, b) => {
+                if (a < b) return -1;
+                if (a > b) return 1;
+                return;
+              });
+              return <td>{sortedTimes[sortedTimes.length - 1]}</td>;
             })}
           </tr>
           <tr>

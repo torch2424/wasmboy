@@ -13,12 +13,16 @@ import packageJson from '../../package.json';
 import getWasmBoyWasmCore from '../../dist/core/getWasmBoyWasmCore.esm';
 import getWasmBoyTsCore from '../../dist/core/getWasmBoyTsCore.esm';
 import getWasmBoyTsClosureCore from '../../dist/core/getWasmBoyTsCore.closure.esm';
+import getBinjgbCore from './binjgb/0.1.3/getcore';
+import getGameBoyOnlineCore from './gameboyOnline/getcore';
 
 import LoadROMSelector from './loadrom';
 import BenchmarkRunner from './benchmarkRunner';
 import BenchmarkResults from './benchmarkResults';
 
-let wasmboyCoreObjects = [];
+let WasmBoyCoreObjects = [];
+let OtherCoreObjects = [];
+let CoreObjects = [];
 
 // Create our valoo variables with dummy callbacks so they update
 const dummyCallback = v => {};
@@ -35,6 +39,7 @@ class WasmBoyBenchmarkApp extends Component {
     this.state = {
       ready: false,
       loading: false,
+      otherGBEmulators: false,
       running,
       browserInfo: {
         ...browserInfo
@@ -49,24 +54,32 @@ class WasmBoyBenchmarkApp extends Component {
       let wasmboyWasmCore = await getWasmBoyWasmCore();
       let wasmboyTsCore = await getWasmBoyTsCore();
       let wasmboyTsClosureCore = await getWasmBoyTsClosureCore();
+      let binjgbCore = await getBinjgbCore();
+      let gameboyOnlineCore = await getGameBoyOnlineCore();
 
       console.log('WasmBoy Wasm Core:', wasmboyWasmCore);
       console.log('WasmBoy TS Core:', wasmboyTsCore);
       console.log('WasmBoy TS Closure Core:', wasmboyTsClosureCore);
+      console.log('Binjgb Core:', binjgbCore);
+      console.log('GameBoy Online Core:', gameboyOnlineCore);
 
       // Set up our times
       const wasmTimes = valoo([]);
       const tsTimes = valoo([]);
       const tsClosureTimes = valoo([]);
+      const binjgbTimes = valoo([]);
+      const gameboyOnlineTimes = valoo([]);
 
       wasmTimes.on(dummyCallback);
       tsTimes.on(dummyCallback);
       tsClosureTimes.on(dummyCallback);
+      binjgbTimes.on(dummyCallback);
+      gameboyOnlineTimes.on(dummyCallback);
 
-      wasmboyCoreObjects = [
+      WasmBoyCoreObjects = [
         {
-          label: 'AssemblyScript',
-          subLabel: 'Web Assembly',
+          label: 'WasmBoy',
+          subLabel: 'Web Assembly, Assemblyscript',
           canvasId: 'wasm-canvas',
           color: '#6447f4',
           core: wasmboyWasmCore,
@@ -76,7 +89,7 @@ class WasmBoyBenchmarkApp extends Component {
           data: []
         },
         {
-          label: 'Javascript',
+          label: 'WasmBoy',
           subLabel: 'Typescript',
           canvasId: 'ts-canvas',
           color: '#f7a800',
@@ -87,7 +100,7 @@ class WasmBoyBenchmarkApp extends Component {
           data: []
         },
         {
-          label: 'Javascript',
+          label: 'WasmBoy',
           subLabel: 'Typescript, Closure Compiled',
           canvasId: 'closure-canvas',
           color: '#009588',
@@ -98,6 +111,32 @@ class WasmBoyBenchmarkApp extends Component {
           data: []
         }
       ];
+      OtherCoreObjects = [
+        {
+          label: 'Binjgb',
+          subLabel: 'Web Assembly, Emscripten',
+          canvasId: 'binjgb-canvas',
+          color: '#4fffc2',
+          core: binjgbCore,
+          times: binjgbTimes,
+          resultTimes: [],
+          timesStartIndexes: [],
+          data: []
+        },
+        {
+          label: 'GameBoy Online',
+          subLabel: 'Javascript',
+          canvasId: 'gameboy-online-canvas',
+          color: '#c83232',
+          core: gameboyOnlineCore,
+          times: gameboyOnlineTimes,
+          resultTimes: [],
+          timesStartIndexes: [],
+          data: []
+        }
+      ];
+
+      CoreObjects = [...WasmBoyCoreObjects];
 
       this.setState({
         ...this.state,
@@ -130,6 +169,14 @@ class WasmBoyBenchmarkApp extends Component {
           >
             In-Depth Article and Results
           </a>
+        </div>
+
+        <div class="wasmboy-benchmark__notices">
+          WasmBoy is{' '}
+          <a href="https://github.com/torch2424/wasmboy/blob/master/test/performance/results.md" target="_blank">
+            configured
+          </a>{' '}
+          with: audioBatchProcessing, audioAccumulateSamples
         </div>
 
         <div class="wasmboy-benchmark__notices">Source is not minified, to allow easy analysis of the bundle.</div>
@@ -170,19 +217,48 @@ class WasmBoyBenchmarkApp extends Component {
             <h1>Setup</h1>
             <hr />
 
-            <LoadROMSelector WasmBoyCoreObjects={wasmboyCoreObjects} ROMLoaded={() => this.setState({ ...this.state, ready: true })} />
+            <label class="wasmboy-benchmark__other-gb">
+              Enable Other Online GameBoy Emulators (
+              <a href="https://github.com/binji/binjgb" target="_blank">
+                Binjgb
+              </a>
+              ,{' '}
+              <a href="https://github.com/taisel/GameBoy-Online" target="_blank">
+                GameBoy Online
+              </a>
+              ):
+              <input
+                name="otherGBEmulators"
+                type="checkbox"
+                checked={this.state.otherGBEmulators}
+                onChange={event => {
+                  const shouldEnableOtherCoreObjects = event.target.checked;
+                  if (shouldEnableOtherCoreObjects) {
+                    CoreObjects = [...WasmBoyCoreObjects, ...OtherCoreObjects];
+                  } else {
+                    CoreObjects = [...WasmBoyCoreObjects];
+                  }
+
+                  this.setState({
+                    otherGBEmulators: event.target.checked
+                  });
+                }}
+              />
+            </label>
+
+            <LoadROMSelector WasmBoyCoreObjects={CoreObjects} ROMLoaded={() => this.setState({ ...this.state, ready: true })} />
 
             <hr />
             <h1>Runner</h1>
             <hr />
 
-            <BenchmarkRunner WasmBoyCoreObjects={wasmboyCoreObjects} ready={this.state.ready} running={this.state.running} />
+            <BenchmarkRunner WasmBoyCoreObjects={CoreObjects} ready={this.state.ready} running={this.state.running} />
 
             <hr />
             <h1>Results</h1>
             <hr />
 
-            <BenchmarkResults WasmBoyCoreObjects={wasmboyCoreObjects} running={this.state.running} />
+            <BenchmarkResults WasmBoyCoreObjects={CoreObjects} running={this.state.running} />
           </main>
         )}
       </div>

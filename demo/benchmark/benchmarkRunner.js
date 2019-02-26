@@ -116,6 +116,19 @@ export default class BenchmarkRunner extends Component {
           times = times.slice(times.length * 0.15);
           coreObject.resultTimes = coreObject.resultTimes.concat(times);
         });
+
+        this.props.running(false);
+
+        // Wait a little bit, and start running again
+        const timeoutPromise = new Promise(resolve => {
+          setTimeout(() => {
+            resolve();
+          }, 10);
+        });
+
+        await timeoutPromise;
+
+        this.props.running(true);
       }
 
       this.benchmarkComplete();
