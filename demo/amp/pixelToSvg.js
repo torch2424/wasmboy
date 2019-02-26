@@ -80,6 +80,17 @@ export default function(width, height, byteMemory, frameLocation) {
   };
   createSvg();
 
+  // Create our svg group
+  let g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+
+  // Assume the most common color as the background. Should help in rendering time.
+  let commonBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  commonBg.setAttribute('x', '0');
+  commonBg.setAttribute('y', '0');
+  commonBg.setAttribute('width', '160');
+  commonBg.setAttribute('height', '144');
+  commonBg.setAttribute('style', 'z-index: -100');
+
   // Organizing by colors so we can draw one at a time
   // And do some better batch processing
   let pointsSortedByColor = {};
@@ -95,6 +106,7 @@ export default function(width, height, byteMemory, frameLocation) {
         let r = byteMemory[frameLocation + pixelStart + 0];
         let g = byteMemory[frameLocation + pixelStart + 1];
         let b = byteMemory[frameLocation + pixelStart + 2];
+
         let rgba = `rgba(${r}, ${g}, ${b}, 255)`;
 
         // Add the color to our points if we havent seen the color before
@@ -112,7 +124,17 @@ export default function(width, height, byteMemory, frameLocation) {
   };
   loopPixels();
 
-  let g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  // Set the most popular color as our bg, and remove it from the points
+  let popularRgba;
+  Object.keys(pointsSortedByColor).forEach(rgba => {
+    if (!popularRgba || pointsSortedByColor[rgba] > pointsSortedByColor[popularRgba]) {
+      popularRgba = rgba;
+    }
+  });
+  commonBg.setAttribute('fill', popularRgba);
+  g.appendChild(commonBg);
+
+  delete pointsSortedByColor[popularRgba];
 
   // Get our pixel paths per color
   const pixelPathsSortedByColor = {};
