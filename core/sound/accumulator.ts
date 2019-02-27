@@ -46,10 +46,10 @@ export function initializeSoundAccumulator(): void {
 // Inlined because closure compiler inlines
 export function accumulateSound(numberOfCycles: i32): void {
   // Check if any of the individual channels will update
-  let channel1WillUpdate: boolean = Channel1.willChannelUpdate(numberOfCycles) || didChannelDacChange(Channel1.channelNumber);
-  let channel2WillUpdate: boolean = Channel2.willChannelUpdate(numberOfCycles) || didChannelDacChange(Channel2.channelNumber);
-  let channel3WillUpdate: boolean = Channel3.willChannelUpdate(numberOfCycles) || didChannelDacChange(Channel3.channelNumber);
-  let channel4WillUpdate: boolean = Channel4.willChannelUpdate(numberOfCycles) || didChannelDacChange(Channel4.channelNumber);
+  let channel1WillUpdate = Channel1.willChannelUpdate(numberOfCycles) || didChannelDacChange(Channel1.channelNumber);
+  let channel2WillUpdate = Channel2.willChannelUpdate(numberOfCycles) || didChannelDacChange(Channel2.channelNumber);
+  let channel3WillUpdate = Channel3.willChannelUpdate(numberOfCycles) || didChannelDacChange(Channel3.channelNumber);
+  let channel4WillUpdate = Channel4.willChannelUpdate(numberOfCycles) || didChannelDacChange(Channel4.channelNumber);
 
   if (channel1WillUpdate) {
     SoundAccumulator.channel1Sample = Channel1.getSampleFromCycleCounter();
@@ -70,11 +70,14 @@ export function accumulateSound(numberOfCycles: i32): void {
   }
 
   // Do Some downsampling magic
-  Sound.downSampleCycleCounter += numberOfCycles * Sound.downSampleCycleMultiplier;
-  if (Sound.downSampleCycleCounter >= Sound.maxDownSampleCycles()) {
+  let downSampleCycleCounter = Sound.downSampleCycleCounter;
+  downSampleCycleCounter += numberOfCycles * Sound.downSampleCycleMultiplier;
+  let maxDownSampleCycles = Sound.maxDownSampleCycles();
+  if (downSampleCycleCounter >= maxDownSampleCycles) {
     // Reset the downsample counter
     // Don't set to zero to catch overflowed cycles
-    Sound.downSampleCycleCounter -= Sound.maxDownSampleCycles();
+    downSampleCycleCounter -= maxDownSampleCycles;
+    Sound.downSampleCycleCounter = downSampleCycleCounter;
 
     if (SoundAccumulator.needToRemixSamples || SoundAccumulator.mixerVolumeChanged || SoundAccumulator.mixerEnabledChanged) {
       mixChannelSamples(
@@ -83,6 +86,8 @@ export function accumulateSound(numberOfCycles: i32): void {
         SoundAccumulator.channel3Sample,
         SoundAccumulator.channel4Sample
       );
+    } else {
+      Sound.downSampleCycleCounter = downSampleCycleCounter;
     }
 
     // Finally Simply place the accumulated sample in memory
@@ -93,45 +98,45 @@ export function accumulateSound(numberOfCycles: i32): void {
       SoundAccumulator.rightChannelSampleUnsignedByte + 1,
       AUDIO_BUFFER_LOCATION
     );
-    Sound.audioQueueIndex += 1;
-
+    let audioQueueIndex = Sound.audioQueueIndex + 1;
     // Don't allow our audioQueueIndex to overflow into other parts of the wasmBoy memory map
     // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit#gid=0
     // Not 0xFFFF because we need half of 64kb since we store left and right channel
-    let maxIndex: i32 = i32Portable(Sound.wasmBoyMemoryMaxBufferSize / 2) - 1;
-    if (Sound.audioQueueIndex >= maxIndex) {
-      Sound.audioQueueIndex -= 1;
+    let maxIndex = i32Portable(Sound.wasmBoyMemoryMaxBufferSize >> 1) - 1;
+    if (audioQueueIndex >= maxIndex) {
+      audioQueueIndex -= 1;
     }
+    Sound.audioQueueIndex = audioQueueIndex;
   }
 }
 
 // Function used by SoundAccumulator to find out if a channel Dac Changed
 function didChannelDacChange(channelNumber: i32): boolean {
   switch (channelNumber) {
-    case Channel1.channelNumber:
-      if (SoundAccumulator.channel1DacEnabled !== Channel1.isDacEnabled) {
-        SoundAccumulator.channel1DacEnabled = Channel1.isDacEnabled;
-        return true;
-      }
-      return false;
-    case Channel2.channelNumber:
-      if (SoundAccumulator.channel2DacEnabled !== Channel2.isDacEnabled) {
-        SoundAccumulator.channel2DacEnabled = Channel2.isDacEnabled;
-        return true;
-      }
-      return false;
-    case Channel3.channelNumber:
-      if (SoundAccumulator.channel3DacEnabled !== Channel3.isDacEnabled) {
-        SoundAccumulator.channel3DacEnabled = Channel3.isDacEnabled;
-        return true;
-      }
-      return false;
-    case Channel4.channelNumber:
-      if (SoundAccumulator.channel4DacEnabled !== Channel4.isDacEnabled) {
-        SoundAccumulator.channel4DacEnabled = Channel4.isDacEnabled;
-        return true;
-      }
-      return false;
+    case Channel1.channelNumber: {
+      let isDacEnabled = Channel1.isDacEnabled;
+      let channel1Enabled = SoundAccumulator.channel1DacEnabled !== isDacEnabled;
+      SoundAccumulator.channel1DacEnabled = isDacEnabled;
+      return channel1Enabled;
+    }
+    case Channel2.channelNumber: {
+      let isDacEnabled = Channel2.isDacEnabled;
+      let channel2Enabled = SoundAccumulator.channel2DacEnabled !== isDacEnabled;
+      SoundAccumulator.channel2DacEnabled = isDacEnabled;
+      return channel2Enabled;
+    }
+    case Channel3.channelNumber: {
+      let isDacEnabled = Channel3.isDacEnabled;
+      let channel3Enabled = SoundAccumulator.channel3DacEnabled !== isDacEnabled;
+      SoundAccumulator.channel3DacEnabled = isDacEnabled;
+      return channel3Enabled;
+    }
+    case Channel4.channelNumber: {
+      let isDacEnabled = Channel4.isDacEnabled;
+      let channel4Enabled = SoundAccumulator.channel4DacEnabled !== isDacEnabled;
+      SoundAccumulator.channel4DacEnabled = isDacEnabled;
+      return channel4Enabled;
+    }
   }
   return false;
 }

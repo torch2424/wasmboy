@@ -1,20 +1,19 @@
 import { Memory } from './memory';
 import { Cpu } from '../cpu/index';
-import { Graphics, batchProcessGraphics } from '../graphics/graphics';
-import { Palette, Lcd } from '../graphics/index';
+import { Graphics } from '../graphics/graphics';
+import { Lcd } from '../graphics/index';
 import { batchProcessAudio, SoundRegisterReadTraps } from '../sound/index';
 import { eightBitStoreIntoGBMemory } from './store';
 import { eightBitLoadFromGBMemory } from './load';
 import { Joypad, getJoypadState } from '../joypad/index';
 import { Timers } from '../timers/index';
-import { Serial } from '../serial/serial';
 import { Interrupts } from '../interrupts/index';
-import { checkBitOnByte, resetBitOnByte, splitHighByte, hexLog } from '../helpers/index';
+import { checkBitOnByte, resetBitOnByte, splitHighByte } from '../helpers/index';
 
 // Returns -1 if no trap found, otherwise returns a value that should be fed for the address
 export function checkReadTraps(offset: i32): i32 {
   // Cache globals used multiple times for performance
-  let videoRamLocation: i32 = Memory.videoRamLocation;
+  let videoRamLocation = Memory.videoRamLocation;
 
   // Try to break early for most common scenario
   if (offset < videoRamLocation) {
@@ -48,22 +47,23 @@ export function checkReadTraps(offset: i32): i32 {
   if (offset >= Memory.spriteInformationTableLocation && offset <= Memory.spriteInformationTableLocationEnd) {
     // Can only read/write from OAM During Mode 2
     // See graphics/lcd.ts
-    if (Lcd.currentLcdMode < 2) {
-      return 0xff;
-    }
+    // if (Lcd.currentLcdMode < 2) {
+    // return 0xff;
+    // }
 
     // Not batch processing here for performance
     // batchProcessGraphics();
 
-    return -1;
+    // return -1;
+    return Lcd.currentLcdMode < 2 ? 0xff : -1;
   }
 
   // CPU
   if (offset === Cpu.memoryLocationSpeedSwitch) {
     // TCAGBD, only Bit 7 and 0 are readable, all others are 1
-    let response: i32 = 0xff;
+    let response = 0xff;
 
-    let currentSpeedSwitchRegister: i32 = eightBitLoadFromGBMemory(Cpu.memoryLocationSpeedSwitch);
+    let currentSpeedSwitchRegister = eightBitLoadFromGBMemory(Cpu.memoryLocationSpeedSwitch);
     if (!checkBitOnByte(0, currentSpeedSwitchRegister)) {
       response = resetBitOnByte(0, response);
     }
@@ -105,6 +105,7 @@ export function checkReadTraps(offset: i32): i32 {
     eightBitStoreIntoGBMemory(offset, upperDividerRegisterBits);
     return upperDividerRegisterBits;
   }
+
   if (offset === Timers.memoryLocationTimerCounter) {
     eightBitStoreIntoGBMemory(offset, Timers.timerCounter);
     return Timers.timerCounter;

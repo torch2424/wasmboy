@@ -3,7 +3,7 @@ import { u8Portable, u16Portable } from '../portable/portable';
 
 // Set flag bit on on register F. For instance set zero flag to zero -> (7, 0)
 function setFlagBit(flagBit: u8, flagValue: i32): u8 {
-  let bitwiseOperand: u8 = u8Portable(1 << flagBit);
+  let bitwiseOperand = u8Portable(1 << flagBit);
   if (flagValue > 0) {
     Cpu.registerF = Cpu.registerF | bitwiseOperand;
   } else {
@@ -54,37 +54,21 @@ export function getCarryFlag(): u8 {
 export function checkAndSetEightBitHalfCarryFlag(value: u8, amountToAdd: i32): void {
   if (amountToAdd >= 0) {
     // https://robdor.com/2016/08/10/gameboy-emulator-half-carry-flag/
-    let result: u8 = u8Portable(((<u8>value) & 0x0f) + ((<u8>amountToAdd) & 0x0f)) & 0x10;
-    if (result !== 0x00) {
-      setHalfCarryFlag(1);
-    } else {
-      setHalfCarryFlag(0);
-    }
+    let result = u8Portable(((<u8>value) & 0x0f) + ((<u8>amountToAdd) & 0x0f)) & 0x10;
+    setHalfCarryFlag(<i32>(result !== 0x00));
   } else {
     // From: https://github.com/djhworld/gomeboycolor/blob/master/src/cpu/index.go
     // CTRL+F "subBytes(a, b byte)"
-    if (<u8>(abs(amountToAdd) & 0x0f) > (value & 0x0f)) {
-      setHalfCarryFlag(1);
-    } else {
-      setHalfCarryFlag(0);
-    }
+    setHalfCarryFlag(<i32>(<u8>(abs(amountToAdd) & 0x0f) > (value & 0x0f)));
   }
 }
 
 export function checkAndSetEightBitCarryFlag(value: u8, amountToAdd: i32): void {
   if (amountToAdd >= 0) {
-    let result: u8 = u8Portable(value + <u8>amountToAdd);
-    if (value > result) {
-      setCarryFlag(1);
-    } else {
-      setCarryFlag(0);
-    }
+    let result = u8Portable(value + <u8>amountToAdd);
+    setCarryFlag(<i32>(value > result));
   } else {
-    if (abs(amountToAdd) > <i32>value) {
-      setCarryFlag(1);
-    } else {
-      setCarryFlag(0);
-    }
+    setCarryFlag(<i32>(abs(amountToAdd) > <i32>value));
   }
 }
 
@@ -97,42 +81,24 @@ export function checkAndSetSixteenBitFlagsAddOverflow(valueOne: u16, valueTwo: i
     // Logic from : https://github.com/nakardo/node-gameboy/blob/master/lib/cpu/opcodes.js
     // CTRL+F add_sp_n
     // using the stack pointer bits means we can safely assume the value is signed
-    let signedValueOne: i32 = <i32>valueOne;
-    let result: i32 = signedValueOne + <i32>valueTwo;
+    let signedValueOne = <i32>valueOne;
+    let result = signedValueOne + valueTwo;
+    let flagXor = signedValueOne ^ valueTwo ^ result;
 
-    let flagXor: i32 = signedValueOne ^ valueTwo ^ result;
-
-    if ((flagXor & 0x10) !== 0) {
-      setHalfCarryFlag(1);
-    } else {
-      setHalfCarryFlag(0);
-    }
-
-    if ((flagXor & 0x100) !== 0) {
-      setCarryFlag(1);
-    } else {
-      setCarryFlag(0);
-    }
+    setHalfCarryFlag(<i32>((flagXor & 0x10) !== 0));
+    setCarryFlag(<i32>((flagXor & 0x100) !== 0));
   } else {
     // Logic from: https://github.com/djhworld/gomeboycolor/blob/master/src/cpu/index.go
     // CTRL+F addWords
     // Value two is not signed
-    let result: u16 = u16Portable(valueOne + <u16>valueTwo);
+    let result = u16Portable(valueOne + <u16>valueTwo);
 
     // Check the carry flag by allowing the overflow
-    if (result < valueOne) {
-      setCarryFlag(1);
-    } else {
-      setCarryFlag(0);
-    }
+    setCarryFlag(<i32>(result < valueOne));
 
     // To check for half carry flag (bit 15), by XOR'ing valyes, and and'ing the bit in question
     let halfCarryXor: u16 = valueOne ^ (<u16>valueTwo) ^ (<u16>result);
-    let halfCarryAnd: u16 = u16Portable(halfCarryXor & 0x1000);
-    if (halfCarryAnd !== 0x00) {
-      setHalfCarryFlag(1);
-    } else {
-      setHalfCarryFlag(0);
-    }
+    let halfCarryAnd = u16Portable(halfCarryXor & 0x1000);
+    setHalfCarryFlag(<i32>(halfCarryAnd !== 0x00));
   }
 }

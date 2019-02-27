@@ -1,7 +1,9 @@
+// No closure, as the whole file is closure'd
 import getWasmBoyTsCore from '../../dist/core/getWasmBoyTsCore.esm.js';
 
 import dataUriToArray from './dataUriToArray.js';
 import rgbaArrayBufferToSvg from './pixelToSvg.js';
+import { run60fps, getFPS } from './run60fps';
 import romUrl from '../../test/performance/testroms/tobutobugirl/tobutobugirl.gb';
 
 let imageDataArray;
@@ -23,7 +25,19 @@ const runTask = async () => {
   WasmBoy.byteMemory.set(ROM, WasmBoy.instance.exports.CARTRIDGE_ROM_LOCATION);
 
   // Config the core
-  const configParams = [0, 1, 0, 0, 0, 0, 0, 0, 0, 0];
+  // Our config params
+  const configParams = [
+    0, // enableBootRom
+    1, // useGbcWhenAvailable
+    1, // audioBatchProcessing
+    0, // graphicsBatchProcessing
+    0, // timersBatchProcessing
+    0, // graphicsDisableScanlineRendering
+    1, // audioAccumulateSamples
+    0, // tileRendering
+    1, // tileCaching
+    0 // enableAudioDebugging
+  ];
   WasmBoy.instance.exports.config.apply(WasmBoy.instance, configParams);
 
   const keyMap = {
@@ -88,6 +102,11 @@ const runTask = async () => {
     });
   };
 
+  // Create an fps counter
+  const fpsCounter = document.createElement('div');
+  fpsCounter.id = 'fps';
+  document.body.appendChild(fpsCounter);
+
   // Create an input handler
   const controlsOverlay = document.createElement('input');
   controlsOverlay.setAttribute('id', 'controls');
@@ -134,12 +153,9 @@ const runTask = async () => {
       keyMap.START.active ? 1 : 0
     );
 
-    // Wait 16ms for 60fps
-    if (isPlaying) {
-      setTimeout(() => play(), 0);
-    }
+    fpsCounter.textContent = `FPS: ${getFPS()}`;
   };
-  play();
+  run60fps(play);
 
   console.log('Playing ROM...');
 };

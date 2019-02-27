@@ -1,7 +1,7 @@
 // Functions for performance hacks, and debugging tiles
 
 import { Cpu } from '../cpu/index';
-import { Graphics, loadFromVramBank, setPixelOnFrame } from './graphics';
+import { Graphics, loadFromVramBank } from './graphics';
 import {
   getMonochromeColorFromPalette,
   getColorizedGbHexColorFromPalette,
@@ -13,9 +13,8 @@ import { addPriorityforPixel } from './priority';
 // Assembly script really not feeling the reexport
 // using Skip Traps, because LCD has unrestricted access
 // http://gbdev.gg8.se/wiki/articles/Video_Display#LCD_OAM_DMA_Transfers
-import { eightBitLoadFromGBMemory } from '../memory/load';
-import { Memory } from '../memory/memory';
-import { hexLog, checkBitOnByte, setBitOnByte, resetBitOnByte } from '../helpers/index';
+import { checkBitOnByte } from '../helpers/index';
+import { i8Portable } from '../portable/portable';
 
 export class TileCache {
   static tileId: i32 = -1;
@@ -46,17 +45,17 @@ export function drawPixelsFromLineOfTile(
   spriteAttributes: i32
 ): i32 {
   // Get our number of pixels drawn
-  let pixelsDrawn: i32 = 0;
+  let pixelsDrawn = 0;
 
   // Get our tile data address
-  let tileDataAddress: i32 = getTileDataAddress(tileDataMemoryLocation, tileId);
+  let tileDataAddress = getTileDataAddress(tileDataMemoryLocation, tileId);
 
   // Get the bytes for our tile
-  let byteOneForLineOfTilePixels: i32 = loadFromVramBank(tileDataAddress + tileLineY * 2, vramBankId);
-  let byteTwoForLineOfTilePixels: i32 = loadFromVramBank(tileDataAddress + tileLineY * 2 + 1, vramBankId);
+  let byteOneForLineOfTilePixels = loadFromVramBank(tileDataAddress + tileLineY * 2, vramBankId);
+  let byteTwoForLineOfTilePixels = loadFromVramBank(tileDataAddress + tileLineY * 2 + 1, vramBankId);
 
   // Loop through our X values to draw
-  for (let x: i32 = tileLineXStart; x <= tileLineXEnd; x++) {
+  for (let x = tileLineXStart; x <= tileLineXEnd; ++x) {
     // First find where we are going to do our final output x
     // And don't allow any width overflow
     let iteratedOutputX = outputLineX + (x - tileLineXStart);
@@ -66,13 +65,13 @@ export function drawPixelsFromLineOfTile(
       // Therefore, is pixelX was 2, then really is need to be 5
       // So 2 - 7 = -5, * 1 = 5
       // Or to simplify, 7 - 2 = 5 haha!
-      let pixelXInTile: i32 = x;
+      let pixelXInTile = x;
       if (bgMapAttributes < 0 || !checkBitOnByte(5, bgMapAttributes)) {
         pixelXInTile = 7 - pixelXInTile;
       }
 
       // Get our pallete colors for the tile
-      let paletteColorId: i32 = 0;
+      let paletteColorId = 0;
       if (checkBitOnByte(pixelXInTile, byteTwoForLineOfTilePixels)) {
         // Byte one represents the second bit in our color id, so bit shift
         paletteColorId += 1;
@@ -83,23 +82,23 @@ export function drawPixelsFromLineOfTile(
       }
 
       // Get the pallete
-      let red: i32 = 0;
-      let green: i32 = 0;
-      let blue: i32 = 0;
+      let red = 0;
+      let green = 0;
+      let blue = 0;
 
       // Check if we should draw color or not
       if (Cpu.GBCEnabled && (bgMapAttributes >= 0 || spriteAttributes >= 0)) {
         // Draw C O L O R
 
-        let isSprite: boolean = spriteAttributes >= 0;
+        let isSprite = spriteAttributes >= 0;
 
         // Call the helper function to grab the correct color from the palette
         // Get the palette index byte
-        let bgPalette: i32 = bgMapAttributes & 0x07;
+        let bgPalette = bgMapAttributes & 0x07;
         if (isSprite) {
           bgPalette = spriteAttributes & 0x07;
         }
-        let rgbColorPalette: i32 = getRgbColorFromPalette(bgPalette, paletteColorId, isSprite);
+        let rgbColorPalette = getRgbColorFromPalette(bgPalette, paletteColorId, isSprite);
 
         // Split off into red green and blue
         red = getColorComponentFromRgb(0, rgbColorPalette);
@@ -114,16 +113,12 @@ export function drawPixelsFromLineOfTile(
         }
 
         if (shouldRepresentMonochromeColorByColorId) {
-          let monochromeColor: i32 = getMonochromeColorFromPalette(
-            paletteColorId,
-            paletteLocation,
-            shouldRepresentMonochromeColorByColorId
-          );
+          let monochromeColor = getMonochromeColorFromPalette(paletteColorId, paletteLocation, shouldRepresentMonochromeColorByColorId);
           red = monochromeColor;
           green = monochromeColor;
           blue = monochromeColor;
         } else {
-          let hexColor: i32 = getColorizedGbHexColorFromPalette(paletteColorId, paletteLocation);
+          let hexColor = getColorizedGbHexColorFromPalette(paletteColorId, paletteLocation);
           red = getRedFromHexColor(hexColor);
           green = getGreenFromHexColor(hexColor);
           blue = getBlueFromHexColor(hexColor);
@@ -132,11 +127,12 @@ export function drawPixelsFromLineOfTile(
 
       // Finally Lets place a pixel in memory
       // Find where our tile line would start
-      let pixelStart: i32 = getTilePixelStart(iteratedOutputX, outputLineY, outputWidth);
+      let pixelStart = getTilePixelStart(iteratedOutputX, outputLineY, outputWidth);
+      wasmMemoryStart += pixelStart;
 
-      store<u8>(wasmMemoryStart + pixelStart, <u8>red);
-      store<u8>(wasmMemoryStart + pixelStart + 1, <u8>green);
-      store<u8>(wasmMemoryStart + pixelStart + 2, <u8>blue);
+      store<u8>(wasmMemoryStart + 0, <u8>red);
+      store<u8>(wasmMemoryStart + 1, <u8>green);
+      store<u8>(wasmMemoryStart + 2, <u8>blue);
 
       let gbcBgPriority: boolean = false;
       if (bgMapAttributes >= 0) {
@@ -159,7 +155,7 @@ export function drawPixelsFromLineOfTile(
 // Inlined because closure compiler inlines
 export function getTilePixelStart(outputLineX: i32, outputLineY: i32, outputWidth: i32): i32 {
   // Finally Lets place a pixel in memory
-  let pixelStart: i32 = outputLineY * outputWidth + outputLineX;
+  let pixelStart = outputLineY * outputWidth + outputLineX;
 
   // Each pixel takes 3 slots, therefore, multiply by 3!
   return pixelStart * 3;
@@ -179,12 +175,11 @@ export function getTileDataAddress(tileDataMemoryLocation: i32, tileIdFromTileMa
   if (tileDataMemoryLocation === Graphics.memoryLocationTileDataSelectZeroStart) {
     // Treat the tile Id as a signed int, subtract an offset of 128
     // if the tileId was 0 then the tile would be in memory region 0x9000-0x900F
-    // NOTE: Assemblyscript, Can't cast to i16, need to make negative manually
-    let signedTileId: i32 = tileIdFromTileMap + 128;
     if (checkBitOnByte(7, tileIdFromTileMap)) {
-      signedTileId = tileIdFromTileMap - 128;
+      tileIdFromTileMap -= 128;
+    } else {
+      tileIdFromTileMap += 128;
     }
-    return tileDataMemoryLocation + signedTileId * 16;
   }
 
   // if the background layout gave us the tileId 0, then the tile data would be between 0x8000-0x800F.

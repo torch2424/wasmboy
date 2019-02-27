@@ -105,7 +105,7 @@ bundleMap.forEach(bundleObject => {
       name: bundleObject.name,
       file: `${bundleObject.output}.umd.js`,
       format: 'umd',
-      sourcemap: false
+      sourcemap: true
     },
     context: 'window',
     plugins: plugins
@@ -116,7 +116,7 @@ bundleMap.forEach(bundleObject => {
       name: bundleObject.name,
       file: `${bundleObject.output}.iife.js`,
       format: 'iife',
-      sourcemap: false
+      sourcemap: true
     },
     context: 'window',
     plugins: plugins
@@ -127,7 +127,7 @@ bundleMap.forEach(bundleObject => {
       name: bundleObject.name,
       file: `${bundleObject.output}.esm.js`,
       format: 'es',
-      sourcemap: false
+      sourcemap: true
     },
     context: 'window',
     plugins: plugins
@@ -138,7 +138,7 @@ bundleMap.forEach(bundleObject => {
       name: bundleObject.name,
       file: `${bundleObject.output}.cjs.js`,
       format: 'cjs',
-      sourcemap: false
+      sourcemap: true
     },
     context: 'global',
     plugins: plugins

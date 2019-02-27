@@ -9,7 +9,7 @@ import { Channel2 } from './channel2';
 import { Channel3 } from './channel3';
 import { Channel4 } from './channel4';
 import { eightBitLoadFromGBMemory, eightBitStoreIntoGBMemory } from '../memory/index';
-import { checkBitOnByte, setBitOnByte, resetBitOnByte, hexLog } from '../helpers/index';
+import { checkBitOnByte, setBitOnByte, resetBitOnByte } from '../helpers/index';
 
 // Function to check and handle writes to sound registers
 // Inlined because closure compiler inlines
@@ -112,7 +112,7 @@ export function SoundRegisterWriteTraps(offset: i32, value: i32): boolean {
       // Reset all registers except NR52
       Sound.updateNR52(value);
       if (!checkBitOnByte(7, value)) {
-        for (let i: i32 = 0xff10; i < 0xff26; i++) {
+        for (let i = 0xff10; i < 0xff26; ++i) {
           eightBitStoreIntoGBMemory(i, 0x00);
         }
       }
@@ -131,10 +131,10 @@ export function SoundRegisterReadTraps(offset: i32): i32 {
   // This will fix bugs in orcale of ages :)
   if (offset === Sound.memoryLocationNR52) {
     // Get our registerNR52
-    let registerNR52: i32 = eightBitLoadFromGBMemory(Sound.memoryLocationNR52);
+    let registerNR52 = eightBitLoadFromGBMemory(Sound.memoryLocationNR52);
 
     // Knock off lower 7 bits
-    registerNR52 = registerNR52 & 0x80;
+    registerNR52 &= 0x80;
 
     // Set our lower 4 bits to our channel isEnabled statuses
     if (Channel1.isEnabled) {
@@ -162,8 +162,7 @@ export function SoundRegisterReadTraps(offset: i32): i32 {
     }
 
     // Or from the table
-    registerNR52 = registerNR52 | 0x70;
-
+    registerNR52 |= 0x70;
     return registerNR52;
   }
 

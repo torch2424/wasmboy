@@ -3,14 +3,10 @@
 import { Config } from './config';
 import { Cpu } from './cpu/index';
 import { Graphics, updateGraphics, batchProcessGraphics } from './graphics/index';
-import { Interrupts, checkInterrupts } from './interrupts/index';
-import { Joypad } from './joypad/index';
-import { Memory, eightBitStoreIntoGBMemory, eightBitLoadFromGBMemory } from './memory/index';
+import { Memory } from './memory/index';
 import { Timers, updateTimers, batchProcessTimers } from './timers/index';
 import { Sound, updateSound } from './sound/index';
-import { Serial, updateSerial } from './serial/serial';
-import { hexLog, log } from './helpers/index';
-import { u16Portable } from './portable/portable';
+import { updateSerial } from './serial/serial';
 
 export class Cycles {
   // An even number below the max 32 bit integer
@@ -33,11 +29,13 @@ export function getCycles(): i32 {
 
 // Inlined because closure compiler inlines
 function trackCyclesRan(numberOfCycles: i32): void {
-  Cycles.cycles += numberOfCycles;
-  if (Cycles.cycles >= Cycles.cyclesPerCycleSet) {
+  let cycles = Cycles.cycles;
+  cycles += numberOfCycles;
+  if (cycles >= Cycles.cyclesPerCycleSet) {
     Cycles.cycleSets += 1;
-    Cycles.cycles -= Cycles.cyclesPerCycleSet;
+    cycles -= Cycles.cyclesPerCycleSet;
   }
+  Cycles.cycles = cycles;
 }
 
 // Inlined because closure compiler inlines

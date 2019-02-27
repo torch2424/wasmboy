@@ -3,10 +3,9 @@
 import { setHasCoreStarted } from './core';
 import { syncCycles } from './cycles';
 import { Cpu, executeOpcode } from './cpu/index';
-import { Interrupts, checkInterrupts } from './interrupts/index';
-import { eightBitStoreIntoGBMemory, eightBitLoadFromGBMemory } from './memory/index';
-import { Sound, getNumberOfSamplesInAudioBuffer, clearAudioBuffer } from './sound/index';
-import { hexLog, log } from './helpers/index';
+import { checkInterrupts } from './interrupts/index';
+import { eightBitLoadFromGBMemory } from './memory/index';
+import { getNumberOfSamplesInAudioBuffer } from './sound/index';
 import { u16Portable } from './portable/portable';
 
 import { Breakpoints } from './debug/breakpoints';
@@ -38,11 +37,13 @@ export function getSteps(): i32 {
 
 // Inlined because closure compiler inlines
 function trackStepsRan(steps: i32): void {
-  Execute.steps += steps;
-  if (Execute.steps >= Execute.stepsPerStepSet) {
+  let esteps = Execute.steps;
+  esteps += steps;
+  if (esteps >= Execute.stepsPerStepSet) {
     Execute.stepSets += 1;
-    Execute.steps -= Execute.stepsPerStepSet;
+    esteps -= Execute.stepsPerStepSet;
   }
+  Execute.steps = esteps;
 }
 
 // Inlined because closure compiler inlines
@@ -58,8 +59,8 @@ export function resetSteps(): void {
 // -1 = error
 // 0 = render a frame
 export function executeMultipleFrames(numberOfFrames: i32): i32 {
-  let frameResponse: i32 = 0;
-  let framesRun: i32 = 0;
+  let frameResponse = 0;
+  let framesRun = 0;
   while (framesRun < numberOfFrames && frameResponse >= 0) {
     frameResponse = executeFrame();
     framesRun += 1;
@@ -91,8 +92,8 @@ export function executeFrameAndCheckAudio(maxAudioBuffer: i32 = 0): i32 {
 // Return values:
 export function executeUntilCondition(checkMaxCyclesPerFrame: boolean = true, maxAudioBuffer: i32 = -1): i32 {
   // Common tracking variables
-  let numberOfCycles: i32 = -1;
-  let audioBufferSize: i32 = 1024;
+  let numberOfCycles = -1;
+  let audioBufferSize = 1024;
 
   if (maxAudioBuffer > 0) {
     audioBufferSize = maxAudioBuffer;
@@ -177,8 +178,8 @@ export function executeStep(): i32 {
 
   // Get the opcode, and additional bytes to be handled
   // Number of cycles defaults to 4, because while we're halted, we run 4 cycles (according to matt :))
-  let numberOfCycles: i32 = 4;
-  let opcode: i32 = 0;
+  let numberOfCycles = 4;
+  let opcode = 0;
 
   // If we are not halted or stopped, run instructions
   // If we are halted, this will be skipped and just sync the 4 cycles

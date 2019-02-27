@@ -23,13 +23,8 @@ import { Channel3 } from './channel3';
 import { Channel4 } from './channel4';
 import { Cpu } from '../cpu/index';
 import { Config } from '../config';
-import {
-  eightBitLoadFromGBMemory,
-  eightBitStoreIntoGBMemory,
-  loadBooleanDirectlyFromWasmMemory,
-  storeBooleanDirectlyToWasmMemory
-} from '../memory/index';
-import { checkBitOnByte, concatenateBytes, splitLowByte, splitHighByte, hexLog, performanceTimestamp } from '../helpers/index';
+import { eightBitStoreIntoGBMemory } from '../memory/index';
+import { checkBitOnByte, concatenateBytes, splitLowByte, splitHighByte } from '../helpers/index';
 import { i32Portable } from '../portable/portable';
 
 export class Sound {
@@ -44,11 +39,8 @@ export class Sound {
   // and does not exceed the minimum number of cyles for either down sampling, or
   // How often we change the frame, or a channel's update process
   static batchProcessCycles(): i32 {
-    if (Cpu.GBCDoubleSpeed) {
-      return 174;
-    }
-
-    return 87;
+    // return Cpu.GBCDoubleSpeed ? 174 : 87;
+    return 87 << (<i32>Cpu.GBCDoubleSpeed);
   }
 
   // Channel control / On-OFF / Volume (RW)
@@ -95,11 +87,8 @@ export class Sound {
   // Which you can read about below
   static frameSequenceCycleCounter: i32 = 0x0000;
   static maxFrameSequenceCycles(): i32 {
-    if (Cpu.GBCDoubleSpeed) {
-      return 16384;
-    }
-
-    return 8192;
+    // return Cpu.GBCDoubleSpeed ? 16384 : 8192;
+    return 8192 << (<i32>Cpu.GBCDoubleSpeed);
   }
 
   // Also need to downsample our audio to average audio qualty
@@ -196,20 +185,17 @@ export function initializeSound(): void {
 
 // Function to batch process our audio after we skipped so many cycles
 export function batchProcessAudio(): void {
-  if (Sound.currentCycles < Sound.batchProcessCycles()) {
-    return;
-  }
-
-  while (Sound.currentCycles >= Sound.batchProcessCycles()) {
-    updateSound(Sound.batchProcessCycles());
-    Sound.currentCycles = Sound.currentCycles - Sound.batchProcessCycles();
+  let batchProcessCycles = Sound.batchProcessCycles();
+  while (Sound.currentCycles >= batchProcessCycles) {
+    updateSound(batchProcessCycles);
+    Sound.currentCycles -= batchProcessCycles;
   }
 }
 
 // Function for updating sound
 export function updateSound(numberOfCycles: i32): void {
   // Check if our frameSequencer updated
-  let frameSequencerUpdated: boolean = updateFrameSequencer(numberOfCycles);
+  let frameSequencerUpdated = updateFrameSequencer(numberOfCycles);
 
   if (Config.audioAccumulateSamples && !frameSequencerUpdated) {
     accumulateSound(numberOfCycles);
@@ -234,10 +220,10 @@ function calculateSound(numberOfCycles: i32): void {
   // All samples will be returned as 0 to 30
   // 0 being -1.0, and 30 being 1.0
   // (see blurb at top)
-  let channel1Sample: i32 = i32Portable(Channel1.getSample(numberOfCycles));
-  let channel2Sample: i32 = i32Portable(Channel2.getSample(numberOfCycles));
-  let channel3Sample: i32 = i32Portable(Channel3.getSample(numberOfCycles));
-  let channel4Sample: i32 = i32Portable(Channel4.getSample(numberOfCycles));
+  let channel1Sample = i32Portable(Channel1.getSample(numberOfCycles));
+  let channel2Sample = i32Portable(Channel2.getSample(numberOfCycles));
+  let channel3Sample = i32Portable(Channel3.getSample(numberOfCycles));
+  let channel4Sample = i32Portable(Channel4.getSample(numberOfCycles));
   // TODO: Allow individual channels to be muted
   // let channel1Sample: i32 = 15;
   // let channel2Sample: i32 = 15;
@@ -251,16 +237,17 @@ function calculateSound(numberOfCycles: i32): void {
   SoundAccumulator.channel4Sample = channel4Sample;
 
   // Do Some downsampling magic
-  Sound.downSampleCycleCounter += numberOfCycles * Sound.downSampleCycleMultiplier;
-  if (Sound.downSampleCycleCounter >= Sound.maxDownSampleCycles()) {
+  let downSampleCycleCounter = Sound.downSampleCycleCounter + numberOfCycles * Sound.downSampleCycleMultiplier;
+  if (downSampleCycleCounter >= Sound.maxDownSampleCycles()) {
     // Reset the downsample counter
     // Don't set to zero to catch overflowed cycles
-    Sound.downSampleCycleCounter -= Sound.maxDownSampleCycles();
+    downSampleCycleCounter -= Sound.maxDownSampleCycles();
+    Sound.downSampleCycleCounter = downSampleCycleCounter;
 
     // Mix our samples
-    let mixedSample: i32 = mixChannelSamples(channel1Sample, channel2Sample, channel3Sample, channel4Sample);
-    let leftChannelSampleUnsignedByte: i32 = splitHighByte(mixedSample);
-    let rightChannelSampleUnsignedByte: i32 = splitLowByte(mixedSample);
+    let mixedSample = mixChannelSamples(channel1Sample, channel2Sample, channel3Sample, channel4Sample);
+    let leftChannelSampleUnsignedByte = splitHighByte(mixedSample);
+    let rightChannelSampleUnsignedByte = splitLowByte(mixedSample);
 
     // Set our volumes in memory
     // +1 so it can not be zero
@@ -290,15 +277,16 @@ function calculateSound(numberOfCycles: i32): void {
       rightChannelSampleUnsignedByte = splitLowByte(mixedSample);
       setLeftAndRightOutputForAudioQueue(leftChannelSampleUnsignedByte + 1, rightChannelSampleUnsignedByte + 1, CHANNEL_4_BUFFER_LOCATION);
     }
-    Sound.audioQueueIndex += 1;
+    let audioQueueIndex = Sound.audioQueueIndex + 1;
 
     // Don't allow our audioQueueIndex to overflow into other parts of the wasmBoy memory map
     // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit#gid=0
     // Not 0xFFFF because we need half of 64kb since we store left and right channel
-    let maxIndex: i32 = i32Portable(Sound.wasmBoyMemoryMaxBufferSize / 2) - 1;
-    if (Sound.audioQueueIndex >= maxIndex) {
-      Sound.audioQueueIndex -= 1;
+    let maxIndex = i32Portable(Sound.wasmBoyMemoryMaxBufferSize >> 1) - 1;
+    if (audioQueueIndex >= maxIndex) {
+      audioQueueIndex -= 1;
     }
+    Sound.audioQueueIndex = audioQueueIndex;
   }
 }
 
@@ -307,15 +295,18 @@ function updateFrameSequencer(numberOfCycles: i32): boolean {
   // APU runs at 4194304 / 512
   // Or Cpu.clockSpeed / 512
   // Which means, we need to update once every 8192 cycles :)
-  Sound.frameSequenceCycleCounter += numberOfCycles;
-  if (Sound.frameSequenceCycleCounter >= Sound.maxFrameSequenceCycles()) {
+  let maxFrameSequenceCycles = Sound.maxFrameSequenceCycles();
+  let frameSequenceCycleCounter = Sound.frameSequenceCycleCounter + numberOfCycles;
+  if (frameSequenceCycleCounter >= maxFrameSequenceCycles) {
     // Reset the frameSequenceCycleCounter
     // Not setting to zero as we do not want to drop cycles
-    Sound.frameSequenceCycleCounter -= Sound.maxFrameSequenceCycles();
+    frameSequenceCycleCounter -= maxFrameSequenceCycles;
+    Sound.frameSequenceCycleCounter = frameSequenceCycleCounter;
 
     // Check our frame sequencer
     // https://gist.github.com/drhelius/3652407
-    switch (Sound.frameSequencer) {
+    let frameSequencer = Sound.frameSequencer;
+    switch (frameSequencer) {
       case 0:
         // Update Length on Channels
         Channel1.updateLength();
@@ -360,12 +351,10 @@ function updateFrameSequencer(numberOfCycles: i32): boolean {
     }
 
     // Update our frame sequencer
-    Sound.frameSequencer += 1;
-    if (Sound.frameSequencer >= 8) {
-      Sound.frameSequencer = 0;
-    }
-
+    Sound.frameSequencer = (frameSequencer + 1) & 7;
     return true;
+  } else {
+    Sound.frameSequenceCycleCounter = frameSequenceCycleCounter;
   }
 
   return false;
@@ -393,54 +382,22 @@ export function mixChannelSamples(
   SoundAccumulator.mixerVolumeChanged = false;
 
   // Get our channel volume for left/right
-  let leftChannelSample: i32 = 0;
-  let rightChannelSample: i32 = 0;
+  let leftChannelSample = 0;
+  let rightChannelSample = 0;
 
   // Find the sample for the left if enabled
   // other wise add silence (15) for the channel
-  if (Sound.NR51IsChannel1EnabledOnLeftOutput) {
-    leftChannelSample += channel1Sample;
-  } else {
-    leftChannelSample += 15;
-  }
-  if (Sound.NR51IsChannel2EnabledOnLeftOutput) {
-    leftChannelSample += channel2Sample;
-  } else {
-    leftChannelSample += 15;
-  }
-  if (Sound.NR51IsChannel3EnabledOnLeftOutput) {
-    leftChannelSample += channel3Sample;
-  } else {
-    leftChannelSample += 15;
-  }
-  if (Sound.NR51IsChannel4EnabledOnLeftOutput) {
-    leftChannelSample += channel4Sample;
-  } else {
-    leftChannelSample += 15;
-  }
+  leftChannelSample += Sound.NR51IsChannel1EnabledOnLeftOutput ? channel1Sample : 15;
+  leftChannelSample += Sound.NR51IsChannel2EnabledOnLeftOutput ? channel2Sample : 15;
+  leftChannelSample += Sound.NR51IsChannel3EnabledOnLeftOutput ? channel3Sample : 15;
+  leftChannelSample += Sound.NR51IsChannel4EnabledOnLeftOutput ? channel4Sample : 15;
 
   // Find the sample for the right if enabled
   // other wise add silence (15) for the channel
-  if (Sound.NR51IsChannel1EnabledOnRightOutput) {
-    rightChannelSample += channel1Sample;
-  } else {
-    rightChannelSample += 15;
-  }
-  if (Sound.NR51IsChannel2EnabledOnRightOutput) {
-    rightChannelSample += channel2Sample;
-  } else {
-    rightChannelSample += 15;
-  }
-  if (Sound.NR51IsChannel3EnabledOnRightOutput) {
-    rightChannelSample += channel3Sample;
-  } else {
-    rightChannelSample += 15;
-  }
-  if (Sound.NR51IsChannel4EnabledOnRightOutput) {
-    rightChannelSample += channel4Sample;
-  } else {
-    rightChannelSample += 15;
-  }
+  rightChannelSample += Sound.NR51IsChannel1EnabledOnRightOutput ? channel1Sample : 15;
+  rightChannelSample += Sound.NR51IsChannel2EnabledOnRightOutput ? channel2Sample : 15;
+  rightChannelSample += Sound.NR51IsChannel3EnabledOnRightOutput ? channel3Sample : 15;
+  rightChannelSample += Sound.NR51IsChannel4EnabledOnRightOutput ? channel4Sample : 15;
 
   // Update our accumulator
   SoundAccumulator.mixerEnabledChanged = false;
@@ -473,16 +430,15 @@ function getSampleAsUnsignedByte(sample: i32, mixerVolume: i32): i32 {
 
   // convert to a signed, precise scale of -6000 to 6000 (cheap way of -1.0 to 1.0)
   // Multiply by the mixer volume fraction (to find the actual volume)
-  let precision: i32 = 100000;
-  let convertedSample: i32 = sample - 60;
+  const precision = 100000;
+  let convertedSample = sample - 60;
   convertedSample = convertedSample * precision;
 
   // Multiply by the mixer volume fraction (to find the actual volume)
-  convertedSample = i32Portable((convertedSample * mixerVolume) / 8);
+  convertedSample = (convertedSample * mixerVolume) >> 3;
 
   // Convert back to scale of 0 to 120
-  convertedSample = i32Portable(convertedSample / precision);
-  convertedSample = convertedSample + 60;
+  convertedSample = i32Portable(convertedSample / precision) + 60;
 
   // Finally, convert to an unsigned byte scale
   // With Four Channels (0 to 30) and no global volume. Max is 120
@@ -491,7 +447,7 @@ function getSampleAsUnsignedByte(sample: i32, mixerVolume: i32): i32 {
   // For example, 120 / 254 = 0.47244094488188976
   // Multiply by 1000 to increase the float into an int
   // so, 120 * 1000 / (0.47244094488188976 * 1000) should give approximate answer for max mixer volume
-  let maxDivider: i32 = i32Portable((120 * precision) / 254);
+  let maxDivider = i32Portable((120 * precision) / 254);
   convertedSample = i32Portable((convertedSample * precision) / maxDivider);
 
   // Ensure we have an i32 and not a float for JS builds
@@ -503,10 +459,10 @@ function getSampleAsUnsignedByte(sample: i32, mixerVolume: i32): i32 {
 // Function to set our left and right channels at the correct queue index
 export function setLeftAndRightOutputForAudioQueue(leftVolume: i32, rightVolume: i32, bufferLocation: i32): void {
   // Get our stereo index
-  let audioQueueOffset = bufferLocation + Sound.audioQueueIndex * 2;
+  let audioQueueOffset = bufferLocation + (Sound.audioQueueIndex << 1);
 
   // Store our volumes
   // +1 that way we don't have empty data to ensure that the value is set
-  store<u8>(audioQueueOffset, <u8>(leftVolume + 1));
+  store<u8>(audioQueueOffset + 0, <u8>(leftVolume + 1));
   store<u8>(audioQueueOffset + 1, <u8>(rightVolume + 1));
 }
