@@ -2,13 +2,16 @@
 const commonTest = require('../common-test');
 
 // Wasm Boy library
-const WasmBoy = require('../../dist/wasmboy.wasm.cjs.js').WasmBoy;
+const WasmBoy = require('../../dist/wasmboy.wasm.cjs').WasmBoy;
 
 // File management
 const fs = require('fs');
 
 // Assertion
 const assert = require('assert');
+
+// Golden file handling
+const { goldenFileCompareOrCreate, goldenImageDataArrayCompare } = require('./goldenCompare');
 
 // Some Timeouts for specified test roms
 const TEST_ROM_DEFAULT_TIMEOUT = 7500;
@@ -25,6 +28,55 @@ WasmBoy.config({
   isGbcEnabled: true
 });
 
+// Audio Golden Test
+// TODO: Remove this with an actual accuracy
+// sound test
+describe('audio golden test', () => {
+  // Define our wasmboy instance
+  // Not using arrow functions, as arrow function timeouts were acting up
+  beforeEach(function(done) {
+    // Set a timeout of 7500, takes a while for wasm module to parse
+    this.timeout(7500);
+
+    // Read the test rom a a Uint8Array and pass to wasmBoy
+    const testRomArray = new Uint8Array(fs.readFileSync('./test/performance/testroms/back-to-color/back-to-color.gbc'));
+
+    WasmBoy.loadROM(testRomArray).then(done);
+  });
+
+  it('should have the same audio buffer', function(done) {
+    // Set our timeout
+    this.timeout(TEST_ROM_DEFAULT_TIMEOUT + 2000);
+
+    const asyncTask = async () => {
+      // Run some frames
+      await WasmBoy._runWasmExport('executeMultipleFrames', [60]);
+      await WasmBoy._runWasmExport('executeMultipleFrames', [60]);
+      await WasmBoy._runWasmExport('clearAudioBuffer');
+      await WasmBoy._runWasmExport('executeMultipleFrames', [60]);
+      await WasmBoy._runWasmExport('executeMultipleFrames', [60]);
+
+      // Execute a few frames
+      const memoryStart = await WasmBoy._getWasmConstant('AUDIO_BUFFER_LOCATION');
+      const memorySize = await WasmBoy._getWasmConstant('AUDIO_BUFFER_SIZE');
+      // - 20 to not include the overrun in the audio buffer
+      const memory = await WasmBoy._getWasmMemorySection(memoryStart, memoryStart + memorySize - 20);
+
+      // Get the memory as a normal array
+      const audioArray = [];
+      for (let i = 0; i < memory.length; i++) {
+        audioArray.push(memory[i]);
+      }
+
+      goldenFileCompareOrCreate('./test/accuracy/sound-test.golden.output.json', audioArray);
+      done();
+    };
+    asyncTask();
+  });
+});
+
+// Graphical Golden Test(s)
+// Simply screenshot the end result of the accuracy test
 const testRomsPath = './test/accuracy/testroms';
 
 commonTest.getDirectories(testRomsPath).forEach(directory => {
@@ -74,61 +126,15 @@ commonTest.getDirectories(testRomsPath).forEach(directory => {
             const wasmboyOutputImageTest = async () => {
               await WasmBoy.pause();
 
-              console.log(`Checking results for the following test rom: ${directory}/${testRom}`);
+              const testDataPath = testRom.replace('.gb', '.golden.output');
+              const goldenFile = `${directory}/${testDataPath}`;
+
+              console.log(`Checking results for the following test rom: ${goldenFile}`);
 
               const imageDataArray = await commonTest.getImageDataFromFrame();
 
-              // Output a gitignored image of the current tests
-              const testImagePath = testRom.replace('.gb', '.current.png');
-              await commonTest.createImageFromFrame(imageDataArray, `${directory}/${testImagePath}`);
-
-              // Now compare with the current array if we have it
-              const testDataPath = testRom.replace('.gb', '.golden.output');
-              if (fs.existsSync(`${directory}/${testDataPath}`)) {
-                // Compare the file
-                const goldenOuput = fs.readFileSync(`${directory}/${testDataPath}`);
-
-                const goldenImageDataArray = JSON.parse(goldenOuput);
-
-                if (goldenImageDataArray.length !== imageDataArray.length) {
-                  assert.equal(goldenImageDataArray.length === imageDataArray.length, true);
-                } else {
-                  // Find the differences between the two arrays
-                  const arrayDiff = [];
-
-                  for (let i = 0; i < goldenImageDataArray.length; i++) {
-                    if (goldenImageDataArray[i] !== imageDataArray[i]) {
-                      arrayDiff.push({
-                        index: i,
-                        goldenElement: goldenImageDataArray[i],
-                        imageDataElement: imageDataArray[i]
-                      });
-                    }
-                  }
-
-                  // Check if we found differences
-                  if (arrayDiff.length > 0) {
-                    console.log('Differences found in expected (golden) output:');
-                    console.log(arrayDiff);
-                  }
-                  assert.equal(arrayDiff.length, 0);
-                }
-
-                done();
-              } else {
-                // Either we didn't have it because this is the first time running this test rom,
-                // or we wanted to update expected output, so we deleted the file
-                console.warn(`No output found in: ${directory}/${testDataPath}, Creating expected (golden) output...`);
-
-                // Create the output file
-                // Stringify our image data
-                const imageDataStringified = JSON.stringify(imageDataArray);
-                fs.writeFileSync(`${directory}/${testDataPath}`, imageDataStringified);
-
-                const testImagePath = testRom.replace('.gb', '.golden.png');
-                await commonTest.createImageFromFrame(imageDataArray, `${directory}/${testImagePath}`);
-                done();
-              }
+              await goldenImageDataArrayCompare(goldenFile, imageDataArray, directory, testRom);
+              done();
             };
             wasmboyOutputImageTest();
           }, timeToWaitForTestRom);
