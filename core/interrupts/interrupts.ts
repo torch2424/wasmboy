@@ -7,7 +7,7 @@ import {
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
-import { setBitOnByte, resetBitOnByte, checkBitOnByte, hexLog } from '../helpers/index';
+import { setBitOnByte, resetBitOnByte, checkBitOnByte } from '../helpers/index';
 
 export class Interrupts {
   static masterInterruptSwitch: boolean = false;

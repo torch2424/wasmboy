@@ -16,7 +16,7 @@ import {
 } from '../graphics/index';
 import { Cpu } from '../cpu/index';
 import { eightBitLoadFromGBMemory, Memory } from '../memory/index';
-import { checkBitOnByte, hexLog } from '../helpers/index';
+import { checkBitOnByte } from '../helpers/index';
 
 // Some Simple internal getters
 export function getLY(): i32 {
