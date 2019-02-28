@@ -301,7 +301,7 @@ export class Channel1 {
     // TODO: The volume envelope and sweep timers treat a period of 0 as 8.
     let envelopeCounter = Channel1.envelopeCounter - 1;
     if (envelopeCounter <= 0) {
-      Channel1.envelopeCounter = Channel1.NRx2EnvelopePeriod;
+      envelopeCounter = Channel1.NRx2EnvelopePeriod;
 
       // When the timer generates a clock and the envelope period is NOT zero, a new volume is calculated
       // NOTE: There is some weiirrdd obscure behavior where zero can equal 8, so watch out for that
@@ -315,9 +315,8 @@ export class Channel1 {
         }
         Channel1.volume = volume;
       }
-    } else {
-      Channel1.envelopeCounter = envelopeCounter;
     }
+    Channel1.envelopeCounter = envelopeCounter;
   }
 
   static setFrequency(frequency: i32): void {
