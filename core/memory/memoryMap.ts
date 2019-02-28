@@ -5,6 +5,7 @@ import {
   WORK_RAM_LOCATION,
   OTHER_GAMEBOY_INTERNAL_MEMORY_LOCATION,
   CARTRIDGE_RAM_LOCATION,
+  BOOT_ROM_LOCATION,
   CARTRIDGE_ROM_LOCATION
 } from '../constants';
 import { Memory } from './memory';
@@ -22,6 +23,31 @@ export function getWasmBoyOffsetFromGameBoyOffset(gameboyOffset: i32): i32 {
   let gameboyOffsetHighByte = gameboyOffset >> 12;
   switch (gameboyOffsetHighByte) {
     case 0x00:
+      // Check if we are currently executing the boot rom
+      // Otherwise, bottom 0x0000 -> 0x03FF is Cartridge ROM Ram Bank 1
+      if (Cpu.BootROMEnabled) {
+        if (Cpu.GBCEnabled) {
+          // See: http://gbdev.gg8.se/wiki/articles/Gameboy_Bootstrap_ROM
+          // "The rom dump includes the 256 byte rom (0x0000-0x00FF) and the,
+          // 1792 byte rom (0x0200-0x08FF) which Dr. Decapitator observed,
+          // but not the 512 byte rom,
+          // which may be cpu microcode or lcd color lookup related."
+
+          // First 0xFF bytes are BOOT rom
+          if (gameboyOffset < 0x0100) {
+            return gameboyOffset + BOOT_ROM_LOCATION;
+          }
+
+          // 0x100 -> 0x1FF is the actual ROM
+
+          // Everything from 0x200 -> 0x8FF is BOOT ROM Again
+          if (gameboyOffset > 0x01ff && gameboyOffset < 0x0900) {
+            return gameboyOffset + BOOT_ROM_LOCATION;
+          }
+        } else if (!Cpu.GBCEnabled && gameboyOffset < 0x0100) {
+          return gameboyOffset + BOOT_ROM_LOCATION;
+        }
+      }
     case 0x01:
     case 0x02:
     case 0x03:

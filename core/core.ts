@@ -75,7 +75,22 @@ function initialize(): void {
     Cpu.GBCEnabled = false;
   }
 
+  // Reset hasStarted, since we are now reset
+  setHasCoreStarted(false);
+
+  // Reset our cycles ran
+  resetCycles();
+  resetSteps();
+
+  if (Config.enableBootRom) {
+    Cpu.BootROMEnabled = true;
+  } else {
+    Cpu.BootROMEnabled = false;
+  }
+
   // Call our respective classes intialization
+  // NOTE: Boot ROM Only handles some initialization, thus we need to check in each one
+  // respecitvely :p
   initializeCpu();
   initializeCartridge();
   initializeDma();
@@ -85,7 +100,10 @@ function initialize(): void {
   initializeInterrupts();
   initializeTimers();
   initializeSerial();
+  initializeVarious();
+}
 
+function initializeVarious(): void {
   // Various Other Registers
   if (Cpu.GBCEnabled) {
     // Various other registers
@@ -109,13 +127,6 @@ function initialize(): void {
     eightBitStoreIntoGBMemory(0xff0f, 0xe1);
     // 0xFFFF = 0x00
   }
-
-  // Reset hasStarted, since we are now reset
-  setHasCoreStarted(false);
-
-  // Reset our cycles ran
-  resetCycles();
-  resetSteps();
 }
 
 // Function to return if we are currently playing a GBC ROM

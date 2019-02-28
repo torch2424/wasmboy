@@ -60,6 +60,14 @@ class DebuggerAnalyticsLib {
     this._fireAnalyticsEvent('load_rom_fail');
   }
 
+  addBootROMSuccess() {
+    this._fireAnalyticsEvent('add_boot_rom_success');
+  }
+
+  addBootROMFail() {
+    this._fireAnalyticsEvent('add_boot_rom_fail');
+  }
+
   saveState() {
     this._fireAnalyticsEvent('save_state');
   }

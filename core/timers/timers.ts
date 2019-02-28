@@ -191,6 +191,18 @@ export function initializeTimers(): void {
     eightBitStoreIntoGBMemory(0xff07, 0xf8);
     Timers.timerInputClock = 0xf8;
   }
+
+  // Override/reset some variables if the boot ROM is enabled
+  if (Cpu.BootROMEnabled) {
+    if (Cpu.GBCEnabled) {
+      // GBC
+    } else {
+      // GB
+      // DIV
+      eightBitStoreIntoGBMemory(0xff04, 0x00);
+      Timers.dividerRegister = 0x0004;
+    }
+  }
 }
 
 // Batch Process Timers

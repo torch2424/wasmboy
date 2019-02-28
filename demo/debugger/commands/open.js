@@ -10,6 +10,7 @@ import Command from './command';
 import { WasmBoy } from '../wasmboy';
 import DebuggerAnalytics from '../analytics';
 import loadROM from '../loadROM';
+import loadBootROM from '../loadBootROM';
 import { PUBX_KEYS } from '../pubx.config';
 
 import { getOpenSourceROMElements } from 'shared-gb/openSourceROMs/preactComponents';
@@ -23,6 +24,7 @@ class OpenLocalFile extends Command {
 
     // Create a hidden input on the page for opening files
     const hiddenInput = document.createElement('input');
+    hiddenInput.id = 'hidden-rom-input';
     hiddenInput.classList.add('hidden-rom-input');
     hiddenInput.setAttribute('type', 'file');
     hiddenInput.setAttribute('accept', '.gb, .gbc, .zip');
@@ -40,7 +42,10 @@ class OpenLocalFile extends Command {
   }
 
   onChange(event) {
-    loadROM(event.target.files[0], event.target.files[0].name);
+    const file = event.target.files[0];
+    const name = event.target.files[0].name;
+
+    loadROM(file, name);
   }
 }
 

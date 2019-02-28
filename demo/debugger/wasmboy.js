@@ -28,6 +28,7 @@ const WasmBoyDefaultOptions = {
   isGbcEnabled: true,
   isGbcColorizationEnabled: true,
   gbcColorizationPalette: undefined,
+  enableBootROMIfAvailable: false,
   isAudioEnabled: true,
   enableAudioDebugging: false,
   frameSkip: 0,

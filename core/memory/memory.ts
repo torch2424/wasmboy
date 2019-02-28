@@ -2,7 +2,7 @@
 // https://docs.google.com/spreadsheets/d/17xrEzJk5-sCB9J2mMJcVnzhbE-XH_NvczVSQH9OHvRk/edit?usp=sharing
 import { getSaveStateMemoryOffset } from '../core';
 import { eightBitLoadFromGBMemory, loadBooleanDirectlyFromWasmMemory } from './load';
-import { storeBooleanDirectlyToWasmMemory } from './store';
+import { eightBitStoreIntoGBMemory, storeBooleanDirectlyToWasmMemory } from './store';
 
 export class Memory {
   // ----------------------------------
@@ -128,4 +128,8 @@ export function initializeCartridge(): void {
 
   Memory.currentRomBank = 0x01;
   Memory.currentRamBank = 0x00;
+
+  // Set our GBC Banks
+  eightBitStoreIntoGBMemory(Memory.memoryLocationGBCVRAMBank, 0x00);
+  eightBitStoreIntoGBMemory(Memory.memoryLocationGBCWRAMBank, 0x01);
 }

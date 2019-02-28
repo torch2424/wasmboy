@@ -147,6 +147,15 @@ export class Channel1 {
     eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx2, 0xf3);
     eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx3, 0xc1);
     eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx4, 0xbf);
+
+    // Override/reset some variables if the boot ROM is enabled
+    // For GBC and GB
+    if (Cpu.BootROMEnabled) {
+      eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx1, 0x3f);
+      eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx2, 0x00);
+      eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx3, 0x00);
+      eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx4, 0xb8);
+    }
   }
 
   // Function to get a sample using the cycle counter on the channel
