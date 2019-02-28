@@ -41,7 +41,6 @@ if (process.env.GET_CORE_CLOSURE) {
   let closureCompilerOptions = {};
 
   if (process.env.CLOSURE_DEBUG) {
-    console.log('Yoooo');
     closureCompilerOptions = {
       ...closureCompilerOptions,
       debug: true

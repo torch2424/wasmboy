@@ -242,7 +242,6 @@ function calculateSound(numberOfCycles: i32): void {
     // Reset the downsample counter
     // Don't set to zero to catch overflowed cycles
     downSampleCycleCounter -= Sound.maxDownSampleCycles();
-    Sound.downSampleCycleCounter = downSampleCycleCounter;
 
     // Mix our samples
     let mixedSample = mixChannelSamples(channel1Sample, channel2Sample, channel3Sample, channel4Sample);
@@ -288,6 +287,8 @@ function calculateSound(numberOfCycles: i32): void {
     }
     Sound.audioQueueIndex = audioQueueIndex;
   }
+
+  Sound.downSampleCycleCounter = downSampleCycleCounter;
 }
 
 // Inlined because closure compiler inlines
