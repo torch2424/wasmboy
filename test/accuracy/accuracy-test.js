@@ -50,9 +50,11 @@ describe('audio golden test', () => {
 
     const asyncTask = async () => {
       // Run some frames
-      await WasmBoy._runWasmExport('executeMultipleFrames', [120]);
+      await WasmBoy._runWasmExport('executeMultipleFrames', [60]);
+      await WasmBoy._runWasmExport('executeMultipleFrames', [60]);
       await WasmBoy._runWasmExport('clearAudioBuffer');
-      await WasmBoy._runWasmExport('executeMultipleFrames', [120]);
+      await WasmBoy._runWasmExport('executeMultipleFrames', [60]);
+      await WasmBoy._runWasmExport('executeMultipleFrames', [60]);
 
       // Execute a few frames
       const memoryStart = await WasmBoy._getWasmConstant('AUDIO_BUFFER_LOCATION');
