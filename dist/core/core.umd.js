@@ -86,10 +86,16 @@ const ceil = value => {
   var CHANNEL_4_BUFFER_SIZE = 0x020000;
   var AUDIO_BUFFER_LOCATION = CHANNEL_4_BUFFER_LOCATION + CHANNEL_4_BUFFER_SIZE;
   var AUDIO_BUFFER_SIZE = 0x020000;
-  // Catridge Memory
+  // Catridge Ram
   var CARTRIDGE_RAM_LOCATION = AUDIO_BUFFER_LOCATION + AUDIO_BUFFER_SIZE;
   var CARTRIDGE_RAM_SIZE = 0x020000;
-  var CARTRIDGE_ROM_LOCATION = CARTRIDGE_RAM_LOCATION + CARTRIDGE_RAM_SIZE;
+  // Boot ROM
+  // http://gbdev.gg8.se/files/roms/bootroms/
+  // Largest Boot rom is GBC, at 2.5KB
+  var BOOT_ROM_LOCATION = CARTRIDGE_RAM_LOCATION + CARTRIDGE_RAM_SIZE;
+  var BOOT_ROM_SIZE = 0x000a00;
+  // Cartridge ROM
+  var CARTRIDGE_ROM_LOCATION = BOOT_ROM_LOCATION + BOOT_ROM_SIZE;
   var CARTRIDGE_ROM_SIZE = 0x7e0400;
   // Debug Memory
   var DEBUG_GAMEBOY_MEMORY_LOCATION = CARTRIDGE_ROM_LOCATION + CARTRIDGE_ROM_SIZE;
@@ -785,6 +791,16 @@ const ceil = value => {
   // Inlined because closure compiler inlines
   function initializeColors() {
       setManualColorizationPalette(0);
+      if (Cpu.GBCEnabled) {
+          // Don't need to continue this if a GBC game
+          return;
+      }
+      if (Cpu.BootROMEnabled) {
+          if (!Cpu.GBCEnabled) {
+              // GB
+              return;
+          }
+      }
       // Do some automatic color palette swapping if we have a loaded ROM
       var titleChecksum = 0x00;
       for (var i = 0x0134; i <= 0x0143; i++) {
@@ -1271,6 +1287,12 @@ const ceil = value => {
           eightBitStoreIntoGBMemory(0xff6a, 0xff);
           eightBitStoreIntoGBMemory(0xff6b, 0xff);
       }
+      // Override some values if using the bootrom
+      if (Cpu.BootROMEnabled && Cpu.GBCEnabled) {
+          // GBC Palettes
+          eightBitStoreIntoGBMemory(0xff69, 0x20);
+          eightBitStoreIntoGBMemory(0xff6b, 0x8a);
+      }
   }
   // Simple get pallete color or monochrome GB
   // shouldRepresentColorByColorId is good for debugging tile data for GBC games that don't have
@@ -1698,6 +1720,14 @@ const ceil = value => {
           eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx2, 0xf3);
           eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx3, 0xc1);
           eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx4, 0xbf);
+          // Override/reset some variables if the boot ROM is enabled
+          // For GBC and GB
+          if (Cpu.BootROMEnabled) {
+              eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx1, 0x3f);
+              eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx2, 0x00);
+              eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx3, 0x00);
+              eightBitStoreIntoGBMemory(Channel1.memoryLocationNRx4, 0xb8);
+          }
       };
       // Function to get a sample using the cycle counter on the channel
       Channel1.getSampleFromCycleCounter = function () {
@@ -1828,7 +1858,7 @@ const ceil = value => {
           // TODO: The volume envelope and sweep timers treat a period of 0 as 8.
           var envelopeCounter = Channel1.envelopeCounter - 1;
           if (envelopeCounter <= 0) {
-              Channel1.envelopeCounter = Channel1.NRx2EnvelopePeriod;
+              envelopeCounter = Channel1.NRx2EnvelopePeriod;
               // When the timer generates a clock and the envelope period is NOT zero, a new volume is calculated
               // NOTE: There is some weiirrdd obscure behavior where zero can equal 8, so watch out for that
               // If notes are sustained for too long, this is probably why
@@ -1843,9 +1873,7 @@ const ceil = value => {
                   Channel1.volume = volume;
               }
           }
-          else {
-              Channel1.envelopeCounter = envelopeCounter;
-          }
+          Channel1.envelopeCounter = envelopeCounter;
       };
       Channel1.setFrequency = function (frequency) {
           // Get the high and low bits
@@ -2855,8 +2883,21 @@ const ceil = value => {
       Channel4.initialize();
       // Other Sound Registers
       eightBitStoreIntoGBMemory(Sound.memoryLocationNR50, 0x77);
+      Sound.updateNR50(0x77);
       eightBitStoreIntoGBMemory(Sound.memoryLocationNR51, 0xf3);
+      Sound.updateNR51(0xf3);
       eightBitStoreIntoGBMemory(Sound.memoryLocationNR52, 0xf1);
+      Sound.updateNR52(0xf1);
+      // Override/reset some variables if the boot ROM is enabled
+      // For both GB and GBC
+      if (Cpu.BootROMEnabled) {
+          eightBitStoreIntoGBMemory(Sound.memoryLocationNR50, 0x00);
+          Sound.updateNR50(0x00);
+          eightBitStoreIntoGBMemory(Sound.memoryLocationNR51, 0x00);
+          Sound.updateNR51(0x00);
+          eightBitStoreIntoGBMemory(Sound.memoryLocationNR52, 0x70);
+          Sound.updateNR52(0x70);
+      }
       initializeSoundAccumulator();
   }
   // Function to batch process our audio after we skipped so many cycles
@@ -2912,7 +2953,6 @@ const ceil = value => {
           // Reset the downsample counter
           // Don't set to zero to catch overflowed cycles
           downSampleCycleCounter -= Sound.maxDownSampleCycles();
-          Sound.downSampleCycleCounter = downSampleCycleCounter;
           // Mix our samples
           var mixedSample = mixChannelSamples(channel1Sample, channel2Sample, channel3Sample, channel4Sample);
           var leftChannelSampleUnsignedByte = splitHighByte(mixedSample);
@@ -2952,6 +2992,7 @@ const ceil = value => {
           }
           Sound.audioQueueIndex = audioQueueIndex;
       }
+      Sound.downSampleCycleCounter = downSampleCycleCounter;
   }
   // Inlined because closure compiler inlines
   function updateFrameSequencer(numberOfCycles) {
@@ -3615,6 +3656,16 @@ const ceil = value => {
           eightBitStoreIntoGBMemory(0xff07, 0xf8);
           Timers.timerInputClock = 0xf8;
       }
+      // Override/reset some variables if the boot ROM is enabled
+      if (Cpu.BootROMEnabled) {
+          if (Cpu.GBCEnabled) ;
+          else {
+              // GB
+              // DIV
+              eightBitStoreIntoGBMemory(0xff04, 0x00);
+              Timers.dividerRegister = 0x0004;
+          }
+      }
   }
   // Batch Process Timers
   // Only checked on writes
@@ -4172,7 +4223,7 @@ const ceil = value => {
           eightBitStoreIntoGBMemory(0xff55, 0xff);
       }
       else {
-          // GBC DMA
+          // GB DMA
           eightBitStoreIntoGBMemory(0xff51, 0xff);
           eightBitStoreIntoGBMemory(0xff52, 0xff);
           eightBitStoreIntoGBMemory(0xff53, 0xff);
@@ -4330,6 +4381,15 @@ const ceil = value => {
           eightBitStoreIntoGBMemory(Cpu.memoryLocationSpeedSwitch, value & 0x01);
           // We did the write, dont need to
           return false;
+      }
+      // Handle Boot ROM Switch
+      if (Cpu.BootROMEnabled && offset === Cpu.memoryLocationBootROMSwitch) {
+          // Disable the boot rom
+          Cpu.BootROMEnabled = false;
+          // Set the program counter to be incremented after this command
+          Cpu.programCounter = 0x00ff;
+          // Allow the write
+          return true;
       }
       // Graphics
       // Cache globals used multiple times for performance
@@ -4519,6 +4579,29 @@ const ceil = value => {
       var gameboyOffsetHighByte = gameboyOffset >> 12;
       switch (gameboyOffsetHighByte) {
           case 0x00:
+              // Check if we are currently executing the boot rom
+              // Otherwise, bottom 0x0000 -> 0x03FF is Cartridge ROM Ram Bank 1
+              if (Cpu.BootROMEnabled) {
+                  if (Cpu.GBCEnabled) {
+                      // See: http://gbdev.gg8.se/wiki/articles/Gameboy_Bootstrap_ROM
+                      // "The rom dump includes the 256 byte rom (0x0000-0x00FF) and the,
+                      // 1792 byte rom (0x0200-0x08FF) which Dr. Decapitator observed,
+                      // but not the 512 byte rom,
+                      // which may be cpu microcode or lcd color lookup related."
+                      // First 0xFF bytes are BOOT rom
+                      if (gameboyOffset < 0x0100) {
+                          return gameboyOffset + BOOT_ROM_LOCATION;
+                      }
+                      // 0x100 -> 0x1FF is the actual ROM
+                      // Everything from 0x200 -> 0x8FF is BOOT ROM Again
+                      if (gameboyOffset > 0x01ff && gameboyOffset < 0x0900) {
+                          return gameboyOffset + BOOT_ROM_LOCATION;
+                      }
+                  }
+                  else if (!Cpu.GBCEnabled && gameboyOffset < 0x0100) {
+                      return gameboyOffset + BOOT_ROM_LOCATION;
+                  }
+              }
           case 0x01:
           case 0x02:
           case 0x03:
@@ -5419,8 +5502,6 @@ const ceil = value => {
       Graphics.windowY = 0;
       Graphics.scanlineRegister = 0x90;
       if (Cpu.GBCEnabled) {
-          // Bgb says LY is 90 on boot
-          eightBitStoreIntoGBMemory(0xff40, 0x91);
           eightBitStoreIntoGBMemory(0xff41, 0x81);
           // 0xFF42 -> 0xFF43 = 0x00
           eightBitStoreIntoGBMemory(0xff44, 0x90);
@@ -5429,7 +5510,6 @@ const ceil = value => {
           // 0xFF48 -> 0xFF4B = 0x00
       }
       else {
-          eightBitStoreIntoGBMemory(0xff40, 0x91);
           eightBitStoreIntoGBMemory(0xff41, 0x85);
           // 0xFF42 -> 0xFF45 = 0x00
           eightBitStoreIntoGBMemory(0xff46, 0xff);
@@ -5437,10 +5517,31 @@ const ceil = value => {
           eightBitStoreIntoGBMemory(0xff48, 0xff);
           eightBitStoreIntoGBMemory(0xff49, 0xff);
           // 0xFF4A -> 0xFF4B = 0x00
+          // GBC VRAM Banks (Handled by Memory, initializeCartridge)
       }
+      // Scanline
+      // Bgb says LY is 90 on boot
+      Graphics.scanlineRegister = 0x90;
+      eightBitStoreIntoGBMemory(0xff40, 0x90);
       // GBC VRAM Banks
       eightBitStoreIntoGBMemory(0xff4f, 0x00);
       eightBitStoreIntoGBMemory(0xff70, 0x01);
+      // Override/reset some variables if the boot ROM is enabled
+      if (Cpu.BootROMEnabled) {
+          if (Cpu.GBCEnabled) {
+              // GBC
+              Graphics.scanlineRegister = 0x00;
+              eightBitStoreIntoGBMemory(0xff40, 0x00);
+              eightBitStoreIntoGBMemory(0xff41, 0x80);
+              eightBitStoreIntoGBMemory(0xff44, 0x00);
+          }
+          else {
+              // GB
+              Graphics.scanlineRegister = 0x00;
+              eightBitStoreIntoGBMemory(0xff40, 0x00);
+              eightBitStoreIntoGBMemory(0xff41, 0x84);
+          }
+      }
       initializeColors();
   }
   function updateGraphics(numberOfCycles) {
@@ -5791,6 +5892,9 @@ const ceil = value => {
       Memory.isMBC5 = cartridgeType >= 0x19 && cartridgeType <= 0x1e;
       Memory.currentRomBank = 0x01;
       Memory.currentRamBank = 0x00;
+      // Set our GBC Banks
+      eightBitStoreIntoGBMemory(Memory.memoryLocationGBCVRAMBank, 0x00);
+      eightBitStoreIntoGBMemory(Memory.memoryLocationGBCWRAMBank, 0x01);
   }
 
   // WasmBoy memory map:
@@ -5852,6 +5956,9 @@ const ceil = value => {
           storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x12, Cpu.saveStateSlot), Cpu.isHaltNoJump);
           storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x13, Cpu.saveStateSlot), Cpu.isHaltBug);
           storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x14, Cpu.saveStateSlot), Cpu.isStopped);
+          storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x15, Cpu.saveStateSlot), Cpu.BootROMEnabled);
+          storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x16, Cpu.saveStateSlot), Cpu.GBCEnabled);
+          storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x17, Cpu.saveStateSlot), Cpu.GBCDoubleSpeed);
       };
       // Function to load the save state from memory
       Cpu.loadState = function () {
@@ -5871,7 +5978,13 @@ const ceil = value => {
           Cpu.isHaltNoJump = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x12, Cpu.saveStateSlot));
           Cpu.isHaltBug = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x13, Cpu.saveStateSlot));
           Cpu.isStopped = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x14, Cpu.saveStateSlot));
+          Cpu.BootROMEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x15, Cpu.saveStateSlot));
+          Cpu.GBCEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x16, Cpu.saveStateSlot));
+          Cpu.GBCDoubleSpeed = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x17, Cpu.saveStateSlot));
       };
+      // Status to track if we are currently executing the boot rom
+      Cpu.memoryLocationBootROMSwitch = 0xff50;
+      Cpu.BootROMEnabled = false;
       // Status to track if we are in Gameboy Color Mode, and GBC State
       Cpu.GBCEnabled = false;
       // Memory Location for the GBC Speed switch
@@ -5925,6 +6038,10 @@ const ceil = value => {
       Cpu.isHaltNoJump = false;
       Cpu.isHaltBug = false;
       Cpu.isStopped = false;
+      // Everything is done by Boot ROM is enabled.
+      if (Cpu.BootROMEnabled) {
+          return;
+      }
       if (Cpu.GBCEnabled) {
           // CPU Registers
           Cpu.registerA = 0x11;
@@ -9026,7 +9143,20 @@ const ceil = value => {
       else {
           Cpu.GBCEnabled = false;
       }
+      // Reset hasStarted, since we are now reset
+      setHasCoreStarted(false);
+      // Reset our cycles ran
+      resetCycles();
+      resetSteps();
+      if (Config.enableBootRom) {
+          Cpu.BootROMEnabled = true;
+      }
+      else {
+          Cpu.BootROMEnabled = false;
+      }
       // Call our respective classes intialization
+      // NOTE: Boot ROM Only handles some initialization, thus we need to check in each one
+      // respecitvely :p
       initializeCpu();
       initializeCartridge();
       initializeDma();
@@ -9036,6 +9166,9 @@ const ceil = value => {
       initializeInterrupts();
       initializeTimers();
       initializeSerial();
+      initializeVarious();
+  }
+  function initializeVarious() {
       // Various Other Registers
       if (Cpu.GBCEnabled) {
           // Various other registers
@@ -9057,11 +9190,6 @@ const ceil = value => {
           eightBitStoreIntoGBMemory(0xff0f, 0xe1);
           // 0xFFFF = 0x00
       }
-      // Reset hasStarted, since we are now reset
-      setHasCoreStarted(false);
-      // Reset our cycles ran
-      resetCycles();
-      resetSteps();
   }
   // Function to return if we are currently playing a GBC ROM
   function isGBC() {
@@ -9550,6 +9678,8 @@ const ceil = value => {
   exports.CHANNEL_4_BUFFER_SIZE = CHANNEL_4_BUFFER_SIZE;
   exports.CARTRIDGE_RAM_LOCATION = CARTRIDGE_RAM_LOCATION;
   exports.CARTRIDGE_RAM_SIZE = CARTRIDGE_RAM_SIZE;
+  exports.BOOT_ROM_LOCATION = BOOT_ROM_LOCATION;
+  exports.BOOT_ROM_SIZE = BOOT_ROM_SIZE;
   exports.CARTRIDGE_ROM_LOCATION = CARTRIDGE_ROM_LOCATION;
   exports.CARTRIDGE_ROM_SIZE = CARTRIDGE_ROM_SIZE;
   exports.DEBUG_GAMEBOY_MEMORY_LOCATION = DEBUG_GAMEBOY_MEMORY_LOCATION;
