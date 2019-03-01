@@ -21,12 +21,27 @@ TEST_ROM_TIMEOUT['cpu_instrs/cpu_instrs.gb'] = 20500;
 // Print our version
 console.log(`WasmBoy version: ${WasmBoy.getVersion()}`);
 
-// Initialize wasmBoy headless, with a speed option
-WasmBoy.config({
-  headless: true,
-  gameboySpeed: 100.0,
-  isGbcEnabled: true
-});
+const configWasmBoyAccuracy = async () => {
+  // Initialize wasmBoy headless, with a speed option
+  await WasmBoy.config({
+    headless: true,
+    gameboySpeed: 100.0,
+    isGbcEnabled: true
+  });
+};
+
+const configWasmBoyPerformance = async () => {
+  // Initialize wasmBoy headless, with a speed option
+  await WasmBoy.config({
+    headless: true,
+    gameboySpeed: 100.0,
+    isGbcEnabled: true,
+    audioBatchProcessing: true,
+    audioAccumulateSamples: true,
+    tileRendering: true,
+    tileCaching: true
+  });
+};
 
 // Audio Golden Test
 // TODO: Remove this with an actual accuracy
@@ -38,10 +53,16 @@ describe('audio golden test', () => {
     // Set a timeout of 7500, takes a while for wasm module to parse
     this.timeout(7500);
 
-    // Read the test rom a a Uint8Array and pass to wasmBoy
-    const testRomArray = new Uint8Array(fs.readFileSync('./test/performance/testroms/back-to-color/back-to-color.gbc'));
+    const asyncTask = async () => {
+      await configWasmBoyAccuracy();
 
-    WasmBoy.loadROM(testRomArray).then(done);
+      // Read the test rom a a Uint8Array and pass to wasmBoy
+      const testRomArray = new Uint8Array(fs.readFileSync('./test/performance/testroms/back-to-color/back-to-color.gbc'));
+
+      await WasmBoy.loadROM(testRomArray);
+      done();
+    };
+    asyncTask();
   });
 
   it('should have the same audio buffer', function(done) {
@@ -69,6 +90,57 @@ describe('audio golden test', () => {
       }
 
       goldenFileCompareOrCreate('./test/accuracy/sound-test.golden.output.json', audioArray);
+      done();
+    };
+    asyncTask();
+  });
+});
+
+// Common mobile options tests
+describe('performance options golden test', () => {
+  // Define our wasmboy instance
+  // Not using arrow functions, as arrow function timeouts were acting up
+  beforeEach(function(done) {
+    // Set a timeout of 7500, takes a while for wasm module to parse
+    this.timeout(7500);
+
+    const asyncTask = async () => {
+      await configWasmBoyPerformance();
+
+      // Read the test rom a a Uint8Array and pass to wasmBoy
+      const testRomArray = new Uint8Array(fs.readFileSync('./test/performance/testroms/back-to-color/back-to-color.gbc'));
+
+      await WasmBoy.loadROM(testRomArray);
+      done();
+    };
+    asyncTask();
+  });
+
+  it('should have the same graphics / audio buffer', function(done) {
+    // Set our timeout
+    this.timeout(TEST_ROM_DEFAULT_TIMEOUT + 2000);
+
+    const asyncTask = async () => {
+      // Run some frames
+      await WasmBoy._runWasmExport('executeMultipleFrames', [60]);
+      await WasmBoy._runWasmExport('executeMultipleFrames', [60]);
+      await WasmBoy._runWasmExport('clearAudioBuffer');
+      await WasmBoy._runWasmExport('executeMultipleFrames', [60]);
+      await WasmBoy._runWasmExport('executeMultipleFrames', [60]);
+
+      // Execute a few frames
+      const memoryStart = await WasmBoy._getWasmConstant('AUDIO_BUFFER_LOCATION');
+      const memorySize = await WasmBoy._getWasmConstant('AUDIO_BUFFER_SIZE');
+      // - 20 to not include the overrun in the audio buffer
+      const memory = await WasmBoy._getWasmMemorySection(memoryStart, memoryStart + memorySize - 20);
+
+      // Get the memory as a normal array
+      const audioArray = [];
+      for (let i = 0; i < memory.length; i++) {
+        audioArray.push(memory[i]);
+      }
+
+      goldenFileCompareOrCreate('./test/accuracy/performance-options-test.sound.golden.output.json', audioArray);
       done();
     };
     asyncTask();
@@ -107,9 +179,13 @@ commonTest.getDirectories(testRomsPath).forEach(directory => {
           // Read the test rom a a Uint8Array and pass to wasmBoy
           const testRomArray = new Uint8Array(fs.readFileSync(`${directory}/${testRom}`));
 
-          WasmBoy.loadROM(testRomArray).then(() => {
-            done();
-          });
+          configWasmBoyAccuracy()
+            .then(() => {
+              return WasmBoy.loadROM(testRomArray);
+            })
+            .then(() => {
+              done();
+            });
         });
 
         it('should match the expected output in the .output file. If it does not exist, create the file.', function(done) {

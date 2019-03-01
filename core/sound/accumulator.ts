@@ -77,7 +77,6 @@ export function accumulateSound(numberOfCycles: i32): void {
     // Reset the downsample counter
     // Don't set to zero to catch overflowed cycles
     downSampleCycleCounter -= maxDownSampleCycles;
-    Sound.downSampleCycleCounter = downSampleCycleCounter;
 
     if (SoundAccumulator.needToRemixSamples || SoundAccumulator.mixerVolumeChanged || SoundAccumulator.mixerEnabledChanged) {
       mixChannelSamples(
@@ -108,6 +107,8 @@ export function accumulateSound(numberOfCycles: i32): void {
     }
     Sound.audioQueueIndex = audioQueueIndex;
   }
+
+  Sound.downSampleCycleCounter = downSampleCycleCounter;
 }
 
 // Function used by SoundAccumulator to find out if a channel Dac Changed
@@ -115,27 +116,27 @@ function didChannelDacChange(channelNumber: i32): boolean {
   switch (channelNumber) {
     case Channel1.channelNumber: {
       let isDacEnabled = Channel1.isDacEnabled;
-      let channel1Enabled = SoundAccumulator.channel1DacEnabled !== isDacEnabled;
+      let channel1EnabledChanged = SoundAccumulator.channel1DacEnabled !== isDacEnabled;
       SoundAccumulator.channel1DacEnabled = isDacEnabled;
-      return channel1Enabled;
+      return channel1EnabledChanged;
     }
     case Channel2.channelNumber: {
       let isDacEnabled = Channel2.isDacEnabled;
-      let channel2Enabled = SoundAccumulator.channel2DacEnabled !== isDacEnabled;
+      let channel2EnabledChanged = SoundAccumulator.channel2DacEnabled !== isDacEnabled;
       SoundAccumulator.channel2DacEnabled = isDacEnabled;
-      return channel2Enabled;
+      return channel2EnabledChanged;
     }
     case Channel3.channelNumber: {
       let isDacEnabled = Channel3.isDacEnabled;
-      let channel3Enabled = SoundAccumulator.channel3DacEnabled !== isDacEnabled;
+      let channel3EnabledChanged = SoundAccumulator.channel3DacEnabled !== isDacEnabled;
       SoundAccumulator.channel3DacEnabled = isDacEnabled;
-      return channel3Enabled;
+      return channel3EnabledChanged;
     }
     case Channel4.channelNumber: {
       let isDacEnabled = Channel4.isDacEnabled;
-      let channel4Enabled = SoundAccumulator.channel4DacEnabled !== isDacEnabled;
+      let channel4EnabledChanged = SoundAccumulator.channel4DacEnabled !== isDacEnabled;
       SoundAccumulator.channel4DacEnabled = isDacEnabled;
-      return channel4Enabled;
+      return channel4EnabledChanged;
     }
   }
   return false;
