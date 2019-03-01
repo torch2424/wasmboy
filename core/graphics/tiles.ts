@@ -128,11 +128,11 @@ export function drawPixelsFromLineOfTile(
       // Finally Lets place a pixel in memory
       // Find where our tile line would start
       let pixelStart = getTilePixelStart(iteratedOutputX, outputLineY, outputWidth);
-      wasmMemoryStart += pixelStart;
 
-      store<u8>(wasmMemoryStart + 0, <u8>red);
-      store<u8>(wasmMemoryStart + 1, <u8>green);
-      store<u8>(wasmMemoryStart + 2, <u8>blue);
+      // Can not optimize wasmMemoryStart any further, as this is in a loop.
+      store<u8>(wasmMemoryStart + pixelStart + 0, <u8>red);
+      store<u8>(wasmMemoryStart + pixelStart + 1, <u8>green);
+      store<u8>(wasmMemoryStart + pixelStart + 2, <u8>blue);
 
       let gbcBgPriority: boolean = false;
       if (bgMapAttributes >= 0) {
