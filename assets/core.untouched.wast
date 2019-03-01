@@ -15,6 +15,7 @@
  (type $iiiiiiii_ (func (param i32 i32 i32 i32 i32 i32 i32 i32)))
  (type $FUNCSIG$iiiiii (func (param i32 i32 i32 i32 i32) (result i32)))
  (type $FUNCSIG$iiiiiiiiiiiiii (func (param i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32) (result i32)))
+ (type $FUNCSIG$vii (func (param i32 i32)))
  (type $FUNCSIG$ii (func (param i32) (result i32)))
  (memory $0 0)
  (table $0 1 funcref)
@@ -3321,6 +3322,7 @@
   (local $15 i32)
   (local $16 i32)
   (local $17 i32)
+  (local $18 i32)
   local.get $1
   local.get $0
   call $core/graphics/tiles/getTileDataAddress
@@ -3339,14 +3341,14 @@
   local.tee $1
   i32.add
   i32.load8_u
-  local.set $16
+  local.set $17
   local.get $0
   i32.const -30719
   i32.add
   local.get $1
   i32.add
   i32.load8_u
-  local.set $17
+  local.set $18
   local.get $3
   local.set $0
   loop $repeat|0
@@ -3390,7 +3392,7 @@
       select
       local.tee $1
       i32.shl
-      local.get $17
+      local.get $18
       i32.and
       if
        i32.const 2
@@ -3404,7 +3406,7 @@
      i32.const 1
      local.get $1
      i32.shl
-     local.get $16
+     local.get $17
      i32.and
      select
      local.set $2
@@ -3500,15 +3502,15 @@
      i32.mul
      local.get $9
      i32.add
-     local.tee $9
+     local.tee $16
      local.get $15
      i32.store8
-     local.get $9
+     local.get $16
      i32.const 1
      i32.add
      local.get $1
      i32.store8
-     local.get $9
+     local.get $16
      i32.const 2
      i32.add
      local.get $5
@@ -5731,8 +5733,7 @@
    local.get $1
    local.get $0
    i32.sub
-   local.tee $1
-   global.set $core/sound/sound/Sound.downSampleCycleCounter
+   local.set $1
    global.get $core/sound/accumulator/SoundAccumulator.needToRemixSamples
    local.tee $0
    global.get $core/sound/accumulator/SoundAccumulator.mixerVolumeChanged
@@ -5757,7 +5758,7 @@
     global.set $core/sound/sound/Sound.downSampleCycleCounter
    end
    global.get $core/sound/sound/Sound.audioQueueIndex
-   local.tee $1
+   local.tee $2
    i32.const 1
    i32.shl
    i32.const 1068160
@@ -5774,7 +5775,7 @@
    i32.const 2
    i32.add
    i32.store8
-   local.get $1
+   local.get $2
    i32.const 1
    i32.add
    local.tee $0
@@ -5793,6 +5794,8 @@
    end
    global.set $core/sound/sound/Sound.audioQueueIndex
   end
+  local.get $1
+  global.set $core/sound/sound/Sound.downSampleCycleCounter
  )
  (func $core/sound/sound/calculateSound (; 85 ;) (type $i_) (param $0 i32)
   (local $1 i32)
@@ -6028,24 +6031,29 @@
  )
  (func $core/sound/sound/batchProcessAudio (; 87 ;) (type $_)
   (local $0 i32)
+  (local $1 i32)
   i32.const 87
   global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
   i32.shl
+  local.set $1
+  global.get $core/sound/sound/Sound.currentCycles
   local.set $0
   loop $continue|0
-   global.get $core/sound/sound/Sound.currentCycles
    local.get $0
+   local.get $1
    i32.ge_s
    if
-    local.get $0
+    local.get $1
     call $core/sound/sound/updateSound
-    global.get $core/sound/sound/Sound.currentCycles
     local.get $0
+    local.get $1
     i32.sub
-    global.set $core/sound/sound/Sound.currentCycles
+    local.set $0
     br $continue|0
    end
   end
+  local.get $0
+  global.set $core/sound/sound/Sound.currentCycles
  )
  (func $core/sound/registers/SoundRegisterReadTraps (; 88 ;) (type $ii) (param $0 i32) (result i32)
   local.get $0
@@ -8520,6 +8528,7 @@
     local.get $0
     i32.add
     global.set $core/sound/sound/Sound.currentCycles
+    call $core/sound/sound/batchProcessAudio
    else    
     local.get $0
     call $core/sound/sound/updateSound
@@ -8591,7 +8600,7 @@
   local.get $1
   call $core/memory/store/eightBitStoreIntoGBMemoryWithTraps
  )
- (func $core/cpu/flags/setFlagBit (; 126 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/cpu/flags/setFlagBit (; 126 ;) (type $FUNCSIG$vii) (param $0 i32) (param $1 i32)
   (local $2 i32)
   i32.const 1
   local.get $0
@@ -8617,13 +8626,11 @@
    i32.and
    global.set $core/cpu/cpu/Cpu.registerF
   end
-  global.get $core/cpu/cpu/Cpu.registerF
  )
  (func $core/cpu/flags/setHalfCarryFlag (; 127 ;) (type $i_) (param $0 i32)
   i32.const 5
   local.get $0
   call $core/cpu/flags/setFlagBit
-  drop
  )
  (func $core/cpu/flags/checkAndSetEightBitHalfCarryFlag (; 128 ;) (type $ii_) (param $0 i32) (param $1 i32)
   (local $2 i32)
@@ -8665,19 +8672,16 @@
   i32.const 7
   local.get $0
   call $core/cpu/flags/setFlagBit
-  drop
  )
  (func $core/cpu/flags/setSubtractFlag (; 130 ;) (type $i_) (param $0 i32)
   i32.const 6
   local.get $0
   call $core/cpu/flags/setFlagBit
-  drop
  )
  (func $core/cpu/flags/setCarryFlag (; 131 ;) (type $i_) (param $0 i32)
   i32.const 4
   local.get $0
   call $core/cpu/flags/setFlagBit
-  drop
  )
  (func $core/memory/store/sixteenBitStoreIntoGBMemoryWithTraps (; 132 ;) (type $ii_) (param $0 i32) (param $1 i32)
   (local $2 i32)

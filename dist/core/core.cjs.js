@@ -1578,10 +1578,10 @@ function drawPixelsFromLineOfTile(tileId, tileDataMemoryLocation, vramBankId, ti
             // Finally Lets place a pixel in memory
             // Find where our tile line would start
             var pixelStart = getTilePixelStart(iteratedOutputX, outputLineY, outputWidth);
-            wasmMemoryStart += pixelStart;
-            store(wasmMemoryStart + 0, red);
-            store(wasmMemoryStart + 1, green);
-            store(wasmMemoryStart + 2, blue);
+            // Can not optimize wasmMemoryStart any further, as this is in a loop.
+            store(wasmMemoryStart + pixelStart + 0, red);
+            store(wasmMemoryStart + pixelStart + 1, green);
+            store(wasmMemoryStart + pixelStart + 2, blue);
             var gbcBgPriority = false;
             if (bgMapAttributes >= 0) {
                 gbcBgPriority = checkBitOnByte(7, bgMapAttributes);
@@ -2704,7 +2704,6 @@ function accumulateSound(numberOfCycles) {
         // Reset the downsample counter
         // Don't set to zero to catch overflowed cycles
         downSampleCycleCounter -= maxDownSampleCycles;
-        Sound.downSampleCycleCounter = downSampleCycleCounter;
         if (SoundAccumulator.needToRemixSamples || SoundAccumulator.mixerVolumeChanged || SoundAccumulator.mixerEnabledChanged) {
             mixChannelSamples(SoundAccumulator.channel1Sample, SoundAccumulator.channel2Sample, SoundAccumulator.channel3Sample, SoundAccumulator.channel4Sample);
         }
@@ -2725,33 +2724,34 @@ function accumulateSound(numberOfCycles) {
         }
         Sound.audioQueueIndex = audioQueueIndex;
     }
+    Sound.downSampleCycleCounter = downSampleCycleCounter;
 }
 // Function used by SoundAccumulator to find out if a channel Dac Changed
 function didChannelDacChange(channelNumber) {
     switch (channelNumber) {
         case Channel1.channelNumber: {
             var isDacEnabled = Channel1.isDacEnabled;
-            var channel1Enabled = SoundAccumulator.channel1DacEnabled !== isDacEnabled;
+            var channel1EnabledChanged = SoundAccumulator.channel1DacEnabled !== isDacEnabled;
             SoundAccumulator.channel1DacEnabled = isDacEnabled;
-            return channel1Enabled;
+            return channel1EnabledChanged;
         }
         case Channel2.channelNumber: {
             var isDacEnabled = Channel2.isDacEnabled;
-            var channel2Enabled = SoundAccumulator.channel2DacEnabled !== isDacEnabled;
+            var channel2EnabledChanged = SoundAccumulator.channel2DacEnabled !== isDacEnabled;
             SoundAccumulator.channel2DacEnabled = isDacEnabled;
-            return channel2Enabled;
+            return channel2EnabledChanged;
         }
         case Channel3.channelNumber: {
             var isDacEnabled = Channel3.isDacEnabled;
-            var channel3Enabled = SoundAccumulator.channel3DacEnabled !== isDacEnabled;
+            var channel3EnabledChanged = SoundAccumulator.channel3DacEnabled !== isDacEnabled;
             SoundAccumulator.channel3DacEnabled = isDacEnabled;
-            return channel3Enabled;
+            return channel3EnabledChanged;
         }
         case Channel4.channelNumber: {
             var isDacEnabled = Channel4.isDacEnabled;
-            var channel4Enabled = SoundAccumulator.channel4DacEnabled !== isDacEnabled;
+            var channel4EnabledChanged = SoundAccumulator.channel4DacEnabled !== isDacEnabled;
             SoundAccumulator.channel4DacEnabled = isDacEnabled;
-            return channel4Enabled;
+            return channel4EnabledChanged;
         }
     }
     return false;
@@ -2765,6 +2765,10 @@ var Sound = /** @class */ (function () {
     // This number should be in sync so that sound doesn't run too many cyles at once
     // and does not exceed the minimum number of cyles for either down sampling, or
     // How often we change the frame, or a channel's update process
+    // Number of cycles is 87, because:
+    // Number of cycles before downsampling a single sample
+    // TODO: Find out how to make this number bigger
+    // Or, don't call this in syncCycles, and make the lib responsible.
     Sound.batchProcessCycles = function () {
         // return Cpu.GBCDoubleSpeed ? 174 : 87;
         return 87 << Cpu.GBCDoubleSpeed;
@@ -2901,10 +2905,12 @@ function initializeSound() {
 // Function to batch process our audio after we skipped so many cycles
 function batchProcessAudio() {
     var batchProcessCycles = Sound.batchProcessCycles();
-    while (Sound.currentCycles >= batchProcessCycles) {
+    var currentCycles = Sound.currentCycles;
+    while (currentCycles >= batchProcessCycles) {
         updateSound(batchProcessCycles);
-        Sound.currentCycles -= batchProcessCycles;
+        currentCycles -= batchProcessCycles;
     }
+    Sound.currentCycles = currentCycles;
 }
 // Function for updating sound
 function updateSound(numberOfCycles) {
@@ -8905,6 +8911,7 @@ function syncCycles(numberOfCycles) {
         }
         if (Config.audioBatchProcessing) {
             Sound.currentCycles += numberOfCycles;
+            batchProcessAudio();
         }
         else {
             updateSound(numberOfCycles);
