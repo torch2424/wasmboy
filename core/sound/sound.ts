@@ -41,6 +41,7 @@ export class Sound {
   // Number of cycles is 87, because:
   // Number of cycles before downsampling a single sample
   // TODO: Find out how to make this number bigger
+  // Or, don't call this in syncCycles, and make the lib responsible.
   static batchProcessCycles(): i32 {
     // return Cpu.GBCDoubleSpeed ? 174 : 87;
     return 87 << (<i32>Cpu.GBCDoubleSpeed);
