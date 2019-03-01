@@ -38,12 +38,12 @@ export class Sound {
   // This number should be in sync so that sound doesn't run too many cyles at once
   // and does not exceed the minimum number of cyles for either down sampling, or
   // How often we change the frame, or a channel's update process
-  // Number of cycles is 89088, because:
-  // 87 (Number of cycles before downsampling a single sample) *
-  // 1024 (a general reccomended number of samples to send back to lib).
+  // Number of cycles is 87, because:
+  // Number of cycles before downsampling a single sample
+  // TODO: Find out how to make this number bigger
   static batchProcessCycles(): i32 {
     // return Cpu.GBCDoubleSpeed ? 174 : 87;
-    return 89088 << (<i32>Cpu.GBCDoubleSpeed);
+    return 87 << (<i32>Cpu.GBCDoubleSpeed);
   }
 
   // Channel control / On-OFF / Volume (RW)
@@ -189,10 +189,12 @@ export function initializeSound(): void {
 // Function to batch process our audio after we skipped so many cycles
 export function batchProcessAudio(): void {
   let batchProcessCycles = Sound.batchProcessCycles();
-  while (Sound.currentCycles >= batchProcessCycles) {
+  let currentCycles = Sound.currentCycles;
+  while (currentCycles >= batchProcessCycles) {
     updateSound(batchProcessCycles);
-    Sound.currentCycles -= batchProcessCycles;
+    currentCycles -= batchProcessCycles;
   }
+  Sound.currentCycles = currentCycles;
 }
 
 // Function for updating sound
