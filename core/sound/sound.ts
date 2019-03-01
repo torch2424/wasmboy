@@ -38,9 +38,12 @@ export class Sound {
   // This number should be in sync so that sound doesn't run too many cyles at once
   // and does not exceed the minimum number of cyles for either down sampling, or
   // How often we change the frame, or a channel's update process
+  // Number of cycles is 89088, because:
+  // 87 (Number of cycles before downsampling a single sample) *
+  // 1024 (a general reccomended number of samples to send back to lib).
   static batchProcessCycles(): i32 {
     // return Cpu.GBCDoubleSpeed ? 174 : 87;
-    return 87 << (<i32>Cpu.GBCDoubleSpeed);
+    return 89088 << (<i32>Cpu.GBCDoubleSpeed);
   }
 
   // Channel control / On-OFF / Volume (RW)
