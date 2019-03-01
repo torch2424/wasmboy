@@ -62,7 +62,7 @@ export default class LoadROMSelector extends Component {
         0, // graphicsDisableScanlineRendering
         1, // audioAccumulateSamples
         0, // tileRendering
-        0, // tileCaching
+        1, // tileCaching
         0 // enableAudioDebugging
       ];
 

@@ -176,7 +176,7 @@ class WasmBoyBenchmarkApp extends Component {
           <a href="https://github.com/torch2424/wasmboy/blob/master/test/performance/results.md" target="_blank">
             configured
           </a>{' '}
-          with: audioBatchProcessing, audioAccumulateSamples
+          with: audioBatchProcessing, audioAccumulateSamples, tileCaching
         </div>
 
         <div class="wasmboy-benchmark__notices">Source is not minified, to allow easy analysis of the bundle.</div>

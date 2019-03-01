@@ -5,7 +5,7 @@ import { Cpu } from './cpu/index';
 import { Graphics, updateGraphics, batchProcessGraphics } from './graphics/index';
 import { Memory } from './memory/index';
 import { Timers, updateTimers, batchProcessTimers } from './timers/index';
-import { Sound, updateSound } from './sound/index';
+import { Sound, updateSound, batchProcessAudio } from './sound/index';
 import { updateSerial } from './serial/serial';
 
 export class Cycles {
@@ -69,6 +69,7 @@ export function syncCycles(numberOfCycles: i32): void {
 
     if (Config.audioBatchProcessing) {
       Sound.currentCycles += numberOfCycles;
+      batchProcessAudio();
     } else {
       updateSound(numberOfCycles);
     }
