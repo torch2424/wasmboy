@@ -22,7 +22,14 @@ export class Channel3 {
   static readonly memoryLocationNRx0: i32 = 0xff1a;
   // E--- ---- DAC power
   static updateNRx0(value: i32): void {
-    Channel3.isDacEnabled = checkBitOnByte(7, value);
+    let isDacEnabled = checkBitOnByte(7, value);
+    Channel3.isDacEnabled = isDacEnabled;
+
+    // Blargg length test
+    // Disabling DAC should disable channel immediately
+    if (!isDacEnabled) {
+      Channel3.isEnabled = isDacEnabled;
+    }
   }
 
   // NR31 -> Sound length (R/W)
@@ -65,6 +72,19 @@ export class Channel3 {
   static NRx4LengthEnabled: boolean = false;
   static NRx4FrequencyMSB: i32 = 0;
   static updateNRx4(value: i32): void {
+    // If the length counter is 0,
+    // And the channel is triggered,
+    // Or the channel length is enabled
+    // Reset the length to the maximum
+    // This is for blargg tests
+    if (Channel3.lengthCounter === 0 && (checkBitOnByte(7, value) || checkBitOnByte(6, value))) {
+      Channel3.lengthCounter = 256;
+    }
+
+    if (checkBitOnByte(7, value)) {
+      Channel3.trigger();
+    }
+
     Channel3.NRx4LengthEnabled = checkBitOnByte(6, value);
     value &= 0x07;
     Channel3.NRx4FrequencyMSB = value;
@@ -221,9 +241,7 @@ export class Channel3 {
   //http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Trigger_Event
   static trigger(): void {
     Channel3.isEnabled = true;
-    if (Channel3.lengthCounter === 0) {
-      Channel3.lengthCounter = 256;
-    }
+    // Length counter maximum handled by write
 
     // Reset our timer
     // A wave channel's frequency timer period is set to (2048-frequency)*2.

@@ -50,7 +50,14 @@ export class Channel2 {
     Channel2.NRx2EnvelopePeriod = value & 0x07;
 
     // Also, get our channel is dac enabled
-    Channel2.isDacEnabled = (value & 0xf8) > 0;
+    let isDacEnabled = (value & 0xf8) > 0;
+    Channel2.isDacEnabled = isDacEnabled;
+
+    // Blargg length test
+    // Disabling DAC should disable channel immediately
+    if (!isDacEnabled) {
+      Channel2.isEnabled = isDacEnabled;
+    }
   }
 
   // NR23 -> Frequency lo (W)
@@ -70,6 +77,19 @@ export class Channel2 {
   static NRx4LengthEnabled: boolean = false;
   static NRx4FrequencyMSB: i32 = 0;
   static updateNRx4(value: i32): void {
+    // If the length counter is 0,
+    // And the channel is triggered,
+    // Or the channel length is enabled
+    // Reset the length to the maximum
+    // This is for blargg tests
+    if (Channel2.lengthCounter === 0 && (checkBitOnByte(7, value) || checkBitOnByte(6, value))) {
+      Channel2.lengthCounter = 64;
+    }
+
+    if (checkBitOnByte(7, value)) {
+      Channel2.trigger();
+    }
+
     Channel2.NRx4LengthEnabled = checkBitOnByte(6, value);
     value &= 0x07;
     Channel2.NRx4FrequencyMSB = value;
@@ -193,9 +213,7 @@ export class Channel2 {
   //http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Trigger_Event
   static trigger(): void {
     Channel2.isEnabled = true;
-    if (Channel2.lengthCounter === 0) {
-      Channel2.lengthCounter = 64;
-    }
+    // Length counter maximum handled by write
 
     // Reset our timer
     // A square channel's frequency timer period is set to (2048-frequency)*4.

@@ -43,7 +43,14 @@ export class Channel4 {
     Channel4.NRx2EnvelopePeriod = value & 0x07;
 
     // Also, get our channel is dac enabled
-    Channel4.isDacEnabled = (value & 0xf8) > 0;
+    let isDacEnabled = (value & 0xf8) > 0;
+    Channel4.isDacEnabled = isDacEnabled;
+
+    // Blargg length test
+    // Disabling DAC should disable channel immediately
+    if (!isDacEnabled) {
+      Channel4.isEnabled = isDacEnabled;
+    }
   }
 
   // NR43 -> Polynomial Counter (R/W)
@@ -68,6 +75,19 @@ export class Channel4 {
   // TL-- ---- Trigger, Length enable
   static NRx4LengthEnabled: boolean = false;
   static updateNRx4(value: i32): void {
+    // If the length counter is 0,
+    // And the channel is triggered,
+    // Or the channel length is enabled
+    // Reset the length to the maximum
+    // This is for blargg tests
+    if (Channel4.lengthCounter === 0 && (checkBitOnByte(7, value) || checkBitOnByte(6, value))) {
+      Channel4.lengthCounter = 64;
+    }
+
+    if (checkBitOnByte(7, value)) {
+      Channel4.trigger();
+    }
+
     Channel4.NRx4LengthEnabled = checkBitOnByte(6, value);
   }
 
@@ -192,9 +212,7 @@ export class Channel4 {
   //http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Trigger_Event
   static trigger(): void {
     Channel4.isEnabled = true;
-    if (Channel4.lengthCounter === 0) {
-      Channel4.lengthCounter = 64;
-    }
+    // Length counter maximum handled by write
 
     // Reset our timers
     Channel4.frequencyTimer = Channel4.getNoiseChannelFrequencyPeriod();

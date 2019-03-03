@@ -9,7 +9,7 @@ import { Channel2 } from './channel2';
 import { Channel3 } from './channel3';
 import { Channel4 } from './channel4';
 import { eightBitLoadFromGBMemory, eightBitStoreIntoGBMemory } from '../memory/index';
-import { checkBitOnByte, setBitOnByte, resetBitOnByte } from '../helpers/index';
+import { checkBitOnByte, setBitOnByte, resetBitOnByte, log } from '../helpers/index';
 
 // Function to check and handle writes to sound registers
 // Inlined because closure compiler inlines
@@ -79,28 +79,16 @@ export function SoundRegisterWriteTraps(offset: i32, value: i32): boolean {
       return true;
     // Check our NRx4 registers to trap our trigger bits
     case Channel1.memoryLocationNRx4:
-      if (checkBitOnByte(7, value)) {
-        Channel1.updateNRx4(value);
-        Channel1.trigger();
-      }
+      Channel1.updateNRx4(value);
       return true;
     case Channel2.memoryLocationNRx4:
-      if (checkBitOnByte(7, value)) {
-        Channel2.updateNRx4(value);
-        Channel2.trigger();
-      }
+      Channel2.updateNRx4(value);
       return true;
     case Channel3.memoryLocationNRx4:
-      if (checkBitOnByte(7, value)) {
-        Channel3.updateNRx4(value);
-        Channel3.trigger();
-      }
+      Channel3.updateNRx4(value);
       return true;
     case Channel4.memoryLocationNRx4:
-      if (checkBitOnByte(7, value)) {
-        Channel4.updateNRx4(value);
-        Channel4.trigger();
-      }
+      Channel4.updateNRx4(value);
       return true;
     // Tell the sound accumulator if volumes changes
     case Sound.memoryLocationNR50:
@@ -205,27 +193,27 @@ export function SoundRegisterReadTraps(offset: i32): i32 {
 
       // Set our lower 4 bits to our channel isEnabled statuses
       if (Channel1.isEnabled) {
-        setBitOnByte(0, registerNR52);
+        registerNR52 = setBitOnByte(0, registerNR52);
       } else {
-        resetBitOnByte(0, registerNR52);
+        registerNR52 = resetBitOnByte(0, registerNR52);
       }
 
       if (Channel2.isEnabled) {
-        setBitOnByte(1, registerNR52);
+        registerNR52 = setBitOnByte(1, registerNR52);
       } else {
-        resetBitOnByte(1, registerNR52);
+        registerNR52 = resetBitOnByte(1, registerNR52);
       }
 
       if (Channel3.isEnabled) {
-        setBitOnByte(2, registerNR52);
+        registerNR52 = setBitOnByte(2, registerNR52);
       } else {
-        resetBitOnByte(2, registerNR52);
+        registerNR52 = resetBitOnByte(2, registerNR52);
       }
 
       if (Channel4.isEnabled) {
-        setBitOnByte(3, registerNR52);
+        registerNR52 = setBitOnByte(3, registerNR52);
       } else {
-        resetBitOnByte(3, registerNR52);
+        registerNR52 = resetBitOnByte(3, registerNR52);
       }
 
       // Or from the table
