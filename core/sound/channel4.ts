@@ -13,6 +13,10 @@ export class Channel4 {
 
   // Channel 4
   // 'white noise' channel with volume envelope functions.
+
+  // Only used by register reading
+  static readonly memoryLocationNRx0: i32 = 0xff1f;
+
   // NR41 -> Sound length (R/W)
   static readonly memoryLocationNRx1: i32 = 0xff20;
   // --LL LLLL Length load (64-L)

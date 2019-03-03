@@ -113,6 +113,7 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
   // Final Wave Table for Channel 3
   if (offset >= 0xff30 && offset <= 0xff3f) {
     batchProcessAudio();
+    return true;
   }
 
   // Other Memory effects fomr read/write to Lcd/Graphics

@@ -90,7 +90,14 @@ export function checkReadTraps(offset: i32): i32 {
     batchProcessAudio();
     return SoundRegisterReadTraps(offset);
   }
+
   // FF27 - FF2F not used
+  // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Register_Reading
+  // Always read as 0xFF
+  if (offset >= 0xff27 && offset <= 0xff2f) {
+    return 0xff;
+  }
+
   // Final Wave Table for Channel 3
   if (offset >= 0xff30 && offset <= 0xff3f) {
     batchProcessAudio();

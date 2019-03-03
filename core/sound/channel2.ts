@@ -19,6 +19,9 @@ export class Channel2 {
 
   // Squarewave channel with volume envelope functions only.
 
+  // Only used by register reading
+  static readonly memoryLocationNRx0: i32 = 0xff15;
+
   // NR21 -> Sound length/Wave pattern duty (R/W)
   static readonly memoryLocationNRx1: i32 = 0xff16;
   // DDLL LLLL Duty, Length load (64-L)

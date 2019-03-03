@@ -13,8 +13,12 @@ import { checkBitOnByte, setBitOnByte, resetBitOnByte } from '../helpers/index';
 
 // Function to check and handle writes to sound registers
 // Inlined because closure compiler inlines
+// NOTE: For write traps, return false = don't write to memory,
+// return true = allow the write to memory
 export function SoundRegisterWriteTraps(offset: i32, value: i32): boolean {
   if (offset !== Sound.memoryLocationNR52 && !Sound.NR52IsSoundEnabled) {
+    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Power_Control
+    // When sound is turned off / enabled
     // Block all writes to any sound register EXCEPT NR52!
     // This is under the assumption that the check for
     // offset >= 0xFF10 && offset <= 0xFF26
@@ -126,44 +130,144 @@ export function SoundRegisterWriteTraps(offset: i32, value: i32): boolean {
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
 // Inlined because closure compiler inlines
 export function SoundRegisterReadTraps(offset: i32): i32 {
-  // TODO: OR All Registers
+  // Registers must be OR'd with values when being read
+  // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
 
-  // This will fix bugs in orcale of ages :)
-  if (offset === Sound.memoryLocationNR52) {
-    // Get our registerNR52
-    let registerNR52 = eightBitLoadFromGBMemory(Sound.memoryLocationNR52);
-
-    // Knock off lower 7 bits
-    registerNR52 &= 0x80;
-
-    // Set our lower 4 bits to our channel isEnabled statuses
-    if (Channel1.isEnabled) {
-      setBitOnByte(0, registerNR52);
-    } else {
-      resetBitOnByte(0, registerNR52);
+  switch (offset) {
+    // Handle NRx0 on Channels
+    case Channel1.memoryLocationNRx0: {
+      let register = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx0);
+      return register | 0x80;
+    }
+    case Channel2.memoryLocationNRx0: {
+      let register = eightBitLoadFromGBMemory(Channel2.memoryLocationNRx0);
+      return register | 0xff;
+    }
+    case Channel3.memoryLocationNRx0: {
+      let register = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx0);
+      return register | 0x7f;
+    }
+    case Channel4.memoryLocationNRx0: {
+      let register = eightBitLoadFromGBMemory(Channel4.memoryLocationNRx0);
+      return register | 0xff;
+    }
+    case Sound.memoryLocationNR50: {
+      let register = eightBitLoadFromGBMemory(Sound.memoryLocationNR50);
+      return register | 0x00;
     }
 
-    if (Channel2.isEnabled) {
-      setBitOnByte(1, registerNR52);
-    } else {
-      resetBitOnByte(1, registerNR52);
+    // Handle NRx1 on Channels
+    case Channel1.memoryLocationNRx1: {
+      let register = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx1);
+      return register | 0x3f;
+    }
+    case Channel2.memoryLocationNRx1: {
+      let register = eightBitLoadFromGBMemory(Channel2.memoryLocationNRx1);
+      return register | 0x3f;
+    }
+    case Channel3.memoryLocationNRx1: {
+      let register = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx1);
+      return register | 0xff;
+    }
+    case Channel4.memoryLocationNRx1: {
+      let register = eightBitLoadFromGBMemory(Channel4.memoryLocationNRx1);
+      return register | 0xff;
+    }
+    case Sound.memoryLocationNR51: {
+      let register = eightBitLoadFromGBMemory(Sound.memoryLocationNR51);
+      return register | 0x00;
     }
 
-    if (Channel3.isEnabled) {
-      setBitOnByte(2, registerNR52);
-    } else {
-      resetBitOnByte(2, registerNR52);
+    // Handle NRx2 on Channels
+    case Channel1.memoryLocationNRx2: {
+      let register = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx2);
+      return register | 0x00;
+    }
+    case Channel2.memoryLocationNRx2: {
+      let register = eightBitLoadFromGBMemory(Channel2.memoryLocationNRx2);
+      return register | 0x00;
+    }
+    case Channel3.memoryLocationNRx2: {
+      let register = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx2);
+      return register | 0x9f;
+    }
+    case Channel4.memoryLocationNRx2: {
+      let register = eightBitLoadFromGBMemory(Channel4.memoryLocationNRx2);
+      return register | 0x00;
+    }
+    case Sound.memoryLocationNR52: {
+      // This will fix bugs in orcale of ages :)
+      // Get our registerNR52
+      let registerNR52 = eightBitLoadFromGBMemory(Sound.memoryLocationNR52);
+
+      // Knock off lower 7 bits
+      registerNR52 &= 0x80;
+
+      // Set our lower 4 bits to our channel isEnabled statuses
+      if (Channel1.isEnabled) {
+        setBitOnByte(0, registerNR52);
+      } else {
+        resetBitOnByte(0, registerNR52);
+      }
+
+      if (Channel2.isEnabled) {
+        setBitOnByte(1, registerNR52);
+      } else {
+        resetBitOnByte(1, registerNR52);
+      }
+
+      if (Channel3.isEnabled) {
+        setBitOnByte(2, registerNR52);
+      } else {
+        resetBitOnByte(2, registerNR52);
+      }
+
+      if (Channel4.isEnabled) {
+        setBitOnByte(3, registerNR52);
+      } else {
+        resetBitOnByte(3, registerNR52);
+      }
+
+      // Or from the table
+      registerNR52 |= 0x70;
+      return registerNR52;
     }
 
-    if (Channel4.isEnabled) {
-      setBitOnByte(3, registerNR52);
-    } else {
-      resetBitOnByte(3, registerNR52);
+    // Handle NRx3 on Channels
+    case Channel1.memoryLocationNRx3: {
+      let register = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx3);
+      return register | 0xff;
+    }
+    case Channel2.memoryLocationNRx3: {
+      let register = eightBitLoadFromGBMemory(Channel2.memoryLocationNRx3);
+      return register | 0xff;
+    }
+    case Channel3.memoryLocationNRx3: {
+      let register = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx3);
+      return register | 0xff;
+    }
+    case Channel4.memoryLocationNRx3: {
+      let register = eightBitLoadFromGBMemory(Channel4.memoryLocationNRx3);
+      return register | 0x00;
     }
 
-    // Or from the table
-    registerNR52 |= 0x70;
-    return registerNR52;
+    // Handle NRx4 on Channels
+    case Channel1.memoryLocationNRx4: {
+      let register = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx4);
+      return register | 0xbf;
+    }
+    case Channel2.memoryLocationNRx4: {
+      let register = eightBitLoadFromGBMemory(Channel2.memoryLocationNRx4);
+      return register | 0xbf;
+    }
+    case Channel3.memoryLocationNRx4: {
+      let register = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx4);
+      return register | 0xbf;
+    }
+    case Channel4.memoryLocationNRx4: {
+      let register = eightBitLoadFromGBMemory(Channel4.memoryLocationNRx4);
+      return register | 0xbf;
+    }
   }
 
   return -1;
