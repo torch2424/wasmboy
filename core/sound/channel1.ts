@@ -4,6 +4,7 @@
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Frequency_Sweep
 import { getSaveStateMemoryOffset } from '../core';
+import { Sound } from './sound';
 import { isDutyCycleClockPositiveOrNegativeForWaveform } from './duty';
 import { Cpu } from '../cpu/index';
 import {
@@ -12,7 +13,7 @@ import {
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
-import { checkBitOnByte } from '../helpers/index';
+import { checkBitOnByte, log } from '../helpers/index';
 
 export class Channel1 {
   // Cycle Counter for our sound accumulator
@@ -85,25 +86,56 @@ export class Channel1 {
   // TL-- -FFF Trigger, Length enable, Frequency MSB
   static NRx4LengthEnabled: boolean = false;
   static NRx4FrequencyMSB: i32 = 0;
+  // Blargg Tests length
+  static lengthFrozen: boolean = false;
+  // NOTE: Order in which these events happen are very particular
+  // And globals can be affected by other functions
+  // Thus, optimizations here should be extremely careful
   static updateNRx4(value: i32): void {
     // If the length counter is 0,
-    // And the channel is triggered,
+    // And the channel is triggered
+    // (which is handled by trigger),
     // Or the channel length is enabled
     // Reset the length to the maximum
     // This is for blargg tests
-    if (Channel1.lengthCounter === 0 && (checkBitOnByte(7, value) || checkBitOnByte(6, value))) {
+    if (!Channel1.lengthFrozen && Channel1.lengthCounter === 0 && checkBitOnByte(6, value)) {
       Channel1.lengthCounter = 64;
     }
 
+    // Obscure behavior
+    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Obscure_Behavior
+    // Also see blargg's cgb sound test
+    // Extra length clocking occurs when writing to NRx4,
+    // when the frame sequencer's next step is one that,
+    // doesn't clock the length counter.
+    // Also, this depends on wether we are being enabled and things.
+    let frameSequencer = Sound.frameSequencer;
+    let frameSequencerClockStep = frameSequencer === 1 || frameSequencer === 3 || frameSequencer === 5 || frameSequencer === 7;
+    let isBeingEnabled = !Channel1.NRx4LengthEnabled && checkBitOnByte(6, value);
+    let isBeingLengthUnfrozen = Channel1.lengthFrozen && checkBitOnByte(7, value);
+    if (frameSequencerClockStep) {
+      if (Channel1.lengthCounter > 0 && (isBeingEnabled || isBeingLengthUnfrozen)) {
+        // Decrement the length counter
+        Channel1.lengthCounter -= 1;
+
+        if (Channel1.lengthCounter === 0) {
+          Channel1.isEnabled = false;
+          Channel1.lengthFrozen = true;
+        }
+      }
+    }
+
+    // Trigger out channel
     if (checkBitOnByte(7, value)) {
       Channel1.trigger();
     }
 
+    // Set the length enabled from the value
     Channel1.NRx4LengthEnabled = checkBitOnByte(6, value);
+
+    // Finally, handle our Channel frequency
     value &= 0x07;
     Channel1.NRx4FrequencyMSB = value;
-
-    // Update Channel Frequency
     Channel1.frequency = (value << 8) | Channel1.NRx3FrequencyLSB;
   }
 
@@ -143,6 +175,8 @@ export class Channel1 {
     storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x19, Channel1.saveStateSlot), Channel1.isSweepEnabled);
     store<i32>(getSaveStateMemoryOffset(0x1a, Channel1.saveStateSlot), Channel1.sweepCounter);
     store<u16>(getSaveStateMemoryOffset(0x1f, Channel1.saveStateSlot), Channel1.sweepShadowFrequency);
+
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x21, Channel1.saveStateSlot), Channel1.lengthFrozen);
   }
 
   // Function to load the save state from memory
@@ -159,6 +193,8 @@ export class Channel1 {
     Channel1.isSweepEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x19, Channel1.saveStateSlot));
     Channel1.sweepCounter = load<i32>(getSaveStateMemoryOffset(0x1a, Channel1.saveStateSlot));
     Channel1.sweepShadowFrequency = load<u16>(getSaveStateMemoryOffset(0x1f, Channel1.saveStateSlot));
+
+    Channel1.lengthFrozen = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x21, Channel1.saveStateSlot));
   }
 
   static initialize(): void {
