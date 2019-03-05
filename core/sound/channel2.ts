@@ -123,7 +123,6 @@ export class Channel2 {
     }
 
     // Set the length enabled from the value
-    log(0x01, value);
     Channel2.NRx4LengthEnabled = checkBitOnByte(6, value);
 
     // Finally, handle our Channel frequency

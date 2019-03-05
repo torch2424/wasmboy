@@ -197,25 +197,25 @@ export function SoundRegisterReadTraps(offset: i32): i32 {
       }
 
       // Set our lower 4 bits to our channel length statuses
-      if (Channel1.NRx4LengthEnabled) {
+      if (Channel1.isEnabled) {
         registerNR52 = setBitOnByte(0, registerNR52);
       } else {
         registerNR52 = resetBitOnByte(0, registerNR52);
       }
 
-      if (Channel2.NRx4LengthEnabled) {
+      if (Channel2.isEnabled) {
         registerNR52 = setBitOnByte(1, registerNR52);
       } else {
         registerNR52 = resetBitOnByte(1, registerNR52);
       }
 
-      if (Channel3.NRx4LengthEnabled) {
+      if (Channel3.isEnabled) {
         registerNR52 = setBitOnByte(2, registerNR52);
       } else {
         registerNR52 = resetBitOnByte(2, registerNR52);
       }
 
-      if (Channel4.NRx4LengthEnabled) {
+      if (Channel4.isEnabled) {
         registerNR52 = setBitOnByte(3, registerNR52);
       } else {
         registerNR52 = resetBitOnByte(3, registerNR52);

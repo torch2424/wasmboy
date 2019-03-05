@@ -66,7 +66,7 @@ export class Channel1 {
     // Blargg length test
     // Disabling DAC should disable channel immediately
     if (!isDacEnabled) {
-      Channel1.NRx4LengthEnabled = isDacEnabled;
+      Channel1.isEnabled = isDacEnabled;
     }
   }
 
@@ -119,15 +119,18 @@ export class Channel1 {
         Channel1.lengthCounter -= 1;
 
         if (Channel1.lengthCounter === 0) {
-          Channel1.NRx4LengthEnabled = false;
+          Channel1.isEnabled = false;
           Channel1.lengthFrozen = true;
+        }
+
+        if (isBeingLengthUnfrozen) {
+          Channel1.lengthFrozen = false;
         }
       }
     }
 
     // Trigger out channel, unfreeze length if frozen
     if (checkBitOnByte(7, value)) {
-      Channel1.lengthFrozen = false;
       Channel1.trigger();
     }
 
@@ -355,10 +358,10 @@ export class Channel1 {
     let lengthCounter = Channel1.lengthCounter;
     if (lengthCounter > 0 && Channel1.NRx4LengthEnabled) {
       lengthCounter -= 1;
-    }
 
-    if (lengthCounter === 0) {
-      Channel1.isEnabled = false;
+      if (lengthCounter === 0) {
+        Channel1.isEnabled = false;
+      }
     }
     Channel1.lengthCounter = lengthCounter;
   }
