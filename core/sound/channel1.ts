@@ -66,7 +66,7 @@ export class Channel1 {
     // Blargg length test
     // Disabling DAC should disable channel immediately
     if (!isDacEnabled) {
-      Channel1.isEnabled = isDacEnabled;
+      Channel1.NRx4LengthEnabled = isDacEnabled;
     }
   }
 
@@ -111,22 +111,23 @@ export class Channel1 {
     // Also, this depends on wether we are being enabled and things.
     let frameSequencer = Sound.frameSequencer;
     let frameSequencerClockStep = frameSequencer === 1 || frameSequencer === 3 || frameSequencer === 5 || frameSequencer === 7;
-    let isBeingEnabled = !Channel1.NRx4LengthEnabled && checkBitOnByte(6, value);
+    let isBeingLengthEnabled = !Channel1.NRx4LengthEnabled && checkBitOnByte(6, value);
     let isBeingLengthUnfrozen = Channel1.lengthFrozen && checkBitOnByte(7, value);
     if (frameSequencerClockStep) {
-      if (Channel1.lengthCounter > 0 && (isBeingEnabled || isBeingLengthUnfrozen)) {
+      if (Channel1.lengthCounter > 0 && (isBeingLengthEnabled || isBeingLengthUnfrozen)) {
         // Decrement the length counter
         Channel1.lengthCounter -= 1;
 
         if (Channel1.lengthCounter === 0) {
-          Channel1.isEnabled = false;
+          Channel1.NRx4LengthEnabled = false;
           Channel1.lengthFrozen = true;
         }
       }
     }
 
-    // Trigger out channel
+    // Trigger out channel, unfreeze length if frozen
     if (checkBitOnByte(7, value)) {
+      Channel1.lengthFrozen = false;
       Channel1.trigger();
     }
 
@@ -141,7 +142,6 @@ export class Channel1 {
 
   // Channel Properties
   static readonly channelNumber: i32 = 1;
-  static isEnabled: boolean = false;
   static isDacEnabled: boolean = false;
   static frequency: i32 = 0;
   static frequencyTimer: i32 = 0x00;
@@ -163,7 +163,6 @@ export class Channel1 {
 
   // Function to save the state of the class
   static saveState(): void {
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x00, Channel1.saveStateSlot), Channel1.isEnabled);
     store<i32>(getSaveStateMemoryOffset(0x01, Channel1.saveStateSlot), Channel1.frequencyTimer);
     store<i32>(getSaveStateMemoryOffset(0x05, Channel1.saveStateSlot), Channel1.envelopeCounter);
     store<i32>(getSaveStateMemoryOffset(0x09, Channel1.saveStateSlot), Channel1.lengthCounter);
@@ -181,7 +180,6 @@ export class Channel1 {
 
   // Function to load the save state from memory
   static loadState(): void {
-    Channel1.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x00, Channel1.saveStateSlot));
     Channel1.frequencyTimer = load<i32>(getSaveStateMemoryOffset(0x01, Channel1.saveStateSlot));
     Channel1.envelopeCounter = load<i32>(getSaveStateMemoryOffset(0x05, Channel1.saveStateSlot));
     Channel1.lengthCounter = load<i32>(getSaveStateMemoryOffset(0x09, Channel1.saveStateSlot));
@@ -260,7 +258,7 @@ export class Channel1 {
     // Finally to set our output volume, the channel must be enabled,
     // Our channel DAC must be enabled, and we must be in an active state
     // Of our duty cycle
-    if (Channel1.isEnabled && Channel1.isDacEnabled) {
+    if (Channel1.NRx4LengthEnabled && Channel1.isDacEnabled) {
       outputVolume = Channel1.volume;
     } else {
       // Return silence
@@ -283,7 +281,7 @@ export class Channel1 {
 
   // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Trigger_Event
   static trigger(): void {
-    Channel1.isEnabled = true;
+    Channel1.NRx4LengthEnabled = true;
     // Set length to maximum done in write
     if (Channel1.lengthCounter === 0) {
       Channel1.lengthCounter = 64;
@@ -315,7 +313,7 @@ export class Channel1 {
 
     // Finally if DAC is off, channel is still disabled
     if (!Channel1.isDacEnabled) {
-      Channel1.isEnabled = false;
+      Channel1.NRx4LengthEnabled = false;
     }
   }
 
@@ -357,7 +355,7 @@ export class Channel1 {
     }
 
     if (lengthCounter === 0) {
-      Channel1.isEnabled = false;
+      Channel1.NRx4LengthEnabled = false;
     }
     Channel1.lengthCounter = lengthCounter;
   }
@@ -428,7 +426,7 @@ function calculateSweepAndCheckOverflow(): void {
   // Next check if the new Frequency is above 0x7FF
   // if So, disable our sweep
   if (newFrequency > 0x7ff) {
-    Channel1.isEnabled = false;
+    Channel1.NRx4LengthEnabled = false;
   }
 }
 

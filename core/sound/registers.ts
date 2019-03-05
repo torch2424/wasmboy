@@ -185,32 +185,37 @@ export function SoundRegisterReadTraps(offset: i32): i32 {
     }
     case Sound.memoryLocationNR52: {
       // This will fix bugs in orcale of ages :)
-      // Get our registerNR52
-      let registerNR52 = eightBitLoadFromGBMemory(Sound.memoryLocationNR52);
 
-      // Knock off lower 7 bits
-      registerNR52 &= 0x80;
+      // Start our registerNR52
+      let registerNR52 = 0x00;
 
-      // Set our lower 4 bits to our channel isEnabled statuses
-      if (Channel1.isEnabled) {
+      // Set the first bit to the sound paower status
+      if (Sound.NR52IsSoundEnabled) {
+        registerNR52 = setBitOnByte(7, registerNR52);
+      } else {
+        registerNR52 = resetBitOnByte(7, registerNR52);
+      }
+
+      // Set our lower 4 bits to our channel length statuses
+      if (Channel1.NRx4LengthEnabled) {
         registerNR52 = setBitOnByte(0, registerNR52);
       } else {
         registerNR52 = resetBitOnByte(0, registerNR52);
       }
 
-      if (Channel2.isEnabled) {
+      if (Channel2.NRx4LengthEnabled) {
         registerNR52 = setBitOnByte(1, registerNR52);
       } else {
         registerNR52 = resetBitOnByte(1, registerNR52);
       }
 
-      if (Channel3.isEnabled) {
+      if (Channel3.NRx4LengthEnabled) {
         registerNR52 = setBitOnByte(2, registerNR52);
       } else {
         registerNR52 = resetBitOnByte(2, registerNR52);
       }
 
-      if (Channel4.isEnabled) {
+      if (Channel4.NRx4LengthEnabled) {
         registerNR52 = setBitOnByte(3, registerNR52);
       } else {
         registerNR52 = resetBitOnByte(3, registerNR52);

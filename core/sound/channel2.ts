@@ -3,6 +3,7 @@
 // Simple Square Channel
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
 import { getSaveStateMemoryOffset } from '../core';
+import { Sound } from './sound';
 import { isDutyCycleClockPositiveOrNegativeForWaveform } from './duty';
 import { Cpu } from '../cpu/index';
 import {
@@ -11,7 +12,7 @@ import {
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
-import { checkBitOnByte } from '../helpers/index';
+import { checkBitOnByte, log } from '../helpers/index';
 
 export class Channel2 {
   // Cycle Counter for our sound accumulator
@@ -76,25 +77,58 @@ export class Channel2 {
   // TL-- -FFF Trigger, Length enable, Frequency MSB
   static NRx4LengthEnabled: boolean = false;
   static NRx4FrequencyMSB: i32 = 0;
+  // Blargg Tests length
+  static lengthFrozen: boolean = false;
   static updateNRx4(value: i32): void {
     // If the length counter is 0,
-    // And the channel is triggered,
+    // And the channel is triggered
+    // (which is handled by trigger),
     // Or the channel length is enabled
     // Reset the length to the maximum
     // This is for blargg tests
-    if (Channel2.lengthCounter === 0 && (checkBitOnByte(7, value) || checkBitOnByte(6, value))) {
+    if (!Channel2.lengthFrozen && Channel2.lengthCounter === 0 && checkBitOnByte(6, value)) {
       Channel2.lengthCounter = 64;
     }
 
+    // Obscure behavior
+    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Obscure_Behavior
+    // Also see blargg's cgb sound test
+    // Extra length clocking occurs when writing to NRx4,
+    // when the frame sequencer's next step is one that,
+    // doesn't clock the length counter.
+    // Also, this depends on wether we are being enabled and things.
+    let frameSequencer = Sound.frameSequencer;
+    let frameSequencerClockStep = frameSequencer === 1 || frameSequencer === 3 || frameSequencer === 5 || frameSequencer === 7;
+    let isBeingLengthEnabled = !Channel2.NRx4LengthEnabled && checkBitOnByte(6, value);
+    let isBeingLengthUnfrozen = Channel2.lengthFrozen && checkBitOnByte(7, value);
+    if (frameSequencerClockStep) {
+      if (Channel2.lengthCounter > 0 && (isBeingLengthEnabled || isBeingLengthUnfrozen)) {
+        // Decrement the length counter
+        Channel2.lengthCounter -= 1;
+
+        if (Channel2.lengthCounter === 0) {
+          Channel2.isEnabled = false;
+          Channel2.lengthFrozen = true;
+        }
+
+        if (isBeingLengthUnfrozen) {
+          Channel2.lengthFrozen = false;
+        }
+      }
+    }
+
+    // Trigger out channel
     if (checkBitOnByte(7, value)) {
       Channel2.trigger();
     }
 
+    // Set the length enabled from the value
+    log(0x01, value);
     Channel2.NRx4LengthEnabled = checkBitOnByte(6, value);
+
+    // Finally, handle our Channel frequency
     value &= 0x07;
     Channel2.NRx4FrequencyMSB = value;
-
-    // Update Channel Frequency
     Channel2.frequency = (value << 8) | Channel2.NRx3FrequencyLSB;
   }
 
@@ -126,6 +160,8 @@ export class Channel2 {
 
     store<u8>(getSaveStateMemoryOffset(0x13, Channel2.saveStateSlot), Channel2.dutyCycle);
     store<u8>(getSaveStateMemoryOffset(0x14, Channel2.saveStateSlot), <u8>Channel2.waveFormPositionOnDuty);
+
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x15, Channel2.saveStateSlot), Channel2.lengthFrozen);
   }
 
   // Function to load the save state from memory
@@ -138,6 +174,8 @@ export class Channel2 {
 
     Channel2.dutyCycle = load<u8>(getSaveStateMemoryOffset(0x13, Channel2.saveStateSlot));
     Channel2.waveFormPositionOnDuty = load<u8>(getSaveStateMemoryOffset(0x14, Channel2.saveStateSlot));
+
+    Channel2.lengthFrozen = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x15, Channel2.saveStateSlot));
   }
 
   static initialize(): void {
