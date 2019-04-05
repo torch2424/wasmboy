@@ -102,6 +102,8 @@ export class Channel1 {
       Channel1.lengthCounter = 64;
     }
 
+    // TODO: The final test issue seems to be a problem with the enabled status, and noth the general well-being.
+
     // Obscure behavior
     // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Obscure_Behavior
     // Also see blargg's cgb sound test

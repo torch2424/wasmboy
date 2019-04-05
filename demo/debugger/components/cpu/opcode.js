@@ -10,7 +10,7 @@ export function stepOpcode() {
       await WasmBoy.pause();
     }
 
-    const numberOfCycles = await WasmBoy._runWasmExport('emulationStep');
+    const numberOfCycles = await WasmBoy._runWasmExport('executeStep');
 
     if (numberOfCycles <= 0) {
       console.error('Opcode not recognized! Check wasm logs.');
