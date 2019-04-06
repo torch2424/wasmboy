@@ -116,6 +116,7 @@ export class Channel1 {
     if (frameSequencerClockStep) {
       if (Channel1.lengthCounter > 0 && (isBeingLengthEnabled || isBeingLengthUnfrozen)) {
         // TODO: Remove this debugging
+        // Maybe the problem is that since we are length enabled, maybe we shouldn't be frozen here?
         log(isBeingLengthEnabled ? 0x11 : 0x12, isBeingLengthUnfrozen ? 0x21 : 0x22);
         log(Channel1.NRx4LengthEnabled ? 0x31 : 0x32, Channel1.lengthFrozen ? 0x41 : 0x42);
 
