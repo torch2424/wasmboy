@@ -102,8 +102,6 @@ export class Channel1 {
       Channel1.lengthCounter = 64;
     }
 
-    // TODO: The final test issue seems to be a problem with the enabled status, and noth the general well-being.
-
     // Obscure behavior
     // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Obscure_Behavior
     // Also see blargg's cgb sound test
@@ -117,6 +115,10 @@ export class Channel1 {
     let isBeingLengthUnfrozen = Channel1.lengthFrozen && checkBitOnByte(7, value);
     if (frameSequencerClockStep) {
       if (Channel1.lengthCounter > 0 && (isBeingLengthEnabled || isBeingLengthUnfrozen)) {
+        // TODO: Remove this debugging
+        log(isBeingLengthEnabled ? 0x11 : 0x12, isBeingLengthUnfrozen ? 0x21 : 0x22);
+        log(Channel1.NRx4LengthEnabled ? 0x31 : 0x32, Channel1.lengthFrozen ? 0x41 : 0x42);
+
         // Decrement the length counter
         Channel1.lengthCounter -= 1;
 
@@ -131,13 +133,18 @@ export class Channel1 {
       }
     }
 
+    // Set the length enabled from the value
+    Channel1.NRx4LengthEnabled = checkBitOnByte(6, value);
+
     // Trigger out channel, unfreeze length if frozen
+    // Triggers should happen after obscure behavior
+    // See test 11 for trigger
     if (checkBitOnByte(7, value)) {
       Channel1.trigger();
     }
 
-    // Set the length enabled from the value
-    Channel1.NRx4LengthEnabled = checkBitOnByte(6, value);
+    // TODO: Remove this debugging
+    log(value, Channel1.lengthCounter);
 
     // Finally, handle our Channel frequency
     value &= 0x07;
