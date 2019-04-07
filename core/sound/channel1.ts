@@ -86,22 +86,10 @@ export class Channel1 {
   // TL-- -FFF Trigger, Length enable, Frequency MSB
   static NRx4LengthEnabled: boolean = false;
   static NRx4FrequencyMSB: i32 = 0;
-  // Blargg Tests length
-  static lengthFrozen: boolean = false;
   // NOTE: Order in which these events happen are very particular
   // And globals can be affected by other functions
   // Thus, optimizations here should be extremely careful
   static updateNRx4(value: i32): void {
-    // If the length counter is 0,
-    // And the channel is triggered
-    // (which is handled by trigger),
-    // Or the channel length is enabled
-    // Reset the length to the maximum
-    // This is for blargg tests
-    if (!Channel1.lengthFrozen && Channel1.lengthCounter === 0 && checkBitOnByte(6, value)) {
-      Channel1.lengthCounter = 64;
-    }
-
     // Obscure behavior
     // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Obscure_Behavior
     // Also see blargg's cgb sound test
@@ -121,14 +109,10 @@ export class Channel1 {
       if (Channel1.lengthCounter > 0 && isBeingLengthEnabled) {
         Channel1.lengthCounter -= 1;
 
-        if (Channel1.lengthCounter === 0) {
+        if (!checkBitOnByte(7, value) && Channel1.lengthCounter === 0) {
           Channel1.isEnabled = false;
-          Channel1.lengthFrozen = true;
         }
       }
-
-      // Check Length Unfreezing
-      isBeingLengthUnfrozen = Channel1.lengthFrozen && checkBitOnByte(7, value);
     }
 
     // Set the length enabled from the value
@@ -140,17 +124,12 @@ export class Channel1 {
     if (checkBitOnByte(7, value)) {
       Channel1.trigger();
 
-      if (!doesNextFrameSequencerUpdateLength && isBeingLengthUnfrozen && Channel1.NRx4LengthEnabled) {
+      // When we trigger on the obscure behavior, and we reset the length Counter to max
+      // We need to clock
+      if (!doesNextFrameSequencerUpdateLength && Channel1.lengthCounter === 64 && Channel1.NRx4LengthEnabled) {
         Channel1.lengthCounter -= 1;
-        Channel1.lengthFrozen = false;
       }
     }
-
-    // TODO: Remove this debugging
-    log(value, Channel1.lengthCounter);
-    // log(isBeingLengthEnabled ? 0x11 : 0x12, isBeingLengthUnfrozen ? 0x21 : 0x22);
-    // log(Channel1.NRx4LengthEnabled ? 0x31 : 0x32, Channel1.lengthFrozen ? 0x41 : 0x42);
-    log(Sound.frameSequenceCycleCounter, frameSequencer);
 
     // Finally, handle our Channel frequency
     value &= 0x07;
@@ -194,8 +173,6 @@ export class Channel1 {
     storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x19, Channel1.saveStateSlot), Channel1.isSweepEnabled);
     store<i32>(getSaveStateMemoryOffset(0x1a, Channel1.saveStateSlot), Channel1.sweepCounter);
     store<u16>(getSaveStateMemoryOffset(0x1f, Channel1.saveStateSlot), Channel1.sweepShadowFrequency);
-
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x21, Channel1.saveStateSlot), Channel1.lengthFrozen);
   }
 
   // Function to load the save state from memory
@@ -212,8 +189,6 @@ export class Channel1 {
     Channel1.isSweepEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x19, Channel1.saveStateSlot));
     Channel1.sweepCounter = load<i32>(getSaveStateMemoryOffset(0x1a, Channel1.saveStateSlot));
     Channel1.sweepShadowFrequency = load<u16>(getSaveStateMemoryOffset(0x1f, Channel1.saveStateSlot));
-
-    Channel1.lengthFrozen = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x21, Channel1.saveStateSlot));
   }
 
   static initialize(): void {
