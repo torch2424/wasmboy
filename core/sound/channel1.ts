@@ -108,30 +108,26 @@ export class Channel1 {
     // Extra length clocking occurs when writing to NRx4,
     // when the frame sequencer's next step is one that,
     // doesn't clock the length counter.
-    // Also, this depends on wether we are being enabled and things.
     let frameSequencer = Sound.frameSequencer;
-    let frameSequencerClockStep = frameSequencer === 1 || frameSequencer === 3 || frameSequencer === 5 || frameSequencer === 7;
-    let isBeingLengthEnabled = !Channel1.NRx4LengthEnabled && checkBitOnByte(6, value);
-    let isBeingLengthUnfrozen = Channel1.lengthFrozen && checkBitOnByte(7, value);
-    if (frameSequencerClockStep) {
-      if (Channel1.lengthCounter > 0 && (isBeingLengthEnabled || isBeingLengthUnfrozen)) {
-        // TODO: Remove this debugging
-        // Maybe the problem is that since we are length enabled, maybe we shouldn't be frozen here?
-        log(isBeingLengthEnabled ? 0x11 : 0x12, isBeingLengthUnfrozen ? 0x21 : 0x22);
-        log(Channel1.NRx4LengthEnabled ? 0x31 : 0x32, Channel1.lengthFrozen ? 0x41 : 0x42);
+    let doesNextFrameSequencerUpdateLength = (frameSequencer & 1) === 1;
+    let isBeingLengthEnabled = false;
+    let isBeingLengthUnfrozen = false;
+    if (!doesNextFrameSequencerUpdateLength) {
+      let oldLengthCounter = Channel1.lengthCounter;
 
-        // Decrement the length counter
+      // Check lengthEnable
+      isBeingLengthEnabled = !Channel1.NRx4LengthEnabled && checkBitOnByte(6, value);
+      if (Channel1.lengthCounter > 0 && isBeingLengthEnabled) {
         Channel1.lengthCounter -= 1;
 
         if (Channel1.lengthCounter === 0) {
           Channel1.isEnabled = false;
           Channel1.lengthFrozen = true;
         }
-
-        if (isBeingLengthUnfrozen) {
-          Channel1.lengthFrozen = false;
-        }
       }
+
+      // Check Length Unfreezing
+      isBeingLengthUnfrozen = Channel1.lengthFrozen && checkBitOnByte(7, value);
     }
 
     // Set the length enabled from the value
@@ -142,10 +138,18 @@ export class Channel1 {
     // See test 11 for trigger
     if (checkBitOnByte(7, value)) {
       Channel1.trigger();
+
+      if (!doesNextFrameSequencerUpdateLength && isBeingLengthUnfrozen && Channel1.NRx4LengthEnabled) {
+        Channel1.lengthCounter -= 1;
+        Channel1.lengthFrozen = false;
+      }
     }
 
     // TODO: Remove this debugging
     log(value, Channel1.lengthCounter);
+    // log(isBeingLengthEnabled ? 0x11 : 0x12, isBeingLengthUnfrozen ? 0x21 : 0x22);
+    // log(Channel1.NRx4LengthEnabled ? 0x31 : 0x32, Channel1.lengthFrozen ? 0x41 : 0x42);
+    log(Sound.frameSequenceCycleCounter, frameSequencer);
 
     // Finally, handle our Channel frequency
     value &= 0x07;

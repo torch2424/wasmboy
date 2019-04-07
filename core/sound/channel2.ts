@@ -96,34 +96,42 @@ export class Channel2 {
     // Extra length clocking occurs when writing to NRx4,
     // when the frame sequencer's next step is one that,
     // doesn't clock the length counter.
-    // Also, this depends on wether we are being enabled and things.
     let frameSequencer = Sound.frameSequencer;
-    let frameSequencerClockStep = frameSequencer === 1 || frameSequencer === 3 || frameSequencer === 5 || frameSequencer === 7;
-    let isBeingLengthEnabled = !Channel2.NRx4LengthEnabled && checkBitOnByte(6, value);
-    let isBeingLengthUnfrozen = Channel2.lengthFrozen && checkBitOnByte(7, value);
-    if (frameSequencerClockStep) {
-      if (Channel2.lengthCounter > 0 && (isBeingLengthEnabled || isBeingLengthUnfrozen)) {
-        // Decrement the length counter
+    let doesNextFrameSequencerUpdateLength = (frameSequencer & 1) === 1;
+    let isBeingLengthEnabled = false;
+    let isBeingLengthUnfrozen = false;
+    if (!doesNextFrameSequencerUpdateLength) {
+      let oldLengthCounter = Channel2.lengthCounter;
+
+      // Check lengthEnable
+      isBeingLengthEnabled = !Channel2.NRx4LengthEnabled && checkBitOnByte(6, value);
+      if (Channel2.lengthCounter > 0 && isBeingLengthEnabled) {
         Channel2.lengthCounter -= 1;
 
         if (Channel2.lengthCounter === 0) {
           Channel2.isEnabled = false;
           Channel2.lengthFrozen = true;
         }
-
-        if (isBeingLengthUnfrozen) {
-          Channel2.lengthFrozen = false;
-        }
       }
-    }
 
-    // Trigger out channel
-    if (checkBitOnByte(7, value)) {
-      Channel2.trigger();
+      // Check Length Unfreezing
+      isBeingLengthUnfrozen = Channel2.lengthFrozen && checkBitOnByte(7, value);
     }
 
     // Set the length enabled from the value
     Channel2.NRx4LengthEnabled = checkBitOnByte(6, value);
+
+    // Trigger out channel, unfreeze length if frozen
+    // Triggers should happen after obscure behavior
+    // See test 11 for trigger
+    if (checkBitOnByte(7, value)) {
+      Channel2.trigger();
+
+      if (!doesNextFrameSequencerUpdateLength && isBeingLengthUnfrozen && Channel2.NRx4LengthEnabled) {
+        Channel2.lengthCounter -= 1;
+        Channel2.lengthFrozen = false;
+      }
+    }
 
     // Finally, handle our Channel frequency
     value &= 0x07;

@@ -24,7 +24,7 @@ import { Channel4 } from './channel4';
 import { Cpu } from '../cpu/index';
 import { Config } from '../config';
 import { eightBitStoreIntoGBMemory } from '../memory/index';
-import { checkBitOnByte, concatenateBytes, splitLowByte, splitHighByte } from '../helpers/index';
+import { checkBitOnByte, concatenateBytes, splitLowByte, splitHighByte, log } from '../helpers/index';
 import { i32Portable } from '../portable/portable';
 
 export class Sound {
@@ -310,9 +310,10 @@ function updateFrameSequencer(numberOfCycles: i32): boolean {
     frameSequenceCycleCounter -= maxFrameSequenceCycles;
     Sound.frameSequenceCycleCounter = frameSequenceCycleCounter;
 
-    // Check our frame sequencer
+    // Update our frame sequencer
     // https://gist.github.com/drhelius/3652407
-    let frameSequencer = Sound.frameSequencer;
+    let frameSequencer = (Sound.frameSequencer + 1) & 7;
+
     switch (frameSequencer) {
       case 0:
         // Update Length on Channels
@@ -357,8 +358,8 @@ function updateFrameSequencer(numberOfCycles: i32): boolean {
         break;
     }
 
-    // Update our frame sequencer
-    Sound.frameSequencer = (frameSequencer + 1) & 7;
+    // Save our frame sequencer
+    Sound.frameSequencer = frameSequencer;
     return true;
   } else {
     Sound.frameSequenceCycleCounter = frameSequenceCycleCounter;

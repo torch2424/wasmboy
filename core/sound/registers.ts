@@ -102,11 +102,33 @@ export function SoundRegisterWriteTraps(offset: i32, value: i32): boolean {
       return true;
     case Sound.memoryLocationNR52:
       // Reset all registers except NR52
-      if (!checkBitOnByte(7, value)) {
+
+      // See if we were enabled, then update the register.
+      let wasNR52Enabled = Sound.NR52IsSoundEnabled;
+
+      // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Power_Control
+      // When powered on, the frame sequencer is reset so that the next step will be 0,
+      // the square duty units are reset to the first step of the waveform,
+      // and the wave channel's sample buffer is reset to 0.
+      if (!wasNR52Enabled && checkBitOnByte(7, value)) {
+        Sound.frameSequencer = 0x07;
+        Channel1.waveFormPositionOnDuty = 0x00;
+        Channel2.waveFormPositionOnDuty = 0x00;
+
+        // TODO: Wave Channel Sample Buffer?
+        // I don't think we clear wave RAM here...
+      }
+
+      // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Power_Control
+      // When powered off, all registers (NR10-NR51) are instantly written with zero
+      // and any writes to those registers are ignored while power remains off
+      if (wasNR52Enabled && !checkBitOnByte(7, value)) {
         for (let i = 0xff10; i < 0xff26; ++i) {
           eightBitStoreIntoGBMemoryWithTraps(i, 0x00);
         }
       }
+
+      // Need to update our new value here, that way writes go through :p
       Sound.updateNR52(value);
       return true;
   }
