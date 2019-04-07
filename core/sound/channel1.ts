@@ -116,6 +116,7 @@ export class Channel1 {
       let oldLengthCounter = Channel1.lengthCounter;
 
       // Check lengthEnable
+      // TODO: Just look at binjgb and search APU.frame
       isBeingLengthEnabled = !Channel1.NRx4LengthEnabled && checkBitOnByte(6, value);
       if (Channel1.lengthCounter > 0 && isBeingLengthEnabled) {
         Channel1.lengthCounter -= 1;
