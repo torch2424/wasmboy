@@ -19,6 +19,9 @@ export class Channel1 {
   // Cycle Counter for our sound accumulator
   static cycleCounter: i32 = 0;
 
+  // Max Length of our Length Load
+  static MAX_LENGTH: i32 = 64;
+
   // Squarewave channel with volume envelope and frequency sweep functions.
   // NR10 -> Sweep Register R/W
   static readonly memoryLocationNRx0: i32 = 0xff10;
@@ -45,7 +48,7 @@ export class Channel1 {
     // Channel length is determined by 64 (or 256 if channel 3), - the length load
     // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
     // Note, this will be different for channel 3
-    Channel1.lengthCounter = 64 - Channel1.NRx1LengthLoad;
+    Channel1.lengthCounter = Channel1.MAX_LENGTH - Channel1.NRx1LengthLoad;
   }
 
   // NR12 -> Volume Envelope (R/W)
@@ -98,12 +101,9 @@ export class Channel1 {
     // doesn't clock the length counter.
     let frameSequencer = Sound.frameSequencer;
     let doesNextFrameSequencerUpdateLength = (frameSequencer & 1) === 1;
-    let isBeingLengthEnabled = false;
+    let isBeingLengthEnabled = !Channel1.NRx4LengthEnabled && checkBitOnByte(6, value);
     if (!doesNextFrameSequencerUpdateLength) {
-      let oldLengthCounter = Channel1.lengthCounter;
-
       // Check lengthEnable
-      isBeingLengthEnabled = !Channel1.NRx4LengthEnabled && checkBitOnByte(6, value);
       if (Channel1.lengthCounter > 0 && isBeingLengthEnabled) {
         Channel1.lengthCounter -= 1;
 
@@ -124,7 +124,7 @@ export class Channel1 {
 
       // When we trigger on the obscure behavior, and we reset the length Counter to max
       // We need to clock
-      if (!doesNextFrameSequencerUpdateLength && Channel1.lengthCounter === 64 && Channel1.NRx4LengthEnabled) {
+      if (!doesNextFrameSequencerUpdateLength && Channel1.lengthCounter === Channel1.MAX_LENGTH && Channel1.NRx4LengthEnabled) {
         Channel1.lengthCounter -= 1;
       }
     }
@@ -278,7 +278,7 @@ export class Channel1 {
     Channel1.isEnabled = true;
     // Set length to maximum done in write
     if (Channel1.lengthCounter === 0) {
-      Channel1.lengthCounter = 64;
+      Channel1.lengthCounter = Channel1.MAX_LENGTH;
     }
 
     // Reset our timer

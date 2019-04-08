@@ -3,6 +3,7 @@
 // Wave Channel
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Wave_Channel
 import { getSaveStateMemoryOffset } from '../core';
+import { Sound } from './sound';
 import { Cpu } from '../cpu/index';
 import {
   eightBitLoadFromGBMemory,
@@ -16,6 +17,9 @@ import { i32Portable } from '../portable/portable';
 export class Channel3 {
   // Cycle Counter for our sound accumulator
   static cycleCounter: i32 = 0;
+
+  // Max Length of our Length Load
+  static MAX_LENGTH: i32 = 256;
 
   // Voluntary Wave channel with 32 4-bit programmable samples, played in sequence.
   // NR30 -> Sound on/off (R/W)
@@ -44,7 +48,7 @@ export class Channel3 {
     // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
     // Note, this will be different for channel 3
     // Supposed to be 256, so subtracting 255 and then adding 1 if that makes sense
-    Channel3.lengthCounter = 256 - Channel3.NRx1LengthLoad;
+    Channel3.lengthCounter = Channel3.MAX_LENGTH - Channel3.NRx1LengthLoad;
   }
 
   // NR32 -> Select ouput level (R/W)
@@ -72,24 +76,46 @@ export class Channel3 {
   static NRx4LengthEnabled: boolean = false;
   static NRx4FrequencyMSB: i32 = 0;
   static updateNRx4(value: i32): void {
-    // If the length counter is 0,
-    // And the channel is triggered,
-    // Or the channel length is enabled
-    // Reset the length to the maximum
-    // This is for blargg tests
-    if (Channel3.lengthCounter === 0 && (checkBitOnByte(7, value) || checkBitOnByte(6, value))) {
-      Channel3.lengthCounter = 256;
+    // Obscure behavior
+    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Obscure_Behavior
+    // Also see blargg's cgb sound test
+    // Extra length clocking occurs when writing to NRx4,
+    // when the frame sequencer's next step is one that,
+    // doesn't clock the length counter.
+    let frameSequencer = Sound.frameSequencer;
+    let doesNextFrameSequencerUpdateLength = (frameSequencer & 1) === 1;
+    let isBeingLengthEnabled = false;
+    if (!doesNextFrameSequencerUpdateLength) {
+      // Check lengthEnable
+      isBeingLengthEnabled = !Channel3.NRx4LengthEnabled && checkBitOnByte(6, value);
+      if (Channel3.lengthCounter > 0 && isBeingLengthEnabled) {
+        Channel3.lengthCounter -= 1;
+
+        if (!checkBitOnByte(7, value) && Channel3.lengthCounter === 0) {
+          Channel3.isEnabled = false;
+        }
+      }
     }
 
+    // Set the length enabled from the value
+    Channel3.NRx4LengthEnabled = checkBitOnByte(6, value);
+
+    // Trigger out channel, unfreeze length if frozen
+    // Triggers should happen after obscure behavior
+    // See test 11 for trigger
     if (checkBitOnByte(7, value)) {
       Channel3.trigger();
+
+      // When we trigger on the obscure behavior, and we reset the length Counter to max
+      // We need to clock
+      if (!doesNextFrameSequencerUpdateLength && Channel3.lengthCounter === Channel3.MAX_LENGTH && Channel3.NRx4LengthEnabled) {
+        Channel3.lengthCounter -= 1;
+      }
     }
 
-    Channel3.NRx4LengthEnabled = checkBitOnByte(6, value);
+    // Finally, handle our Channel frequency
     value &= 0x07;
     Channel3.NRx4FrequencyMSB = value;
-
-    // Update Channel Frequency
     Channel3.frequency = (value << 8) | Channel3.NRx3FrequencyLSB;
   }
 
@@ -242,6 +268,9 @@ export class Channel3 {
   static trigger(): void {
     Channel3.isEnabled = true;
     // Length counter maximum handled by write
+    if (Channel3.lengthCounter === 0) {
+      Channel3.lengthCounter = Channel3.MAX_LENGTH;
+    }
 
     // Reset our timer
     // A wave channel's frequency timer period is set to (2048-frequency)*2.

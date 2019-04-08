@@ -18,6 +18,9 @@ export class Channel2 {
   // Cycle Counter for our sound accumulator
   static cycleCounter: i32 = 0;
 
+  // Max Length of our Length Load
+  static MAX_LENGTH: i32 = 64;
+
   // Squarewave channel with volume envelope functions only.
 
   // Only used by register reading
@@ -36,7 +39,7 @@ export class Channel2 {
     // Channel length is determined by 64 (or 256 if channel 3), - the length load
     // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
     // Note, this will be different for channel 3
-    Channel2.lengthCounter = 64 - Channel2.NRx1LengthLoad;
+    Channel2.lengthCounter = Channel2.MAX_LENGTH - Channel2.NRx1LengthLoad;
   }
 
   // NR22 -> Volume Envelope (R/W)
@@ -86,12 +89,8 @@ export class Channel2 {
     // doesn't clock the length counter.
     let frameSequencer = Sound.frameSequencer;
     let doesNextFrameSequencerUpdateLength = (frameSequencer & 1) === 1;
-    let isBeingLengthEnabled = false;
+    let isBeingLengthEnabled = !Channel2.NRx4LengthEnabled && checkBitOnByte(6, value);
     if (!doesNextFrameSequencerUpdateLength) {
-      let oldLengthCounter = Channel2.lengthCounter;
-
-      // Check lengthEnable
-      isBeingLengthEnabled = !Channel2.NRx4LengthEnabled && checkBitOnByte(6, value);
       if (Channel2.lengthCounter > 0 && isBeingLengthEnabled) {
         Channel2.lengthCounter -= 1;
 
@@ -112,7 +111,7 @@ export class Channel2 {
 
       // When we trigger on the obscure behavior, and we reset the length Counter to max
       // We need to clock
-      if (!doesNextFrameSequencerUpdateLength && Channel2.lengthCounter === 64 && Channel2.NRx4LengthEnabled) {
+      if (!doesNextFrameSequencerUpdateLength && Channel2.lengthCounter === Channel2.MAX_LENGTH && Channel2.NRx4LengthEnabled) {
         Channel2.lengthCounter -= 1;
       }
     }
@@ -240,7 +239,7 @@ export class Channel2 {
     Channel2.isEnabled = true;
     // Set length to maximum done in write
     if (Channel2.lengthCounter === 0) {
-      Channel2.lengthCounter = 64;
+      Channel2.lengthCounter = Channel2.MAX_LENGTH;
     }
 
     // Reset our timer

@@ -3,6 +3,7 @@
 // Noise Channel
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Noise_Channel
 import { getSaveStateMemoryOffset } from '../core';
+import { Sound } from './sound';
 import { Cpu } from '../cpu/index';
 import { eightBitStoreIntoGBMemory, loadBooleanDirectlyFromWasmMemory, storeBooleanDirectlyToWasmMemory } from '../memory/index';
 import { checkBitOnByte } from '../helpers/index';
@@ -10,6 +11,9 @@ import { checkBitOnByte } from '../helpers/index';
 export class Channel4 {
   // Cycle Counter for our sound accumulator
   static cycleCounter: i32 = 0;
+
+  // Max Length of our Length Load
+  static MAX_LENGTH: i32 = 64;
 
   // Channel 4
   // 'white noise' channel with volume envelope functions.
@@ -28,7 +32,7 @@ export class Channel4 {
     // Channel length is determined by 64 (or 256 if channel 3), - the length load
     // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
     // Note, this will be different for channel 3
-    Channel4.lengthCounter = 64 - Channel4.NRx1LengthLoad;
+    Channel4.lengthCounter = Channel4.MAX_LENGTH - Channel4.NRx1LengthLoad;
   }
 
   // NR42 -> Volume Envelope (R/W)
@@ -75,20 +79,40 @@ export class Channel4 {
   // TL-- ---- Trigger, Length enable
   static NRx4LengthEnabled: boolean = false;
   static updateNRx4(value: i32): void {
-    // If the length counter is 0,
-    // And the channel is triggered,
-    // Or the channel length is enabled
-    // Reset the length to the maximum
-    // This is for blargg tests
-    if (Channel4.lengthCounter === 0 && (checkBitOnByte(7, value) || checkBitOnByte(6, value))) {
-      Channel4.lengthCounter = 64;
+    // Obscure behavior
+    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Obscure_Behavior
+    // Also see blargg's cgb sound test
+    // Extra length clocking occurs when writing to NRx4,
+    // when the frame sequencer's next step is one that,
+    // doesn't clock the length counter.
+    let frameSequencer = Sound.frameSequencer;
+    let doesNextFrameSequencerUpdateLength = (frameSequencer & 1) === 1;
+    let isBeingLengthEnabled = !Channel4.NRx4LengthEnabled && checkBitOnByte(6, value);
+    if (!doesNextFrameSequencerUpdateLength) {
+      if (Channel4.lengthCounter > 0 && isBeingLengthEnabled) {
+        Channel4.lengthCounter -= 1;
+
+        if (!checkBitOnByte(7, value) && Channel4.lengthCounter === 0) {
+          Channel4.isEnabled = false;
+        }
+      }
     }
 
+    // Set the length enabled from the value
+    Channel4.NRx4LengthEnabled = checkBitOnByte(6, value);
+
+    // Trigger out channel, unfreeze length if frozen
+    // Triggers should happen after obscure behavior
+    // See test 11 for trigger
     if (checkBitOnByte(7, value)) {
       Channel4.trigger();
-    }
 
-    Channel4.NRx4LengthEnabled = checkBitOnByte(6, value);
+      // When we trigger on the obscure behavior, and we reset the length Counter to max
+      // We need to clock
+      if (!doesNextFrameSequencerUpdateLength && Channel4.lengthCounter === Channel4.MAX_LENGTH && Channel4.NRx4LengthEnabled) {
+        Channel4.lengthCounter -= 1;
+      }
+    }
   }
 
   // Channel Properties
@@ -213,6 +237,9 @@ export class Channel4 {
   static trigger(): void {
     Channel4.isEnabled = true;
     // Length counter maximum handled by write
+    if (Channel4.lengthCounter === 0) {
+      Channel4.lengthCounter = Channel4.MAX_LENGTH;
+    }
 
     // Reset our timers
     Channel4.frequencyTimer = Channel4.getNoiseChannelFrequencyPeriod();
