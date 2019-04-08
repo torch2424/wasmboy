@@ -77,19 +77,7 @@ export class Channel2 {
   // TL-- -FFF Trigger, Length enable, Frequency MSB
   static NRx4LengthEnabled: boolean = false;
   static NRx4FrequencyMSB: i32 = 0;
-  // Blargg Tests length
-  static lengthFrozen: boolean = false;
   static updateNRx4(value: i32): void {
-    // If the length counter is 0,
-    // And the channel is triggered
-    // (which is handled by trigger),
-    // Or the channel length is enabled
-    // Reset the length to the maximum
-    // This is for blargg tests
-    if (!Channel2.lengthFrozen && Channel2.lengthCounter === 0 && checkBitOnByte(6, value)) {
-      Channel2.lengthCounter = 64;
-    }
-
     // Obscure behavior
     // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Obscure_Behavior
     // Also see blargg's cgb sound test
@@ -99,7 +87,6 @@ export class Channel2 {
     let frameSequencer = Sound.frameSequencer;
     let doesNextFrameSequencerUpdateLength = (frameSequencer & 1) === 1;
     let isBeingLengthEnabled = false;
-    let isBeingLengthUnfrozen = false;
     if (!doesNextFrameSequencerUpdateLength) {
       let oldLengthCounter = Channel2.lengthCounter;
 
@@ -108,14 +95,10 @@ export class Channel2 {
       if (Channel2.lengthCounter > 0 && isBeingLengthEnabled) {
         Channel2.lengthCounter -= 1;
 
-        if (Channel2.lengthCounter === 0) {
+        if (!checkBitOnByte(7, value) && Channel2.lengthCounter === 0) {
           Channel2.isEnabled = false;
-          Channel2.lengthFrozen = true;
         }
       }
-
-      // Check Length Unfreezing
-      isBeingLengthUnfrozen = Channel2.lengthFrozen && checkBitOnByte(7, value);
     }
 
     // Set the length enabled from the value
@@ -127,9 +110,10 @@ export class Channel2 {
     if (checkBitOnByte(7, value)) {
       Channel2.trigger();
 
-      if (!doesNextFrameSequencerUpdateLength && isBeingLengthUnfrozen && Channel2.NRx4LengthEnabled) {
+      // When we trigger on the obscure behavior, and we reset the length Counter to max
+      // We need to clock
+      if (!doesNextFrameSequencerUpdateLength && Channel2.lengthCounter === 64 && Channel2.NRx4LengthEnabled) {
         Channel2.lengthCounter -= 1;
-        Channel2.lengthFrozen = false;
       }
     }
 
@@ -167,8 +151,6 @@ export class Channel2 {
 
     store<u8>(getSaveStateMemoryOffset(0x13, Channel2.saveStateSlot), Channel2.dutyCycle);
     store<u8>(getSaveStateMemoryOffset(0x14, Channel2.saveStateSlot), <u8>Channel2.waveFormPositionOnDuty);
-
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x15, Channel2.saveStateSlot), Channel2.lengthFrozen);
   }
 
   // Function to load the save state from memory
@@ -181,8 +163,6 @@ export class Channel2 {
 
     Channel2.dutyCycle = load<u8>(getSaveStateMemoryOffset(0x13, Channel2.saveStateSlot));
     Channel2.waveFormPositionOnDuty = load<u8>(getSaveStateMemoryOffset(0x14, Channel2.saveStateSlot));
-
-    Channel2.lengthFrozen = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x15, Channel2.saveStateSlot));
   }
 
   static initialize(): void {
@@ -258,7 +238,10 @@ export class Channel2 {
   //http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Trigger_Event
   static trigger(): void {
     Channel2.isEnabled = true;
-    // Length counter maximum handled by write
+    // Set length to maximum done in write
+    if (Channel2.lengthCounter === 0) {
+      Channel2.lengthCounter = 64;
+    }
 
     // Reset our timer
     // A square channel's frequency timer period is set to (2048-frequency)*4.
