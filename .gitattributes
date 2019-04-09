@@ -5,3 +5,11 @@ lib/**/*.js linguist-vendored=false
 *.ts linguist-vendored=false
 *.wasm linguist-vendored=false
 *.wast linguist-vendored=false
+*.wat linguist-vendored=false
+dist/wasm/*.wasm linguist-vendored=false
+dist/wasm/*.wast linguist-vendored=false
+dist/wasm/*.wat linguist-vendored=false
+**/*.wasm linguist-vendored=false
+**/*.wast linguist-vendored=false
+**/*.wat linguist-vendored=false
+
