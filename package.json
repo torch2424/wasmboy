@@ -43,7 +43,7 @@
     "precommit": "npx pretty-quick --staged",
     "core:watch": "npx watch \"npm run core:build\" core",
     "core:build": "npx run-s core:build:asc core:build:dist core:build:done",
-    "core:build:asc": "npx asc core/index.ts -b dist/core/core.untouched.wasm -t dist/core/core.untouched.wast -O3 --validate --sourceMap core/dist/core.untouched.wasm.map --memoryBase 0",
+    "core:build:asc": "npx asc core/index.ts -b dist/core/core.untouched.wasm -t dist/core/core.untouched.wat -O3 --validate --sourceMap core/dist/core.untouched.wasm.map --memoryBase 0",
     "core:build:ts": "npx rollup -c --environment TS",
     "core:build:asc:measure": "npm run core:build:asc -- --measure --noEmit",
     "core:build:ts:measure": "npx tsc --project core/tsconfig.json --noEmit --extendedDiagnostics",
