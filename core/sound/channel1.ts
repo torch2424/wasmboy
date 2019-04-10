@@ -303,7 +303,7 @@ export class Channel1 {
 
     // If the sweep shift is non-zero, frequency calculation and the overflow check are performed immediately.
     if (Channel1.NRx0SweepShift > 0) {
-      calculateSweepAndCheckOverflow();
+      calculateSweepAndCheckOverflow(true);
     }
 
     // Finally if DAC is off, channel is still disabled
@@ -336,7 +336,7 @@ export class Channel1 {
       // When it generates a clock and the sweep's internal enabled flag is set and the sweep period is not zero,
       // a new frequency is calculated and the overflow check is performed.
       if (Channel1.isSweepEnabled && Channel1.NRx0SweepPeriod > 0) {
-        calculateSweepAndCheckOverflow();
+        calculateSweepAndCheckOverflow(true);
       }
     } else {
       Channel1.sweepCounter = sweepCounter;
@@ -379,8 +379,11 @@ export class Channel1 {
   }
 
   static setFrequency(frequency: i32): void {
+    // Set our shadowFrequency
+    Channel1.sweepShadowFrequency = frequency;
+
     // Get the high and low bits
-    let passedFrequencyHighBits = frequency >> 8;
+    let passedFrequencyHighBits = (frequency >> 8) & 0x07;
     let passedFrequencyLowBits = frequency & 0xff;
 
     // Get the new register 4
@@ -402,26 +405,25 @@ export class Channel1 {
 }
 
 // Sweep Specific functions
-function calculateSweepAndCheckOverflow(): void {
-  let newFrequency = getNewFrequencyFromSweep();
+function calculateSweepAndCheckOverflow(isFirstCalculation: boolean): void {
   // 7FF is the highest value of the frequency: 111 1111 1111
+  let newFrequency = getNewFrequencyFromSweep();
 
-  if (newFrequency <= 0x7ff && Channel1.NRx0SweepShift > 0) {
+  if (isFirstCalculation && newFrequency <= 0x7ff && Channel1.NRx0SweepShift > 0) {
     // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
     // If the new frequency is 2047 or less and the sweep shift is not zero,
     // this new frequency is written back to the shadow frequency and square 1's frequency in NR13 and NR14,
     // then frequency calculation and overflow check are run AGAIN immediately using this new value,
     // but this second new frequency is not written back.
-    Channel1.sweepShadowFrequency = newFrequency;
     Channel1.setFrequency(newFrequency);
 
-    // Re calculate the new frequency
-    newFrequency = getNewFrequencyFromSweep();
-  }
-
-  // Next check if the new Frequency is above 0x7FF
-  // if So, disable our sweep
-  if (newFrequency > 0x7ff) {
+    // Re-calculate the new frequency
+    calculateSweepAndCheckOverflow(false);
+  } else if (newFrequency > 0x7ff) {
+    // TODO: Why am I still failing #5?
+    log(0x25, isFirstCalculation ? 0x01 : 0x02);
+    // Next check if the new Frequency is above 0x7FF
+    // if So, disable our sweep
     Channel1.isEnabled = false;
   }
 }
