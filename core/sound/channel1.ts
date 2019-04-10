@@ -299,7 +299,7 @@ export class Channel1 {
     Channel1.sweepCounter = Channel1.NRx0SweepPeriod;
 
     // The internal enabled flag is set if either the sweep period or shift are non-zero, cleared otherwise.
-    Channel1.isSweepEnabled = Channel1.NRx0SweepPeriod > 0 && Channel1.NRx0SweepShift > 0;
+    Channel1.isSweepEnabled = Channel1.NRx0SweepPeriod > 0 || Channel1.NRx0SweepShift > 0;
 
     // If the sweep shift is non-zero, frequency calculation and the overflow check are performed immediately.
     if (Channel1.NRx0SweepShift > 0) {
