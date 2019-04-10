@@ -93,6 +93,12 @@ export class Channel1 {
   // And globals can be affected by other functions
   // Thus, optimizations here should be extremely careful
   static updateNRx4(value: i32): void {
+    // Handle our Channel frequency first
+    // As this is modified if we trigger for length.
+    let frequencyMSB = value & 0x07;
+    Channel1.NRx4FrequencyMSB = frequencyMSB;
+    Channel1.frequency = (frequencyMSB << 8) | Channel1.NRx3FrequencyLSB;
+
     // Obscure behavior
     // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Obscure_Behavior
     // Also see blargg's cgb sound test
@@ -128,11 +134,6 @@ export class Channel1 {
         Channel1.lengthCounter -= 1;
       }
     }
-
-    // Finally, handle our Channel frequency
-    value &= 0x07;
-    Channel1.NRx4FrequencyMSB = value;
-    Channel1.frequency = (value << 8) | Channel1.NRx3FrequencyLSB;
   }
 
   // Channel Properties
@@ -404,6 +405,7 @@ export class Channel1 {
 function calculateSweepAndCheckOverflow(): void {
   let newFrequency = getNewFrequencyFromSweep();
   // 7FF is the highest value of the frequency: 111 1111 1111
+
   if (newFrequency <= 0x7ff && Channel1.NRx0SweepShift > 0) {
     // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
     // If the new frequency is 2047 or less and the sweep shift is not zero,
