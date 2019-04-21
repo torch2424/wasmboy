@@ -296,14 +296,21 @@ export class Channel1 {
     Channel1.sweepShadowFrequency = Channel1.frequency;
 
     // Reset back to the sweep period
-    Channel1.sweepCounter = Channel1.NRx0SweepPeriod;
+    // Obscure behavior
+    // Sweep timers treat a period o 0 as 8
+    if (Channel1.NRx0SweepPeriod === 0) {
+      Channel1.sweepCounter = 8;
+    } else {
+      Channel1.sweepCounter = Channel1.NRx0SweepPeriod;
+    }
 
     // The internal enabled flag is set if either the sweep period or shift are non-zero, cleared otherwise.
     Channel1.isSweepEnabled = Channel1.NRx0SweepPeriod > 0 || Channel1.NRx0SweepShift > 0;
 
     // If the sweep shift is non-zero, frequency calculation and the overflow check are performed immediately.
-    if (Channel1.NRx0SweepShift > 0) {
-      calculateSweepAndCheckOverflow(true);
+    // NOTE: The double calculation thing for the sweep does not happen here.
+    if (Channel1.NRx0SweepShift > 0 && didCalculatedSweepOverflow(calculateSweep())) {
+      Channel1.isEnabled = false;
     }
 
     // Finally if DAC is off, channel is still disabled
@@ -324,19 +331,44 @@ export class Channel1 {
   }
 
   static updateSweep(): void {
-    // Obscure behavior
-    // TODO: The volume envelope and sweep timers treat a period of 0 as 8.
+    // Dont update period if not enabled
+    if (!Channel1.isEnabled || !Channel1.isSweepEnabled) {
+      return;
+    }
+
     // Decrement the sweep counter
     let sweepCounter = Channel1.sweepCounter - 1;
     if (sweepCounter <= 0) {
       // Reset back to the sweep period
-      Channel1.sweepCounter = Channel1.NRx0SweepPeriod;
+      // Obscure behavior
+      // Sweep timers treat a period of 0 as 8
+      if (Channel1.NRx0SweepPeriod === 0) {
+        // Sweep isn't calculated when the period is 0
+        Channel1.sweepCounter = 8;
+      } else {
+        // Reset our sweep counter to its period
+        Channel1.sweepCounter = Channel1.NRx0SweepPeriod;
 
-      // Calculate our sweep
-      // When it generates a clock and the sweep's internal enabled flag is set and the sweep period is not zero,
-      // a new frequency is calculated and the overflow check is performed.
-      if (Channel1.isSweepEnabled && Channel1.NRx0SweepPeriod > 0) {
-        calculateSweepAndCheckOverflow(true);
+        // Calculate our sweep
+        // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
+        // When it generates a clock and the sweep's internal enabled flag is set and the sweep period is not zero,
+        // a new frequency is calculated and the overflow check is performed. If the new frequency is 2047 or less,
+        // and the sweep shift is not zero, this new frequency is written back to the shadow frequency,
+        // and square 1's frequency in NR13 and NR14, then frequency calculation,
+        // and overflow check are run AGAIN immediately using this new value,
+        // but this second new frequency is not written back.
+        let newFrequency = calculateSweep();
+        if (didCalculatedSweepOverflow(newFrequency)) {
+          Channel1.isEnabled = false;
+        }
+
+        if (Channel1.NRx0SweepShift > 0) {
+          Channel1.setFrequency(newFrequency);
+
+          if (didCalculatedSweepOverflow(calculateSweep())) {
+            Channel1.isEnabled = false;
+          }
+        }
       }
     } else {
       Channel1.sweepCounter = sweepCounter;
@@ -405,35 +437,11 @@ export class Channel1 {
 }
 
 // Sweep Specific functions
-function calculateSweepAndCheckOverflow(isFirstCalculation: boolean): void {
-  // 7FF is the highest value of the frequency: 111 1111 1111
-  let newFrequency = getNewFrequencyFromSweep();
-
-  if (isFirstCalculation && newFrequency <= 0x7ff && Channel1.NRx0SweepShift > 0) {
-    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
-    // If the new frequency is 2047 or less and the sweep shift is not zero,
-    // this new frequency is written back to the shadow frequency and square 1's frequency in NR13 and NR14,
-    // then frequency calculation and overflow check are run AGAIN immediately using this new value,
-    // but this second new frequency is not written back.
-    Channel1.setFrequency(newFrequency);
-
-    // Re-calculate the new frequency
-    calculateSweepAndCheckOverflow(false);
-  } else if (newFrequency > 0x7ff) {
-    // TODO: Why am I still failing #5?
-    log(0x25, isFirstCalculation ? 0x01 : 0x02);
-    // Next check if the new Frequency is above 0x7FF
-    // if So, disable our sweep
-    Channel1.isEnabled = false;
-  }
-}
-
 // Function to determing a new sweep in the current context
-function getNewFrequencyFromSweep(): i32 {
+function calculateSweep(): i32 {
   // Start our new frequency, by making it equal to the "shadow frequency"
   let oldFrequency = Channel1.sweepShadowFrequency;
-  let newFrequency = oldFrequency;
-  newFrequency = newFrequency >> Channel1.NRx0SweepShift;
+  let newFrequency = oldFrequency >> Channel1.NRx0SweepShift;
 
   // Check for sweep negation
   if (Channel1.NRx0Negate) {
@@ -443,4 +451,15 @@ function getNewFrequencyFromSweep(): i32 {
   }
 
   return newFrequency;
+}
+
+// Function to check if a calculated sweep overflowed
+function didCalculatedSweepOverflow(calculatedSweep: i32): boolean {
+  // 7FF is the highest value of the frequency: 111 1111 1111
+  // if it overflows, should disable the channel (handled by the caller)
+  if (calculatedSweep > 0x7ff) {
+    return true;
+  }
+
+  return false;
 }
