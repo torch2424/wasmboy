@@ -30,9 +30,20 @@ export class Channel1 {
   static NRx0Negate: boolean = false;
   static NRx0SweepShift: i32 = 0;
   static updateNRx0(value: i32): void {
+    let oldSweepNegate = Channel1.NRx0Negate;
+
     Channel1.NRx0SweepPeriod = (value & 0x70) >> 4;
     Channel1.NRx0Negate = checkBitOnByte(3, value);
     Channel1.NRx0SweepShift = value & 0x07;
+
+    // Obscure Behavior
+    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
+    // Clearing the sweep negate mode bit in NR10 after at least one sweep calculation has been made,
+    // using the negate mode since the last trigger causes the channel to be immediately disabled.
+    // This prevents you from having the sweep lower the frequency then raise the frequency without a trigger inbetween.
+    if (oldSweepNegate && (!Channel1.NRx0Negate && Channel1.sweepNegateShouldDisableChannelOnClear)) {
+      Channel1.isEnabled = false;
+    }
   }
 
   // NR11 -> Sound length/Wave pattern duty (R/W)
@@ -154,6 +165,7 @@ export class Channel1 {
   static isSweepEnabled: boolean = false;
   static sweepCounter: i32 = 0x00;
   static sweepShadowFrequency: i32 = 0x00;
+  static sweepNegateShouldDisableChannelOnClear: boolean = false;
 
   // Save States
   static readonly saveStateSlot: i32 = 7;
@@ -307,6 +319,8 @@ export class Channel1 {
     // The internal enabled flag is set if either the sweep period or shift are non-zero, cleared otherwise.
     Channel1.isSweepEnabled = Channel1.NRx0SweepPeriod > 0 || Channel1.NRx0SweepShift > 0;
 
+    Channel1.sweepNegateShouldDisableChannelOnClear = false;
+
     // If the sweep shift is non-zero, frequency calculation and the overflow check are performed immediately.
     // NOTE: The double calculation thing for the sweep does not happen here.
     if (Channel1.NRx0SweepShift > 0 && didCalculatedSweepOverflow(calculateSweep())) {
@@ -445,6 +459,7 @@ function calculateSweep(): i32 {
 
   // Check for sweep negation
   if (Channel1.NRx0Negate) {
+    Channel1.sweepNegateShouldDisableChannelOnClear = true;
     newFrequency = oldFrequency - newFrequency;
   } else {
     newFrequency = oldFrequency + newFrequency;
