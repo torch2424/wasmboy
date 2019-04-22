@@ -154,13 +154,14 @@ These are all currently known passing tests (by me), there may be more test roms
 
 [Repo with all blargg's tests and source](https://github.com/retrio/gb-test-roms)
 
-cpu_instrs, instr_timing, mem_timing, mem_timing-2, halt_bug
+cpu_instrs, instr_timing, mem_timing, mem_timing-2, halt_bug, cgb_sound
 
 ![Cpu Instructions all tests passing](./test/accuracy/testroms/blargg/cpu_instrs/cpu_instrs.golden.png)
 ![Instruction timing all tests passing](./test/accuracy/testroms/blargg/instr_timing/instr_timing.golden.png)
 ![Memory timing all tests passing](./test/accuracy/testroms/blargg/mem_timing/mem_timing.golden.png)
 ![Memory timing 2 all tests passing](./test/accuracy/testroms/blargg/mem_timing-2/mem_timing-2.golden.png)
 ![halt bug all tests passing](./test/accuracy/testroms/blargg/halt_bug/halt_bug.golden.png)
+![cgb sound all tests passing](./test/accuracy/testroms/blargg/cgb_sound/cgb_sound.golden.png)
 
 ### Mooneye
 
