@@ -15,7 +15,7 @@ import {
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
-import { checkBitOnByte } from '../helpers/index';
+import { checkBitOnByte, log } from '../helpers/index';
 import { i32Portable } from '../portable/portable';
 
 export class Channel3 {
@@ -31,6 +31,12 @@ export class Channel3 {
   // E--- ---- DAC power
   static updateNRx0(value: i32): void {
     let isDacEnabled = checkBitOnByte(7, value);
+
+    // Sample buffer reset to zero when powered on
+    if (!Channel3.isDacEnabled && isDacEnabled) {
+      Channel3.sampleBuffer = 0x00;
+    }
+
     Channel3.isDacEnabled = isDacEnabled;
 
     // Blargg length test
@@ -104,7 +110,7 @@ export class Channel3 {
     // Set the length enabled from the value
     Channel3.NRx4LengthEnabled = checkBitOnByte(6, value);
 
-    // Trigger out channel, unfreeze length if frozen
+    // Trigger our channel, unfreeze length if frozen
     // Triggers should happen after obscure behavior
     // See test 11 for trigger
     if (checkBitOnByte(7, value)) {
@@ -136,6 +142,7 @@ export class Channel3 {
   static waveTablePosition: i32 = 0x00;
   static volumeCode: i32 = 0x00;
   static volumeCodeChanged: boolean = false;
+  static sampleBuffer: i32 = 0x00;
 
   // Save States
 
@@ -168,7 +175,9 @@ export class Channel3 {
 
     // TODO: Handle DMG case
 
-    return readCurrentSampleFromWaveRam();
+    log(Channel3.frequency, Channel3.frequencyTimer);
+
+    return readCurrentSampleByteFromWaveRam();
   }
 
   static initialize(): void {
@@ -197,58 +206,27 @@ export class Channel3 {
     Channel3.frequencyTimer = frequencyTimer << (<i32>Cpu.GBCDoubleSpeed);
   }
 
-  // TODO: After dinner. Seems like the sample buffer is a requirement.
-  // After looking at binjgb and re-reading the GB Docs at:
-  // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
-  // Seems like on getSample, it is not just a performance optimization.
-  // But rather, you need to return whatever sample is already computed.
-  // And then when we clock the frequency timer, then update the sample.
-  // E.g, return whatever is current sample, and then update for the NEXT
-  // getSample
   static getSample(numberOfCycles: i32): i32 {
-    // Decrement our channel timer
-    let frequencyTimer = Channel3.frequencyTimer;
-    frequencyTimer -= numberOfCycles;
-    if (frequencyTimer <= 0) {
-      // Get the amount that overflowed so we don't drop cycles
-      let overflowAmount = abs(frequencyTimer);
-      Channel3.frequencyTimer = frequencyTimer;
-
-      // Reset our timer
-      // A wave channel's frequency timer period is set to (2048-frequency) * 2.
-      // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Wave_Channel
-      Channel3.resetTimer();
-      Channel3.frequencyTimer -= overflowAmount;
-
-      // Advance the wave table position, and loop back if needed
-      Channel3.waveTablePosition = (Channel3.waveTablePosition + 1) & 31;
-    } else {
-      Channel3.frequencyTimer = frequencyTimer;
-    }
-
-    // Get our output volume
-    let volumeCode = Channel3.volumeCode;
-
-    // Finally to set our output volume, the channel must be enabled,
-    // Our channel DAC must be enabled, and we must be in an active state
-    // Of our duty cycle
-    if (Channel3.isEnabled && Channel3.isDacEnabled) {
-      // Get our volume code
-      if (Channel3.volumeCodeChanged) {
-        volumeCode = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx2);
-        volumeCode = volumeCode >> 5;
-        volumeCode = volumeCode & 0x0f;
-        Channel3.volumeCode = volumeCode;
-        Channel3.volumeCodeChanged = false;
-      }
-    } else {
+    // Check if we are enabled
+    if (!Channel3.isEnabled || !Channel3.isDacEnabled) {
       // Return silence
       // Since range from -15 - 15, or 0 to 30 for our unsigned
       return 15;
     }
 
+    // Get our volume code
+    // Need this to compute the sample
+    let volumeCode = Channel3.volumeCode;
+    if (Channel3.volumeCodeChanged) {
+      volumeCode = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx2);
+      volumeCode = volumeCode >> 5;
+      volumeCode = volumeCode & 0x0f;
+      Channel3.volumeCode = volumeCode;
+      Channel3.volumeCodeChanged = false;
+    }
+
     // Get the current sample
-    let sample = readCurrentSampleFromWaveRam();
+    let sample = getSampleFromSampleBufferForWaveTablePosition();
 
     // Shift our sample and set our volume depending on the volume code
     // Since we can't multiply by float, simply divide by 4, 2, 1
@@ -276,6 +254,28 @@ export class Channel3 {
     sample = outputVolume > 0 ? sample / outputVolume : 0;
     // Square Waves Can range from -15 - 15. Therefore simply add 15
     sample += 15;
+
+    // Update the sample based on our timer
+    let frequencyTimer = Channel3.frequencyTimer;
+    frequencyTimer -= numberOfCycles;
+    while (frequencyTimer <= 0) {
+      // Get the amount that overflowed so we don't drop cycles
+      let overflowAmount = abs(frequencyTimer);
+
+      // Reset our timer
+      // A wave channel's frequency timer period is set to (2048-frequency) * 2.
+      // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Wave_Channel
+      Channel3.resetTimer();
+      frequencyTimer = Channel3.frequencyTimer;
+      frequencyTimer -= overflowAmount;
+
+      // Update our sample buffer
+      advanceWavePositionAndSampleBuffer();
+    }
+
+    Channel3.frequencyTimer = frequencyTimer;
+
+    // Finally return the sample
     return sample;
   }
 
@@ -324,16 +324,33 @@ export class Channel3 {
 }
 
 // Functions specific to wave memory
-function readCurrentSampleFromWaveRam(): i32 {
-  // Will Find the position, and knock off any remainder
+function advanceWavePositionAndSampleBuffer(): void {
+  // Advance the wave table position, and loop back if needed
   let waveTablePosition = Channel3.waveTablePosition;
-  let positionIndexToAdd = i32Portable(waveTablePosition >> 1);
+  waveTablePosition += 1;
+  while (waveTablePosition >= 32) {
+    waveTablePosition -= 32;
+  }
+  Channel3.waveTablePosition = waveTablePosition;
+
+  // Load the next sample byte from wave ram,
+  // into the sample buffer
+  Channel3.sampleBuffer = readCurrentSampleByteFromWaveRam();
+}
+
+function readCurrentSampleByteFromWaveRam(): i32 {
+  // Will Find the position, and knock off any remainder
+  let positionIndexToAdd = i32Portable(Channel3.waveTablePosition >> 1);
   let memoryLocationWaveSample = Channel3.memoryLocationWaveTable + positionIndexToAdd;
 
-  let sample = eightBitLoadFromGBMemory(memoryLocationWaveSample);
+  return eightBitLoadFromGBMemory(memoryLocationWaveSample);
+}
+
+function getSampleFromSampleBufferForWaveTablePosition(): i32 {
+  let sample = Channel3.sampleBuffer;
 
   // Need to grab the top or lower half for the correct sample
-  sample >>= (<i32>((waveTablePosition & 1) === 0)) << 2;
+  sample >>= (<i32>((Channel3.waveTablePosition & 1) === 0)) << 2;
   sample &= 0x0f;
 
   return sample;
