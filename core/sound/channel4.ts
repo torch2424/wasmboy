@@ -173,6 +173,8 @@ export class Channel4 {
     let frequencyTimer = Channel4.frequencyTimer;
     frequencyTimer -= numberOfCycles;
 
+    // TODO: This can't be a while loop to use up all the cycles,
+    // Since noise is psuedo random and the period can be anything
     if (frequencyTimer <= 0) {
       // Get the amount that overflowed so we don't drop cycles
       let overflowAmount = abs(frequencyTimer);
@@ -205,6 +207,12 @@ export class Channel4 {
       }
       Channel4.linearFeedbackShiftRegister = linearFeedbackShiftRegister;
     }
+
+    // Make sure period never becomes negative
+    if (frequencyTimer < 0) {
+      frequencyTimer = 0;
+    }
+
     Channel4.frequencyTimer = frequencyTimer;
 
     // Get our ourput volume, set to zero for silence

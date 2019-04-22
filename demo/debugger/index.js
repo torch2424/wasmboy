@@ -71,8 +71,13 @@ setTimeout(() => {
 // Add some hotkeys
 let quickSpeed = false;
 WasmBoy.ResponsiveGamepad.onInputsChange(
-  [WasmBoy.ResponsiveGamepad.RESPONSIVE_GAMEPAD_INPUTS.LEFT_TRIGGER, WasmBoy.ResponsiveGamepad.RESPONSIVE_GAMEPAD_INPUTS.RIGHT_TRIGGER],
+  [
+    WasmBoy.ResponsiveGamepad.RESPONSIVE_GAMEPAD_INPUTS.LEFT_TRIGGER,
+    WasmBoy.ResponsiveGamepad.RESPONSIVE_GAMEPAD_INPUTS.RIGHT_TRIGGER,
+    WasmBoy.ResponsiveGamepad.RESPONSIVE_GAMEPAD_INPUTS.SPECIAL
+  ],
   state => {
+    // Quick Speed
     if (!quickSpeed && state.LEFT_TRIGGER) {
       WasmBoy.setSpeed(2.5);
       quickSpeed = true;
@@ -80,6 +85,15 @@ WasmBoy.ResponsiveGamepad.onInputsChange(
     } else if (quickSpeed && !state.LEFT_TRIGGER) {
       WasmBoy.setSpeed(1.0);
       quickSpeed = false;
+    }
+
+    // Play / Pause
+    if (WasmBoy.isPlaying() && state.SPECIAL) {
+      WasmBoy.pause();
+      Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Play/Pause Hotkey! ⏯️');
+    } else if (!WasmBoy.isPlaying() && state.SPECIAL) {
+      WasmBoy.play();
+      Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Play/Pause Hotkey! ⏯️');
     }
   }
 );

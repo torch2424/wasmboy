@@ -189,9 +189,9 @@ export class Channel2 {
 
   static getSample(numberOfCycles: i32): i32 {
     // Decrement our channel timer
-    let frequencyTimer = Channel2.frequencyTimer - numberOfCycles;
-    Channel2.frequencyTimer = frequencyTimer;
-    if (frequencyTimer <= 0) {
+    let frequencyTimer = Channel2.frequencyTimer;
+    frequencyTimer -= numberOfCycles;
+    while (frequencyTimer <= 0) {
       // Get the amount that overflowed so we don't drop cycles
       let overflowAmount = abs(frequencyTimer);
 
@@ -199,13 +199,16 @@ export class Channel2 {
       // A square channel's frequency timer period is set to (2048-frequency)*4.
       // Four duty cycles are available, each waveform taking 8 frequency timer clocks to cycle through:
       Channel2.resetTimer();
-      Channel2.frequencyTimer -= overflowAmount;
+      frequencyTimer = Channel2.frequencyTimer;
+      frequencyTimer -= overflowAmount;
 
       // Also increment our duty cycle
       // What is duty? https://en.wikipedia.org/wiki/Duty_cycle
       // Duty cycle for square wave: http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
       Channel2.waveFormPositionOnDuty = (Channel2.waveFormPositionOnDuty + 1) & 7;
     }
+
+    Channel2.frequencyTimer = frequencyTimer;
 
     // Get our ourput volume
     let outputVolume = 0;
