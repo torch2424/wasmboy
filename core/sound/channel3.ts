@@ -1,5 +1,9 @@
 // NOTE: Tons of Copy-pasta btween channels, because Classes cannot be instantiated yet in assemblyscript
 
+// How to Search for similar things in binjgb
+// Wave channel trigger : APU_NR34_ADDR
+// Wave Channel getSample : update_wave
+
 // Wave Channel
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Wave_Channel
 import { getSaveStateMemoryOffset } from '../core';
@@ -153,6 +157,20 @@ export class Channel3 {
     Channel3.waveTablePosition = load<u16>(getSaveStateMemoryOffset(0x09, Channel3.saveStateSlot));
   }
 
+  // Memory Read Trap
+  static handleWaveRamRead(): i32 {
+    // Obscure behavior
+    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
+    // If the wave channel is enabled, accessing any byte from $FF30-$FF3F is equivalent to,
+    // accessing the current byte selected by the waveform position. Further, on the DMG accesses will only work in this manner,
+    // if made within a couple of clocks of the wave channel accessing wave RAM;
+    // if made at any other time, reads return $FF and writes have no effect.
+
+    // TODO: Handle DMG case
+
+    return readCurrentSampleFromWaveRam();
+  }
+
   static initialize(): void {
     eightBitStoreIntoGBMemory(Channel3.memoryLocationNRx0, 0x7f);
     eightBitStoreIntoGBMemory(Channel3.memoryLocationNRx1, 0xff);
@@ -179,6 +197,14 @@ export class Channel3 {
     Channel3.frequencyTimer = frequencyTimer << (<i32>Cpu.GBCDoubleSpeed);
   }
 
+  // TODO: After dinner. Seems like the sample buffer is a requirement.
+  // After looking at binjgb and re-reading the GB Docs at:
+  // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
+  // Seems like on getSample, it is not just a performance optimization.
+  // But rather, you need to return whatever sample is already computed.
+  // And then when we clock the frequency timer, then update the sample.
+  // E.g, return whatever is current sample, and then update for the NEXT
+  // getSample
   static getSample(numberOfCycles: i32): i32 {
     // Decrement our channel timer
     let frequencyTimer = Channel3.frequencyTimer;
@@ -222,18 +248,7 @@ export class Channel3 {
     }
 
     // Get the current sample
-    let sample = 0;
-
-    // Will Find the position, and knock off any remainder
-    let waveTablePosition = Channel3.waveTablePosition;
-    let positionIndexToAdd = i32Portable(waveTablePosition >> 1);
-    let memoryLocationWaveSample = Channel3.memoryLocationWaveTable + positionIndexToAdd;
-
-    sample = eightBitLoadFromGBMemory(memoryLocationWaveSample);
-
-    // Need to grab the top or lower half for the correct sample
-    sample >>= (<i32>((waveTablePosition & 1) === 0)) << 2;
-    sample &= 0x0f;
+    let sample = readCurrentSampleFromWaveRam();
 
     // Shift our sample and set our volume depending on the volume code
     // Since we can't multiply by float, simply divide by 4, 2, 1
@@ -257,7 +272,7 @@ export class Channel3 {
         break;
     }
 
-    // Spply out output volume
+    // Apply out output volume
     sample = outputVolume > 0 ? sample / outputVolume : 0;
     // Square Waves Can range from -15 - 15. Therefore simply add 15
     sample += 15;
@@ -306,4 +321,20 @@ export class Channel3 {
     }
     Channel3.lengthCounter = lengthCounter;
   }
+}
+
+// Functions specific to wave memory
+function readCurrentSampleFromWaveRam(): i32 {
+  // Will Find the position, and knock off any remainder
+  let waveTablePosition = Channel3.waveTablePosition;
+  let positionIndexToAdd = i32Portable(waveTablePosition >> 1);
+  let memoryLocationWaveSample = Channel3.memoryLocationWaveTable + positionIndexToAdd;
+
+  let sample = eightBitLoadFromGBMemory(memoryLocationWaveSample);
+
+  // Need to grab the top or lower half for the correct sample
+  sample >>= (<i32>((waveTablePosition & 1) === 0)) << 2;
+  sample &= 0x0f;
+
+  return sample;
 }
