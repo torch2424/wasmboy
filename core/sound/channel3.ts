@@ -175,9 +175,28 @@ export class Channel3 {
 
     // TODO: Handle DMG case
 
-    log(Channel3.frequency, Channel3.frequencyTimer);
-
     return readCurrentSampleByteFromWaveRam();
+  }
+
+  // Memory Write Trap
+  static handleWaveRamWrite(value: i32): void {
+    // Obscure behavior
+    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
+    // If the wave channel is enabled, accessing any byte from $FF30-$FF3F is equivalent to,
+    // accessing the current byte selected by the waveform position. Further, on the DMG accesses will only work in this manner,
+    // if made within a couple of clocks of the wave channel accessing wave RAM;
+    // if made at any other time, reads return $FF and writes have no effect.
+
+    // Thus we want to write the value to the current sample position
+    // Will Find the position, and knock off any remainder
+    let positionIndexToAdd = i32Portable(Channel3.waveTablePosition >> 1);
+    let memoryLocationWaveSample = Channel3.memoryLocationWaveTable + positionIndexToAdd;
+
+    log(0x25, Channel3.waveTablePosition);
+    log(Channel3.frequency, Channel3.frequencyTimer);
+    log(memoryLocationWaveSample, value);
+
+    eightBitStoreIntoGBMemory(memoryLocationWaveSample, value);
   }
 
   static initialize(): void {
@@ -290,6 +309,20 @@ export class Channel3 {
     // Reset our timer
     // A wave channel's frequency timer period is set to (2048-frequency)*2.
     Channel3.resetTimer();
+
+    // Add some delay to our frequency timer
+    // So Honestly, lifted this from binjgb
+    // https://github.com/binji/binjgb/blob/68eb4b2f6d5d7a98d270e12c4b8ff065c07f5e94/src/emulator.c#L2625
+    // I have no clue why this is, but it passes 09-wave read while on.s
+    // blargg test.
+    // I think this has to do with obscure behavior?
+    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
+    // When triggering the wave channel,
+    // the first sample to play is the previous one still in the high nibble of the sample buffer,
+    // and the next sample is the second nibble from the wave table.
+    // This is because it doesn't load the first byte on trigger like it "should".
+    // The first nibble from the wave table is thus not played until the waveform loops.
+    Channel3.frequencyTimer += 6;
 
     // Reset our wave table position
     Channel3.waveTablePosition = 0;
