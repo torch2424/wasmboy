@@ -86,6 +86,13 @@ export class Channel3 {
   static NRx4LengthEnabled: boolean = false;
   static NRx4FrequencyMSB: i32 = 0;
   static updateNRx4(value: i32): void {
+    // Handle our frequency
+    // Must be done first for our upcoming trigger
+    // To correctly reset timing
+    let frequencyMSB = value & 0x07;
+    Channel3.NRx4FrequencyMSB = frequencyMSB;
+    Channel3.frequency = (frequencyMSB << 8) | Channel3.NRx3FrequencyLSB;
+
     // Obscure behavior
     // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Obscure_Behavior
     // Also see blargg's cgb sound test
@@ -122,11 +129,6 @@ export class Channel3 {
         Channel3.lengthCounter -= 1;
       }
     }
-
-    // Finally, handle our Channel frequency
-    value &= 0x07;
-    Channel3.NRx4FrequencyMSB = value;
-    Channel3.frequency = (value << 8) | Channel3.NRx3FrequencyLSB;
   }
 
   // Our wave table location
@@ -191,10 +193,6 @@ export class Channel3 {
     // Will Find the position, and knock off any remainder
     let positionIndexToAdd = i32Portable(Channel3.waveTablePosition >> 1);
     let memoryLocationWaveSample = Channel3.memoryLocationWaveTable + positionIndexToAdd;
-
-    log(0x25, Channel3.waveTablePosition);
-    log(Channel3.frequency, Channel3.frequencyTimer);
-    log(memoryLocationWaveSample, value);
 
     eightBitStoreIntoGBMemory(memoryLocationWaveSample, value);
   }

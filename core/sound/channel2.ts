@@ -81,6 +81,12 @@ export class Channel2 {
   static NRx4LengthEnabled: boolean = false;
   static NRx4FrequencyMSB: i32 = 0;
   static updateNRx4(value: i32): void {
+    // Handle our Channel frequency first
+    // As this is modified if we trigger for length.
+    let frequencyMSB = value & 0x07;
+    Channel2.NRx4FrequencyMSB = frequencyMSB;
+    Channel2.frequency = (frequencyMSB << 8) | Channel2.NRx3FrequencyLSB;
+
     // Obscure behavior
     // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Obscure_Behavior
     // Also see blargg's cgb sound test
@@ -115,11 +121,6 @@ export class Channel2 {
         Channel2.lengthCounter -= 1;
       }
     }
-
-    // Finally, handle our Channel frequency
-    value &= 0x07;
-    Channel2.NRx4FrequencyMSB = value;
-    Channel2.frequency = (value << 8) | Channel2.NRx3FrequencyLSB;
   }
 
   // Channel Properties
