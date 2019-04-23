@@ -270,6 +270,10 @@ function calculateSound(numberOfCycles: i32): void {
       rightChannelSampleUnsignedByte = splitLowByte(mixedSample);
       setLeftAndRightOutputForAudioQueue(leftChannelSampleUnsignedByte + 1, rightChannelSampleUnsignedByte + 1, CHANNEL_2_BUFFER_LOCATION);
 
+      // TODO: Check if we are slanting our sample output?
+      // Hard to tell from audacity. But it seems that if the Square wave isn't
+      // Completely straight, we get crackling.
+
       // Channel 3
       mixedSample = mixChannelSamples(15, 15, channel3Sample, 15);
       leftChannelSampleUnsignedByte = splitHighByte(mixedSample);

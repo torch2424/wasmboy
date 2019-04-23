@@ -30,19 +30,6 @@ export default class AudioWaveform extends AudioVisualizer {
       // Update our waveform
       visualizationChannel.analyser.getFloatTimeDomainData(visualizationChannel.visualization);
 
-      // Count the values in the visualization
-      if (channelKey === 'channel2') {
-        // Count the values in the buffer
-        const valueCount = {};
-        visualizationChannel.visualization.forEach(value => {
-          if (valueCount[value] === undefined) {
-            valueCount[value] = 0;
-          }
-          valueCount[value]++;
-        });
-        console.log('channel2 visual buffer', valueCount);
-      }
-
       visualizationChannel.canvasContext.clearRect(
         0,
         0,
