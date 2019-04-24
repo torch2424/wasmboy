@@ -71,7 +71,7 @@ export function accumulateSound(numberOfCycles: i32): void {
 
   // Do Some downsampling magic
   let downSampleCycleCounter = Sound.downSampleCycleCounter;
-  downSampleCycleCounter += numberOfCycles * Sound.downSampleCycleMultiplier;
+  downSampleCycleCounter += numberOfCycles;
   let maxDownSampleCycles = Sound.maxDownSampleCycles();
   if (downSampleCycleCounter >= maxDownSampleCycles) {
     // Reset the downsample counter

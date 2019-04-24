@@ -97,11 +97,11 @@ export class Sound {
 
   // Also need to downsample our audio to average audio qualty
   // https://www.reddit.com/r/EmuDev/comments/5gkwi5/gb_apu_sound_emulation/
-  // Want to do 48000hz, so CpuRate / Sound Rate, 4194304 / 48000 ~ 87 cycles
+  // Want to do 44100hz, so CpuRate / Sound Rate, 4194304 / 44100 ~ 91 cycles
   static downSampleCycleCounter: i32 = 0x00;
-  static downSampleCycleMultiplier: i32 = 48000;
+  static sampleRate: i32 = 44100;
   static maxDownSampleCycles(): i32 {
-    return Cpu.CLOCK_SPEED();
+    return Cpu.CLOCK_SPEED() / Sound.sampleRate;
   }
 
   // Frame sequencer controls what should be updated and and ticked
@@ -243,7 +243,7 @@ function calculateSound(numberOfCycles: i32): void {
   SoundAccumulator.channel4Sample = channel4Sample;
 
   // Do Some downsampling magic
-  let downSampleCycleCounter = Sound.downSampleCycleCounter + numberOfCycles * Sound.downSampleCycleMultiplier;
+  let downSampleCycleCounter = Sound.downSampleCycleCounter + numberOfCycles;
   if (downSampleCycleCounter >= Sound.maxDownSampleCycles()) {
     // Reset the downsample counter
     // Don't set to zero to catch overflowed cycles
@@ -269,10 +269,6 @@ function calculateSound(numberOfCycles: i32): void {
       leftChannelSampleUnsignedByte = splitHighByte(mixedSample);
       rightChannelSampleUnsignedByte = splitLowByte(mixedSample);
       setLeftAndRightOutputForAudioQueue(leftChannelSampleUnsignedByte + 1, rightChannelSampleUnsignedByte + 1, CHANNEL_2_BUFFER_LOCATION);
-
-      // TODO: Check if we are slanting our sample output?
-      // Hard to tell from audacity. But it seems that if the Square wave isn't
-      // Completely straight, we get crackling.
 
       // Channel 3
       mixedSample = mixChannelSamples(15, 15, channel3Sample, 15);

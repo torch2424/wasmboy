@@ -79,7 +79,7 @@ WasmBoy.ResponsiveGamepad.onInputsChange(
   state => {
     // Quick Speed
     if (!quickSpeed && state.LEFT_TRIGGER) {
-      WasmBoy.setSpeed(2.5);
+      WasmBoy.setSpeed(3.0);
       quickSpeed = true;
       Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Quick Speed Hotkey! ⚡');
     } else if (quickSpeed && !state.LEFT_TRIGGER) {
