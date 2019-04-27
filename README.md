@@ -16,6 +16,8 @@
 
 [Core/Lib Documentation](https://github.com/torch2424/wasmBoy/wiki)
 
+[Talk given at WebAssembly SF March 28th, 2019](https://youtu.be/ZlL1nduatZQ)
+
 <!-- Header Images -->
 
 ![Pokemon Crystal Wasmboy Debugger Demo](./docs/images/debuggerDesktopDemo.gif)
@@ -290,6 +292,8 @@ Using the [gh-pages](https://www.npmjs.com/package/gh-pages) for debugger/demo d
 - Blargg. Wherever you may be, thank you for all the awesome tests!
 
 # Resources
+
+- [Talk given at WebAssembly SF March 28th, 2019](https://youtu.be/ZlL1nduatZQ), general Wasm / AssemblyScript introduction, overview of WasmBoy and how it works.
 
 - [awesome gbdev](https://github.com/avivace/awesome-gbdev) for reference material, and getting help from the awesome discord community
 
