@@ -161,13 +161,19 @@ export const WasmBoyUpdateCanvas = (isMobile, stateUpdateCallback) => {
 };
 
 // WasmBoy Plugin
-let graphicsPluginCalled = false;
+const pluginCalled = {};
 const DebuggerPlugin = {
   name: 'WasmBoy Debugger',
   graphics: imageDataArray => {
-    if (!graphicsPluginCalled) {
-      console.log('Graphics Plugin Called! Only Logging this once... imageDataArray:', imageDataArray);
-      graphicsPluginCalled = true;
+    if (!pluginCalled.graphics) {
+      console.log('Plugin "graphics" Called! Only Logging this once...', arguments);
+      pluginCalled.graphics = true;
+    }
+  },
+  audio: (audioContext, masterAudioNode, channelId) => {
+    if (!pluginCalled.audio) {
+      console.log('Plugin "audio" Called! Only Logging this once...', arguments);
+      pluginCalled.audio = true;
     }
   }
 };

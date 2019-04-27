@@ -18,6 +18,10 @@ export default class AudioVisualizer extends Component {
     this.title = title;
     this.analyserNodeGetDataKey = analyserNodeGetDataKey;
     this.audioVisualizations = {};
+
+    // Set up for our plugin
+    this.pluginAnalysers = {};
+    this.removePlugin = undefined;
   }
 
   componentDidMount() {
@@ -27,7 +31,8 @@ export default class AudioVisualizer extends Component {
       // And configure for a plesant looking result
       const analyser = audioChannels[audioChannelKey].audioContext.createAnalyser();
       analyser.smoothingTimeConstant = 0.4;
-      audioChannels[audioChannelKey].additionalAudioNodes.push(analyser);
+
+      this.pluginAnalysers[audioChannelKey] = analyser;
 
       let visualization;
       if (this.analyserNodeGetDataKey.includes('Float')) {
@@ -52,6 +57,14 @@ export default class AudioVisualizer extends Component {
       };
     });
 
+    // Add a plugin for our analysers
+    this.removePlugin = WasmBoy.addPlugin({
+      name: 'WasmBoy Debugger Visualizer',
+      audio: (audioContext, audioNode, channelId) => {
+        return this.pluginAnalysers[channelId];
+      }
+    });
+
     this.update();
     // Update at ~30fps
     updateInterval = setInterval(() => this.update(), 32);
@@ -59,14 +72,10 @@ export default class AudioVisualizer extends Component {
 
   componentWillUnmount() {
     clearInterval(updateInterval);
-
-    Object.keys(audioChannels).forEach(audioChannelKey => {
-      // Remove our analyser nodes
-      audioChannels[audioChannelKey].additionalAudioNodes.splice(
-        audioChannels[audioChannelKey].additionalAudioNodes.indexOf(this.audioVisualizations[audioChannelKey].analyser),
-        1
-      );
-    });
+    if (this.removePlugin) {
+      this.removePlugin();
+      this.removePlugin = undefined;
+    }
   }
 
   update() {
