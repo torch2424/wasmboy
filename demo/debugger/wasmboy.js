@@ -62,22 +62,9 @@ const WasmBoyDefaultOptions = {
       console.log('Save State Callback Called! Only Logging this once... saveStateObject:', saveStateObject);
       saveStateCallbackCalled = true;
     }
-
-    // Function called everytime a savestate occurs
-    // Used by the WasmBoySystemControls to show screenshots on save states
-    let canvasElement;
-    if (isMobileCanvas) {
-      canvasElement = getMobileCanvasElement();
-    } else {
-      canvasElement = getDesktopCanvasElement();
-    }
-
-    if (canvasElement) {
-      saveStateObject.screenshotCanvasDataURL = canvasElement.toDataURL();
-    }
   },
   breakpointCallback: () => {
-    Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Reach Breakpoint! 🛑');
+    console.log('breakpoint Callback Called!');
   },
   onReady: () => {
     console.log('onReady Callback Called!');
@@ -166,17 +153,46 @@ const DebuggerPlugin = {
   name: 'WasmBoy Debugger',
   graphics: imageDataArray => {
     if (!pluginCalled.graphics) {
-      console.log('Plugin "graphics" Called! Only Logging this once...', arguments);
+      console.log('Plugin "graphics" called! Only Logging this once...', imageDataArray);
       pluginCalled.graphics = true;
     }
   },
   audio: (audioContext, masterAudioNode, channelId) => {
     if (!pluginCalled.audio) {
-      console.log('Plugin "audio" Called! Only Logging this once...', arguments);
+      console.log('Plugin "audio" called! Only Logging this once...', audioContext, masterAudioNode, channelId);
       pluginCalled.audio = true;
     }
-  }
-  // TODO: Other plugin callbacks
+  },
+  saveState: saveStateObject => {
+    if (!pluginCalled.saveState) {
+      console.log('Plugin "saveState" called! Only Logging this once...', saveStateObject);
+      pluginCalled.saveState = true;
+    }
+
+    // Function called everytime a savestate occurs
+    // Used by the WasmBoySystemControls to show screenshots on save states
+    let canvasElement;
+    if (isMobileCanvas) {
+      canvasElement = getMobileCanvasElement();
+    } else {
+      canvasElement = getDesktopCanvasElement();
+    }
+
+    if (canvasElement) {
+      saveStateObject.screenshotCanvasDataURL = canvasElement.toDataURL();
+    }
+  },
+  setCanvas: canvasElement => {
+    console.log('Plugin "setCanvas" called!', canvasElement);
+  },
+  breakpoint: () => {
+    console.log('Plugin "breakpoint" called!');
+    Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Reach Breakpoint! 🛑');
+  },
+  ready: () => console.log('Plugin "ready" called!'),
+  play: () => console.log('Plugin "play" called!'),
+  pause: () => console.log('Plugin "pause" called!'),
+  loadedAndStarted: () => console.log('Plugin "loadedAndStarted" called!')
 };
 
 WasmBoy.addPlugin(DebuggerPlugin);
