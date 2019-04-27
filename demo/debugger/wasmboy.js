@@ -176,6 +176,7 @@ const DebuggerPlugin = {
       pluginCalled.audio = true;
     }
   }
+  // TODO: Other plugin callbacks
 };
 
 WasmBoy.addPlugin(DebuggerPlugin);
