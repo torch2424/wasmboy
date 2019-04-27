@@ -159,3 +159,17 @@ export const WasmBoyUpdateCanvas = (isMobile, stateUpdateCallback) => {
 
   return true;
 };
+
+// WasmBoy Plugin
+let graphicsPluginCalled = false;
+const DebuggerPlugin = {
+  name: 'WasmBoy Debugger',
+  graphics: imageDataArray => {
+    if (!graphicsPluginCalled) {
+      console.log('Graphics Plugin Called! Only Logging this once... imageDataArray:', imageDataArray);
+      graphicsPluginCalled = true;
+    }
+  }
+};
+
+WasmBoy.addPlugin(DebuggerPlugin);
