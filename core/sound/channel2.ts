@@ -3,6 +3,7 @@
 // Simple Square Channel
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
 import { getSaveStateMemoryOffset } from '../core';
+import { Sound } from './sound';
 import { isDutyCycleClockPositiveOrNegativeForWaveform } from './duty';
 import { Cpu } from '../cpu/index';
 import {
@@ -11,13 +12,19 @@ import {
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
-import { checkBitOnByte } from '../helpers/index';
+import { checkBitOnByte, log } from '../helpers/index';
 
 export class Channel2 {
   // Cycle Counter for our sound accumulator
   static cycleCounter: i32 = 0;
 
+  // Max Length of our Length Load
+  static MAX_LENGTH: i32 = 64;
+
   // Squarewave channel with volume envelope functions only.
+
+  // Only used by register reading
+  static readonly memoryLocationNRx0: i32 = 0xff15;
 
   // NR21 -> Sound length/Wave pattern duty (R/W)
   static readonly memoryLocationNRx1: i32 = 0xff16;
@@ -32,7 +39,7 @@ export class Channel2 {
     // Channel length is determined by 64 (or 256 if channel 3), - the length load
     // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
     // Note, this will be different for channel 3
-    Channel2.lengthCounter = 64 - Channel2.NRx1LengthLoad;
+    Channel2.lengthCounter = Channel2.MAX_LENGTH - Channel2.NRx1LengthLoad;
   }
 
   // NR22 -> Volume Envelope (R/W)
@@ -47,7 +54,14 @@ export class Channel2 {
     Channel2.NRx2EnvelopePeriod = value & 0x07;
 
     // Also, get our channel is dac enabled
-    Channel2.isDacEnabled = (value & 0xf8) > 0;
+    let isDacEnabled = (value & 0xf8) > 0;
+    Channel2.isDacEnabled = isDacEnabled;
+
+    // Blargg length test
+    // Disabling DAC should disable channel immediately
+    if (!isDacEnabled) {
+      Channel2.isEnabled = isDacEnabled;
+    }
   }
 
   // NR23 -> Frequency lo (W)
@@ -67,12 +81,46 @@ export class Channel2 {
   static NRx4LengthEnabled: boolean = false;
   static NRx4FrequencyMSB: i32 = 0;
   static updateNRx4(value: i32): void {
-    Channel2.NRx4LengthEnabled = checkBitOnByte(6, value);
-    value &= 0x07;
-    Channel2.NRx4FrequencyMSB = value;
+    // Handle our Channel frequency first
+    // As this is modified if we trigger for length.
+    let frequencyMSB = value & 0x07;
+    Channel2.NRx4FrequencyMSB = frequencyMSB;
+    Channel2.frequency = (frequencyMSB << 8) | Channel2.NRx3FrequencyLSB;
 
-    // Update Channel Frequency
-    Channel2.frequency = (value << 8) | Channel2.NRx3FrequencyLSB;
+    // Obscure behavior
+    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Obscure_Behavior
+    // Also see blargg's cgb sound test
+    // Extra length clocking occurs when writing to NRx4,
+    // when the frame sequencer's next step is one that,
+    // doesn't clock the length counter.
+    let frameSequencer = Sound.frameSequencer;
+    let doesNextFrameSequencerUpdateLength = (frameSequencer & 1) === 1;
+    let isBeingLengthEnabled = !Channel2.NRx4LengthEnabled && checkBitOnByte(6, value);
+    if (!doesNextFrameSequencerUpdateLength) {
+      if (Channel2.lengthCounter > 0 && isBeingLengthEnabled) {
+        Channel2.lengthCounter -= 1;
+
+        if (!checkBitOnByte(7, value) && Channel2.lengthCounter === 0) {
+          Channel2.isEnabled = false;
+        }
+      }
+    }
+
+    // Set the length enabled from the value
+    Channel2.NRx4LengthEnabled = checkBitOnByte(6, value);
+
+    // Trigger out channel, unfreeze length if frozen
+    // Triggers should happen after obscure behavior
+    // See test 11 for trigger
+    if (checkBitOnByte(7, value)) {
+      Channel2.trigger();
+
+      // When we trigger on the obscure behavior, and we reset the length Counter to max
+      // We need to clock
+      if (!doesNextFrameSequencerUpdateLength && Channel2.lengthCounter === Channel2.MAX_LENGTH && Channel2.NRx4LengthEnabled) {
+        Channel2.lengthCounter -= 1;
+      }
+    }
   }
 
   // Channel Properties
@@ -142,9 +190,9 @@ export class Channel2 {
 
   static getSample(numberOfCycles: i32): i32 {
     // Decrement our channel timer
-    let frequencyTimer = Channel2.frequencyTimer - numberOfCycles;
-    Channel2.frequencyTimer = frequencyTimer;
-    if (frequencyTimer <= 0) {
+    let frequencyTimer = Channel2.frequencyTimer;
+    frequencyTimer -= numberOfCycles;
+    while (frequencyTimer <= 0) {
       // Get the amount that overflowed so we don't drop cycles
       let overflowAmount = abs(frequencyTimer);
 
@@ -152,13 +200,16 @@ export class Channel2 {
       // A square channel's frequency timer period is set to (2048-frequency)*4.
       // Four duty cycles are available, each waveform taking 8 frequency timer clocks to cycle through:
       Channel2.resetTimer();
-      Channel2.frequencyTimer -= overflowAmount;
+      frequencyTimer = Channel2.frequencyTimer;
+      frequencyTimer -= overflowAmount;
 
       // Also increment our duty cycle
       // What is duty? https://en.wikipedia.org/wiki/Duty_cycle
       // Duty cycle for square wave: http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
       Channel2.waveFormPositionOnDuty = (Channel2.waveFormPositionOnDuty + 1) & 7;
     }
+
+    Channel2.frequencyTimer = frequencyTimer;
 
     // Get our ourput volume
     let outputVolume = 0;
@@ -190,8 +241,9 @@ export class Channel2 {
   //http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Trigger_Event
   static trigger(): void {
     Channel2.isEnabled = true;
+    // Set length to maximum done in write
     if (Channel2.lengthCounter === 0) {
-      Channel2.lengthCounter = 64;
+      Channel2.lengthCounter = Channel2.MAX_LENGTH;
     }
 
     // Reset our timer

@@ -18,6 +18,17 @@ export default class HelpComponent extends Component {
             </video>
           </div>
         </div>
+        <h2>Hotkeys</h2>
+        <div>
+          <ul>
+            <li>
+              <b>Left Trigger, Right Trigger, Q</b> - Double Speed
+            </li>
+            <li>
+              <b>Special, Space</b> - Play / Pause
+            </li>
+          </ul>
+        </div>
         <h2>How to report bugs / suggestions</h2>
         <div>
           Please feel free to file any bugs, suggestions, issues, etc.. At the{' '}

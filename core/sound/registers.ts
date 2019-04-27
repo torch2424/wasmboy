@@ -8,13 +8,17 @@ import { Channel1 } from './channel1';
 import { Channel2 } from './channel2';
 import { Channel3 } from './channel3';
 import { Channel4 } from './channel4';
-import { eightBitLoadFromGBMemory, eightBitStoreIntoGBMemory } from '../memory/index';
-import { checkBitOnByte, setBitOnByte, resetBitOnByte } from '../helpers/index';
+import { eightBitLoadFromGBMemory, eightBitStoreIntoGBMemory, eightBitStoreIntoGBMemoryWithTraps } from '../memory/index';
+import { checkBitOnByte, setBitOnByte, resetBitOnByte, log } from '../helpers/index';
 
 // Function to check and handle writes to sound registers
 // Inlined because closure compiler inlines
+// NOTE: For write traps, return false = don't write to memory,
+// return true = allow the write to memory
 export function SoundRegisterWriteTraps(offset: i32, value: i32): boolean {
   if (offset !== Sound.memoryLocationNR52 && !Sound.NR52IsSoundEnabled) {
+    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Power_Control
+    // When sound is turned off / enabled
     // Block all writes to any sound register EXCEPT NR52!
     // This is under the assumption that the check for
     // offset >= 0xFF10 && offset <= 0xFF26
@@ -75,28 +79,16 @@ export function SoundRegisterWriteTraps(offset: i32, value: i32): boolean {
       return true;
     // Check our NRx4 registers to trap our trigger bits
     case Channel1.memoryLocationNRx4:
-      if (checkBitOnByte(7, value)) {
-        Channel1.updateNRx4(value);
-        Channel1.trigger();
-      }
+      Channel1.updateNRx4(value);
       return true;
     case Channel2.memoryLocationNRx4:
-      if (checkBitOnByte(7, value)) {
-        Channel2.updateNRx4(value);
-        Channel2.trigger();
-      }
+      Channel2.updateNRx4(value);
       return true;
     case Channel3.memoryLocationNRx4:
-      if (checkBitOnByte(7, value)) {
-        Channel3.updateNRx4(value);
-        Channel3.trigger();
-      }
+      Channel3.updateNRx4(value);
       return true;
     case Channel4.memoryLocationNRx4:
-      if (checkBitOnByte(7, value)) {
-        Channel4.updateNRx4(value);
-        Channel4.trigger();
-      }
+      Channel4.updateNRx4(value);
       return true;
     // Tell the sound accumulator if volumes changes
     case Sound.memoryLocationNR50:
@@ -110,12 +102,34 @@ export function SoundRegisterWriteTraps(offset: i32, value: i32): boolean {
       return true;
     case Sound.memoryLocationNR52:
       // Reset all registers except NR52
-      Sound.updateNR52(value);
-      if (!checkBitOnByte(7, value)) {
+
+      // See if we were enabled, then update the register.
+      let wasNR52Enabled = Sound.NR52IsSoundEnabled;
+
+      // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Power_Control
+      // When powered on, the frame sequencer is reset so that the next step will be 0,
+      // the square duty units are reset to the first step of the waveform,
+      // and the wave channel's sample buffer is reset to 0.
+      if (!wasNR52Enabled && checkBitOnByte(7, value)) {
+        Sound.frameSequencer = 0x07;
+        Channel1.waveFormPositionOnDuty = 0x00;
+        Channel2.waveFormPositionOnDuty = 0x00;
+
+        // TODO: Wave Channel Sample Buffer?
+        // I don't think we clear wave RAM here...
+      }
+
+      // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Power_Control
+      // When powered off, all registers (NR10-NR51) are instantly written with zero
+      // and any writes to those registers are ignored while power remains off
+      if (wasNR52Enabled && !checkBitOnByte(7, value)) {
         for (let i = 0xff10; i < 0xff26; ++i) {
-          eightBitStoreIntoGBMemory(i, 0x00);
+          eightBitStoreIntoGBMemoryWithTraps(i, 0x00);
         }
       }
+
+      // Need to update our new value here, that way writes go through :p
+      Sound.updateNR52(value);
       return true;
   }
 
@@ -126,44 +140,149 @@ export function SoundRegisterWriteTraps(offset: i32, value: i32): boolean {
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
 // Inlined because closure compiler inlines
 export function SoundRegisterReadTraps(offset: i32): i32 {
-  // TODO: OR All Registers
+  // Registers must be OR'd with values when being read
+  // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
 
-  // This will fix bugs in orcale of ages :)
-  if (offset === Sound.memoryLocationNR52) {
-    // Get our registerNR52
-    let registerNR52 = eightBitLoadFromGBMemory(Sound.memoryLocationNR52);
-
-    // Knock off lower 7 bits
-    registerNR52 &= 0x80;
-
-    // Set our lower 4 bits to our channel isEnabled statuses
-    if (Channel1.isEnabled) {
-      setBitOnByte(0, registerNR52);
-    } else {
-      resetBitOnByte(0, registerNR52);
+  switch (offset) {
+    // Handle NRx0 on Channels
+    case Channel1.memoryLocationNRx0: {
+      let register = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx0);
+      return register | 0x80;
+    }
+    case Channel2.memoryLocationNRx0: {
+      let register = eightBitLoadFromGBMemory(Channel2.memoryLocationNRx0);
+      return register | 0xff;
+    }
+    case Channel3.memoryLocationNRx0: {
+      let register = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx0);
+      return register | 0x7f;
+    }
+    case Channel4.memoryLocationNRx0: {
+      let register = eightBitLoadFromGBMemory(Channel4.memoryLocationNRx0);
+      return register | 0xff;
+    }
+    case Sound.memoryLocationNR50: {
+      let register = eightBitLoadFromGBMemory(Sound.memoryLocationNR50);
+      return register | 0x00;
     }
 
-    if (Channel2.isEnabled) {
-      setBitOnByte(1, registerNR52);
-    } else {
-      resetBitOnByte(1, registerNR52);
+    // Handle NRx1 on Channels
+    case Channel1.memoryLocationNRx1: {
+      let register = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx1);
+      return register | 0x3f;
+    }
+    case Channel2.memoryLocationNRx1: {
+      let register = eightBitLoadFromGBMemory(Channel2.memoryLocationNRx1);
+      return register | 0x3f;
+    }
+    case Channel3.memoryLocationNRx1: {
+      let register = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx1);
+      return register | 0xff;
+    }
+    case Channel4.memoryLocationNRx1: {
+      let register = eightBitLoadFromGBMemory(Channel4.memoryLocationNRx1);
+      return register | 0xff;
+    }
+    case Sound.memoryLocationNR51: {
+      let register = eightBitLoadFromGBMemory(Sound.memoryLocationNR51);
+      return register | 0x00;
     }
 
-    if (Channel3.isEnabled) {
-      setBitOnByte(2, registerNR52);
-    } else {
-      resetBitOnByte(2, registerNR52);
+    // Handle NRx2 on Channels
+    case Channel1.memoryLocationNRx2: {
+      let register = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx2);
+      return register | 0x00;
+    }
+    case Channel2.memoryLocationNRx2: {
+      let register = eightBitLoadFromGBMemory(Channel2.memoryLocationNRx2);
+      return register | 0x00;
+    }
+    case Channel3.memoryLocationNRx2: {
+      let register = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx2);
+      return register | 0x9f;
+    }
+    case Channel4.memoryLocationNRx2: {
+      let register = eightBitLoadFromGBMemory(Channel4.memoryLocationNRx2);
+      return register | 0x00;
+    }
+    case Sound.memoryLocationNR52: {
+      // This will fix bugs in orcale of ages :)
+
+      // Start our registerNR52
+      let registerNR52 = 0x00;
+
+      // Set the first bit to the sound paower status
+      if (Sound.NR52IsSoundEnabled) {
+        registerNR52 = setBitOnByte(7, registerNR52);
+      } else {
+        registerNR52 = resetBitOnByte(7, registerNR52);
+      }
+
+      // Set our lower 4 bits to our channel length statuses
+      if (Channel1.isEnabled) {
+        registerNR52 = setBitOnByte(0, registerNR52);
+      } else {
+        registerNR52 = resetBitOnByte(0, registerNR52);
+      }
+
+      if (Channel2.isEnabled) {
+        registerNR52 = setBitOnByte(1, registerNR52);
+      } else {
+        registerNR52 = resetBitOnByte(1, registerNR52);
+      }
+
+      if (Channel3.isEnabled) {
+        registerNR52 = setBitOnByte(2, registerNR52);
+      } else {
+        registerNR52 = resetBitOnByte(2, registerNR52);
+      }
+
+      if (Channel4.isEnabled) {
+        registerNR52 = setBitOnByte(3, registerNR52);
+      } else {
+        registerNR52 = resetBitOnByte(3, registerNR52);
+      }
+
+      // Or from the table
+      registerNR52 |= 0x70;
+      return registerNR52;
     }
 
-    if (Channel4.isEnabled) {
-      setBitOnByte(3, registerNR52);
-    } else {
-      resetBitOnByte(3, registerNR52);
+    // Handle NRx3 on Channels
+    case Channel1.memoryLocationNRx3: {
+      let register = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx3);
+      return register | 0xff;
+    }
+    case Channel2.memoryLocationNRx3: {
+      let register = eightBitLoadFromGBMemory(Channel2.memoryLocationNRx3);
+      return register | 0xff;
+    }
+    case Channel3.memoryLocationNRx3: {
+      let register = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx3);
+      return register | 0xff;
+    }
+    case Channel4.memoryLocationNRx3: {
+      let register = eightBitLoadFromGBMemory(Channel4.memoryLocationNRx3);
+      return register | 0x00;
     }
 
-    // Or from the table
-    registerNR52 |= 0x70;
-    return registerNR52;
+    // Handle NRx4 on Channels
+    case Channel1.memoryLocationNRx4: {
+      let register = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx4);
+      return register | 0xbf;
+    }
+    case Channel2.memoryLocationNRx4: {
+      let register = eightBitLoadFromGBMemory(Channel2.memoryLocationNRx4);
+      return register | 0xbf;
+    }
+    case Channel3.memoryLocationNRx4: {
+      let register = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx4);
+      return register | 0xbf;
+    }
+    case Channel4.memoryLocationNRx4: {
+      let register = eightBitLoadFromGBMemory(Channel4.memoryLocationNRx4);
+      return register | 0xbf;
+    }
   }
 
   return -1;

@@ -3,6 +3,7 @@
 // Noise Channel
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Noise_Channel
 import { getSaveStateMemoryOffset } from '../core';
+import { Sound } from './sound';
 import { Cpu } from '../cpu/index';
 import { eightBitStoreIntoGBMemory, loadBooleanDirectlyFromWasmMemory, storeBooleanDirectlyToWasmMemory } from '../memory/index';
 import { checkBitOnByte } from '../helpers/index';
@@ -11,8 +12,15 @@ export class Channel4 {
   // Cycle Counter for our sound accumulator
   static cycleCounter: i32 = 0;
 
+  // Max Length of our Length Load
+  static MAX_LENGTH: i32 = 64;
+
   // Channel 4
   // 'white noise' channel with volume envelope functions.
+
+  // Only used by register reading
+  static readonly memoryLocationNRx0: i32 = 0xff1f;
+
   // NR41 -> Sound length (R/W)
   static readonly memoryLocationNRx1: i32 = 0xff20;
   // --LL LLLL Length load (64-L)
@@ -24,7 +32,7 @@ export class Channel4 {
     // Channel length is determined by 64 (or 256 if channel 3), - the length load
     // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
     // Note, this will be different for channel 3
-    Channel4.lengthCounter = 64 - Channel4.NRx1LengthLoad;
+    Channel4.lengthCounter = Channel4.MAX_LENGTH - Channel4.NRx1LengthLoad;
   }
 
   // NR42 -> Volume Envelope (R/W)
@@ -39,7 +47,14 @@ export class Channel4 {
     Channel4.NRx2EnvelopePeriod = value & 0x07;
 
     // Also, get our channel is dac enabled
-    Channel4.isDacEnabled = (value & 0xf8) > 0;
+    let isDacEnabled = (value & 0xf8) > 0;
+    Channel4.isDacEnabled = isDacEnabled;
+
+    // Blargg length test
+    // Disabling DAC should disable channel immediately
+    if (!isDacEnabled) {
+      Channel4.isEnabled = isDacEnabled;
+    }
   }
 
   // NR43 -> Polynomial Counter (R/W)
@@ -64,7 +79,40 @@ export class Channel4 {
   // TL-- ---- Trigger, Length enable
   static NRx4LengthEnabled: boolean = false;
   static updateNRx4(value: i32): void {
+    // Obscure behavior
+    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Obscure_Behavior
+    // Also see blargg's cgb sound test
+    // Extra length clocking occurs when writing to NRx4,
+    // when the frame sequencer's next step is one that,
+    // doesn't clock the length counter.
+    let frameSequencer = Sound.frameSequencer;
+    let doesNextFrameSequencerUpdateLength = (frameSequencer & 1) === 1;
+    let isBeingLengthEnabled = !Channel4.NRx4LengthEnabled && checkBitOnByte(6, value);
+    if (!doesNextFrameSequencerUpdateLength) {
+      if (Channel4.lengthCounter > 0 && isBeingLengthEnabled) {
+        Channel4.lengthCounter -= 1;
+
+        if (!checkBitOnByte(7, value) && Channel4.lengthCounter === 0) {
+          Channel4.isEnabled = false;
+        }
+      }
+    }
+
+    // Set the length enabled from the value
     Channel4.NRx4LengthEnabled = checkBitOnByte(6, value);
+
+    // Trigger out channel, unfreeze length if frozen
+    // Triggers should happen after obscure behavior
+    // See test 11 for trigger
+    if (checkBitOnByte(7, value)) {
+      Channel4.trigger();
+
+      // When we trigger on the obscure behavior, and we reset the length Counter to max
+      // We need to clock
+      if (!doesNextFrameSequencerUpdateLength && Channel4.lengthCounter === Channel4.MAX_LENGTH && Channel4.NRx4LengthEnabled) {
+        Channel4.lengthCounter -= 1;
+      }
+    }
   }
 
   // Channel Properties
@@ -125,6 +173,8 @@ export class Channel4 {
     let frequencyTimer = Channel4.frequencyTimer;
     frequencyTimer -= numberOfCycles;
 
+    // TODO: This can't be a while loop to use up all the cycles,
+    // Since noise is psuedo random and the period can be anything
     if (frequencyTimer <= 0) {
       // Get the amount that overflowed so we don't drop cycles
       let overflowAmount = abs(frequencyTimer);
@@ -157,6 +207,12 @@ export class Channel4 {
       }
       Channel4.linearFeedbackShiftRegister = linearFeedbackShiftRegister;
     }
+
+    // Make sure period never becomes negative
+    if (frequencyTimer < 0) {
+      frequencyTimer = 0;
+    }
+
     Channel4.frequencyTimer = frequencyTimer;
 
     // Get our ourput volume, set to zero for silence
@@ -188,8 +244,9 @@ export class Channel4 {
   //http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Trigger_Event
   static trigger(): void {
     Channel4.isEnabled = true;
+    // Length counter maximum handled by write
     if (Channel4.lengthCounter === 0) {
-      Channel4.lengthCounter = 64;
+      Channel4.lengthCounter = Channel4.MAX_LENGTH;
     }
 
     // Reset our timers

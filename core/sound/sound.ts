@@ -24,7 +24,7 @@ import { Channel4 } from './channel4';
 import { Cpu } from '../cpu/index';
 import { Config } from '../config';
 import { eightBitStoreIntoGBMemory } from '../memory/index';
-import { checkBitOnByte, concatenateBytes, splitLowByte, splitHighByte } from '../helpers/index';
+import { checkBitOnByte, concatenateBytes, splitLowByte, splitHighByte, log } from '../helpers/index';
 import { i32Portable } from '../portable/portable';
 
 export class Sound {
@@ -97,11 +97,11 @@ export class Sound {
 
   // Also need to downsample our audio to average audio qualty
   // https://www.reddit.com/r/EmuDev/comments/5gkwi5/gb_apu_sound_emulation/
-  // Want to do 48000hz, so CpuRate / Sound Rate, 4194304 / 48000 ~ 87 cycles
+  // Want to do 44100hz, so CpuRate / Sound Rate, 4194304 / 44100 ~ 91 cycles
   static downSampleCycleCounter: i32 = 0x00;
-  static downSampleCycleMultiplier: i32 = 48000;
+  static sampleRate: i32 = 44100;
   static maxDownSampleCycles(): i32 {
-    return Cpu.CLOCK_SPEED();
+    return Cpu.CLOCK_SPEED() / Sound.sampleRate;
   }
 
   // Frame sequencer controls what should be updated and and ticked
@@ -243,7 +243,7 @@ function calculateSound(numberOfCycles: i32): void {
   SoundAccumulator.channel4Sample = channel4Sample;
 
   // Do Some downsampling magic
-  let downSampleCycleCounter = Sound.downSampleCycleCounter + numberOfCycles * Sound.downSampleCycleMultiplier;
+  let downSampleCycleCounter = Sound.downSampleCycleCounter + numberOfCycles;
   if (downSampleCycleCounter >= Sound.maxDownSampleCycles()) {
     // Reset the downsample counter
     // Don't set to zero to catch overflowed cycles
@@ -310,9 +310,10 @@ function updateFrameSequencer(numberOfCycles: i32): boolean {
     frameSequenceCycleCounter -= maxFrameSequenceCycles;
     Sound.frameSequenceCycleCounter = frameSequenceCycleCounter;
 
-    // Check our frame sequencer
+    // Update our frame sequencer
     // https://gist.github.com/drhelius/3652407
-    let frameSequencer = Sound.frameSequencer;
+    let frameSequencer = (Sound.frameSequencer + 1) & 7;
+
     switch (frameSequencer) {
       case 0:
         // Update Length on Channels
@@ -357,8 +358,8 @@ function updateFrameSequencer(numberOfCycles: i32): boolean {
         break;
     }
 
-    // Update our frame sequencer
-    Sound.frameSequencer = (frameSequencer + 1) & 7;
+    // Save our frame sequencer
+    Sound.frameSequencer = frameSequencer;
     return true;
   } else {
     Sound.frameSequenceCycleCounter = frameSequenceCycleCounter;

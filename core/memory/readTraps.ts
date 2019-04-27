@@ -2,7 +2,7 @@ import { Memory } from './memory';
 import { Cpu } from '../cpu/index';
 import { Graphics } from '../graphics/graphics';
 import { Lcd } from '../graphics/index';
-import { batchProcessAudio, SoundRegisterReadTraps } from '../sound/index';
+import { batchProcessAudio, SoundRegisterReadTraps, Channel3 } from '../sound/index';
 import { eightBitStoreIntoGBMemory } from './store';
 import { eightBitLoadFromGBMemory } from './load';
 import { Joypad, getJoypadState } from '../joypad/index';
@@ -90,10 +90,21 @@ export function checkReadTraps(offset: i32): i32 {
     batchProcessAudio();
     return SoundRegisterReadTraps(offset);
   }
+
   // FF27 - FF2F not used
+  // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Register_Reading
+  // Always read as 0xFF
+  if (offset >= 0xff27 && offset <= 0xff2f) {
+    return 0xff;
+  }
+
   // Final Wave Table for Channel 3
   if (offset >= 0xff30 && offset <= 0xff3f) {
     batchProcessAudio();
+
+    if (Channel3.isEnabled) {
+      return Channel3.handleWaveRamRead();
+    }
     return -1;
   }
 

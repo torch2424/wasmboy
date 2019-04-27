@@ -2,7 +2,7 @@ import { Memory } from './memory';
 import { Cpu } from '../cpu/index';
 import { Graphics } from '../graphics/graphics';
 import { Palette, writeColorPaletteToMemory, Lcd } from '../graphics/index';
-import { batchProcessAudio, SoundRegisterWriteTraps } from '../sound/index';
+import { batchProcessAudio, SoundRegisterWriteTraps, Channel3 } from '../sound/index';
 import { Timers, batchProcessTimers } from '../timers/index';
 import { Serial } from '../serial/serial';
 import { Interrupts } from '../interrupts/index';
@@ -110,9 +110,17 @@ export function checkWriteTraps(offset: i32, value: i32): boolean {
   }
 
   // FF27 - FF2F not used
+
   // Final Wave Table for Channel 3
   if (offset >= 0xff30 && offset <= 0xff3f) {
     batchProcessAudio();
+
+    // Need to handle the write if channel 3 is enabled
+    if (Channel3.isEnabled) {
+      Channel3.handleWaveRamWrite(value);
+      return false;
+    }
+    return true;
   }
 
   // Other Memory effects fomr read/write to Lcd/Graphics

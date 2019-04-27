@@ -17,6 +17,7 @@ const { goldenFileCompareOrCreate, goldenImageDataArrayCompare } = require('./go
 const TEST_ROM_DEFAULT_TIMEOUT = 7500;
 const TEST_ROM_TIMEOUT = {};
 TEST_ROM_TIMEOUT['cpu_instrs/cpu_instrs.gb'] = 20500;
+TEST_ROM_TIMEOUT['cgb_sound/cgb_sound.gb'] = 25500;
 
 // Print our version
 console.log(`WasmBoy version: ${WasmBoy.getVersion()}`);

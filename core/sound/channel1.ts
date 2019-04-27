@@ -4,6 +4,7 @@
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
 // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Frequency_Sweep
 import { getSaveStateMemoryOffset } from '../core';
+import { Sound } from './sound';
 import { isDutyCycleClockPositiveOrNegativeForWaveform } from './duty';
 import { Cpu } from '../cpu/index';
 import {
@@ -12,11 +13,14 @@ import {
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
-import { checkBitOnByte } from '../helpers/index';
+import { checkBitOnByte, log } from '../helpers/index';
 
 export class Channel1 {
   // Cycle Counter for our sound accumulator
   static cycleCounter: i32 = 0;
+
+  // Max Length of our Length Load
+  static MAX_LENGTH: i32 = 64;
 
   // Squarewave channel with volume envelope and frequency sweep functions.
   // NR10 -> Sweep Register R/W
@@ -26,9 +30,20 @@ export class Channel1 {
   static NRx0Negate: boolean = false;
   static NRx0SweepShift: i32 = 0;
   static updateNRx0(value: i32): void {
+    let oldSweepNegate = Channel1.NRx0Negate;
+
     Channel1.NRx0SweepPeriod = (value & 0x70) >> 4;
     Channel1.NRx0Negate = checkBitOnByte(3, value);
     Channel1.NRx0SweepShift = value & 0x07;
+
+    // Obscure Behavior
+    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
+    // Clearing the sweep negate mode bit in NR10 after at least one sweep calculation has been made,
+    // using the negate mode since the last trigger causes the channel to be immediately disabled.
+    // This prevents you from having the sweep lower the frequency then raise the frequency without a trigger inbetween.
+    if (oldSweepNegate && (!Channel1.NRx0Negate && Channel1.sweepNegateShouldDisableChannelOnClear)) {
+      Channel1.isEnabled = false;
+    }
   }
 
   // NR11 -> Sound length/Wave pattern duty (R/W)
@@ -44,7 +59,7 @@ export class Channel1 {
     // Channel length is determined by 64 (or 256 if channel 3), - the length load
     // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
     // Note, this will be different for channel 3
-    Channel1.lengthCounter = 64 - Channel1.NRx1LengthLoad;
+    Channel1.lengthCounter = Channel1.MAX_LENGTH - Channel1.NRx1LengthLoad;
   }
 
   // NR12 -> Volume Envelope (R/W)
@@ -59,7 +74,14 @@ export class Channel1 {
     Channel1.NRx2EnvelopePeriod = value & 0x07;
 
     // Also, get our channel is dac enabled
-    Channel1.isDacEnabled = (value & 0xf8) > 0;
+    let isDacEnabled = (value & 0xf8) > 0;
+    Channel1.isDacEnabled = isDacEnabled;
+
+    // Blargg length test
+    // Disabling DAC should disable channel immediately
+    if (!isDacEnabled) {
+      Channel1.isEnabled = isDacEnabled;
+    }
   }
 
   // NR13 -> Frequency lo (W)
@@ -78,13 +100,51 @@ export class Channel1 {
   // TL-- -FFF Trigger, Length enable, Frequency MSB
   static NRx4LengthEnabled: boolean = false;
   static NRx4FrequencyMSB: i32 = 0;
+  // NOTE: Order in which these events happen are very particular
+  // And globals can be affected by other functions
+  // Thus, optimizations here should be extremely careful
   static updateNRx4(value: i32): void {
-    Channel1.NRx4LengthEnabled = checkBitOnByte(6, value);
-    value &= 0x07;
-    Channel1.NRx4FrequencyMSB = value;
+    // Handle our Channel frequency first
+    // As this is modified if we trigger for length.
+    let frequencyMSB = value & 0x07;
+    Channel1.NRx4FrequencyMSB = frequencyMSB;
+    Channel1.frequency = (frequencyMSB << 8) | Channel1.NRx3FrequencyLSB;
 
-    // Update Channel Frequency
-    Channel1.frequency = (value << 8) | Channel1.NRx3FrequencyLSB;
+    // Obscure behavior
+    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Obscure_Behavior
+    // Also see blargg's cgb sound test
+    // Extra length clocking occurs when writing to NRx4,
+    // when the frame sequencer's next step is one that,
+    // doesn't clock the length counter.
+    let frameSequencer = Sound.frameSequencer;
+    let doesNextFrameSequencerUpdateLength = (frameSequencer & 1) === 1;
+    let isBeingLengthEnabled = !Channel1.NRx4LengthEnabled && checkBitOnByte(6, value);
+    if (!doesNextFrameSequencerUpdateLength) {
+      // Check lengthEnable
+      if (Channel1.lengthCounter > 0 && isBeingLengthEnabled) {
+        Channel1.lengthCounter -= 1;
+
+        if (!checkBitOnByte(7, value) && Channel1.lengthCounter === 0) {
+          Channel1.isEnabled = false;
+        }
+      }
+    }
+
+    // Set the length enabled from the value
+    Channel1.NRx4LengthEnabled = checkBitOnByte(6, value);
+
+    // Trigger out channel, unfreeze length if frozen
+    // Triggers should happen after obscure behavior
+    // See test 11 for trigger
+    if (checkBitOnByte(7, value)) {
+      Channel1.trigger();
+
+      // When we trigger on the obscure behavior, and we reset the length Counter to max
+      // We need to clock
+      if (!doesNextFrameSequencerUpdateLength && Channel1.lengthCounter === Channel1.MAX_LENGTH && Channel1.NRx4LengthEnabled) {
+        Channel1.lengthCounter -= 1;
+      }
+    }
   }
 
   // Channel Properties
@@ -105,6 +165,7 @@ export class Channel1 {
   static isSweepEnabled: boolean = false;
   static sweepCounter: i32 = 0x00;
   static sweepShadowFrequency: i32 = 0x00;
+  static sweepNegateShouldDisableChannelOnClear: boolean = false;
 
   // Save States
   static readonly saveStateSlot: i32 = 7;
@@ -127,7 +188,7 @@ export class Channel1 {
 
   // Function to load the save state from memory
   static loadState(): void {
-    Channel1.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x00, Channel1.saveStateSlot));
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x00, Channel1.saveStateSlot), Channel1.isEnabled);
     Channel1.frequencyTimer = load<i32>(getSaveStateMemoryOffset(0x01, Channel1.saveStateSlot));
     Channel1.envelopeCounter = load<i32>(getSaveStateMemoryOffset(0x05, Channel1.saveStateSlot));
     Channel1.lengthCounter = load<i32>(getSaveStateMemoryOffset(0x09, Channel1.saveStateSlot));
@@ -178,25 +239,26 @@ export class Channel1 {
 
   static getSample(numberOfCycles: i32): i32 {
     // Decrement our channel timer
-    let frequencyTimer = Channel1.frequencyTimer - numberOfCycles;
-    if (frequencyTimer <= 0) {
+    let frequencyTimer = Channel1.frequencyTimer;
+    frequencyTimer -= numberOfCycles;
+    while (frequencyTimer <= 0) {
       // Get the amount that overflowed so we don't drop cycles
       let overflowAmount = abs(frequencyTimer);
-      Channel1.frequencyTimer = frequencyTimer;
 
       // Reset our timer
       // A square channel's frequency timer period is set to (2048-frequency)*4.
       // Four duty cycles are available, each waveform taking 8 frequency timer clocks to cycle through:
       Channel1.resetTimer();
-      Channel1.frequencyTimer -= overflowAmount;
+      frequencyTimer = Channel1.frequencyTimer;
+      frequencyTimer -= overflowAmount;
 
       // Also increment our duty cycle
       // What is duty? https://en.wikipedia.org/wiki/Duty_cycle
       // Duty cycle for square wave: http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
       Channel1.waveFormPositionOnDuty = (Channel1.waveFormPositionOnDuty + 1) & 7;
-    } else {
-      Channel1.frequencyTimer = frequencyTimer;
     }
+
+    Channel1.frequencyTimer = frequencyTimer;
 
     // Get our ourput volume
     let outputVolume = 0;
@@ -225,11 +287,12 @@ export class Channel1 {
     return sample;
   }
 
-  //http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Trigger_Event
+  // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Trigger_Event
   static trigger(): void {
     Channel1.isEnabled = true;
+    // Set length to maximum done in write
     if (Channel1.lengthCounter === 0) {
-      Channel1.lengthCounter = 64;
+      Channel1.lengthCounter = Channel1.MAX_LENGTH;
     }
 
     // Reset our timer
@@ -246,14 +309,23 @@ export class Channel1 {
     Channel1.sweepShadowFrequency = Channel1.frequency;
 
     // Reset back to the sweep period
-    Channel1.sweepCounter = Channel1.NRx0SweepPeriod;
+    // Obscure behavior
+    // Sweep timers treat a period o 0 as 8
+    if (Channel1.NRx0SweepPeriod === 0) {
+      Channel1.sweepCounter = 8;
+    } else {
+      Channel1.sweepCounter = Channel1.NRx0SweepPeriod;
+    }
 
     // The internal enabled flag is set if either the sweep period or shift are non-zero, cleared otherwise.
-    Channel1.isSweepEnabled = Channel1.NRx0SweepPeriod > 0 && Channel1.NRx0SweepShift > 0;
+    Channel1.isSweepEnabled = Channel1.NRx0SweepPeriod > 0 || Channel1.NRx0SweepShift > 0;
+
+    Channel1.sweepNegateShouldDisableChannelOnClear = false;
 
     // If the sweep shift is non-zero, frequency calculation and the overflow check are performed immediately.
-    if (Channel1.NRx0SweepShift > 0) {
-      calculateSweepAndCheckOverflow();
+    // NOTE: The double calculation thing for the sweep does not happen here.
+    if (Channel1.NRx0SweepShift > 0 && didCalculatedSweepOverflow(calculateSweep())) {
+      Channel1.isEnabled = false;
     }
 
     // Finally if DAC is off, channel is still disabled
@@ -274,19 +346,44 @@ export class Channel1 {
   }
 
   static updateSweep(): void {
-    // Obscure behavior
-    // TODO: The volume envelope and sweep timers treat a period of 0 as 8.
+    // Dont update period if not enabled
+    if (!Channel1.isEnabled || !Channel1.isSweepEnabled) {
+      return;
+    }
+
     // Decrement the sweep counter
     let sweepCounter = Channel1.sweepCounter - 1;
     if (sweepCounter <= 0) {
       // Reset back to the sweep period
-      Channel1.sweepCounter = Channel1.NRx0SweepPeriod;
+      // Obscure behavior
+      // Sweep timers treat a period of 0 as 8
+      if (Channel1.NRx0SweepPeriod === 0) {
+        // Sweep isn't calculated when the period is 0
+        Channel1.sweepCounter = 8;
+      } else {
+        // Reset our sweep counter to its period
+        Channel1.sweepCounter = Channel1.NRx0SweepPeriod;
 
-      // Calculate our sweep
-      // When it generates a clock and the sweep's internal enabled flag is set and the sweep period is not zero,
-      // a new frequency is calculated and the overflow check is performed.
-      if (Channel1.isSweepEnabled && Channel1.NRx0SweepPeriod > 0) {
-        calculateSweepAndCheckOverflow();
+        // Calculate our sweep
+        // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
+        // When it generates a clock and the sweep's internal enabled flag is set and the sweep period is not zero,
+        // a new frequency is calculated and the overflow check is performed. If the new frequency is 2047 or less,
+        // and the sweep shift is not zero, this new frequency is written back to the shadow frequency,
+        // and square 1's frequency in NR13 and NR14, then frequency calculation,
+        // and overflow check are run AGAIN immediately using this new value,
+        // but this second new frequency is not written back.
+        let newFrequency = calculateSweep();
+        if (didCalculatedSweepOverflow(newFrequency)) {
+          Channel1.isEnabled = false;
+        }
+
+        if (Channel1.NRx0SweepShift > 0) {
+          Channel1.setFrequency(newFrequency);
+
+          if (didCalculatedSweepOverflow(calculateSweep())) {
+            Channel1.isEnabled = false;
+          }
+        }
       }
     } else {
       Channel1.sweepCounter = sweepCounter;
@@ -297,10 +394,10 @@ export class Channel1 {
     let lengthCounter = Channel1.lengthCounter;
     if (lengthCounter > 0 && Channel1.NRx4LengthEnabled) {
       lengthCounter -= 1;
-    }
 
-    if (lengthCounter === 0) {
-      Channel1.isEnabled = false;
+      if (lengthCounter === 0) {
+        Channel1.isEnabled = false;
+      }
     }
     Channel1.lengthCounter = lengthCounter;
   }
@@ -329,8 +426,11 @@ export class Channel1 {
   }
 
   static setFrequency(frequency: i32): void {
+    // Set our shadowFrequency
+    Channel1.sweepShadowFrequency = frequency;
+
     // Get the high and low bits
-    let passedFrequencyHighBits = frequency >> 8;
+    let passedFrequencyHighBits = (frequency >> 8) & 0x07;
     let passedFrequencyLowBits = frequency & 0xff;
 
     // Get the new register 4
@@ -352,42 +452,30 @@ export class Channel1 {
 }
 
 // Sweep Specific functions
-function calculateSweepAndCheckOverflow(): void {
-  let newFrequency = getNewFrequencyFromSweep();
-  // 7FF is the highest value of the frequency: 111 1111 1111
-  if (newFrequency <= 0x7ff && Channel1.NRx0SweepShift > 0) {
-    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
-    // If the new frequency is 2047 or less and the sweep shift is not zero,
-    // this new frequency is written back to the shadow frequency and square 1's frequency in NR13 and NR14,
-    // then frequency calculation and overflow check are run AGAIN immediately using this new value,
-    // but this second new frequency is not written back.
-    Channel1.sweepShadowFrequency = newFrequency;
-    Channel1.setFrequency(newFrequency);
-
-    // Re calculate the new frequency
-    newFrequency = getNewFrequencyFromSweep();
-  }
-
-  // Next check if the new Frequency is above 0x7FF
-  // if So, disable our sweep
-  if (newFrequency > 0x7ff) {
-    Channel1.isEnabled = false;
-  }
-}
-
 // Function to determing a new sweep in the current context
-function getNewFrequencyFromSweep(): i32 {
+function calculateSweep(): i32 {
   // Start our new frequency, by making it equal to the "shadow frequency"
   let oldFrequency = Channel1.sweepShadowFrequency;
-  let newFrequency = oldFrequency;
-  newFrequency = newFrequency >> Channel1.NRx0SweepShift;
+  let newFrequency = oldFrequency >> Channel1.NRx0SweepShift;
 
   // Check for sweep negation
   if (Channel1.NRx0Negate) {
+    Channel1.sweepNegateShouldDisableChannelOnClear = true;
     newFrequency = oldFrequency - newFrequency;
   } else {
     newFrequency = oldFrequency + newFrequency;
   }
 
   return newFrequency;
+}
+
+// Function to check if a calculated sweep overflowed
+function didCalculatedSweepOverflow(calculatedSweep: i32): boolean {
+  // 7FF is the highest value of the frequency: 111 1111 1111
+  // if it overflows, should disable the channel (handled by the caller)
+  if (calculatedSweep > 0x7ff) {
+    return true;
+  }
+
+  return false;
 }
