@@ -1855,9 +1855,18 @@
     function Channel1() {}
 
     Channel1.updateNRx0 = function (value) {
+      var oldSweepNegate = Channel1.NRx0Negate;
       Channel1.NRx0SweepPeriod = (value & 0x70) >> 4;
       Channel1.NRx0Negate = checkBitOnByte(3, value);
-      Channel1.NRx0SweepShift = value & 0x07;
+      Channel1.NRx0SweepShift = value & 0x07; // Obscure Behavior
+      // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
+      // Clearing the sweep negate mode bit in NR10 after at least one sweep calculation has been made,
+      // using the negate mode since the last trigger causes the channel to be immediately disabled.
+      // This prevents you from having the sweep lower the frequency then raise the frequency without a trigger inbetween.
+
+      if (oldSweepNegate && !Channel1.NRx0Negate && Channel1.sweepNegateShouldDisableChannelOnClear) {
+        Channel1.isEnabled = false;
+      }
     };
 
     Channel1.updateNRx1 = function (value) {
@@ -1867,7 +1876,7 @@
       // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
       // Note, this will be different for channel 3
 
-      Channel1.lengthCounter = 64 - Channel1.NRx1LengthLoad;
+      Channel1.lengthCounter = Channel1.MAX_LENGTH - Channel1.NRx1LengthLoad;
     };
 
     Channel1.updateNRx2 = function (value) {
@@ -1875,21 +1884,64 @@
       Channel1.NRx2EnvelopeAddMode = checkBitOnByte(3, value);
       Channel1.NRx2EnvelopePeriod = value & 0x07; // Also, get our channel is dac enabled
 
-      Channel1.isDacEnabled = (value & 0xf8) > 0;
+      var isDacEnabled = (value & 0xf8) > 0;
+      Channel1.isDacEnabled = isDacEnabled; // Blargg length test
+      // Disabling DAC should disable channel immediately
+
+      if (!isDacEnabled) {
+        Channel1.isEnabled = isDacEnabled;
+      }
     };
 
     Channel1.updateNRx3 = function (value) {
       Channel1.NRx3FrequencyLSB = value; // Update Channel Frequency
 
       Channel1.frequency = Channel1.NRx4FrequencyMSB << 8 | value;
-    };
+    }; // NOTE: Order in which these events happen are very particular
+    // And globals can be affected by other functions
+    // Thus, optimizations here should be extremely careful
+
 
     Channel1.updateNRx4 = function (value) {
-      Channel1.NRx4LengthEnabled = checkBitOnByte(6, value);
-      value &= 0x07;
-      Channel1.NRx4FrequencyMSB = value; // Update Channel Frequency
+      // Handle our Channel frequency first
+      // As this is modified if we trigger for length.
+      var frequencyMSB = value & 0x07;
+      Channel1.NRx4FrequencyMSB = frequencyMSB;
+      Channel1.frequency = frequencyMSB << 8 | Channel1.NRx3FrequencyLSB; // Obscure behavior
+      // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Obscure_Behavior
+      // Also see blargg's cgb sound test
+      // Extra length clocking occurs when writing to NRx4,
+      // when the frame sequencer's next step is one that,
+      // doesn't clock the length counter.
 
-      Channel1.frequency = value << 8 | Channel1.NRx3FrequencyLSB;
+      var frameSequencer = Sound.frameSequencer;
+      var doesNextFrameSequencerUpdateLength = (frameSequencer & 1) === 1;
+      var isBeingLengthEnabled = !Channel1.NRx4LengthEnabled && checkBitOnByte(6, value);
+
+      if (!doesNextFrameSequencerUpdateLength) {
+        // Check lengthEnable
+        if (Channel1.lengthCounter > 0 && isBeingLengthEnabled) {
+          Channel1.lengthCounter -= 1;
+
+          if (!checkBitOnByte(7, value) && Channel1.lengthCounter === 0) {
+            Channel1.isEnabled = false;
+          }
+        }
+      } // Set the length enabled from the value
+
+
+      Channel1.NRx4LengthEnabled = checkBitOnByte(6, value); // Trigger out channel, unfreeze length if frozen
+      // Triggers should happen after obscure behavior
+      // See test 11 for trigger
+
+      if (checkBitOnByte(7, value)) {
+        Channel1.trigger(); // When we trigger on the obscure behavior, and we reset the length Counter to max
+        // We need to clock
+
+        if (!doesNextFrameSequencerUpdateLength && Channel1.lengthCounter === Channel1.MAX_LENGTH && Channel1.NRx4LengthEnabled) {
+          Channel1.lengthCounter -= 1;
+        }
+      }
     }; // Function to save the state of the class
 
 
@@ -1908,7 +1960,7 @@
 
 
     Channel1.loadState = function () {
-      Channel1.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x00, Channel1.saveStateSlot));
+      storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x00, Channel1.saveStateSlot), Channel1.isEnabled);
       Channel1.frequencyTimer = load(getSaveStateMemoryOffset(0x01, Channel1.saveStateSlot));
       Channel1.envelopeCounter = load(getSaveStateMemoryOffset(0x05, Channel1.saveStateSlot));
       Channel1.lengthCounter = load(getSaveStateMemoryOffset(0x09, Channel1.saveStateSlot));
@@ -1956,25 +2008,25 @@
 
     Channel1.getSample = function (numberOfCycles) {
       // Decrement our channel timer
-      var frequencyTimer = Channel1.frequencyTimer - numberOfCycles;
+      var frequencyTimer = Channel1.frequencyTimer;
+      frequencyTimer -= numberOfCycles;
 
-      if (frequencyTimer <= 0) {
+      while (frequencyTimer <= 0) {
         // Get the amount that overflowed so we don't drop cycles
-        var overflowAmount = abs(frequencyTimer);
-        Channel1.frequencyTimer = frequencyTimer; // Reset our timer
+        var overflowAmount = abs(frequencyTimer); // Reset our timer
         // A square channel's frequency timer period is set to (2048-frequency)*4.
         // Four duty cycles are available, each waveform taking 8 frequency timer clocks to cycle through:
 
         Channel1.resetTimer();
-        Channel1.frequencyTimer -= overflowAmount; // Also increment our duty cycle
+        frequencyTimer = Channel1.frequencyTimer;
+        frequencyTimer -= overflowAmount; // Also increment our duty cycle
         // What is duty? https://en.wikipedia.org/wiki/Duty_cycle
         // Duty cycle for square wave: http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
 
         Channel1.waveFormPositionOnDuty = Channel1.waveFormPositionOnDuty + 1 & 7;
-      } else {
-        Channel1.frequencyTimer = frequencyTimer;
-      } // Get our ourput volume
+      }
 
+      Channel1.frequencyTimer = frequencyTimer; // Get our ourput volume
 
       var outputVolume = 0; // Finally to set our output volume, the channel must be enabled,
       // Our channel DAC must be enabled, and we must be in an active state
@@ -1999,14 +2051,14 @@
 
       sample += 15;
       return sample;
-    }; //http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Trigger_Event
+    }; // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Trigger_Event
 
 
     Channel1.trigger = function () {
-      Channel1.isEnabled = true;
+      Channel1.isEnabled = true; // Set length to maximum done in write
 
       if (Channel1.lengthCounter === 0) {
-        Channel1.lengthCounter = 64;
+        Channel1.lengthCounter = Channel1.MAX_LENGTH;
       } // Reset our timer
       // A square channel's frequency timer period is set to (2048-frequency)*4.
       // Four duty cycles are available, each waveform taking 8 frequency timer clocks to cycle through:
@@ -2018,13 +2070,22 @@
       // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
 
       Channel1.sweepShadowFrequency = Channel1.frequency; // Reset back to the sweep period
+      // Obscure behavior
+      // Sweep timers treat a period o 0 as 8
 
-      Channel1.sweepCounter = Channel1.NRx0SweepPeriod; // The internal enabled flag is set if either the sweep period or shift are non-zero, cleared otherwise.
+      if (Channel1.NRx0SweepPeriod === 0) {
+        Channel1.sweepCounter = 8;
+      } else {
+        Channel1.sweepCounter = Channel1.NRx0SweepPeriod;
+      } // The internal enabled flag is set if either the sweep period or shift are non-zero, cleared otherwise.
 
-      Channel1.isSweepEnabled = Channel1.NRx0SweepPeriod > 0 && Channel1.NRx0SweepShift > 0; // If the sweep shift is non-zero, frequency calculation and the overflow check are performed immediately.
 
-      if (Channel1.NRx0SweepShift > 0) {
-        calculateSweepAndCheckOverflow();
+      Channel1.isSweepEnabled = Channel1.NRx0SweepPeriod > 0 || Channel1.NRx0SweepShift > 0;
+      Channel1.sweepNegateShouldDisableChannelOnClear = false; // If the sweep shift is non-zero, frequency calculation and the overflow check are performed immediately.
+      // NOTE: The double calculation thing for the sweep does not happen here.
+
+      if (Channel1.NRx0SweepShift > 0 && didCalculatedSweepOverflow(calculateSweep())) {
+        Channel1.isEnabled = false;
       } // Finally if DAC is off, channel is still disabled
 
 
@@ -2044,19 +2105,45 @@
     };
 
     Channel1.updateSweep = function () {
-      // Obscure behavior
-      // TODO: The volume envelope and sweep timers treat a period of 0 as 8.
-      // Decrement the sweep counter
+      // Dont update period if not enabled
+      if (!Channel1.isEnabled || !Channel1.isSweepEnabled) {
+        return;
+      } // Decrement the sweep counter
+
+
       var sweepCounter = Channel1.sweepCounter - 1;
 
       if (sweepCounter <= 0) {
         // Reset back to the sweep period
-        Channel1.sweepCounter = Channel1.NRx0SweepPeriod; // Calculate our sweep
-        // When it generates a clock and the sweep's internal enabled flag is set and the sweep period is not zero,
-        // a new frequency is calculated and the overflow check is performed.
+        // Obscure behavior
+        // Sweep timers treat a period of 0 as 8
+        if (Channel1.NRx0SweepPeriod === 0) {
+          // Sweep isn't calculated when the period is 0
+          Channel1.sweepCounter = 8;
+        } else {
+          // Reset our sweep counter to its period
+          Channel1.sweepCounter = Channel1.NRx0SweepPeriod; // Calculate our sweep
+          // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
+          // When it generates a clock and the sweep's internal enabled flag is set and the sweep period is not zero,
+          // a new frequency is calculated and the overflow check is performed. If the new frequency is 2047 or less,
+          // and the sweep shift is not zero, this new frequency is written back to the shadow frequency,
+          // and square 1's frequency in NR13 and NR14, then frequency calculation,
+          // and overflow check are run AGAIN immediately using this new value,
+          // but this second new frequency is not written back.
 
-        if (Channel1.isSweepEnabled && Channel1.NRx0SweepPeriod > 0) {
-          calculateSweepAndCheckOverflow();
+          var newFrequency = calculateSweep();
+
+          if (didCalculatedSweepOverflow(newFrequency)) {
+            Channel1.isEnabled = false;
+          }
+
+          if (Channel1.NRx0SweepShift > 0) {
+            Channel1.setFrequency(newFrequency);
+
+            if (didCalculatedSweepOverflow(calculateSweep())) {
+              Channel1.isEnabled = false;
+            }
+          }
         }
       } else {
         Channel1.sweepCounter = sweepCounter;
@@ -2068,10 +2155,10 @@
 
       if (lengthCounter > 0 && Channel1.NRx4LengthEnabled) {
         lengthCounter -= 1;
-      }
 
-      if (lengthCounter === 0) {
-        Channel1.isEnabled = false;
+        if (lengthCounter === 0) {
+          Channel1.isEnabled = false;
+        }
       }
 
       Channel1.lengthCounter = lengthCounter;
@@ -2104,8 +2191,10 @@
     };
 
     Channel1.setFrequency = function (frequency) {
-      // Get the high and low bits
-      var passedFrequencyHighBits = frequency >> 8;
+      // Set our shadowFrequency
+      Channel1.sweepShadowFrequency = frequency; // Get the high and low bits
+
+      var passedFrequencyHighBits = frequency >> 8 & 0x07;
       var passedFrequencyLowBits = frequency & 0xff; // Get the new register 4
 
       var register4 = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx4); // Knock off lower 3 bits, and Or on our high bits
@@ -2122,7 +2211,9 @@
     }; // Cycle Counter for our sound accumulator
 
 
-    Channel1.cycleCounter = 0; // Squarewave channel with volume envelope and frequency sweep functions.
+    Channel1.cycleCounter = 0; // Max Length of our Length Load
+
+    Channel1.MAX_LENGTH = 64; // Squarewave channel with volume envelope and frequency sweep functions.
     // NR10 -> Sweep Register R/W
 
     Channel1.memoryLocationNRx0 = 0xff10; // -PPP NSSS Sweep period, negate, shift
@@ -2165,49 +2256,39 @@
 
     Channel1.isSweepEnabled = false;
     Channel1.sweepCounter = 0x00;
-    Channel1.sweepShadowFrequency = 0x00; // Save States
+    Channel1.sweepShadowFrequency = 0x00;
+    Channel1.sweepNegateShouldDisableChannelOnClear = false; // Save States
 
     Channel1.saveStateSlot = 7;
     return Channel1;
   }(); // Sweep Specific functions
+  // Function to determing a new sweep in the current context
 
 
-  function calculateSweepAndCheckOverflow() {
-    var newFrequency = getNewFrequencyFromSweep(); // 7FF is the highest value of the frequency: 111 1111 1111
-
-    if (newFrequency <= 0x7ff && Channel1.NRx0SweepShift > 0) {
-      // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
-      // If the new frequency is 2047 or less and the sweep shift is not zero,
-      // this new frequency is written back to the shadow frequency and square 1's frequency in NR13 and NR14,
-      // then frequency calculation and overflow check are run AGAIN immediately using this new value,
-      // but this second new frequency is not written back.
-      Channel1.sweepShadowFrequency = newFrequency;
-      Channel1.setFrequency(newFrequency); // Re calculate the new frequency
-
-      newFrequency = getNewFrequencyFromSweep();
-    } // Next check if the new Frequency is above 0x7FF
-    // if So, disable our sweep
-
-
-    if (newFrequency > 0x7ff) {
-      Channel1.isEnabled = false;
-    }
-  } // Function to determing a new sweep in the current context
-
-
-  function getNewFrequencyFromSweep() {
+  function calculateSweep() {
     // Start our new frequency, by making it equal to the "shadow frequency"
     var oldFrequency = Channel1.sweepShadowFrequency;
-    var newFrequency = oldFrequency;
-    newFrequency = newFrequency >> Channel1.NRx0SweepShift; // Check for sweep negation
+    var newFrequency = oldFrequency >> Channel1.NRx0SweepShift; // Check for sweep negation
 
     if (Channel1.NRx0Negate) {
+      Channel1.sweepNegateShouldDisableChannelOnClear = true;
       newFrequency = oldFrequency - newFrequency;
     } else {
       newFrequency = oldFrequency + newFrequency;
     }
 
     return newFrequency;
+  } // Function to check if a calculated sweep overflowed
+
+
+  function didCalculatedSweepOverflow(calculatedSweep) {
+    // 7FF is the highest value of the frequency: 111 1111 1111
+    // if it overflows, should disable the channel (handled by the caller)
+    if (calculatedSweep > 0x7ff) {
+      return true;
+    }
+
+    return false;
   } // NOTE: Tons of Copy-pasta btween channels, because Classes cannot be instantiated yet in assemblyscript
 
 
@@ -2223,7 +2304,7 @@
       // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
       // Note, this will be different for channel 3
 
-      Channel2.lengthCounter = 64 - Channel2.NRx1LengthLoad;
+      Channel2.lengthCounter = Channel2.MAX_LENGTH - Channel2.NRx1LengthLoad;
     };
 
     Channel2.updateNRx2 = function (value) {
@@ -2231,7 +2312,13 @@
       Channel2.NRx2EnvelopeAddMode = checkBitOnByte(3, value);
       Channel2.NRx2EnvelopePeriod = value & 0x07; // Also, get our channel is dac enabled
 
-      Channel2.isDacEnabled = (value & 0xf8) > 0;
+      var isDacEnabled = (value & 0xf8) > 0;
+      Channel2.isDacEnabled = isDacEnabled; // Blargg length test
+      // Disabling DAC should disable channel immediately
+
+      if (!isDacEnabled) {
+        Channel2.isEnabled = isDacEnabled;
+      }
     };
 
     Channel2.updateNRx3 = function (value) {
@@ -2241,11 +2328,44 @@
     };
 
     Channel2.updateNRx4 = function (value) {
-      Channel2.NRx4LengthEnabled = checkBitOnByte(6, value);
-      value &= 0x07;
-      Channel2.NRx4FrequencyMSB = value; // Update Channel Frequency
+      // Handle our Channel frequency first
+      // As this is modified if we trigger for length.
+      var frequencyMSB = value & 0x07;
+      Channel2.NRx4FrequencyMSB = frequencyMSB;
+      Channel2.frequency = frequencyMSB << 8 | Channel2.NRx3FrequencyLSB; // Obscure behavior
+      // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Obscure_Behavior
+      // Also see blargg's cgb sound test
+      // Extra length clocking occurs when writing to NRx4,
+      // when the frame sequencer's next step is one that,
+      // doesn't clock the length counter.
 
-      Channel2.frequency = value << 8 | Channel2.NRx3FrequencyLSB;
+      var frameSequencer = Sound.frameSequencer;
+      var doesNextFrameSequencerUpdateLength = (frameSequencer & 1) === 1;
+      var isBeingLengthEnabled = !Channel2.NRx4LengthEnabled && checkBitOnByte(6, value);
+
+      if (!doesNextFrameSequencerUpdateLength) {
+        if (Channel2.lengthCounter > 0 && isBeingLengthEnabled) {
+          Channel2.lengthCounter -= 1;
+
+          if (!checkBitOnByte(7, value) && Channel2.lengthCounter === 0) {
+            Channel2.isEnabled = false;
+          }
+        }
+      } // Set the length enabled from the value
+
+
+      Channel2.NRx4LengthEnabled = checkBitOnByte(6, value); // Trigger out channel, unfreeze length if frozen
+      // Triggers should happen after obscure behavior
+      // See test 11 for trigger
+
+      if (checkBitOnByte(7, value)) {
+        Channel2.trigger(); // When we trigger on the obscure behavior, and we reset the length Counter to max
+        // We need to clock
+
+        if (!doesNextFrameSequencerUpdateLength && Channel2.lengthCounter === Channel2.MAX_LENGTH && Channel2.NRx4LengthEnabled) {
+          Channel2.lengthCounter -= 1;
+        }
+      }
     }; // Function to save the state of the class
 
 
@@ -2294,23 +2414,25 @@
 
     Channel2.getSample = function (numberOfCycles) {
       // Decrement our channel timer
-      var frequencyTimer = Channel2.frequencyTimer - numberOfCycles;
-      Channel2.frequencyTimer = frequencyTimer;
+      var frequencyTimer = Channel2.frequencyTimer;
+      frequencyTimer -= numberOfCycles;
 
-      if (frequencyTimer <= 0) {
+      while (frequencyTimer <= 0) {
         // Get the amount that overflowed so we don't drop cycles
         var overflowAmount = abs(frequencyTimer); // Reset our timer
         // A square channel's frequency timer period is set to (2048-frequency)*4.
         // Four duty cycles are available, each waveform taking 8 frequency timer clocks to cycle through:
 
         Channel2.resetTimer();
-        Channel2.frequencyTimer -= overflowAmount; // Also increment our duty cycle
+        frequencyTimer = Channel2.frequencyTimer;
+        frequencyTimer -= overflowAmount; // Also increment our duty cycle
         // What is duty? https://en.wikipedia.org/wiki/Duty_cycle
         // Duty cycle for square wave: http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Square_Wave
 
         Channel2.waveFormPositionOnDuty = Channel2.waveFormPositionOnDuty + 1 & 7;
-      } // Get our ourput volume
+      }
 
+      Channel2.frequencyTimer = frequencyTimer; // Get our ourput volume
 
       var outputVolume = 0; // Finally to set our output volume, the channel must be enabled,
       // Our channel DAC must be enabled, and we must be in an active state
@@ -2339,10 +2461,10 @@
 
 
     Channel2.trigger = function () {
-      Channel2.isEnabled = true;
+      Channel2.isEnabled = true; // Set length to maximum done in write
 
       if (Channel2.lengthCounter === 0) {
-        Channel2.lengthCounter = 64;
+        Channel2.lengthCounter = Channel2.MAX_LENGTH;
       } // Reset our timer
       // A square channel's frequency timer period is set to (2048-frequency)*4.
       // Four duty cycles are available, each waveform taking 8 frequency timer clocks to cycle through:
@@ -2425,8 +2547,12 @@
     }; // Cycle Counter for our sound accumulator
 
 
-    Channel2.cycleCounter = 0; // Squarewave channel with volume envelope functions only.
-    // NR21 -> Sound length/Wave pattern duty (R/W)
+    Channel2.cycleCounter = 0; // Max Length of our Length Load
+
+    Channel2.MAX_LENGTH = 64; // Squarewave channel with volume envelope functions only.
+    // Only used by register reading
+
+    Channel2.memoryLocationNRx0 = 0xff15; // NR21 -> Sound length/Wave pattern duty (R/W)
 
     Channel2.memoryLocationNRx1 = 0xff16; // DDLL LLLL Duty, Length load (64-L)
 
@@ -2472,7 +2598,18 @@
 
 
     Channel3.updateNRx0 = function (value) {
-      Channel3.isDacEnabled = checkBitOnByte(7, value);
+      var isDacEnabled = checkBitOnByte(7, value); // Sample buffer reset to zero when powered on
+
+      if (!Channel3.isDacEnabled && isDacEnabled) {
+        Channel3.sampleBuffer = 0x00;
+      }
+
+      Channel3.isDacEnabled = isDacEnabled; // Blargg length test
+      // Disabling DAC should disable channel immediately
+
+      if (!isDacEnabled) {
+        Channel3.isEnabled = isDacEnabled;
+      }
     };
 
     Channel3.updateNRx1 = function (value) {
@@ -2482,7 +2619,7 @@
       // Note, this will be different for channel 3
       // Supposed to be 256, so subtracting 255 and then adding 1 if that makes sense
 
-      Channel3.lengthCounter = 256 - Channel3.NRx1LengthLoad;
+      Channel3.lengthCounter = Channel3.MAX_LENGTH - Channel3.NRx1LengthLoad;
     };
 
     Channel3.updateNRx2 = function (value) {
@@ -2496,11 +2633,48 @@
     };
 
     Channel3.updateNRx4 = function (value) {
-      Channel3.NRx4LengthEnabled = checkBitOnByte(6, value);
-      value &= 0x07;
-      Channel3.NRx4FrequencyMSB = value; // Update Channel Frequency
+      // Handle our frequency
+      // Must be done first for our upcoming trigger
+      // To correctly reset timing
+      var frequencyMSB = value & 0x07;
+      Channel3.NRx4FrequencyMSB = frequencyMSB;
+      Channel3.frequency = frequencyMSB << 8 | Channel3.NRx3FrequencyLSB; // Obscure behavior
+      // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Obscure_Behavior
+      // Also see blargg's cgb sound test
+      // Extra length clocking occurs when writing to NRx4,
+      // when the frame sequencer's next step is one that,
+      // doesn't clock the length counter.
 
-      Channel3.frequency = value << 8 | Channel3.NRx3FrequencyLSB;
+      var frameSequencer = Sound.frameSequencer;
+      var doesNextFrameSequencerUpdateLength = (frameSequencer & 1) === 1;
+      var isBeingLengthEnabled = false;
+
+      if (!doesNextFrameSequencerUpdateLength) {
+        // Check lengthEnable
+        isBeingLengthEnabled = !Channel3.NRx4LengthEnabled && checkBitOnByte(6, value);
+
+        if (Channel3.lengthCounter > 0 && isBeingLengthEnabled) {
+          Channel3.lengthCounter -= 1;
+
+          if (!checkBitOnByte(7, value) && Channel3.lengthCounter === 0) {
+            Channel3.isEnabled = false;
+          }
+        }
+      } // Set the length enabled from the value
+
+
+      Channel3.NRx4LengthEnabled = checkBitOnByte(6, value); // Trigger our channel, unfreeze length if frozen
+      // Triggers should happen after obscure behavior
+      // See test 11 for trigger
+
+      if (checkBitOnByte(7, value)) {
+        Channel3.trigger(); // When we trigger on the obscure behavior, and we reset the length Counter to max
+        // We need to clock
+
+        if (!doesNextFrameSequencerUpdateLength && Channel3.lengthCounter === Channel3.MAX_LENGTH && Channel3.NRx4LengthEnabled) {
+          Channel3.lengthCounter -= 1;
+        }
+      }
     }; // Function to save the state of the class
 
 
@@ -2517,6 +2691,33 @@
       Channel3.frequencyTimer = load(getSaveStateMemoryOffset(0x01, Channel3.saveStateSlot));
       Channel3.lengthCounter = load(getSaveStateMemoryOffset(0x05, Channel3.saveStateSlot));
       Channel3.waveTablePosition = load(getSaveStateMemoryOffset(0x09, Channel3.saveStateSlot));
+    }; // Memory Read Trap
+
+
+    Channel3.handleWaveRamRead = function () {
+      // Obscure behavior
+      // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
+      // If the wave channel is enabled, accessing any byte from $FF30-$FF3F is equivalent to,
+      // accessing the current byte selected by the waveform position. Further, on the DMG accesses will only work in this manner,
+      // if made within a couple of clocks of the wave channel accessing wave RAM;
+      // if made at any other time, reads return $FF and writes have no effect.
+      // TODO: Handle DMG case
+      return readCurrentSampleByteFromWaveRam();
+    }; // Memory Write Trap
+
+
+    Channel3.handleWaveRamWrite = function (value) {
+      // Obscure behavior
+      // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
+      // If the wave channel is enabled, accessing any byte from $FF30-$FF3F is equivalent to,
+      // accessing the current byte selected by the waveform position. Further, on the DMG accesses will only work in this manner,
+      // if made within a couple of clocks of the wave channel accessing wave RAM;
+      // if made at any other time, reads return $FF and writes have no effect.
+      // Thus we want to write the value to the current sample position
+      // Will Find the position, and knock off any remainder
+      var positionIndexToAdd = i32Portable(Channel3.waveTablePosition >> 1);
+      var memoryLocationWaveSample = Channel3.memoryLocationWaveTable + positionIndexToAdd;
+      eightBitStoreIntoGBMemory(memoryLocationWaveSample, value);
     };
 
     Channel3.initialize = function () {
@@ -2544,55 +2745,27 @@
     };
 
     Channel3.getSample = function (numberOfCycles) {
-      // Decrement our channel timer
-      var frequencyTimer = Channel3.frequencyTimer;
-      frequencyTimer -= numberOfCycles;
-
-      if (frequencyTimer <= 0) {
-        // Get the amount that overflowed so we don't drop cycles
-        var overflowAmount = abs(frequencyTimer);
-        Channel3.frequencyTimer = frequencyTimer; // Reset our timer
-        // A wave channel's frequency timer period is set to (2048-frequency) * 2.
-        // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Wave_Channel
-
-        Channel3.resetTimer();
-        Channel3.frequencyTimer -= overflowAmount; // Advance the wave table position, and loop back if needed
-
-        Channel3.waveTablePosition = Channel3.waveTablePosition + 1 & 31;
-      } else {
-        Channel3.frequencyTimer = frequencyTimer;
-      } // Get our output volume
-
-
-      var volumeCode = Channel3.volumeCode; // Finally to set our output volume, the channel must be enabled,
-      // Our channel DAC must be enabled, and we must be in an active state
-      // Of our duty cycle
-
-      if (Channel3.isEnabled && Channel3.isDacEnabled) {
-        // Get our volume code
-        if (Channel3.volumeCodeChanged) {
-          volumeCode = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx2);
-          volumeCode = volumeCode >> 5;
-          volumeCode = volumeCode & 0x0f;
-          Channel3.volumeCode = volumeCode;
-          Channel3.volumeCodeChanged = false;
-        }
-      } else {
+      // Check if we are enabled
+      if (!Channel3.isEnabled || !Channel3.isDacEnabled) {
         // Return silence
         // Since range from -15 - 15, or 0 to 30 for our unsigned
         return 15;
+      } // Get our volume code
+      // Need this to compute the sample
+
+
+      var volumeCode = Channel3.volumeCode;
+
+      if (Channel3.volumeCodeChanged) {
+        volumeCode = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx2);
+        volumeCode = volumeCode >> 5;
+        volumeCode = volumeCode & 0x0f;
+        Channel3.volumeCode = volumeCode;
+        Channel3.volumeCodeChanged = false;
       } // Get the current sample
 
 
-      var sample = 0; // Will Find the position, and knock off any remainder
-
-      var waveTablePosition = Channel3.waveTablePosition;
-      var positionIndexToAdd = i32Portable(waveTablePosition >> 1);
-      var memoryLocationWaveSample = Channel3.memoryLocationWaveTable + positionIndexToAdd;
-      sample = eightBitLoadFromGBMemory(memoryLocationWaveSample); // Need to grab the top or lower half for the correct sample
-
-      sample >>= ((waveTablePosition & 1) === 0) << 2;
-      sample &= 0x0f; // Shift our sample and set our volume depending on the volume code
+      var sample = getSampleFromSampleBufferForWaveTablePosition(); // Shift our sample and set our volume depending on the volume code
       // Since we can't multiply by float, simply divide by 4, 2, 1
       // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Wave_Channel
 
@@ -2617,26 +2790,58 @@
           sample >>= 2;
           outputVolume = 4;
           break;
-      } // Spply out output volume
+      } // Apply out output volume
 
 
       sample = outputVolume > 0 ? sample / outputVolume : 0; // Square Waves Can range from -15 - 15. Therefore simply add 15
 
-      sample += 15;
+      sample += 15; // Update the sample based on our timer
+
+      var frequencyTimer = Channel3.frequencyTimer;
+      frequencyTimer -= numberOfCycles;
+
+      while (frequencyTimer <= 0) {
+        // Get the amount that overflowed so we don't drop cycles
+        var overflowAmount = abs(frequencyTimer); // Reset our timer
+        // A wave channel's frequency timer period is set to (2048-frequency) * 2.
+        // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Wave_Channel
+
+        Channel3.resetTimer();
+        frequencyTimer = Channel3.frequencyTimer;
+        frequencyTimer -= overflowAmount; // Update our sample buffer
+
+        advanceWavePositionAndSampleBuffer();
+      }
+
+      Channel3.frequencyTimer = frequencyTimer; // Finally return the sample
+
       return sample;
     }; //http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Trigger_Event
 
 
     Channel3.trigger = function () {
-      Channel3.isEnabled = true;
+      Channel3.isEnabled = true; // Length counter maximum handled by write
 
       if (Channel3.lengthCounter === 0) {
-        Channel3.lengthCounter = 256;
+        Channel3.lengthCounter = Channel3.MAX_LENGTH;
       } // Reset our timer
       // A wave channel's frequency timer period is set to (2048-frequency)*2.
 
 
-      Channel3.resetTimer(); // Reset our wave table position
+      Channel3.resetTimer(); // Add some delay to our frequency timer
+      // So Honestly, lifted this from binjgb
+      // https://github.com/binji/binjgb/blob/68eb4b2f6d5d7a98d270e12c4b8ff065c07f5e94/src/emulator.c#L2625
+      // I have no clue why this is, but it passes 09-wave read while on.s
+      // blargg test.
+      // I think this has to do with obscure behavior?
+      // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware
+      // When triggering the wave channel,
+      // the first sample to play is the previous one still in the high nibble of the sample buffer,
+      // and the next sample is the second nibble from the wave table.
+      // This is because it doesn't load the first byte on trigger like it "should".
+      // The first nibble from the wave table is thus not played until the waveform loops.
+
+      Channel3.frequencyTimer += 6; // Reset our wave table position
 
       Channel3.waveTablePosition = 0; // Finally if DAC is off, channel is still disabled
 
@@ -2669,7 +2874,9 @@
     }; // Cycle Counter for our sound accumulator
 
 
-    Channel3.cycleCounter = 0; // Voluntary Wave channel with 32 4-bit programmable samples, played in sequence.
+    Channel3.cycleCounter = 0; // Max Length of our Length Load
+
+    Channel3.MAX_LENGTH = 256; // Voluntary Wave channel with 32 4-bit programmable samples, played in sequence.
     // NR30 -> Sound on/off (R/W)
 
     Channel3.memoryLocationNRx0 = 0xff1a; // NR31 -> Sound length (R/W)
@@ -2701,11 +2908,43 @@
     Channel3.lengthCounter = 0x00;
     Channel3.waveTablePosition = 0x00;
     Channel3.volumeCode = 0x00;
-    Channel3.volumeCodeChanged = false; // Save States
+    Channel3.volumeCodeChanged = false;
+    Channel3.sampleBuffer = 0x00; // Save States
 
     Channel3.saveStateSlot = 9;
     return Channel3;
-  }(); // NOTE: Tons of Copy-pasta btween channels, because Classes cannot be instantiated yet in assemblyscript
+  }(); // Functions specific to wave memory
+
+
+  function advanceWavePositionAndSampleBuffer() {
+    // Advance the wave table position, and loop back if needed
+    var waveTablePosition = Channel3.waveTablePosition;
+    waveTablePosition += 1;
+
+    while (waveTablePosition >= 32) {
+      waveTablePosition -= 32;
+    }
+
+    Channel3.waveTablePosition = waveTablePosition; // Load the next sample byte from wave ram,
+    // into the sample buffer
+
+    Channel3.sampleBuffer = readCurrentSampleByteFromWaveRam();
+  }
+
+  function readCurrentSampleByteFromWaveRam() {
+    // Will Find the position, and knock off any remainder
+    var positionIndexToAdd = i32Portable(Channel3.waveTablePosition >> 1);
+    var memoryLocationWaveSample = Channel3.memoryLocationWaveTable + positionIndexToAdd;
+    return eightBitLoadFromGBMemory(memoryLocationWaveSample);
+  }
+
+  function getSampleFromSampleBufferForWaveTablePosition() {
+    var sample = Channel3.sampleBuffer; // Need to grab the top or lower half for the correct sample
+
+    sample >>= ((Channel3.waveTablePosition & 1) === 0) << 2;
+    sample &= 0x0f;
+    return sample;
+  } // NOTE: Tons of Copy-pasta btween channels, because Classes cannot be instantiated yet in assemblyscript
 
 
   var Channel4 =
@@ -2719,7 +2958,7 @@
       // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
       // Note, this will be different for channel 3
 
-      Channel4.lengthCounter = 64 - Channel4.NRx1LengthLoad;
+      Channel4.lengthCounter = Channel4.MAX_LENGTH - Channel4.NRx1LengthLoad;
     };
 
     Channel4.updateNRx2 = function (value) {
@@ -2727,7 +2966,13 @@
       Channel4.NRx2EnvelopeAddMode = checkBitOnByte(3, value);
       Channel4.NRx2EnvelopePeriod = value & 0x07; // Also, get our channel is dac enabled
 
-      Channel4.isDacEnabled = (value & 0xf8) > 0;
+      var isDacEnabled = (value & 0xf8) > 0;
+      Channel4.isDacEnabled = isDacEnabled; // Blargg length test
+      // Disabling DAC should disable channel immediately
+
+      if (!isDacEnabled) {
+        Channel4.isEnabled = isDacEnabled;
+      }
     };
 
     Channel4.updateNRx3 = function (value) {
@@ -2742,7 +2987,39 @@
     };
 
     Channel4.updateNRx4 = function (value) {
-      Channel4.NRx4LengthEnabled = checkBitOnByte(6, value);
+      // Obscure behavior
+      // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Obscure_Behavior
+      // Also see blargg's cgb sound test
+      // Extra length clocking occurs when writing to NRx4,
+      // when the frame sequencer's next step is one that,
+      // doesn't clock the length counter.
+      var frameSequencer = Sound.frameSequencer;
+      var doesNextFrameSequencerUpdateLength = (frameSequencer & 1) === 1;
+      var isBeingLengthEnabled = !Channel4.NRx4LengthEnabled && checkBitOnByte(6, value);
+
+      if (!doesNextFrameSequencerUpdateLength) {
+        if (Channel4.lengthCounter > 0 && isBeingLengthEnabled) {
+          Channel4.lengthCounter -= 1;
+
+          if (!checkBitOnByte(7, value) && Channel4.lengthCounter === 0) {
+            Channel4.isEnabled = false;
+          }
+        }
+      } // Set the length enabled from the value
+
+
+      Channel4.NRx4LengthEnabled = checkBitOnByte(6, value); // Trigger out channel, unfreeze length if frozen
+      // Triggers should happen after obscure behavior
+      // See test 11 for trigger
+
+      if (checkBitOnByte(7, value)) {
+        Channel4.trigger(); // When we trigger on the obscure behavior, and we reset the length Counter to max
+        // We need to clock
+
+        if (!doesNextFrameSequencerUpdateLength && Channel4.lengthCounter === Channel4.MAX_LENGTH && Channel4.NRx4LengthEnabled) {
+          Channel4.lengthCounter -= 1;
+        }
+      }
     }; // Function to save the state of the class
 
 
@@ -2783,7 +3060,8 @@
     Channel4.getSample = function (numberOfCycles) {
       // Decrement our channel timer
       var frequencyTimer = Channel4.frequencyTimer;
-      frequencyTimer -= numberOfCycles;
+      frequencyTimer -= numberOfCycles; // TODO: This can't be a while loop to use up all the cycles,
+      // Since noise is psuedo random and the period can be anything
 
       if (frequencyTimer <= 0) {
         // Get the amount that overflowed so we don't drop cycles
@@ -2811,6 +3089,11 @@
         }
 
         Channel4.linearFeedbackShiftRegister = linearFeedbackShiftRegister;
+      } // Make sure period never becomes negative
+
+
+      if (frequencyTimer < 0) {
+        frequencyTimer = 0;
       }
 
       Channel4.frequencyTimer = frequencyTimer; // Get our ourput volume, set to zero for silence
@@ -2839,10 +3122,10 @@
 
 
     Channel4.trigger = function () {
-      Channel4.isEnabled = true;
+      Channel4.isEnabled = true; // Length counter maximum handled by write
 
       if (Channel4.lengthCounter === 0) {
-        Channel4.lengthCounter = 64;
+        Channel4.lengthCounter = Channel4.MAX_LENGTH;
       } // Reset our timers
 
 
@@ -2912,9 +3195,13 @@
     }; // Cycle Counter for our sound accumulator
 
 
-    Channel4.cycleCounter = 0; // Channel 4
+    Channel4.cycleCounter = 0; // Max Length of our Length Load
+
+    Channel4.MAX_LENGTH = 64; // Channel 4
     // 'white noise' channel with volume envelope functions.
-    // NR41 -> Sound length (R/W)
+    // Only used by register reading
+
+    Channel4.memoryLocationNRx0 = 0xff1f; // NR41 -> Sound length (R/W)
 
     Channel4.memoryLocationNRx1 = 0xff20; // --LL LLLL Length load (64-L)
 
@@ -3024,7 +3311,7 @@
 
 
     var downSampleCycleCounter = Sound.downSampleCycleCounter;
-    downSampleCycleCounter += numberOfCycles * Sound.downSampleCycleMultiplier;
+    downSampleCycleCounter += numberOfCycles;
     var maxDownSampleCycles = Sound.maxDownSampleCycles();
 
     if (downSampleCycleCounter >= maxDownSampleCycles) {
@@ -3142,7 +3429,7 @@
     };
 
     Sound.maxDownSampleCycles = function () {
-      return Cpu.CLOCK_SPEED();
+      return Cpu.CLOCK_SPEED() / Sound.sampleRate;
     }; // Function to save the state of the class
 
 
@@ -3188,10 +3475,10 @@
 
     Sound.frameSequenceCycleCounter = 0x0000; // Also need to downsample our audio to average audio qualty
     // https://www.reddit.com/r/EmuDev/comments/5gkwi5/gb_apu_sound_emulation/
-    // Want to do 48000hz, so CpuRate / Sound Rate, 4194304 / 48000 ~ 87 cycles
+    // Want to do 44100hz, so CpuRate / Sound Rate, 4194304 / 44100 ~ 91 cycles
 
     Sound.downSampleCycleCounter = 0x00;
-    Sound.downSampleCycleMultiplier = 48000; // Frame sequencer controls what should be updated and and ticked
+    Sound.sampleRate = 44100; // Frame sequencer controls what should be updated and and ticked
     // Every time the sound is updated :) It is updated everytime the
     // Cycle counter reaches the max cycle
 
@@ -3311,7 +3598,7 @@
     SoundAccumulator.channel3Sample = channel3Sample;
     SoundAccumulator.channel4Sample = channel4Sample; // Do Some downsampling magic
 
-    var downSampleCycleCounter = Sound.downSampleCycleCounter + numberOfCycles * Sound.downSampleCycleMultiplier;
+    var downSampleCycleCounter = Sound.downSampleCycleCounter + numberOfCycles;
 
     if (downSampleCycleCounter >= Sound.maxDownSampleCycles()) {
       // Reset the downsample counter
@@ -3376,10 +3663,10 @@
       // Reset the frameSequenceCycleCounter
       // Not setting to zero as we do not want to drop cycles
       frameSequenceCycleCounter -= maxFrameSequenceCycles;
-      Sound.frameSequenceCycleCounter = frameSequenceCycleCounter; // Check our frame sequencer
+      Sound.frameSequenceCycleCounter = frameSequenceCycleCounter; // Update our frame sequencer
       // https://gist.github.com/drhelius/3652407
 
-      var frameSequencer = Sound.frameSequencer;
+      var frameSequencer = Sound.frameSequencer + 1 & 7;
 
       switch (frameSequencer) {
         case 0:
@@ -3428,10 +3715,10 @@
           Channel2.updateEnvelope();
           Channel4.updateEnvelope();
           break;
-      } // Update our frame sequencer
+      } // Save our frame sequencer
 
 
-      Sound.frameSequencer = frameSequencer + 1 & 7;
+      Sound.frameSequencer = frameSequencer;
       return true;
     } else {
       Sound.frameSequenceCycleCounter = frameSequenceCycleCounter;
@@ -3542,10 +3829,14 @@
   } // Functions involved in R/W of sound registers
   // Function to check and handle writes to sound registers
   // Inlined because closure compiler inlines
+  // NOTE: For write traps, return false = don't write to memory,
+  // return true = allow the write to memory
 
 
   function SoundRegisterWriteTraps(offset, value) {
     if (offset !== Sound.memoryLocationNR52 && !Sound.NR52IsSoundEnabled) {
+      // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Power_Control
+      // When sound is turned off / enabled
       // Block all writes to any sound register EXCEPT NR52!
       // This is under the assumption that the check for
       // offset >= 0xFF10 && offset <= 0xFF26
@@ -3620,35 +3911,19 @@
       // Check our NRx4 registers to trap our trigger bits
 
       case Channel1.memoryLocationNRx4:
-        if (checkBitOnByte(7, value)) {
-          Channel1.updateNRx4(value);
-          Channel1.trigger();
-        }
-
+        Channel1.updateNRx4(value);
         return true;
 
       case Channel2.memoryLocationNRx4:
-        if (checkBitOnByte(7, value)) {
-          Channel2.updateNRx4(value);
-          Channel2.trigger();
-        }
-
+        Channel2.updateNRx4(value);
         return true;
 
       case Channel3.memoryLocationNRx4:
-        if (checkBitOnByte(7, value)) {
-          Channel3.updateNRx4(value);
-          Channel3.trigger();
-        }
-
+        Channel3.updateNRx4(value);
         return true;
 
       case Channel4.memoryLocationNRx4:
-        if (checkBitOnByte(7, value)) {
-          Channel4.updateNRx4(value);
-          Channel4.trigger();
-        }
-
+        Channel4.updateNRx4(value);
         return true;
       // Tell the sound accumulator if volumes changes
 
@@ -3665,14 +3940,30 @@
 
       case Sound.memoryLocationNR52:
         // Reset all registers except NR52
-        Sound.updateNR52(value);
+        // See if we were enabled, then update the register.
+        var wasNR52Enabled = Sound.NR52IsSoundEnabled; // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Power_Control
+        // When powered on, the frame sequencer is reset so that the next step will be 0,
+        // the square duty units are reset to the first step of the waveform,
+        // and the wave channel's sample buffer is reset to 0.
 
-        if (!checkBitOnByte(7, value)) {
+        if (!wasNR52Enabled && checkBitOnByte(7, value)) {
+          Sound.frameSequencer = 0x07;
+          Channel1.waveFormPositionOnDuty = 0x00;
+          Channel2.waveFormPositionOnDuty = 0x00; // TODO: Wave Channel Sample Buffer?
+          // I don't think we clear wave RAM here...
+        } // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Power_Control
+        // When powered off, all registers (NR10-NR51) are instantly written with zero
+        // and any writes to those registers are ignored while power remains off
+
+
+        if (wasNR52Enabled && !checkBitOnByte(7, value)) {
           for (var i = 0xff10; i < 0xff26; ++i) {
-            eightBitStoreIntoGBMemory(i, 0x00);
+            eightBitStoreIntoGBMemoryWithTraps(i, 0x00);
           }
-        }
+        } // Need to update our new value here, that way writes go through :p
 
+
+        Sound.updateNR52(value);
         return true;
     } // We did not handle the write, Allow the write
 
@@ -3683,16 +3974,187 @@
 
 
   function SoundRegisterReadTraps(offset) {
-    // TODO: OR All Registers
-    // This will fix bugs in orcale of ages :)
-    if (offset === Sound.memoryLocationNR52) {
-      // Get our registerNR52
-      var registerNR52 = eightBitLoadFromGBMemory(Sound.memoryLocationNR52); // Knock off lower 7 bits
+    // Registers must be OR'd with values when being read
+    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Registers
+    switch (offset) {
+      // Handle NRx0 on Channels
+      case Channel1.memoryLocationNRx0:
+        {
+          var register = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx0);
+          return register | 0x80;
+        }
 
-      registerNR52 &= 0x80; // Or from the table
+      case Channel2.memoryLocationNRx0:
+        {
+          var register = eightBitLoadFromGBMemory(Channel2.memoryLocationNRx0);
+          return register | 0xff;
+        }
 
-      registerNR52 |= 0x70;
-      return registerNR52;
+      case Channel3.memoryLocationNRx0:
+        {
+          var register = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx0);
+          return register | 0x7f;
+        }
+
+      case Channel4.memoryLocationNRx0:
+        {
+          var register = eightBitLoadFromGBMemory(Channel4.memoryLocationNRx0);
+          return register | 0xff;
+        }
+
+      case Sound.memoryLocationNR50:
+        {
+          var register = eightBitLoadFromGBMemory(Sound.memoryLocationNR50);
+          return register | 0x00;
+        }
+      // Handle NRx1 on Channels
+
+      case Channel1.memoryLocationNRx1:
+        {
+          var register = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx1);
+          return register | 0x3f;
+        }
+
+      case Channel2.memoryLocationNRx1:
+        {
+          var register = eightBitLoadFromGBMemory(Channel2.memoryLocationNRx1);
+          return register | 0x3f;
+        }
+
+      case Channel3.memoryLocationNRx1:
+        {
+          var register = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx1);
+          return register | 0xff;
+        }
+
+      case Channel4.memoryLocationNRx1:
+        {
+          var register = eightBitLoadFromGBMemory(Channel4.memoryLocationNRx1);
+          return register | 0xff;
+        }
+
+      case Sound.memoryLocationNR51:
+        {
+          var register = eightBitLoadFromGBMemory(Sound.memoryLocationNR51);
+          return register | 0x00;
+        }
+      // Handle NRx2 on Channels
+
+      case Channel1.memoryLocationNRx2:
+        {
+          var register = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx2);
+          return register | 0x00;
+        }
+
+      case Channel2.memoryLocationNRx2:
+        {
+          var register = eightBitLoadFromGBMemory(Channel2.memoryLocationNRx2);
+          return register | 0x00;
+        }
+
+      case Channel3.memoryLocationNRx2:
+        {
+          var register = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx2);
+          return register | 0x9f;
+        }
+
+      case Channel4.memoryLocationNRx2:
+        {
+          var register = eightBitLoadFromGBMemory(Channel4.memoryLocationNRx2);
+          return register | 0x00;
+        }
+
+      case Sound.memoryLocationNR52:
+        {
+          // This will fix bugs in orcale of ages :)
+          // Start our registerNR52
+          var registerNR52 = 0x00; // Set the first bit to the sound paower status
+
+          if (Sound.NR52IsSoundEnabled) {
+            registerNR52 = setBitOnByte(7, registerNR52);
+          } else {
+            registerNR52 = resetBitOnByte(7, registerNR52);
+          } // Set our lower 4 bits to our channel length statuses
+
+
+          if (Channel1.isEnabled) {
+            registerNR52 = setBitOnByte(0, registerNR52);
+          } else {
+            registerNR52 = resetBitOnByte(0, registerNR52);
+          }
+
+          if (Channel2.isEnabled) {
+            registerNR52 = setBitOnByte(1, registerNR52);
+          } else {
+            registerNR52 = resetBitOnByte(1, registerNR52);
+          }
+
+          if (Channel3.isEnabled) {
+            registerNR52 = setBitOnByte(2, registerNR52);
+          } else {
+            registerNR52 = resetBitOnByte(2, registerNR52);
+          }
+
+          if (Channel4.isEnabled) {
+            registerNR52 = setBitOnByte(3, registerNR52);
+          } else {
+            registerNR52 = resetBitOnByte(3, registerNR52);
+          } // Or from the table
+
+
+          registerNR52 |= 0x70;
+          return registerNR52;
+        }
+      // Handle NRx3 on Channels
+
+      case Channel1.memoryLocationNRx3:
+        {
+          var register = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx3);
+          return register | 0xff;
+        }
+
+      case Channel2.memoryLocationNRx3:
+        {
+          var register = eightBitLoadFromGBMemory(Channel2.memoryLocationNRx3);
+          return register | 0xff;
+        }
+
+      case Channel3.memoryLocationNRx3:
+        {
+          var register = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx3);
+          return register | 0xff;
+        }
+
+      case Channel4.memoryLocationNRx3:
+        {
+          var register = eightBitLoadFromGBMemory(Channel4.memoryLocationNRx3);
+          return register | 0x00;
+        }
+      // Handle NRx4 on Channels
+
+      case Channel1.memoryLocationNRx4:
+        {
+          var register = eightBitLoadFromGBMemory(Channel1.memoryLocationNRx4);
+          return register | 0xbf;
+        }
+
+      case Channel2.memoryLocationNRx4:
+        {
+          var register = eightBitLoadFromGBMemory(Channel2.memoryLocationNRx4);
+          return register | 0xbf;
+        }
+
+      case Channel3.memoryLocationNRx4:
+        {
+          var register = eightBitLoadFromGBMemory(Channel3.memoryLocationNRx4);
+          return register | 0xbf;
+        }
+
+      case Channel4.memoryLocationNRx4:
+        {
+          var register = eightBitLoadFromGBMemory(Channel4.memoryLocationNRx4);
+          return register | 0xbf;
+        }
     }
 
     return -1;
@@ -5024,7 +5486,14 @@
 
 
     if (offset >= 0xff30 && offset <= 0xff3f) {
-      batchProcessAudio();
+      batchProcessAudio(); // Need to handle the write if channel 3 is enabled
+
+      if (Channel3.isEnabled) {
+        Channel3.handleWaveRamWrite(value);
+        return false;
+      }
+
+      return true;
     } // Other Memory effects fomr read/write to Lcd/Graphics
 
 
@@ -6441,11 +6910,22 @@
       batchProcessAudio();
       return SoundRegisterReadTraps(offset);
     } // FF27 - FF2F not used
-    // Final Wave Table for Channel 3
+    // http://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Register_Reading
+    // Always read as 0xFF
+
+
+    if (offset >= 0xff27 && offset <= 0xff2f) {
+      return 0xff;
+    } // Final Wave Table for Channel 3
 
 
     if (offset >= 0xff30 && offset <= 0xff3f) {
       batchProcessAudio();
+
+      if (Channel3.isEnabled) {
+        return Channel3.handleWaveRamRead();
+      }
+
       return -1;
     } // Timers
 
