@@ -373,8 +373,10 @@ var WasmBoy = (function (exports) {
       if (!this.audioContext && typeof window !== 'undefined') {
         // Get our Audio context
         this.audioContext = new (window.AudioContext || window.webkitAudioContext)(); // Set up our nodes
+        // Seems like closure compiler will optimize this out
+        // Thus, need to do a very specifc type check if statement here.
 
-        if (this.audioContext) {
+        if (!!this.audioContext === true) {
           this.gainNode = this.audioContext.createGain();
         }
       }
@@ -6155,7 +6157,7 @@ var WasmBoy = (function (exports) {
   	"gameboy-color"
   ];
   var author = "Aaron Turner";
-  var version = "0.4.0";
+  var version = "0.4.1";
   var license = "GPL-3.0-or-later";
   var homepage = "https://wasmboy.app";
   var repository = {
