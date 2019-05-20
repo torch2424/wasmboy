@@ -11843,7 +11843,11 @@
     let maxFrameSkip = 2; // Start playing the rom
 
     const play = () => {
-      // Run a frame
+      if (!isPlaying) {
+        return;
+      } // Run a frame
+
+
       WasmBoy.instance.exports.executeFrame(); // Render graphics
 
       if (frameSkip >= maxFrameSkip) {
