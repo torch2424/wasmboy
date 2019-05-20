@@ -72,15 +72,6 @@
         background: #edf0f0;
       }
 
-      #root {
-        display: flex;
-        position: relative;
-        justify-content: center;
-        align-items: center;
-        flex-wrap: wrap;
-        padding: 10px;
-      }
-
       #description {
         z-index: 2;
         width: 100%;
@@ -97,6 +88,26 @@
         opacity: 0;
       }
 
+      .wasmboy-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        width: 100%;
+
+        margin-bottom: 10px;
+      }
+
+      #wasmboy-amp-script {
+        border: 1px solid black;
+
+        display: flex;
+        position: relative;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
       #fps {
         text-align: center;
         margin-top: 10px;
@@ -107,8 +118,6 @@
         display: block;
 
         width: 100%;
-        max-width: 400px;
-        border: solid 1px #000;
 
         text-align: center;
         margin-top: 10px;
@@ -118,35 +127,40 @@
       }
     </style>
 
+    <meta
+      name="amp-experiment-token"
+      content="AAAAAFl7Im9yaWdpbiI6Imh0dHBzOi8vd3d3Lndhc21ib3kuYXBwIiwiZXhwZXJpbWVudCI6ImFtcC1zY3JpcHQiLCJleHBpcmF0aW9uIjoxNTY3Mjk2MDAwMDAwfVFCT5mEg3FCtSDuJzKQYQhpPn8lEFY93MBV1Dil9fge2LTUFehhUFWd3ozbMUZz+71aiCsR+t0sM2jng+o7GOzBc9oZIP0ruHdDdjnL1bdUmRPjd4IbbVz9b3WRJIBCBzfadrJPxRsHyMDgLIEAlPWCwtHL5St5ZKMTNPSkWRbS8RQ99FeRJCHstZtMAZPG7lXzGLopFCcVy6wyET8j6Ly6a0+SukRVmPNyz/7Kxh3c6RqPKwxZ/riJLK/DzJb9/9GI5xLlD/dgS+s0P+GL5UFdfk/I6VqK6S16KaXCdA3Q8gPxi83XmJmhJksNFscV+Foi/fc7GY4SV7kU5r6gefY="
+    />
+
     <script async src="https://cdn.ampproject.org/v0.js"></script>
     <script async src="https://torch2424-amp-glitch-express.glitch.me/amp-script.js"></script>
   </head>
 
   <body>
-    <!-- need to serve cors because of new amp-script requirement -->
-    <amp-script layout="container" src="<%BUNDLE%>">
-      <div id="root">
-        <h1>⚡wAsMP Boy⚡</h1>
-        <p id="description">
-          <a href="https://github.com/torch2424/wasmBoy" target="_blank">WasmBoy</a> TS Core Running within
-          <a href="https://github.com/ampproject/amphtml/tree/master/extensions/amp-script" target="_blank">amp-script</a> and
-          <a href="https://github.com/ampproject/worker-dom" target="_blank">Worker DOM</a>. Runs slow due to experimenal amp-script /
-          Worker DOM limitations. Which is worked around using a Pixel-by-pixel RGBA ImageData Array to SVG solution.
+    <h1>⚡wAsMP Boy⚡</h1>
+    <p id="description">
+      <a href="https://github.com/torch2424/wasmBoy" target="_blank">WasmBoy</a> TS Core Running within
+      <a href="https://github.com/ampproject/amphtml/tree/master/extensions/amp-script" target="_blank">amp-script</a> and
+      <a href="https://github.com/ampproject/worker-dom" target="_blank">Worker DOM</a>. Runs slow due to experimenal amp-script / Worker
+      DOM limitations. Which is worked around using a Pixel-by-pixel RGBA ImageData Array to SVG solution.
 
-          <b>NOTE:</b>
-          Play on desktop. You must click the game to control it.
+      <b>NOTE:</b>
+      Play on desktop. You must click the game to control it.
 
-          <b>You must toggle the amp-script experiment:</b>
-          `AMP.toggleExperiment('amp-script')` in Dev tools console.
+      <b>You must toggle the amp-script experiment:</b>
+      `AMP.toggleExperiment('amp-script')` in Dev tools console.
 
-          <b>Lifted the <a href="https://github.com/ampproject/amphtml/pull/20427" target="_blank">AMP Script Size restriction</a></b>
+      <b>Lifted the <a href="https://github.com/ampproject/amphtml/pull/20427" target="_blank">AMP Script Size restriction</a></b>
 
-          <b>ROM played is: <a href="http://tangramgames.dk/tobutobugirl/" target="_blank">Tobu Tobu Girl</a></b>
+      <b>ROM played is: <a href="http://tangramgames.dk/tobutobugirl/" target="_blank">Tobu Tobu Girl</a></b>
 
-          <b>Controls:</b>
-          Up,Down,Left,Right = Arrow Keys, WASD A = Z B = X Start = Enter Select = Shift Play/Pause = Space
-        </p>
-      </div>
-    </amp-script>
+      <b>Controls:</b>
+      Up,Down,Left,Right = Arrow Keys, WASD A = Z B = X Start = Enter Select = Shift Play/Pause = Space
+    </p>
+
+    <div class="wasmboy-container">
+      <!-- need to serve cors because of new amp-script requirement -->
+      <amp-script layout="fixed" width="322px" height="290px" id="wasmboy-amp-script" src="<%BUNDLE%>"> </amp-script>
+    </div>
   </body>
 </html>

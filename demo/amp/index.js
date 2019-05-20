@@ -120,6 +120,10 @@ const runTask = async () => {
 
   // Start playing the rom
   const play = () => {
+    if (!isPlaying) {
+      return;
+    }
+
     // Run a frame
     WasmBoy.instance.exports.executeFrame();
 
