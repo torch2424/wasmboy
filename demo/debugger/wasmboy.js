@@ -182,8 +182,8 @@ const DebuggerPlugin = {
       saveStateObject.screenshotCanvasDataURL = canvasElement.toDataURL();
     }
   },
-  setCanvas: canvasElement => {
-    console.log('Plugin "setCanvas" called!', canvasElement);
+  canvas: (canvasElement, canvasContext, canvasImageData) => {
+    console.log('Plugin "canvas" called!', canvasElement, canvasContext, canvasImageData);
   },
   breakpoint: () => {
     console.log('Plugin "breakpoint" called!');
