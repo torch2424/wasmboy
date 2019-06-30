@@ -28,6 +28,11 @@ const wasmImportObject = {
   index: {
     consoleLog: log,
     consoleLogTimeout: logTimeout
+  },
+  env: {
+    abort: () => {
+      console.error('AssemblyScript Import Object Aborted!');
+    }
   }
 };
 
