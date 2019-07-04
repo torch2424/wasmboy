@@ -11,7 +11,7 @@ const WASMBOY_PLUGIN = {
   // Return AudioNode, which will be connected to the destination node eventually.
   saveState: saveStateObject => {},
   // Returns undefined. Edit object in place.
-  setCanvas: canvasElement => {},
+  canvas: (canvasElement, canvasContext, canvasImageData) => {},
   // Returns undefined. Edit object in place.
   breakpoint: () => {},
   ready: () => {},
@@ -163,7 +163,7 @@ class WasmBoyGraphicsService {
       this.canvasContext = this.canvasElement.getContext('2d');
       this.canvasElement.width = GAMEBOY_CAMERA_WIDTH;
       this.canvasElement.height = GAMEBOY_CAMERA_HEIGHT;
-      this.canvasImageData = this.canvasContext.createImageData(GAMEBOY_CAMERA_WIDTH, GAMEBOY_CAMERA_HEIGHT); // Add some css for smooth 8-bit canvas scaling
+      this.canvasImageData = this.canvasContext.createImageData(this.canvasElement.width, this.canvasElement.height); // Add some css for smooth 8-bit canvas scaling
       // https://stackoverflow.com/questions/7615009/disable-interpolation-when-scaling-a-canvas
       // https://caniuse.com/#feat=css-crisp-edges
 
@@ -179,7 +179,30 @@ class WasmBoyGraphicsService {
       // https://developer.mozilla.org/en-US/docs/Web/API/Element/clientWidth
       // TODO: Mention respopnsive canvas scaling in the docs
 
-      this.canvasContext.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height); // Finally make sure we set our constants for our worker
+      this.canvasContext.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height); // Doing set canvas here, as multiple sources can re-initialize the graphics
+      // TODO: Move setCanvas out of initialize :p
+
+      WasmBoyPlugins.runHook({
+        key: 'canvas',
+        params: [this.canvasElement, this.canvasContext, this.canvasImageData],
+        callback: response => {
+          if (!response) {
+            return;
+          }
+
+          if (response.canvasElement) {
+            this.canvasElement = response.canvasElement;
+          }
+
+          if (response.canvasContext) {
+            this.canvasContext = response.canvasContext;
+          }
+
+          if (response.canvasImageData) {
+            this.canvasImageData = response.canvasImageData;
+          }
+        }
+      }); // Finally make sure we set our constants for our worker
 
       if (this.worker) {
         await this.worker.postMessage({
@@ -227,11 +250,16 @@ class WasmBoyGraphicsService {
 
     WasmBoyPlugins.runHook({
       key: 'graphics',
-      params: [this.imageDataArray]
+      params: [this.imageDataArray],
+      callback: response => {
+        if (response) {
+          this.imageDataArray = response;
+        }
+      }
     }); // Add our new imageData
 
     this.canvasImageData.data.set(this.imageDataArray);
-    this.canvasContext.clearRect(0, 0, GAMEBOY_CAMERA_WIDTH, GAMEBOY_CAMERA_HEIGHT);
+    this.canvasContext.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
     this.canvasContext.putImageData(this.canvasImageData, 0, 0);
   }
 
@@ -920,20 +948,24 @@ function _defineProperty(obj, key, value) {
   return obj;
 }
 
-function _objectSpread(target) {
+function _objectSpread2(target) {
   for (var i = 1; i < arguments.length; i++) {
-    var source = arguments[i] != null ? arguments[i] : {};
-    var ownKeys = Object.keys(source);
+    if (i % 2) {
+      var source = arguments[i] != null ? arguments[i] : {};
+      var ownKeys = Object.keys(source);
 
-    if (typeof Object.getOwnPropertySymbols === 'function') {
-      ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
-        return Object.getOwnPropertyDescriptor(source, sym).enumerable;
-      }));
+      if (typeof Object.getOwnPropertySymbols === 'function') {
+        ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
+          return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+        }));
+      }
+
+      ownKeys.forEach(function (key) {
+        _defineProperty(target, key, source[key]);
+      });
+    } else {
+      Object.defineProperties(target, Object.getOwnPropertyDescriptors(arguments[i]));
     }
-
-    ownKeys.forEach(function (key) {
-      _defineProperty(target, key, source[key]);
-    });
   }
 
   return target;
@@ -3096,7 +3128,7 @@ class WasmBoyMemoryService {
       name = 'Game Boy Color';
     }
 
-    const bootROMObject = _objectSpread({
+    const bootROMObject = _objectSpread2({
       ROM: fetchROMObject.ROM,
       name,
       type,
@@ -3144,7 +3176,7 @@ class WasmBoyMemoryService {
     workerMemoryObject[MEMORY_TYPE.BOOT_ROM] = bootROMObject.ROM.buffer; // Don't pass the rom as a transferrable, since,
     // We want to keep a copy of it for reset
 
-    await this.worker.postMessage(_objectSpread({
+    await this.worker.postMessage(_objectSpread2({
       type: WORKER_MESSAGE_TYPE.SET_MEMORY
     }, workerMemoryObject)).then(event => {
       this.loadedCartridgeMemoryState.BOOT = true;
@@ -3165,7 +3197,7 @@ class WasmBoyMemoryService {
       workerMemoryObject[MEMORY_TYPE.CARTRIDGE_ROM] = ROM.buffer; // Don't pass the rom as a transferrable, since,
       // We want to keep a copy of it for reset
 
-      await this.worker.postMessage(_objectSpread({
+      await this.worker.postMessage(_objectSpread2({
         type: WORKER_MESSAGE_TYPE.SET_MEMORY
       }, workerMemoryObject)).then(event => {
         this.loadedCartridgeMemoryState.ROM = true;
@@ -3207,7 +3239,7 @@ class WasmBoyMemoryService {
 
 
       let fileName = this.cartridgeRomFileName || 'Unknown';
-      cartridgeObject.cartridgeRom = _objectSpread({
+      cartridgeObject.cartridgeRom = _objectSpread2({
         ROM: this.cartridgeRom,
         header: this.cartridgeHeader,
         fileName: fileName,
@@ -3308,7 +3340,7 @@ class WasmBoyMemoryService {
 
       const workerMemoryObject = {};
       workerMemoryObject[MEMORY_TYPE.CARTRIDGE_RAM] = cartridgeObject.cartridgeRam.buffer;
-      await this.worker.postMessage(_objectSpread({
+      await this.worker.postMessage(_objectSpread2({
         type: WORKER_MESSAGE_TYPE.SET_MEMORY
       }, workerMemoryObject)).then(event => {
         this.loadedCartridgeMemoryState.RAM = true;
@@ -3416,7 +3448,7 @@ class WasmBoyMemoryService {
       workerMemoryObject[MEMORY_TYPE.GAMEBOY_MEMORY] = saveState.wasmboyMemory.gameBoyMemory.buffer;
       workerMemoryObject[MEMORY_TYPE.PALETTE_MEMORY] = saveState.wasmboyMemory.wasmBoyPaletteMemory.buffer;
       workerMemoryObject[MEMORY_TYPE.INTERNAL_STATE] = saveState.wasmboyMemory.wasmBoyInternalState.buffer;
-      await this.worker.postMessage(_objectSpread({
+      await this.worker.postMessage(_objectSpread2({
         type: WORKER_MESSAGE_TYPE.SET_MEMORY
       }, workerMemoryObject), [workerMemoryObject[MEMORY_TYPE.CARTRIDGE_RAM], workerMemoryObject[MEMORY_TYPE.GAMEBOY_MEMORY], workerMemoryObject[MEMORY_TYPE.PALETTE_MEMORY], workerMemoryObject[MEMORY_TYPE.INTERNAL_STATE]]);
       await this.worker.postMessage({
@@ -4824,6 +4856,10 @@ var bigInt = (function (undefined) {
         if (mod.isZero()) throw new Error("Cannot take modPow with modulus 0");
         var r = Integer[1],
             base = this.mod(mod);
+        if (exp.isNegative()) {
+            exp = exp.multiply(Integer[-1]);
+            base = base.modInv(mod);
+        }
         while (exp.isPositive()) {
             if (base.isZero()) return Integer[0];
             if (exp.isOdd()) r = r.multiply(base).mod(mod);
@@ -5839,10 +5875,6 @@ class WasmBoyLibService {
 
       this.canvasElement = canvasElement;
       await WasmBoyGraphics.initialize(this.canvasElement, this.options.updateGraphicsCallback);
-      WasmBoyPlugins.runHook({
-        key: 'setCanvas',
-        params: [this.canvasElement]
-      });
     };
 
     return setCanvasTask();
@@ -6154,7 +6186,7 @@ var keywords = [
 	"gameboy-color"
 ];
 var author = "Aaron Turner";
-var version = "0.4.1";
+var version = "0.5.0";
 var license = "GPL-3.0-or-later";
 var homepage = "https://wasmboy.app";
 var repository = {
