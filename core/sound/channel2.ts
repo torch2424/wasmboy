@@ -282,7 +282,13 @@ export class Channel2 {
     // Four duty cycles are available, each waveform taking 8 frequency timer clocks to cycle through:
     Channel2.resetTimer();
 
-    Channel2.envelopeCounter = Channel2.NRx2EnvelopePeriod;
+    // The volume envelope and sweep timers treat a period of 0 as 8.
+    // Meaning, if the period is zero, set it to the max (8).
+    if (Channel2.NRx2EnvelopePeriod === 0) {
+      Channel2.envelopeCounter = 8;
+    } else {
+      Channel2.envelopeCounter = Channel2.NRx2EnvelopePeriod;
+    }
     Channel2.isEnvelopeAutomaticUpdating = true;
 
     Channel2.volume = Channel2.NRx2StartingVolume;
@@ -317,26 +323,31 @@ export class Channel2 {
   }
 
   static updateEnvelope(): void {
-    // Obscure behavior
-    // TODO: The volume envelope and sweep timers treat a period of 0 as 8.
     let envelopeCounter = Channel2.envelopeCounter - 1;
     if (envelopeCounter <= 0) {
-      envelopeCounter = Channel2.NRx2EnvelopePeriod;
+      // Reset back to the sweep period
+      // Obscure behavior
+      // Envelopes treat a period of 0 as 8 (They reset back to the max)
+      if (Channel2.NRx2EnvelopePeriod === 0) {
+        envelopeCounter = 8;
+      } else {
+        envelopeCounter = Channel2.NRx2EnvelopePeriod;
 
-      // When the timer generates a clock and the envelope period is NOT zero, a new volume is calculated
-      // NOTE: There is some weiirrdd obscure behavior where zero can equal 8, so watch out for that
-      if (envelopeCounter !== 0 && Channel2.isEnvelopeAutomaticUpdating) {
-        let volume = Channel2.volume;
-        if (Channel2.NRx2EnvelopeAddMode && volume < 15) {
-          volume += 1;
-        } else if (!Channel2.NRx2EnvelopeAddMode && volume > 0) {
-          volume -= 1;
-        }
-        Channel2.volume = volume;
+        // When the timer generates a clock and the envelope period is NOT zero, a new volume is calculated
+        // NOTE: There is some weiirrdd obscure behavior where zero can equal 8, so watch out for that
+        if (envelopeCounter !== 0 && Channel2.isEnvelopeAutomaticUpdating) {
+          let volume = Channel2.volume;
+          if (Channel2.NRx2EnvelopeAddMode && volume < 15) {
+            volume += 1;
+          } else if (!Channel2.NRx2EnvelopeAddMode && volume > 0) {
+            volume -= 1;
+          }
+          Channel2.volume = volume;
 
-        // Check if we still are automatically updating
-        if (volume === 15 || volume === 0) {
-          Channel2.isEnvelopeAutomaticUpdating = false;
+          // Check if we still are automatically updating
+          if (volume === 15 || volume === 0) {
+            Channel2.isEnvelopeAutomaticUpdating = false;
+          }
         }
       }
     }

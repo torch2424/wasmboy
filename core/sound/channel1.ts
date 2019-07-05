@@ -332,7 +332,13 @@ export class Channel1 {
     // Four duty cycles are available, each waveform taking 8 frequency timer clocks to cycle through:
     Channel1.resetTimer();
 
-    Channel1.envelopeCounter = Channel1.NRx2EnvelopePeriod;
+    // The volume envelope and sweep timers treat a period of 0 as 8.
+    // Meaning, if the period is zero, set it to the max (8).
+    if (Channel1.NRx2EnvelopePeriod === 0) {
+      Channel1.envelopeCounter = 8;
+    } else {
+      Channel1.envelopeCounter = Channel1.NRx2EnvelopePeriod;
+    }
     Channel1.isEnvelopeAutomaticUpdating = true;
 
     Channel1.volume = Channel1.NRx2StartingVolume;
@@ -389,7 +395,7 @@ export class Channel1 {
     if (sweepCounter <= 0) {
       // Reset back to the sweep period
       // Obscure behavior
-      // Sweep timers treat a period of 0 as 8
+      // Sweep timers treat a period of 0 as 8 (They reset back to the max)
       if (Channel1.NRx0SweepPeriod === 0) {
         // Sweep isn't calculated when the period is 0
         Channel1.sweepCounter = 8;
@@ -436,27 +442,32 @@ export class Channel1 {
   }
 
   static updateEnvelope(): void {
-    // Obscure behavior
-    // TODO: The volume envelope and sweep timers treat a period of 0 as 8.
     let envelopeCounter = Channel1.envelopeCounter - 1;
     if (envelopeCounter <= 0) {
-      envelopeCounter = Channel1.NRx2EnvelopePeriod;
+      // Reset back to the sweep period
+      // Obscure behavior
+      // Envelopes treat a period of 0 as 8 (They reset back to the max)
+      if (Channel1.NRx2EnvelopePeriod === 0) {
+        envelopeCounter = 8;
+      } else {
+        envelopeCounter = Channel1.NRx2EnvelopePeriod;
 
-      // When the timer generates a clock and the envelope period is NOT zero, a new volume is calculated
-      // NOTE: There is some weiirrdd obscure behavior where zero can equal 8, so watch out for that
-      // If notes are sustained for too long, this is probably why
-      if (envelopeCounter !== 0 && Channel1.isEnvelopeAutomaticUpdating) {
-        let volume = Channel1.volume;
-        if (Channel1.NRx2EnvelopeAddMode && volume < 15) {
-          volume += 1;
-        } else if (!Channel1.NRx2EnvelopeAddMode && volume > 0) {
-          volume -= 1;
-        }
-        Channel1.volume = volume;
+        // When the timer generates a clock and the envelope period is NOT zero, a new volume is calculated
+        // NOTE: There is some weiirrdd obscure behavior where zero can equal 8, so watch out for that
+        // If notes are sustained for too long, this is probably why
+        if (envelopeCounter !== 0 && Channel1.isEnvelopeAutomaticUpdating) {
+          let volume = Channel1.volume;
+          if (Channel1.NRx2EnvelopeAddMode && volume < 15) {
+            volume += 1;
+          } else if (!Channel1.NRx2EnvelopeAddMode && volume > 0) {
+            volume -= 1;
+          }
+          Channel1.volume = volume;
 
-        // Check if we still are automatically updating
-        if (volume === 15 || volume === 0) {
-          Channel1.isEnvelopeAutomaticUpdating = false;
+          // Check if we still are automatically updating
+          if (volume === 15 || volume === 0) {
+            Channel1.isEnvelopeAutomaticUpdating = false;
+          }
         }
       }
     }
