@@ -48,25 +48,17 @@ export class Channel4 {
       // If the old envelope period was zero and the envelope is still doing automatic updates,
       // volume is incremented by 1, otherwise if the envelope was in subtract mode,
       // volume is incremented by 2.
+      // NOTE: However, from my testing, it ALWAYS increments by one. This was determined
+      // by my testing for prehistoric man
       if (Channel4.NRx2EnvelopePeriod === 0 && Channel4.isEnvelopeAutomaticUpdating) {
-        let volume = Channel4.volume;
-        if (Channel4.NRx2EnvelopeAddMode) {
-          volume += 1;
-        } else {
-          volume += 2;
-        }
-
-        // Don't allow the volume to go above 8 bits.
-        if (volume > 15) {
-          volume = 15;
-        }
-        Channel4.volume = volume;
+        // Volume can't be more than 4 bits
+        Channel4.volume = (Channel4.volume + 1) & 0x0f;
       }
 
       // If the mode was changed (add to subtract or subtract to add),
-      // volume is set to 16-volume.
+      // volume is set to 16-volume. But volume cant be more than 4 bits
       if (Channel4.NRx2EnvelopeAddMode !== checkBitOnByte(3, value)) {
-        Channel4.volume = 16 - Channel4.volume;
+        Channel4.volume = (16 - Channel4.volume) & 0x0f;
       }
     }
 
@@ -253,7 +245,9 @@ export class Channel4 {
     // Our channel DAC must be enabled, and we must be in an active state
     // Of our duty cycle
     if (Channel4.isEnabled && Channel4.isDacEnabled) {
-      outputVolume = Channel4.volume;
+      // Volume can't be more than 4 bits.
+      // Volume should never be more than 4 bits, but doing a check here
+      outputVolume = Channel4.volume & 0x0f;
     } else {
       // Return silence
       // Since range from -15 - 15, or 0 to 30 for our unsigned
@@ -344,14 +338,25 @@ export class Channel4 {
 
         // When the timer generates a clock and the envelope period is NOT zero, a new volume is calculated
         // NOTE: There is some weiirrdd obscure behavior where zero can equal 8, so watch out for that
-        if (envelopeCounter !== 0) {
+        if (envelopeCounter !== 0 && Channel4.isEnvelopeAutomaticUpdating) {
           let volume = Channel4.volume;
-          if (Channel4.NRx2EnvelopeAddMode && volume < 15) {
+
+          // Increment the volume
+          if (Channel4.NRx2EnvelopeAddMode) {
             volume += 1;
-          } else if (!Channel4.NRx2EnvelopeAddMode && volume > 0) {
+          } else {
             volume -= 1;
           }
-          Channel4.volume = volume;
+
+          // Don't allow the volume to go above 4 bits.
+          volume = volume & 0x0f;
+
+          // Check if we are below the max
+          if (volume < 15) {
+            Channel4.volume = volume;
+          } else {
+            Channel4.isEnvelopeAutomaticUpdating = false;
+          }
         }
       }
     }

@@ -13,7 +13,7 @@ import {
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
-import { checkBitOnByte, log } from '../helpers/index';
+import { checkBitOnByte, log, logTimeout } from '../helpers/index';
 
 export class Channel1 {
   // Cycle Counter for our sound accumulator
@@ -75,25 +75,17 @@ export class Channel1 {
       // If the old envelope period was zero and the envelope is still doing automatic updates,
       // volume is incremented by 1, otherwise if the envelope was in subtract mode,
       // volume is incremented by 2.
+      // NOTE: However, from my testing, it ALWAYS increments by one. This was determined
+      // by my testing for prehistoric man
       if (Channel1.NRx2EnvelopePeriod === 0 && Channel1.isEnvelopeAutomaticUpdating) {
-        let volume = Channel1.volume;
-        if (Channel1.NRx2EnvelopeAddMode) {
-          volume += 1;
-        } else {
-          volume += 2;
-        }
-
-        // Don't allow the volume to go above 8 bits.
-        if (volume > 15) {
-          volume = 15;
-        }
-        Channel1.volume = volume;
+        // Volume can't be more than 4 bits
+        Channel1.volume = (Channel1.volume + 1) & 0x0f;
       }
 
       // If the mode was changed (add to subtract or subtract to add),
-      // volume is set to 16-volume.
+      // volume is set to 16-volume. But volume cant be more than 4 bits
       if (Channel1.NRx2EnvelopeAddMode !== checkBitOnByte(3, value)) {
-        Channel1.volume = 16 - Channel1.volume;
+        Channel1.volume = (16 - Channel1.volume) & 0x0f;
       }
     }
 
@@ -109,7 +101,7 @@ export class Channel1 {
     // Blargg length test
     // Disabling DAC should disable channel immediately
     if (!isDacEnabled) {
-      Channel1.isEnabled = isDacEnabled;
+      Channel1.isEnabled = false;
     }
   }
 
@@ -299,7 +291,9 @@ export class Channel1 {
     // Our channel DAC must be enabled, and we must be in an active state
     // Of our duty cycle
     if (Channel1.isEnabled && Channel1.isDacEnabled) {
-      outputVolume = Channel1.volume;
+      // Volume can't be more than 4 bits.
+      // Volume should never be more than 4 bits, but doing a check here
+      outputVolume = Channel1.volume & 0x0f;
     } else {
       // Return silence
       // Since range from -15 - 15, or 0 to 30 for our unsigned
@@ -457,15 +451,21 @@ export class Channel1 {
         // If notes are sustained for too long, this is probably why
         if (envelopeCounter !== 0 && Channel1.isEnvelopeAutomaticUpdating) {
           let volume = Channel1.volume;
-          if (Channel1.NRx2EnvelopeAddMode && volume < 15) {
+
+          // Increment the volume
+          if (Channel1.NRx2EnvelopeAddMode) {
             volume += 1;
-          } else if (!Channel1.NRx2EnvelopeAddMode && volume > 0) {
+          } else {
             volume -= 1;
           }
-          Channel1.volume = volume;
 
-          // Check if we still are automatically updating
-          if (volume === 15 || volume === 0) {
+          // Don't allow the volume to go above 4 bits.
+          volume = volume & 0x0f;
+
+          // Check if we are below the max
+          if (volume < 15) {
+            Channel1.volume = volume;
+          } else {
             Channel1.isEnvelopeAutomaticUpdating = false;
           }
         }

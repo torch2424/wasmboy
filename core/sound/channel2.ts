@@ -12,7 +12,7 @@ import {
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
-import { checkBitOnByte, log } from '../helpers/index';
+import { checkBitOnByte, log, logTimeout } from '../helpers/index';
 
 export class Channel2 {
   // Cycle Counter for our sound accumulator
@@ -55,25 +55,17 @@ export class Channel2 {
       // If the old envelope period was zero and the envelope is still doing automatic updates,
       // volume is incremented by 1, otherwise if the envelope was in subtract mode,
       // volume is incremented by 2.
+      // NOTE: However, from my testing, it ALWAYS increments by one. This was determined
+      // by my testing for prehistoric man
       if (Channel2.NRx2EnvelopePeriod === 0 && Channel2.isEnvelopeAutomaticUpdating) {
-        let volume = Channel2.volume;
-        if (Channel2.NRx2EnvelopeAddMode) {
-          volume += 1;
-        } else {
-          volume += 2;
-        }
-
-        // Don't allow the volume to go above 8 bits.
-        if (volume > 15) {
-          volume = 15;
-        }
-        Channel2.volume = volume;
+        // Volume can't be more than 4 bits
+        Channel2.volume = (Channel2.volume + 1) & 0x0f;
       }
 
       // If the mode was changed (add to subtract or subtract to add),
-      // volume is set to 16-volume.
+      // volume is set to 16-volume. But volume cant be more than 4 bits
       if (Channel2.NRx2EnvelopeAddMode !== checkBitOnByte(3, value)) {
-        Channel2.volume = 16 - Channel2.volume;
+        Channel2.volume = (16 - Channel2.volume) & 0x0f;
       }
     }
 
@@ -249,7 +241,9 @@ export class Channel2 {
     // Our channel DAC must be enabled, and we must be in an active state
     // Of our duty cycle
     if (Channel2.isEnabled && Channel2.isDacEnabled) {
-      outputVolume = Channel2.volume;
+      // Volume can't be more than 4 bits.
+      // Volume should never be more than 4 bits, but doing a check here
+      outputVolume = Channel2.volume & 0x0f;
     } else {
       // Return silence
       // Since range from -15 - 15, or 0 to 30 for our unsigned
@@ -337,15 +331,21 @@ export class Channel2 {
         // NOTE: There is some weiirrdd obscure behavior where zero can equal 8, so watch out for that
         if (envelopeCounter !== 0 && Channel2.isEnvelopeAutomaticUpdating) {
           let volume = Channel2.volume;
-          if (Channel2.NRx2EnvelopeAddMode && volume < 15) {
+
+          // Increment the volume
+          if (Channel2.NRx2EnvelopeAddMode) {
             volume += 1;
-          } else if (!Channel2.NRx2EnvelopeAddMode && volume > 0) {
+          } else {
             volume -= 1;
           }
-          Channel2.volume = volume;
 
-          // Check if we still are automatically updating
-          if (volume === 15 || volume === 0) {
+          // Don't allow the volume to go above 4 bits.
+          volume = volume & 0x0f;
+
+          // Check if we are below the max
+          if (volume < 15) {
+            Channel2.volume = volume;
+          } else {
             Channel2.isEnvelopeAutomaticUpdating = false;
           }
         }
