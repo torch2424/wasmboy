@@ -49,6 +49,34 @@ export class Channel2 {
   static NRx2EnvelopeAddMode: boolean = false;
   static NRx2EnvelopePeriod: i32 = 0;
   static updateNRx2(value: i32): void {
+    // Handle "Zombie Mode" Obscure behavior
+    // https://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Obscure_Behavior
+    if (Channel2.isEnabled) {
+      // If the old envelope period was zero and the envelope is still doing automatic updates,
+      // volume is incremented by 1, otherwise if the envelope was in subtract mode,
+      // volume is incremented by 2.
+      if (Channel2.NRx2EnvelopePeriod === 0 && Channel2.isEnvelopeAutomaticUpdating) {
+        let volume = Channel2.volume;
+        if (Channel2.NRx2EnvelopeAddMode) {
+          volume += 1;
+        } else {
+          volume += 2;
+        }
+
+        // Don't allow the volume to go above 8 bits.
+        if (volume > 15) {
+          volume = 15;
+        }
+        Channel2.volume = volume;
+      }
+
+      // If the mode was changed (add to subtract or subtract to add),
+      // volume is set to 16-volume.
+      if (Channel2.NRx2EnvelopeAddMode !== checkBitOnByte(3, value)) {
+        Channel2.volume = 16 - Channel2.volume;
+      }
+    }
+
     Channel2.NRx2StartingVolume = (value >> 4) & 0x0f;
     Channel2.NRx2EnvelopeAddMode = checkBitOnByte(3, value);
     Channel2.NRx2EnvelopePeriod = value & 0x07;
@@ -130,6 +158,7 @@ export class Channel2 {
   static frequency: i32 = 0;
   static frequencyTimer: i32 = 0x00;
   static envelopeCounter: i32 = 0x00;
+  static isEnvelopeAutomaticUpdating: boolean = false;
   static lengthCounter: i32 = 0x00;
   static volume: i32 = 0x00;
 
@@ -151,6 +180,7 @@ export class Channel2 {
 
     store<u8>(getSaveStateMemoryOffset(0x13, Channel2.saveStateSlot), Channel2.dutyCycle);
     store<u8>(getSaveStateMemoryOffset(0x14, Channel2.saveStateSlot), <u8>Channel2.waveFormPositionOnDuty);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x15, Channel2.saveStateSlot), Channel2.isEnvelopeAutomaticUpdating);
   }
 
   // Function to load the save state from memory
@@ -163,6 +193,7 @@ export class Channel2 {
 
     Channel2.dutyCycle = load<u8>(getSaveStateMemoryOffset(0x13, Channel2.saveStateSlot));
     Channel2.waveFormPositionOnDuty = load<u8>(getSaveStateMemoryOffset(0x14, Channel2.saveStateSlot));
+    Channel2.isEnvelopeAutomaticUpdating = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x21, Channel2.saveStateSlot));
   }
 
   static initialize(): void {
@@ -252,6 +283,7 @@ export class Channel2 {
     Channel2.resetTimer();
 
     Channel2.envelopeCounter = Channel2.NRx2EnvelopePeriod;
+    Channel2.isEnvelopeAutomaticUpdating = true;
 
     Channel2.volume = Channel2.NRx2StartingVolume;
 
@@ -293,7 +325,7 @@ export class Channel2 {
 
       // When the timer generates a clock and the envelope period is NOT zero, a new volume is calculated
       // NOTE: There is some weiirrdd obscure behavior where zero can equal 8, so watch out for that
-      if (envelopeCounter !== 0) {
+      if (envelopeCounter !== 0 && Channel2.isEnvelopeAutomaticUpdating) {
         let volume = Channel2.volume;
         if (Channel2.NRx2EnvelopeAddMode && volume < 15) {
           volume += 1;
@@ -301,6 +333,11 @@ export class Channel2 {
           volume -= 1;
         }
         Channel2.volume = volume;
+
+        // Check if we still are automatically updating
+        if (volume === 15 || volume === 0) {
+          Channel2.isEnvelopeAutomaticUpdating = false;
+        }
       }
     }
     Channel2.envelopeCounter = envelopeCounter;
