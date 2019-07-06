@@ -20,7 +20,7 @@ export class Lcd {
   // 2 or 10: Searching Sprites Atts
   // 3 or 11: Transfering Data to LCD Driver
   static readonly memoryLocationLcdStatus: i32 = 0xff41;
-  static mode: i32 = 0;
+  static currentLcdMode: i32 = 0;
   // Function called in write traps to update our hardware registers
   static updateLcdStatus(value: i32): void {
     // Bottom three bits are read only
@@ -82,33 +82,11 @@ export class Lcd {
       resetLcd(false);
     }
   }
-
-  // Cycle getters for scanlines
-  // (NOTE: One scanline is 456 cycles. Thus, they should add to 456)
-  // TODO: Optimize this, so that double speed updates all cycle constants
-  // Rather than re-calculating every time
-
-  // Hblank
-  static MODE_0_CYCLES(): i32 {
-    return 204 << (<i32>Cpu.GBCDoubleSpeed);
-  }
-
-  // OAM Search
-  static MODE_2_CYCLES(): i32 {
-    return 80 << (<i32>Cpu.GBCDoubleSpeed);
-  }
-
-  // Pixel Transfer
-  static MODE_3_CYCLES(): i32 {
-    return 172 << (<i32>Cpu.GBCDoubleSpeed);
-  }
-
-  static;
 }
 
 function resetLcd(shouldBlankScreen: boolean): void {
   // Reset scanline cycle counter
-  Graphics.scanlineCycles = 0;
+  Graphics.scanlineCycleCounter = 0;
   Graphics.scanlineRegister = 0;
   eightBitStoreIntoGBMemory(Graphics.memoryLocationScanlineRegister, 0);
 
@@ -117,7 +95,7 @@ function resetLcd(shouldBlankScreen: boolean): void {
   let lcdStatus: i32 = eightBitLoadFromGBMemory(Lcd.memoryLocationLcdStatus);
   lcdStatus = resetBitOnByte(1, lcdStatus);
   lcdStatus = resetBitOnByte(0, lcdStatus);
-  Lcd.mode = 0;
+  Lcd.currentLcdMode = 0;
 
   // Store the status in memory
   eightBitStoreIntoGBMemory(Lcd.memoryLocationLcdStatus, lcdStatus);
@@ -130,50 +108,34 @@ function resetLcd(shouldBlankScreen: boolean): void {
   }
 }
 
-function checkCoincidence(lcdMode: i32, lcdStatus: i32): i32 {
-  // Check for the coincidence flag
-  // Need to check on every mode, and not just HBLANK, as checking on hblank breaks shantae, which checks on vblank
-  if ((lcdMode === 0 || lcdMode === 1) && Graphics.scanlineRegister === Lcd.coincidenceCompare) {
-    lcdStatus = setBitOnByte(2, lcdStatus);
-    if (checkBitOnByte(6, lcdStatus)) {
-      requestLcdInterrupt();
-    }
-  } else {
-    lcdStatus = resetBitOnByte(2, lcdStatus);
+// Pass in the lcd status for performance
+// Inlined because closure compiler inlines
+export function setLcdStatus(): void {
+  // Check if the Lcd was disabled
+  if (!Lcd.enabled) {
+    return;
   }
 
-  return lcdStatus;
-}
-
-export function updateLcd(): void {
   // Get our current scanline, and lcd mode
   let scanlineRegister: i32 = Graphics.scanlineRegister;
-  let scanlineCycles: i32 = Graphics.scanlineCycles;
-  let lcdMode: i32 = Lcd.mode;
+  let lcdMode: i32 = Lcd.currentLcdMode;
 
-  // Get our new LCD mode (if it is new)
-  let newLcdMode: i32 = 0;
+  // Default to  H-Blank
+  let newLcdMode = 0;
 
-  // First check if we are in V-Blank
+  // Find our newLcd mode
   if (scanlineRegister >= 144) {
     // VBlank mode
     newLcdMode = 1;
   } else {
-    // We are drawing scanlines
-    // Get all of our cycles
-    let mode2Cycles = Lcd.MODE_2_CYCLES();
-    let mode3Cycles = Lcd.MODE_3_CYCLES();
-    let mode0Cycles = Lcd.MODE_0_CYCLES();
-
-    if (scanlineCycles > mode2Cycles + mode3Cycles) {
-      // We are in mode 0 Hblank
-      newLcdMode = 0;
-    } else if (scanlineCycles > mode2Cycles) {
-      // We are in mode 3 Pixel Transfer
-      newLcdMode = 3;
-    } else {
-      // We are in mode 2, OAM Search
+    let scanlineCycleCounter = Graphics.scanlineCycleCounter;
+    let MIN_CYCLES_SPRITES_LCD_MODE = Graphics.MIN_CYCLES_SPRITES_LCD_MODE();
+    if (scanlineCycleCounter >= MIN_CYCLES_SPRITES_LCD_MODE) {
+      // Searching Sprites Atts
       newLcdMode = 2;
+    } else if (scanlineCycleCounter >= MIN_CYCLES_SPRITES_LCD_MODE) {
+      // Transferring data to lcd
+      newLcdMode = 3;
     }
   }
 
@@ -182,7 +144,7 @@ export function updateLcd(): void {
     let lcdStatus: i32 = eightBitLoadFromGBMemory(Lcd.memoryLocationLcdStatus);
 
     // Save our lcd mode
-    Lcd.mode = newLcdMode;
+    Lcd.currentLcdMode = newLcdMode;
 
     let shouldRequestInterrupt = false;
 
@@ -192,19 +154,11 @@ export function updateLcd(): void {
         lcdStatus = resetBitOnByte(0, lcdStatus);
         lcdStatus = resetBitOnByte(1, lcdStatus);
         shouldRequestInterrupt = checkBitOnByte(3, lcdStatus);
-
-        // Update the Hblank DMA, will simply return if not active
-        updateHblankHdma();
-
         break;
       case 0x01:
         lcdStatus = resetBitOnByte(1, lcdStatus);
         lcdStatus = setBitOnByte(0, lcdStatus);
         shouldRequestInterrupt = checkBitOnByte(4, lcdStatus);
-
-        // request a VBLANK interrupt
-        requestVBlankInterrupt();
-
         break;
       case 0x02:
         lcdStatus = resetBitOnByte(0, lcdStatus);
@@ -222,6 +176,17 @@ export function updateLcd(): void {
       requestLcdInterrupt();
     }
 
+    // Check for updating the Hblank HDMA
+    if (newLcdMode === 0) {
+      // Update the Hblank DMA, will simply return if not active
+      updateHblankHdma();
+    }
+
+    // Check for requesting a VBLANK interrupt
+    if (newLcdMode === 1) {
+      requestVBlankInterrupt();
+    }
+
     // Check for the coincidence
     lcdStatus = checkCoincidence(newLcdMode, lcdStatus);
 
@@ -234,4 +199,19 @@ export function updateLcd(): void {
     lcdStatus = checkCoincidence(newLcdMode, lcdStatus);
     eightBitStoreIntoGBMemory(Lcd.memoryLocationLcdStatus, lcdStatus);
   }
+}
+
+function checkCoincidence(lcdMode: i32, lcdStatus: i32): i32 {
+  // Check for the coincidence flag
+  // Need to check on every mode, and not just HBLANK, as checking on hblank breaks shantae, which checks on vblank
+  if ((lcdMode === 0 || lcdMode === 1) && Graphics.scanlineRegister === Lcd.coincidenceCompare) {
+    lcdStatus = setBitOnByte(2, lcdStatus);
+    if (checkBitOnByte(6, lcdStatus)) {
+      requestLcdInterrupt();
+    }
+  } else {
+    lcdStatus = resetBitOnByte(2, lcdStatus);
+  }
+
+  return lcdStatus;
 }
