@@ -42,6 +42,26 @@ export class Channel4 {
   static NRx2EnvelopeAddMode: boolean = false;
   static NRx2EnvelopePeriod: i32 = 0;
   static updateNRx2(value: i32): void {
+    // Handle "Zombie Mode" Obscure behavior
+    // https://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Obscure_Behavior
+    if (Channel4.isEnabled) {
+      // If the old envelope period was zero and the envelope is still doing automatic updates,
+      // volume is incremented by 1, otherwise if the envelope was in subtract mode,
+      // volume is incremented by 2.
+      // NOTE: However, from my testing, it ALWAYS increments by one. This was determined
+      // by my testing for prehistoric man
+      if (Channel4.NRx2EnvelopePeriod === 0 && Channel4.isEnvelopeAutomaticUpdating) {
+        // Volume can't be more than 4 bits
+        Channel4.volume = (Channel4.volume + 1) & 0x0f;
+      }
+
+      // If the mode was changed (add to subtract or subtract to add),
+      // volume is set to 16-volume. But volume cant be more than 4 bits
+      if (Channel4.NRx2EnvelopeAddMode !== checkBitOnByte(3, value)) {
+        Channel4.volume = (16 - Channel4.volume) & 0x0f;
+      }
+    }
+
     Channel4.NRx2StartingVolume = (value >> 4) & 0x0f;
     Channel4.NRx2EnvelopeAddMode = checkBitOnByte(3, value);
     Channel4.NRx2EnvelopePeriod = value & 0x07;
@@ -121,6 +141,7 @@ export class Channel4 {
   static isDacEnabled: boolean = false;
   static frequencyTimer: i32 = 0x00;
   static envelopeCounter: i32 = 0x00;
+  static isEnvelopeAutomaticUpdating: boolean = false;
   static lengthCounter: i32 = 0x00;
   static volume: i32 = 0x00;
   static divisor: i32 = 0;
@@ -141,6 +162,7 @@ export class Channel4 {
     store<i32>(getSaveStateMemoryOffset(0x09, Channel4.saveStateSlot), Channel4.lengthCounter);
     store<i32>(getSaveStateMemoryOffset(0x0e, Channel4.saveStateSlot), Channel4.volume);
     store<u16>(getSaveStateMemoryOffset(0x13, Channel4.saveStateSlot), Channel4.linearFeedbackShiftRegister);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x15, Channel4.saveStateSlot), Channel4.isEnvelopeAutomaticUpdating);
   }
 
   // Function to load the save state from memory
@@ -151,6 +173,7 @@ export class Channel4 {
     Channel4.lengthCounter = load<i32>(getSaveStateMemoryOffset(0x09, Channel4.saveStateSlot));
     Channel4.volume = load<i32>(getSaveStateMemoryOffset(0x0e, Channel4.saveStateSlot));
     Channel4.linearFeedbackShiftRegister = load<u16>(getSaveStateMemoryOffset(0x13, Channel4.saveStateSlot));
+    Channel4.isEnvelopeAutomaticUpdating = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x15, Channel4.saveStateSlot));
   }
 
   static initialize(): void {
@@ -222,7 +245,9 @@ export class Channel4 {
     // Our channel DAC must be enabled, and we must be in an active state
     // Of our duty cycle
     if (Channel4.isEnabled && Channel4.isDacEnabled) {
-      outputVolume = Channel4.volume;
+      // Volume can't be more than 4 bits.
+      // Volume should never be more than 4 bits, but doing a check here
+      outputVolume = Channel4.volume & 0x0f;
     } else {
       // Return silence
       // Since range from -15 - 15, or 0 to 30 for our unsigned
@@ -252,7 +277,14 @@ export class Channel4 {
     // Reset our timers
     Channel4.frequencyTimer = Channel4.getNoiseChannelFrequencyPeriod();
 
-    Channel4.envelopeCounter = Channel4.NRx2EnvelopePeriod;
+    // The volume envelope and sweep timers treat a period of 0 as 8.
+    // Meaning, if the period is zero, set it to the max (8).
+    if (Channel4.NRx2EnvelopePeriod === 0) {
+      Channel4.envelopeCounter = 8;
+    } else {
+      Channel4.envelopeCounter = Channel4.NRx2EnvelopePeriod;
+    }
+    Channel4.isEnvelopeAutomaticUpdating = true;
 
     Channel4.volume = Channel4.NRx2StartingVolume;
 
@@ -294,22 +326,38 @@ export class Channel4 {
   }
 
   static updateEnvelope(): void {
-    // Obscure behavior
-    // TODO: The volume envelope and sweep timers treat a period of 0 as 8.
     let envelopeCounter = Channel4.envelopeCounter - 1;
     if (envelopeCounter <= 0) {
-      envelopeCounter = Channel4.NRx2EnvelopePeriod;
+      // Reset back to the sweep period
+      // Obscure behavior
+      // Envelopes treat a period of 0 as 8 (They reset back to the max)
+      if (Channel4.NRx2EnvelopePeriod === 0) {
+        envelopeCounter = 8;
+      } else {
+        envelopeCounter = Channel4.NRx2EnvelopePeriod;
 
-      // When the timer generates a clock and the envelope period is NOT zero, a new volume is calculated
-      // NOTE: There is some weiirrdd obscure behavior where zero can equal 8, so watch out for that
-      if (envelopeCounter !== 0) {
-        let volume = Channel4.volume;
-        if (Channel4.NRx2EnvelopeAddMode && volume < 15) {
-          volume += 1;
-        } else if (!Channel4.NRx2EnvelopeAddMode && volume > 0) {
-          volume -= 1;
+        // When the timer generates a clock and the envelope period is NOT zero, a new volume is calculated
+        // NOTE: There is some weiirrdd obscure behavior where zero can equal 8, so watch out for that
+        if (envelopeCounter !== 0 && Channel4.isEnvelopeAutomaticUpdating) {
+          let volume = Channel4.volume;
+
+          // Increment the volume
+          if (Channel4.NRx2EnvelopeAddMode) {
+            volume += 1;
+          } else {
+            volume -= 1;
+          }
+
+          // Don't allow the volume to go above 4 bits.
+          volume = volume & 0x0f;
+
+          // Check if we are below the max
+          if (volume < 15) {
+            Channel4.volume = volume;
+          } else {
+            Channel4.isEnvelopeAutomaticUpdating = false;
+          }
         }
-        Channel4.volume = volume;
       }
     }
     Channel4.envelopeCounter = envelopeCounter;

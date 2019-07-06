@@ -13,7 +13,7 @@ import {
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
-import { checkBitOnByte, log } from '../helpers/index';
+import { checkBitOnByte, log, logTimeout } from '../helpers/index';
 
 export class Channel1 {
   // Cycle Counter for our sound accumulator
@@ -69,6 +69,27 @@ export class Channel1 {
   static NRx2EnvelopeAddMode: boolean = false;
   static NRx2EnvelopePeriod: i32 = 0;
   static updateNRx2(value: i32): void {
+    // Handle "Zombie Mode" Obscure behavior
+    // https://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Obscure_Behavior
+    if (Channel1.isEnabled) {
+      // If the old envelope period was zero and the envelope is still doing automatic updates,
+      // volume is incremented by 1, otherwise if the envelope was in subtract mode,
+      // volume is incremented by 2.
+      // NOTE: However, from my testing, it ALWAYS increments by one. This was determined
+      // by my testing for prehistoric man
+      if (Channel1.NRx2EnvelopePeriod === 0 && Channel1.isEnvelopeAutomaticUpdating) {
+        // Volume can't be more than 4 bits
+        Channel1.volume = (Channel1.volume + 1) & 0x0f;
+      }
+
+      // If the mode was changed (add to subtract or subtract to add),
+      // volume is set to 16-volume. But volume cant be more than 4 bits
+      if (Channel1.NRx2EnvelopeAddMode !== checkBitOnByte(3, value)) {
+        Channel1.volume = (16 - Channel1.volume) & 0x0f;
+      }
+    }
+
+    // Handle the regular write
     Channel1.NRx2StartingVolume = (value >> 4) & 0x0f;
     Channel1.NRx2EnvelopeAddMode = checkBitOnByte(3, value);
     Channel1.NRx2EnvelopePeriod = value & 0x07;
@@ -80,7 +101,7 @@ export class Channel1 {
     // Blargg length test
     // Disabling DAC should disable channel immediately
     if (!isDacEnabled) {
-      Channel1.isEnabled = isDacEnabled;
+      Channel1.isEnabled = false;
     }
   }
 
@@ -154,6 +175,7 @@ export class Channel1 {
   static frequency: i32 = 0;
   static frequencyTimer: i32 = 0x00;
   static envelopeCounter: i32 = 0x00;
+  static isEnvelopeAutomaticUpdating: boolean = false;
   static lengthCounter: i32 = 0x00;
   static volume: i32 = 0x00;
 
@@ -184,11 +206,12 @@ export class Channel1 {
     storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x19, Channel1.saveStateSlot), Channel1.isSweepEnabled);
     store<i32>(getSaveStateMemoryOffset(0x1a, Channel1.saveStateSlot), Channel1.sweepCounter);
     store<u16>(getSaveStateMemoryOffset(0x1f, Channel1.saveStateSlot), Channel1.sweepShadowFrequency);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x21, Channel1.saveStateSlot), Channel1.isEnvelopeAutomaticUpdating);
   }
 
   // Function to load the save state from memory
   static loadState(): void {
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x00, Channel1.saveStateSlot), Channel1.isEnabled);
+    Channel1.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x00, Channel1.saveStateSlot));
     Channel1.frequencyTimer = load<i32>(getSaveStateMemoryOffset(0x01, Channel1.saveStateSlot));
     Channel1.envelopeCounter = load<i32>(getSaveStateMemoryOffset(0x05, Channel1.saveStateSlot));
     Channel1.lengthCounter = load<i32>(getSaveStateMemoryOffset(0x09, Channel1.saveStateSlot));
@@ -200,6 +223,7 @@ export class Channel1 {
     Channel1.isSweepEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x19, Channel1.saveStateSlot));
     Channel1.sweepCounter = load<i32>(getSaveStateMemoryOffset(0x1a, Channel1.saveStateSlot));
     Channel1.sweepShadowFrequency = load<u16>(getSaveStateMemoryOffset(0x1f, Channel1.saveStateSlot));
+    Channel1.isEnvelopeAutomaticUpdating = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x21, Channel1.saveStateSlot));
   }
 
   static initialize(): void {
@@ -267,7 +291,9 @@ export class Channel1 {
     // Our channel DAC must be enabled, and we must be in an active state
     // Of our duty cycle
     if (Channel1.isEnabled && Channel1.isDacEnabled) {
-      outputVolume = Channel1.volume;
+      // Volume can't be more than 4 bits.
+      // Volume should never be more than 4 bits, but doing a check here
+      outputVolume = Channel1.volume & 0x0f;
     } else {
       // Return silence
       // Since range from -15 - 15, or 0 to 30 for our unsigned
@@ -300,7 +326,14 @@ export class Channel1 {
     // Four duty cycles are available, each waveform taking 8 frequency timer clocks to cycle through:
     Channel1.resetTimer();
 
-    Channel1.envelopeCounter = Channel1.NRx2EnvelopePeriod;
+    // The volume envelope and sweep timers treat a period of 0 as 8.
+    // Meaning, if the period is zero, set it to the max (8).
+    if (Channel1.NRx2EnvelopePeriod === 0) {
+      Channel1.envelopeCounter = 8;
+    } else {
+      Channel1.envelopeCounter = Channel1.NRx2EnvelopePeriod;
+    }
+    Channel1.isEnvelopeAutomaticUpdating = true;
 
     Channel1.volume = Channel1.NRx2StartingVolume;
 
@@ -356,7 +389,7 @@ export class Channel1 {
     if (sweepCounter <= 0) {
       // Reset back to the sweep period
       // Obscure behavior
-      // Sweep timers treat a period of 0 as 8
+      // Sweep timers treat a period of 0 as 8 (They reset back to the max)
       if (Channel1.NRx0SweepPeriod === 0) {
         // Sweep isn't calculated when the period is 0
         Channel1.sweepCounter = 8;
@@ -403,23 +436,39 @@ export class Channel1 {
   }
 
   static updateEnvelope(): void {
-    // Obscure behavior
-    // TODO: The volume envelope and sweep timers treat a period of 0 as 8.
     let envelopeCounter = Channel1.envelopeCounter - 1;
     if (envelopeCounter <= 0) {
-      envelopeCounter = Channel1.NRx2EnvelopePeriod;
+      // Reset back to the sweep period
+      // Obscure behavior
+      // Envelopes treat a period of 0 as 8 (They reset back to the max)
+      if (Channel1.NRx2EnvelopePeriod === 0) {
+        envelopeCounter = 8;
+      } else {
+        envelopeCounter = Channel1.NRx2EnvelopePeriod;
 
-      // When the timer generates a clock and the envelope period is NOT zero, a new volume is calculated
-      // NOTE: There is some weiirrdd obscure behavior where zero can equal 8, so watch out for that
-      // If notes are sustained for too long, this is probably why
-      if (envelopeCounter !== 0) {
-        let volume = Channel1.volume;
-        if (Channel1.NRx2EnvelopeAddMode && volume < 15) {
-          volume += 1;
-        } else if (!Channel1.NRx2EnvelopeAddMode && volume > 0) {
-          volume -= 1;
+        // When the timer generates a clock and the envelope period is NOT zero, a new volume is calculated
+        // NOTE: There is some weiirrdd obscure behavior where zero can equal 8, so watch out for that
+        // If notes are sustained for too long, this is probably why
+        if (envelopeCounter !== 0 && Channel1.isEnvelopeAutomaticUpdating) {
+          let volume = Channel1.volume;
+
+          // Increment the volume
+          if (Channel1.NRx2EnvelopeAddMode) {
+            volume += 1;
+          } else {
+            volume -= 1;
+          }
+
+          // Don't allow the volume to go above 4 bits.
+          volume = volume & 0x0f;
+
+          // Check if we are below the max
+          if (volume < 15) {
+            Channel1.volume = volume;
+          } else {
+            Channel1.isEnvelopeAutomaticUpdating = false;
+          }
         }
-        Channel1.volume = volume;
       }
     }
     Channel1.envelopeCounter = envelopeCounter;
