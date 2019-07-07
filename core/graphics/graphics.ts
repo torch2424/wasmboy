@@ -1,15 +1,17 @@
 // Main Class and funcitons for rendering the gameboy display
 import { FRAME_LOCATION, GAMEBOY_INTERNAL_MEMORY_LOCATION } from '../constants';
 import { getSaveStateMemoryOffset } from '../core';
-import { Lcd, setLcdStatus } from './lcd';
-import { renderBackground, renderWindow } from './backgroundWindow';
-import { renderSprites } from './sprites';
-import { clearPriorityMap } from './priority';
-import { resetTileCache } from './tiles';
-import { initializeColors } from './colors';
 import { Cpu } from '../cpu/index';
-import { Config } from '../config';
-import { Memory, eightBitLoadFromGBMemory, eightBitStoreIntoGBMemory } from '../memory/index';
+import {
+  Memory,
+  eightBitLoadFromGBMemory,
+  eightBitStoreIntoGBMemory,
+  loadBooleanDirectlyFromWasmMemory,
+  storeBooleanDirectlyToWasmMemory
+} from '../memory/index';
+import { Lcd } from './lcd';
+import { initializeColors } from './colors';
+import { oamSearchForVisibleSprites } from './sprites';
 
 export class Graphics {
   // Current cycles
@@ -57,7 +59,6 @@ export class Graphics {
   // 0x00 - 0x24 Graphics, 0x25 - 0x50 LCD
   static saveState(): void {
     // Graphics
-
     store<i32>(getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot), Graphics.scanlineCycles);
     eightBitStoreIntoGBMemory(Graphics.memoryLocationScanlineRegister, Graphics.scanlineRegister);
 
@@ -158,29 +159,48 @@ export function updateGraphics(numberOfCycles: i32): void {
   // Update our cycles
   Graphics.scanlineCycles += numberOfCycles;
 
-  // Update our LCD
-  updateLcd();
-}
+  // See if we need to go from OAM Search mode to Pixel Transfer
+  let cyclesPerOamSearch = 80 << (<i32>Cpu.GBCDoubleSpeed);
+  if (Lcd.mode === 2 && Graphics.scanlineCycles > oamSearchCycles) {
+    // Do the actual OAM Search
+    oamSearchForVisibleSprites();
 
-// Function to get the start of a RGB pixel (R, G, B)
-// Inlined because closure compiler inlines
-export function getRgbPixelStart(x: i32, y: i32): i32 {
-  // Get the pixel number
-  // let pixelNumber: i32 = (y * 160) + x;
-  // Each pixel takes 3 slots, therefore, multiply by 3!
-  return (y * 160 + x) * 3;
-}
+    // Switch to pixel transfer mode
+    Lcd.setMode(3);
 
-// Also need to store current frame in memory to be read by JS
-export function setPixelOnFrame(x: i32, y: i32, colorId: i32, color: i32): void {
-  // Currently only supports 160x144
-  // Storing in X, then y
-  // So need an offset
-  store<u8>(FRAME_LOCATION + getRgbPixelStart(x, y) + colorId, color);
-}
+    // Continue to do the pixel Transfer
+  }
 
-// Function to shortcut the memory map, and load directly from the VRAM Bank
-export function loadFromVramBank(gameboyOffset: i32, vramBankId: i32): u8 {
-  let wasmBoyAddress = gameboyOffset - Memory.videoRamLocation + GAMEBOY_INTERNAL_MEMORY_LOCATION + 0x2000 * (vramBankId & 0x01);
-  return load<u8>(wasmBoyAddress);
+  // Check if we are in pixel transfer mode
+  // If so, do the pixel transfer!
+  if (Lcd.mode === 3) {
+    PixelPipeline.update(numberOfCycles);
+  }
+
+  // Check if we need to increment the scanline
+  // 80 << (<i32>Cpu.GBCDoubleSpeed) is the number of OAM Search cycles
+  let cyclesPerScanline = 456 << (<i32>Cpu.GBCDoubleSpeed);
+  if (Graphics.scanlineCycles >= cyclesPerScanline) {
+    // Remove the cycles, start a new scanline
+    Graphics.scanlineCycles -= cyclesPerScanline;
+    Graphics.scanlineRegister++;
+
+    if (Lcd.mode === 3) {
+      // Clear our Pixel Pipeline
+      PixelPipeline.reset();
+    }
+
+    // Check if we need to enter a new mode
+    if (Graphics.scanlineRegister === 144) {
+      // Enter VBlank mode
+      Lcd.setMode(1);
+    } else if (Graphics.scanlineRegister === 154) {
+      // Wrap the scanline, go back to OAM Search
+      Graphics.scanlineRegister = 0;
+      Lcd.setMode(2);
+    }
+
+    // Lastly, check the LCD Coincidence since we changed scanlines
+    Lcd.checkCoincidence();
+  }
 }

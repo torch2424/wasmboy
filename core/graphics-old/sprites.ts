@@ -28,7 +28,7 @@ export function renderSprites(scanlineRegister: i32, useLargerSprites: boolean):
     let spriteXPosition = eightBitLoadFromGBMemory(index + 1);
     let spriteTileId = eightBitLoadFromGBMemory(index + 2);
 
-    // Pan docs of sprite attirbute table
+    // Pan docs of sprite attribute table
     // Bit7   OBJ-to-BG Priority (0=OBJ Above BG, 1=OBJ Behind BG color 1-3)
     //      (Used for both BG and Window. BG color 0 is always behind OBJ)
     // Bit6   Y flip          (0=Normal, 1=Vertically mirrored)

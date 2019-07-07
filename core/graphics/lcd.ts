@@ -74,110 +74,26 @@ export class Lcd {
 
     if (wasLcdEnabled && !Lcd.enabled) {
       // Disable the LCD
-      resetLcd(true);
+      _resetLcd(true);
     }
 
     if (!wasLcdEnabled && Lcd.enabled) {
       // Re-enable the LCD
-      resetLcd(false);
+      _resetLcd(false);
     }
   }
 
-  // Cycle getters for scanlines
-  // (NOTE: One scanline is 456 cycles. Thus, they should add to 456)
-  // TODO: Optimize this, so that double speed updates all cycle constants
-  // Rather than re-calculating every time
-
-  // Hblank
-  static MODE_0_CYCLES(): i32 {
-    return 204 << (<i32>Cpu.GBCDoubleSpeed);
-  }
-
-  // OAM Search
-  static MODE_2_CYCLES(): i32 {
-    return 80 << (<i32>Cpu.GBCDoubleSpeed);
-  }
-
-  // Pixel Transfer
-  static MODE_3_CYCLES(): i32 {
-    return 172 << (<i32>Cpu.GBCDoubleSpeed);
-  }
-
-  static;
-}
-
-function resetLcd(shouldBlankScreen: boolean): void {
-  // Reset scanline cycle counter
-  Graphics.scanlineCycles = 0;
-  Graphics.scanlineRegister = 0;
-  eightBitStoreIntoGBMemory(Graphics.memoryLocationScanlineRegister, 0);
-
-  // Set to mode 0
-  // https://www.reddit.com/r/EmuDev/comments/4w6479/gb_dr_mario_level_generation_issues/
-  let lcdStatus: i32 = eightBitLoadFromGBMemory(Lcd.memoryLocationLcdStatus);
-  lcdStatus = resetBitOnByte(1, lcdStatus);
-  lcdStatus = resetBitOnByte(0, lcdStatus);
-  Lcd.mode = 0;
-
-  // Store the status in memory
-  eightBitStoreIntoGBMemory(Lcd.memoryLocationLcdStatus, lcdStatus);
-
-  // Blank the screen
-  if (shouldBlankScreen) {
-    for (let i = 0; i < FRAME_SIZE; ++i) {
-      store<u8>(FRAME_LOCATION + i, 255);
+  // Function to set the LCD Mode, and do all the neccessary checks
+  // Modes:
+  // 0 or 00: H-Blank
+  // 1 or 01: V-Blank
+  // 2 or 10: Searching Sprites Atts
+  // 3 or 11: Transfering Data to LCD Driver
+  static setMode(newLcdMode: i32): void {
+    if (Lcd.mode === newLcdMode) {
+      return;
     }
-  }
-}
 
-function checkCoincidence(lcdMode: i32, lcdStatus: i32): i32 {
-  // Check for the coincidence flag
-  // Need to check on every mode, and not just HBLANK, as checking on hblank breaks shantae, which checks on vblank
-  if ((lcdMode === 0 || lcdMode === 1) && Graphics.scanlineRegister === Lcd.coincidenceCompare) {
-    lcdStatus = setBitOnByte(2, lcdStatus);
-    if (checkBitOnByte(6, lcdStatus)) {
-      requestLcdInterrupt();
-    }
-  } else {
-    lcdStatus = resetBitOnByte(2, lcdStatus);
-  }
-
-  return lcdStatus;
-}
-
-export function updateLcd(): void {
-  // Get our current scanline, and lcd mode
-  let scanlineRegister: i32 = Graphics.scanlineRegister;
-  let scanlineCycles: i32 = Graphics.scanlineCycles;
-  let lcdMode: i32 = Lcd.mode;
-
-  // Get our new LCD mode (if it is new)
-  let newLcdMode: i32 = 0;
-
-  // First check if we are in V-Blank
-  if (scanlineRegister >= 144) {
-    // VBlank mode
-    newLcdMode = 1;
-  } else {
-    // We are drawing scanlines
-    // Get all of our cycles
-    let mode2Cycles = Lcd.MODE_2_CYCLES();
-    let mode3Cycles = Lcd.MODE_3_CYCLES();
-    let mode0Cycles = Lcd.MODE_0_CYCLES();
-
-    if (scanlineCycles > mode2Cycles + mode3Cycles) {
-      // We are in mode 0 Hblank
-      newLcdMode = 0;
-    } else if (scanlineCycles > mode2Cycles) {
-      // We are in mode 3 Pixel Transfer
-      newLcdMode = 3;
-    } else {
-      // We are in mode 2, OAM Search
-      newLcdMode = 2;
-    }
-  }
-
-  if (lcdMode !== newLcdMode) {
     // Get our lcd status
     let lcdStatus: i32 = eightBitLoadFromGBMemory(Lcd.memoryLocationLcdStatus);
 
@@ -221,17 +137,55 @@ export function updateLcd(): void {
     if (shouldRequestInterrupt) {
       requestLcdInterrupt();
     }
+  }
+
+  // Function to check the coincidence flag for every scanline
+  // NOTE: Need to check on every mode, and not just HBLANK, as checking on hblank breaks shantae, which checks on vblank
+  // NOTE: Games like Pokemon crystal want the vblank right as it turns to the value, and not have it increment after
+  // It will break and lead to an infinite loop in crystal
+  // Therefore, we want to be checking/Setting our LCD status after the scanline updates
+  // NOTE: Special Case, need to check LYC
+  // Fix prehistorik man freeze
+  static checkCoincidence(): void {
+    // Get our Lcd Mode and status
+    let lcdMode: i32 = Lcd.mode;
+    let lcdStatus: i32 = eightBitLoadFromGBMemory(Lcd.memoryLocationLcdStatus);
 
     // Check for the coincidence
-    lcdStatus = checkCoincidence(newLcdMode, lcdStatus);
+    if (Graphics.scanlineRegister === Lcd.coincidenceCompare) {
+      lcdStatus = setBitOnByte(2, lcdStatus);
+      if (checkBitOnByte(6, lcdStatus)) {
+        requestLcdInterrupt();
+      }
+    } else {
+      lcdStatus = resetBitOnByte(2, lcdStatus);
+    }
 
-    // Finally, save our status
+    // Store our LCD status after the check
     eightBitStoreIntoGBMemory(Lcd.memoryLocationLcdStatus, lcdStatus);
-  } else if (scanlineRegister === 153) {
-    // Special Case, need to check LYC
-    // Fix prehistorik man freeze
-    let lcdStatus: i32 = eightBitLoadFromGBMemory(Lcd.memoryLocationLcdStatus);
-    lcdStatus = checkCoincidence(newLcdMode, lcdStatus);
-    eightBitStoreIntoGBMemory(Lcd.memoryLocationLcdStatus, lcdStatus);
+  }
+}
+
+function _resetLcd(shouldBlankScreen: boolean): void {
+  // Reset scanline cycle counter
+  Graphics.scanlineCycles = 0;
+  Graphics.scanlineRegister = 0;
+  eightBitStoreIntoGBMemory(Graphics.memoryLocationScanlineRegister, 0);
+
+  // Set to mode 0
+  // https://www.reddit.com/r/EmuDev/comments/4w6479/gb_dr_mario_level_generation_issues/
+  let lcdStatus: i32 = eightBitLoadFromGBMemory(Lcd.memoryLocationLcdStatus);
+  lcdStatus = resetBitOnByte(1, lcdStatus);
+  lcdStatus = resetBitOnByte(0, lcdStatus);
+  Lcd.mode = 0;
+
+  // Store the status in memory
+  eightBitStoreIntoGBMemory(Lcd.memoryLocationLcdStatus, lcdStatus);
+
+  // Blank the screen
+  if (shouldBlankScreen) {
+    for (let i = 0; i < FRAME_SIZE; ++i) {
+      store<u8>(FRAME_LOCATION + i, 255);
+    }
   }
 }
