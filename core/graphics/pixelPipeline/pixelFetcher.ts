@@ -1,11 +1,16 @@
 // Fetcher for the pixel pipeline
 // https://youtu.be/HyzD8pNlpwI?t=2957
-import { PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION } from '../../constants';
 import { checkBitOnByte, setBitOnByte, resetBitOnByte } from '../../helpers/index';
+import { eightBitLoadFromGBMemory, eightBitStoreIntoGBMemory } from '../../memory/index';
 import { Lcd } from '../lcd';
 import { getTileDataAddress } from '../tiles';
 import { LoadFromVramBank } from '../util';
-import { PixelPipeline } from './pixelPipeline';
+import { PixelFifo } from './pixelFifo';
+import {
+  getPaletteColorIdForPixelFromTileData,
+  loadPixelFifoByteForPixelIndexFromWasmBoyMemory,
+  storePixelFifoByteForPixelIndexIntoWasmBoyMemory
+} from './util';
 
 export class PixelFetcher {
   // Number of CPU cycles for the current step of the fetch
@@ -36,7 +41,7 @@ export class PixelFetcher {
   static tileDataByteOne: i32 = 0;
   static tileAttributes: i32 = 0;
 
-  static startFetch(tileMapLocation: i32, tileLine: i32, isSprite: boolean, spriteArrtributeIndex: i32): void {
+  static startFetch(tileMapLocation: i32, tileLine: i32, isSprite: boolean, spriteAttributeIndex: i32): void {
     // Reset the fetcher
     PixelFetcher.currentStatus = 0;
     PixelFetcher.cycles = 0;
@@ -47,16 +52,16 @@ export class PixelFetcher {
     PixelFetcher.spriteAttributeIndex = spriteAttributeIndex;
   }
 
-  static update(numberOfCycles: i32) {
+  static step() {
     // Check if we can continue idling
     // Pixel Fetcher won't add more pixels unless there are only 8 pixels left
-    let pixelsRemainingInFifo = PixelPipeline.numberOfPixelsInFifo - pixelFifoIndex;
+    let pixelsRemainingInFifo = PixelFifo.numberOfPixelsInFifo - PixelFifo.currentIndex;
     if (PixelFetcher.currentStatus === 0 && pixelsRemainingInFifo > 8) {
       return;
     }
 
-    // Update our cycles
-    PixelFetcher.cycles += numberOfCycles;
+    // Update our cycles (Each step should be 4 CPU Cycles)
+    PixelFetcher.cycles += 4;
 
     // Update our current status / Execute the step
     let cyclesPerStep = 8 << (<i32>Cpu.GBCDoubleSpeed);
@@ -112,7 +117,7 @@ function _readTileData(byteNumber: i32): i32 {
   let tileAttributes: i32 = 0;
   if (PixelFetcher.isSprite) {
     // Get our sprite attributes
-    let spriteTableIndex = i * 4;
+    let spriteTableIndex = PixelFetcher.spriteAttributeIndex * 4;
     let spriteMemoryLocation = Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex;
 
     // Pan docs of sprite attribute table (Byte 3 of Sprite Table Entry)
@@ -191,12 +196,10 @@ function _storeFetchIntoFifo(): void {
   if (PixelFetcher.isSprite) {
     // Need to mix the pixel on top of the old data
 
-    // Get the location of where we will be mixing
-    // Which is the first 8 pixels in the fifo
-    let pixelFifoIndex = PixelPipeline.pixelFifoIndex * 11;
-
-    // Get our type per pixel
-    let typePerPixel = eightBitLoadFromGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex + 2);
+    // Get our data and type per pixel
+    let fifoTileDataByteZero = loadPixelFifoByteForPixelIndexFromWasmBoyMemory(0, PixelFifo.currentIndex);
+    let fifoTileDataByteOne = loadPixelFifoByteForPixelIndexFromWasmBoyMemory(1, PixelFifo.currentIndex);
+    let fifoTypePerPixel = loadPixelFifoByteForPixelIndexFromWasmBoyMemory(2, PixelFifo.currentIndex);
 
     // Go one by one for the 8 pixels in the current fifo
     for (let i = 0; i < 8; i++) {
@@ -206,19 +209,7 @@ function _storeFetchIntoFifo(): void {
       }
 
       // Get the Palette Color Ids of the pixel in our current sprite
-      // Colors are represented by getting X position of ByteTwo, and X positon of Byte One
-      // To Get the color Id.
-      // For example, the result of the color id is 0000 00[xPixelByteTwo][xPixelByteOne]
-      // See: How to draw a tile/sprite from memory: http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html
-      let spritePaletteColorId = 0;
-      if (checkBitOnByte(i, PixelFetcher.tileDataByteOne)) {
-        // Byte one represents the second bit in our color id, so bit shift
-        spritePaletteColorId += 1;
-        spritePaletteColorId = spritePaletteColorId << 1;
-      }
-      if (checkBitOnByte(i, PixelFetcher.tileDataByteZero)) {
-        spritePaletteColorId += 1;
-      }
+      let spritePaletteColorId = getPaletteColorIdForPixelFromTileData(i, PixelFetcher.tileDataByteZero, PixelFetcher.tileDataByteOne);
 
       // Palette ColorId zero (last two bits of pallette) of a sprite are always transparent
       // http://gbdev.gg8.se/wiki/articles/Video_Display
@@ -226,21 +217,11 @@ function _storeFetchIntoFifo(): void {
         continue;
       }
 
-      // Load the data & attributes for the pixel
-      let fifoTileDataByteZero = eightBitLoadFromGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex + 0);
-      let fifoTileDataByteOne = eightBitLoadFromGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex + 1);
-      let fifoTileAttributes = eightBitLoadFromGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex + 3 + i);
+      // Load the attributes for the pixel
+      loadPixelFifoByteForPixelIndexFromWasmBoyMemory(3 + i, PixelFifo.currentIndex + i);
 
       // Get the Palette Color Ids of the pixel in the Fifo
-      let fifoPaletteColorId = 0;
-      if (checkBitOnByte(i, fifoTileDataByteOne)) {
-        // Byte one represents the second bit in our color id, so bit shift
-        fifoPaletteColorId += 1;
-        fifoPaletteColorId = fifoPaletteColorId << 1;
-      }
-      if (checkBitOnByte(i, fifoTileDataByteZero)) {
-        fifoPaletteColorId += 1;
-      }
+      let fifoPaletteColorId = getPaletteColorIdForPixelFromTileData(i, fifoTileDataByteZero, fifoTileDataByteOne);
 
       // NOTE:
       // We are trying to draw a sprite pixel over a BG/Window pixel.
@@ -271,24 +252,21 @@ function _storeFetchIntoFifo(): void {
         setBitOnByte(i, typePerPixel);
 
         // Write back to the fifo
-        eightBitStoreIntoGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex, fifoTileDataByteZero);
-        eightBitStoreIntoGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex + 1, fifoTileDataByteOne);
-        eightBitStoreIntoGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex + 2, typePerPixel);
-        eightBitStoreIntoGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex + 3 + i, PixelFetcher.tileAttributes);
+        storePixelFifoByteForPixelIndexIntoWasmBoyMemory(0, PixelFifo.currentIndex, fifoTileDataByteZero);
+        storePixelFifoByteForPixelIndexIntoWasmBoyMemory(1, PixelFifo.currentIndex, fifoTileDataByteOne);
+        storePixelFifoByteForPixelIndexIntoWasmBoyMemory(2, PixelFifo.currentIndex, typePerPixel);
+        storePixelFifoByteForPixelIndexIntoWasmBoyMemory(3 + i, PixelFifo.currentIndex + i, PixelFetcher.tileAttributes);
       }
     }
   } else {
     // Simply add the pixels to the end of the fifo
-    // * 11, because Fifo has the 2 data tile bytes, and for WasmBoy Specifically,
-    // A 3rd byte representing the type of pixel (0 = BG/Window, 1 = Sprite)
-    // Bytes 4-11 represent the attributes for that tile's pixel
-    let pixelFifoIndex = PixelPipeline.numberOfPixelsInFifo * 11;
-    eightBitStoreIntoGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex, PixelFetcher.tileDataByteZero);
-    eightBitStoreIntoGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex + 1, PixelFetcher.tileDataByteOne);
-    eightBitStoreIntoGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex + 2, 0);
+    storePixelFifoByteForPixelIndexIntoWasmBoyMemory(0, PixelFifo.numberOfPixelsInFifo, PixelFetcher.tileDataByteZero);
+    storePixelFifoByteForPixelIndexIntoWasmBoyMemory(1, PixelFifo.numberOfPixelsInFifo, PixelFetcher.tileDataByteOne);
+    // All BG/Window type pixels
+    storePixelFifoByteForPixelIndexIntoWasmBoyMemory(2, PixelFifo.numberOfPixelsInFifo, 0);
     for (let i = 0; i < 8; i++) {
-      eightBitStoreIntoGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex + 3 + i, PixelFetcher.tileAttributes);
+      storePixelFifoByteForPixelIndexIntoWasmBoyMemory(3 + i, PixelFifo.numberOfPixelsInFifo + i, PixelFetcher.tileAttributes);
     }
-    PixelPipeline.numberOfPixelsInFifo += 8;
+    PixelFifo.numberOfPixelsInFifo += 8;
   }
 }
