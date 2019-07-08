@@ -193,11 +193,10 @@ function _storeFetchIntoFifo(): void {
 
     // Get the location of where we will be mixing
     // Which is the first 8 pixels in the fifo
-    let pixelFifoIndex = PixelPipeline.pixelFifoIndex * 4;
+    let pixelFifoIndex = PixelPipeline.pixelFifoIndex * 11;
 
-    // Get our priority per pixel, and type per pixel
-    let priorityPerPixel = eightBitLoadFromGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex + 2);
-    let typePerPixel = eightBitLoadFromGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex + 3);
+    // Get our type per pixel
+    let typePerPixel = eightBitLoadFromGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex + 2);
 
     // Go one by one for the 8 pixels in the current fifo
     for (let i = 0; i < 8; i++) {
@@ -227,9 +226,10 @@ function _storeFetchIntoFifo(): void {
         continue;
       }
 
-      // Load the data for the pixel
+      // Load the data & attributes for the pixel
       let fifoTileDataByteZero = eightBitLoadFromGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex + 0);
       let fifoTileDataByteOne = eightBitLoadFromGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex + 1);
+      let fifoTileAttributes = eightBitLoadFromGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex + 3 + i);
 
       // Get the Palette Color Ids of the pixel in the Fifo
       let fifoPaletteColorId = 0;
@@ -243,14 +243,14 @@ function _storeFetchIntoFifo(): void {
       }
 
       // NOTE:
-      // We are trying to draw a sprite pixel over a BG/Window pixel
+      // We are trying to draw a sprite pixel over a BG/Window pixel.
       // There are multiple cases where we NEED to draw a sprite pixel over a Background
       // 1. The LCDC Bit 0 - BG/Window Display/Priority is cleared, thus BG priority is ignored
       // 2. The Sprite Priority bit is NOT set. If it is, we can only draw over BG color id 0.
       // 3. (CGB Only) The BG Priority bit is NOT set. If it is, If it is, we can only draw over BG color id 0.
       let shouldShowRelativeToLcdcPriority = Cpu.GBCEnabled && !Lcd.bgDisplayEnabled;
-      let shouldShowRelativeToOamPriority = !checkBitOnByte(6, PixelFetcher.tileAttributes) || fifoPaletteColorId === 0;
-      let shouldShowRelativeToBgPriority = !checkBitOnByte(i, priorityPerPixel) || fifoPaletteColorId === 0;
+      let shouldShowRelativeToOamPriority = !checkBitOnByte(7, PixelFetcher.tileAttributes) || fifoPaletteColorId === 0;
+      let shouldShowRelativeToBgPriority = !checkBitOnByte(7, fifoTileAttributes) || fifoPaletteColorId === 0;
 
       if (shouldShowRelativeToLcdcPriority || (shouldShowRelativeToOamPriority && shouldShowRelativeToBgPriority)) {
         // Mix the pixel!
@@ -267,32 +267,28 @@ function _storeFetchIntoFifo(): void {
           resetBitOnByte(i, fifoTileDataByteZero);
         }
 
-        // Note: Don't need to worry about priority,
-        // since sprite can't draw over sprites
-
         // Set that we are a sprite
         setBitOnByte(i, typePerPixel);
 
         // Write back to the fifo
         eightBitStoreIntoGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex, fifoTileDataByteZero);
         eightBitStoreIntoGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex + 1, fifoTileDataByteOne);
-        eightBitStoreIntoGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex + 3, typePerPixel);
+        eightBitStoreIntoGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex + 2, typePerPixel);
+        eightBitStoreIntoGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex + 3 + i, PixelFetcher.tileAttributes);
       }
     }
   } else {
     // Simply add the pixels to the end of the fifo
-    // * 4, because Fifo has the 2 data tile bytes, and for WasmBoy Specifically,
-    // A third byte representing the priority for each pixel (0 = no priority bit, 1 = priority bit)
-    // and a 4th byte representing the type of pixel (0 = BG/Window, 1 = Sprite)
-    let pixelFifoIndex = PixelPipeline.numberOfPixelsInFifo * 4;
+    // * 11, because Fifo has the 2 data tile bytes, and for WasmBoy Specifically,
+    // A 3rd byte representing the type of pixel (0 = BG/Window, 1 = Sprite)
+    // Bytes 4-11 represent the attributes for that tile's pixel
+    let pixelFifoIndex = PixelPipeline.numberOfPixelsInFifo * 11;
     eightBitStoreIntoGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex, PixelFetcher.tileDataByteZero);
     eightBitStoreIntoGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex + 1, PixelFetcher.tileDataByteOne);
-    let tilePriority = 0;
-    if (checkBitOnByte(7, PixelFetcher.tileAttributes)) {
-      tilePriority = 0xff;
+    eightBitStoreIntoGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex + 2, 0);
+    for (let i = 0; i < 8; i++) {
+      eightBitStoreIntoGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex + 3 + i, PixelFetcher.tileAttributes);
     }
-    eightBitStoreIntoGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex + 2, tilePriority);
-    eightBitStoreIntoGBMemory(PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex + 3, 0);
     PixelPipeline.numberOfPixelsInFifo += 8;
   }
 }
