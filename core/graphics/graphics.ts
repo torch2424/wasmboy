@@ -1,4 +1,5 @@
 // Main Class and funcitons for rendering the gameboy display
+import { log } from '../helpers/index';
 import { getSaveStateMemoryOffset } from '../core';
 import { Cpu } from '../cpu/index';
 import {
@@ -175,6 +176,8 @@ export function updateGraphics(numberOfCycles: i32): void {
     if (PixelPipeline.getCurrentIndex() >= 160) {
       // Go to Hblank
       Lcd.setMode(0);
+
+      log(0x01, 0x02);
 
       // No longer need to fetch pixels, reset everything
       PixelPipeline.reset();
