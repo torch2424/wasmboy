@@ -246,7 +246,6 @@ function _drawScanline(scanlineRegister: i32): void {
   // When Bit 0 is cleared, the background and window lose their priority -
   // the sprites will be always displayed on top of background and window,
   // independently of the priority flags in OAM and BG Map attributes.
-  // TODO: Enable this different feature for GBC
   if (Cpu.GBCEnabled || Lcd.bgDisplayEnabled) {
     // Get our map memory location
     let tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectZeroStart;

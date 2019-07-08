@@ -17,10 +17,11 @@ export class PixelFetcher {
   static cycles: i32 = 0;
 
   // Status of the Fetcher
-  // 0: Idling
+  // 0: Idling, waiting for next fetch
   // 1: Reading Tile Number
   // 2: Reading first byte of Tile Data
   // 3: Reading second byte of Tile Data
+  // 4: Idling, because waiting to store
   static currentStatus: i32 = 0;
 
   // Sprite Info
@@ -28,7 +29,7 @@ export class PixelFetcher {
   static spriteAttributeIndex: i32 = 0;
 
   // The current tile we are be fetching from the tileMap
-  static tileMapLocation: i32 = 0;
+  static tileIdInTileMapLocation: i32 = 0;
 
   // The line (y value) of the tile we are fetching (0 -> 7)
   // But we start counting at 1: 1 2 3 4 5 6 7 0
@@ -41,22 +42,49 @@ export class PixelFetcher {
   static tileDataByteOne: i32 = 0;
   static tileAttributes: i32 = 0;
 
-  static startFetch(tileMapLocation: i32, tileLine: i32, isSprite: boolean, spriteAttributeIndex: i32): void {
+  static startBgWindowFetch(tileLine: i32, tileIdInTileMapLocation: i32): void {
     // Reset the fetcher
     PixelFetcher.currentStatus = 0;
     PixelFetcher.cycles = 0;
 
-    PixelFetcher.tileMapLocation = tileMapLocation;
+    PixelFetcher.isSprite = false;
+
     PixelFetcher.tileLine = tileLine;
-    PixelFetcher.isSprite = isSprite;
+    PixelFetcher.tileIdInTileMapLocation = tileIdInTileMapLocation;
+  }
+
+  static isFetchingBgWindowTileLine(tileLine: i32, tileIdInTileMapLocation: i32): boolean {
+    return !PixelFetcher.isSprite && PixelFetcher.tileLine === tileLine && PixelFetcher.tileIdInTileMapLocation === tileIdInTileMapLocation;
+  }
+
+  static startSpriteFetch(tileLine: i32, spriteAttributeIndex: i32) {
+    // Reset the fetcher
+    PixelFetcher.currentStatus = 0;
+    PixelFetcher.cycles = 0;
+
+    PixelFetcher.isSprite = true;
+
+    PixelFetcher.tileLine = tileLine;
     PixelFetcher.spriteAttributeIndex = spriteAttributeIndex;
+  }
+
+  static isFetchingSpriteTileLine(tileLine: i32, spriteAttributeIndex: i32): boolean {
+    return PixelFetcher.isSprite && PixelFetcher.tileLine === tileLine && PixelFetcher.spriteAttributeIndex === spriteAttributeIndex;
   }
 
   static step() {
     // Check if we can continue idling
+
     // Pixel Fetcher won't add more pixels unless there are only 8 pixels left
     let pixelsRemainingInFifo = PixelFifo.numberOfPixelsInFifo - PixelFifo.currentIndex;
-    if (PixelFetcher.currentStatus === 0 && pixelsRemainingInFifo > 8) {
+    if (PixelFetcher.currentStatus === 0 || PixelFetcher.currentStatus === 4) {
+      if (PixelFetcher.currentStatus === 4 && pixelsRemainingInFifo <= 8) {
+        // Place into the fifo
+        _storeFetchIntoFifo();
+
+        // Idle and wait for next fetch to start
+        PixelFetcher.currentStatus = 0;
+      }
       return;
     }
 
@@ -85,11 +113,8 @@ export class PixelFetcher {
       // Read the tile data
       _readTileData(1);
 
-      // Place into the fifo
-      _storeFetchIntoFifo();
-
-      // Set to Idle
-      PixelFetcher.currentStatus = 0;
+      // Set to Idle to store
+      PixelFetcher.currentStatus = 4;
 
       PixelFetcher.cycles -= cyclesPerStep;
     }
@@ -97,8 +122,33 @@ export class PixelFetcher {
 }
 
 function _readTileIdFromTileMap(): i32 {
-  // Get the tile Id on the Tile Map
-  PixelFetcher.tileIdFromTileMap = loadFromVramBank(PixelFetcher.tileMapLocation, 0);
+  if (PixelFetcher.isSprite) {
+    // Get the Tile Id from the Attributes table
+    let spriteTableIndex = PixelFetcher.spriteAttributeIndex * 4;
+    let spriteMemoryLocation = Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex;
+
+    // Byte2 - Tile/Pattern Number
+    let spriteTileId = eightBitLoadFromGBMemory(spriteMemoryIndex + 2);
+    if (Lcd.tallSpriteSize) {
+      // @binji says in 8x16 mode, even tileId always drawn first
+      // This will fix shantae sprites which always uses odd numbered indexes
+      // TODO: Do the actual Pandocs thing:
+      // "In 8x16 mode, the lower bit of the tile number is ignored.
+      // Ie. the upper 8x8 tile is "NN AND FEh", and the lower 8x8 tile is "NN OR 01h"."
+      // So just knock off the last bit? :)
+      spriteTileId -= spriteTileId & 1;
+
+      // Check if we wanted to draw the second tile though
+      if (PixelFetcher.tileLine >= 8) {
+        spriteTileId += 1;
+      }
+    }
+
+    PixelFetcher.tileIdFromTileMap = spriteTileId;
+  } else {
+    // Get the tile Id on the Tile Map
+    PixelFetcher.tileIdFromTileMap = loadFromVramBank(PixelFetcher.tileIdInTileMapLocation, 0);
+  }
 }
 
 function _readTileData(byteNumber: i32): i32 {
@@ -137,7 +187,7 @@ function _readTileData(byteNumber: i32): i32 {
     // Bit 5    Horizontal Flip            (0=Normal, 1=Mirror horizontally)
     // Bit 6    Vertical Flip              (0=Normal, 1=Mirror vertically)
     // Bit 7    BG-to-OAM Priority         (0=Use OAM priority bit, 1=BG Priority)
-    tileAttributes = loadFromVramBank(PixelFetcher.tileMapLocation, 1);
+    tileAttributes = loadFromVramBank(PixelFetcher.tileIdInTileMapLocation, 1);
   }
 
   // Check for our Vram Bank

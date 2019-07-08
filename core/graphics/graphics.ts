@@ -12,7 +12,7 @@ import {
 import { Lcd } from './lcd';
 import { initializeColors } from './colors';
 import { initializePalette } from './palette';
-import { oamSearchForVisibleSprites } from './sprites';
+import { Sprites } from './sprites';
 
 export class Graphics {
   // Current cycles
@@ -160,18 +160,25 @@ export function updateGraphics(numberOfCycles: i32): void {
   let cyclesPerOamSearch = 80 << (<i32>Cpu.GBCDoubleSpeed);
   if (Lcd.mode === 2 && Graphics.scanlineCycles > oamSearchCycles) {
     // Do the actual OAM Search
-    oamSearchForVisibleSprites();
+    Sprites.oamSearchForVisibleSprites();
 
     // Switch to pixel transfer mode
     Lcd.setMode(3);
-
-    // Continue to do the pixel Transfer
   }
 
   // Check if we are in pixel transfer mode
   // If so, do the pixel transfer!
   if (Lcd.mode === 3) {
     PixelPipeline.update(numberOfCycles);
+
+    // Check if we hit the end of the scanline
+    if (PixelPipeline.getCurrentIndex() >= 160) {
+      // Go to Hblank
+      Lcd.setMode(0);
+
+      // No longer need to fetch pixels, reset everything
+      PixelPipeline.reset();
+    }
   }
 
   // Check if we need to increment the scanline
@@ -181,11 +188,6 @@ export function updateGraphics(numberOfCycles: i32): void {
     // Remove the cycles, start a new scanline
     Graphics.scanlineCycles -= cyclesPerScanline;
     Graphics.scanlineRegister++;
-
-    if (Lcd.mode === 3) {
-      // Clear our Pixel Pipeline
-      PixelPipeline.reset();
-    }
 
     // Check if we need to enter a new mode
     if (Graphics.scanlineRegister === 144) {
