@@ -20,21 +20,29 @@ export function getPaletteColorIdForPixelFromTileData(xIndex: i32, tileDataByteZ
   return paletteColorId;
 }
 
-export function loadPixelFifoByteForPixelIndexFromWasmBoyMemory(byteNumber: i32, pixelIndex: i32) {
-  let pixelFifoPixelIndexLocation = _getLocationOfPixelIndexFromPixelFifoFromWasmBoyMemory(pixelIndex);
+export function loadPixelFifoByteForTileIndexFromWasmBoyMemory(byteNumber: i32, pixelIndex: i32) {
+  let pixelFifoPixelIndexLocation = _getLocationOfTileIndexFromPixelIndexInPixelFifoFromWasmBoyMemory(pixelIndex);
   return eightBitLoadFromGBMemory(pixelFifoPixelIndexLocation + byteNumber);
 }
 
-export function storePixelFifoByteForPixelIndexIntoWasmBoyMemory(byteNumber: i32, pixelIndex: i32, value: i32) {
-  let pixelFifoPixelIndexLocation = _getLocationOfPixelIndexFromPixelFifoFromWasmBoyMemory(pixelIndex);
+export function storePixelFifoByteForTileIndexIntoWasmBoyMemory(byteNumber: i32, pixelIndex: i32, value: i32) {
+  let pixelFifoPixelIndexLocation = _getLocationOfTileIndexFromPixelIndexInPixelFifoFromWasmBoyMemory(pixelIndex);
   return eightBitStoreIntoGBMemory(pixelFifoPixelIndexLocation + byteNumber, value);
 }
 
-function _getLocationOfPixelIndexFromPixelFifoFromWasmBoyMemory(pixelIndex: i32) {
+// This function takes in a pixel index,
+// and finds the tile in the viewport that is associated with that pixel
+// And then returns where the start of that tile for the passed pixel would be
+// In our WasmBoy Memory
+function _getLocationOfTileIndexFromPixelIndexInPixelFifoFromWasmBoyMemory(pixelIndex: i32) {
+  // Get the index of the tile from the specified pixel
+  // Divide by 8 to find the correct index
+  let tileIndex = pixelIndex >> 3;
+
   // * 11, because Fifo has the 2 data tile bytes (as shown in ultimate gameboy talk),
   // and for WasmBoy Specifically:
-  // A 3rd byte representing the type of pixel (0 = BG/Window, 1 = Sprite)
+  // A 3rd byte representing the type of pixel for each pixel in the tile (0 = BG/Window, 1 = Sprite)
   // Bytes 4-11 represent the attributes for that tile's pixel
-  let pixelFifoIndex = PixelFifo.numberOfPixelsInFifo * 11;
+  let pixelFifoIndex = tileIndex * 11;
   return PIXEL_PIPELINE_ENTIRE_SCANLINE_FIFO_LOCATION + pixelFifoIndex;
 }

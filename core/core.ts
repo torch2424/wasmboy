@@ -4,7 +4,7 @@ import { Config } from './config';
 import { resetCycles } from './cycles';
 import { resetSteps } from './execute';
 import { Cpu, initializeCpu } from './cpu/index';
-import { Graphics, initializeGraphics, initializePalette } from './graphics/index';
+import { Graphics, initializeGraphics } from './graphics/index';
 import { Interrupts, initializeInterrupts } from './interrupts/index';
 import { Joypad } from './joypad/index';
 import { Memory, initializeCartridge, initializeDma, eightBitStoreIntoGBMemory, eightBitLoadFromGBMemory } from './memory/index';
@@ -95,7 +95,6 @@ function initialize(): void {
   initializeCartridge();
   initializeDma();
   initializeGraphics();
-  initializePalette();
   initializeSound();
   initializeInterrupts();
   initializeTimers();

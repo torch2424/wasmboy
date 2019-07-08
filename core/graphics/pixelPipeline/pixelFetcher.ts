@@ -121,7 +121,7 @@ function _readTileData(byteNumber: i32): i32 {
     let spriteMemoryLocation = Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex;
 
     // Pan docs of sprite attribute table (Byte 3 of Sprite Table Entry)
-    // Bit2-0 Palette number  **CGB Mode Only**     (OBP0-7)
+    // Bit0-2 Palette number  **CGB Mode Only**     (OBP0-7)
     // Bit3   Tile VRAM-Bank  **CGB Mode Only**     (0=Bank 0, 1=Bank 1)
     // Bit4   Palette number  **Non CGB Mode Only** (0=OBP0, 1=OBP1)
     // Bit5   X flip          (0=Normal, 1=Horizontally mirrored)
@@ -218,7 +218,7 @@ function _storeFetchIntoFifo(): void {
       }
 
       // Load the attributes for the pixel
-      loadPixelFifoByteForPixelIndexFromWasmBoyMemory(3 + i, PixelFifo.currentIndex + i);
+      let fifoTileAttributes = loadPixelFifoByteForPixelIndexFromWasmBoyMemory(3 + i, PixelFifo.currentIndex);
 
       // Get the Palette Color Ids of the pixel in the Fifo
       let fifoPaletteColorId = getPaletteColorIdForPixelFromTileData(i, fifoTileDataByteZero, fifoTileDataByteOne);
@@ -255,11 +255,11 @@ function _storeFetchIntoFifo(): void {
         storePixelFifoByteForPixelIndexIntoWasmBoyMemory(0, PixelFifo.currentIndex, fifoTileDataByteZero);
         storePixelFifoByteForPixelIndexIntoWasmBoyMemory(1, PixelFifo.currentIndex, fifoTileDataByteOne);
         storePixelFifoByteForPixelIndexIntoWasmBoyMemory(2, PixelFifo.currentIndex, typePerPixel);
-        storePixelFifoByteForPixelIndexIntoWasmBoyMemory(3 + i, PixelFifo.currentIndex + i, PixelFetcher.tileAttributes);
+        storePixelFifoByteForPixelIndexIntoWasmBoyMemory(3 + i, PixelFifo.currentIndex, PixelFetcher.tileAttributes);
       }
     }
   } else {
-    // Simply add the pixels to the end of the fifo
+    // Simply add the tile pixels to the end of the fifo
     storePixelFifoByteForPixelIndexIntoWasmBoyMemory(0, PixelFifo.numberOfPixelsInFifo, PixelFetcher.tileDataByteZero);
     storePixelFifoByteForPixelIndexIntoWasmBoyMemory(1, PixelFifo.numberOfPixelsInFifo, PixelFetcher.tileDataByteOne);
     // All BG/Window type pixels

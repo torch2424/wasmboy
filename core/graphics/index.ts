@@ -8,7 +8,6 @@ export { getRedFromHexColor, getGreenFromHexColor, getBlueFromHexColor } from '.
 
 export {
   Palette,
-  initializePalette,
   writeColorPaletteToMemory,
   getMonochromeColorFromPalette,
   getColorizedGbHexColorFromPalette,

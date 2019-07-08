@@ -11,6 +11,7 @@ import {
 } from '../memory/index';
 import { Lcd } from './lcd';
 import { initializeColors } from './colors';
+import { initializePalette } from './palette';
 import { oamSearchForVisibleSprites } from './sprites';
 
 export class Graphics {
@@ -44,11 +45,6 @@ export class Graphics {
 
   // Sprites
   static readonly memoryLocationSpriteAttributesTable: i32 = 0xfe00;
-
-  // Palettes
-  static readonly memoryLocationBackgroundPalette: i32 = 0xff47;
-  static readonly memoryLocationSpritePaletteOne: i32 = 0xff48;
-  static readonly memoryLocationSpritePaletteTwo: i32 = 0xff49;
 
   // Save States
 
@@ -137,6 +133,7 @@ export function initializeGraphics(): void {
   }
 
   initializeColors();
+  initializePalette();
 }
 
 // Batch Process Graphics
