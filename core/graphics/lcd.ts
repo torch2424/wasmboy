@@ -39,7 +39,7 @@ export class Lcd {
   static coincidenceCompare: i32 = 0;
 
   // Also known as LCDC
-  // http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html
+  // http://gbdev.gg8.se/wiki/articles/LCDC
   // Bit 7 - LCD Display Enable (0=Off, 1=On)
   // Bit 6 - Window Tile Map Display Select (0=9800-9BFF, 1=9C00-9FFF)
   // Bit 5 - Window Display Enable (0=Off, 1=On)
