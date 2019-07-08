@@ -1,5 +1,6 @@
 // Implementation of the pixel pipeline
 // https://youtu.be/HyzD8pNlpwI?t=2957
+import { log } from '../../helpers/index';
 import { eightBitLoadFromGBMemory } from '../../memory/index';
 import { Cpu } from '../../cpu/index';
 import { Graphics } from '../graphics';
@@ -44,9 +45,7 @@ export class PixelPipeline {
   // Function to completely reset the PixelPipeline
   // Probably should only do this at the end of a scanline
   static reset(): void {
-    // Handled by setting a new fetch target
-    // PixelFetcher.reset();
-
+    PixelFetcher.reset();
     PixelFifo.reset();
   }
 }
@@ -175,7 +174,10 @@ function _tryToFetchBackground(): boolean {
     // So in our case, let's reset the fetcher, and pop 8 white pixels on the screen once we reach here.
 
     // In the meantime, let's just add 8 pixels to the fifo to avoid infinite loops
-    PixelFifo.numberOfPixelsInFifo += 8;
+    let pixelsRemainingInFifo = PixelFifo.numberOfPixelsInFifo - PixelFifo.currentIndex;
+    if (pixelsRemainingInFifo <= 8) {
+      PixelFifo.numberOfPixelsInFifo += 8;
+    }
 
     return false;
   }
@@ -239,10 +241,6 @@ function _tryToFetchBackground(): boolean {
 
   // Finally, check if we are already fetching, otherwise, start to
   if (!PixelFetcher.isFetchingBgWindowTileLine(tileLine, tileIdInTileMapLocation)) {
-    // Need to clear the current pixels in the pixel fifo
-    // Siad so in the ultimate gameboy talk
-    PixelFifo.numberOfPixelsInFifo = PixelFifo.currentIndex;
-
     // Fetch the window
     PixelFetcher.startBgWindowFetch(tileLine, tileIdInTileMapLocation);
   }

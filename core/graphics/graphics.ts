@@ -177,7 +177,10 @@ export function updateGraphics(numberOfCycles: i32): void {
       // Go to Hblank
       Lcd.setMode(0);
 
-      log(0x01, 0x02);
+      // DEBUG: Seems like thie Pixel Pipeline is taking wayyyy too long.
+      // This shows we are takin about 340 cycles, which is double what it should be.
+      // And only 1 H-Blank per VBlank?
+      log(0x12, Graphics.scanlineCycles);
 
       // No longer need to fetch pixels, reset everything
       PixelPipeline.reset();
@@ -194,6 +197,8 @@ export function updateGraphics(numberOfCycles: i32): void {
 
     // Check if we need to enter a new mode
     if (Graphics.scanlineRegister === 144) {
+      log(0x13, 0x13);
+
       // Enter VBlank mode
       Lcd.setMode(1);
     } else if (Graphics.scanlineRegister === 154) {

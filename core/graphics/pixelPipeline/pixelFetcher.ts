@@ -1,6 +1,6 @@
 // Fetcher for the pixel pipeline
 // https://youtu.be/HyzD8pNlpwI?t=2957
-import { checkBitOnByte, setBitOnByte, resetBitOnByte } from '../../helpers/index';
+import { checkBitOnByte, setBitOnByte, resetBitOnByte, log } from '../../helpers/index';
 import { Cpu } from '../../cpu/index';
 import { eightBitLoadFromGBMemory, eightBitStoreIntoGBMemory } from '../../memory/index';
 import { Graphics } from '../graphics';
@@ -44,9 +44,14 @@ export class PixelFetcher {
   static tileDataByteOne: i32 = 0;
   static tileAttributes: i32 = 0;
 
+  static reset(): void {
+    PixelFetcher.currentStatus = 0;
+    PixelFetcher.cycles = 0;
+  }
+
   static startBgWindowFetch(tileLine: i32, tileIdInTileMapLocation: i32): void {
     // Reset the fetcher
-    PixelFetcher.currentStatus = 0;
+    PixelFetcher.currentStatus = 1;
     PixelFetcher.cycles = 0;
 
     PixelFetcher.isSprite = false;
@@ -56,22 +61,34 @@ export class PixelFetcher {
   }
 
   static isFetchingBgWindowTileLine(tileLine: i32, tileIdInTileMapLocation: i32): boolean {
-    return !PixelFetcher.isSprite && PixelFetcher.tileLine === tileLine && PixelFetcher.tileIdInTileMapLocation === tileIdInTileMapLocation;
+    return (
+      PixelFetcher.currentStatus !== 0 &&
+      !PixelFetcher.isSprite &&
+      PixelFetcher.tileLine === tileLine &&
+      PixelFetcher.tileIdInTileMapLocation === tileIdInTileMapLocation
+    );
   }
 
   static startSpriteFetch(tileLine: i32, spriteAttributeIndex: i32): void {
     // Reset the fetcher
-    PixelFetcher.currentStatus = 0;
+    PixelFetcher.currentStatus = 1;
     PixelFetcher.cycles = 0;
 
     PixelFetcher.isSprite = true;
 
     PixelFetcher.tileLine = tileLine;
     PixelFetcher.spriteAttributeIndex = spriteAttributeIndex;
+
+    log(PixelFetcher.tileLine, PixelFetcher.spriteAttributeIndex);
   }
 
   static isFetchingSpriteTileLine(tileLine: i32, spriteAttributeIndex: i32): boolean {
-    return PixelFetcher.isSprite && PixelFetcher.tileLine === tileLine && PixelFetcher.spriteAttributeIndex === spriteAttributeIndex;
+    return (
+      PixelFetcher.currentStatus !== 0 &&
+      PixelFetcher.isSprite &&
+      PixelFetcher.tileLine === tileLine &&
+      PixelFetcher.spriteAttributeIndex === spriteAttributeIndex
+    );
   }
 
   static step(): void {
@@ -95,9 +112,7 @@ export class PixelFetcher {
 
     // Update our current status / Execute the step
     let cyclesPerStep = 8 << (<i32>Cpu.GBCDoubleSpeed);
-    if (PixelFetcher.currentStatus === 0) {
-      PixelFetcher.currentStatus = 1;
-    } else if (PixelFetcher.currentStatus === 1 && PixelFetcher.cycles >= cyclesPerStep) {
+    if (PixelFetcher.currentStatus === 1 && PixelFetcher.cycles >= cyclesPerStep) {
       // Read the tile number
       _readTileIdFromTileMap();
 

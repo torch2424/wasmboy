@@ -1,5 +1,5 @@
 // Class responsible for pushing our pixels with their respective palettes
-import { checkBitOnByte } from '../../helpers/index';
+import { checkBitOnByte, log } from '../../helpers/index';
 import { Cpu } from '../../cpu/index';
 import { Graphics } from '../graphics';
 import { Palette, getColorizedGbHexColorFromPalette, getRgbColorFromPalette, getColorComponentFromRgb } from '../palette';
