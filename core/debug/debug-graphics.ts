@@ -3,6 +3,7 @@ import { BACKGROUND_MAP_LOCATION, TILE_DATA_LOCATION, OAM_TILES_LOCATION } from 
 import {
   Graphics,
   Lcd,
+  Palette,
   getTileDataAddress,
   drawPixelsFromLineOfTile,
   getMonochromeColorFromPalette,
@@ -175,7 +176,7 @@ export function drawBackgroundMapToWasmMemory(showColor: i32): void {
       } else {
         // Only rendering camera for now, so coordinates are for the camera.
         // Get the rgb value for the color Id, will be repeated into R, G, B (if not colorized)
-        let hexColor: i32 = getColorizedGbHexColorFromPalette(paletteColorId, Graphics.memoryLocationBackgroundPalette);
+        let hexColor: i32 = getColorizedGbHexColorFromPalette(paletteColorId, Palette.memoryLocationBackgroundPalette);
 
         let offset: i32 = BACKGROUND_MAP_LOCATION + pixelStart;
 
@@ -220,7 +221,7 @@ export function drawTileDataToWasmMemory(): void {
       // Let's see if we have C O L O R
       // Set the map and sprite attributes to -1
       // Meaning, we will draw monochrome
-      let paletteLocation: i32 = Graphics.memoryLocationBackgroundPalette;
+      let paletteLocation: i32 = Palette.memoryLocationBackgroundPalette;
       let bgMapAttributes: i32 = -1;
       let spriteAttributes: i32 = -1;
 
@@ -249,9 +250,9 @@ export function drawTileDataToWasmMemory(): void {
               spriteColumn = 5;
 
               // Set our paletteLocation
-              paletteLocation = Graphics.memoryLocationSpritePaletteOne;
+              paletteLocation = Palette.memoryLocationSpritePaletteOne;
               if (checkBitOnByte(4, spriteAttributes)) {
-                paletteLocation = Graphics.memoryLocationSpritePaletteTwo;
+                paletteLocation = Palette.memoryLocationSpritePaletteTwo;
               }
             }
           }
@@ -291,7 +292,7 @@ export function drawTileDataToWasmMemory(): void {
       for (let tileLineY: i32 = 0; tileLineY < 8; tileLineY++) {
         drawPixelsFromLineOfTile(
           tileId, // tileId
-          tileDataMemoryLocation, // Graphics.memoryLocationTileDataSelect
+          tileDataMemoryLocation, // Paltte.memoryLocationTileDataSelect
           vramBankId, // Vram Bank
           0, // Tile Line X Start
           7, // Tile Line X End
@@ -355,9 +356,9 @@ export function drawOamToWasmMemory(): void {
       }
 
       // Find which monochrome palette we should use
-      let paletteLocation: i32 = Graphics.memoryLocationSpritePaletteOne;
+      let paletteLocation: i32 = Palette.memoryLocationSpritePaletteOne;
       if (checkBitOnByte(4, spriteAttributes)) {
-        paletteLocation = Graphics.memoryLocationSpritePaletteTwo;
+        paletteLocation = Palette.memoryLocationSpritePaletteTwo;
       }
 
       // Start Drawing our tiles

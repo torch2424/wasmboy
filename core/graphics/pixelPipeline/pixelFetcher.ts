@@ -1,10 +1,12 @@
 // Fetcher for the pixel pipeline
 // https://youtu.be/HyzD8pNlpwI?t=2957
 import { checkBitOnByte, setBitOnByte, resetBitOnByte } from '../../helpers/index';
+import { Cpu } from '../../cpu/index';
 import { eightBitLoadFromGBMemory, eightBitStoreIntoGBMemory } from '../../memory/index';
+import { Graphics } from '../graphics';
 import { Lcd } from '../lcd';
 import { getTileDataAddress } from '../tiles';
-import { LoadFromVramBank } from '../util';
+import { loadFromVramBank } from '../util';
 import { PixelFifo } from './pixelFifo';
 import {
   getPaletteColorIdForPixelFromTileData,
@@ -57,7 +59,7 @@ export class PixelFetcher {
     return !PixelFetcher.isSprite && PixelFetcher.tileLine === tileLine && PixelFetcher.tileIdInTileMapLocation === tileIdInTileMapLocation;
   }
 
-  static startSpriteFetch(tileLine: i32, spriteAttributeIndex: i32) {
+  static startSpriteFetch(tileLine: i32, spriteAttributeIndex: i32): void {
     // Reset the fetcher
     PixelFetcher.currentStatus = 0;
     PixelFetcher.cycles = 0;
@@ -72,7 +74,7 @@ export class PixelFetcher {
     return PixelFetcher.isSprite && PixelFetcher.tileLine === tileLine && PixelFetcher.spriteAttributeIndex === spriteAttributeIndex;
   }
 
-  static step() {
+  static step(): void {
     // Check if we can continue idling
 
     // Pixel Fetcher won't add more pixels unless there are only 8 pixels left
@@ -121,14 +123,14 @@ export class PixelFetcher {
   }
 }
 
-function _readTileIdFromTileMap(): i32 {
+function _readTileIdFromTileMap(): void {
   if (PixelFetcher.isSprite) {
     // Get the Tile Id from the Attributes table
     let spriteTableIndex = PixelFetcher.spriteAttributeIndex * 4;
     let spriteMemoryLocation = Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex;
 
     // Byte2 - Tile/Pattern Number
-    let spriteTileId = eightBitLoadFromGBMemory(spriteMemoryIndex + 2);
+    let spriteTileId = eightBitLoadFromGBMemory(spriteMemoryLocation + 2);
     if (Lcd.tallSpriteSize) {
       // @binji says in 8x16 mode, even tileId always drawn first
       // This will fix shantae sprites which always uses odd numbered indexes
@@ -151,7 +153,7 @@ function _readTileIdFromTileMap(): i32 {
   }
 }
 
-function _readTileData(byteNumber: i32): i32 {
+function _readTileData(byteNumber: i32): void {
   // Get our seleted tile data memory location
   // This is always one for sprites, or can be set on LCDC for BG and Window
   let tileDataMemoryLocation = Graphics.memoryLocationTileDataSelectZeroStart;
@@ -221,12 +223,12 @@ function _readTileData(byteNumber: i32): i32 {
   // E.g [line 0 byte 0 | line 0 byte 1 | line 1 byte 0 | etc... ]
   // Therefore, we need to times our modulo by 2, to get the correct line of pixels on the tile.
   let tileByteAddress = tileDataAddress + tileLine * 2 + byteNumber;
-  let tileData = loadFromVramBank(tileByteAddress, vramBankId);
+  let tileData: i32 = loadFromVramBank(tileByteAddress, vramBankId);
 
   // Handle the X Flip
   // Simply reverse the byte
   if (checkBitOnByte(5, tileAttributes)) {
-    let newTileData = 0;
+    let newTileData: i32 = 0;
     for (let i = 0; i < 8; i++) {
       if (checkBitOnByte(i, tileData)) {
         setBitOnByte(7 - i, newTileData);
@@ -254,7 +256,7 @@ function _storeFetchIntoFifo(): void {
     // Go one by one for the 8 pixels in the current fifo
     for (let i = 0; i < 8; i++) {
       // Don't draw a sprite, over a sprite
-      if (checkBitOnByte(i, typePerPixel)) {
+      if (checkBitOnByte(i, fifoTypePerPixel)) {
         continue;
       }
 
@@ -263,7 +265,7 @@ function _storeFetchIntoFifo(): void {
 
       // Palette ColorId zero (last two bits of pallette) of a sprite are always transparent
       // http://gbdev.gg8.se/wiki/articles/Video_Display
-      if (spriteColorId !== 0) {
+      if (spritePaletteColorId !== 0) {
         continue;
       }
 
@@ -299,12 +301,12 @@ function _storeFetchIntoFifo(): void {
         }
 
         // Set that we are a sprite
-        setBitOnByte(i, typePerPixel);
+        setBitOnByte(i, fifoTypePerPixel);
 
         // Write back to the fifo
         storePixelFifoByteForPixelIndexIntoWasmBoyMemory(0, PixelFifo.currentIndex, fifoTileDataByteZero);
         storePixelFifoByteForPixelIndexIntoWasmBoyMemory(1, PixelFifo.currentIndex, fifoTileDataByteOne);
-        storePixelFifoByteForPixelIndexIntoWasmBoyMemory(2, PixelFifo.currentIndex, typePerPixel);
+        storePixelFifoByteForPixelIndexIntoWasmBoyMemory(2, PixelFifo.currentIndex, fifoTypePerPixel);
         storePixelFifoByteForPixelIndexIntoWasmBoyMemory(3 + i, PixelFifo.currentIndex, PixelFetcher.tileAttributes);
       }
     }

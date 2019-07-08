@@ -27,7 +27,7 @@ export function checkReadTraps(offset: i32): i32 {
     // See graphics/lcd.ts
     // TODO: This can do more harm than good in a beta emulator,
     // requres precise timing, disabling for now
-    // if (Graphics.currentLcdMode > 2) {
+    // if (Lcd.mode > 2) {
     //   return 0xFF;
     // }
 
@@ -47,7 +47,7 @@ export function checkReadTraps(offset: i32): i32 {
   if (offset >= Memory.spriteInformationTableLocation && offset <= Memory.spriteInformationTableLocationEnd) {
     // Can only read/write from OAM During Mode 2
     // See graphics/lcd.ts
-    // if (Lcd.currentLcdMode < 2) {
+    // if (Lcd.mode < 2) {
     // return 0xff;
     // }
 
@@ -55,7 +55,7 @@ export function checkReadTraps(offset: i32): i32 {
     // batchProcessGraphics();
 
     // return -1;
-    return Lcd.currentLcdMode < 2 ? 0xff : -1;
+    return Lcd.mode < 2 ? 0xff : -1;
   }
 
   // CPU

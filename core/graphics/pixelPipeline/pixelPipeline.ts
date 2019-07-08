@@ -1,5 +1,7 @@
 // Implementation of the pixel pipeline
 // https://youtu.be/HyzD8pNlpwI?t=2957
+import { eightBitLoadFromGBMemory } from '../../memory/index';
+import { Cpu } from '../../cpu/index';
 import { Graphics } from '../graphics';
 import { Lcd } from '../lcd';
 import { Sprites } from '../sprites';
@@ -42,13 +44,15 @@ export class PixelPipeline {
   // Function to completely reset the PixelPipeline
   // Probably should only do this at the end of a scanline
   static reset(): void {
-    PixelFetcher.reset();
+    // Handled by setting a new fetch target
+    // PixelFetcher.reset();
+
     PixelFifo.reset();
   }
 }
 
 // Returns if we started fetching / we are fetching sprites
-function _tryToFetchSprite(): void {
+function _tryToFetchSprite(): boolean {
   // Check if sprites are enabled
   if (!Lcd.spriteDisplayEnable) {
     return false;
@@ -87,7 +91,7 @@ function _tryToFetchSprite(): void {
     // NOTE: Y Position was handled by the OAM Search,
     // and sprites are not affected by scroll Y
     // So we know the sprite is on this scanline
-    if (PixelFifo.currentIndex >= spriteXPosition && PixelFifo.currentIndex < spriteXPositon + 8) {
+    if (PixelFifo.currentIndex >= spriteXPosition && PixelFifo.currentIndex < spriteXPosition + 8) {
       // We need to fetch this sprite!
 
       // Check if we are already fetching the sprite,
@@ -107,7 +111,7 @@ function _tryToFetchSprite(): void {
 }
 
 // Returns if we started fetching / we are fetching Window
-function _tryToFetchWindow(): void {
+function _tryToFetchWindow(): boolean {
   // First let's see if the window is enabled
   if (!Lcd.windowDisplayEnabled) {
     return false;
@@ -143,10 +147,10 @@ function _tryToFetchWindow(): void {
   if (pixelXPositionInMap >= 0x100) {
     pixelXPositionInMap -= 0x100;
   }
-  let pixelYPositionInMap = scanlineRegister - windowY;
+  let pixelYPositionInMap = Graphics.scanlineRegister - windowY;
 
   // Get the location of our tileId on the tileMap
-  let tileIdInTileMapLocation = _bgWindowGetTileIdTileMapLocation(pixelXPositionInMap, pixelYPositionInMap);
+  let tileIdInTileMapLocation = _bgWindowGetTileIdTileMapLocation(tileMapMemoryLocation, pixelXPositionInMap, pixelYPositionInMap);
 
   // Finally, check if we are already fetching, otherwise, start to
   if (!PixelFetcher.isFetchingBgWindowTileLine(tileLine, tileIdInTileMapLocation)) {
@@ -162,7 +166,7 @@ function _tryToFetchWindow(): void {
 }
 
 // Returns if we started fetching / we are fetching Background
-function _tryToFetchBackground(): void {
+function _tryToFetchBackground(): boolean {
   // First let's see if background should be drawn
   if (!Cpu.GBCEnabled && !Lcd.bgDisplayEnabled) {
     // TODO: Handle for the OG Gameboy Case
@@ -187,7 +191,7 @@ function _tryToFetchBackground(): void {
       // Find out how much scrollX changed
       let scrollXDifference = Graphics.scrollX - PixelPipeline.previousScrollX;
 
-      if (scrollXDifference > 0 && scollXDifference < pixelsRemainingInFifo) {
+      if (scrollXDifference > 0 && scrollXDifference < pixelsRemainingInFifo) {
         // TODO: Let's copy over the pixels we already got to the right position
         // This will be a performance, and timing improvement
 
@@ -213,7 +217,7 @@ function _tryToFetchBackground(): void {
   // Get our current pixel y positon on the 160x144 camera (Row that the scanline draws across)
   // this is done by getting the current scroll Y position,
   // and adding it do what Y Value the scanline is drawing on the camera.
-  let pixelYPositionInMap: i32 = scanlineRegister + Graphics.scrollY;
+  let pixelYPositionInMap: i32 = Graphics.scanlineRegister + Graphics.scrollY;
   // Gameboy camera will "wrap" around the background map,
   // meaning that if the pixelValue is 350, then we need to subtract 256 (decimal) to get it's actual value
   // pixel values (scrollX and scrollY) range from 0x00 - 0xFF
@@ -231,7 +235,7 @@ function _tryToFetchBackground(): void {
   let tileLine: i32 = pixelYPositionInMap & 7;
 
   // Get the location of our tileId on the tileMap
-  let tileIdInTileMapLocation = _bgWindowGetTileIdTileMapLocation(pixelXPositionInMap, pixelYPositionInMap);
+  let tileIdInTileMapLocation = _bgWindowGetTileIdTileMapLocation(tileMapMemoryLocation, pixelXPositionInMap, pixelYPositionInMap);
 
   // Finally, check if we are already fetching, otherwise, start to
   if (!PixelFetcher.isFetchingBgWindowTileLine(tileLine, tileIdInTileMapLocation)) {
@@ -246,7 +250,7 @@ function _tryToFetchBackground(): void {
   return true;
 }
 
-function _bgWindowGetTileIdTileMapLocation(pixelXPositionInMap: i32, pixelYPositionInMap: i32): i32 {
+function _bgWindowGetTileIdTileMapLocation(tileMapMemoryLocation: i32, pixelXPositionInMap: i32, pixelYPositionInMap: i32): i32 {
   // Divide our pixel position by 8 to get our tile.
   // Since, there are 256x256 pixels, and 32x32 tiles.
   // 256 / 8 = 32.

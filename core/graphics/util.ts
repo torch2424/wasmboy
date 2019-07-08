@@ -1,4 +1,6 @@
 // Utilities for general graphics stuff with the wasmboy core
+import { Memory } from '../memory/index';
+import { FRAME_LOCATION, GAMEBOY_INTERNAL_MEMORY_LOCATION } from '../constants';
 
 // Function to get the start of a RGB pixel (R, G, B)
 // Inlined because closure compiler inlines

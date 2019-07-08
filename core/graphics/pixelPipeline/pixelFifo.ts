@@ -1,6 +1,9 @@
 // Class responsible for pushing our pixels with their respective palettes
+import { checkBitOnByte } from '../../helpers/index';
+import { Cpu } from '../../cpu/index';
 import { Graphics } from '../graphics';
-import { getColorizedGbHexColorFromPalette, getRgbColorFromPalette, getColorComponentFromRgb } from './palette';
+import { Palette, getColorizedGbHexColorFromPalette, getRgbColorFromPalette, getColorComponentFromRgb } from '../palette';
+import { getRedFromHexColor, getGreenFromHexColor, getBlueFromHexColor } from '../colors';
 import { setPixelOnFrame } from '../util';
 import { getPaletteColorIdForPixelFromTileData, loadPixelFifoByteForPixelIndexFromWasmBoyMemory } from './util';
 
@@ -16,10 +19,10 @@ export class PixelFifo {
   // Current index of the pixels we should pop next.
   static currentIndex: i32 = 0;
 
-  static step() {
+  static step(): void {
     // Check if we can continue idling
     // Pixel Fifo won't push out pixels unless there are <= 8 pixels in the fifo
-    let pixelsRemainingInFifo = PixelPipeline.numberOfPixelsInFifo - pixelFifoIndex;
+    let pixelsRemainingInFifo = PixelFifo.numberOfPixelsInFifo - PixelFifo.currentIndex;
     if (pixelsRemainingInFifo <= 8) {
       PixelFifo.currentStatus = 0;
       return;
@@ -28,21 +31,21 @@ export class PixelFifo {
     // We are pushing pixels
     PixelFifo.currentStatus = 1;
 
-    // Grab the info for the pixel
-    let fifoTileDataByteZero = loadPixelFifoByteForPixelIndexFromWasmBoyMemory(0, PixelFifo.currentIndex);
-    let fifoTileDataByteOne = loadPixelFifoByteForPixelIndexFromWasmBoyMemory(1, PixelFifo.currentIndex);
-    let fifoTypePerPixel = loadPixelFifoByteForPixelIndexFromWasmBoyMemory(2, PixelFifo.currentIndex);
-    let fifoPixelAttributes = loadPixelFifoByteForPixelIndexFromWasmBoyMemory(3 + i, PixelFifo.currentIndex);
-
     // Find which pixel from the tile we want to push
     // By modulo 8 (doing & 7 since it is faster)
     let pixelIndex = PixelFifo.currentIndex & 7;
 
+    // Grab the info for the pixel
+    let fifoTileDataByteZero = loadPixelFifoByteForPixelIndexFromWasmBoyMemory(0, PixelFifo.currentIndex);
+    let fifoTileDataByteOne = loadPixelFifoByteForPixelIndexFromWasmBoyMemory(1, PixelFifo.currentIndex);
+    let fifoTypePerPixel = loadPixelFifoByteForPixelIndexFromWasmBoyMemory(2, PixelFifo.currentIndex);
+    let fifoPixelAttributes = loadPixelFifoByteForPixelIndexFromWasmBoyMemory(3 + pixelIndex, PixelFifo.currentIndex);
+
     // Find if our pixel is a sprite or note
-    let pixelIsSprite = checkBitOnByte(pixelIndex, fifoTypePerPixel);
+    let pixelIsSprite: boolean = checkBitOnByte(pixelIndex, fifoTypePerPixel);
 
     // Get the color id of our pixel
-    let fifoPaletteColorId = getPaletteColorIdForPixelFromTileData(pixelIndex, fifoTileDataByteZero, fifoTileDataByteOne);
+    let fifoPaletteColorId: i32 = getPaletteColorIdForPixelFromTileData(pixelIndex, fifoTileDataByteZero, fifoTileDataByteOne);
 
     // Get the actual RGB Color of our pixel
     let red: i32 = 0;
@@ -74,7 +77,7 @@ export class PixelFifo {
       }
 
       // Get the rgb value for the color Id, will be repeated into R, G, B. if not colorized
-      let hexColor: i32 = getColorizedGbHexColorFromPalette(paletteColorId, paletteMemoryLocation);
+      let hexColor: i32 = getColorizedGbHexColorFromPalette(fifoPaletteColorId, paletteMemoryLocation);
       red = getRedFromHexColor(hexColor);
       green = getGreenFromHexColor(hexColor);
       blue = getBlueFromHexColor(hexColor);
@@ -90,7 +93,7 @@ export class PixelFifo {
     PixelFifo.currentIndex++;
   }
 
-  static reset() {
+  static reset(): void {
     PixelFifo.currentStatus = 0;
     PixelFifo.currentIndex = 0;
     PixelFifo.numberOfPixelsInFifo = 0;

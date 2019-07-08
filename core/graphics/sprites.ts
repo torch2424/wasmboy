@@ -10,7 +10,7 @@ export class Sprites {
   static numberOfVisibleSprites: i32 = 0;
 
   // Function to get a visible sprite index
-  static getVisibleSpriteIndex(visibileSpriteIndex: i32) {
+  static getVisibleSpriteIndex(visibileSpriteIndex: i32): i32 {
     return eightBitLoadFromGBMemory(OAM_VISIBLE_SPRITES_LOCATION + visibileSpriteIndex);
   }
 

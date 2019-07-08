@@ -1,5 +1,4 @@
 // Main Class and funcitons for rendering the gameboy display
-import { FRAME_LOCATION, GAMEBOY_INTERNAL_MEMORY_LOCATION } from '../constants';
 import { getSaveStateMemoryOffset } from '../core';
 import { Cpu } from '../cpu/index';
 import {
@@ -9,10 +8,11 @@ import {
   loadBooleanDirectlyFromWasmMemory,
   storeBooleanDirectlyToWasmMemory
 } from '../memory/index';
-import { Lcd } from './lcd';
 import { initializeColors } from './colors';
 import { initializePalette } from './palette';
+import { Lcd } from './lcd';
 import { Sprites } from './sprites';
+import { PixelPipeline } from './pixelPipeline/pixelPipeline';
 
 export class Graphics {
   // Current cycles
@@ -143,7 +143,7 @@ export function initializeGraphics(): void {
 // TODO: Actually batch process after the pixel fifo rewrite
 export function batchProcessGraphics(): void {
   updateGraphics(Graphics.currentCycles);
-  Graphics.currentCycles -= batchProcessCycles;
+  Graphics.currentCycles = 0;
 }
 
 // Our main update function
@@ -158,7 +158,7 @@ export function updateGraphics(numberOfCycles: i32): void {
 
   // See if we need to go from OAM Search mode to Pixel Transfer
   let cyclesPerOamSearch = 80 << (<i32>Cpu.GBCDoubleSpeed);
-  if (Lcd.mode === 2 && Graphics.scanlineCycles > oamSearchCycles) {
+  if (Lcd.mode === 2 && Graphics.scanlineCycles > cyclesPerOamSearch) {
     // Do the actual OAM Search
     Sprites.oamSearchForVisibleSprites();
 
