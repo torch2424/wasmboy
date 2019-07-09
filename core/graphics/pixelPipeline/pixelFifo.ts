@@ -19,9 +19,15 @@ export class PixelFifo {
   // Current index of the pixels we should pop next.
   static currentIndex: i32 = 0;
 
+  static reset(): void {
+    PixelFifo.currentStatus = 0;
+    PixelFifo.currentIndex = 0;
+    PixelFifo.numberOfPixelsInFifo = 0;
+  }
+
   static step(): void {
     // Check if we can continue idling
-    // Pixel Fifo won't push out pixels unless there are <= 8 pixels in the fifo
+    // Pixel Fifo won't push out pixels if there is <= 8 pixels in the fifo
     let pixelsRemainingInFifo = PixelFifo.numberOfPixelsInFifo - PixelFifo.currentIndex;
     if (pixelsRemainingInFifo <= 8) {
       PixelFifo.currentStatus = 0;
@@ -91,11 +97,5 @@ export class PixelFifo {
 
     // Increase our pixel index
     PixelFifo.currentIndex++;
-  }
-
-  static reset(): void {
-    PixelFifo.currentStatus = 0;
-    PixelFifo.currentIndex = 0;
-    PixelFifo.numberOfPixelsInFifo = 0;
   }
 }

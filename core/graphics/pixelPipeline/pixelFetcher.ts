@@ -19,24 +19,24 @@ export class PixelFetcher {
   static cycles: i32 = 0;
 
   // Status of the Fetcher
-  // 0: Idling, waiting for next fetch
+  // 0: Ready to fetch
   // 1: Reading Tile Number
   // 2: Reading first byte of Tile Data
   // 3: Reading second byte of Tile Data
   // 4: Idling, because waiting to store
   static currentStatus: i32 = 0;
 
-  // Sprite Info
-  static isSprite: boolean = false;
-  static spriteAttributeIndex: i32 = 0;
-
-  // The current tile we are be fetching from the tileMap
-  static tileIdInTileMapLocation: i32 = 0;
-
   // The line (y value) of the tile we are fetching (0 -> 7)
   // But we start counting at 1: 1 2 3 4 5 6 7 0
   // NOTE: We wil handle the x/y flipping in the fetcher
   static tileLine: i32 = 0;
+
+  // The current tile we are be fetching from the tileMap
+  static tileIdInTileMapLocation: i32 = 0;
+
+  // Sprite Info
+  static isSprite: boolean = false;
+  static spriteAttributeIndex: i32 = 0;
 
   // Our response bytes in the fetcher
   static tileIdFromTileMap: i32 = 0;
@@ -78,8 +78,6 @@ export class PixelFetcher {
 
     PixelFetcher.tileLine = tileLine;
     PixelFetcher.spriteAttributeIndex = spriteAttributeIndex;
-
-    log(PixelFetcher.tileLine, PixelFetcher.spriteAttributeIndex);
   }
 
   static isFetchingSpriteTileLine(tileLine: i32, spriteAttributeIndex: i32): boolean {
@@ -112,28 +110,30 @@ export class PixelFetcher {
 
     // Update our current status / Execute the step
     let cyclesPerStep = 8 << (<i32>Cpu.GBCDoubleSpeed);
-    if (PixelFetcher.currentStatus === 1 && PixelFetcher.cycles >= cyclesPerStep) {
-      // Read the tile number
-      _readTileIdFromTileMap();
+    if (PixelFetcher.cycles >= cyclesPerStep) {
+      if (PixelFetcher.currentStatus === 1) {
+        // Read the tile number
+        _readTileIdFromTileMap();
 
-      PixelFetcher.currentStatus = 2;
+        PixelFetcher.currentStatus = 2;
 
-      PixelFetcher.cycles -= cyclesPerStep;
-    } else if (PixelFetcher.currentStatus === 2 && PixelFetcher.cycles >= cyclesPerStep) {
-      // Read the tile data
-      _readTileData(0);
+        PixelFetcher.cycles = 0;
+      } else if (PixelFetcher.currentStatus === 2) {
+        // Read the tile data
+        _readTileData(0);
 
-      PixelFetcher.currentStatus = 3;
+        PixelFetcher.currentStatus = 3;
 
-      PixelFetcher.cycles -= cyclesPerStep;
-    } else if (PixelFetcher.currentStatus === 3 && PixelFetcher.cycles >= cyclesPerStep) {
-      // Read the tile data
-      _readTileData(1);
+        PixelFetcher.cycles = 0;
+      } else if (PixelFetcher.currentStatus === 3) {
+        // Read the tile data
+        _readTileData(1);
 
-      // Set to Idle to store
-      PixelFetcher.currentStatus = 4;
+        // Set to Idle to store
+        PixelFetcher.currentStatus = 4;
 
-      PixelFetcher.cycles -= cyclesPerStep;
+        PixelFetcher.cycles = 0;
+      }
     }
   }
 }

@@ -15,6 +15,8 @@ import { Lcd } from './lcd';
 import { Sprites } from './sprites';
 import { PixelPipeline } from './pixelPipeline/pixelPipeline';
 
+let numHblanksDebug = 0;
+
 export class Graphics {
   // Current cycles
   // This will be used for batch processing
@@ -177,10 +179,13 @@ export function updateGraphics(numberOfCycles: i32): void {
       // Go to Hblank
       Lcd.setMode(0);
 
-      // DEBUG: Seems like thie Pixel Pipeline is taking wayyyy too long.
-      // This shows we are takin about 340 cycles, which is double what it should be.
-      // And only 1 H-Blank per VBlank?
-      log(0x12, Graphics.scanlineCycles);
+      // Debug: Sike, Pixel Pipeline is wayyy too fast
+      // log(0x12, Graphics.scanlineCycles);
+      // Debug: Sike Sike, pixel pipeline is only drawing ~0x24
+      // scanlines (number of Hblanks) per Vblank (frame).
+      // Which is why we get that crazy "shredded" image.
+      // Also sprites don't draw, so that's probably why :')
+      numHblanksDebug++;
 
       // No longer need to fetch pixels, reset everything
       PixelPipeline.reset();
@@ -195,15 +200,21 @@ export function updateGraphics(numberOfCycles: i32): void {
     Graphics.scanlineCycles -= cyclesPerScanline;
     Graphics.scanlineRegister++;
 
-    // Check if we need to enter a new mode
-    if (Graphics.scanlineRegister === 144) {
-      log(0x13, 0x13);
-
+    // Check if we need to enter VBLANK
+    if (Graphics.scanlineRegister >= 144 && Graphics.scanlineRegister <= 153) {
       // Enter VBlank mode
       Lcd.setMode(1);
-    } else if (Graphics.scanlineRegister === 154) {
-      // Wrap the scanline, go back to OAM Search
-      Graphics.scanlineRegister = 0;
+    } else {
+      // Check if we finished VBLANK
+      if (Graphics.scanlineRegister === 154) {
+        log(0x13, numHblanksDebug);
+        numHblanksDebug = 0;
+
+        // Wrap the scanline
+        Graphics.scanlineRegister = 0;
+      }
+
+      // Go Back to OAM Search
       Lcd.setMode(2);
     }
 

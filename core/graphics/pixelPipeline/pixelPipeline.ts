@@ -23,6 +23,10 @@ export class PixelPipeline {
   static update(numberOfCycles: i32): void {
     // NOTE: Camera is reffering to what you can see inside the 160x144 viewport of the entire rendered 256x256 map.
 
+    // DEBUG: Looking at the cycles being run, and how often the pixel fetcher is working (Which is the right amount).
+    // It looks like as soon as we hit H Blank. We just never go back to updating...
+    // log(0x05, numberOfCycles);
+
     for (let cyclesStepped: i32 = 0; cyclesStepped < numberOfCycles; cyclesStepped += 4) {
       // Push our a pixel
       PixelFifo.step();
