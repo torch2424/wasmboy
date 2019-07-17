@@ -30,6 +30,8 @@ export class PixelFifo {
     // Pixel Fifo won't push out pixels if there is <= 8 pixels in the fifo
     let pixelsRemainingInFifo = PixelFifo.numberOfPixelsInFifo - PixelFifo.currentIndex;
     if (pixelsRemainingInFifo <= 8) {
+      // DEBUG: How often are we stuck in the fifo
+      // log(0x40, 0x00);
       PixelFifo.currentStatus = 0;
       return;
     }

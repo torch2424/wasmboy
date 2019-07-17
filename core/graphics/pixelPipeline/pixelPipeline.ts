@@ -10,6 +10,16 @@ import { PixelFetcher } from './pixelFetcher';
 import { PixelFifo } from './pixelFifo';
 
 export class PixelPipeline {
+  // Current cycle of the Pixel Pipeline
+  // Ultimate Gameboy talk:
+  // CPU is 1MHz (1 cycle = 4 cycles to us)
+  // But Fifo is 4MHz and Fetcher is 2MHz on their talk.
+  // Meaning the Fifo is 4 times as fast as CPU, and Fetcher is 2 times as fast.
+  // In our case, we will use a base of 2Mhz, meaning on every cpu cycle,
+  // We will update the fifo, and increase our Cycles By one.
+  // When Cycles == 1, we will step the fetcher.
+  static cycles: i32 = 0;
+
   // The last recorded scrollX value
   // Useful for checking background pixels
   static previousScrollX: i32 = 0;
@@ -23,16 +33,18 @@ export class PixelPipeline {
   static update(numberOfCycles: i32): void {
     // NOTE: Camera is reffering to what you can see inside the 160x144 viewport of the entire rendered 256x256 map.
 
-    // DEBUG: Looking at the cycles being run, and how often the pixel fetcher is working (Which is the right amount).
-    // It looks like as soon as we hit H Blank. We just never go back to updating...
-    // log(0x05, numberOfCycles);
+    // Need to specify CPU vs PixelPipeline Cycles (see static declaration above).
+    // In double speed mode, the realtive PixelPipleine cycles would be would be half.
+    let cpuCycles: i32 = numberOfCycles;
+    cpuCycles = cpuCycles >> (<i32>Cpu.GBCDoubleSpeed);
 
-    for (let cyclesStepped: i32 = 0; cyclesStepped < numberOfCycles; cyclesStepped += 4) {
+    for (let pixelPipelineCyclesStepped: i32 = 0; pixelPipelineCyclesStepped < cpuCycles; pixelPipelineCyclesStepped++) {
       // Push our a pixel
       PixelFifo.step();
 
       // Determine what we should be fetching
       // Call our fetching functions in order of their priority
+      /*
       if (_tryToFetchSprite()) {
         // We are fetching a sprite!
       } else if (_tryToFetchWindow()) {
@@ -40,9 +52,18 @@ export class PixelPipeline {
       } else {
         _tryToFetchBackground();
       }
+       */
 
-      // Step our fetcher
-      PixelFetcher.step();
+      // DEBUG: Try just fetching background
+      _tryToFetchBackground();
+
+      // Step our fetcher (2 times as slow as fifo)
+      if (PixelPipeline.cycles !== 0) {
+        PixelFetcher.step();
+        PixelPipeline.cycles = 0;
+      } else {
+        PixelPipeline.cycles++;
+      }
     }
   }
 
@@ -51,6 +72,8 @@ export class PixelPipeline {
   static reset(): void {
     PixelFetcher.reset();
     PixelFifo.reset();
+
+    PixelPipeline.cycles = 0;
   }
 }
 
@@ -229,8 +252,8 @@ function _tryToFetchBackground(): boolean {
   // pixel values (scrollX and scrollY) range from 0x00 - 0xFF
   pixelYPositionInMap &= 0x100 - 1;
 
-  // Get the X Position of the pixel in the map (see above)
-  let pixelXPositionInMap = PixelFifo.currentIndex + Graphics.scrollX;
+  // Get the X Position of the next tile / pixel in the map (see above)
+  let pixelXPositionInMap = PixelFifo.numberOfPixelsInFifo + Graphics.scrollX;
   // This is to compensate wrapping
   if (pixelXPositionInMap >= 0x100) {
     pixelXPositionInMap -= 0x100;
@@ -245,7 +268,7 @@ function _tryToFetchBackground(): boolean {
 
   // Finally, check if we are already fetching, otherwise, start to
   if (!PixelFetcher.isFetchingBgWindowTileLine(tileLine, tileIdInTileMapLocation)) {
-    // Fetch the window
+    // Fetch the tile
     PixelFetcher.startBgWindowFetch(tileLine, tileIdInTileMapLocation);
   }
 

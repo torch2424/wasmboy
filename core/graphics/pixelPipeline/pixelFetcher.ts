@@ -15,9 +15,6 @@ import {
 } from './util';
 
 export class PixelFetcher {
-  // Number of CPU cycles for the current step of the fetch
-  static cycles: i32 = 0;
-
   // Status of the Fetcher
   // 0: Ready to fetch
   // 1: Reading Tile Number
@@ -46,18 +43,20 @@ export class PixelFetcher {
 
   static reset(): void {
     PixelFetcher.currentStatus = 0;
-    PixelFetcher.cycles = 0;
   }
 
   static startBgWindowFetch(tileLine: i32, tileIdInTileMapLocation: i32): void {
     // Reset the fetcher
     PixelFetcher.currentStatus = 1;
-    PixelFetcher.cycles = 0;
 
     PixelFetcher.isSprite = false;
 
     PixelFetcher.tileLine = tileLine;
     PixelFetcher.tileIdInTileMapLocation = tileIdInTileMapLocation;
+
+    // Debug: How often are we fetching?
+    // 23 tiles per HBlank (Correct)
+    // log(0x88, 0x01);
   }
 
   static isFetchingBgWindowTileLine(tileLine: i32, tileIdInTileMapLocation: i32): boolean {
@@ -72,7 +71,6 @@ export class PixelFetcher {
   static startSpriteFetch(tileLine: i32, spriteAttributeIndex: i32): void {
     // Reset the fetcher
     PixelFetcher.currentStatus = 1;
-    PixelFetcher.cycles = 0;
 
     PixelFetcher.isSprite = true;
 
@@ -101,38 +99,39 @@ export class PixelFetcher {
 
         // Idle and wait for next fetch to start
         PixelFetcher.currentStatus = 0;
+      } else {
+        // DEBUG: How often are we stuck in the fetcher
+        // DEBUG: Seems like we are always hitting this, like we aren't fetching new stuff?
+        // log(0x55, PixelFetcher.currentStatus);
       }
+
       return;
     }
 
-    // Update our cycles (Each step should be 4 CPU Cycles)
-    PixelFetcher.cycles += 4;
-
     // Update our current status / Execute the step
-    let cyclesPerStep = 8 << (<i32>Cpu.GBCDoubleSpeed);
-    if (PixelFetcher.cycles >= cyclesPerStep) {
-      if (PixelFetcher.currentStatus === 1) {
-        // Read the tile number
-        _readTileIdFromTileMap();
+    if (PixelFetcher.currentStatus === 1) {
+      // Read the tile number
+      _readTileIdFromTileMap();
 
-        PixelFetcher.currentStatus = 2;
+      PixelFetcher.currentStatus = 2;
+    } else if (PixelFetcher.currentStatus === 2) {
+      // Read the tile data
+      _readTileData(0);
 
-        PixelFetcher.cycles = 0;
-      } else if (PixelFetcher.currentStatus === 2) {
-        // Read the tile data
-        _readTileData(0);
+      PixelFetcher.currentStatus = 3;
+    } else if (PixelFetcher.currentStatus === 3) {
+      // Read the tile data
+      _readTileData(1);
 
-        PixelFetcher.currentStatus = 3;
+      if (pixelsRemainingInFifo <= 8) {
+        // Place into the fifo
+        _storeFetchIntoFifo();
 
-        PixelFetcher.cycles = 0;
-      } else if (PixelFetcher.currentStatus === 3) {
-        // Read the tile data
-        _readTileData(1);
-
+        // Idle and wait for next fetch to start
+        PixelFetcher.currentStatus = 0;
+      } else {
         // Set to Idle to store
         PixelFetcher.currentStatus = 4;
-
-        PixelFetcher.cycles = 0;
       }
     }
   }
@@ -240,13 +239,14 @@ function _readTileData(byteNumber: i32): void {
   let tileByteAddress = tileDataAddress + tileLine * 2 + byteNumber;
   let tileData: i32 = loadFromVramBank(tileByteAddress, vramBankId);
 
-  // Handle the X Flip
-  // Simply reverse the byte
-  if (checkBitOnByte(5, tileAttributes)) {
+  // tileData is stored horizontally flipped.
+  // Thus, if we ARE supposed to flip it, we do nothing,
+  // Other wise, we need to reverse the byte before storing.
+  if (!checkBitOnByte(5, tileAttributes)) {
     let newTileData: i32 = 0;
-    for (let i = 0; i < 8; i++) {
+    for (let i = 7; i >= 0; i--) {
       if (checkBitOnByte(i, tileData)) {
-        setBitOnByte(7 - i, newTileData);
+        newTileData = setBitOnByte(7 - i, newTileData);
       }
     }
     tileData = newTileData;
