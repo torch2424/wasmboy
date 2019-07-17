@@ -54,8 +54,12 @@ export class PixelPipeline {
       }
        */
 
-      // DEBUG: Try just fetching background
-      _tryToFetchBackground();
+      // DEBUG: Just do sprites and BG
+      if (_tryToFetchSprite()) {
+        // We are fetching a sprite!
+      } else {
+        _tryToFetchBackground();
+      }
 
       // Step our fetcher (2 times as slow as fifo)
       if (PixelPipeline.cycles !== 0) {

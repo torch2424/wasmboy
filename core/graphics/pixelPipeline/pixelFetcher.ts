@@ -43,6 +43,13 @@ export class PixelFetcher {
 
   static reset(): void {
     PixelFetcher.currentStatus = 0;
+
+    // Clear the pixel fifo memory
+    for (let pixelIndex = 0; pixelIndex < 160; pixelIndex++) {
+      for (let byteIndex = 0; byteIndex < 11; byteIndex++) {
+        storePixelFifoByteForPixelIndexIntoWasmBoyMemory(pixelIndex, byteIndex, 0);
+      }
+    }
   }
 
   static startBgWindowFetch(tileLine: i32, tileIdInTileMapLocation: i32): void {
@@ -53,10 +60,6 @@ export class PixelFetcher {
 
     PixelFetcher.tileLine = tileLine;
     PixelFetcher.tileIdInTileMapLocation = tileIdInTileMapLocation;
-
-    // Debug: How often are we fetching?
-    // 23 tiles per HBlank (Correct)
-    // log(0x88, 0x01);
   }
 
   static isFetchingBgWindowTileLine(tileLine: i32, tileIdInTileMapLocation: i32): boolean {
@@ -99,10 +102,6 @@ export class PixelFetcher {
 
         // Idle and wait for next fetch to start
         PixelFetcher.currentStatus = 0;
-      } else {
-        // DEBUG: How often are we stuck in the fetcher
-        // DEBUG: Seems like we are always hitting this, like we aren't fetching new stuff?
-        // log(0x55, PixelFetcher.currentStatus);
       }
 
       return;
@@ -263,6 +262,15 @@ function _storeFetchIntoFifo(): void {
   if (PixelFetcher.isSprite) {
     // Need to mix the pixel on top of the old data
 
+    // Don't store anything if the Pixel Fifo is out of bounds
+    if (PixelFifo.currentIndex >= 160) {
+      return;
+    }
+
+    // Debug: Are we writing sprites?
+    // Yes we are, and what seems like correct scanlines
+    // log(0x99, Graphics.scanlineRegister);
+
     // Get our data and type per pixel
     let fifoTileDataByteZero = loadPixelFifoByteForPixelIndexFromWasmBoyMemory(0, PixelFifo.currentIndex);
     let fifoTileDataByteOne = loadPixelFifoByteForPixelIndexFromWasmBoyMemory(1, PixelFifo.currentIndex);
@@ -305,18 +313,21 @@ function _storeFetchIntoFifo(): void {
 
         // Replace the pixel data in the fifo with out sprite
         if (checkBitOnByte(1, spritePaletteColorId)) {
-          setBitOnByte(i, fifoTileDataByteOne);
+          fifoTileDataByteOne = setBitOnByte(i, fifoTileDataByteOne);
         } else {
-          resetBitOnByte(i, fifoTileDataByteOne);
+          fifoTileDataByteOne = resetBitOnByte(i, fifoTileDataByteOne);
         }
         if (checkBitOnByte(0, spritePaletteColorId)) {
-          setBitOnByte(i, fifoTileDataByteZero);
+          fifoTileDataByteZero = setBitOnByte(i, fifoTileDataByteZero);
         } else {
-          resetBitOnByte(i, fifoTileDataByteZero);
+          fifoTileDataByteZero = resetBitOnByte(i, fifoTileDataByteZero);
         }
 
         // Set that we are a sprite
-        setBitOnByte(i, fifoTypePerPixel);
+        fifoTypePerPixel = setBitOnByte(i, fifoTypePerPixel);
+
+        // Debug / TODO : Firgure our why sprites aren't shoing up...
+        log(0x87, fifoTypePerPixel);
 
         // Write back to the fifo
         storePixelFifoByteForPixelIndexIntoWasmBoyMemory(0, PixelFifo.currentIndex, fifoTileDataByteZero);
@@ -326,6 +337,12 @@ function _storeFetchIntoFifo(): void {
       }
     }
   } else {
+    // Don't store anything if the Pixel Fifo is out of bounds
+    if (PixelFifo.numberOfPixelsInFifo >= 160) {
+      PixelFifo.numberOfPixelsInFifo += 8;
+      return;
+    }
+
     // Simply add the tile pixels to the end of the fifo
     storePixelFifoByteForPixelIndexIntoWasmBoyMemory(0, PixelFifo.numberOfPixelsInFifo, PixelFetcher.tileDataByteZero);
     storePixelFifoByteForPixelIndexIntoWasmBoyMemory(1, PixelFifo.numberOfPixelsInFifo, PixelFetcher.tileDataByteOne);
