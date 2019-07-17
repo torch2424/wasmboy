@@ -327,7 +327,8 @@ function _storeFetchIntoFifo(): void {
         fifoTypePerPixel = setBitOnByte(i, fifoTypePerPixel);
 
         // Debug / TODO : Firgure our why sprites aren't shoing up...
-        log(0x87, fifoTypePerPixel);
+        // fifoTypePerPixel is correct, maybe is is the data bytes?
+        // log(0x87, fifoTypePerPixel);
 
         // Write back to the fifo
         storePixelFifoByteForPixelIndexIntoWasmBoyMemory(0, PixelFifo.currentIndex, fifoTileDataByteZero);
