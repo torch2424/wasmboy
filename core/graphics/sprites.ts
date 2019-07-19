@@ -46,6 +46,8 @@ export class Sprites {
       // Y is offset by 16. An off-screen value (for example, Y=0 or Y>=160) hides the sprite.
       spriteYPosition -= 16;
 
+      // DEBUG: Tile line is wrong, both here and the fetcher.
+
       // Find if the sprite is visible
       // spriteXPosition > -8 because:
       // X is minus 8 pixels, and since sprites can only be 8 pixels wide, it would be not visible.

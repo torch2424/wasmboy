@@ -267,10 +267,6 @@ function _storeFetchIntoFifo(): void {
       return;
     }
 
-    // Debug: Are we writing sprites?
-    // Yes we are, and what seems like correct scanlines
-    // log(0x99, Graphics.scanlineRegister);
-
     // Get our data and type per pixel
     let fifoTileDataByteZero = loadPixelFifoByteForPixelIndexFromWasmBoyMemory(0, PixelFifo.currentIndex);
     let fifoTileDataByteOne = loadPixelFifoByteForPixelIndexFromWasmBoyMemory(1, PixelFifo.currentIndex);
@@ -288,7 +284,7 @@ function _storeFetchIntoFifo(): void {
 
       // Palette ColorId zero (last two bits of pallette) of a sprite are always transparent
       // http://gbdev.gg8.se/wiki/articles/Video_Display
-      if (spritePaletteColorId !== 0) {
+      if (spritePaletteColorId === 0) {
         continue;
       }
 
@@ -329,6 +325,13 @@ function _storeFetchIntoFifo(): void {
         // Debug / TODO : Firgure our why sprites aren't shoing up...
         // fifoTypePerPixel is correct, maybe is is the data bytes?
         // log(0x87, fifoTypePerPixel);
+        // log(0x89, spritePaletteColorId);
+        // log(0x90, fifoTileDataByteZero);
+        // log(0x91, fifoTileDataByteOne);
+
+        // Debug: Are we writing sprites?
+        // Yes we are, and what seems like correct scanlines
+        // log(0x99, Graphics.scanlineRegister);
 
         // Write back to the fifo
         storePixelFifoByteForPixelIndexIntoWasmBoyMemory(0, PixelFifo.currentIndex, fifoTileDataByteZero);

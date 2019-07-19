@@ -39,6 +39,10 @@ export class PixelPipeline {
     cpuCycles = cpuCycles >> (<i32>Cpu.GBCDoubleSpeed);
 
     for (let pixelPipelineCyclesStepped: i32 = 0; pixelPipelineCyclesStepped < cpuCycles; pixelPipelineCyclesStepped++) {
+      // Debug:
+      // The problem with sprites is that we are still pushing pixels, while we are trying to fetch sprites.
+      // We need to do checks, and then proceed down a certain path
+
       // Push our a pixel
       PixelFifo.step();
 
@@ -47,17 +51,25 @@ export class PixelPipeline {
       /*
       if (_tryToFetchSprite()) {
         // We are fetching a sprite!
-      } else if (_tryToFetchWindow()) {
-        // We are fetching window!
+        PixelFifo.startSpriteIdle();
       } else {
-        _tryToFetchBackground();
+
+        PixelFifo.stopSpriteIdle();
+
+        if (_tryToFetchWindow()) {
+          // We are fetching window!
+        } else {
+          _tryToFetchBackground();
+        }
       }
        */
 
       // DEBUG: Just do sprites and BG
       if (_tryToFetchSprite()) {
         // We are fetching a sprite!
+        PixelFifo.startSpriteIdle();
       } else {
+        PixelFifo.stopSpriteIdle();
         _tryToFetchBackground();
       }
 
@@ -121,13 +133,28 @@ function _tryToFetchSprite(): boolean {
     // NOTE: Y Position was handled by the OAM Search,
     // and sprites are not affected by scroll Y
     // So we know the sprite is on this scanline
-    if (PixelFifo.currentIndex >= spriteXPosition && PixelFifo.currentIndex < spriteXPosition + 8) {
+    // Also, we only want to check for the start of the sprite, not it's entire width
+    // since the entire 8 x pixels of the tile are fetched at once
+    if (PixelFifo.currentIndex === spriteXPosition) {
       // We need to fetch this sprite!
+
+      // Debug: also need to fix tile line in the fetcher!!!
+      // getting off train
+
+      // Get which line of the 8x8 or 8x16 tile.
+      // Need to sub tract 16 from the total because of the tile height, to get the line
+      // Debug, may need to put the sprite height here in stead of 16.
+      let spriteTileLine = Graphics.scanlineRegister - spriteYPosition - 16;
 
       // Check if we are already fetching the sprite,
       // If not, start fetching it
-      let spriteTileLine = Graphics.scanlineRegister - spriteYPosition;
       if (!PixelFetcher.isFetchingSpriteTileLine(spriteTileLine, spriteIndex)) {
+        // Debug: We are fetching this sprite
+        // But which line and things?
+        let spriteHeight: i32 = Lcd.tallSpriteSize ? 16 : 8;
+        log(Graphics.scanlineRegister, spriteYPosition);
+        log(0x01, spriteHeight);
+
         // Just reset everything, and start fetching the sprite
         PixelFetcher.startSpriteFetch(spriteTileLine, spriteIndex);
       }

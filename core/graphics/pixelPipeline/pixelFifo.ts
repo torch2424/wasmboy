@@ -11,6 +11,7 @@ export class PixelFifo {
   // Status of the Fetcher
   // 0: Idling
   // 1: Pushing Pixels
+  // 2: Idling because fetching sprite
   static currentStatus: i32 = 0;
 
   // Number of pixels in our fifo
@@ -25,7 +26,20 @@ export class PixelFifo {
     PixelFifo.numberOfPixelsInFifo = 0;
   }
 
+  static startSpriteIdle(): void {
+    PixelFifo.currentStatus = 2;
+  }
+
+  static stopSpriteIdle(): void {
+    PixelFifo.currentStatus = 0;
+  }
+
   static step(): void {
+    // Check if we are waiting for a sprite fetch
+    if (PixelFifo.currentStatus === 2) {
+      return;
+    }
+
     // Check if we can continue idling
     // Pixel Fifo won't push out pixels if there is <= 8 pixels in the fifo
     let pixelsRemainingInFifo = PixelFifo.numberOfPixelsInFifo - PixelFifo.currentIndex;
