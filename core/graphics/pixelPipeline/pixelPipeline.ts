@@ -47,12 +47,10 @@ export class PixelPipeline {
 
       // Determine what we should be fetching
       // Call our fetching functions in order of their priority
-      /*
       if (_tryToFetchSprite()) {
         // We are fetching a sprite!
         PixelFifo.startSpriteIdle();
-      } else {
-
+      } else if (!isFetchingSprite()) {
         PixelFifo.stopSpriteIdle();
 
         if (_tryToFetchWindow()) {
@@ -60,17 +58,6 @@ export class PixelPipeline {
         } else {
           _tryToFetchBackground();
         }
-      }
-       */
-
-      // Figure out what we should be fetching next
-      // First check if we should fetch a sprite
-      if (_tryToFetchSprite()) {
-        // We are fetching a sprite!
-        PixelFifo.startSpriteIdle();
-      } else if (!isFetchingSprite()) {
-        PixelFifo.stopSpriteIdle();
-        _tryToFetchBackground();
       }
 
       // Step our fetcher (2 times as slow as fifo)
@@ -96,7 +83,7 @@ export class PixelPipeline {
 }
 
 function isFetchingSprite(): boolean {
-  return PixelFetcher.isSprite && PixelFetcher.currentStatus !== 0;
+  return PixelFetcher.currentTileType === 2 && PixelFetcher.currentStatus !== 0;
 }
 
 // Returns if we started fetching / we are fetching sprites
@@ -186,7 +173,18 @@ function _tryToFetchWindow(): boolean {
     return false;
   }
 
+  // Let's see if window is on our current X
+  if (PixelFifo.currentIndex < windowX) {
+    return false;
+  }
+
   // We need to draw window
+
+  // First, if we were just fetching background, we need to clear the fifo
+  // Said so in the ultimate gameboy talk
+  if (PixelFetcher.currentTileType === 0) {
+    PixelFifo.numberOfPixelsInFifo = PixelFifo.currentIndex;
+  }
 
   // Get our TileMap
   let tileMapMemoryLocation = Graphics.memoryLocationTileMapSelectZeroStart;
@@ -211,13 +209,9 @@ function _tryToFetchWindow(): boolean {
   let tileIdInTileMapLocation = _bgWindowGetTileIdTileMapLocation(tileMapMemoryLocation, pixelXPositionInMap, pixelYPositionInMap);
 
   // Finally, check if we are already fetching, otherwise, start to
-  if (!PixelFetcher.isFetchingBgWindowTileLine(tileLine, tileIdInTileMapLocation)) {
-    // Need to clear the current pixels in the pixel fifo
-    // Siad so in the ultimate gameboy talk
-    PixelFifo.numberOfPixelsInFifo = PixelFifo.currentIndex;
-
+  if (!PixelFetcher.isFetchingWindowTileLine(tileLine, tileIdInTileMapLocation)) {
     // Fetch the window
-    PixelFetcher.startBgWindowFetch(tileLine, tileIdInTileMapLocation);
+    PixelFetcher.startWindowFetch(tileLine, tileIdInTileMapLocation);
   }
 
   return true;
@@ -299,9 +293,9 @@ function _tryToFetchBackground(): boolean {
   let tileIdInTileMapLocation = _bgWindowGetTileIdTileMapLocation(tileMapMemoryLocation, pixelXPositionInMap, pixelYPositionInMap);
 
   // Finally, check if we are already fetching, otherwise, start to
-  if (!PixelFetcher.isFetchingBgWindowTileLine(tileLine, tileIdInTileMapLocation)) {
+  if (!PixelFetcher.isFetchingBackgroundTileLine(tileLine, tileIdInTileMapLocation)) {
     // Fetch the tile
-    PixelFetcher.startBgWindowFetch(tileLine, tileIdInTileMapLocation);
+    PixelFetcher.startBackgroundFetch(tileLine, tileIdInTileMapLocation);
   }
 
   return true;

@@ -23,6 +23,12 @@ export class PixelFetcher {
   // 4: Idling, because waiting to store
   static currentStatus: i32 = 0;
 
+  // The type of tile we are fetching
+  // 0: Background
+  // 1: Window
+  // 2: Sprite
+  static currentTileType: i32 = 0;
+
   // The line (y value) of the tile we are fetching (0 -> 7)
   // But we start counting at 1: 1 2 3 4 5 6 7 0
   // NOTE: We wil handle the x/y flipping in the fetcher
@@ -32,7 +38,6 @@ export class PixelFetcher {
   static tileIdInTileMapLocation: i32 = 0;
 
   // Sprite Info
-  static isSprite: boolean = false;
   static spriteAttributeIndex: i32 = 0;
 
   // Our response bytes in the fetcher
@@ -43,7 +48,7 @@ export class PixelFetcher {
 
   static reset(): void {
     PixelFetcher.currentStatus = 0;
-    PixelFetcher.isSprite = false;
+    PixelFetcher.currentTileType = 0;
 
     // Clear the pixel fifo memory
     for (let pixelIndex = 0; pixelIndex < 160; pixelIndex++) {
@@ -53,20 +58,39 @@ export class PixelFetcher {
     }
   }
 
-  static startBgWindowFetch(tileLine: i32, tileIdInTileMapLocation: i32): void {
+  static startBackgroundFetch(tileLine: i32, tileIdInTileMapLocation: i32): void {
     // Reset the fetcher
     PixelFetcher.currentStatus = 1;
 
-    PixelFetcher.isSprite = false;
+    PixelFetcher.currentTileType = 0;
 
     PixelFetcher.tileLine = tileLine;
     PixelFetcher.tileIdInTileMapLocation = tileIdInTileMapLocation;
   }
 
-  static isFetchingBgWindowTileLine(tileLine: i32, tileIdInTileMapLocation: i32): boolean {
+  static isFetchingBackgroundTileLine(tileLine: i32, tileIdInTileMapLocation: i32): boolean {
     return (
       PixelFetcher.currentStatus !== 0 &&
-      !PixelFetcher.isSprite &&
+      PixelFetcher.currentTileType === 0 &&
+      PixelFetcher.tileLine === tileLine &&
+      PixelFetcher.tileIdInTileMapLocation === tileIdInTileMapLocation
+    );
+  }
+
+  static startWindowFetch(tileLine: i32, tileIdInTileMapLocation: i32): void {
+    // Reset the fetcher
+    PixelFetcher.currentStatus = 1;
+
+    PixelFetcher.currentTileType = 1;
+
+    PixelFetcher.tileLine = tileLine;
+    PixelFetcher.tileIdInTileMapLocation = tileIdInTileMapLocation;
+  }
+
+  static isFetchingWindowTileLine(tileLine: i32, tileIdInTileMapLocation: i32): boolean {
+    return (
+      PixelFetcher.currentStatus !== 0 &&
+      PixelFetcher.currentTileType === 1 &&
       PixelFetcher.tileLine === tileLine &&
       PixelFetcher.tileIdInTileMapLocation === tileIdInTileMapLocation
     );
@@ -76,7 +100,7 @@ export class PixelFetcher {
     // Reset the fetcher
     PixelFetcher.currentStatus = 1;
 
-    PixelFetcher.isSprite = true;
+    PixelFetcher.currentTileType = 2;
 
     PixelFetcher.tileLine = tileLine;
     PixelFetcher.spriteAttributeIndex = spriteAttributeIndex;
@@ -85,7 +109,7 @@ export class PixelFetcher {
   static isFetchingSpriteTileLine(tileLine: i32, spriteAttributeIndex: i32): boolean {
     return (
       PixelFetcher.currentStatus !== 0 &&
-      PixelFetcher.isSprite &&
+      PixelFetcher.currentTileType === 2 &&
       PixelFetcher.tileLine === tileLine &&
       PixelFetcher.spriteAttributeIndex === spriteAttributeIndex
     );
@@ -97,7 +121,7 @@ export class PixelFetcher {
     // Pixel Fetcher won't add more pixels unless there are only 8 pixels left
     let pixelsRemainingInFifo = PixelFifo.numberOfPixelsInFifo - PixelFifo.currentIndex;
     if (PixelFetcher.currentStatus === 0 || PixelFetcher.currentStatus === 4) {
-      if (PixelFetcher.currentStatus === 4 && (PixelFetcher.isSprite || pixelsRemainingInFifo <= 8)) {
+      if (PixelFetcher.currentStatus === 4 && (PixelFetcher.currentTileType === 2 || pixelsRemainingInFifo <= 8)) {
         // Place into the fifo
         _storeFetchIntoFifo();
 
@@ -123,7 +147,7 @@ export class PixelFetcher {
       // Read the tile data
       _readTileData(1);
 
-      if (PixelFetcher.isSprite || pixelsRemainingInFifo <= 8) {
+      if (PixelFetcher.currentTileType === 2 || pixelsRemainingInFifo <= 8) {
         // Place into the fifo
         _storeFetchIntoFifo();
 
@@ -138,7 +162,7 @@ export class PixelFetcher {
 }
 
 function _readTileIdFromTileMap(): void {
-  if (PixelFetcher.isSprite) {
+  if (PixelFetcher.currentTileType === 2) {
     // Get the Tile Id from the Attributes table
     let spriteTableIndex = PixelFetcher.spriteAttributeIndex * 4;
     let spriteMemoryLocation = Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex;
@@ -169,7 +193,7 @@ function _readTileData(byteNumber: i32): void {
   // Get our seleted tile data memory location
   // This is always one for sprites, or can be set on LCDC for BG and Window
   let tileDataMemoryLocation = Graphics.memoryLocationTileDataSelectZeroStart;
-  if (PixelFetcher.isSprite || Lcd.bgWindowTileDataSelect) {
+  if (PixelFetcher.currentTileType === 2 || Lcd.bgWindowTileDataSelect) {
     tileDataMemoryLocation = Graphics.memoryLocationTileDataSelectOneStart;
   }
 
@@ -179,7 +203,7 @@ function _readTileData(byteNumber: i32): void {
   // Sprites and BG tiles use different attributes
   let vramBankId: i32 = 0;
   let tileAttributes: i32 = 0;
-  if (PixelFetcher.isSprite) {
+  if (PixelFetcher.currentTileType === 2) {
     // Get our sprite attributes
     let spriteTableIndex = PixelFetcher.spriteAttributeIndex * 4;
     let spriteMemoryLocation = Graphics.memoryLocationSpriteAttributesTable + spriteTableIndex;
@@ -216,7 +240,7 @@ function _readTileData(byteNumber: i32): void {
   if (checkBitOnByte(6, tileAttributes)) {
     // Get the height of the tile
     let tileHeight = 8;
-    if (PixelFetcher.isSprite && Lcd.tallSpriteSize) {
+    if (PixelFetcher.currentTileType === 2 && Lcd.tallSpriteSize) {
       tileHeight = 16;
     }
 
@@ -260,7 +284,7 @@ function _readTileData(byteNumber: i32): void {
 // Note: We should only store when we are storing a sprite
 // Or if we have <= 8 pixels left in the fifo.
 function _storeFetchIntoFifo(): void {
-  if (PixelFetcher.isSprite) {
+  if (PixelFetcher.currentTileType === 2) {
     // Need to mix the pixel on top of the old data
 
     // Don't store anything if the Pixel Fifo is out of bounds
