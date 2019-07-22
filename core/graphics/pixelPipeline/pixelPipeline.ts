@@ -197,12 +197,17 @@ function _tryToFetchWindow(): boolean {
   let tileLine: i32 = Graphics.scanlineRegister - windowY;
   tileLine = tileLine & 7;
 
-  // Find the x/y coordinates of the tile on the 256x256 Bg map
-  let pixelXPositionInMap = PixelFifo.currentIndex + windowX;
+  // Find the x/y coordinates of the tile
+
+  // Get our Current X position of our pixel on the on the 160x144 camera
+  // this is done by getting the current scroll X position,
+  // and adding it do what X Value the scanline is drawing on the camera.
+  let pixelXPositionInMap = PixelFifo.currentIndex - windowX;
   // This is to compensate wrapping
   if (pixelXPositionInMap >= 0x100) {
     pixelXPositionInMap -= 0x100;
   }
+  // Get our current pixel y positon on the 160x144 camera (Row that the scanline draws across)
   let pixelYPositionInMap = Graphics.scanlineRegister - windowY;
 
   // Get the location of our tileId on the tileMap
