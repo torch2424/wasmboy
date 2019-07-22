@@ -20,6 +20,9 @@ export class PixelPipeline {
   // When Cycles == 1, we will step the fetcher.
   static cycles: i32 = 0;
 
+  // The X index of the previous sprite that was fetched
+  static previousSpriteIndex: i32 = -1;
+
   // The last recorded scrollX value
   // Useful for checking background pixels
   static previousScrollX: i32 = 0;
@@ -39,10 +42,6 @@ export class PixelPipeline {
     cpuCycles = cpuCycles >> (<i32>Cpu.GBCDoubleSpeed);
 
     for (let pixelPipelineCyclesStepped: i32 = 0; pixelPipelineCyclesStepped < cpuCycles; pixelPipelineCyclesStepped++) {
-      // Debug:
-      // The problem with sprites is that we are still pushing pixels, while we are trying to fetch sprites.
-      // We need to do checks, and then proceed down a certain path
-
       // Push our a pixel
       PixelFifo.step();
 
@@ -64,11 +63,12 @@ export class PixelPipeline {
       }
        */
 
-      // DEBUG: Just do sprites and BG
+      // Figure out what we should be fetching next
+      // First check if we should fetch a sprite
       if (_tryToFetchSprite()) {
         // We are fetching a sprite!
         PixelFifo.startSpriteIdle();
-      } else {
+      } else if (!isFetchingSprite()) {
         PixelFifo.stopSpriteIdle();
         _tryToFetchBackground();
       }
@@ -90,7 +90,13 @@ export class PixelPipeline {
     PixelFifo.reset();
 
     PixelPipeline.cycles = 0;
+    PixelPipeline.previousScrollX = 0;
+    PixelPipeline.previousSpriteIndex = -1;
   }
+}
+
+function isFetchingSprite(): boolean {
+  return PixelFetcher.isSprite && PixelFetcher.currentStatus !== 0;
 }
 
 // Returns if we started fetching / we are fetching sprites
@@ -104,6 +110,11 @@ function _tryToFetchSprite(): boolean {
   // But only if we already have 8 pixels in the fifo,
   let pixelsRemainingInFifo = PixelFifo.numberOfPixelsInFifo - PixelFifo.currentIndex;
   if (pixelsRemainingInFifo < 8) {
+    return false;
+  }
+
+  // Can only show one sprite per x value
+  if (PixelFifo.currentIndex <= PixelPipeline.previousSpriteIndex) {
     return false;
   }
 
@@ -138,25 +149,15 @@ function _tryToFetchSprite(): boolean {
     if (PixelFifo.currentIndex === spriteXPosition) {
       // We need to fetch this sprite!
 
-      // Debug: also need to fix tile line in the fetcher!!!
-      // getting off train
-
       // Get which line of the 8x8 or 8x16 tile.
-      // Need to sub tract 16 from the total because of the tile height, to get the line
-      // Debug, may need to put the sprite height here in stead of 16.
-      let spriteTileLine = Graphics.scanlineRegister - spriteYPosition - 16;
+      let spriteTileLine = Graphics.scanlineRegister - spriteYPosition;
 
       // Check if we are already fetching the sprite,
       // If not, start fetching it
       if (!PixelFetcher.isFetchingSpriteTileLine(spriteTileLine, spriteIndex)) {
-        // Debug: We are fetching this sprite
-        // But which line and things?
-        let spriteHeight: i32 = Lcd.tallSpriteSize ? 16 : 8;
-        log(Graphics.scanlineRegister, spriteYPosition);
-        log(0x01, spriteHeight);
-
-        // Just reset everything, and start fetching the sprite
+        // Start fetching the sprite
         PixelFetcher.startSpriteFetch(spriteTileLine, spriteIndex);
+        PixelPipeline.previousSpriteIndex = PixelFifo.currentIndex;
       }
 
       return true;

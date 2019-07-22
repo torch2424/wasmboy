@@ -31,7 +31,9 @@ export class PixelFifo {
   }
 
   static stopSpriteIdle(): void {
-    PixelFifo.currentStatus = 0;
+    if (PixelFifo.currentStatus === 2) {
+      PixelFifo.currentStatus = 0;
+    }
   }
 
   static step(): void {

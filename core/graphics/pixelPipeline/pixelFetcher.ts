@@ -43,6 +43,7 @@ export class PixelFetcher {
 
   static reset(): void {
     PixelFetcher.currentStatus = 0;
+    PixelFetcher.isSprite = false;
 
     // Clear the pixel fifo memory
     for (let pixelIndex = 0; pixelIndex < 160; pixelIndex++) {
@@ -96,7 +97,7 @@ export class PixelFetcher {
     // Pixel Fetcher won't add more pixels unless there are only 8 pixels left
     let pixelsRemainingInFifo = PixelFifo.numberOfPixelsInFifo - PixelFifo.currentIndex;
     if (PixelFetcher.currentStatus === 0 || PixelFetcher.currentStatus === 4) {
-      if (PixelFetcher.currentStatus === 4 && pixelsRemainingInFifo <= 8) {
+      if (PixelFetcher.currentStatus === 4 && (PixelFetcher.isSprite || pixelsRemainingInFifo <= 8)) {
         // Place into the fifo
         _storeFetchIntoFifo();
 
@@ -122,7 +123,7 @@ export class PixelFetcher {
       // Read the tile data
       _readTileData(1);
 
-      if (pixelsRemainingInFifo <= 8) {
+      if (PixelFetcher.isSprite || pixelsRemainingInFifo <= 8) {
         // Place into the fifo
         _storeFetchIntoFifo();
 
@@ -153,10 +154,8 @@ function _readTileIdFromTileMap(): void {
       // So just knock off the last bit? :)
       spriteTileId -= spriteTileId & 1;
 
-      // Check if we wanted to draw the second tile though
-      if (PixelFetcher.tileLine >= 8) {
-        spriteTileId += 1;
-      }
+      // NOTE: We don't need to do any tile line stuf here, as tall
+      // sprites will automatically go into the next tile :)
     }
 
     PixelFetcher.tileIdFromTileMap = spriteTileId;
@@ -258,6 +257,8 @@ function _readTileData(byteNumber: i32): void {
   }
 }
 
+// Note: We should only store when we are storing a sprite
+// Or if we have <= 8 pixels left in the fifo.
 function _storeFetchIntoFifo(): void {
   if (PixelFetcher.isSprite) {
     // Need to mix the pixel on top of the old data
@@ -321,17 +322,6 @@ function _storeFetchIntoFifo(): void {
 
         // Set that we are a sprite
         fifoTypePerPixel = setBitOnByte(i, fifoTypePerPixel);
-
-        // Debug / TODO : Firgure our why sprites aren't shoing up...
-        // fifoTypePerPixel is correct, maybe is is the data bytes?
-        // log(0x87, fifoTypePerPixel);
-        // log(0x89, spritePaletteColorId);
-        // log(0x90, fifoTileDataByteZero);
-        // log(0x91, fifoTileDataByteOne);
-
-        // Debug: Are we writing sprites?
-        // Yes we are, and what seems like correct scanlines
-        // log(0x99, Graphics.scanlineRegister);
 
         // Write back to the fifo
         storePixelFifoByteForPixelIndexIntoWasmBoyMemory(0, PixelFifo.currentIndex, fifoTileDataByteZero);
