@@ -372,6 +372,7 @@ export class Descriptor {
         data.push(load<u8>(data_partial + i));
       }
     }
+
     if (read < 0) {
       return null;
     }

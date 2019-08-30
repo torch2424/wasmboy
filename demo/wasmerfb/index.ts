@@ -5,15 +5,15 @@ import { config, executeFrame, CARTRIDGE_ROM_LOCATION, FRAME_LOCATION } from '..
 import { showHelp } from './cli/cli';
 
 // Import our CommandLine for grabbing args
-import { CommandLine, FileSystem, Descriptor, Performance, Console } from './wasa';
+import { CommandLine, FileSystem, Descriptor, Date, Console } from './wasa';
 
 function sleep(sleepTicks: f64): void {
-  let lastTime: f64 = Performance.now();
+  let lastTime: f64 = Date.now();
 
   let shouldLoop: boolean = true;
 
   while (shouldLoop) {
-    let currentTime: f64 = Performance.now();
+    let currentTime: f64 = Date.now();
 
     // See if it is time to update
     if (abs(lastTime - currentTime) > sleepTicks) {
@@ -36,14 +36,19 @@ export function _start(): void {
     return;
   }
 
-  let arg: string = args[0];
+  let arg: string = args[1];
+
+  Console.log('Loading Rom: ' + arg);
 
   // Read the ROM, place into memory
   let rom: Descriptor = FileSystem.open(arg) as Descriptor;
+  Console.log('Rom Fd: ' + rom.rawfd.toString());
   let romBytes = rom.readAll() as Array<u8>;
   for (let i: i32 = 0; i < romBytes.length; i++) {
     store<u8>(CARTRIDGE_ROM_LOCATION + i, romBytes[i]);
   }
+
+  Console.log('Configuring WasmBoy...');
 
   // Configure the core
   config(
@@ -66,6 +71,8 @@ export function _start(): void {
 
   size.writeString('160x144');
 
+  Console.log('Starting!');
+
   while (true) {
     Console.log('Running!');
 
@@ -85,7 +92,7 @@ export function _start(): void {
     // Tell the framebuffer to draw
     draw.writeString('1');
 
-    sleep(20.0);
+    sleep(16.0);
 
     // Done!
   }
