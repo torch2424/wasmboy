@@ -86,6 +86,7 @@ export function _start(): void {
 
     let GAMEBOY_CAMERA_WIDTH = 160;
     let GAMEBOY_CAMERA_HEIGHT = 144;
+    let whence: u8 = 2;
 
     let imageDataArray = new Array<u8>(160 * 144 * 4);
 
@@ -98,9 +99,9 @@ export function _start(): void {
 
         const imageDataIndex = stride2 + (x << 2);
 
-        imageDataArray[imageDataIndex + 2] = load<u8>(CARTRIDGE_ROM_LOCATION + pixelStart + 0);
-        imageDataArray[imageDataIndex + 1] = load<u8>(CARTRIDGE_ROM_LOCATION + pixelStart + 1);
-        imageDataArray[imageDataIndex + 0] = load<u8>(CARTRIDGE_ROM_LOCATION + pixelStart + 2);
+        imageDataArray[imageDataIndex + 2] = load<u8>(FRAME_LOCATION + pixelStart + 0);
+        imageDataArray[imageDataIndex + 1] = load<u8>(FRAME_LOCATION + pixelStart + 1);
+        imageDataArray[imageDataIndex + 0] = load<u8>(FRAME_LOCATION + pixelStart + 2);
 
         // Alpha, no transparency
         imageDataArray[imageDataIndex + 3] = 255;
@@ -108,14 +109,14 @@ export function _start(): void {
     }
 
     // Draw into the framebuffer
+    fb.seek(0, whence);
     fb.write(imageDataArray);
 
     // Tell the framebuffer to draw
-    let drawArray = new Array<u8>(1);
-    drawArray[0] = 0;
-    draw.write(drawArray);
+    draw.seek(0, whence);
+    draw.writeString('0');
 
-    sleep(1.0);
+    sleep(6.0);
 
     // Done!
   }
