@@ -78,6 +78,7 @@
     "amp:build:skiplib": "npx rollup -c --environment PROD,TS,AMP,SKIP_LIB",
     "amp:dev": "npm run amp:watch",
     "amp:watch": "npx rollup -c -w --environment AMP,SERVE",
+    "wasmerfb:build": "npx asc demo/wasmerfb/index.ts -b dist/wasmerfb/wasmerfb.untouched.wasm -t dist/wasmerfb/wasmerfb.untouched.wat -O3 --validate --memoryBase 8324096",
     "demo:build": "npx run-s core:build lib:build demo:build:apps",
     "demo:build:apps": "npx run-s debugger:build benchmark:build:skiplib amp:build:skiplib",
     "demo:cname": "echo 'wasmboy.app' > build/CNAME",
