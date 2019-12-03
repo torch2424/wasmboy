@@ -41,7 +41,7 @@ export class Channel1 {
     // Clearing the sweep negate mode bit in NR10 after at least one sweep calculation has been made,
     // using the negate mode since the last trigger causes the channel to be immediately disabled.
     // This prevents you from having the sweep lower the frequency then raise the frequency without a trigger inbetween.
-    if (oldSweepNegate && (!Channel1.NRx0Negate && Channel1.sweepNegateShouldDisableChannelOnClear)) {
+    if (oldSweepNegate && !Channel1.NRx0Negate && Channel1.sweepNegateShouldDisableChannelOnClear) {
       Channel1.isEnabled = false;
     }
   }
