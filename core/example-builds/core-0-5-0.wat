@@ -1,25 +1,34 @@
 (module
- (type $_ (func))
- (type $iiiiiiiiii_ (func (param i32 i32 i32 i32 i32 i32 i32 i32 i32 i32)))
- (type $ii (func (param i32) (result i32)))
- (type $i_ (func (param i32)))
- (type $ii_ (func (param i32 i32)))
- (type $iii (func (param i32 i32) (result i32)))
- (type $i (func (result i32)))
- (type $iii_ (func (param i32 i32 i32)))
- (type $iiiiii_ (func (param i32 i32 i32 i32 i32 i32)))
- (type $iiiiiiii (func (param i32 i32 i32 i32 i32 i32 i32) (result i32)))
- (type $iiii (func (param i32 i32 i32) (result i32)))
- (type $iiiiiii_ (func (param i32 i32 i32 i32 i32 i32 i32)))
- (type $iiiii (func (param i32 i32 i32 i32) (result i32)))
- (type $iiiiiiii_ (func (param i32 i32 i32 i32 i32 i32 i32 i32)))
- (type $FUNCSIG$iiiiii (func (param i32 i32 i32 i32 i32) (result i32)))
- (type $FUNCSIG$iiiiiiiiiiiiii (func (param i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32) (result i32)))
+ (type $FUNCSIG$iii (func (param i32 i32) (result i32)))
+ (type $FUNCSIG$v (func))
+ (type $FUNCSIG$iiii (func (param i32 i32 i32) (result i32)))
+ (type $FUNCSIG$viiii (func (param i32 i32 i32 i32)))
  (type $FUNCSIG$vii (func (param i32 i32)))
  (type $FUNCSIG$ii (func (param i32) (result i32)))
- (memory $0 0)
- (table $0 1 funcref)
- (elem (i32.const 0) $null)
+ (type $FUNCSIG$vi (func (param i32)))
+ (type $FUNCSIG$viii (func (param i32 i32 i32)))
+ (type $FUNCSIG$viiiiiiiiii (func (param i32 i32 i32 i32 i32 i32 i32 i32 i32 i32)))
+ (type $FUNCSIG$i (func (result i32)))
+ (type $FUNCSIG$viiiiii (func (param i32 i32 i32 i32 i32 i32)))
+ (type $FUNCSIG$iiiiiiii (func (param i32 i32 i32 i32 i32 i32 i32) (result i32)))
+ (type $FUNCSIG$viiiiiii (func (param i32 i32 i32 i32 i32 i32 i32)))
+ (type $FUNCSIG$iiiii (func (param i32 i32 i32 i32) (result i32)))
+ (type $FUNCSIG$viiiiiiii (func (param i32 i32 i32 i32 i32 i32 i32 i32)))
+ (type $FUNCSIG$iiiiii (func (param i32 i32 i32 i32 i32) (result i32)))
+ (type $FUNCSIG$iiiiiiiiiiiiii (func (param i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32 i32) (result i32)))
+ (import "env" "abort" (func $~lib/builtins/abort (param i32 i32 i32 i32)))
+ (memory $0 1)
+ (data (i32.const 8) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00t\00l\00s\00f\00.\00t\00s")
+ (data (i32.const 56) "(\00\00\00\01\00\00\00\01\00\00\00(\00\00\00a\00l\00l\00o\00c\00a\00t\00i\00o\00n\00 \00t\00o\00o\00 \00l\00a\00r\00g\00e")
+ (data (i32.const 112) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00p\00u\00r\00e\00.\00t\00s")
+ (data (i32.const 160) "$\00\00\00\01\00\00\00\01\00\00\00$\00\00\00I\00n\00d\00e\00x\00 \00o\00u\00t\00 \00o\00f\00 \00r\00a\00n\00g\00e")
+ (data (i32.const 216) "\14\00\00\00\01\00\00\00\01\00\00\00\14\00\00\00~\00l\00i\00b\00/\00r\00t\00.\00t\00s")
+ (data (i32.const 256) "\03\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\00\10")
+ (global $~lib/rt/tlsf/ROOT (mut i32) (i32.const 0))
+ (global $~lib/rt/tlsf/collectLock (mut i32) (i32.const 0))
+ (global $~lib/rt/pure/ROOTS (mut i32) (i32.const 0))
+ (global $~lib/rt/pure/CUR (mut i32) (i32.const 0))
+ (global $~lib/rt/pure/END (mut i32) (i32.const 0))
  (global $core/constants/ASSEMBLYSCRIPT_MEMORY_LOCATION i32 (i32.const 0))
  (global $core/constants/ASSEMBLYSCRIPT_MEMORY_SIZE i32 (i32.const 1024))
  (global $core/constants/WASMBOY_STATE_LOCATION i32 (i32.const 1024))
@@ -89,13 +98,9 @@
  (global $core/graphics/colors/Colors.obj1LightGrey (mut i32) (i32.const 0))
  (global $core/graphics/colors/Colors.obj1DarkGrey (mut i32) (i32.const 0))
  (global $core/graphics/colors/Colors.obj1Black (mut i32) (i32.const 0))
- (global $core/graphics/palette/Palette.memoryLocationBackgroundPaletteIndex (mut i32) (i32.const 65384))
- (global $core/graphics/palette/Palette.memoryLocationBackgroundPaletteData (mut i32) (i32.const 65385))
- (global $core/graphics/palette/Palette.memoryLocationSpritePaletteData (mut i32) (i32.const 65387))
  (global $core/graphics/tiles/TileCache.tileId (mut i32) (i32.const -1))
  (global $core/graphics/tiles/TileCache.nextXIndexToPerformCacheCheck (mut i32) (i32.const -1))
  (global $core/sound/channel1/Channel1.cycleCounter (mut i32) (i32.const 0))
- (global $core/sound/channel1/Channel1.MAX_LENGTH (mut i32) (i32.const 64))
  (global $core/sound/channel1/Channel1.NRx0SweepPeriod (mut i32) (i32.const 0))
  (global $core/sound/channel1/Channel1.NRx0Negate (mut i32) (i32.const 0))
  (global $core/sound/channel1/Channel1.NRx0SweepShift (mut i32) (i32.const 0))
@@ -112,6 +117,7 @@
  (global $core/sound/channel1/Channel1.frequency (mut i32) (i32.const 0))
  (global $core/sound/channel1/Channel1.frequencyTimer (mut i32) (i32.const 0))
  (global $core/sound/channel1/Channel1.envelopeCounter (mut i32) (i32.const 0))
+ (global $core/sound/channel1/Channel1.isEnvelopeAutomaticUpdating (mut i32) (i32.const 0))
  (global $core/sound/channel1/Channel1.lengthCounter (mut i32) (i32.const 0))
  (global $core/sound/channel1/Channel1.volume (mut i32) (i32.const 0))
  (global $core/sound/channel1/Channel1.dutyCycle (mut i32) (i32.const 0))
@@ -119,8 +125,8 @@
  (global $core/sound/channel1/Channel1.isSweepEnabled (mut i32) (i32.const 0))
  (global $core/sound/channel1/Channel1.sweepCounter (mut i32) (i32.const 0))
  (global $core/sound/channel1/Channel1.sweepShadowFrequency (mut i32) (i32.const 0))
+ (global $core/sound/channel1/Channel1.sweepNegateShouldDisableChannelOnClear (mut i32) (i32.const 0))
  (global $core/sound/channel2/Channel2.cycleCounter (mut i32) (i32.const 0))
- (global $core/sound/channel2/Channel2.MAX_LENGTH (mut i32) (i32.const 64))
  (global $core/sound/channel2/Channel2.NRx1Duty (mut i32) (i32.const 0))
  (global $core/sound/channel2/Channel2.NRx1LengthLoad (mut i32) (i32.const 0))
  (global $core/sound/channel2/Channel2.NRx2StartingVolume (mut i32) (i32.const 0))
@@ -134,12 +140,12 @@
  (global $core/sound/channel2/Channel2.frequency (mut i32) (i32.const 0))
  (global $core/sound/channel2/Channel2.frequencyTimer (mut i32) (i32.const 0))
  (global $core/sound/channel2/Channel2.envelopeCounter (mut i32) (i32.const 0))
+ (global $core/sound/channel2/Channel2.isEnvelopeAutomaticUpdating (mut i32) (i32.const 0))
  (global $core/sound/channel2/Channel2.lengthCounter (mut i32) (i32.const 0))
  (global $core/sound/channel2/Channel2.volume (mut i32) (i32.const 0))
  (global $core/sound/channel2/Channel2.dutyCycle (mut i32) (i32.const 0))
  (global $core/sound/channel2/Channel2.waveFormPositionOnDuty (mut i32) (i32.const 0))
  (global $core/sound/channel3/Channel3.cycleCounter (mut i32) (i32.const 0))
- (global $core/sound/channel3/Channel3.MAX_LENGTH (mut i32) (i32.const 256))
  (global $core/sound/channel3/Channel3.NRx1LengthLoad (mut i32) (i32.const 0))
  (global $core/sound/channel3/Channel3.NRx2VolumeCode (mut i32) (i32.const 0))
  (global $core/sound/channel3/Channel3.NRx3FrequencyLSB (mut i32) (i32.const 0))
@@ -153,8 +159,8 @@
  (global $core/sound/channel3/Channel3.waveTablePosition (mut i32) (i32.const 0))
  (global $core/sound/channel3/Channel3.volumeCode (mut i32) (i32.const 0))
  (global $core/sound/channel3/Channel3.volumeCodeChanged (mut i32) (i32.const 0))
+ (global $core/sound/channel3/Channel3.sampleBuffer (mut i32) (i32.const 0))
  (global $core/sound/channel4/Channel4.cycleCounter (mut i32) (i32.const 0))
- (global $core/sound/channel4/Channel4.MAX_LENGTH (mut i32) (i32.const 64))
  (global $core/sound/channel4/Channel4.NRx1LengthLoad (mut i32) (i32.const 0))
  (global $core/sound/channel4/Channel4.NRx2StartingVolume (mut i32) (i32.const 0))
  (global $core/sound/channel4/Channel4.NRx2EnvelopeAddMode (mut i32) (i32.const 0))
@@ -167,6 +173,7 @@
  (global $core/sound/channel4/Channel4.isDacEnabled (mut i32) (i32.const 0))
  (global $core/sound/channel4/Channel4.frequencyTimer (mut i32) (i32.const 0))
  (global $core/sound/channel4/Channel4.envelopeCounter (mut i32) (i32.const 0))
+ (global $core/sound/channel4/Channel4.isEnvelopeAutomaticUpdating (mut i32) (i32.const 0))
  (global $core/sound/channel4/Channel4.lengthCounter (mut i32) (i32.const 0))
  (global $core/sound/channel4/Channel4.volume (mut i32) (i32.const 0))
  (global $core/sound/channel4/Channel4.divisor (mut i32) (i32.const 0))
@@ -198,10 +205,8 @@
  (global $core/sound/sound/Sound.NR52IsSoundEnabled (mut i32) (i32.const 1))
  (global $core/sound/sound/Sound.frameSequenceCycleCounter (mut i32) (i32.const 0))
  (global $core/sound/sound/Sound.downSampleCycleCounter (mut i32) (i32.const 0))
- (global $core/sound/sound/Sound.downSampleCycleMultiplier (mut i32) (i32.const 48000))
  (global $core/sound/sound/Sound.frameSequencer (mut i32) (i32.const 0))
  (global $core/sound/sound/Sound.audioQueueIndex (mut i32) (i32.const 0))
- (global $core/sound/sound/Sound.wasmBoyMemoryMaxBufferSize (mut i32) (i32.const 131072))
  (global $core/interrupts/interrupts/Interrupts.masterInterruptSwitch (mut i32) (i32.const 0))
  (global $core/interrupts/interrupts/Interrupts.masterInterruptSwitchDelay (mut i32) (i32.const 0))
  (global $core/interrupts/interrupts/Interrupts.interruptsEnabledValue (mut i32) (i32.const 0))
@@ -270,18 +275,11 @@
  (global $core/memory/memory/Memory.isMBC2 (mut i32) (i32.const 0))
  (global $core/memory/memory/Memory.isMBC3 (mut i32) (i32.const 0))
  (global $core/memory/memory/Memory.isMBC5 (mut i32) (i32.const 0))
- (global $core/memory/memory/Memory.memoryLocationHdmaSourceHigh (mut i32) (i32.const 65361))
- (global $core/memory/memory/Memory.memoryLocationHdmaSourceLow (mut i32) (i32.const 65362))
- (global $core/memory/memory/Memory.memoryLocationHdmaDestinationHigh (mut i32) (i32.const 65363))
- (global $core/memory/memory/Memory.memoryLocationHdmaDestinationLow (mut i32) (i32.const 65364))
- (global $core/memory/memory/Memory.memoryLocationHdmaTrigger (mut i32) (i32.const 65365))
  (global $core/memory/memory/Memory.DMACycles (mut i32) (i32.const 0))
  (global $core/memory/memory/Memory.isHblankHdmaActive (mut i32) (i32.const 0))
  (global $core/memory/memory/Memory.hblankHdmaTransferLengthRemaining (mut i32) (i32.const 0))
  (global $core/memory/memory/Memory.hblankHdmaSource (mut i32) (i32.const 0))
  (global $core/memory/memory/Memory.hblankHdmaDestination (mut i32) (i32.const 0))
- (global $core/memory/memory/Memory.memoryLocationGBCVRAMBank (mut i32) (i32.const 65359))
- (global $core/memory/memory/Memory.memoryLocationGBCWRAMBank (mut i32) (i32.const 65392))
  (global $core/cpu/cpu/Cpu.BootROMEnabled (mut i32) (i32.const 0))
  (global $core/cpu/cpu/Cpu.GBCEnabled (mut i32) (i32.const 0))
  (global $core/cpu/cpu/Cpu.GBCDoubleSpeed (mut i32) (i32.const 0))
@@ -306,13 +304,15 @@
  (global $core/execute/Execute.stepsPerStepSet (mut i32) (i32.const 2000000000))
  (global $core/execute/Execute.stepSets (mut i32) (i32.const 0))
  (global $core/execute/Execute.steps (mut i32) (i32.const 0))
- (global $core/execute/Execute.RESPONSE_CONDITION_FRAME (mut i32) (i32.const 0))
- (global $core/execute/Execute.RESPONSE_CONDITION_AUDIO (mut i32) (i32.const 1))
- (global $core/execute/Execute.RESPONSE_CONDITION_BREAKPOINT (mut i32) (i32.const 2))
  (global $core/core/hasStarted (mut i32) (i32.const 0))
+ (global $~lib/rt/__rtti_base i32 (i32.const 256))
  (global $~lib/argc (mut i32) (i32.const 0))
  (export "memory" (memory $0))
- (export "table" (table $0))
+ (export "__alloc" (func $~lib/rt/tlsf/__alloc))
+ (export "__retain" (func $~lib/rt/pure/__retain))
+ (export "__release" (func $~lib/rt/pure/__release))
+ (export "__collect" (func $~lib/rt/pure/__collect))
+ (export "__rtti_base" (global $~lib/rt/__rtti_base))
  (export "config" (func $core/core/config))
  (export "hasCoreStarted" (func $core/core/hasCoreStarted))
  (export "saveState" (func $core/core/saveState))
@@ -323,7 +323,7 @@
  (export "getSteps" (func $core/execute/getSteps))
  (export "executeMultipleFrames" (func $core/execute/executeMultipleFrames))
  (export "executeFrame" (func $core/execute/executeFrame))
- (export "_setargc" (func $~lib/setargc))
+ (export "__setargc" (func $~lib/setargc))
  (export "executeFrameAndCheckAudio" (func $core/execute/executeFrameAndCheckAudio|trampoline))
  (export "executeUntilCondition" (func $core/execute/executeUntilCondition|trampoline))
  (export "executeStep" (func $core/execute/executeStep))
@@ -409,7 +409,2607 @@
  (export "getTAC" (func $core/debug/debug-timer/getTAC))
  (export "updateDebugGBMemory" (func $core/debug/debug-memory/updateDebugGBMemory))
  (start $start)
- (func $start:core/graphics/colors (; 0 ;) (type $_)
+ (func $~lib/rt/tlsf/removeBlock (; 1 ;) (type $FUNCSIG$vii) (param $0 i32) (param $1 i32)
+  (local $2 i32)
+  (local $3 i32)
+  (local $4 i32)
+  (local $5 i32)
+  local.get $1
+  i32.load
+  local.tee $3
+  i32.const 1
+  i32.and
+  i32.eqz
+  if
+   i32.const 0
+   i32.const 24
+   i32.const 277
+   i32.const 13
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $3
+  i32.const -4
+  i32.and
+  local.tee $2
+  i32.const 16
+  i32.ge_u
+  if (result i32)
+   local.get $2
+   i32.const 1073741808
+   i32.lt_u
+  else
+   i32.const 0
+  end
+  i32.eqz
+  if
+   i32.const 0
+   i32.const 24
+   i32.const 279
+   i32.const 13
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $2
+  i32.const 256
+  i32.lt_u
+  if (result i32)
+   local.get $2
+   i32.const 4
+   i32.shr_u
+   local.set $2
+   i32.const 0
+  else
+   local.get $2
+   i32.const 31
+   local.get $2
+   i32.clz
+   i32.sub
+   local.tee $3
+   i32.const 4
+   i32.sub
+   i32.shr_u
+   i32.const 16
+   i32.xor
+   local.set $2
+   local.get $3
+   i32.const 7
+   i32.sub
+  end
+  local.tee $3
+  i32.const 23
+  i32.lt_u
+  if (result i32)
+   local.get $2
+   i32.const 16
+   i32.lt_u
+  else
+   i32.const 0
+  end
+  i32.eqz
+  if
+   i32.const 0
+   i32.const 24
+   i32.const 292
+   i32.const 13
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $1
+  i32.load offset=20
+  local.set $4
+  local.get $1
+  i32.load offset=16
+  local.tee $5
+  if
+   local.get $5
+   local.get $4
+   i32.store offset=20
+  end
+  local.get $4
+  if
+   local.get $4
+   local.get $5
+   i32.store offset=16
+  end
+  local.get $3
+  i32.const 4
+  i32.shl
+  local.get $2
+  i32.add
+  i32.const 2
+  i32.shl
+  local.get $0
+  i32.add
+  i32.load offset=96
+  local.get $1
+  i32.eq
+  if
+   local.get $3
+   i32.const 4
+   i32.shl
+   local.get $2
+   i32.add
+   i32.const 2
+   i32.shl
+   local.get $0
+   i32.add
+   local.get $4
+   i32.store offset=96
+   local.get $4
+   i32.eqz
+   if
+    local.get $3
+    i32.const 2
+    i32.shl
+    local.get $0
+    i32.add
+    local.get $3
+    i32.const 2
+    i32.shl
+    local.get $0
+    i32.add
+    i32.load offset=4
+    i32.const 1
+    local.get $2
+    i32.shl
+    i32.const -1
+    i32.xor
+    i32.and
+    local.tee $1
+    i32.store offset=4
+    local.get $1
+    i32.eqz
+    if
+     local.get $0
+     local.get $0
+     i32.load
+     i32.const 1
+     local.get $3
+     i32.shl
+     i32.const -1
+     i32.xor
+     i32.and
+     i32.store
+    end
+   end
+  end
+ )
+ (func $~lib/rt/tlsf/insertBlock (; 2 ;) (type $FUNCSIG$vii) (param $0 i32) (param $1 i32)
+  (local $2 i32)
+  (local $3 i32)
+  (local $4 i32)
+  (local $5 i32)
+  (local $6 i32)
+  (local $7 i32)
+  local.get $1
+  i32.eqz
+  if
+   i32.const 0
+   i32.const 24
+   i32.const 205
+   i32.const 13
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $1
+  i32.load
+  local.tee $3
+  i32.const 1
+  i32.and
+  i32.eqz
+  if
+   i32.const 0
+   i32.const 24
+   i32.const 207
+   i32.const 13
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $1
+  i32.const 16
+  i32.add
+  local.get $1
+  i32.load
+  i32.const -4
+  i32.and
+  i32.add
+  local.tee $4
+  i32.load
+  local.tee $5
+  i32.const 1
+  i32.and
+  if
+   local.get $3
+   i32.const -4
+   i32.and
+   i32.const 16
+   i32.add
+   local.get $5
+   i32.const -4
+   i32.and
+   i32.add
+   local.tee $2
+   i32.const 1073741808
+   i32.lt_u
+   if
+    local.get $0
+    local.get $4
+    call $~lib/rt/tlsf/removeBlock
+    local.get $1
+    local.get $3
+    i32.const 3
+    i32.and
+    local.get $2
+    i32.or
+    local.tee $3
+    i32.store
+    local.get $1
+    i32.const 16
+    i32.add
+    local.get $1
+    i32.load
+    i32.const -4
+    i32.and
+    i32.add
+    local.tee $4
+    i32.load
+    local.set $5
+   end
+  end
+  local.get $3
+  i32.const 2
+  i32.and
+  if
+   local.get $1
+   i32.const 4
+   i32.sub
+   i32.load
+   local.tee $2
+   i32.load
+   local.tee $6
+   i32.const 1
+   i32.and
+   i32.eqz
+   if
+    i32.const 0
+    i32.const 24
+    i32.const 228
+    i32.const 15
+    call $~lib/builtins/abort
+    unreachable
+   end
+   local.get $6
+   i32.const -4
+   i32.and
+   i32.const 16
+   i32.add
+   local.get $3
+   i32.const -4
+   i32.and
+   i32.add
+   local.tee $7
+   i32.const 1073741808
+   i32.lt_u
+   if (result i32)
+    local.get $0
+    local.get $2
+    call $~lib/rt/tlsf/removeBlock
+    local.get $2
+    local.get $6
+    i32.const 3
+    i32.and
+    local.get $7
+    i32.or
+    local.tee $3
+    i32.store
+    local.get $2
+   else
+    local.get $1
+   end
+   local.set $1
+  end
+  local.get $4
+  local.get $5
+  i32.const 2
+  i32.or
+  i32.store
+  local.get $3
+  i32.const -4
+  i32.and
+  local.tee $2
+  i32.const 16
+  i32.ge_u
+  if (result i32)
+   local.get $2
+   i32.const 1073741808
+   i32.lt_u
+  else
+   i32.const 0
+  end
+  i32.eqz
+  if
+   i32.const 0
+   i32.const 24
+   i32.const 243
+   i32.const 13
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $4
+  local.get $1
+  i32.const 16
+  i32.add
+  local.get $2
+  i32.add
+  i32.ne
+  if
+   i32.const 0
+   i32.const 24
+   i32.const 244
+   i32.const 13
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $4
+  i32.const 4
+  i32.sub
+  local.get $1
+  i32.store
+  local.get $2
+  i32.const 256
+  i32.lt_u
+  if (result i32)
+   local.get $2
+   i32.const 4
+   i32.shr_u
+   local.set $4
+   i32.const 0
+  else
+   local.get $2
+   i32.const 31
+   local.get $2
+   i32.clz
+   i32.sub
+   local.tee $2
+   i32.const 4
+   i32.sub
+   i32.shr_u
+   i32.const 16
+   i32.xor
+   local.set $4
+   local.get $2
+   i32.const 7
+   i32.sub
+  end
+  local.tee $3
+  i32.const 23
+  i32.lt_u
+  if (result i32)
+   local.get $4
+   i32.const 16
+   i32.lt_u
+  else
+   i32.const 0
+  end
+  i32.eqz
+  if
+   i32.const 0
+   i32.const 24
+   i32.const 260
+   i32.const 13
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $3
+  i32.const 4
+  i32.shl
+  local.get $4
+  i32.add
+  i32.const 2
+  i32.shl
+  local.get $0
+  i32.add
+  i32.load offset=96
+  local.set $2
+  local.get $1
+  i32.const 0
+  i32.store offset=16
+  local.get $1
+  local.get $2
+  i32.store offset=20
+  local.get $2
+  if
+   local.get $2
+   local.get $1
+   i32.store offset=16
+  end
+  local.get $3
+  i32.const 4
+  i32.shl
+  local.get $4
+  i32.add
+  i32.const 2
+  i32.shl
+  local.get $0
+  i32.add
+  local.get $1
+  i32.store offset=96
+  local.get $0
+  local.get $0
+  i32.load
+  i32.const 1
+  local.get $3
+  i32.shl
+  i32.or
+  i32.store
+  local.get $3
+  i32.const 2
+  i32.shl
+  local.get $0
+  i32.add
+  local.get $3
+  i32.const 2
+  i32.shl
+  local.get $0
+  i32.add
+  i32.load offset=4
+  i32.const 1
+  local.get $4
+  i32.shl
+  i32.or
+  i32.store offset=4
+ )
+ (func $~lib/rt/tlsf/addMemory (; 3 ;) (type $FUNCSIG$viii) (param $0 i32) (param $1 i32) (param $2 i32)
+  (local $3 i32)
+  (local $4 i32)
+  local.get $2
+  i32.const 15
+  i32.and
+  i32.eqz
+  i32.const 0
+  local.get $1
+  i32.const 15
+  i32.and
+  i32.eqz
+  i32.const 0
+  local.get $1
+  local.get $2
+  i32.le_u
+  select
+  select
+  i32.eqz
+  if
+   i32.const 0
+   i32.const 24
+   i32.const 386
+   i32.const 4
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $0
+  i32.load offset=1568
+  local.tee $3
+  if
+   local.get $1
+   local.get $3
+   i32.const 16
+   i32.add
+   i32.lt_u
+   if
+    i32.const 0
+    i32.const 24
+    i32.const 396
+    i32.const 15
+    call $~lib/builtins/abort
+    unreachable
+   end
+   local.get $1
+   i32.const 16
+   i32.sub
+   local.get $3
+   i32.eq
+   if
+    local.get $3
+    i32.load
+    local.set $4
+    local.get $1
+    i32.const 16
+    i32.sub
+    local.set $1
+   end
+  else
+   local.get $1
+   local.get $0
+   i32.const 1572
+   i32.add
+   i32.lt_u
+   if
+    i32.const 0
+    i32.const 24
+    i32.const 408
+    i32.const 4
+    call $~lib/builtins/abort
+    unreachable
+   end
+  end
+  local.get $2
+  local.get $1
+  i32.sub
+  local.tee $2
+  i32.const 48
+  i32.lt_u
+  if
+   return
+  end
+  local.get $1
+  local.get $4
+  i32.const 2
+  i32.and
+  local.get $2
+  i32.const 32
+  i32.sub
+  i32.const 1
+  i32.or
+  i32.or
+  i32.store
+  local.get $1
+  i32.const 0
+  i32.store offset=16
+  local.get $1
+  i32.const 0
+  i32.store offset=20
+  local.get $1
+  local.get $2
+  i32.add
+  i32.const 16
+  i32.sub
+  local.tee $2
+  i32.const 2
+  i32.store
+  local.get $0
+  local.get $2
+  i32.store offset=1568
+  local.get $0
+  local.get $1
+  call $~lib/rt/tlsf/insertBlock
+ )
+ (func $~lib/rt/tlsf/initializeRoot (; 4 ;) (type $FUNCSIG$v)
+  (local $0 i32)
+  (local $1 i32)
+  i32.const 1
+  memory.size
+  local.tee $0
+  i32.gt_s
+  if (result i32)
+   i32.const 1
+   local.get $0
+   i32.sub
+   memory.grow
+   i32.const 0
+   i32.lt_s
+  else
+   i32.const 0
+  end
+  if
+   unreachable
+  end
+  i32.const 288
+  i32.const 0
+  i32.store
+  i32.const 1856
+  i32.const 0
+  i32.store
+  i32.const 0
+  local.set $0
+  loop $loop|0
+   block $break|0
+    local.get $0
+    i32.const 23
+    i32.ge_u
+    br_if $break|0
+    local.get $0
+    i32.const 2
+    i32.shl
+    i32.const 288
+    i32.add
+    i32.const 0
+    i32.store offset=4
+    i32.const 0
+    local.set $1
+    loop $loop|1
+     block $break|1
+      local.get $1
+      i32.const 16
+      i32.ge_u
+      br_if $break|1
+      local.get $0
+      i32.const 4
+      i32.shl
+      local.get $1
+      i32.add
+      i32.const 2
+      i32.shl
+      i32.const 288
+      i32.add
+      i32.const 0
+      i32.store offset=96
+      local.get $1
+      i32.const 1
+      i32.add
+      local.set $1
+      br $loop|1
+     end
+    end
+    local.get $0
+    i32.const 1
+    i32.add
+    local.set $0
+    br $loop|0
+   end
+  end
+  i32.const 288
+  i32.const 1872
+  memory.size
+  i32.const 16
+  i32.shl
+  call $~lib/rt/tlsf/addMemory
+  i32.const 288
+  global.set $~lib/rt/tlsf/ROOT
+ )
+ (func $~lib/rt/tlsf/prepareSize (; 5 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
+  local.get $0
+  i32.const 1073741808
+  i32.ge_u
+  if
+   i32.const 72
+   i32.const 24
+   i32.const 457
+   i32.const 29
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $0
+  i32.const 15
+  i32.add
+  i32.const -16
+  i32.and
+  local.tee $0
+  i32.const 16
+  local.get $0
+  i32.const 16
+  i32.gt_u
+  select
+ )
+ (func $~lib/rt/tlsf/searchBlock (; 6 ;) (type $FUNCSIG$iii) (param $0 i32) (param $1 i32) (result i32)
+  (local $2 i32)
+  local.get $1
+  i32.const 256
+  i32.lt_u
+  if (result i32)
+   local.get $1
+   i32.const 4
+   i32.shr_u
+   local.set $1
+   i32.const 0
+  else
+   local.get $1
+   i32.const 536870904
+   i32.lt_u
+   if
+    i32.const 1
+    i32.const 27
+    local.get $1
+    i32.clz
+    i32.sub
+    i32.shl
+    local.get $1
+    i32.add
+    i32.const 1
+    i32.sub
+    local.set $1
+   end
+   local.get $1
+   i32.const 31
+   local.get $1
+   i32.clz
+   i32.sub
+   local.tee $2
+   i32.const 4
+   i32.sub
+   i32.shr_u
+   i32.const 16
+   i32.xor
+   local.set $1
+   local.get $2
+   i32.const 7
+   i32.sub
+  end
+  local.tee $2
+  i32.const 23
+  i32.lt_u
+  if (result i32)
+   local.get $1
+   i32.const 16
+   i32.lt_u
+  else
+   i32.const 0
+  end
+  i32.eqz
+  if
+   i32.const 0
+   i32.const 24
+   i32.const 338
+   i32.const 13
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $2
+  i32.const 2
+  i32.shl
+  local.get $0
+  i32.add
+  i32.load offset=4
+  i32.const -1
+  local.get $1
+  i32.shl
+  i32.and
+  local.tee $1
+  if (result i32)
+   local.get $1
+   i32.ctz
+   local.get $2
+   i32.const 4
+   i32.shl
+   i32.add
+   i32.const 2
+   i32.shl
+   local.get $0
+   i32.add
+   i32.load offset=96
+  else
+   local.get $0
+   i32.load
+   i32.const -1
+   local.get $2
+   i32.const 1
+   i32.add
+   i32.shl
+   i32.and
+   local.tee $1
+   if (result i32)
+    local.get $1
+    i32.ctz
+    local.tee $1
+    i32.const 2
+    i32.shl
+    local.get $0
+    i32.add
+    i32.load offset=4
+    local.tee $2
+    i32.eqz
+    if
+     i32.const 0
+     i32.const 24
+     i32.const 351
+     i32.const 17
+     call $~lib/builtins/abort
+     unreachable
+    end
+    local.get $2
+    i32.ctz
+    local.get $1
+    i32.const 4
+    i32.shl
+    i32.add
+    i32.const 2
+    i32.shl
+    local.get $0
+    i32.add
+    i32.load offset=96
+   else
+    i32.const 0
+   end
+  end
+ )
+ (func $~lib/rt/pure/markGray (; 7 ;) (type $FUNCSIG$vi) (param $0 i32)
+  (local $1 i32)
+  local.get $0
+  i32.load offset=4
+  local.tee $1
+  i32.const 1879048192
+  i32.and
+  i32.const 268435456
+  i32.ne
+  if
+   local.get $0
+   local.get $1
+   i32.const -1879048193
+   i32.and
+   i32.const 268435456
+   i32.or
+   i32.store offset=4
+   local.get $0
+   i32.const 16
+   i32.add
+   i32.const 2
+   call $~lib/rt/__visit_members
+  end
+ )
+ (func $~lib/rt/tlsf/freeBlock (; 8 ;) (type $FUNCSIG$vii) (param $0 i32) (param $1 i32)
+  (local $2 i32)
+  local.get $1
+  i32.load
+  local.tee $2
+  i32.const 1
+  i32.and
+  if
+   i32.const 0
+   i32.const 24
+   i32.const 563
+   i32.const 2
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $1
+  local.get $2
+  i32.const 1
+  i32.or
+  i32.store
+  local.get $0
+  local.get $1
+  call $~lib/rt/tlsf/insertBlock
+ )
+ (func $~lib/rt/pure/scanBlack (; 9 ;) (type $FUNCSIG$vi) (param $0 i32)
+  local.get $0
+  local.get $0
+  i32.load offset=4
+  i32.const -1879048193
+  i32.and
+  i32.store offset=4
+  local.get $0
+  i32.const 16
+  i32.add
+  i32.const 4
+  call $~lib/rt/__visit_members
+ )
+ (func $~lib/rt/pure/scan (; 10 ;) (type $FUNCSIG$vi) (param $0 i32)
+  (local $1 i32)
+  local.get $0
+  i32.load offset=4
+  local.tee $1
+  i32.const 1879048192
+  i32.and
+  i32.const 268435456
+  i32.eq
+  if
+   local.get $1
+   i32.const 268435455
+   i32.and
+   i32.const 0
+   i32.gt_u
+   if
+    local.get $0
+    call $~lib/rt/pure/scanBlack
+   else
+    local.get $0
+    local.get $1
+    i32.const -1879048193
+    i32.and
+    i32.const 536870912
+    i32.or
+    i32.store offset=4
+    local.get $0
+    i32.const 16
+    i32.add
+    i32.const 3
+    call $~lib/rt/__visit_members
+   end
+  end
+ )
+ (func $~lib/rt/pure/collectWhite (; 11 ;) (type $FUNCSIG$vi) (param $0 i32)
+  (local $1 i32)
+  local.get $0
+  i32.load offset=4
+  local.tee $1
+  i32.const 1879048192
+  i32.and
+  i32.const 536870912
+  i32.eq
+  if (result i32)
+   local.get $1
+   i32.const -2147483648
+   i32.and
+   i32.eqz
+  else
+   i32.const 0
+  end
+  if
+   local.get $0
+   local.get $1
+   i32.const -1879048193
+   i32.and
+   i32.store offset=4
+   local.get $0
+   i32.const 16
+   i32.add
+   i32.const 5
+   call $~lib/rt/__visit_members
+   global.get $~lib/rt/tlsf/ROOT
+   local.get $0
+   call $~lib/rt/tlsf/freeBlock
+  end
+ )
+ (func $~lib/rt/pure/__collect (; 12 ;) (type $FUNCSIG$v)
+  (local $0 i32)
+  (local $1 i32)
+  (local $2 i32)
+  (local $3 i32)
+  (local $4 i32)
+  (local $5 i32)
+  global.get $~lib/rt/pure/ROOTS
+  local.tee $5
+  local.tee $2
+  local.set $3
+  global.get $~lib/rt/pure/CUR
+  local.set $0
+  loop $loop|0
+   block $break|0
+    local.get $3
+    local.get $0
+    i32.ge_u
+    br_if $break|0
+    local.get $3
+    i32.load
+    local.tee $4
+    i32.load offset=4
+    local.tee $1
+    i32.const 1879048192
+    i32.and
+    i32.const 805306368
+    i32.eq
+    if (result i32)
+     local.get $1
+     i32.const 268435455
+     i32.and
+     i32.const 0
+     i32.gt_u
+    else
+     i32.const 0
+    end
+    if
+     local.get $4
+     call $~lib/rt/pure/markGray
+     local.get $2
+     local.get $4
+     i32.store
+     local.get $2
+     i32.const 4
+     i32.add
+     local.set $2
+    else
+     i32.const 0
+     local.get $1
+     i32.const 268435455
+     i32.and
+     i32.eqz
+     local.get $1
+     i32.const 1879048192
+     i32.and
+     select
+     if
+      global.get $~lib/rt/tlsf/ROOT
+      local.get $4
+      call $~lib/rt/tlsf/freeBlock
+     else
+      local.get $4
+      local.get $1
+      i32.const 2147483647
+      i32.and
+      i32.store offset=4
+     end
+    end
+    local.get $3
+    i32.const 4
+    i32.add
+    local.set $3
+    br $loop|0
+   end
+  end
+  local.get $2
+  global.set $~lib/rt/pure/CUR
+  local.get $5
+  local.set $0
+  loop $loop|1
+   block $break|1
+    local.get $0
+    local.get $2
+    i32.ge_u
+    br_if $break|1
+    local.get $0
+    i32.load
+    call $~lib/rt/pure/scan
+    local.get $0
+    i32.const 4
+    i32.add
+    local.set $0
+    br $loop|1
+   end
+  end
+  local.get $5
+  local.set $0
+  loop $loop|2
+   block $break|2
+    local.get $0
+    local.get $2
+    i32.ge_u
+    br_if $break|2
+    local.get $0
+    i32.load
+    local.tee $1
+    local.get $1
+    i32.load offset=4
+    i32.const 2147483647
+    i32.and
+    i32.store offset=4
+    local.get $1
+    call $~lib/rt/pure/collectWhite
+    local.get $0
+    i32.const 4
+    i32.add
+    local.set $0
+    br $loop|2
+   end
+  end
+  local.get $5
+  global.set $~lib/rt/pure/CUR
+ )
+ (func $~lib/rt/tlsf/growMemory (; 13 ;) (type $FUNCSIG$vii) (param $0 i32) (param $1 i32)
+  (local $2 i32)
+  memory.size
+  local.tee $2
+  local.get $1
+  i32.const 536870904
+  i32.lt_u
+  if (result i32)
+   i32.const 1
+   i32.const 27
+   local.get $1
+   i32.clz
+   i32.sub
+   i32.shl
+   i32.const 1
+   i32.sub
+   local.get $1
+   i32.add
+  else
+   local.get $1
+  end
+  i32.const 16
+  local.get $0
+  i32.load offset=1568
+  local.get $2
+  i32.const 16
+  i32.shl
+  i32.const 16
+  i32.sub
+  i32.ne
+  i32.shl
+  i32.add
+  i32.const 65535
+  i32.add
+  i32.const -65536
+  i32.and
+  i32.const 16
+  i32.shr_u
+  local.tee $1
+  local.get $2
+  local.get $1
+  i32.gt_s
+  select
+  memory.grow
+  i32.const 0
+  i32.lt_s
+  if
+   local.get $1
+   memory.grow
+   i32.const 0
+   i32.lt_s
+   if
+    unreachable
+   end
+  end
+  local.get $0
+  local.get $2
+  i32.const 16
+  i32.shl
+  memory.size
+  i32.const 16
+  i32.shl
+  call $~lib/rt/tlsf/addMemory
+ )
+ (func $~lib/rt/tlsf/prepareBlock (; 14 ;) (type $FUNCSIG$viii) (param $0 i32) (param $1 i32) (param $2 i32)
+  (local $3 i32)
+  (local $4 i32)
+  local.get $1
+  i32.load
+  local.set $3
+  local.get $2
+  i32.const 15
+  i32.and
+  if
+   i32.const 0
+   i32.const 24
+   i32.const 365
+   i32.const 13
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $3
+  i32.const -4
+  i32.and
+  local.get $2
+  i32.sub
+  local.tee $4
+  i32.const 32
+  i32.ge_u
+  if
+   local.get $1
+   local.get $3
+   i32.const 2
+   i32.and
+   local.get $2
+   i32.or
+   i32.store
+   local.get $1
+   i32.const 16
+   i32.add
+   local.get $2
+   i32.add
+   local.tee $1
+   local.get $4
+   i32.const 16
+   i32.sub
+   i32.const 1
+   i32.or
+   i32.store
+   local.get $0
+   local.get $1
+   call $~lib/rt/tlsf/insertBlock
+  else
+   local.get $1
+   local.get $3
+   i32.const -2
+   i32.and
+   i32.store
+   local.get $1
+   i32.const 16
+   i32.add
+   local.get $1
+   i32.load
+   i32.const -4
+   i32.and
+   i32.add
+   local.get $1
+   i32.const 16
+   i32.add
+   local.get $1
+   i32.load
+   i32.const -4
+   i32.and
+   i32.add
+   i32.load
+   i32.const -3
+   i32.and
+   i32.store
+  end
+ )
+ (func $~lib/rt/tlsf/allocateBlock (; 15 ;) (type $FUNCSIG$iii) (param $0 i32) (param $1 i32) (result i32)
+  (local $2 i32)
+  (local $3 i32)
+  global.get $~lib/rt/tlsf/collectLock
+  if
+   i32.const 0
+   i32.const 24
+   i32.const 486
+   i32.const 13
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $0
+  local.get $1
+  call $~lib/rt/tlsf/prepareSize
+  local.tee $3
+  call $~lib/rt/tlsf/searchBlock
+  local.tee $2
+  i32.eqz
+  if
+   i32.const 1
+   global.set $~lib/rt/tlsf/collectLock
+   call $~lib/rt/pure/__collect
+   i32.const 0
+   global.set $~lib/rt/tlsf/collectLock
+   local.get $0
+   local.get $3
+   call $~lib/rt/tlsf/searchBlock
+   local.tee $2
+   i32.eqz
+   if
+    local.get $0
+    local.get $3
+    call $~lib/rt/tlsf/growMemory
+    local.get $0
+    local.get $3
+    call $~lib/rt/tlsf/searchBlock
+    local.tee $2
+    i32.eqz
+    if
+     i32.const 0
+     i32.const 24
+     i32.const 498
+     i32.const 19
+     call $~lib/builtins/abort
+     unreachable
+    end
+   end
+  end
+  local.get $2
+  i32.load
+  i32.const -4
+  i32.and
+  local.get $3
+  i32.lt_u
+  if
+   i32.const 0
+   i32.const 24
+   i32.const 506
+   i32.const 13
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $2
+  i32.const 0
+  i32.store offset=4
+  local.get $2
+  local.get $1
+  i32.store offset=12
+  local.get $0
+  local.get $2
+  call $~lib/rt/tlsf/removeBlock
+  local.get $0
+  local.get $2
+  local.get $3
+  call $~lib/rt/tlsf/prepareBlock
+  local.get $2
+ )
+ (func $~lib/rt/tlsf/__alloc (; 16 ;) (type $FUNCSIG$iii) (param $0 i32) (param $1 i32) (result i32)
+  (local $2 i32)
+  global.get $~lib/rt/tlsf/ROOT
+  local.tee $2
+  if (result i32)
+   local.get $2
+  else
+   call $~lib/rt/tlsf/initializeRoot
+   global.get $~lib/rt/tlsf/ROOT
+  end
+  local.get $0
+  call $~lib/rt/tlsf/allocateBlock
+  local.tee $0
+  local.get $1
+  i32.store offset=8
+  local.get $0
+  i32.const 16
+  i32.add
+ )
+ (func $~lib/rt/pure/increment (; 17 ;) (type $FUNCSIG$vi) (param $0 i32)
+  (local $1 i32)
+  local.get $0
+  i32.load offset=4
+  local.tee $1
+  i32.const -268435456
+  i32.and
+  local.get $1
+  i32.const 1
+  i32.add
+  i32.const -268435456
+  i32.and
+  i32.ne
+  if
+   i32.const 0
+   i32.const 128
+   i32.const 104
+   i32.const 2
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $0
+  local.get $1
+  i32.const 1
+  i32.add
+  i32.store offset=4
+  local.get $0
+  i32.load
+  i32.const 1
+  i32.and
+  if
+   i32.const 0
+   i32.const 128
+   i32.const 107
+   i32.const 13
+   call $~lib/builtins/abort
+   unreachable
+  end
+ )
+ (func $~lib/rt/pure/__retain (; 18 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
+  local.get $0
+  i32.const 284
+  i32.gt_u
+  if
+   local.get $0
+   i32.const 16
+   i32.sub
+   call $~lib/rt/pure/increment
+  end
+  local.get $0
+ )
+ (func $~lib/rt/__typeinfo (; 19 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
+  local.get $0
+  i32.const 256
+  i32.load
+  i32.gt_u
+  if
+   i32.const 176
+   i32.const 232
+   i32.const 22
+   i32.const 27
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $0
+  i32.const 3
+  i32.shl
+  i32.const 260
+  i32.add
+  i32.load
+ )
+ (func $~lib/util/memory/memcpy (; 20 ;) (type $FUNCSIG$viii) (param $0 i32) (param $1 i32) (param $2 i32)
+  (local $3 i32)
+  (local $4 i32)
+  (local $5 i32)
+  loop $continue|0
+   local.get $1
+   i32.const 3
+   i32.and
+   i32.const 0
+   local.get $2
+   select
+   if
+    local.get $0
+    local.tee $3
+    i32.const 1
+    i32.add
+    local.set $0
+    local.get $1
+    local.tee $4
+    i32.const 1
+    i32.add
+    local.set $1
+    local.get $3
+    local.get $4
+    i32.load8_u
+    i32.store8
+    local.get $2
+    i32.const 1
+    i32.sub
+    local.set $2
+    br $continue|0
+   end
+  end
+  local.get $0
+  i32.const 3
+  i32.and
+  i32.eqz
+  if
+   loop $continue|1
+    local.get $2
+    i32.const 16
+    i32.lt_u
+    i32.eqz
+    if
+     local.get $0
+     local.get $1
+     i32.load
+     i32.store
+     local.get $0
+     i32.const 4
+     i32.add
+     local.get $1
+     i32.const 4
+     i32.add
+     i32.load
+     i32.store
+     local.get $0
+     i32.const 8
+     i32.add
+     local.get $1
+     i32.const 8
+     i32.add
+     i32.load
+     i32.store
+     local.get $0
+     i32.const 12
+     i32.add
+     local.get $1
+     i32.const 12
+     i32.add
+     i32.load
+     i32.store
+     local.get $1
+     i32.const 16
+     i32.add
+     local.set $1
+     local.get $0
+     i32.const 16
+     i32.add
+     local.set $0
+     local.get $2
+     i32.const 16
+     i32.sub
+     local.set $2
+     br $continue|1
+    end
+   end
+   local.get $2
+   i32.const 8
+   i32.and
+   if
+    local.get $0
+    local.get $1
+    i32.load
+    i32.store
+    local.get $0
+    i32.const 4
+    i32.add
+    local.get $1
+    i32.const 4
+    i32.add
+    i32.load
+    i32.store
+    local.get $1
+    i32.const 8
+    i32.add
+    local.set $1
+    local.get $0
+    i32.const 8
+    i32.add
+    local.set $0
+   end
+   local.get $2
+   i32.const 4
+   i32.and
+   if
+    local.get $0
+    local.get $1
+    i32.load
+    i32.store
+    local.get $1
+    i32.const 4
+    i32.add
+    local.set $1
+    local.get $0
+    i32.const 4
+    i32.add
+    local.set $0
+   end
+   local.get $2
+   i32.const 2
+   i32.and
+   if
+    local.get $0
+    local.get $1
+    i32.load16_u
+    i32.store16
+    local.get $1
+    i32.const 2
+    i32.add
+    local.set $1
+    local.get $0
+    i32.const 2
+    i32.add
+    local.set $0
+   end
+   local.get $2
+   i32.const 1
+   i32.and
+   if
+    local.get $0
+    local.get $1
+    i32.load8_u
+    i32.store8
+   end
+   return
+  end
+  local.get $2
+  i32.const 32
+  i32.ge_u
+  if
+   block $break|2
+    block $case2|2
+     block $case1|2
+      local.get $0
+      i32.const 3
+      i32.and
+      local.tee $3
+      i32.const 1
+      i32.ne
+      if
+       local.get $3
+       i32.const 2
+       i32.eq
+       br_if $case1|2
+       local.get $3
+       i32.const 3
+       i32.eq
+       br_if $case2|2
+       br $break|2
+      end
+      local.get $1
+      i32.load
+      local.set $5
+      local.get $0
+      local.get $1
+      i32.load8_u
+      i32.store8
+      local.get $0
+      i32.const 1
+      i32.add
+      local.tee $0
+      local.get $1
+      i32.const 1
+      i32.add
+      local.tee $1
+      i32.load8_u
+      i32.store8
+      local.get $0
+      i32.const 1
+      i32.add
+      local.tee $3
+      i32.const 1
+      i32.add
+      local.set $0
+      local.get $1
+      i32.const 1
+      i32.add
+      local.tee $4
+      i32.const 1
+      i32.add
+      local.set $1
+      local.get $3
+      local.get $4
+      i32.load8_u
+      i32.store8
+      local.get $2
+      i32.const 3
+      i32.sub
+      local.set $2
+      loop $continue|3
+       local.get $2
+       i32.const 17
+       i32.lt_u
+       i32.eqz
+       if
+        local.get $0
+        local.get $1
+        i32.const 1
+        i32.add
+        i32.load
+        local.tee $3
+        i32.const 8
+        i32.shl
+        local.get $5
+        i32.const 24
+        i32.shr_u
+        i32.or
+        i32.store
+        local.get $0
+        i32.const 4
+        i32.add
+        local.get $3
+        i32.const 24
+        i32.shr_u
+        local.get $1
+        i32.const 5
+        i32.add
+        i32.load
+        local.tee $3
+        i32.const 8
+        i32.shl
+        i32.or
+        i32.store
+        local.get $0
+        i32.const 8
+        i32.add
+        local.get $3
+        i32.const 24
+        i32.shr_u
+        local.get $1
+        i32.const 9
+        i32.add
+        i32.load
+        local.tee $3
+        i32.const 8
+        i32.shl
+        i32.or
+        i32.store
+        local.get $0
+        i32.const 12
+        i32.add
+        local.get $1
+        i32.const 13
+        i32.add
+        i32.load
+        local.tee $5
+        i32.const 8
+        i32.shl
+        local.get $3
+        i32.const 24
+        i32.shr_u
+        i32.or
+        i32.store
+        local.get $1
+        i32.const 16
+        i32.add
+        local.set $1
+        local.get $0
+        i32.const 16
+        i32.add
+        local.set $0
+        local.get $2
+        i32.const 16
+        i32.sub
+        local.set $2
+        br $continue|3
+       end
+      end
+      br $break|2
+     end
+     local.get $1
+     i32.load
+     local.set $5
+     local.get $0
+     local.get $1
+     i32.load8_u
+     i32.store8
+     local.get $0
+     i32.const 1
+     i32.add
+     local.tee $3
+     i32.const 1
+     i32.add
+     local.set $0
+     local.get $1
+     i32.const 1
+     i32.add
+     local.tee $4
+     i32.const 1
+     i32.add
+     local.set $1
+     local.get $3
+     local.get $4
+     i32.load8_u
+     i32.store8
+     local.get $2
+     i32.const 2
+     i32.sub
+     local.set $2
+     loop $continue|4
+      local.get $2
+      i32.const 18
+      i32.lt_u
+      i32.eqz
+      if
+       local.get $0
+       local.get $1
+       i32.const 2
+       i32.add
+       i32.load
+       local.tee $3
+       i32.const 16
+       i32.shl
+       local.get $5
+       i32.const 16
+       i32.shr_u
+       i32.or
+       i32.store
+       local.get $0
+       i32.const 4
+       i32.add
+       local.get $3
+       i32.const 16
+       i32.shr_u
+       local.get $1
+       i32.const 6
+       i32.add
+       i32.load
+       local.tee $3
+       i32.const 16
+       i32.shl
+       i32.or
+       i32.store
+       local.get $0
+       i32.const 8
+       i32.add
+       local.get $3
+       i32.const 16
+       i32.shr_u
+       local.get $1
+       i32.const 10
+       i32.add
+       i32.load
+       local.tee $3
+       i32.const 16
+       i32.shl
+       i32.or
+       i32.store
+       local.get $0
+       i32.const 12
+       i32.add
+       local.get $1
+       i32.const 14
+       i32.add
+       i32.load
+       local.tee $5
+       i32.const 16
+       i32.shl
+       local.get $3
+       i32.const 16
+       i32.shr_u
+       i32.or
+       i32.store
+       local.get $1
+       i32.const 16
+       i32.add
+       local.set $1
+       local.get $0
+       i32.const 16
+       i32.add
+       local.set $0
+       local.get $2
+       i32.const 16
+       i32.sub
+       local.set $2
+       br $continue|4
+      end
+     end
+     br $break|2
+    end
+    local.get $1
+    i32.load
+    local.set $5
+    local.get $0
+    local.tee $3
+    i32.const 1
+    i32.add
+    local.set $0
+    local.get $1
+    local.tee $4
+    i32.const 1
+    i32.add
+    local.set $1
+    local.get $3
+    local.get $4
+    i32.load8_u
+    i32.store8
+    local.get $2
+    i32.const 1
+    i32.sub
+    local.set $2
+    loop $continue|5
+     local.get $2
+     i32.const 19
+     i32.lt_u
+     i32.eqz
+     if
+      local.get $0
+      local.get $1
+      i32.const 3
+      i32.add
+      i32.load
+      local.tee $3
+      i32.const 24
+      i32.shl
+      local.get $5
+      i32.const 8
+      i32.shr_u
+      i32.or
+      i32.store
+      local.get $0
+      i32.const 4
+      i32.add
+      local.get $3
+      i32.const 8
+      i32.shr_u
+      local.get $1
+      i32.const 7
+      i32.add
+      i32.load
+      local.tee $3
+      i32.const 24
+      i32.shl
+      i32.or
+      i32.store
+      local.get $0
+      i32.const 8
+      i32.add
+      local.get $3
+      i32.const 8
+      i32.shr_u
+      local.get $1
+      i32.const 11
+      i32.add
+      i32.load
+      local.tee $3
+      i32.const 24
+      i32.shl
+      i32.or
+      i32.store
+      local.get $0
+      i32.const 12
+      i32.add
+      local.get $1
+      i32.const 15
+      i32.add
+      i32.load
+      local.tee $5
+      i32.const 24
+      i32.shl
+      local.get $3
+      i32.const 8
+      i32.shr_u
+      i32.or
+      i32.store
+      local.get $1
+      i32.const 16
+      i32.add
+      local.set $1
+      local.get $0
+      i32.const 16
+      i32.add
+      local.set $0
+      local.get $2
+      i32.const 16
+      i32.sub
+      local.set $2
+      br $continue|5
+     end
+    end
+   end
+  end
+  local.get $2
+  i32.const 16
+  i32.and
+  if
+   local.get $0
+   local.get $1
+   i32.load8_u
+   i32.store8
+   local.get $0
+   i32.const 1
+   i32.add
+   local.tee $0
+   local.get $1
+   i32.const 1
+   i32.add
+   local.tee $1
+   i32.load8_u
+   i32.store8
+   local.get $0
+   i32.const 1
+   i32.add
+   local.tee $0
+   local.get $1
+   i32.const 1
+   i32.add
+   local.tee $1
+   i32.load8_u
+   i32.store8
+   local.get $0
+   i32.const 1
+   i32.add
+   local.tee $0
+   local.get $1
+   i32.const 1
+   i32.add
+   local.tee $1
+   i32.load8_u
+   i32.store8
+   local.get $0
+   i32.const 1
+   i32.add
+   local.tee $0
+   local.get $1
+   i32.const 1
+   i32.add
+   local.tee $1
+   i32.load8_u
+   i32.store8
+   local.get $0
+   i32.const 1
+   i32.add
+   local.tee $0
+   local.get $1
+   i32.const 1
+   i32.add
+   local.tee $1
+   i32.load8_u
+   i32.store8
+   local.get $0
+   i32.const 1
+   i32.add
+   local.tee $0
+   local.get $1
+   i32.const 1
+   i32.add
+   local.tee $1
+   i32.load8_u
+   i32.store8
+   local.get $0
+   i32.const 1
+   i32.add
+   local.tee $0
+   local.get $1
+   i32.const 1
+   i32.add
+   local.tee $1
+   i32.load8_u
+   i32.store8
+   local.get $0
+   i32.const 1
+   i32.add
+   local.tee $0
+   local.get $1
+   i32.const 1
+   i32.add
+   local.tee $1
+   i32.load8_u
+   i32.store8
+   local.get $0
+   i32.const 1
+   i32.add
+   local.tee $0
+   local.get $1
+   i32.const 1
+   i32.add
+   local.tee $1
+   i32.load8_u
+   i32.store8
+   local.get $0
+   i32.const 1
+   i32.add
+   local.tee $0
+   local.get $1
+   i32.const 1
+   i32.add
+   local.tee $1
+   i32.load8_u
+   i32.store8
+   local.get $0
+   i32.const 1
+   i32.add
+   local.tee $0
+   local.get $1
+   i32.const 1
+   i32.add
+   local.tee $1
+   i32.load8_u
+   i32.store8
+   local.get $0
+   i32.const 1
+   i32.add
+   local.tee $0
+   local.get $1
+   i32.const 1
+   i32.add
+   local.tee $1
+   i32.load8_u
+   i32.store8
+   local.get $0
+   i32.const 1
+   i32.add
+   local.tee $0
+   local.get $1
+   i32.const 1
+   i32.add
+   local.tee $1
+   i32.load8_u
+   i32.store8
+   local.get $0
+   i32.const 1
+   i32.add
+   local.tee $0
+   local.get $1
+   i32.const 1
+   i32.add
+   local.tee $1
+   i32.load8_u
+   i32.store8
+   local.get $0
+   i32.const 1
+   i32.add
+   local.tee $3
+   i32.const 1
+   i32.add
+   local.set $0
+   local.get $1
+   i32.const 1
+   i32.add
+   local.tee $4
+   i32.const 1
+   i32.add
+   local.set $1
+   local.get $3
+   local.get $4
+   i32.load8_u
+   i32.store8
+  end
+  local.get $2
+  i32.const 8
+  i32.and
+  if
+   local.get $0
+   local.get $1
+   i32.load8_u
+   i32.store8
+   local.get $0
+   i32.const 1
+   i32.add
+   local.tee $0
+   local.get $1
+   i32.const 1
+   i32.add
+   local.tee $1
+   i32.load8_u
+   i32.store8
+   local.get $0
+   i32.const 1
+   i32.add
+   local.tee $0
+   local.get $1
+   i32.const 1
+   i32.add
+   local.tee $1
+   i32.load8_u
+   i32.store8
+   local.get $0
+   i32.const 1
+   i32.add
+   local.tee $0
+   local.get $1
+   i32.const 1
+   i32.add
+   local.tee $1
+   i32.load8_u
+   i32.store8
+   local.get $0
+   i32.const 1
+   i32.add
+   local.tee $0
+   local.get $1
+   i32.const 1
+   i32.add
+   local.tee $1
+   i32.load8_u
+   i32.store8
+   local.get $0
+   i32.const 1
+   i32.add
+   local.tee $0
+   local.get $1
+   i32.const 1
+   i32.add
+   local.tee $1
+   i32.load8_u
+   i32.store8
+   local.get $0
+   i32.const 1
+   i32.add
+   local.tee $0
+   local.get $1
+   i32.const 1
+   i32.add
+   local.tee $1
+   i32.load8_u
+   i32.store8
+   local.get $0
+   i32.const 1
+   i32.add
+   local.tee $3
+   i32.const 1
+   i32.add
+   local.set $0
+   local.get $1
+   i32.const 1
+   i32.add
+   local.tee $4
+   i32.const 1
+   i32.add
+   local.set $1
+   local.get $3
+   local.get $4
+   i32.load8_u
+   i32.store8
+  end
+  local.get $2
+  i32.const 4
+  i32.and
+  if
+   local.get $0
+   local.get $1
+   i32.load8_u
+   i32.store8
+   local.get $0
+   i32.const 1
+   i32.add
+   local.tee $0
+   local.get $1
+   i32.const 1
+   i32.add
+   local.tee $1
+   i32.load8_u
+   i32.store8
+   local.get $0
+   i32.const 1
+   i32.add
+   local.tee $0
+   local.get $1
+   i32.const 1
+   i32.add
+   local.tee $1
+   i32.load8_u
+   i32.store8
+   local.get $0
+   i32.const 1
+   i32.add
+   local.tee $3
+   i32.const 1
+   i32.add
+   local.set $0
+   local.get $1
+   i32.const 1
+   i32.add
+   local.tee $4
+   i32.const 1
+   i32.add
+   local.set $1
+   local.get $3
+   local.get $4
+   i32.load8_u
+   i32.store8
+  end
+  local.get $2
+  i32.const 2
+  i32.and
+  if
+   local.get $0
+   local.get $1
+   i32.load8_u
+   i32.store8
+   local.get $0
+   i32.const 1
+   i32.add
+   local.tee $3
+   i32.const 1
+   i32.add
+   local.set $0
+   local.get $1
+   i32.const 1
+   i32.add
+   local.tee $4
+   i32.const 1
+   i32.add
+   local.set $1
+   local.get $3
+   local.get $4
+   i32.load8_u
+   i32.store8
+  end
+  local.get $2
+  i32.const 1
+  i32.and
+  if
+   local.get $0
+   local.get $1
+   i32.load8_u
+   i32.store8
+  end
+ )
+ (func $~lib/memory/memory.copy (; 21 ;) (type $FUNCSIG$viii) (param $0 i32) (param $1 i32) (param $2 i32)
+  (local $3 i32)
+  (local $4 i32)
+  block $~lib/util/memory/memmove|inlined.0
+   local.get $2
+   local.set $3
+   local.get $0
+   local.get $1
+   i32.eq
+   br_if $~lib/util/memory/memmove|inlined.0
+   i32.const 1
+   local.get $0
+   local.get $3
+   i32.add
+   local.get $1
+   i32.le_u
+   local.get $1
+   local.get $3
+   i32.add
+   local.get $0
+   i32.le_u
+   select
+   if
+    local.get $0
+    local.get $1
+    local.get $3
+    call $~lib/util/memory/memcpy
+    br $~lib/util/memory/memmove|inlined.0
+   end
+   local.get $0
+   local.get $1
+   i32.lt_u
+   if
+    local.get $1
+    i32.const 7
+    i32.and
+    local.get $0
+    i32.const 7
+    i32.and
+    i32.eq
+    if
+     loop $continue|0
+      local.get $0
+      i32.const 7
+      i32.and
+      if
+       local.get $3
+       i32.eqz
+       br_if $~lib/util/memory/memmove|inlined.0
+       local.get $3
+       i32.const 1
+       i32.sub
+       local.set $3
+       local.get $0
+       local.tee $2
+       i32.const 1
+       i32.add
+       local.set $0
+       local.get $1
+       local.tee $4
+       i32.const 1
+       i32.add
+       local.set $1
+       local.get $2
+       local.get $4
+       i32.load8_u
+       i32.store8
+       br $continue|0
+      end
+     end
+     loop $continue|1
+      local.get $3
+      i32.const 8
+      i32.lt_u
+      i32.eqz
+      if
+       local.get $0
+       local.get $1
+       i64.load
+       i64.store
+       local.get $3
+       i32.const 8
+       i32.sub
+       local.set $3
+       local.get $0
+       i32.const 8
+       i32.add
+       local.set $0
+       local.get $1
+       i32.const 8
+       i32.add
+       local.set $1
+       br $continue|1
+      end
+     end
+    end
+    loop $continue|2
+     local.get $3
+     if
+      local.get $0
+      local.tee $2
+      i32.const 1
+      i32.add
+      local.set $0
+      local.get $1
+      local.tee $4
+      i32.const 1
+      i32.add
+      local.set $1
+      local.get $2
+      local.get $4
+      i32.load8_u
+      i32.store8
+      local.get $3
+      i32.const 1
+      i32.sub
+      local.set $3
+      br $continue|2
+     end
+    end
+   else
+    local.get $1
+    i32.const 7
+    i32.and
+    local.get $0
+    i32.const 7
+    i32.and
+    i32.eq
+    if
+     loop $continue|3
+      local.get $0
+      local.get $3
+      i32.add
+      i32.const 7
+      i32.and
+      if
+       local.get $3
+       i32.eqz
+       br_if $~lib/util/memory/memmove|inlined.0
+       local.get $0
+       local.get $3
+       i32.const 1
+       i32.sub
+       local.tee $3
+       i32.add
+       local.get $1
+       local.get $3
+       i32.add
+       i32.load8_u
+       i32.store8
+       br $continue|3
+      end
+     end
+     loop $continue|4
+      local.get $3
+      i32.const 8
+      i32.lt_u
+      i32.eqz
+      if
+       local.get $0
+       local.get $3
+       i32.const 8
+       i32.sub
+       local.tee $3
+       i32.add
+       local.get $1
+       local.get $3
+       i32.add
+       i64.load
+       i64.store
+       br $continue|4
+      end
+     end
+    end
+    loop $continue|5
+     local.get $3
+     if
+      local.get $0
+      local.get $3
+      i32.const 1
+      i32.sub
+      local.tee $3
+      i32.add
+      local.get $1
+      local.get $3
+      i32.add
+      i32.load8_u
+      i32.store8
+      br $continue|5
+     end
+    end
+   end
+  end
+ )
+ (func $~lib/rt/tlsf/__free (; 22 ;) (type $FUNCSIG$vi) (param $0 i32)
+  global.get $~lib/rt/tlsf/ROOT
+  i32.eqz
+  if
+   i32.const 0
+   i32.const 24
+   i32.const 593
+   i32.const 13
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $0
+  i32.const 15
+  i32.and
+  i32.eqz
+  i32.const 0
+  local.get $0
+  select
+  i32.eqz
+  if
+   i32.const 0
+   i32.const 24
+   i32.const 594
+   i32.const 2
+   call $~lib/builtins/abort
+   unreachable
+  end
+  global.get $~lib/rt/tlsf/ROOT
+  local.get $0
+  i32.const 16
+  i32.sub
+  call $~lib/rt/tlsf/freeBlock
+ )
+ (func $~lib/rt/pure/growRoots (; 23 ;) (type $FUNCSIG$v)
+  (local $0 i32)
+  (local $1 i32)
+  (local $2 i32)
+  (local $3 i32)
+  global.get $~lib/rt/pure/CUR
+  global.get $~lib/rt/pure/ROOTS
+  local.tee $1
+  i32.sub
+  local.tee $2
+  i32.const 1
+  i32.shl
+  local.tee $0
+  i32.const 256
+  local.get $0
+  i32.const 256
+  i32.gt_u
+  select
+  local.tee $3
+  i32.const 0
+  call $~lib/rt/tlsf/__alloc
+  local.tee $0
+  local.get $1
+  local.get $2
+  call $~lib/memory/memory.copy
+  local.get $1
+  if
+   local.get $1
+   call $~lib/rt/tlsf/__free
+  end
+  local.get $0
+  global.set $~lib/rt/pure/ROOTS
+  local.get $0
+  local.get $2
+  i32.add
+  global.set $~lib/rt/pure/CUR
+  local.get $0
+  local.get $3
+  i32.add
+  global.set $~lib/rt/pure/END
+ )
+ (func $~lib/rt/pure/appendRoot (; 24 ;) (type $FUNCSIG$vi) (param $0 i32)
+  (local $1 i32)
+  global.get $~lib/rt/pure/CUR
+  local.tee $1
+  global.get $~lib/rt/pure/END
+  i32.ge_u
+  if
+   call $~lib/rt/pure/growRoots
+   global.get $~lib/rt/pure/CUR
+   local.set $1
+  end
+  local.get $1
+  local.get $0
+  i32.store
+  local.get $1
+  i32.const 4
+  i32.add
+  global.set $~lib/rt/pure/CUR
+ )
+ (func $~lib/rt/pure/decrement (; 25 ;) (type $FUNCSIG$vi) (param $0 i32)
+  (local $1 i32)
+  (local $2 i32)
+  local.get $0
+  i32.load offset=4
+  local.tee $2
+  i32.const 268435455
+  i32.and
+  local.set $1
+  local.get $0
+  i32.load
+  i32.const 1
+  i32.and
+  if
+   i32.const 0
+   i32.const 128
+   i32.const 115
+   i32.const 13
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $1
+  i32.const 1
+  i32.eq
+  if
+   local.get $0
+   i32.const 16
+   i32.add
+   i32.const 1
+   call $~lib/rt/__visit_members
+   local.get $2
+   i32.const -2147483648
+   i32.and
+   if
+    local.get $0
+    i32.const -2147483648
+    i32.store offset=4
+   else
+    global.get $~lib/rt/tlsf/ROOT
+    local.get $0
+    call $~lib/rt/tlsf/freeBlock
+   end
+  else
+   local.get $1
+   i32.const 0
+   i32.le_u
+   if
+    i32.const 0
+    i32.const 128
+    i32.const 124
+    i32.const 15
+    call $~lib/builtins/abort
+    unreachable
+   end
+   local.get $0
+   i32.load offset=8
+   call $~lib/rt/__typeinfo
+   i32.const 16
+   i32.and
+   if
+    local.get $0
+    local.get $1
+    i32.const 1
+    i32.sub
+    local.get $2
+    i32.const -268435456
+    i32.and
+    i32.or
+    i32.store offset=4
+   else
+    local.get $0
+    local.get $1
+    i32.const 1
+    i32.sub
+    i32.const -1342177280
+    i32.or
+    i32.store offset=4
+    local.get $2
+    i32.const -2147483648
+    i32.and
+    i32.eqz
+    if
+     local.get $0
+     call $~lib/rt/pure/appendRoot
+    end
+   end
+  end
+ )
+ (func $~lib/rt/pure/__release (; 26 ;) (type $FUNCSIG$vi) (param $0 i32)
+  local.get $0
+  i32.const 284
+  i32.gt_u
+  if
+   local.get $0
+   i32.const 16
+   i32.sub
+   call $~lib/rt/pure/decrement
+  end
+ )
+ (func $start:core/graphics/colors (; 27 ;) (type $FUNCSIG$v)
   i32.const 15921906
   global.set $core/graphics/colors/Colors.bgWhite
   i32.const 10526880
@@ -435,7 +3035,7 @@
   i32.const 526344
   global.set $core/graphics/colors/Colors.obj1Black
  )
- (func $core/memory/memoryMap/getWasmBoyOffsetFromGameBoyOffset (; 1 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/memory/memoryMap/getWasmBoyOffsetFromGameBoyOffset (; 28 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   (local $1 i32)
   block $folding-inner0
    block $case14|0
@@ -452,8 +3052,15 @@
           if
            local.get $1
            i32.const 1
-           i32.sub
-           br_table $case3|0 $case3|0 $case3|0 $case7|0 $case7|0 $case7|0 $case7|0 $case9|0 $case9|0 $case11|0 $case11|0 $case12|0 $case13|0 $case14|0
+           i32.eq
+           br_if $case3|0
+           block $tablify|0
+            local.get $1
+            i32.const 2
+            i32.sub
+            br_table $case3|0 $case3|0 $case7|0 $case7|0 $case7|0 $case7|0 $case9|0 $case9|0 $case11|0 $case11|0 $case12|0 $case13|0 $tablify|0
+           end
+           br $case14|0
           end
           global.get $core/cpu/cpu/Cpu.BootROMEnabled
           if
@@ -464,28 +3071,21 @@
             i32.lt_s
             br_if $folding-inner0
             local.get $0
+            i32.const 2304
+            i32.lt_s
+            i32.const 0
+            local.get $0
             i32.const 511
             i32.gt_s
-            local.tee $1
-            if (result i32)
-             local.get $0
-             i32.const 2304
-             i32.lt_s
-            else             
-             local.get $1
-            end
+            select
             br_if $folding-inner0
-           else            
+           else
+            i32.const 0
+            local.get $0
+            i32.const 256
+            i32.lt_s
             global.get $core/cpu/cpu/Cpu.GBCEnabled
-            i32.eqz
-            local.tee $1
-            if (result i32)
-             local.get $0
-             i32.const 256
-             i32.lt_s
-            else             
-             local.get $1
-            end
+            select
             br_if $folding-inner0
            end
           end
@@ -498,16 +3098,12 @@
         local.get $0
         i32.const 1
         global.get $core/memory/memory/Memory.currentRomBank
-        local.tee $1
-        global.get $core/memory/memory/Memory.isMBC5
-        i32.eqz
         local.tee $0
-        if (result i32)
-         local.get $1
-         i32.eqz
-        else         
-         local.get $0
-        end
+        i32.const 0
+        local.get $0
+        i32.eqz
+        global.get $core/memory/memory/Memory.isMBC5
+        select
         select
         i32.const 14
         i32.shl
@@ -521,11 +3117,11 @@
        i32.add
        global.get $core/cpu/cpu/Cpu.GBCEnabled
        if (result i32)
-        global.get $core/memory/memory/Memory.memoryLocationGBCVRAMBank
+        i32.const 65359
         call $core/memory/load/eightBitLoadFromGBMemory
         i32.const 1
         i32.and
-       else        
+       else
         i32.const 0
        end
        i32.const 13
@@ -549,22 +3145,20 @@
     end
     i32.const 0
     local.set $1
-    block (result i32)
-     global.get $core/cpu/cpu/Cpu.GBCEnabled
-     if
-      global.get $core/memory/memory/Memory.memoryLocationGBCWRAMBank
-      call $core/memory/load/eightBitLoadFromGBMemory
-      i32.const 7
-      i32.and
-      local.set $1
-     end
-     local.get $1
-     i32.const 1
-     i32.lt_s
+    global.get $core/cpu/cpu/Cpu.GBCEnabled
+    if
+     i32.const 65392
+     call $core/memory/load/eightBitLoadFromGBMemory
+     i32.const 7
+     i32.and
+     local.set $1
     end
+    local.get $1
+    i32.const 1
+    i32.lt_s
     if (result i32)
      i32.const 1
-    else     
+    else
      local.get $1
     end
     i32.const 12
@@ -584,12 +3178,12 @@
   i32.const 1330304
   i32.add
  )
- (func $core/memory/load/eightBitLoadFromGBMemory (; 2 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/memory/load/eightBitLoadFromGBMemory (; 29 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   local.get $0
   call $core/memory/memoryMap/getWasmBoyOffsetFromGameBoyOffset
   i32.load8_u
  )
- (func $core/cpu/cpu/initializeCpu (; 3 ;) (type $_)
+ (func $core/cpu/cpu/initializeCpu (; 30 ;) (type $FUNCSIG$v)
   i32.const 0
   global.set $core/cpu/cpu/Cpu.GBCDoubleSpeed
   i32.const 0
@@ -644,7 +3238,7 @@
    global.set $core/cpu/cpu/Cpu.registerH
    i32.const 13
    global.set $core/cpu/cpu/Cpu.registerL
-  else   
+  else
    i32.const 1
    global.set $core/cpu/cpu/Cpu.registerA
    i32.const 176
@@ -667,84 +3261,71 @@
   i32.const 65534
   global.set $core/cpu/cpu/Cpu.stackPointer
  )
- (func $core/memory/store/eightBitStoreIntoGBMemory (; 4 ;) (type $ii_) (param $0 i32) (param $1 i32)
+ (func $core/memory/store/eightBitStoreIntoGBMemory (; 31 ;) (type $FUNCSIG$vii) (param $0 i32) (param $1 i32)
   local.get $0
   call $core/memory/memoryMap/getWasmBoyOffsetFromGameBoyOffset
   local.get $1
   i32.store8
  )
- (func $core/memory/memory/initializeCartridge (; 5 ;) (type $_)
+ (func $core/memory/memory/initializeCartridge (; 32 ;) (type $FUNCSIG$v)
   (local $0 i32)
-  (local $1 i32)
   i32.const 0
   global.set $core/memory/memory/Memory.isRamBankingEnabled
   i32.const 1
   global.set $core/memory/memory/Memory.isMBC1RomModeEnabled
   i32.const 327
   call $core/memory/load/eightBitLoadFromGBMemory
-  local.tee $1
+  local.tee $0
   i32.eqz
   global.set $core/memory/memory/Memory.isRomOnly
-  local.get $1
+  local.get $0
+  i32.const 3
+  i32.le_s
+  i32.const 0
+  local.get $0
   i32.const 1
   i32.ge_s
-  local.tee $0
-  if
-   local.get $1
-   i32.const 3
-   i32.le_s
-   local.set $0
-  end
-  local.get $0
+  select
   global.set $core/memory/memory/Memory.isMBC1
-  local.get $1
+  local.get $0
+  i32.const 6
+  i32.le_s
+  i32.const 0
+  local.get $0
   i32.const 5
   i32.ge_s
-  local.tee $0
-  if
-   local.get $1
-   i32.const 6
-   i32.le_s
-   local.set $0
-  end
-  local.get $0
+  select
   global.set $core/memory/memory/Memory.isMBC2
-  local.get $1
+  local.get $0
+  i32.const 19
+  i32.le_s
+  i32.const 0
+  local.get $0
   i32.const 15
   i32.ge_s
-  local.tee $0
-  if
-   local.get $1
-   i32.const 19
-   i32.le_s
-   local.set $0
-  end
-  local.get $0
+  select
   global.set $core/memory/memory/Memory.isMBC3
-  local.get $1
+  local.get $0
+  i32.const 30
+  i32.le_s
+  i32.const 0
+  local.get $0
   i32.const 25
   i32.ge_s
-  local.tee $0
-  if
-   local.get $1
-   i32.const 30
-   i32.le_s
-   local.set $0
-  end
-  local.get $0
+  select
   global.set $core/memory/memory/Memory.isMBC5
   i32.const 1
   global.set $core/memory/memory/Memory.currentRomBank
   i32.const 0
   global.set $core/memory/memory/Memory.currentRamBank
-  global.get $core/memory/memory/Memory.memoryLocationGBCVRAMBank
+  i32.const 65359
   i32.const 0
   call $core/memory/store/eightBitStoreIntoGBMemory
-  global.get $core/memory/memory/Memory.memoryLocationGBCWRAMBank
+  i32.const 65392
   i32.const 1
   call $core/memory/store/eightBitStoreIntoGBMemory
  )
- (func $core/memory/dma/initializeDma (; 6 ;) (type $_)
+ (func $core/memory/dma/initializeDma (; 33 ;) (type $FUNCSIG$v)
   i32.const 65361
   i32.const 255
   call $core/memory/store/eightBitStoreIntoGBMemory
@@ -761,8 +3342,7 @@
   i32.const 255
   call $core/memory/store/eightBitStoreIntoGBMemory
  )
- (func $core/graphics/colors/setManualColorizationPalette (; 7 ;) (type $i_) (param $0 i32)
-  (local $1 i32)
+ (func $core/graphics/colors/setManualColorizationPalette (; 34 ;) (type $FUNCSIG$vi) (param $0 i32)
   block $break|0
    block $case12|0
     block $case11|0
@@ -779,12 +3359,11 @@
                local.get $0
                if
                 local.get $0
-                local.tee $1
                 i32.const 1
                 i32.eq
                 br_if $case1|0
                 block $tablify|0
-                 local.get $1
+                 local.get $0
                  i32.const 2
                  i32.sub
                  br_table $case2|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $case9|0 $case10|0 $case11|0 $case12|0 $tablify|0
@@ -1129,8 +3708,7 @@
    global.set $core/graphics/colors/Colors.obj1Black
   end
  )
- (func $core/graphics/colors/setHashColorizationPalette (; 8 ;) (type $i_) (param $0 i32)
-  (local $1 i32)
+ (func $core/graphics/colors/setHashColorizationPalette (; 35 ;) (type $FUNCSIG$vi) (param $0 i32)
   block $break|0
    block $case19|0
     block $case18|0
@@ -1148,79 +3726,78 @@
               i32.ne
               if
                local.get $0
-               local.tee $1
                i32.const 97
                i32.eq
                br_if $case1|0
-               local.get $1
+               local.get $0
                i32.const 20
                i32.eq
                br_if $case2|0
-               local.get $1
+               local.get $0
                i32.const 70
                i32.eq
                br_if $case3|0
-               local.get $1
+               local.get $0
                i32.const 89
                i32.eq
                br_if $case5|0
-               local.get $1
+               local.get $0
                i32.const 198
                i32.eq
                br_if $case5|0
-               local.get $1
+               local.get $0
                i32.const 134
                i32.eq
                br_if $case7|0
-               local.get $1
+               local.get $0
                i32.const 168
                i32.eq
                br_if $case7|0
-               local.get $1
+               local.get $0
                i32.const 191
                i32.eq
                br_if $case11|0
-               local.get $1
+               local.get $0
                i32.const 206
                i32.eq
                br_if $case11|0
-               local.get $1
+               local.get $0
                i32.const 209
                i32.eq
                br_if $case11|0
-               local.get $1
+               local.get $0
                i32.const 240
                i32.eq
                br_if $case11|0
-               local.get $1
+               local.get $0
                i32.const 39
                i32.eq
                br_if $case15|0
-               local.get $1
+               local.get $0
                i32.const 73
                i32.eq
                br_if $case15|0
-               local.get $1
+               local.get $0
                i32.const 92
                i32.eq
                br_if $case15|0
-               local.get $1
+               local.get $0
                i32.const 179
                i32.eq
                br_if $case15|0
-               local.get $1
+               local.get $0
                i32.const 201
                i32.eq
                br_if $case16|0
-               local.get $1
+               local.get $0
                i32.const 112
                i32.eq
                br_if $case17|0
-               local.get $1
+               local.get $0
                i32.const 70
                i32.eq
                br_if $case18|0
-               local.get $1
+               local.get $0
                i32.const 211
                i32.eq
                br_if $case19|0
@@ -1538,7 +4115,7 @@
    global.set $core/graphics/colors/Colors.obj1Black
   end
  )
- (func $core/graphics/colors/initializeColors (; 9 ;) (type $_)
+ (func $core/graphics/colors/initializeColors (; 36 ;) (type $FUNCSIG$v)
   (local $0 i32)
   (local $1 i32)
   i32.const 0
@@ -1557,7 +4134,7 @@
   end
   i32.const 308
   local.set $0
-  loop $repeat|0
+  loop $loop|0
    block $break|0
     local.get $0
     i32.const 323
@@ -1572,7 +4149,7 @@
     i32.const 1
     i32.add
     local.set $0
-    br $repeat|0
+    br $loop|0
    end
   end
   local.get $1
@@ -1580,7 +4157,7 @@
   i32.and
   call $core/graphics/colors/setHashColorizationPalette
  )
- (func $core/graphics/graphics/initializeGraphics (; 10 ;) (type $_)
+ (func $core/graphics/graphics/initializeGraphics (; 37 ;) (type $FUNCSIG$v)
   i32.const 0
   global.set $core/graphics/graphics/Graphics.currentCycles
   i32.const 0
@@ -1608,7 +4185,7 @@
    i32.const 65351
    i32.const 252
    call $core/memory/store/eightBitStoreIntoGBMemory
-  else   
+  else
    i32.const 65345
    i32.const 133
    call $core/memory/store/eightBitStoreIntoGBMemory
@@ -1651,7 +4228,7 @@
     i32.const 65348
     i32.const 0
     call $core/memory/store/eightBitStoreIntoGBMemory
-   else    
+   else
     i32.const 0
     global.set $core/graphics/graphics/Graphics.scanlineRegister
     i32.const 65344
@@ -1664,7 +4241,7 @@
   end
   call $core/graphics/colors/initializeColors
  )
- (func $core/graphics/palette/initializePalette (; 11 ;) (type $_)
+ (func $core/graphics/palette/initializePalette (; 38 ;) (type $FUNCSIG$v)
   global.get $core/cpu/cpu/Cpu.GBCEnabled
   if
    i32.const 65384
@@ -1679,7 +4256,7 @@
    i32.const 65387
    i32.const 13
    call $core/memory/store/eightBitStoreIntoGBMemory
-  else   
+  else
    i32.const 65384
    i32.const 255
    call $core/memory/store/eightBitStoreIntoGBMemory
@@ -1694,7 +4271,7 @@
    call $core/memory/store/eightBitStoreIntoGBMemory
   end
   global.get $core/cpu/cpu/Cpu.GBCEnabled
-  global.get $core/cpu/cpu/Cpu.BootROMEnabled
+  i32.const 0
   global.get $core/cpu/cpu/Cpu.BootROMEnabled
   select
   if
@@ -1706,7 +4283,7 @@
    call $core/memory/store/eightBitStoreIntoGBMemory
   end
  )
- (func $core/sound/channel1/Channel1.initialize (; 12 ;) (type $_)
+ (func $core/sound/channel1/Channel1.initialize (; 39 ;) (type $FUNCSIG$v)
   i32.const 65296
   i32.const 128
   call $core/memory/store/eightBitStoreIntoGBMemory
@@ -1738,7 +4315,7 @@
    call $core/memory/store/eightBitStoreIntoGBMemory
   end
  )
- (func $core/sound/channel2/Channel2.initialize (; 13 ;) (type $_)
+ (func $core/sound/channel2/Channel2.initialize (; 40 ;) (type $FUNCSIG$v)
   i32.const 65301
   i32.const 255
   call $core/memory/store/eightBitStoreIntoGBMemory
@@ -1755,7 +4332,7 @@
   i32.const 184
   call $core/memory/store/eightBitStoreIntoGBMemory
  )
- (func $core/sound/channel3/Channel3.initialize (; 14 ;) (type $_)
+ (func $core/sound/channel3/Channel3.initialize (; 41 ;) (type $FUNCSIG$v)
   i32.const 65306
   i32.const 127
   call $core/memory/store/eightBitStoreIntoGBMemory
@@ -1774,7 +4351,7 @@
   i32.const 1
   global.set $core/sound/channel3/Channel3.volumeCodeChanged
  )
- (func $core/sound/channel4/Channel4.initialize (; 15 ;) (type $_)
+ (func $core/sound/channel4/Channel4.initialize (; 42 ;) (type $FUNCSIG$v)
   i32.const 65311
   i32.const 255
   call $core/memory/store/eightBitStoreIntoGBMemory
@@ -1791,7 +4368,7 @@
   i32.const 191
   call $core/memory/store/eightBitStoreIntoGBMemory
  )
- (func $core/sound/sound/Sound.updateNR51 (; 16 ;) (type $i_) (param $0 i32)
+ (func $core/sound/sound/Sound.updateNR51 (; 43 ;) (type $FUNCSIG$vi) (param $0 i32)
   local.get $0
   i32.const 128
   i32.and
@@ -1841,7 +4418,7 @@
   i32.ne
   global.set $core/sound/sound/Sound.NR51IsChannel1EnabledOnRightOutput
  )
- (func $core/sound/accumulator/initializeSoundAccumulator (; 17 ;) (type $_)
+ (func $core/sound/accumulator/initializeSoundAccumulator (; 44 ;) (type $FUNCSIG$v)
   i32.const 15
   global.set $core/sound/accumulator/SoundAccumulator.channel1Sample
   i32.const 15
@@ -1869,7 +4446,7 @@
   i32.const 0
   global.set $core/sound/accumulator/SoundAccumulator.needToRemixSamples
  )
- (func $core/sound/sound/initializeSound (; 18 ;) (type $_)
+ (func $core/sound/sound/initializeSound (; 45 ;) (type $FUNCSIG$v)
   i32.const 0
   global.set $core/sound/sound/Sound.currentCycles
   i32.const 0
@@ -1945,7 +4522,7 @@
   end
   call $core/sound/accumulator/initializeSoundAccumulator
  )
- (func $core/interrupts/interrupts/Interrupts.updateInterruptEnabled (; 19 ;) (type $i_) (param $0 i32)
+ (func $core/interrupts/interrupts/Interrupts.updateInterruptEnabled (; 46 ;) (type $FUNCSIG$vi) (param $0 i32)
   local.get $0
   i32.const 1
   i32.and
@@ -1979,7 +4556,7 @@
   local.get $0
   global.set $core/interrupts/interrupts/Interrupts.interruptsEnabledValue
  )
- (func $core/interrupts/interrupts/Interrupts.updateInterruptRequested (; 20 ;) (type $i_) (param $0 i32)
+ (func $core/interrupts/interrupts/Interrupts.updateInterruptRequested (; 47 ;) (type $FUNCSIG$vi) (param $0 i32)
   local.get $0
   i32.const 1
   i32.and
@@ -2013,7 +4590,7 @@
   local.get $0
   global.set $core/interrupts/interrupts/Interrupts.interruptsRequestedValue
  )
- (func $core/timers/timers/initializeTimers (; 21 ;) (type $_)
+ (func $core/timers/timers/initializeTimers (; 48 ;) (type $FUNCSIG$v)
   i32.const 0
   global.set $core/timers/timers/Timers.currentCycles
   i32.const 0
@@ -2037,7 +4614,7 @@
    call $core/memory/store/eightBitStoreIntoGBMemory
    i32.const 7840
    global.set $core/timers/timers/Timers.dividerRegister
-  else   
+  else
    i32.const 65284
    i32.const 171
    call $core/memory/store/eightBitStoreIntoGBMemory
@@ -2062,7 +4639,7 @@
    end
   end
  )
- (func $core/serial/serial/initializeSerial (; 22 ;) (type $_)
+ (func $core/serial/serial/initializeSerial (; 49 ;) (type $FUNCSIG$v)
   i32.const 0
   global.set $core/serial/serial/Serial.currentCycles
   i32.const 0
@@ -2078,7 +4655,7 @@
    global.set $core/serial/serial/Serial.isClockSpeedFast
    i32.const 0
    global.set $core/serial/serial/Serial.transferStartFlag
-  else   
+  else
    i32.const 65282
    i32.const 126
    call $core/memory/store/eightBitStoreIntoGBMemory
@@ -2090,7 +4667,7 @@
    global.set $core/serial/serial/Serial.transferStartFlag
   end
  )
- (func $core/core/initializeVarious (; 23 ;) (type $_)
+ (func $core/core/initializeVarious (; 50 ;) (type $FUNCSIG$v)
   global.get $core/cpu/cpu/Cpu.GBCEnabled
   if
    i32.const 65392
@@ -2114,7 +4691,7 @@
    i32.const 65397
    i32.const 143
    call $core/memory/store/eightBitStoreIntoGBMemory
-  else   
+  else
    i32.const 65392
    i32.const 255
    call $core/memory/store/eightBitStoreIntoGBMemory
@@ -2132,30 +4709,27 @@
    call $core/memory/store/eightBitStoreIntoGBMemory
   end
  )
- (func $core/core/initialize (; 24 ;) (type $_)
+ (func $core/core/initialize (; 51 ;) (type $FUNCSIG$v)
   (local $0 i32)
-  (local $1 i32)
   i32.const 323
   call $core/memory/load/eightBitLoadFromGBMemory
-  local.tee $1
+  local.tee $0
   i32.const 192
   i32.eq
-  local.tee $0
   if (result i32)
+   i32.const 1
+  else
    local.get $0
-  else   
-   local.get $1
    i32.const 128
    i32.eq
+   i32.const 0
    global.get $core/config/Config.useGbcWhenAvailable
-   local.tee $0
-   local.get $0
    select
   end
   if
    i32.const 1
    global.set $core/cpu/cpu/Cpu.GBCEnabled
-  else   
+  else
    i32.const 0
    global.set $core/cpu/cpu/Cpu.GBCEnabled
   end
@@ -2177,7 +4751,7 @@
   if
    i32.const 1
    global.set $core/cpu/cpu/Cpu.BootROMEnabled
-  else   
+  else
    i32.const 0
    global.set $core/cpu/cpu/Cpu.BootROMEnabled
   end
@@ -2201,7 +4775,7 @@
   call $core/serial/serial/initializeSerial
   call $core/core/initializeVarious
  )
- (func $core/core/config (; 25 ;) (type $iiiiiiiiii_) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (param $7 i32) (param $8 i32) (param $9 i32)
+ (func $core/core/config (; 52 ;) (type $FUNCSIG$viiiiiiiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (param $7 i32) (param $8 i32) (param $9 i32)
   local.get $0
   i32.const 0
   i32.gt_s
@@ -2244,10 +4818,10 @@
   global.set $core/config/Config.enableAudioDebugging
   call $core/core/initialize
  )
- (func $core/core/hasCoreStarted (; 26 ;) (type $i) (result i32)
+ (func $core/core/hasCoreStarted (; 53 ;) (type $FUNCSIG$i) (result i32)
   global.get $core/core/hasStarted
  )
- (func $core/cpu/cpu/Cpu.saveState (; 27 ;) (type $_)
+ (func $core/cpu/cpu/Cpu.saveState (; 54 ;) (type $FUNCSIG$v)
   i32.const 1024
   global.get $core/cpu/cpu/Cpu.registerA
   i32.store8
@@ -2317,7 +4891,7 @@
   i32.ne
   i32.store8
  )
- (func $core/memory/memory/Memory.saveState (; 28 ;) (type $_)
+ (func $core/memory/memory/Memory.saveState (; 55 ;) (type $FUNCSIG$v)
   i32.const 1224
   global.get $core/memory/memory/Memory.currentRomBank
   i32.store16
@@ -2360,7 +4934,7 @@
   i32.ne
   i32.store8
  )
- (func $core/timers/timers/Timers.saveState (; 29 ;) (type $_)
+ (func $core/timers/timers/Timers.saveState (; 56 ;) (type $FUNCSIG$v)
   i32.const 1274
   global.get $core/timers/timers/Timers.currentCycles
   i32.store
@@ -2381,7 +4955,7 @@
   global.get $core/timers/timers/Timers.timerCounter
   call $core/memory/store/eightBitStoreIntoGBMemory
  )
- (func $core/sound/channel1/Channel1.saveState (; 30 ;) (type $_)
+ (func $core/sound/channel1/Channel1.saveState (; 57 ;) (type $FUNCSIG$v)
   i32.const 1374
   global.get $core/sound/channel1/Channel1.isEnabled
   i32.const 0
@@ -2416,8 +4990,13 @@
   i32.const 1405
   global.get $core/sound/channel1/Channel1.sweepShadowFrequency
   i32.store16
+  i32.const 1407
+  global.get $core/sound/channel1/Channel1.isEnvelopeAutomaticUpdating
+  i32.const 0
+  i32.ne
+  i32.store8
  )
- (func $core/sound/channel2/Channel2.saveState (; 31 ;) (type $_)
+ (func $core/sound/channel2/Channel2.saveState (; 58 ;) (type $FUNCSIG$v)
   i32.const 1424
   global.get $core/sound/channel2/Channel2.isEnabled
   i32.const 0
@@ -2441,8 +5020,13 @@
   i32.const 1444
   global.get $core/sound/channel2/Channel2.waveFormPositionOnDuty
   i32.store8
+  i32.const 1445
+  global.get $core/sound/channel2/Channel2.isEnvelopeAutomaticUpdating
+  i32.const 0
+  i32.ne
+  i32.store8
  )
- (func $core/sound/channel4/Channel4.saveState (; 32 ;) (type $_)
+ (func $core/sound/channel4/Channel4.saveState (; 59 ;) (type $FUNCSIG$v)
   i32.const 1524
   global.get $core/sound/channel4/Channel4.isEnabled
   i32.const 0
@@ -2463,8 +5047,13 @@
   i32.const 1543
   global.get $core/sound/channel4/Channel4.linearFeedbackShiftRegister
   i32.store16
+  i32.const 1545
+  global.get $core/sound/channel4/Channel4.isEnvelopeAutomaticUpdating
+  i32.const 0
+  i32.ne
+  i32.store8
  )
- (func $core/core/saveState (; 33 ;) (type $_)
+ (func $core/core/saveState (; 60 ;) (type $FUNCSIG$v)
   call $core/cpu/cpu/Cpu.saveState
   i32.const 1074
   global.get $core/graphics/graphics/Graphics.scanlineCycleCounter
@@ -2516,7 +5105,7 @@
   i32.const 0
   global.set $core/core/hasStarted
  )
- (func $core/cpu/cpu/Cpu.loadState (; 34 ;) (type $_)
+ (func $core/cpu/cpu/Cpu.loadState (; 61 ;) (type $FUNCSIG$v)
   i32.const 1024
   i32.load8_u
   global.set $core/cpu/cpu/Cpu.registerA
@@ -2586,7 +5175,7 @@
   i32.gt_s
   global.set $core/cpu/cpu/Cpu.GBCDoubleSpeed
  )
- (func $core/graphics/lcd/resetLcd (; 35 ;) (type $i_) (param $0 i32)
+ (func $core/graphics/lcd/resetLcd (; 62 ;) (type $FUNCSIG$vi) (param $0 i32)
   (local $1 i32)
   i32.const 0
   global.set $core/graphics/graphics/Graphics.scanlineCycleCounter
@@ -2610,7 +5199,7 @@
    block $break|0
     i32.const 0
     local.set $0
-    loop $repeat|0
+    loop $loop|0
      local.get $0
      i32.const 93184
      i32.ge_s
@@ -2624,14 +5213,13 @@
      i32.const 1
      i32.add
      local.set $0
-     br $repeat|0
-     unreachable
+     br $loop|0
     end
     unreachable
    end
   end
  )
- (func $core/graphics/lcd/Lcd.updateLcdControl (; 36 ;) (type $i_) (param $0 i32)
+ (func $core/graphics/lcd/Lcd.updateLcdControl (; 63 ;) (type $FUNCSIG$vi) (param $0 i32)
   (local $1 i32)
   global.get $core/graphics/lcd/Lcd.enabled
   local.set $1
@@ -2685,27 +5273,23 @@
   global.set $core/graphics/lcd/Lcd.bgDisplayEnabled
   global.get $core/graphics/lcd/Lcd.enabled
   i32.eqz
-  local.get $1
+  i32.const 0
   local.get $1
   select
   if
    i32.const 1
    call $core/graphics/lcd/resetLcd
   end
+  i32.const 0
+  global.get $core/graphics/lcd/Lcd.enabled
   local.get $1
-  i32.eqz
-  local.tee $0
-  if (result i32)
-   global.get $core/graphics/lcd/Lcd.enabled
-  else   
-   local.get $0
-  end
+  select
   if
    i32.const 0
    call $core/graphics/lcd/resetLcd
   end
  )
- (func $core/interrupts/interrupts/Interrupts.loadState (; 37 ;) (type $_)
+ (func $core/interrupts/interrupts/Interrupts.loadState (; 64 ;) (type $FUNCSIG$v)
   i32.const 1124
   i32.load8_u
   i32.const 0
@@ -2723,7 +5307,7 @@
   call $core/memory/load/eightBitLoadFromGBMemory
   call $core/interrupts/interrupts/Interrupts.updateInterruptRequested
  )
- (func $core/memory/memory/Memory.loadState (; 38 ;) (type $_)
+ (func $core/memory/memory/Memory.loadState (; 65 ;) (type $FUNCSIG$v)
   i32.const 1224
   i32.load16_u
   global.set $core/memory/memory/Memory.currentRomBank
@@ -2766,7 +5350,7 @@
   i32.gt_s
   global.set $core/memory/memory/Memory.isMBC5
  )
- (func $core/timers/timers/Timers.loadState (; 39 ;) (type $_)
+ (func $core/timers/timers/Timers.loadState (; 66 ;) (type $FUNCSIG$v)
   i32.const 1274
   i32.load
   global.set $core/timers/timers/Timers.currentCycles
@@ -2793,16 +5377,16 @@
   call $core/memory/load/eightBitLoadFromGBMemory
   global.set $core/timers/timers/Timers.timerInputClock
  )
- (func $core/sound/sound/clearAudioBuffer (; 40 ;) (type $_)
+ (func $core/sound/sound/clearAudioBuffer (; 67 ;) (type $FUNCSIG$v)
   i32.const 0
   global.set $core/sound/sound/Sound.audioQueueIndex
  )
- (func $core/sound/channel1/Channel1.loadState (; 41 ;) (type $_)
+ (func $core/sound/channel1/Channel1.loadState (; 68 ;) (type $FUNCSIG$v)
   i32.const 1374
-  global.get $core/sound/channel1/Channel1.isEnabled
+  i32.load8_u
   i32.const 0
-  i32.ne
-  i32.store8
+  i32.gt_s
+  global.set $core/sound/channel1/Channel1.isEnabled
   i32.const 1375
   i32.load
   global.set $core/sound/channel1/Channel1.frequencyTimer
@@ -2832,8 +5416,13 @@
   i32.const 1405
   i32.load16_u
   global.set $core/sound/channel1/Channel1.sweepShadowFrequency
+  i32.const 1407
+  i32.load8_u
+  i32.const 0
+  i32.gt_s
+  global.set $core/sound/channel1/Channel1.isEnvelopeAutomaticUpdating
  )
- (func $core/sound/channel2/Channel2.loadState (; 42 ;) (type $_)
+ (func $core/sound/channel2/Channel2.loadState (; 69 ;) (type $FUNCSIG$v)
   i32.const 1424
   i32.load8_u
   i32.const 0
@@ -2857,8 +5446,13 @@
   i32.const 1444
   i32.load8_u
   global.set $core/sound/channel2/Channel2.waveFormPositionOnDuty
+  i32.const 1457
+  i32.load8_u
+  i32.const 0
+  i32.gt_s
+  global.set $core/sound/channel2/Channel2.isEnvelopeAutomaticUpdating
  )
- (func $core/sound/channel4/Channel4.loadState (; 43 ;) (type $_)
+ (func $core/sound/channel4/Channel4.loadState (; 70 ;) (type $FUNCSIG$v)
   i32.const 1524
   i32.load8_u
   i32.const 0
@@ -2879,8 +5473,13 @@
   i32.const 1543
   i32.load16_u
   global.set $core/sound/channel4/Channel4.linearFeedbackShiftRegister
+  i32.const 1545
+  i32.load8_u
+  i32.const 0
+  i32.gt_s
+  global.set $core/sound/channel4/Channel4.isEnvelopeAutomaticUpdating
  )
- (func $core/core/loadState (; 44 ;) (type $_)
+ (func $core/core/loadState (; 71 ;) (type $FUNCSIG$v)
   (local $0 i32)
   call $core/cpu/cpu/Cpu.loadState
   i32.const 1074
@@ -2959,55 +5558,44 @@
   i32.const 0
   global.set $core/execute/Execute.steps
  )
- (func $core/core/isGBC (; 45 ;) (type $i) (result i32)
+ (func $core/core/isGBC (; 72 ;) (type $FUNCSIG$i) (result i32)
   global.get $core/cpu/cpu/Cpu.GBCEnabled
  )
- (func $core/execute/getStepsPerStepSet (; 46 ;) (type $i) (result i32)
+ (func $core/execute/getStepsPerStepSet (; 73 ;) (type $FUNCSIG$i) (result i32)
   global.get $core/execute/Execute.stepsPerStepSet
  )
- (func $core/execute/getStepSets (; 47 ;) (type $i) (result i32)
+ (func $core/execute/getStepSets (; 74 ;) (type $FUNCSIG$i) (result i32)
   global.get $core/execute/Execute.stepSets
  )
- (func $core/execute/getSteps (; 48 ;) (type $i) (result i32)
+ (func $core/execute/getSteps (; 75 ;) (type $FUNCSIG$i) (result i32)
   global.get $core/execute/Execute.steps
  )
- (func $core/graphics/backgroundWindow/drawLineOfTileFromTileCache (; 49 ;) (type $FUNCSIG$iiiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (result i32)
+ (func $core/graphics/backgroundWindow/drawLineOfTileFromTileCache (; 76 ;) (type $FUNCSIG$iiiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (result i32)
   (local $5 i32)
   (local $6 i32)
   (local $7 i32)
   (local $8 i32)
   (local $9 i32)
+  (local $10 i32)
   global.get $core/graphics/tiles/TileCache.nextXIndexToPerformCacheCheck
-  local.set $6
-  block (result i32)
-   block (result i32)
-    local.get $1
-    i32.const 0
-    i32.gt_s
-    local.tee $5
-    if
-     local.get $0
-     i32.const 8
-     i32.gt_s
-     local.set $5
-    end
-    local.get $5
-   end
-   if
-    global.get $core/graphics/tiles/TileCache.tileId
-    local.get $4
-    i32.eq
-    local.set $5
-   end
-   local.get $5
-  end
-  if (result i32)
-   local.get $0
-   local.get $6
-   i32.eq
-  else   
-   local.get $5
-  end
+  local.tee $5
+  local.get $0
+  i32.eq
+  i32.const 0
+  global.get $core/graphics/tiles/TileCache.tileId
+  local.get $4
+  i32.eq
+  i32.const 0
+  local.get $0
+  i32.const 8
+  i32.gt_s
+  i32.const 0
+  local.get $1
+  i32.const 0
+  i32.gt_s
+  select
+  select
+  select
   if
    local.get $3
    i32.const 1
@@ -3017,17 +5605,17 @@
    i32.and
    i32.const 0
    i32.ne
-   local.set $5
+   local.set $8
    local.get $3
    call $core/memory/load/eightBitLoadFromGBMemory
    i32.const 32
    i32.and
    i32.const 0
    i32.ne
-   local.set $8
+   local.set $9
    i32.const 0
    local.set $3
-   loop $repeat|0
+   loop $loop|0
     local.get $3
     i32.const 8
     i32.lt_s
@@ -3036,64 +5624,66 @@
      local.get $3
      i32.sub
      local.get $3
-     local.get $5
      local.get $8
+     local.get $9
      i32.ne
      select
-     local.tee $3
+     local.tee $7
      local.get $0
      i32.add
-     local.tee $4
+     local.tee $3
      i32.const 160
      i32.le_s
      if
       local.get $1
       i32.const 160
       i32.mul
-      local.get $4
+      local.get $3
       i32.add
       i32.const 3
       i32.mul
       i32.const 91264
       i32.add
-      local.tee $7
-      local.get $7
+      local.tee $4
       i32.load8_u
+      local.set $10
+      local.get $4
+      local.get $10
       i32.store8
       local.get $1
       i32.const 160
       i32.mul
-      local.get $4
+      local.get $3
       i32.add
       i32.const 3
       i32.mul
       i32.const 91265
       i32.add
-      local.get $7
+      local.get $4
       i32.load8_u offset=1
       i32.store8
       local.get $1
       i32.const 160
       i32.mul
-      local.get $4
+      local.get $3
       i32.add
       i32.const 3
       i32.mul
       i32.const 91266
       i32.add
-      local.get $7
+      local.get $4
       i32.load8_u offset=2
       i32.store8
       local.get $1
       i32.const 160
       i32.mul
-      local.get $4
+      local.get $3
       i32.add
       i32.const 67712
       i32.add
       local.get $0
       i32.const 0
-      local.get $3
+      local.get $7
       i32.sub
       i32.sub
       local.get $1
@@ -3103,60 +5693,59 @@
       i32.const 67704
       i32.add
       i32.load8_u
-      local.tee $4
+      local.tee $3
       i32.const 3
       i32.and
-      local.tee $7
+      local.tee $4
       i32.const 4
       i32.or
-      local.get $7
       local.get $4
+      local.get $3
       i32.const 4
       i32.and
       select
       i32.store8
-      local.get $9
+      local.get $6
       i32.const 1
       i32.add
-      local.set $9
+      local.set $6
      end
-     local.get $3
+     local.get $7
      i32.const 1
      i32.add
      local.set $3
-     br $repeat|0
+     br $loop|0
     end
    end
-  else   
+  else
    local.get $4
    global.set $core/graphics/tiles/TileCache.tileId
   end
   local.get $0
-  local.get $6
+  local.get $5
   i32.ge_s
   if
    local.get $0
    i32.const 8
    i32.add
-   local.set $6
-   local.get $0
+   local.tee $1
    local.get $2
    i32.const 7
    i32.and
-   local.tee $8
+   local.tee $2
+   i32.add
+   local.get $1
+   local.get $0
+   local.get $2
    i32.lt_s
-   if
-    local.get $6
-    local.get $8
-    i32.add
-    local.set $6
-   end
+   select
+   local.set $5
   end
-  local.get $6
+  local.get $5
   global.set $core/graphics/tiles/TileCache.nextXIndexToPerformCacheCheck
-  local.get $9
+  local.get $6
  )
- (func $core/graphics/tiles/getTileDataAddress (; 50 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/graphics/tiles/getTileDataAddress (; 77 ;) (type $FUNCSIG$iii) (param $0 i32) (param $1 i32) (result i32)
   local.get $0
   i32.const 34816
   i32.eq
@@ -3179,7 +5768,7 @@
   local.get $0
   i32.add
  )
- (func $core/graphics/palette/getRgbColorFromPalette (; 51 ;) (type $iiii) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $core/graphics/palette/getRgbColorFromPalette (; 78 ;) (type $FUNCSIG$iiii) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   local.get $0
   i32.const 3
   i32.shl
@@ -3221,7 +5810,7 @@
   i32.shl
   i32.or
  )
- (func $core/graphics/palette/getColorizedGbHexColorFromPalette (; 52 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/graphics/palette/getColorizedGbHexColorFromPalette (; 79 ;) (type $FUNCSIG$iii) (param $0 i32) (param $1 i32) (result i32)
   local.get $1
   call $core/memory/load/eightBitLoadFromGBMemory
   local.get $0
@@ -3244,10 +5833,13 @@
     block $case3|0
      block $case2|0
       block $case1|0
-       local.get $0
-       i32.const 1
-       i32.sub
-       br_table $case1|0 $case2|0 $case3|0 $break|0
+       block $tablify|0
+        local.get $0
+        i32.const 1
+        i32.sub
+        br_table $case1|0 $case2|0 $case3|0 $tablify|0
+       end
+       br $break|0
       end
       global.get $core/graphics/colors/Colors.obj0LightGrey
       local.set $1
@@ -3260,7 +5852,7 @@
     global.get $core/graphics/colors/Colors.obj0Black
     local.set $1
    end
-  else   
+  else
    local.get $1
    i32.const 65353
    i32.eq
@@ -3274,10 +5866,13 @@
      block $case3|1
       block $case2|1
        block $case1|1
-        local.get $0
-        i32.const 1
-        i32.sub
-        br_table $case1|1 $case2|1 $case3|1 $break|1
+        block $tablify|00
+         local.get $0
+         i32.const 1
+         i32.sub
+         br_table $case1|1 $case2|1 $case3|1 $tablify|00
+        end
+        br $break|1
        end
        global.get $core/graphics/colors/Colors.obj1LightGrey
        local.set $1
@@ -3290,7 +5885,7 @@
      global.get $core/graphics/colors/Colors.obj1Black
      local.set $1
     end
-   else    
+   else
     global.get $core/graphics/colors/Colors.bgWhite
     local.set $1
     block $break|2
@@ -3300,10 +5895,13 @@
      block $case3|2
       block $case2|2
        block $case1|2
-        local.get $0
-        i32.const 1
-        i32.sub
-        br_table $case1|2 $case2|2 $case3|2 $break|2
+        block $tablify|01
+         local.get $0
+         i32.const 1
+         i32.sub
+         br_table $case1|2 $case2|2 $case3|2 $tablify|01
+        end
+        br $break|2
        end
        global.get $core/graphics/colors/Colors.bgLightGrey
        local.set $1
@@ -3320,7 +5918,7 @@
   end
   local.get $1
  )
- (func $core/graphics/tiles/drawPixelsFromLineOfTile (; 53 ;) (type $FUNCSIG$iiiiiiiiiiiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (param $7 i32) (param $8 i32) (param $9 i32) (param $10 i32) (param $11 i32) (param $12 i32) (result i32)
+ (func $core/graphics/tiles/drawPixelsFromLineOfTile (; 80 ;) (type $FUNCSIG$iiiiiiiiiiiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (param $7 i32) (param $8 i32) (param $9 i32) (param $10 i32) (param $11 i32) (param $12 i32) (result i32)
   (local $13 i32)
   (local $14 i32)
   (local $15 i32)
@@ -3355,7 +5953,7 @@
   local.set $18
   local.get $3
   local.set $0
-  loop $repeat|0
+  loop $loop|0
    local.get $0
    local.get $4
    i32.le_s
@@ -3369,44 +5967,35 @@
     local.get $8
     i32.lt_s
     if
+     i32.const 0
+     local.set $5
+     i32.const 1
      i32.const 7
      local.get $0
      i32.sub
-     local.set $5
+     local.get $0
+     i32.const 1
+     local.get $11
+     i32.const 32
+     i32.and
+     i32.eqz
      local.get $11
      i32.const 0
      i32.lt_s
-     local.tee $2
-     if (result i32)
-      local.get $2
-     else      
-      local.get $11
-      i32.const 32
-      i32.and
-      i32.eqz
+     select
+     select
+     local.tee $1
+     i32.shl
+     local.get $18
+     i32.and
+     if
+      i32.const 2
+      local.set $5
      end
-     local.set $1
-     i32.const 0
-     local.set $2
-     block (result i32)
-      i32.const 1
-      local.get $5
-      local.get $0
-      local.get $1
-      select
-      local.tee $1
-      i32.shl
-      local.get $18
-      i32.and
-      if
-       i32.const 2
-       local.set $2
-      end
-      local.get $2
-      i32.const 1
-      i32.add
-     end
-     local.get $2
+     local.get $5
+     i32.const 1
+     i32.add
+     local.get $5
      i32.const 1
      local.get $1
      i32.shl
@@ -3416,45 +6005,42 @@
      local.set $2
      global.get $core/cpu/cpu/Cpu.GBCEnabled
      if (result i32)
+      i32.const 1
+      local.get $12
+      i32.const 0
+      i32.ge_s
       local.get $11
       i32.const 0
       i32.ge_s
-      local.tee $1
-      if (result i32)
-       local.get $1
-      else       
-       local.get $12
-       i32.const 0
-       i32.ge_s
-      end
-     else      
-      global.get $core/cpu/cpu/Cpu.GBCEnabled
+      select
+     else
+      i32.const 0
      end
      if (result i32)
       local.get $11
       i32.const 7
       i32.and
-      local.set $5
+      local.set $1
       local.get $12
       i32.const 0
       i32.ge_s
-      local.tee $1
+      local.tee $5
       if
        local.get $12
        i32.const 7
        i32.and
-       local.set $5
+       local.set $1
       end
-      local.get $5
-      local.get $2
       local.get $1
+      local.get $2
+      local.get $5
       call $core/graphics/palette/getRgbColorFromPalette
       local.tee $5
       i32.const 31
       i32.and
       i32.const 3
       i32.shl
-      local.set $15
+      local.set $1
       local.get $5
       i32.const 992
       i32.and
@@ -3462,7 +6048,7 @@
       i32.shr_s
       i32.const 3
       i32.shl
-      local.set $1
+      local.set $15
       local.get $5
       i32.const 31744
       i32.and
@@ -3470,7 +6056,7 @@
       i32.shr_s
       i32.const 3
       i32.shl
-     else      
+     else
       local.get $2
       i32.const 65351
       local.get $10
@@ -3485,13 +6071,13 @@
       i32.and
       i32.const 16
       i32.shr_s
-      local.set $15
+      local.set $1
       local.get $5
       i32.const 65280
       i32.and
       i32.const 8
       i32.shr_s
-      local.set $1
+      local.set $15
       local.get $5
       i32.const 255
       i32.and
@@ -3507,12 +6093,12 @@
      local.get $9
      i32.add
      local.tee $16
-     local.get $15
+     local.get $1
      i32.store8
      local.get $16
      i32.const 1
      i32.add
-     local.get $1
+     local.get $15
      i32.store8
      local.get $16
      i32.const 2
@@ -3537,8 +6123,6 @@
      i32.const 128
      i32.and
      i32.const 0
-     i32.ne
-     i32.const 0
      local.get $11
      i32.const 0
      i32.ge_s
@@ -3554,12 +6138,12 @@
     i32.const 1
     i32.add
     local.set $0
-    br $repeat|0
+    br $loop|0
    end
   end
   local.get $13
  )
- (func $core/graphics/backgroundWindow/drawLineOfTileFromTileId (; 54 ;) (type $iiiiiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (result i32)
+ (func $core/graphics/backgroundWindow/drawLineOfTileFromTileId (; 81 ;) (type $FUNCSIG$iiiiiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (result i32)
   (local $7 i32)
   (local $8 i32)
   (local $9 i32)
@@ -3628,7 +6212,7 @@
   i32.const -1
   call $core/graphics/tiles/drawPixelsFromLineOfTile
  )
- (func $core/graphics/backgroundWindow/drawColorPixelFromTileId (; 55 ;) (type $iiiiiii_) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32)
+ (func $core/graphics/backgroundWindow/drawColorPixelFromTileId (; 82 ;) (type $FUNCSIG$viiiiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32)
   (local $7 i32)
   local.get $3
   i32.const 7
@@ -3648,13 +6232,13 @@
    i32.const 7
    local.get $3
    i32.sub
-  else   
+  else
    local.get $3
   end
   i32.const 1
   i32.shl
   i32.add
-  local.tee $3
+  local.tee $5
   i32.const -30720
   i32.add
   local.get $4
@@ -3662,23 +6246,12 @@
   i32.and
   i32.const 0
   i32.ne
-  local.tee $5
+  local.tee $6
   i32.const 13
   i32.shl
   i32.add
   i32.load8_u
-  local.set $6
-  local.get $3
-  i32.const -30719
-  i32.add
-  local.get $5
-  i32.const 1
-  i32.and
-  i32.const 13
-  i32.shl
-  i32.add
-  i32.load8_u
-  local.set $5
+  local.set $7
   local.get $2
   i32.const 7
   i32.and
@@ -3697,39 +6270,46 @@
   local.get $4
   i32.const 7
   i32.and
-  block (result i32)
-   i32.const 1
-   local.get $3
-   i32.const 7
-   local.get $3
-   i32.sub
-   local.get $4
-   i32.const 32
-   i32.and
-   select
-   local.tee $3
-   i32.shl
-   local.get $5
-   i32.and
-   if
-    i32.const 2
-    local.set $2
-   end
-   local.get $2
-   i32.const 1
-   i32.add
+  local.get $5
+  i32.const -30719
+  i32.add
+  local.get $6
+  i32.const 1
+  i32.and
+  i32.const 13
+  i32.shl
+  i32.add
+  i32.load8_u
+  i32.const 1
+  local.get $3
+  i32.const 7
+  local.get $3
+  i32.sub
+  local.get $4
+  i32.const 32
+  i32.and
+  select
+  local.tee $3
+  i32.shl
+  i32.and
+  if
+   i32.const 2
+   local.set $2
   end
+  local.get $2
+  i32.const 1
+  i32.add
   local.get $2
   i32.const 1
   local.get $3
   i32.shl
-  local.get $6
+  local.get $7
   i32.and
   select
-  local.tee $2
+  local.tee $3
   i32.const 0
   call $core/graphics/palette/getRgbColorFromPalette
-  local.tee $3
+  local.tee $2
   i32.const 31
   i32.and
   i32.const 3
@@ -3744,7 +6324,7 @@
   i32.mul
   i32.const 91265
   i32.add
-  local.get $3
+  local.get $2
   i32.const 992
   i32.and
   i32.const 5
@@ -3761,7 +6341,7 @@
   i32.mul
   i32.const 91266
   i32.add
-  local.get $3
+  local.get $2
   i32.const 31744
   i32.and
   i32.const 10
@@ -3776,20 +6356,20 @@
   i32.add
   i32.const 67712
   i32.add
-  local.get $2
+  local.get $3
   i32.const 3
   i32.and
-  local.tee $7
+  local.tee $0
   i32.const 4
   i32.or
-  local.get $7
+  local.get $0
   local.get $4
   i32.const 128
   i32.and
   select
   i32.store8
  )
- (func $core/graphics/backgroundWindow/drawMonochromePixelFromTileId (; 56 ;) (type $iiiiii_) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32)
+ (func $core/graphics/backgroundWindow/drawMonochromePixelFromTileId (; 83 ;) (type $FUNCSIG$viiiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32)
   local.get $4
   local.get $5
   call $core/graphics/tiles/getTileDataAddress
@@ -3815,28 +6395,26 @@
   i32.mul
   i32.const 91264
   i32.add
-  block (result i32)
-   local.get $4
-   i32.const -30719
-   i32.add
-   i32.load8_u
-   i32.const 1
-   i32.const 7
-   local.get $2
-   i32.const 7
-   i32.and
-   i32.sub
-   local.tee $2
-   i32.shl
-   i32.and
-   if
-    i32.const 2
-    local.set $3
-   end
-   local.get $3
-   i32.const 1
-   i32.add
+  local.get $4
+  i32.const -30719
+  i32.add
+  i32.load8_u
+  i32.const 1
+  i32.const 7
+  local.get $2
+  i32.const 7
+  i32.and
+  i32.sub
+  local.tee $2
+  i32.shl
+  i32.and
+  if
+   i32.const 2
+   local.set $3
   end
+  local.get $3
+  i32.const 1
+  i32.add
   local.get $3
   i32.const 1
   local.get $2
@@ -3891,7 +6469,7 @@
   i32.and
   i32.store8
  )
- (func $core/graphics/backgroundWindow/drawBackgroundWindowScanline (; 57 ;) (type $iiiiii_) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32)
+ (func $core/graphics/backgroundWindow/drawBackgroundWindowScanline (; 84 ;) (type $FUNCSIG$viiiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32)
   (local $6 i32)
   (local $7 i32)
   (local $8 i32)
@@ -3901,8 +6479,8 @@
   local.get $3
   i32.const 3
   i32.shr_s
-  local.set $11
-  loop $repeat|0
+  local.set $10
+  loop $loop|0
    local.get $4
    i32.const 160
    i32.lt_s
@@ -3919,7 +6497,7 @@
      i32.sub
      local.set $6
     end
-    local.get $11
+    local.get $10
     i32.const 5
     i32.shl
     local.get $2
@@ -3928,28 +6506,28 @@
     i32.const 3
     i32.shr_s
     i32.add
-    local.tee $9
+    local.tee $8
     i32.const -30720
     i32.add
     i32.load8_u
-    local.set $8
+    local.set $7
     i32.const 0
-    local.set $10
+    local.set $9
     global.get $core/config/Config.tileCaching
     if
      local.get $4
      local.get $0
      local.get $6
-     local.get $9
      local.get $8
+     local.get $7
      call $core/graphics/backgroundWindow/drawLineOfTileFromTileCache
-     local.tee $7
+     local.tee $11
      i32.const 0
      i32.gt_s
      if
       i32.const 1
-      local.set $10
-      local.get $7
+      local.set $9
+      local.get $11
       i32.const 1
       i32.sub
       local.get $4
@@ -3957,34 +6535,33 @@
       local.set $4
      end
     end
-    local.get $10
+    local.get $9
     i32.eqz
+    i32.const 0
     global.get $core/config/Config.tileRendering
-    local.tee $7
-    local.get $7
     select
     if
      local.get $4
      local.get $0
      local.get $6
      local.get $3
-     local.get $9
-     local.get $1
      local.get $8
+     local.get $1
+     local.get $7
      call $core/graphics/backgroundWindow/drawLineOfTileFromTileId
-     local.tee $7
+     local.tee $6
      i32.const 0
      i32.gt_s
      if
-      local.get $7
+      local.get $6
       i32.const 1
       i32.sub
       local.get $4
       i32.add
       local.set $4
      end
-    else     
-     local.get $10
+    else
+     local.get $9
      i32.eqz
      if
       global.get $core/cpu/cpu/Cpu.GBCEnabled
@@ -3993,17 +6570,17 @@
        local.get $0
        local.get $6
        local.get $3
-       local.get $9
-       local.get $1
        local.get $8
+       local.get $1
+       local.get $7
        call $core/graphics/backgroundWindow/drawColorPixelFromTileId
-      else       
+      else
        local.get $4
        local.get $0
        local.get $6
        local.get $3
        local.get $1
-       local.get $8
+       local.get $7
        call $core/graphics/backgroundWindow/drawMonochromePixelFromTileId
       end
      end
@@ -4012,11 +6589,11 @@
     i32.const 1
     i32.add
     local.set $4
-    br $repeat|0
+    br $loop|0
    end
   end
  )
- (func $core/graphics/backgroundWindow/renderWindow (; 58 ;) (type $iii_) (param $0 i32) (param $1 i32) (param $2 i32)
+ (func $core/graphics/backgroundWindow/renderWindow (; 85 ;) (type $FUNCSIG$viii) (param $0 i32) (param $1 i32) (param $2 i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
@@ -4046,7 +6623,7 @@
   local.get $5
   call $core/graphics/backgroundWindow/drawBackgroundWindowScanline
  )
- (func $core/graphics/sprites/renderSprites (; 59 ;) (type $ii_) (param $0 i32) (param $1 i32)
+ (func $core/graphics/sprites/renderSprites (; 86 ;) (type $FUNCSIG$vii) (param $0 i32) (param $1 i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -4064,45 +6641,43 @@
   (local $16 i32)
   block $break|0
    i32.const 39
-   local.set $9
-   loop $repeat|0
-    local.get $9
+   local.set $6
+   loop $loop|0
+    local.get $6
     i32.const 0
     i32.lt_s
     br_if $break|0
-    local.get $9
+    local.get $6
     i32.const 2
     i32.shl
-    local.tee $7
+    local.tee $5
     i32.const 65024
     i32.add
     local.tee $3
     call $core/memory/load/eightBitLoadFromGBMemory
-    local.set $2
     local.get $3
     i32.const 1
     i32.add
     call $core/memory/load/eightBitLoadFromGBMemory
-    local.set $10
+    local.set $7
     local.get $3
     i32.const 2
     i32.add
     call $core/memory/load/eightBitLoadFromGBMemory
     local.set $3
-    local.get $2
     i32.const 16
     i32.sub
-    local.set $2
-    local.get $10
+    local.set $4
+    local.get $7
     i32.const 8
     i32.sub
-    local.set $10
+    local.set $11
     i32.const 8
-    local.set $4
+    local.set $2
     local.get $1
     if
      i32.const 16
-     local.set $4
+     local.set $2
      local.get $3
      local.get $3
      i32.const 1
@@ -4112,19 +6687,16 @@
     end
     local.get $0
     local.get $2
+    local.get $4
+    i32.add
+    i32.lt_s
+    i32.const 0
+    local.get $0
+    local.get $4
     i32.ge_s
-    local.tee $5
+    select
     if
-     local.get $0
-     local.get $2
-     local.get $4
-     i32.add
-     i32.lt_s
-     local.set $5
-    end
-    local.get $5
-    if
-     local.get $7
+     local.get $5
      i32.const 65027
      i32.add
      call $core/memory/load/eightBitLoadFromGBMemory
@@ -4133,25 +6705,25 @@
      i32.and
      i32.const 0
      i32.ne
-     local.set $11
+     local.set $12
      local.get $5
      i32.const 32
      i32.and
      i32.const 0
      i32.ne
-     local.set $14
+     local.set $13
      i32.const 32768
      local.get $3
      call $core/graphics/tiles/getTileDataAddress
-     local.get $4
-     local.get $0
      local.get $2
+     local.get $0
+     local.get $4
      i32.sub
-     local.tee $2
+     local.tee $3
      i32.sub
      i32.const 1
      i32.sub
-     local.get $2
+     local.get $3
      local.get $5
      i32.const 64
      i32.and
@@ -4178,151 +6750,136 @@
      local.tee $2
      i32.add
      i32.load8_u
-     local.set $15
+     local.set $14
      local.get $3
      i32.const -30719
      i32.add
      local.get $2
      i32.add
      i32.load8_u
-     local.set $16
+     local.set $15
      i32.const 7
-     local.set $7
-     loop $repeat|1
-      local.get $7
+     local.set $3
+     loop $loop|1
+      local.get $3
       i32.const 0
       i32.ge_s
       if
        i32.const 0
-       local.set $8
-       block (result i32)
-        i32.const 1
-        i32.const 0
-        local.get $7
-        local.tee $2
-        i32.const 7
-        i32.sub
-        i32.sub
-        local.get $2
-        local.get $14
-        select
-        local.tee $2
-        i32.shl
-        local.get $16
-        i32.and
-        if
-         i32.const 2
-         local.set $8
-        end
-        local.get $8
-        i32.const 1
-        i32.add
-       end
-       local.get $8
+       local.set $2
        i32.const 1
-       local.get $2
+       i32.const 0
+       local.get $3
+       i32.const 7
+       i32.sub
+       i32.sub
+       local.get $3
+       local.get $13
+       select
+       local.tee $4
        i32.shl
        local.get $15
        i32.and
+       if
+        i32.const 2
+        local.set $2
+       end
+       local.get $2
+       i32.const 1
+       i32.add
+       local.get $2
+       i32.const 1
+       local.get $4
+       i32.shl
+       local.get $14
+       i32.and
        select
-       local.tee $8
+       local.tee $4
        if
         i32.const 7
-        local.get $7
+        local.get $3
         i32.sub
-        local.get $10
+        local.get $11
         i32.add
-        local.tee $6
+        local.tee $2
         i32.const 0
         i32.ge_s
-        local.tee $2
-        if
-         local.get $6
+        if (result i32)
+         local.get $2
          i32.const 160
          i32.le_s
-         local.set $2
+        else
+         i32.const 0
         end
-        local.get $2
         if
          i32.const 0
-         local.set $12
+         local.set $7
          i32.const 0
-         local.set $13
+         local.set $10
          global.get $core/graphics/lcd/Lcd.bgDisplayEnabled
          i32.eqz
          global.get $core/cpu/cpu/Cpu.GBCEnabled
-         local.tee $2
-         local.get $2
+         local.tee $8
+         local.get $8
          select
-         local.tee $2
+         local.tee $8
          i32.eqz
          if
           local.get $0
           i32.const 160
           i32.mul
-          local.get $6
+          local.get $2
           i32.add
           i32.const 67712
           i32.add
           i32.load8_u
-          local.tee $3
+          local.tee $9
+          local.set $16
+          local.get $9
           i32.const 3
           i32.and
-          local.tee $4
+          local.tee $9
           i32.const 0
           i32.gt_u
-          local.get $11
-          local.get $11
+          i32.const 0
+          local.get $12
           select
           if
            i32.const 1
-           local.set $12
-          else           
-           local.get $3
+           local.set $7
+          else
+           i32.const 1
+           i32.const 0
+           local.get $9
+           i32.const 0
+           i32.gt_u
+           i32.const 0
+           local.get $16
            i32.const 4
            i32.and
            i32.const 0
-           i32.ne
            global.get $core/cpu/cpu/Cpu.GBCEnabled
-           local.tee $3
-           local.get $3
            select
-           local.tee $3
-           if
-            local.get $4
-            i32.const 0
-            i32.gt_u
-            local.set $3
-           end
-           i32.const 1
-           i32.const 0
-           local.get $3
            select
-           local.set $13
+           select
+           local.set $10
           end
          end
-         local.get $2
+         i32.const 1
+         i32.const 0
+         local.get $10
          i32.eqz
-         if
-          local.get $12
-          i32.eqz
-          local.tee $4
-          if (result i32)
-           local.get $13
-           i32.eqz
-          else           
-           local.get $4
-          end
-          local.set $2
-         end
-         local.get $2
+         local.get $7
+         select
+         local.get $8
+         select
          if
           global.get $core/cpu/cpu/Cpu.GBCEnabled
           if
            local.get $0
            i32.const 160
            i32.mul
-           local.get $6
+           local.get $2
            i32.add
            i32.const 3
            i32.mul
@@ -4331,7 +6888,7 @@
            local.get $5
            i32.const 7
            i32.and
-           local.get $8
+           local.get $4
            i32.const 1
            call $core/graphics/palette/getRgbColorFromPalette
            local.tee $4
@@ -4343,7 +6900,7 @@
            local.get $0
            i32.const 160
            i32.mul
-           local.get $6
+           local.get $2
            i32.add
            i32.const 3
            i32.mul
@@ -4360,7 +6917,7 @@
            local.get $0
            i32.const 160
            i32.mul
-           local.get $6
+           local.get $2
            i32.add
            i32.const 3
            i32.mul
@@ -4374,17 +6931,17 @@
            i32.const 3
            i32.shl
            i32.store8
-          else           
+          else
            local.get $0
            i32.const 160
            i32.mul
-           local.get $6
+           local.get $2
            i32.add
            i32.const 3
            i32.mul
            i32.const 91264
            i32.add
-           local.get $8
+           local.get $4
            i32.const 65353
            i32.const 65352
            local.get $5
@@ -4392,7 +6949,7 @@
            i32.and
            select
            call $core/graphics/palette/getColorizedGbHexColorFromPalette
-           local.tee $3
+           local.tee $4
            i32.const 16711680
            i32.and
            i32.const 16
@@ -4401,13 +6958,13 @@
            local.get $0
            i32.const 160
            i32.mul
-           local.get $6
+           local.get $2
            i32.add
            i32.const 3
            i32.mul
            i32.const 91265
            i32.add
-           local.get $3
+           local.get $4
            i32.const 65280
            i32.and
            i32.const 8
@@ -4416,48 +6973,45 @@
            local.get $0
            i32.const 160
            i32.mul
-           local.get $6
+           local.get $2
            i32.add
            i32.const 3
            i32.mul
            i32.const 91266
            i32.add
-           local.get $3
+           local.get $4
            i32.store8
           end
          end
         end
        end
-       local.get $7
+       local.get $3
        i32.const 1
        i32.sub
-       local.set $7
-       br $repeat|1
+       local.set $3
+       br $loop|1
       end
      end
     end
-    local.get $9
+    local.get $6
     i32.const 1
     i32.sub
-    local.set $9
-    br $repeat|0
-    unreachable
+    local.set $6
+    br $loop|0
    end
    unreachable
   end
  )
- (func $core/graphics/graphics/_drawScanline (; 60 ;) (type $i_) (param $0 i32)
+ (func $core/graphics/graphics/_drawScanline (; 87 ;) (type $FUNCSIG$vi) (param $0 i32)
   (local $1 i32)
-  (local $2 i32)
   i32.const 32768
   i32.const 34816
   global.get $core/graphics/lcd/Lcd.bgWindowTileDataSelect
   select
   local.set $1
-  global.get $core/cpu/cpu/Cpu.GBCEnabled
-  local.tee $2
+  i32.const 1
   global.get $core/graphics/lcd/Lcd.bgDisplayEnabled
-  local.get $2
+  global.get $core/cpu/cpu/Cpu.GBCEnabled
   select
   if
    local.get $0
@@ -4492,10 +7046,10 @@
    call $core/graphics/sprites/renderSprites
   end
  )
- (func $core/graphics/graphics/_renderEntireFrame (; 61 ;) (type $_)
+ (func $core/graphics/graphics/_renderEntireFrame (; 88 ;) (type $FUNCSIG$v)
   (local $0 i32)
   block $break|0
-   loop $repeat|0
+   loop $loop|0
     local.get $0
     i32.const 144
     i32.gt_s
@@ -4508,16 +7062,15 @@
     i32.const 1
     i32.add
     local.set $0
-    br $repeat|0
-    unreachable
+    br $loop|0
    end
    unreachable
   end
  )
- (func $core/graphics/priority/clearPriorityMap (; 62 ;) (type $_)
+ (func $core/graphics/priority/clearPriorityMap (; 89 ;) (type $FUNCSIG$v)
   (local $0 i32)
   (local $1 i32)
-  loop $repeat|0
+  loop $loop|0
    local.get $1
    i32.const 144
    i32.ge_s
@@ -4525,7 +7078,7 @@
    if
     i32.const 0
     local.set $0
-    loop $repeat|1
+    loop $loop|1
      local.get $0
      i32.const 160
      i32.lt_s
@@ -4543,83 +7096,54 @@
       i32.const 1
       i32.add
       local.set $0
-      br $repeat|1
+      br $loop|1
      end
     end
     local.get $1
     i32.const 1
     i32.add
     local.set $1
-    br $repeat|0
+    br $loop|0
    end
   end
  )
- (func $core/interrupts/interrupts/_requestInterrupt (; 63 ;) (type $i_) (param $0 i32)
-  (local $1 i32)
+ (func $core/interrupts/interrupts/_requestInterrupt (; 90 ;) (type $FUNCSIG$vi) (param $0 i32)
   i32.const 65295
   call $core/memory/load/eightBitLoadFromGBMemory
   i32.const 1
   local.get $0
   i32.shl
   i32.or
-  local.tee $1
+  local.tee $0
   global.set $core/interrupts/interrupts/Interrupts.interruptsRequestedValue
   i32.const 65295
-  local.get $1
+  local.get $0
   call $core/memory/store/eightBitStoreIntoGBMemory
  )
- (func $core/interrupts/interrupts/requestLcdInterrupt (; 64 ;) (type $_)
+ (func $core/interrupts/interrupts/requestLcdInterrupt (; 91 ;) (type $FUNCSIG$v)
   i32.const 1
   global.set $core/interrupts/interrupts/Interrupts.isLcdInterruptRequested
   i32.const 1
   call $core/interrupts/interrupts/_requestInterrupt
  )
- (func $core/sound/channel1/Channel1.updateLength (; 65 ;) (type $_)
+ (func $core/sound/channel2/Channel2.updateLength (; 92 ;) (type $FUNCSIG$v)
   (local $0 i32)
-  (local $1 i32)
-  global.get $core/sound/channel1/Channel1.lengthCounter
-  local.tee $0
-  i32.const 0
-  i32.gt_s
-  local.tee $1
-  if
-   global.get $core/sound/channel1/Channel1.NRx4LengthEnabled
-   local.set $1
-  end
-  local.get $1
-  if
-   local.get $0
-   i32.const 1
-   i32.sub
-   local.tee $0
-   i32.eqz
-   if
-    i32.const 0
-    global.set $core/sound/channel1/Channel1.isEnabled
-   end
-  end
-  local.get $0
-  global.set $core/sound/channel1/Channel1.lengthCounter
- )
- (func $core/sound/channel2/Channel2.updateLength (; 66 ;) (type $_)
-  (local $0 i32)
-  (local $1 i32)
   global.get $core/sound/channel2/Channel2.lengthCounter
   local.tee $0
   i32.const 0
   i32.gt_s
-  local.tee $1
-  if
+  if (result i32)
    global.get $core/sound/channel2/Channel2.NRx4LengthEnabled
-   local.set $1
+  else
+   i32.const 0
+  end
+  if
+   local.get $0
+   i32.const 1
+   i32.sub
+   local.set $0
   end
   local.get $0
-  i32.const 1
-  i32.sub
-  local.get $0
-  local.get $1
-  select
-  local.tee $0
   i32.eqz
   if
    i32.const 0
@@ -4628,25 +7152,24 @@
   local.get $0
   global.set $core/sound/channel2/Channel2.lengthCounter
  )
- (func $core/sound/channel3/Channel3.updateLength (; 67 ;) (type $_)
+ (func $core/sound/channel3/Channel3.updateLength (; 93 ;) (type $FUNCSIG$v)
   (local $0 i32)
-  (local $1 i32)
   global.get $core/sound/channel3/Channel3.lengthCounter
   local.tee $0
   i32.const 0
   i32.gt_s
-  local.tee $1
-  if
+  if (result i32)
    global.get $core/sound/channel3/Channel3.NRx4LengthEnabled
-   local.set $1
+  else
+   i32.const 0
+  end
+  if
+   local.get $0
+   i32.const 1
+   i32.sub
+   local.set $0
   end
   local.get $0
-  i32.const 1
-  i32.sub
-  local.get $0
-  local.get $1
-  select
-  local.tee $0
   i32.eqz
   if
    i32.const 0
@@ -4655,25 +7178,24 @@
   local.get $0
   global.set $core/sound/channel3/Channel3.lengthCounter
  )
- (func $core/sound/channel4/Channel4.updateLength (; 68 ;) (type $_)
+ (func $core/sound/channel4/Channel4.updateLength (; 94 ;) (type $FUNCSIG$v)
   (local $0 i32)
-  (local $1 i32)
   global.get $core/sound/channel4/Channel4.lengthCounter
   local.tee $0
   i32.const 0
   i32.gt_s
-  local.tee $1
-  if
+  if (result i32)
    global.get $core/sound/channel4/Channel4.NRx4LengthEnabled
-   local.set $1
+  else
+   i32.const 0
+  end
+  if
+   local.get $0
+   i32.const 1
+   i32.sub
+   local.set $0
   end
   local.get $0
-  i32.const 1
-  i32.sub
-  local.get $0
-  local.get $1
-  select
-  local.tee $0
   i32.eqz
   if
    i32.const 0
@@ -4682,9 +7204,11 @@
   local.get $0
   global.set $core/sound/channel4/Channel4.lengthCounter
  )
- (func $core/sound/channel1/Channel1.setFrequency (; 69 ;) (type $i_) (param $0 i32)
+ (func $core/sound/channel1/Channel1.setFrequency (; 95 ;) (type $FUNCSIG$vi) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
+  local.get $0
+  global.set $core/sound/channel1/Channel1.sweepShadowFrequency
   i32.const 65300
   call $core/memory/load/eightBitLoadFromGBMemory
   i32.const 248
@@ -4701,6 +7225,8 @@
   local.get $0
   i32.const 8
   i32.shr_s
+  i32.const 7
+  i32.and
   local.tee $0
   i32.or
   call $core/memory/store/eightBitStoreIntoGBMemory
@@ -4715,63 +7241,17 @@
   i32.or
   global.set $core/sound/channel1/Channel1.frequency
  )
- (func $core/sound/channel1/calculateSweepAndCheckOverflow (; 70 ;) (type $_)
+ (func $core/sound/channel1/Channel1.updateSweep (; 96 ;) (type $FUNCSIG$v)
   (local $0 i32)
   (local $1 i32)
-  global.get $core/sound/channel1/Channel1.sweepShadowFrequency
-  local.tee $1
-  global.get $core/sound/channel1/Channel1.NRx0SweepShift
-  i32.shr_s
-  local.set $0
-  local.get $1
-  local.get $0
-  i32.sub
-  local.get $0
-  local.get $1
-  i32.add
-  global.get $core/sound/channel1/Channel1.NRx0Negate
+  global.get $core/sound/channel1/Channel1.isSweepEnabled
+  i32.eqz
+  i32.const 1
+  global.get $core/sound/channel1/Channel1.isEnabled
   select
-  local.tee $0
-  i32.const 2047
-  i32.le_s
-  local.tee $1
-  if (result i32)
-   global.get $core/sound/channel1/Channel1.NRx0SweepShift
-   i32.const 0
-   i32.gt_s
-  else   
-   local.get $1
-  end
   if
-   local.get $0
-   global.set $core/sound/channel1/Channel1.sweepShadowFrequency
-   local.get $0
-   call $core/sound/channel1/Channel1.setFrequency
-   global.get $core/sound/channel1/Channel1.sweepShadowFrequency
-   local.tee $1
-   global.get $core/sound/channel1/Channel1.NRx0SweepShift
-   i32.shr_s
-   local.set $0
-   local.get $1
-   local.get $0
-   i32.sub
-   local.get $0
-   local.get $1
-   i32.add
-   global.get $core/sound/channel1/Channel1.NRx0Negate
-   select
-   local.set $0
+   return
   end
-  local.get $0
-  i32.const 2047
-  i32.gt_s
-  if
-   i32.const 0
-   global.set $core/sound/channel1/Channel1.isEnabled
-  end
- )
- (func $core/sound/channel1/Channel1.updateSweep (; 71 ;) (type $_)
-  (local $0 i32)
   global.get $core/sound/channel1/Channel1.sweepCounter
   i32.const 1
   i32.sub
@@ -4780,25 +7260,87 @@
   i32.le_s
   if
    global.get $core/sound/channel1/Channel1.NRx0SweepPeriod
-   global.set $core/sound/channel1/Channel1.sweepCounter
-   global.get $core/sound/channel1/Channel1.NRx0SweepPeriod
-   i32.const 0
-   i32.gt_s
-   global.get $core/sound/channel1/Channel1.isSweepEnabled
-   global.get $core/sound/channel1/Channel1.isSweepEnabled
-   select
    if
-    call $core/sound/channel1/calculateSweepAndCheckOverflow
+    global.get $core/sound/channel1/Channel1.NRx0SweepPeriod
+    global.set $core/sound/channel1/Channel1.sweepCounter
+    block $__inlined_func$core/sound/channel1/didCalculatedSweepOverflow (result i32)
+     global.get $core/sound/channel1/Channel1.sweepShadowFrequency
+     local.tee $1
+     global.get $core/sound/channel1/Channel1.NRx0SweepShift
+     i32.shr_s
+     local.set $0
+     i32.const 1
+     global.get $core/sound/channel1/Channel1.NRx0Negate
+     if (result i32)
+      i32.const 1
+      global.set $core/sound/channel1/Channel1.sweepNegateShouldDisableChannelOnClear
+      local.get $1
+      local.get $0
+      i32.sub
+     else
+      local.get $0
+      local.get $1
+      i32.add
+     end
+     local.tee $0
+     i32.const 2047
+     i32.gt_s
+     br_if $__inlined_func$core/sound/channel1/didCalculatedSweepOverflow
+     drop
+     i32.const 0
+    end
+    if
+     i32.const 0
+     global.set $core/sound/channel1/Channel1.isEnabled
+    end
+    global.get $core/sound/channel1/Channel1.NRx0SweepShift
+    i32.const 0
+    i32.gt_s
+    if
+     local.get $0
+     call $core/sound/channel1/Channel1.setFrequency
+     block $__inlined_func$core/sound/channel1/didCalculatedSweepOverflow0 (result i32)
+      global.get $core/sound/channel1/Channel1.sweepShadowFrequency
+      local.tee $1
+      global.get $core/sound/channel1/Channel1.NRx0SweepShift
+      i32.shr_s
+      local.set $0
+      i32.const 1
+      global.get $core/sound/channel1/Channel1.NRx0Negate
+      if (result i32)
+       i32.const 1
+       global.set $core/sound/channel1/Channel1.sweepNegateShouldDisableChannelOnClear
+       local.get $1
+       local.get $0
+       i32.sub
+      else
+       local.get $0
+       local.get $1
+       i32.add
+      end
+      i32.const 2047
+      i32.gt_s
+      br_if $__inlined_func$core/sound/channel1/didCalculatedSweepOverflow0
+      drop
+      i32.const 0
+     end
+     if
+      i32.const 0
+      global.set $core/sound/channel1/Channel1.isEnabled
+     end
+    end
+   else
+    i32.const 8
+    global.set $core/sound/channel1/Channel1.sweepCounter
    end
-  else   
+  else
    local.get $0
    global.set $core/sound/channel1/Channel1.sweepCounter
   end
  )
- (func $core/sound/channel1/Channel1.updateEnvelope (; 72 ;) (type $_)
+ (func $core/sound/channel1/Channel1.updateEnvelope (; 97 ;) (type $FUNCSIG$v)
   (local $0 i32)
   (local $1 i32)
-  (local $2 i32)
   global.get $core/sound/channel1/Channel1.envelopeCounter
   i32.const 1
   i32.sub
@@ -4807,47 +7349,49 @@
   i32.le_s
   if
    global.get $core/sound/channel1/Channel1.NRx2EnvelopePeriod
-   local.tee $1
    if
-    global.get $core/sound/channel1/Channel1.volume
-    local.set $0
-    local.get $0
-    i32.const 15
-    i32.lt_s
-    global.get $core/sound/channel1/Channel1.NRx2EnvelopeAddMode
-    global.get $core/sound/channel1/Channel1.NRx2EnvelopeAddMode
-    select
+    global.get $core/sound/channel1/Channel1.NRx2EnvelopePeriod
+    local.tee $1
     if (result i32)
+     global.get $core/sound/channel1/Channel1.isEnvelopeAutomaticUpdating
+    else
+     i32.const 0
+    end
+    if
+     global.get $core/sound/channel1/Channel1.volume
+     local.set $0
      local.get $0
      i32.const 1
      i32.add
-    else     
-     global.get $core/sound/channel1/Channel1.NRx2EnvelopeAddMode
-     i32.eqz
-     local.tee $2
-     if
-      local.get $0
-      i32.const 0
-      i32.gt_s
-      local.set $2
-     end
      local.get $0
      i32.const 1
      i32.sub
-     local.get $0
-     local.get $2
+     global.get $core/sound/channel1/Channel1.NRx2EnvelopeAddMode
      select
+     i32.const 15
+     i32.and
+     local.tee $0
+     i32.const 15
+     i32.lt_s
+     if
+      local.get $0
+      global.set $core/sound/channel1/Channel1.volume
+     else
+      i32.const 0
+      global.set $core/sound/channel1/Channel1.isEnvelopeAutomaticUpdating
+     end
     end
-    global.set $core/sound/channel1/Channel1.volume
+   else
+    i32.const 8
+    local.set $1
    end
   end
   local.get $1
   global.set $core/sound/channel1/Channel1.envelopeCounter
  )
- (func $core/sound/channel2/Channel2.updateEnvelope (; 73 ;) (type $_)
+ (func $core/sound/channel2/Channel2.updateEnvelope (; 98 ;) (type $FUNCSIG$v)
   (local $0 i32)
   (local $1 i32)
-  (local $2 i32)
   global.get $core/sound/channel2/Channel2.envelopeCounter
   i32.const 1
   i32.sub
@@ -4856,47 +7400,49 @@
   i32.le_s
   if
    global.get $core/sound/channel2/Channel2.NRx2EnvelopePeriod
-   local.tee $1
    if
-    global.get $core/sound/channel2/Channel2.volume
-    local.set $0
-    local.get $0
-    i32.const 15
-    i32.lt_s
-    global.get $core/sound/channel2/Channel2.NRx2EnvelopeAddMode
-    global.get $core/sound/channel2/Channel2.NRx2EnvelopeAddMode
-    select
+    global.get $core/sound/channel2/Channel2.NRx2EnvelopePeriod
+    local.tee $1
     if (result i32)
+     global.get $core/sound/channel2/Channel2.isEnvelopeAutomaticUpdating
+    else
+     i32.const 0
+    end
+    if
+     global.get $core/sound/channel2/Channel2.volume
+     local.set $0
      local.get $0
      i32.const 1
      i32.add
-    else     
-     global.get $core/sound/channel2/Channel2.NRx2EnvelopeAddMode
-     i32.eqz
-     local.tee $2
-     if
-      local.get $0
-      i32.const 0
-      i32.gt_s
-      local.set $2
-     end
      local.get $0
      i32.const 1
      i32.sub
-     local.get $0
-     local.get $2
+     global.get $core/sound/channel2/Channel2.NRx2EnvelopeAddMode
      select
+     i32.const 15
+     i32.and
+     local.tee $0
+     i32.const 15
+     i32.lt_s
+     if
+      local.get $0
+      global.set $core/sound/channel2/Channel2.volume
+     else
+      i32.const 0
+      global.set $core/sound/channel2/Channel2.isEnvelopeAutomaticUpdating
+     end
     end
-    global.set $core/sound/channel2/Channel2.volume
+   else
+    i32.const 8
+    local.set $1
    end
   end
   local.get $1
   global.set $core/sound/channel2/Channel2.envelopeCounter
  )
- (func $core/sound/channel4/Channel4.updateEnvelope (; 74 ;) (type $_)
+ (func $core/sound/channel4/Channel4.updateEnvelope (; 99 ;) (type $FUNCSIG$v)
   (local $0 i32)
   (local $1 i32)
-  (local $2 i32)
   global.get $core/sound/channel4/Channel4.envelopeCounter
   i32.const 1
   i32.sub
@@ -4905,44 +7451,47 @@
   i32.le_s
   if
    global.get $core/sound/channel4/Channel4.NRx2EnvelopePeriod
-   local.tee $1
    if
-    global.get $core/sound/channel4/Channel4.volume
-    local.set $0
-    local.get $0
-    i32.const 15
-    i32.lt_s
-    global.get $core/sound/channel4/Channel4.NRx2EnvelopeAddMode
-    global.get $core/sound/channel4/Channel4.NRx2EnvelopeAddMode
-    select
+    global.get $core/sound/channel4/Channel4.NRx2EnvelopePeriod
+    local.tee $1
     if (result i32)
+     global.get $core/sound/channel4/Channel4.isEnvelopeAutomaticUpdating
+    else
+     i32.const 0
+    end
+    if
+     global.get $core/sound/channel4/Channel4.volume
+     local.set $0
      local.get $0
      i32.const 1
      i32.add
-    else     
-     global.get $core/sound/channel4/Channel4.NRx2EnvelopeAddMode
-     i32.eqz
-     local.tee $2
-     if
-      local.get $0
-      i32.const 0
-      i32.gt_s
-      local.set $2
-     end
      local.get $0
      i32.const 1
      i32.sub
-     local.get $0
-     local.get $2
+     global.get $core/sound/channel4/Channel4.NRx2EnvelopeAddMode
      select
+     i32.const 15
+     i32.and
+     local.tee $0
+     i32.const 15
+     i32.lt_s
+     if
+      local.get $0
+      global.set $core/sound/channel4/Channel4.volume
+     else
+      i32.const 0
+      global.set $core/sound/channel4/Channel4.isEnvelopeAutomaticUpdating
+     end
     end
-    global.set $core/sound/channel4/Channel4.volume
+   else
+    i32.const 8
+    local.set $1
    end
   end
   local.get $1
   global.set $core/sound/channel4/Channel4.envelopeCounter
  )
- (func $core/sound/sound/updateFrameSequencer (; 75 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/sound/sound/updateFrameSequencer (; 100 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   i32.const 8192
@@ -4985,26 +7534,110 @@
          end
          br $break|0
         end
-        call $core/sound/channel1/Channel1.updateLength
+        global.get $core/sound/channel1/Channel1.lengthCounter
+        local.tee $1
+        i32.const 0
+        i32.gt_s
+        if (result i32)
+         global.get $core/sound/channel1/Channel1.NRx4LengthEnabled
+        else
+         i32.const 0
+        end
+        if
+         local.get $1
+         i32.const 1
+         i32.sub
+         local.tee $1
+         i32.eqz
+         if
+          i32.const 0
+          global.set $core/sound/channel1/Channel1.isEnabled
+         end
+        end
+        local.get $1
+        global.set $core/sound/channel1/Channel1.lengthCounter
         call $core/sound/channel2/Channel2.updateLength
         call $core/sound/channel3/Channel3.updateLength
         call $core/sound/channel4/Channel4.updateLength
         br $break|0
        end
-       call $core/sound/channel1/Channel1.updateLength
+       global.get $core/sound/channel1/Channel1.lengthCounter
+       local.tee $1
+       i32.const 0
+       i32.gt_s
+       if (result i32)
+        global.get $core/sound/channel1/Channel1.NRx4LengthEnabled
+       else
+        i32.const 0
+       end
+       if
+        local.get $1
+        i32.const 1
+        i32.sub
+        local.tee $1
+        i32.eqz
+        if
+         i32.const 0
+         global.set $core/sound/channel1/Channel1.isEnabled
+        end
+       end
+       local.get $1
+       global.set $core/sound/channel1/Channel1.lengthCounter
        call $core/sound/channel2/Channel2.updateLength
        call $core/sound/channel3/Channel3.updateLength
        call $core/sound/channel4/Channel4.updateLength
        call $core/sound/channel1/Channel1.updateSweep
        br $break|0
       end
-      call $core/sound/channel1/Channel1.updateLength
+      global.get $core/sound/channel1/Channel1.lengthCounter
+      local.tee $1
+      i32.const 0
+      i32.gt_s
+      if (result i32)
+       global.get $core/sound/channel1/Channel1.NRx4LengthEnabled
+      else
+       i32.const 0
+      end
+      if
+       local.get $1
+       i32.const 1
+       i32.sub
+       local.tee $1
+       i32.eqz
+       if
+        i32.const 0
+        global.set $core/sound/channel1/Channel1.isEnabled
+       end
+      end
+      local.get $1
+      global.set $core/sound/channel1/Channel1.lengthCounter
       call $core/sound/channel2/Channel2.updateLength
       call $core/sound/channel3/Channel3.updateLength
       call $core/sound/channel4/Channel4.updateLength
       br $break|0
      end
-     call $core/sound/channel1/Channel1.updateLength
+     global.get $core/sound/channel1/Channel1.lengthCounter
+     local.tee $1
+     i32.const 0
+     i32.gt_s
+     if (result i32)
+      global.get $core/sound/channel1/Channel1.NRx4LengthEnabled
+     else
+      i32.const 0
+     end
+     if
+      local.get $1
+      i32.const 1
+      i32.sub
+      local.tee $1
+      i32.eqz
+      if
+       i32.const 0
+       global.set $core/sound/channel1/Channel1.isEnabled
+      end
+     end
+     local.get $1
+     global.set $core/sound/channel1/Channel1.lengthCounter
      call $core/sound/channel2/Channel2.updateLength
      call $core/sound/channel3/Channel3.updateLength
      call $core/sound/channel4/Channel4.updateLength
@@ -5019,13 +7652,13 @@
    global.set $core/sound/sound/Sound.frameSequencer
    i32.const 1
    return
-  else   
+  else
    local.get $0
    global.set $core/sound/sound/Sound.frameSequenceCycleCounter
   end
   i32.const 0
  )
- (func $core/sound/accumulator/didChannelDacChange (; 76 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/sound/accumulator/didChannelDacChange (; 101 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   (local $1 i32)
   block $break|0
    block $case3|0
@@ -5035,54 +7668,49 @@
       i32.const 1
       i32.ne
       if
-       local.get $0
-       i32.const 2
-       i32.sub
-       br_table $case1|0 $case2|0 $case3|0 $break|0
+       block $tablify|0
+        local.get $0
+        i32.const 2
+        i32.sub
+        br_table $case1|0 $case2|0 $case3|0 $tablify|0
+       end
+       br $break|0
       end
       global.get $core/sound/channel1/Channel1.isDacEnabled
       local.tee $0
       global.get $core/sound/accumulator/SoundAccumulator.channel1DacEnabled
       i32.ne
-      local.set $1
       local.get $0
       global.set $core/sound/accumulator/SoundAccumulator.channel1DacEnabled
-      local.get $1
       return
      end
      global.get $core/sound/channel2/Channel2.isDacEnabled
-     local.tee $1
+     local.tee $0
      global.get $core/sound/accumulator/SoundAccumulator.channel2DacEnabled
      i32.ne
-     local.set $0
-     local.get $1
-     global.set $core/sound/accumulator/SoundAccumulator.channel2DacEnabled
      local.get $0
+     global.set $core/sound/accumulator/SoundAccumulator.channel2DacEnabled
      return
     end
     global.get $core/sound/channel3/Channel3.isDacEnabled
     local.tee $0
     global.get $core/sound/accumulator/SoundAccumulator.channel3DacEnabled
     i32.ne
-    local.set $1
     local.get $0
     global.set $core/sound/accumulator/SoundAccumulator.channel3DacEnabled
-    local.get $1
     return
    end
    global.get $core/sound/channel4/Channel4.isDacEnabled
-   local.tee $1
+   local.tee $0
    global.get $core/sound/accumulator/SoundAccumulator.channel4DacEnabled
    i32.ne
-   local.set $0
-   local.get $1
-   global.set $core/sound/accumulator/SoundAccumulator.channel4DacEnabled
    local.get $0
+   global.set $core/sound/accumulator/SoundAccumulator.channel4DacEnabled
    return
   end
   i32.const 0
  )
- (func $core/sound/duty/isDutyCycleClockPositiveOrNegativeForWaveform (; 77 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/sound/duty/isDutyCycleClockPositiveOrNegativeForWaveform (; 102 ;) (type $FUNCSIG$iii) (param $0 i32) (param $1 i32) (result i32)
   block $case3|0
    block $case2|0
     block $case1|0
@@ -5135,58 +7763,60 @@
   i32.const 0
   i32.ne
  )
- (func $core/sound/channel1/Channel1.getSample (; 78 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/sound/channel1/Channel1.getSample (; 103 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   (local $1 i32)
   global.get $core/sound/channel1/Channel1.frequencyTimer
   local.get $0
   i32.sub
-  local.tee $1
-  i32.const 0
-  i32.le_s
-  if
-   local.get $1
-   global.set $core/sound/channel1/Channel1.frequencyTimer
-   i32.const 2048
-   global.get $core/sound/channel1/Channel1.frequency
-   i32.sub
-   i32.const 2
-   i32.shl
-   local.tee $0
-   i32.const 2
-   i32.shl
+  local.set $0
+  loop $continue|0
    local.get $0
-   global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
-   select
-   global.set $core/sound/channel1/Channel1.frequencyTimer
-   global.get $core/sound/channel1/Channel1.frequencyTimer
-   local.get $1
-   i32.const 31
-   i32.shr_s
-   local.tee $0
-   local.get $0
-   local.get $1
-   i32.add
-   i32.xor
-   i32.sub
-   global.set $core/sound/channel1/Channel1.frequencyTimer
-   global.get $core/sound/channel1/Channel1.waveFormPositionOnDuty
-   i32.const 1
-   i32.add
-   i32.const 7
-   i32.and
-   global.set $core/sound/channel1/Channel1.waveFormPositionOnDuty
-  else   
-   local.get $1
-   global.set $core/sound/channel1/Channel1.frequencyTimer
+   i32.const 0
+   i32.le_s
+   if
+    i32.const 2048
+    global.get $core/sound/channel1/Channel1.frequency
+    i32.sub
+    i32.const 2
+    i32.shl
+    local.tee $1
+    i32.const 2
+    i32.shl
+    local.get $1
+    global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
+    select
+    global.set $core/sound/channel1/Channel1.frequencyTimer
+    global.get $core/sound/channel1/Channel1.frequencyTimer
+    local.get $0
+    i32.const 31
+    i32.shr_s
+    local.tee $1
+    local.get $0
+    local.get $1
+    i32.add
+    i32.xor
+    i32.sub
+    local.set $0
+    global.get $core/sound/channel1/Channel1.waveFormPositionOnDuty
+    i32.const 1
+    i32.add
+    i32.const 7
+    i32.and
+    global.set $core/sound/channel1/Channel1.waveFormPositionOnDuty
+    br $continue|0
+   end
   end
-  global.get $core/sound/channel1/Channel1.isDacEnabled
-  global.get $core/sound/channel1/Channel1.isEnabled
-  local.tee $0
   local.get $0
+  global.set $core/sound/channel1/Channel1.frequencyTimer
+  global.get $core/sound/channel1/Channel1.isDacEnabled
+  i32.const 0
+  global.get $core/sound/channel1/Channel1.isEnabled
   select
   if (result i32)
    global.get $core/sound/channel1/Channel1.volume
-  else   
+   i32.const 15
+   i32.and
+  else
    i32.const 15
    return
   end
@@ -5195,58 +7825,63 @@
   call $core/sound/duty/isDutyCycleClockPositiveOrNegativeForWaveform
   if (result i32)
    i32.const 1
-  else   
+  else
    i32.const -1
   end
   i32.mul
   i32.const 15
   i32.add
  )
- (func $core/sound/channel2/Channel2.getSample (; 79 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/sound/channel2/Channel2.getSample (; 104 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   (local $1 i32)
   global.get $core/sound/channel2/Channel2.frequencyTimer
   local.get $0
   i32.sub
-  local.tee $1
-  global.set $core/sound/channel2/Channel2.frequencyTimer
-  local.get $1
-  i32.const 0
-  i32.le_s
-  if
-   i32.const 2048
-   global.get $core/sound/channel2/Channel2.frequency
-   i32.sub
-   i32.const 2
-   i32.shl
-   global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
-   i32.shl
-   global.set $core/sound/channel2/Channel2.frequencyTimer
-   global.get $core/sound/channel2/Channel2.frequencyTimer
-   local.get $1
-   i32.const 31
-   i32.shr_s
-   local.tee $0
+  local.set $0
+  loop $continue|0
    local.get $0
-   local.get $1
-   i32.add
-   i32.xor
-   i32.sub
-   global.set $core/sound/channel2/Channel2.frequencyTimer
-   global.get $core/sound/channel2/Channel2.waveFormPositionOnDuty
-   i32.const 1
-   i32.add
-   i32.const 7
-   i32.and
-   global.set $core/sound/channel2/Channel2.waveFormPositionOnDuty
+   i32.const 0
+   i32.le_s
+   if
+    i32.const 2048
+    global.get $core/sound/channel2/Channel2.frequency
+    i32.sub
+    i32.const 2
+    i32.shl
+    global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
+    i32.shl
+    global.set $core/sound/channel2/Channel2.frequencyTimer
+    global.get $core/sound/channel2/Channel2.frequencyTimer
+    local.get $0
+    i32.const 31
+    i32.shr_s
+    local.tee $1
+    local.get $0
+    local.get $1
+    i32.add
+    i32.xor
+    i32.sub
+    local.set $0
+    global.get $core/sound/channel2/Channel2.waveFormPositionOnDuty
+    i32.const 1
+    i32.add
+    i32.const 7
+    i32.and
+    global.set $core/sound/channel2/Channel2.waveFormPositionOnDuty
+    br $continue|0
+   end
   end
-  global.get $core/sound/channel2/Channel2.isDacEnabled
-  global.get $core/sound/channel2/Channel2.isEnabled
-  local.tee $0
   local.get $0
+  global.set $core/sound/channel2/Channel2.frequencyTimer
+  global.get $core/sound/channel2/Channel2.isDacEnabled
+  i32.const 0
+  global.get $core/sound/channel2/Channel2.isEnabled
   select
   if (result i32)
    global.get $core/sound/channel2/Channel2.volume
-  else   
+   i32.const 15
+   i32.and
+  else
    i32.const 15
    return
   end
@@ -5255,87 +7890,75 @@
   call $core/sound/duty/isDutyCycleClockPositiveOrNegativeForWaveform
   if (result i32)
    i32.const 1
-  else   
+  else
    i32.const -1
   end
   i32.mul
   i32.const 15
   i32.add
  )
- (func $core/sound/channel3/Channel3.getSample (; 80 ;) (type $ii) (param $0 i32) (result i32)
-  (local $1 i32)
-  (local $2 i32)
-  global.get $core/sound/channel3/Channel3.frequencyTimer
-  local.get $0
-  i32.sub
-  local.tee $1
-  i32.const 0
-  i32.le_s
-  if
-   local.get $1
-   global.set $core/sound/channel3/Channel3.frequencyTimer
-   i32.const 2048
-   global.get $core/sound/channel3/Channel3.frequency
-   i32.sub
-   i32.const 1
-   i32.shl
-   global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
-   i32.shl
-   global.set $core/sound/channel3/Channel3.frequencyTimer
-   global.get $core/sound/channel3/Channel3.frequencyTimer
-   local.get $1
-   i32.const 31
-   i32.shr_s
-   local.tee $0
-   local.get $0
-   local.get $1
-   i32.add
-   i32.xor
-   i32.sub
-   global.set $core/sound/channel3/Channel3.frequencyTimer
-   global.get $core/sound/channel3/Channel3.waveTablePosition
-   i32.const 1
-   i32.add
-   i32.const 31
-   i32.and
-   global.set $core/sound/channel3/Channel3.waveTablePosition
-  else   
-   local.get $1
-   global.set $core/sound/channel3/Channel3.frequencyTimer
-  end
-  global.get $core/sound/channel3/Channel3.volumeCode
-  local.set $1
-  global.get $core/sound/channel3/Channel3.isDacEnabled
-  global.get $core/sound/channel3/Channel3.isEnabled
-  local.tee $0
-  local.get $0
-  select
-  if
-   global.get $core/sound/channel3/Channel3.volumeCodeChanged
-   if
-    i32.const 65308
-    call $core/memory/load/eightBitLoadFromGBMemory
-    i32.const 5
-    i32.shr_s
-    i32.const 15
-    i32.and
-    local.tee $1
-    global.set $core/sound/channel3/Channel3.volumeCode
-    i32.const 0
-    global.set $core/sound/channel3/Channel3.volumeCodeChanged
-   end
-  else   
-   i32.const 15
-   return
-  end
+ (func $core/sound/channel3/readCurrentSampleByteFromWaveRam (; 105 ;) (type $FUNCSIG$i) (result i32)
   global.get $core/sound/channel3/Channel3.waveTablePosition
-  local.tee $2
   i32.const 1
   i32.shr_s
   i32.const 65328
   i32.add
   call $core/memory/load/eightBitLoadFromGBMemory
-  local.get $2
+ )
+ (func $core/sound/channel3/advanceWavePositionAndSampleBuffer (; 106 ;) (type $FUNCSIG$v)
+  (local $0 i32)
+  global.get $core/sound/channel3/Channel3.waveTablePosition
+  i32.const 1
+  i32.add
+  local.set $0
+  loop $continue|0
+   local.get $0
+   i32.const 32
+   i32.lt_s
+   i32.eqz
+   if
+    local.get $0
+    i32.const 32
+    i32.sub
+    local.set $0
+    br $continue|0
+   end
+  end
+  local.get $0
+  global.set $core/sound/channel3/Channel3.waveTablePosition
+  call $core/sound/channel3/readCurrentSampleByteFromWaveRam
+  global.set $core/sound/channel3/Channel3.sampleBuffer
+ )
+ (func $core/sound/channel3/Channel3.getSample (; 107 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
+  (local $1 i32)
+  (local $2 i32)
+  (local $3 i32)
+  global.get $core/sound/channel3/Channel3.isDacEnabled
+  i32.eqz
+  i32.const 1
+  global.get $core/sound/channel3/Channel3.isEnabled
+  select
+  if
+   i32.const 15
+   return
+  end
+  global.get $core/sound/channel3/Channel3.volumeCode
+  local.set $2
+  global.get $core/sound/channel3/Channel3.volumeCodeChanged
+  if
+   i32.const 65308
+   call $core/memory/load/eightBitLoadFromGBMemory
+   i32.const 5
+   i32.shr_s
+   i32.const 15
+   i32.and
+   local.tee $2
+   global.set $core/sound/channel3/Channel3.volumeCode
+   i32.const 0
+   global.set $core/sound/channel3/Channel3.volumeCodeChanged
+  end
+  global.get $core/sound/channel3/Channel3.sampleBuffer
+  global.get $core/sound/channel3/Channel3.waveTablePosition
   i32.const 1
   i32.and
   i32.eqz
@@ -5344,70 +7967,102 @@
   i32.shr_s
   i32.const 15
   i32.and
-  local.set $0
-  i32.const 0
-  local.set $2
+  local.set $1
   block $break|0
    block $case3|0
     block $case2|0
      block $case1|0
-      local.get $1
+      local.get $2
       if
-       local.get $1
+       local.get $2
        i32.const 1
        i32.eq
        br_if $case1|0
-       local.get $1
+       local.get $2
        i32.const 2
        i32.eq
        br_if $case2|0
        br $case3|0
       end
-      local.get $0
+      local.get $1
       i32.const 4
       i32.shr_s
-      local.set $0
+      local.set $1
       br $break|0
      end
      i32.const 1
-     local.set $2
+     local.set $3
      br $break|0
     end
-    local.get $0
+    local.get $1
     i32.const 1
     i32.shr_s
-    local.set $0
+    local.set $1
     i32.const 2
-    local.set $2
+    local.set $3
     br $break|0
    end
-   local.get $0
+   local.get $1
    i32.const 2
    i32.shr_s
-   local.set $0
+   local.set $1
    i32.const 4
-   local.set $2
+   local.set $3
   end
-  local.get $2
+  local.get $3
   i32.const 0
   i32.gt_s
   if (result i32)
-   local.get $0
-   local.get $2
+   local.get $1
+   local.get $3
    i32.div_s
-  else   
+  else
    i32.const 0
   end
   i32.const 15
   i32.add
+  global.get $core/sound/channel3/Channel3.frequencyTimer
+  local.get $0
+  i32.sub
+  local.set $0
+  loop $continue|1
+   local.get $0
+   i32.const 0
+   i32.le_s
+   if
+    i32.const 2048
+    global.get $core/sound/channel3/Channel3.frequency
+    i32.sub
+    i32.const 1
+    i32.shl
+    global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
+    i32.shl
+    global.set $core/sound/channel3/Channel3.frequencyTimer
+    global.get $core/sound/channel3/Channel3.frequencyTimer
+    local.get $0
+    i32.const 31
+    i32.shr_s
+    local.tee $2
+    local.get $0
+    local.get $2
+    i32.add
+    i32.xor
+    i32.sub
+    local.set $0
+    call $core/sound/channel3/advanceWavePositionAndSampleBuffer
+    br $continue|1
+   end
+  end
+  local.get $0
+  global.set $core/sound/channel3/Channel3.frequencyTimer
  )
- (func $core/sound/channel4/Channel4.getSample (; 81 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/sound/channel4/Channel4.getSample (; 108 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   global.get $core/sound/channel4/Channel4.frequencyTimer
   local.get $0
   i32.sub
-  local.tee $1
+  local.tee $0
   i32.const 0
   i32.le_s
   if
@@ -5416,54 +8071,60 @@
    i32.shl
    global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
    i32.shl
-   local.get $1
+   local.get $0
    i32.const 31
    i32.shr_s
-   local.tee $0
+   local.tee $1
    local.get $0
    local.get $1
    i32.add
    i32.xor
    i32.sub
-   local.set $1
+   local.set $0
    global.get $core/sound/channel4/Channel4.linearFeedbackShiftRegister
-   local.tee $0
+   local.tee $1
    i32.const 1
    i32.shr_s
    local.tee $2
-   local.get $0
+   local.get $1
    i32.const 1
    i32.and
    local.get $2
    i32.const 1
    i32.and
    i32.xor
-   local.tee $2
+   local.tee $1
    i32.const 14
    i32.shl
    i32.or
-   local.tee $0
+   local.tee $2
    i32.const -65
    i32.and
-   local.get $2
+   local.get $1
    i32.const 6
    i32.shl
    i32.or
-   local.get $0
+   local.get $2
    global.get $core/sound/channel4/Channel4.NRx3WidthMode
    select
    global.set $core/sound/channel4/Channel4.linearFeedbackShiftRegister
   end
-  local.get $1
+  i32.const 0
+  local.get $0
+  local.get $0
+  i32.const 0
+  i32.lt_s
+  select
   global.set $core/sound/channel4/Channel4.frequencyTimer
   global.get $core/sound/channel4/Channel4.isDacEnabled
+  i32.const 0
   global.get $core/sound/channel4/Channel4.isEnabled
-  local.tee $0
-  local.get $0
   select
   if (result i32)
    global.get $core/sound/channel4/Channel4.volume
-  else   
+   i32.const 15
+   i32.and
+  else
    i32.const 15
    return
   end
@@ -5477,7 +8138,7 @@
   i32.const 15
   i32.add
  )
- (func $core/sound/sound/getSampleAsUnsignedByte (; 82 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/sound/sound/getSampleAsUnsignedByte (; 109 ;) (type $FUNCSIG$iii) (param $0 i32) (param $1 i32) (result i32)
   local.get $0
   i32.const 60
   i32.eq
@@ -5503,7 +8164,7 @@
   i32.const 47244
   i32.div_s
  )
- (func $core/sound/sound/mixChannelSamples (; 83 ;) (type $iiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (result i32)
+ (func $core/sound/sound/mixChannelSamples (; 110 ;) (type $FUNCSIG$iiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (result i32)
   (local $4 i32)
   i32.const 0
   global.set $core/sound/accumulator/SoundAccumulator.mixerVolumeChanged
@@ -5526,7 +8187,6 @@
   global.get $core/sound/sound/Sound.NR51IsChannel4EnabledOnLeftOutput
   select
   i32.add
-  local.set $4
   local.get $0
   i32.const 15
   global.get $core/sound/sound/Sound.NR51IsChannel1EnabledOnRightOutput
@@ -5551,7 +8211,6 @@
   global.set $core/sound/accumulator/SoundAccumulator.mixerEnabledChanged
   i32.const 0
   global.set $core/sound/accumulator/SoundAccumulator.needToRemixSamples
-  local.get $4
   global.get $core/sound/sound/Sound.NR50LeftMixerVolume
   i32.const 1
   i32.add
@@ -5579,7 +8238,7 @@
   i32.shl
   i32.or
  )
- (func $core/sound/accumulator/accumulateSound (; 84 ;) (type $i_) (param $0 i32)
+ (func $core/sound/accumulator/accumulateSound (; 111 ;) (type $FUNCSIG$vi) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -5588,9 +8247,26 @@
   global.get $core/sound/channel1/Channel1.cycleCounter
   local.get $0
   i32.add
-  local.tee $1
+  local.tee $2
   global.set $core/sound/channel1/Channel1.cycleCounter
   global.get $core/sound/channel1/Channel1.frequencyTimer
+  local.get $2
+  i32.sub
+  i32.const 0
+  i32.le_s
+  local.tee $2
+  i32.eqz
+  if
+   i32.const 1
+   call $core/sound/accumulator/didChannelDacChange
+   local.set $2
+  end
+  global.get $core/sound/channel2/Channel2.cycleCounter
+  local.get $0
+  i32.add
+  local.tee $1
+  global.set $core/sound/channel2/Channel2.cycleCounter
+  global.get $core/sound/channel2/Channel2.frequencyTimer
   local.get $1
   i32.sub
   i32.const 0
@@ -5598,50 +8274,29 @@
   local.tee $1
   i32.eqz
   if
-   i32.const 1
-   call $core/sound/accumulator/didChannelDacChange
-   local.set $1
-  end
-  global.get $core/sound/channel2/Channel2.cycleCounter
-  local.get $0
-  i32.add
-  local.tee $4
-  global.set $core/sound/channel2/Channel2.cycleCounter
-  global.get $core/sound/channel2/Channel2.frequencyTimer
-  local.get $4
-  i32.sub
-  i32.const 0
-  i32.le_s
-  local.tee $4
-  i32.eqz
-  if
    i32.const 2
    call $core/sound/accumulator/didChannelDacChange
-   local.set $4
+   local.set $1
   end
   global.get $core/sound/channel3/Channel3.cycleCounter
   local.get $0
   i32.add
   global.set $core/sound/channel3/Channel3.cycleCounter
+  i32.const 0
+  global.get $core/sound/channel3/Channel3.frequencyTimer
+  global.get $core/sound/channel3/Channel3.cycleCounter
+  i32.sub
+  i32.const 0
+  i32.gt_s
   global.get $core/sound/channel3/Channel3.volumeCodeChanged
+  select
   i32.eqz
-  local.tee $2
-  if
-   global.get $core/sound/channel3/Channel3.frequencyTimer
-   global.get $core/sound/channel3/Channel3.cycleCounter
-   i32.sub
-   i32.const 0
-   i32.gt_s
-   local.set $2
-  end
-  local.get $2
-  i32.eqz
-  local.tee $2
+  local.tee $4
   i32.eqz
   if
    i32.const 3
    call $core/sound/accumulator/didChannelDacChange
-   local.set $2
+   local.set $4
   end
   global.get $core/sound/channel4/Channel4.cycleCounter
   local.get $0
@@ -5659,97 +8314,77 @@
    call $core/sound/accumulator/didChannelDacChange
    local.set $5
   end
-  local.get $1
+  local.get $2
   if
    global.get $core/sound/channel1/Channel1.cycleCounter
-   local.set $3
    i32.const 0
    global.set $core/sound/channel1/Channel1.cycleCounter
-   local.get $3
    call $core/sound/channel1/Channel1.getSample
    global.set $core/sound/accumulator/SoundAccumulator.channel1Sample
   end
-  local.get $4
+  local.get $1
   if
    global.get $core/sound/channel2/Channel2.cycleCounter
-   local.set $3
    i32.const 0
    global.set $core/sound/channel2/Channel2.cycleCounter
-   local.get $3
    call $core/sound/channel2/Channel2.getSample
    global.set $core/sound/accumulator/SoundAccumulator.channel2Sample
   end
-  local.get $2
+  local.get $4
   if
    global.get $core/sound/channel3/Channel3.cycleCounter
-   local.set $3
    i32.const 0
    global.set $core/sound/channel3/Channel3.cycleCounter
-   local.get $3
    call $core/sound/channel3/Channel3.getSample
    global.set $core/sound/accumulator/SoundAccumulator.channel3Sample
   end
   local.get $5
   if
    global.get $core/sound/channel4/Channel4.cycleCounter
-   local.set $3
    i32.const 0
    global.set $core/sound/channel4/Channel4.cycleCounter
-   local.get $3
    call $core/sound/channel4/Channel4.getSample
    global.set $core/sound/accumulator/SoundAccumulator.channel4Sample
   end
-  block (result i32)
-   local.get $1
-   local.get $4
-   local.get $1
-   select
-   local.tee $1
-   i32.eqz
-   if
-    local.get $2
-    local.set $1
-   end
-   local.get $1
-   i32.eqz
-  end
-  if
-   local.get $5
-   local.set $1
-  end
+  i32.const 1
+  local.get $5
+  i32.const 1
+  local.get $4
+  i32.const 1
   local.get $1
+  local.get $2
+  select
+  select
+  select
   if
    i32.const 1
    global.set $core/sound/accumulator/SoundAccumulator.needToRemixSamples
   end
-  global.get $core/sound/sound/Sound.downSampleCycleCounter
-  global.get $core/sound/sound/Sound.downSampleCycleMultiplier
-  local.get $0
-  i32.mul
-  i32.add
-  local.tee $1
   i32.const 4194304
   global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
   i32.shl
+  i32.const 44100
+  i32.div_s
+  local.tee $2
+  local.set $1
+  global.get $core/sound/sound/Sound.downSampleCycleCounter
+  local.get $0
+  i32.add
   local.tee $0
+  local.get $2
   i32.ge_s
   if
+   local.get $0
    local.get $1
-   local.get $0
    i32.sub
-   local.set $1
-   global.get $core/sound/accumulator/SoundAccumulator.needToRemixSamples
-   local.tee $0
+   local.set $0
+   i32.const 1
+   global.get $core/sound/accumulator/SoundAccumulator.mixerEnabledChanged
+   i32.const 1
    global.get $core/sound/accumulator/SoundAccumulator.mixerVolumeChanged
-   local.get $0
+   global.get $core/sound/accumulator/SoundAccumulator.needToRemixSamples
    select
-   local.tee $0
-   i32.eqz
-   if
-    global.get $core/sound/accumulator/SoundAccumulator.mixerEnabledChanged
-    local.set $0
-   end
-   local.get $0
+   select
    if
     global.get $core/sound/accumulator/SoundAccumulator.channel1Sample
     global.get $core/sound/accumulator/SoundAccumulator.channel2Sample
@@ -5757,8 +8392,8 @@
     global.get $core/sound/accumulator/SoundAccumulator.channel4Sample
     call $core/sound/sound/mixChannelSamples
     drop
-   else    
-    local.get $1
+   else
+    local.get $0
     global.set $core/sound/sound/Sound.downSampleCycleCounter
    end
    global.get $core/sound/sound/Sound.audioQueueIndex
@@ -5767,12 +8402,12 @@
    i32.shl
    i32.const 1068160
    i32.add
-   local.tee $0
+   local.tee $1
    global.get $core/sound/accumulator/SoundAccumulator.leftChannelSampleUnsignedByte
    i32.const 2
    i32.add
    i32.store8
-   local.get $0
+   local.get $1
    i32.const 1
    i32.add
    global.get $core/sound/accumulator/SoundAccumulator.rightChannelSampleUnsignedByte
@@ -5782,26 +8417,22 @@
    local.get $2
    i32.const 1
    i32.add
-   local.tee $0
-   global.get $core/sound/sound/Sound.wasmBoyMemoryMaxBufferSize
-   i32.const 1
-   i32.shr_s
-   i32.const 1
-   i32.sub
+   local.tee $1
+   i32.const 65535
    i32.ge_s
    if (result i32)
-    local.get $0
+    local.get $1
     i32.const 1
     i32.sub
-   else    
-    local.get $0
+   else
+    local.get $1
    end
    global.set $core/sound/sound/Sound.audioQueueIndex
   end
-  local.get $1
+  local.get $0
   global.set $core/sound/sound/Sound.downSampleCycleCounter
  )
- (func $core/sound/sound/calculateSound (; 85 ;) (type $i_) (param $0 i32)
+ (func $core/sound/sound/calculateSound (; 112 ;) (type $FUNCSIG$vi) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -5816,48 +8447,50 @@
   local.set $2
   local.get $0
   call $core/sound/channel3/Channel3.getSample
-  local.set $3
+  local.set $4
   local.get $0
   call $core/sound/channel4/Channel4.getSample
-  local.set $4
+  local.set $5
   local.get $1
   global.set $core/sound/accumulator/SoundAccumulator.channel1Sample
   local.get $2
   global.set $core/sound/accumulator/SoundAccumulator.channel2Sample
-  local.get $3
-  global.set $core/sound/accumulator/SoundAccumulator.channel3Sample
   local.get $4
+  global.set $core/sound/accumulator/SoundAccumulator.channel3Sample
+  local.get $5
   global.set $core/sound/accumulator/SoundAccumulator.channel4Sample
   global.get $core/sound/sound/Sound.downSampleCycleCounter
-  global.get $core/sound/sound/Sound.downSampleCycleMultiplier
   local.get $0
-  i32.mul
   i32.add
-  local.tee $5
+  local.tee $0
   i32.const 4194304
   global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
   i32.shl
+  i32.const 44100
+  i32.div_s
   i32.ge_s
   if
-   local.get $5
+   local.get $0
    i32.const 4194304
    global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
    i32.shl
+   i32.const 44100
+   i32.div_s
    i32.sub
-   local.set $5
+   local.set $0
    local.get $1
    local.get $2
-   local.get $3
    local.get $4
+   local.get $5
    call $core/sound/sound/mixChannelSamples
-   local.set $0
+   local.set $3
    global.get $core/sound/sound/Sound.audioQueueIndex
    i32.const 1
    i32.shl
    i32.const 1068160
    i32.add
    local.tee $6
-   local.get $0
+   local.get $3
    i32.const 65280
    i32.and
    i32.const 8
@@ -5868,7 +8501,7 @@
    local.get $6
    i32.const 1
    i32.add
-   local.get $0
+   local.get $3
    i32.const 255
    i32.and
    i32.const 2
@@ -5881,14 +8514,14 @@
     i32.const 15
     i32.const 15
     call $core/sound/sound/mixChannelSamples
-    local.set $0
+    local.set $1
     global.get $core/sound/sound/Sound.audioQueueIndex
     i32.const 1
     i32.shl
     i32.const 543872
     i32.add
-    local.tee $1
-    local.get $0
+    local.tee $3
+    local.get $1
     i32.const 65280
     i32.and
     i32.const 8
@@ -5896,10 +8529,10 @@
     i32.const 2
     i32.add
     i32.store8
-    local.get $1
+    local.get $3
     i32.const 1
     i32.add
-    local.get $0
+    local.get $1
     i32.const 255
     i32.and
     i32.const 2
@@ -5910,14 +8543,14 @@
     i32.const 15
     i32.const 15
     call $core/sound/sound/mixChannelSamples
-    local.set $0
+    local.set $1
     global.get $core/sound/sound/Sound.audioQueueIndex
     i32.const 1
     i32.shl
     i32.const 674944
     i32.add
     local.tee $2
-    local.get $0
+    local.get $1
     i32.const 65280
     i32.and
     i32.const 8
@@ -5928,7 +8561,7 @@
     local.get $2
     i32.const 1
     i32.add
-    local.get $0
+    local.get $1
     i32.const 255
     i32.and
     i32.const 2
@@ -5936,17 +8569,17 @@
     i32.store8
     i32.const 15
     i32.const 15
-    local.get $3
+    local.get $4
     i32.const 15
     call $core/sound/sound/mixChannelSamples
-    local.set $0
+    local.set $1
     global.get $core/sound/sound/Sound.audioQueueIndex
     i32.const 1
     i32.shl
     i32.const 806016
     i32.add
-    local.tee $3
-    local.get $0
+    local.tee $2
+    local.get $1
     i32.const 65280
     i32.and
     i32.const 8
@@ -5954,10 +8587,10 @@
     i32.const 2
     i32.add
     i32.store8
-    local.get $3
+    local.get $2
     i32.const 1
     i32.add
-    local.get $0
+    local.get $1
     i32.const 255
     i32.and
     i32.const 2
@@ -5966,16 +8599,16 @@
     i32.const 15
     i32.const 15
     i32.const 15
-    local.get $4
+    local.get $5
     call $core/sound/sound/mixChannelSamples
-    local.set $0
+    local.set $1
     global.get $core/sound/sound/Sound.audioQueueIndex
     i32.const 1
     i32.shl
     i32.const 937088
     i32.add
-    local.tee $4
-    local.get $0
+    local.tee $2
+    local.get $1
     i32.const 65280
     i32.and
     i32.const 8
@@ -5983,10 +8616,10 @@
     i32.const 2
     i32.add
     i32.store8
-    local.get $4
+    local.get $2
     i32.const 1
     i32.add
-    local.get $0
+    local.get $1
     i32.const 255
     i32.and
     i32.const 2
@@ -5996,44 +8629,38 @@
    global.get $core/sound/sound/Sound.audioQueueIndex
    i32.const 1
    i32.add
-   local.tee $0
-   global.get $core/sound/sound/Sound.wasmBoyMemoryMaxBufferSize
-   i32.const 1
-   i32.shr_s
-   i32.const 1
-   i32.sub
+   local.tee $1
+   i32.const 65535
    i32.ge_s
    if (result i32)
-    local.get $0
+    local.get $1
     i32.const 1
     i32.sub
-   else    
-    local.get $0
+   else
+    local.get $1
    end
    global.set $core/sound/sound/Sound.audioQueueIndex
   end
-  local.get $5
+  local.get $0
   global.set $core/sound/sound/Sound.downSampleCycleCounter
  )
- (func $core/sound/sound/updateSound (; 86 ;) (type $i_) (param $0 i32)
+ (func $core/sound/sound/updateSound (; 113 ;) (type $FUNCSIG$vi) (param $0 i32)
   (local $1 i32)
   local.get $0
   call $core/sound/sound/updateFrameSequencer
-  local.set $1
-  local.get $1
   i32.eqz
-  global.get $core/config/Config.audioAccumulateSamples
+  i32.const 0
   global.get $core/config/Config.audioAccumulateSamples
   select
   if
    local.get $0
    call $core/sound/accumulator/accumulateSound
-  else   
+  else
    local.get $0
    call $core/sound/sound/calculateSound
   end
  )
- (func $core/sound/sound/batchProcessAudio (; 87 ;) (type $_)
+ (func $core/sound/sound/batchProcessAudio (; 114 ;) (type $FUNCSIG$v)
   (local $0 i32)
   (local $1 i32)
   i32.const 87
@@ -6059,7 +8686,7 @@
   local.get $0
   global.set $core/sound/sound/Sound.currentCycles
  )
- (func $core/sound/registers/SoundRegisterReadTraps (; 88 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/sound/registers/SoundRegisterReadTraps (; 115 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   block $break|0
    block $case22|0
     block $case21|0
@@ -6088,9 +8715,16 @@
                          i32.ne
                          if
                           local.get $0
-                          i32.const 65297
-                          i32.sub
-                          br_table $case5|0 $case10|0 $case15|0 $case19|0 $case1|0 $case6|0 $case11|0 $case16|0 $case20|0 $case2|0 $case7|0 $case12|0 $case17|0 $case21|0 $case3|0 $case8|0 $case13|0 $case18|0 $case22|0 $case4|0 $case9|0 $case14|0 $break|0
+                          i32.const 65301
+                          i32.eq
+                          br_if $case1|0
+                          block $tablify|0
+                           local.get $0
+                           i32.const 65297
+                           i32.sub
+                           br_table $case5|0 $case10|0 $case15|0 $case19|0 $tablify|0 $case6|0 $case11|0 $case16|0 $case20|0 $case2|0 $case7|0 $case12|0 $case17|0 $case21|0 $case3|0 $case8|0 $case13|0 $case18|0 $case22|0 $case4|0 $case9|0 $case14|0 $tablify|0
+                          end
+                          br $break|0
                          end
                          i32.const 65296
                          call $core/memory/load/eightBitLoadFromGBMemory
@@ -6258,7 +8892,7 @@
   end
   i32.const -1
  )
- (func $core/joypad/joypad/getJoypadState (; 89 ;) (type $i) (result i32)
+ (func $core/joypad/joypad/getJoypadState (; 116 ;) (type $FUNCSIG$i) (result i32)
   (local $0 i32)
   global.get $core/joypad/joypad/Joypad.joypadRegisterFlipped
   local.set $0
@@ -6300,7 +8934,7 @@
    global.get $core/joypad/joypad/Joypad.left
    select
    local.set $0
-  else   
+  else
    global.get $core/joypad/joypad/Joypad.isButtonType
    if
     local.get $0
@@ -6345,8 +8979,7 @@
   i32.const 240
   i32.or
  )
- (func $core/memory/readTraps/checkReadTraps (; 90 ;) (type $ii) (param $0 i32) (result i32)
-  (local $1 i32)
+ (func $core/memory/readTraps/checkReadTraps (; 117 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   local.get $0
   i32.const 32768
   i32.lt_s
@@ -6355,31 +8988,25 @@
    return
   end
   local.get $0
+  i32.const 40960
+  i32.lt_s
+  i32.const 0
+  local.get $0
   i32.const 32768
   i32.ge_s
-  local.tee $1
-  if (result i32)
-   local.get $0
-   i32.const 40960
-   i32.lt_s
-  else   
-   local.get $1
-  end
+  select
   if
    i32.const -1
    return
   end
   local.get $0
+  i32.const 65024
+  i32.lt_s
+  i32.const 0
+  local.get $0
   i32.const 57344
   i32.ge_s
-  local.tee $1
-  if (result i32)
-   local.get $0
-   i32.const 65024
-   i32.lt_s
-  else   
-   local.get $1
-  end
+  select
   if
    local.get $0
    i32.const -8192
@@ -6388,16 +9015,13 @@
    return
   end
   local.get $0
+  i32.const 65183
+  i32.le_s
+  i32.const 0
+  local.get $0
   i32.const 65024
   i32.ge_s
-  local.tee $1
-  if (result i32)
-   local.get $0
-   i32.const 65183
-   i32.le_s
-  else   
-   local.get $1
-  end
+  select
   if
    i32.const 255
    i32.const -1
@@ -6412,7 +9036,7 @@
   i32.eq
   if
    i32.const 255
-   local.set $1
+   local.set $0
    i32.const 65357
    call $core/memory/load/eightBitLoadFromGBMemory
    i32.const 1
@@ -6420,17 +9044,17 @@
    i32.eqz
    if
     i32.const 254
-    local.set $1
+    local.set $0
    end
    global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
    i32.eqz
    if
-    local.get $1
+    local.get $0
     i32.const -129
     i32.and
-    local.set $1
+    local.set $0
    end
-   local.get $1
+   local.get $0
    return
   end
   local.get $0
@@ -6444,16 +9068,13 @@
    return
   end
   local.get $0
+  i32.const 65318
+  i32.le_s
+  i32.const 0
+  local.get $0
   i32.const 65296
   i32.ge_s
-  local.tee $1
-  if (result i32)
-   local.get $0
-   i32.const 65318
-   i32.le_s
-  else   
-   local.get $1
-  end
+  select
   if
    call $core/sound/sound/batchProcessAudio
    local.get $0
@@ -6461,33 +9082,32 @@
    return
   end
   local.get $0
+  i32.const 65327
+  i32.le_s
+  i32.const 0
+  local.get $0
   i32.const 65319
   i32.ge_s
-  local.tee $1
-  if (result i32)
-   local.get $0
-   i32.const 65327
-   i32.le_s
-  else   
-   local.get $1
-  end
+  select
   if
    i32.const 255
    return
   end
   local.get $0
+  i32.const 65343
+  i32.le_s
+  i32.const 0
+  local.get $0
   i32.const 65328
   i32.ge_s
-  local.tee $1
-  if (result i32)
-   local.get $0
-   i32.const 65343
-   i32.le_s
-  else   
-   local.get $1
-  end
+  select
   if
    call $core/sound/sound/batchProcessAudio
+   global.get $core/sound/channel3/Channel3.isEnabled
+   if
+    call $core/sound/channel3/readCurrentSampleByteFromWaveRam
+    return
+   end
    i32.const -1
    return
   end
@@ -6501,9 +9121,9 @@
    i32.and
    i32.const 8
    i32.shr_s
-   local.tee $1
+   local.tee $0
    call $core/memory/store/eightBitStoreIntoGBMemory
-   local.get $1
+   local.get $0
    return
   end
   local.get $0
@@ -6534,7 +9154,7 @@
   end
   i32.const -1
  )
- (func $core/memory/load/eightBitLoadFromGBMemoryWithTraps (; 91 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/memory/load/eightBitLoadFromGBMemoryWithTraps (; 118 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   (local $1 i32)
   global.get $core/debug/breakpoints/Breakpoints.readGbMemory
   local.get $0
@@ -6551,113 +9171,108 @@
   if (result i32)
    local.get $0
    call $core/memory/load/eightBitLoadFromGBMemory
-  else   
+  else
    local.get $1
    i32.const 255
    i32.and
   end
  )
- (func $core/memory/banking/handleBanking (; 92 ;) (type $ii_) (param $0 i32) (param $1 i32)
+ (func $core/memory/banking/handleBanking (; 119 ;) (type $FUNCSIG$vii) (param $0 i32) (param $1 i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
-  (local $5 i32)
   global.get $core/memory/memory/Memory.isRomOnly
   if
    return
   end
   global.get $core/memory/memory/Memory.isMBC1
-  local.set $5
-  global.get $core/memory/memory/Memory.isMBC2
   local.set $3
+  global.get $core/memory/memory/Memory.isMBC2
+  local.set $2
   local.get $0
   i32.const 8191
   i32.le_s
   if
-   local.get $3
+   local.get $2
    if (result i32)
     local.get $1
     i32.const 16
     i32.and
     i32.eqz
-   else    
-    local.get $3
+   else
+    i32.const 0
    end
    i32.eqz
    if
     local.get $1
     i32.const 15
     i32.and
-    local.tee $4
+    local.tee $0
     if
-     local.get $4
+     local.get $0
      i32.const 10
      i32.eq
      if
       i32.const 1
       global.set $core/memory/memory/Memory.isRamBankingEnabled
      end
-    else     
+    else
      i32.const 0
      global.set $core/memory/memory/Memory.isRamBankingEnabled
     end
    end
-  else   
+  else
    local.get $0
    i32.const 16383
    i32.le_s
    if
     global.get $core/memory/memory/Memory.isMBC5
     local.tee $4
-    i32.eqz
-    local.tee $2
     if (result i32)
-     local.get $2
-    else     
      local.get $0
      i32.const 12287
      i32.le_s
+    else
+     i32.const 1
     end
     if
      local.get $1
      i32.const 15
      i32.and
      global.get $core/memory/memory/Memory.currentRomBank
-     local.get $3
+     local.get $2
      select
-     local.set $2
-     local.get $5
+     local.set $0
+     local.get $3
      if (result i32)
       local.get $1
       i32.const 31
       i32.and
       local.set $1
-      local.get $2
+      local.get $0
       i32.const 224
       i32.and
-     else      
+     else
       global.get $core/memory/memory/Memory.isMBC3
       if (result i32)
        local.get $1
        i32.const 127
        i32.and
        local.set $1
-       local.get $2
+       local.get $0
        i32.const 128
        i32.and
-      else       
+      else
        i32.const 0
-       local.get $2
+       local.get $0
        local.get $4
        select
       end
      end
-     local.set $0
-     local.get $0
      local.get $1
      i32.or
      global.set $core/memory/memory/Memory.currentRomBank
-    else     
+    else
      global.get $core/memory/memory/Memory.currentRomBank
      i32.const 255
      i32.and
@@ -6669,21 +9284,17 @@
      i32.or
      global.set $core/memory/memory/Memory.currentRomBank
     end
-   else    
-    local.get $3
-    i32.eqz
-    local.tee $4
-    if (result i32)
-     local.get $0
-     i32.const 24575
-     i32.le_s
-    else     
-     local.get $4
-    end
+   else
+    i32.const 0
+    local.get $0
+    i32.const 24575
+    i32.le_s
+    local.get $2
+    select
     if
      global.get $core/memory/memory/Memory.isMBC1RomModeEnabled
-     local.get $5
-     local.get $5
+     i32.const 0
+     local.get $3
      select
      if
       global.get $core/memory/memory/Memory.currentRomBank
@@ -6705,19 +9316,15 @@
      global.get $core/memory/memory/Memory.isMBC5
      select
      global.set $core/memory/memory/Memory.currentRamBank
-    else     
-     local.get $3
-     i32.eqz
-     local.tee $2
-     if (result i32)
-      local.get $0
-      i32.const 32767
-      i32.le_s
-     else      
-      local.get $2
-     end
+    else
+     i32.const 0
+     local.get $0
+     i32.const 32767
+     i32.le_s
+     local.get $2
+     select
      if
-      local.get $5
+      local.get $3
       if
        local.get $1
        i32.const 1
@@ -6731,8 +9338,69 @@
    end
   end
  )
- (func $core/sound/channel1/Channel1.updateNRx2 (; 93 ;) (type $i_) (param $0 i32)
+ (func $core/sound/channel1/Channel1.updateNRx0 (; 120 ;) (type $FUNCSIG$vi) (param $0 i32)
   (local $1 i32)
+  global.get $core/sound/channel1/Channel1.NRx0Negate
+  local.set $1
+  local.get $0
+  i32.const 112
+  i32.and
+  i32.const 4
+  i32.shr_s
+  global.set $core/sound/channel1/Channel1.NRx0SweepPeriod
+  local.get $0
+  i32.const 8
+  i32.and
+  i32.const 0
+  i32.ne
+  global.set $core/sound/channel1/Channel1.NRx0Negate
+  local.get $0
+  i32.const 7
+  i32.and
+  global.set $core/sound/channel1/Channel1.NRx0SweepShift
+  i32.const 0
+  global.get $core/sound/channel1/Channel1.sweepNegateShouldDisableChannelOnClear
+  global.get $core/sound/channel1/Channel1.NRx0Negate
+  select
+  i32.const 0
+  local.get $1
+  select
+  if
+   i32.const 0
+   global.set $core/sound/channel1/Channel1.isEnabled
+  end
+ )
+ (func $core/sound/channel1/Channel1.updateNRx2 (; 121 ;) (type $FUNCSIG$vi) (param $0 i32)
+  global.get $core/sound/channel1/Channel1.isEnabled
+  if
+   i32.const 0
+   global.get $core/sound/channel1/Channel1.isEnvelopeAutomaticUpdating
+   global.get $core/sound/channel1/Channel1.NRx2EnvelopePeriod
+   select
+   if
+    global.get $core/sound/channel1/Channel1.volume
+    i32.const 1
+    i32.add
+    i32.const 15
+    i32.and
+    global.set $core/sound/channel1/Channel1.volume
+   end
+   global.get $core/sound/channel1/Channel1.NRx2EnvelopeAddMode
+   local.get $0
+   i32.const 8
+   i32.and
+   i32.const 0
+   i32.ne
+   i32.ne
+   if
+    i32.const 16
+    global.get $core/sound/channel1/Channel1.volume
+    i32.sub
+    i32.const 15
+    i32.and
+    global.set $core/sound/channel1/Channel1.volume
+   end
+  end
   local.get $0
   i32.const 4
   i32.shr_s
@@ -6754,17 +9422,46 @@
   i32.and
   i32.const 0
   i32.gt_s
-  local.tee $1
+  local.tee $0
   global.set $core/sound/channel1/Channel1.isDacEnabled
-  local.get $1
+  local.get $0
   i32.eqz
   if
-   local.get $1
+   i32.const 0
    global.set $core/sound/channel1/Channel1.isEnabled
   end
  )
- (func $core/sound/channel2/Channel2.updateNRx2 (; 94 ;) (type $i_) (param $0 i32)
-  (local $1 i32)
+ (func $core/sound/channel2/Channel2.updateNRx2 (; 122 ;) (type $FUNCSIG$vi) (param $0 i32)
+  global.get $core/sound/channel2/Channel2.isEnabled
+  if
+   i32.const 0
+   global.get $core/sound/channel2/Channel2.isEnvelopeAutomaticUpdating
+   global.get $core/sound/channel2/Channel2.NRx2EnvelopePeriod
+   select
+   if
+    global.get $core/sound/channel2/Channel2.volume
+    i32.const 1
+    i32.add
+    i32.const 15
+    i32.and
+    global.set $core/sound/channel2/Channel2.volume
+   end
+   global.get $core/sound/channel2/Channel2.NRx2EnvelopeAddMode
+   local.get $0
+   i32.const 8
+   i32.and
+   i32.const 0
+   i32.ne
+   i32.ne
+   if
+    i32.const 16
+    global.get $core/sound/channel2/Channel2.volume
+    i32.sub
+    i32.const 15
+    i32.and
+    global.set $core/sound/channel2/Channel2.volume
+   end
+  end
   local.get $0
   i32.const 4
   i32.shr_s
@@ -6786,17 +9483,46 @@
   i32.and
   i32.const 0
   i32.gt_s
-  local.tee $1
+  local.tee $0
   global.set $core/sound/channel2/Channel2.isDacEnabled
-  local.get $1
+  local.get $0
   i32.eqz
   if
-   local.get $1
+   local.get $0
    global.set $core/sound/channel2/Channel2.isEnabled
   end
  )
- (func $core/sound/channel4/Channel4.updateNRx2 (; 95 ;) (type $i_) (param $0 i32)
-  (local $1 i32)
+ (func $core/sound/channel4/Channel4.updateNRx2 (; 123 ;) (type $FUNCSIG$vi) (param $0 i32)
+  global.get $core/sound/channel4/Channel4.isEnabled
+  if
+   i32.const 0
+   global.get $core/sound/channel4/Channel4.isEnvelopeAutomaticUpdating
+   global.get $core/sound/channel4/Channel4.NRx2EnvelopePeriod
+   select
+   if
+    global.get $core/sound/channel4/Channel4.volume
+    i32.const 1
+    i32.add
+    i32.const 15
+    i32.and
+    global.set $core/sound/channel4/Channel4.volume
+   end
+   global.get $core/sound/channel4/Channel4.NRx2EnvelopeAddMode
+   local.get $0
+   i32.const 8
+   i32.and
+   i32.const 0
+   i32.ne
+   i32.ne
+   if
+    i32.const 16
+    global.get $core/sound/channel4/Channel4.volume
+    i32.sub
+    i32.const 15
+    i32.and
+    global.set $core/sound/channel4/Channel4.volume
+   end
+  end
   local.get $0
   i32.const 4
   i32.shr_s
@@ -6818,16 +9544,16 @@
   i32.and
   i32.const 0
   i32.gt_s
-  local.tee $1
+  local.tee $0
   global.set $core/sound/channel4/Channel4.isDacEnabled
-  local.get $1
+  local.get $0
   i32.eqz
   if
-   local.get $1
+   local.get $0
    global.set $core/sound/channel4/Channel4.isEnabled
   end
  )
- (func $core/sound/channel4/Channel4.updateNRx3 (; 96 ;) (type $i_) (param $0 i32)
+ (func $core/sound/channel4/Channel4.updateNRx3 (; 124 ;) (type $FUNCSIG$vi) (param $0 i32)
   local.get $0
   i32.const 4
   i32.shr_s
@@ -6858,14 +9584,15 @@
   i32.shl
   global.set $core/sound/channel4/Channel4.divisor
  )
- (func $core/sound/channel1/Channel1.trigger (; 97 ;) (type $_)
+ (func $core/sound/channel1/Channel1.trigger (; 125 ;) (type $FUNCSIG$v)
   (local $0 i32)
+  (local $1 i32)
   i32.const 1
   global.set $core/sound/channel1/Channel1.isEnabled
   global.get $core/sound/channel1/Channel1.lengthCounter
   i32.eqz
   if
-   global.get $core/sound/channel1/Channel1.MAX_LENGTH
+   i32.const 64
    global.set $core/sound/channel1/Channel1.lengthCounter
   end
   i32.const 2048
@@ -6881,31 +9608,72 @@
   select
   global.set $core/sound/channel1/Channel1.frequencyTimer
   global.get $core/sound/channel1/Channel1.NRx2EnvelopePeriod
-  global.set $core/sound/channel1/Channel1.envelopeCounter
+  if
+   global.get $core/sound/channel1/Channel1.NRx2EnvelopePeriod
+   global.set $core/sound/channel1/Channel1.envelopeCounter
+  else
+   i32.const 8
+   global.set $core/sound/channel1/Channel1.envelopeCounter
+  end
+  i32.const 1
+  global.set $core/sound/channel1/Channel1.isEnvelopeAutomaticUpdating
   global.get $core/sound/channel1/Channel1.NRx2StartingVolume
   global.set $core/sound/channel1/Channel1.volume
   global.get $core/sound/channel1/Channel1.frequency
   global.set $core/sound/channel1/Channel1.sweepShadowFrequency
   global.get $core/sound/channel1/Channel1.NRx0SweepPeriod
-  local.tee $0
-  global.set $core/sound/channel1/Channel1.sweepCounter
-  local.get $0
-  i32.const 0
-  i32.gt_s
-  local.tee $0
-  if (result i32)
-   global.get $core/sound/channel1/Channel1.NRx0SweepShift
-   i32.const 0
-   i32.gt_s
-  else   
-   local.get $0
+  if
+   global.get $core/sound/channel1/Channel1.NRx0SweepPeriod
+   global.set $core/sound/channel1/Channel1.sweepCounter
+  else
+   i32.const 8
+   global.set $core/sound/channel1/Channel1.sweepCounter
   end
-  global.set $core/sound/channel1/Channel1.isSweepEnabled
+  i32.const 1
   global.get $core/sound/channel1/Channel1.NRx0SweepShift
   i32.const 0
   i32.gt_s
+  local.tee $0
+  global.get $core/sound/channel1/Channel1.NRx0SweepPeriod
+  i32.const 0
+  i32.gt_s
+  select
+  global.set $core/sound/channel1/Channel1.isSweepEnabled
+  i32.const 0
+  global.set $core/sound/channel1/Channel1.sweepNegateShouldDisableChannelOnClear
+  local.get $0
+  if (result i32)
+   block $__inlined_func$core/sound/channel1/didCalculatedSweepOverflow (result i32)
+    global.get $core/sound/channel1/Channel1.sweepShadowFrequency
+    local.tee $0
+    global.get $core/sound/channel1/Channel1.NRx0SweepShift
+    i32.shr_s
+    local.set $1
+    i32.const 1
+    global.get $core/sound/channel1/Channel1.NRx0Negate
+    if (result i32)
+     i32.const 1
+     global.set $core/sound/channel1/Channel1.sweepNegateShouldDisableChannelOnClear
+     local.get $0
+     local.get $1
+     i32.sub
+    else
+     local.get $0
+     local.get $1
+     i32.add
+    end
+    i32.const 2047
+    i32.gt_s
+    br_if $__inlined_func$core/sound/channel1/didCalculatedSweepOverflow
+    drop
+    i32.const 0
+   end
+  else
+   i32.const 0
+  end
   if
-   call $core/sound/channel1/calculateSweepAndCheckOverflow
+   i32.const 0
+   global.set $core/sound/channel1/Channel1.isEnabled
   end
   global.get $core/sound/channel1/Channel1.isDacEnabled
   i32.eqz
@@ -6914,55 +9682,58 @@
    global.set $core/sound/channel1/Channel1.isEnabled
   end
  )
- (func $core/sound/channel1/Channel1.updateNRx4 (; 98 ;) (type $i_) (param $0 i32)
+ (func $core/sound/channel1/Channel1.updateNRx4 (; 126 ;) (type $FUNCSIG$vi) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
-  (local $3 i32)
+  local.get $0
+  i32.const 7
+  i32.and
+  local.tee $1
+  global.set $core/sound/channel1/Channel1.NRx4FrequencyMSB
+  global.get $core/sound/channel1/Channel1.NRx3FrequencyLSB
+  local.get $1
+  i32.const 8
+  i32.shl
+  i32.or
+  global.set $core/sound/channel1/Channel1.frequency
   global.get $core/sound/sound/Sound.frameSequencer
   i32.const 1
   i32.and
   i32.const 1
   i32.eq
-  local.set $3
+  local.set $2
   global.get $core/sound/channel1/Channel1.NRx4LengthEnabled
   i32.eqz
-  local.tee $2
+  local.tee $1
   if
    local.get $0
    i32.const 64
    i32.and
    i32.const 0
    i32.ne
-   local.set $2
+   local.set $1
   end
-  local.get $3
+  local.get $2
   i32.eqz
   if
+   i32.const 0
+   local.get $1
    global.get $core/sound/channel1/Channel1.lengthCounter
    i32.const 0
-   i32.gt_s
-   local.tee $1
-   if (result i32)
-    local.get $2
-   else    
-    local.get $1
-   end
+   i32.le_s
+   select
    if
     global.get $core/sound/channel1/Channel1.lengthCounter
     i32.const 1
     i32.sub
     global.set $core/sound/channel1/Channel1.lengthCounter
+    i32.const 0
+    global.get $core/sound/channel1/Channel1.lengthCounter
+    i32.eqz
     local.get $0
     i32.const 128
     i32.and
-    i32.eqz
-    local.tee $1
-    if (result i32)
-     global.get $core/sound/channel1/Channel1.lengthCounter
-     i32.eqz
-    else     
-     local.get $1
-    end
+    select
     if
      i32.const 0
      global.set $core/sound/channel1/Channel1.isEnabled
@@ -6980,23 +9751,15 @@
   i32.and
   if
    call $core/sound/channel1/Channel1.trigger
-   block (result i32)
-    local.get $3
-    i32.eqz
-    local.tee $1
-    if
-     global.get $core/sound/channel1/Channel1.lengthCounter
-     global.get $core/sound/channel1/Channel1.MAX_LENGTH
-     i32.eq
-     local.set $1
-    end
-    local.get $1
-   end
-   if (result i32)
-    global.get $core/sound/channel1/Channel1.NRx4LengthEnabled
-   else    
-    local.get $1
-   end
+   global.get $core/sound/channel1/Channel1.NRx4LengthEnabled
+   i32.const 0
+   i32.const 0
+   global.get $core/sound/channel1/Channel1.lengthCounter
+   i32.const 64
+   i32.eq
+   local.get $2
+   select
+   select
    if
     global.get $core/sound/channel1/Channel1.lengthCounter
     i32.const 1
@@ -7004,25 +9767,14 @@
     global.set $core/sound/channel1/Channel1.lengthCounter
    end
   end
-  local.get $0
-  i32.const 7
-  i32.and
-  local.tee $0
-  global.set $core/sound/channel1/Channel1.NRx4FrequencyMSB
-  global.get $core/sound/channel1/Channel1.NRx3FrequencyLSB
-  local.get $0
-  i32.const 8
-  i32.shl
-  i32.or
-  global.set $core/sound/channel1/Channel1.frequency
  )
- (func $core/sound/channel2/Channel2.trigger (; 99 ;) (type $_)
+ (func $core/sound/channel2/Channel2.trigger (; 127 ;) (type $FUNCSIG$v)
   i32.const 1
   global.set $core/sound/channel2/Channel2.isEnabled
   global.get $core/sound/channel2/Channel2.lengthCounter
   i32.eqz
   if
-   global.get $core/sound/channel2/Channel2.MAX_LENGTH
+   i32.const 64
    global.set $core/sound/channel2/Channel2.lengthCounter
   end
   i32.const 2048
@@ -7034,7 +9786,15 @@
   i32.shl
   global.set $core/sound/channel2/Channel2.frequencyTimer
   global.get $core/sound/channel2/Channel2.NRx2EnvelopePeriod
-  global.set $core/sound/channel2/Channel2.envelopeCounter
+  if
+   global.get $core/sound/channel2/Channel2.NRx2EnvelopePeriod
+   global.set $core/sound/channel2/Channel2.envelopeCounter
+  else
+   i32.const 8
+   global.set $core/sound/channel2/Channel2.envelopeCounter
+  end
+  i32.const 1
+  global.set $core/sound/channel2/Channel2.isEnvelopeAutomaticUpdating
   global.get $core/sound/channel2/Channel2.NRx2StartingVolume
   global.set $core/sound/channel2/Channel2.volume
   global.get $core/sound/channel2/Channel2.isDacEnabled
@@ -7044,55 +9804,58 @@
    global.set $core/sound/channel2/Channel2.isEnabled
   end
  )
- (func $core/sound/channel2/Channel2.updateNRx4 (; 100 ;) (type $i_) (param $0 i32)
+ (func $core/sound/channel2/Channel2.updateNRx4 (; 128 ;) (type $FUNCSIG$vi) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
-  (local $3 i32)
+  local.get $0
+  i32.const 7
+  i32.and
+  local.tee $1
+  global.set $core/sound/channel2/Channel2.NRx4FrequencyMSB
+  global.get $core/sound/channel2/Channel2.NRx3FrequencyLSB
+  local.get $1
+  i32.const 8
+  i32.shl
+  i32.or
+  global.set $core/sound/channel2/Channel2.frequency
   global.get $core/sound/sound/Sound.frameSequencer
   i32.const 1
   i32.and
   i32.const 1
   i32.eq
-  local.set $3
+  local.set $2
   global.get $core/sound/channel2/Channel2.NRx4LengthEnabled
   i32.eqz
-  local.tee $2
+  local.tee $1
   if
    local.get $0
    i32.const 64
    i32.and
    i32.const 0
    i32.ne
-   local.set $2
+   local.set $1
   end
-  local.get $3
+  local.get $2
   i32.eqz
   if
+   i32.const 0
+   local.get $1
    global.get $core/sound/channel2/Channel2.lengthCounter
    i32.const 0
-   i32.gt_s
-   local.tee $1
-   if (result i32)
-    local.get $2
-   else    
-    local.get $1
-   end
+   i32.le_s
+   select
    if
     global.get $core/sound/channel2/Channel2.lengthCounter
     i32.const 1
     i32.sub
     global.set $core/sound/channel2/Channel2.lengthCounter
+    i32.const 0
+    global.get $core/sound/channel2/Channel2.lengthCounter
+    i32.eqz
     local.get $0
     i32.const 128
     i32.and
-    i32.eqz
-    local.tee $1
-    if (result i32)
-     global.get $core/sound/channel2/Channel2.lengthCounter
-     i32.eqz
-    else     
-     local.get $1
-    end
+    select
     if
      i32.const 0
      global.set $core/sound/channel2/Channel2.isEnabled
@@ -7110,23 +9873,15 @@
   i32.and
   if
    call $core/sound/channel2/Channel2.trigger
-   block (result i32)
-    local.get $3
-    i32.eqz
-    local.tee $1
-    if
-     global.get $core/sound/channel2/Channel2.lengthCounter
-     global.get $core/sound/channel2/Channel2.MAX_LENGTH
-     i32.eq
-     local.set $1
-    end
-    local.get $1
-   end
-   if (result i32)
-    global.get $core/sound/channel2/Channel2.NRx4LengthEnabled
-   else    
-    local.get $1
-   end
+   global.get $core/sound/channel2/Channel2.NRx4LengthEnabled
+   i32.const 0
+   i32.const 0
+   global.get $core/sound/channel2/Channel2.lengthCounter
+   i32.const 64
+   i32.eq
+   local.get $2
+   select
+   select
    if
     global.get $core/sound/channel2/Channel2.lengthCounter
     i32.const 1
@@ -7134,25 +9889,14 @@
     global.set $core/sound/channel2/Channel2.lengthCounter
    end
   end
-  local.get $0
-  i32.const 7
-  i32.and
-  local.tee $0
-  global.set $core/sound/channel2/Channel2.NRx4FrequencyMSB
-  global.get $core/sound/channel2/Channel2.NRx3FrequencyLSB
-  local.get $0
-  i32.const 8
-  i32.shl
-  i32.or
-  global.set $core/sound/channel2/Channel2.frequency
  )
- (func $core/sound/channel3/Channel3.trigger (; 101 ;) (type $_)
+ (func $core/sound/channel3/Channel3.trigger (; 129 ;) (type $FUNCSIG$v)
   i32.const 1
   global.set $core/sound/channel3/Channel3.isEnabled
   global.get $core/sound/channel3/Channel3.lengthCounter
   i32.eqz
   if
-   global.get $core/sound/channel3/Channel3.MAX_LENGTH
+   i32.const 256
    global.set $core/sound/channel3/Channel3.lengthCounter
   end
   i32.const 2048
@@ -7163,6 +9907,10 @@
   global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
   i32.shl
   global.set $core/sound/channel3/Channel3.frequencyTimer
+  global.get $core/sound/channel3/Channel3.frequencyTimer
+  i32.const 6
+  i32.add
+  global.set $core/sound/channel3/Channel3.frequencyTimer
   i32.const 0
   global.set $core/sound/channel3/Channel3.waveTablePosition
   global.get $core/sound/channel3/Channel3.isDacEnabled
@@ -7172,56 +9920,50 @@
    global.set $core/sound/channel3/Channel3.isEnabled
   end
  )
- (func $core/sound/channel3/Channel3.updateNRx4 (; 102 ;) (type $i_) (param $0 i32)
+ (func $core/sound/channel3/Channel3.updateNRx4 (; 130 ;) (type $FUNCSIG$vi) (param $0 i32)
   (local $1 i32)
-  (local $2 i32)
-  (local $3 i32)
+  local.get $0
+  i32.const 7
+  i32.and
+  local.tee $1
+  global.set $core/sound/channel3/Channel3.NRx4FrequencyMSB
+  global.get $core/sound/channel3/Channel3.NRx3FrequencyLSB
+  local.get $1
+  i32.const 8
+  i32.shl
+  i32.or
+  global.set $core/sound/channel3/Channel3.frequency
   global.get $core/sound/sound/Sound.frameSequencer
   i32.const 1
   i32.and
   i32.const 1
   i32.eq
-  local.tee $2
+  local.tee $1
   i32.eqz
   if
+   i32.const 0
+   i32.const 0
+   local.get $0
+   i32.const 64
+   i32.and
    global.get $core/sound/channel3/Channel3.NRx4LengthEnabled
-   i32.eqz
-   local.tee $1
-   if (result i32)
-    local.get $0
-    i32.const 64
-    i32.and
-    i32.const 0
-    i32.ne
-   else    
-    local.get $1
-   end
-   local.set $3
+   select
    global.get $core/sound/channel3/Channel3.lengthCounter
    i32.const 0
-   i32.gt_s
-   local.tee $1
-   if (result i32)
-    local.get $3
-   else    
-    local.get $1
-   end
+   i32.le_s
+   select
    if
     global.get $core/sound/channel3/Channel3.lengthCounter
     i32.const 1
     i32.sub
     global.set $core/sound/channel3/Channel3.lengthCounter
+    i32.const 0
+    global.get $core/sound/channel3/Channel3.lengthCounter
+    i32.eqz
     local.get $0
     i32.const 128
     i32.and
-    i32.eqz
-    local.tee $1
-    if (result i32)
-     global.get $core/sound/channel3/Channel3.lengthCounter
-     i32.eqz
-    else     
-     local.get $1
-    end
+    select
     if
      i32.const 0
      global.set $core/sound/channel3/Channel3.isEnabled
@@ -7239,23 +9981,15 @@
   i32.and
   if
    call $core/sound/channel3/Channel3.trigger
-   block (result i32)
-    local.get $2
-    i32.eqz
-    local.tee $1
-    if
-     global.get $core/sound/channel3/Channel3.lengthCounter
-     global.get $core/sound/channel3/Channel3.MAX_LENGTH
-     i32.eq
-     local.set $1
-    end
-    local.get $1
-   end
-   if (result i32)
-    global.get $core/sound/channel3/Channel3.NRx4LengthEnabled
-   else    
-    local.get $1
-   end
+   global.get $core/sound/channel3/Channel3.NRx4LengthEnabled
+   i32.const 0
+   i32.const 0
+   global.get $core/sound/channel3/Channel3.lengthCounter
+   i32.const 256
+   i32.eq
+   local.get $1
+   select
+   select
    if
     global.get $core/sound/channel3/Channel3.lengthCounter
     i32.const 1
@@ -7263,25 +9997,14 @@
     global.set $core/sound/channel3/Channel3.lengthCounter
    end
   end
-  local.get $0
-  i32.const 7
-  i32.and
-  local.tee $0
-  global.set $core/sound/channel3/Channel3.NRx4FrequencyMSB
-  global.get $core/sound/channel3/Channel3.NRx3FrequencyLSB
-  local.get $0
-  i32.const 8
-  i32.shl
-  i32.or
-  global.set $core/sound/channel3/Channel3.frequency
  )
- (func $core/sound/channel4/Channel4.trigger (; 103 ;) (type $_)
+ (func $core/sound/channel4/Channel4.trigger (; 131 ;) (type $FUNCSIG$v)
   i32.const 1
   global.set $core/sound/channel4/Channel4.isEnabled
   global.get $core/sound/channel4/Channel4.lengthCounter
   i32.eqz
   if
-   global.get $core/sound/channel4/Channel4.MAX_LENGTH
+   i32.const 64
    global.set $core/sound/channel4/Channel4.lengthCounter
   end
   global.get $core/sound/channel4/Channel4.divisor
@@ -7291,7 +10014,15 @@
   i32.shl
   global.set $core/sound/channel4/Channel4.frequencyTimer
   global.get $core/sound/channel4/Channel4.NRx2EnvelopePeriod
-  global.set $core/sound/channel4/Channel4.envelopeCounter
+  if
+   global.get $core/sound/channel4/Channel4.NRx2EnvelopePeriod
+   global.set $core/sound/channel4/Channel4.envelopeCounter
+  else
+   i32.const 8
+   global.set $core/sound/channel4/Channel4.envelopeCounter
+  end
+  i32.const 1
+  global.set $core/sound/channel4/Channel4.isEnvelopeAutomaticUpdating
   global.get $core/sound/channel4/Channel4.NRx2StartingVolume
   global.set $core/sound/channel4/Channel4.volume
   i32.const 32767
@@ -7303,55 +10034,47 @@
    global.set $core/sound/channel4/Channel4.isEnabled
   end
  )
- (func $core/sound/channel4/Channel4.updateNRx4 (; 104 ;) (type $i_) (param $0 i32)
+ (func $core/sound/channel4/Channel4.updateNRx4 (; 132 ;) (type $FUNCSIG$vi) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
-  (local $3 i32)
   global.get $core/sound/sound/Sound.frameSequencer
   i32.const 1
   i32.and
   i32.const 1
   i32.eq
-  local.set $3
+  local.set $2
   global.get $core/sound/channel4/Channel4.NRx4LengthEnabled
   i32.eqz
-  local.tee $2
+  local.tee $1
   if
    local.get $0
    i32.const 64
    i32.and
    i32.const 0
    i32.ne
-   local.set $2
+   local.set $1
   end
-  local.get $3
+  local.get $2
   i32.eqz
   if
+   i32.const 0
+   local.get $1
    global.get $core/sound/channel4/Channel4.lengthCounter
    i32.const 0
-   i32.gt_s
-   local.tee $1
-   if (result i32)
-    local.get $2
-   else    
-    local.get $1
-   end
+   i32.le_s
+   select
    if
     global.get $core/sound/channel4/Channel4.lengthCounter
     i32.const 1
     i32.sub
     global.set $core/sound/channel4/Channel4.lengthCounter
+    i32.const 0
+    global.get $core/sound/channel4/Channel4.lengthCounter
+    i32.eqz
     local.get $0
     i32.const 128
     i32.and
-    i32.eqz
-    local.tee $1
-    if (result i32)
-     global.get $core/sound/channel4/Channel4.lengthCounter
-     i32.eqz
-    else     
-     local.get $1
-    end
+    select
     if
      i32.const 0
      global.set $core/sound/channel4/Channel4.isEnabled
@@ -7369,23 +10092,15 @@
   i32.and
   if
    call $core/sound/channel4/Channel4.trigger
-   block (result i32)
-    local.get $3
-    i32.eqz
-    local.tee $1
-    if
-     global.get $core/sound/channel4/Channel4.lengthCounter
-     global.get $core/sound/channel4/Channel4.MAX_LENGTH
-     i32.eq
-     local.set $1
-    end
-    local.get $1
-   end
-   if (result i32)
-    global.get $core/sound/channel4/Channel4.NRx4LengthEnabled
-   else    
-    local.get $1
-   end
+   global.get $core/sound/channel4/Channel4.NRx4LengthEnabled
+   i32.const 0
+   i32.const 0
+   global.get $core/sound/channel4/Channel4.lengthCounter
+   i32.const 64
+   i32.eq
+   local.get $2
+   select
+   select
    if
     global.get $core/sound/channel4/Channel4.lengthCounter
     i32.const 1
@@ -7394,18 +10109,14 @@
    end
   end
  )
- (func $core/sound/registers/SoundRegisterWriteTraps (; 105 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
-  (local $2 i32)
+ (func $core/sound/registers/SoundRegisterWriteTraps (; 133 ;) (type $FUNCSIG$iii) (param $0 i32) (param $1 i32) (result i32)
+  global.get $core/sound/sound/Sound.NR52IsSoundEnabled
+  i32.eqz
+  i32.const 0
   local.get $0
   i32.const 65318
   i32.ne
-  local.tee $2
-  if
-   global.get $core/sound/sound/Sound.NR52IsSoundEnabled
-   i32.eqz
-   local.set $2
-  end
-  local.get $2
+  select
   if
    i32.const 0
    return
@@ -7433,39 +10144,39 @@
                       block $case2|0
                        block $case1|0
                         local.get $0
-                        local.tee $2
                         i32.const 65296
                         i32.ne
                         if
-                         local.get $2
-                         i32.const 65297
-                         i32.sub
-                         br_table $case2|0 $case6|0 $case10|0 $case14|0 $break|0 $case3|0 $case7|0 $case11|0 $case15|0 $case1|0 $case4|0 $case8|0 $case12|0 $case16|0 $break|0 $case5|0 $case9|0 $case13|0 $case17|0 $case18|0 $case19|0 $case20|0 $break|0
+                         local.get $0
+                         i32.const 65306
+                         i32.eq
+                         br_if $case1|0
+                         block $tablify|0
+                          local.get $0
+                          i32.const 65297
+                          i32.sub
+                          br_table $case2|0 $case6|0 $case10|0 $case14|0 $tablify|0 $case3|0 $case7|0 $case11|0 $case15|0 $tablify|0 $case4|0 $case8|0 $case12|0 $case16|0 $tablify|0 $case5|0 $case9|0 $case13|0 $case17|0 $case18|0 $case19|0 $case20|0 $tablify|0
+                         end
+                         br $break|0
                         end
                         local.get $1
-                        i32.const 112
-                        i32.and
-                        i32.const 4
-                        i32.shr_s
-                        global.set $core/sound/channel1/Channel1.NRx0SweepPeriod
-                        local.get $1
-                        i32.const 8
-                        i32.and
-                        i32.const 0
-                        i32.ne
-                        global.set $core/sound/channel1/Channel1.NRx0Negate
-                        local.get $1
-                        i32.const 7
-                        i32.and
-                        global.set $core/sound/channel1/Channel1.NRx0SweepShift
+                        call $core/sound/channel1/Channel1.updateNRx0
                         br $folding-inner0
                        end
+                       i32.const 0
                        local.get $1
                        i32.const 128
                        i32.and
                        i32.const 0
                        i32.ne
                        local.tee $0
+                       global.get $core/sound/channel3/Channel3.isDacEnabled
+                       select
+                       if
+                        i32.const 0
+                        global.set $core/sound/channel3/Channel3.sampleBuffer
+                       end
+                       local.get $0
                        global.set $core/sound/channel3/Channel3.isDacEnabled
                        local.get $0
                        i32.eqz
@@ -7485,7 +10196,7 @@
                       i32.const 63
                       i32.and
                       global.set $core/sound/channel1/Channel1.NRx1LengthLoad
-                      global.get $core/sound/channel1/Channel1.MAX_LENGTH
+                      i32.const 64
                       global.get $core/sound/channel1/Channel1.NRx1LengthLoad
                       i32.sub
                       global.set $core/sound/channel1/Channel1.lengthCounter
@@ -7501,7 +10212,7 @@
                      i32.const 63
                      i32.and
                      global.set $core/sound/channel2/Channel2.NRx1LengthLoad
-                     global.get $core/sound/channel2/Channel2.MAX_LENGTH
+                     i32.const 64
                      global.get $core/sound/channel2/Channel2.NRx1LengthLoad
                      i32.sub
                      global.set $core/sound/channel2/Channel2.lengthCounter
@@ -7509,7 +10220,7 @@
                     end
                     local.get $1
                     global.set $core/sound/channel3/Channel3.NRx1LengthLoad
-                    global.get $core/sound/channel3/Channel3.MAX_LENGTH
+                    i32.const 256
                     global.get $core/sound/channel3/Channel3.NRx1LengthLoad
                     i32.sub
                     global.set $core/sound/channel3/Channel3.lengthCounter
@@ -7519,7 +10230,7 @@
                    i32.const 63
                    i32.and
                    global.set $core/sound/channel4/Channel4.NRx1LengthLoad
-                   global.get $core/sound/channel4/Channel4.MAX_LENGTH
+                   i32.const 64
                    global.get $core/sound/channel4/Channel4.NRx1LengthLoad
                    i32.sub
                    global.set $core/sound/channel4/Channel4.lengthCounter
@@ -7618,16 +10329,14 @@
      br $folding-inner0
     end
     global.get $core/sound/sound/Sound.NR52IsSoundEnabled
-    local.tee $2
-    i32.eqz
     local.tee $0
-    if
+    if (result i32)
+     i32.const 0
+    else
      local.get $1
      i32.const 128
      i32.and
-     local.set $0
     end
-    local.get $0
     if
      i32.const 7
      global.set $core/sound/sound/Sound.frameSequencer
@@ -7640,14 +10349,14 @@
     i32.const 128
     i32.and
     i32.eqz
-    local.get $2
-    local.get $2
+    i32.const 0
+    local.get $0
     select
     if
      block $break|1
       i32.const 65296
       local.set $0
-      loop $repeat|1
+      loop $loop|1
        local.get $0
        i32.const 65318
        i32.ge_s
@@ -7659,8 +10368,7 @@
        i32.const 1
        i32.add
        local.set $0
-       br $repeat|1
-       unreachable
+       br $loop|1
       end
       unreachable
      end
@@ -7678,7 +10386,7 @@
   end
   i32.const 1
  )
- (func $core/memory/dma/startDmaTransfer (; 106 ;) (type $i_) (param $0 i32)
+ (func $core/memory/dma/startDmaTransfer (; 134 ;) (type $FUNCSIG$vi) (param $0 i32)
   (local $1 i32)
   local.get $0
   i32.const 8
@@ -7686,7 +10394,7 @@
   local.set $1
   i32.const 0
   local.set $0
-  loop $repeat|0
+  loop $loop|0
    block $break|0
     local.get $0
     i32.const 159
@@ -7704,18 +10412,18 @@
     i32.const 1
     i32.add
     local.set $0
-    br $repeat|0
+    br $loop|0
    end
   end
   i32.const 644
   global.set $core/memory/memory/Memory.DMACycles
  )
- (func $core/memory/dma/getHdmaSourceFromMemory (; 107 ;) (type $i) (result i32)
+ (func $core/memory/dma/getHdmaSourceFromMemory (; 135 ;) (type $FUNCSIG$i) (result i32)
   (local $0 i32)
-  global.get $core/memory/memory/Memory.memoryLocationHdmaSourceHigh
+  i32.const 65361
   call $core/memory/load/eightBitLoadFromGBMemory
   local.set $0
-  global.get $core/memory/memory/Memory.memoryLocationHdmaSourceLow
+  i32.const 65362
   call $core/memory/load/eightBitLoadFromGBMemory
   i32.const 255
   i32.and
@@ -7728,12 +10436,12 @@
   i32.const 65520
   i32.and
  )
- (func $core/memory/dma/getHdmaDestinationFromMemory (; 108 ;) (type $i) (result i32)
+ (func $core/memory/dma/getHdmaDestinationFromMemory (; 136 ;) (type $FUNCSIG$i) (result i32)
   (local $0 i32)
-  global.get $core/memory/memory/Memory.memoryLocationHdmaDestinationHigh
+  i32.const 65363
   call $core/memory/load/eightBitLoadFromGBMemory
   local.set $0
-  global.get $core/memory/memory/Memory.memoryLocationHdmaDestinationLow
+  i32.const 65364
   call $core/memory/load/eightBitLoadFromGBMemory
   i32.const 255
   i32.and
@@ -7748,7 +10456,7 @@
   i32.const 32768
   i32.add
  )
- (func $core/memory/dma/startHdmaTransfer (; 109 ;) (type $i_) (param $0 i32)
+ (func $core/memory/dma/startHdmaTransfer (; 137 ;) (type $FUNCSIG$vi) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -7761,19 +10469,17 @@
   i32.const 128
   i32.and
   i32.eqz
-  global.get $core/memory/memory/Memory.isHblankHdmaActive
+  i32.const 0
   global.get $core/memory/memory/Memory.isHblankHdmaActive
   select
   if
    i32.const 0
    global.set $core/memory/memory/Memory.isHblankHdmaActive
-   global.get $core/memory/memory/Memory.memoryLocationHdmaTrigger
+   i32.const 65365
+   i32.const 65365
    call $core/memory/load/eightBitLoadFromGBMemory
    i32.const 128
    i32.or
-   local.set $0
-   global.get $core/memory/memory/Memory.memoryLocationHdmaTrigger
-   local.get $0
    call $core/memory/store/eightBitStoreIntoGBMemory
    return
   end
@@ -7801,40 +10507,35 @@
    global.set $core/memory/memory/Memory.hblankHdmaSource
    local.get $2
    global.set $core/memory/memory/Memory.hblankHdmaDestination
-   global.get $core/memory/memory/Memory.memoryLocationHdmaTrigger
+   i32.const 65365
    local.get $0
    i32.const -129
    i32.and
    call $core/memory/store/eightBitStoreIntoGBMemory
-  else   
+  else
    local.get $1
    local.get $2
    local.get $3
    call $core/memory/dma/hdmaTransfer
-   global.get $core/memory/memory/Memory.memoryLocationHdmaTrigger
+   i32.const 65365
    i32.const 255
    call $core/memory/store/eightBitStoreIntoGBMemory
   end
  )
- (func $core/graphics/palette/writeColorPaletteToMemory (; 110 ;) (type $ii_) (param $0 i32) (param $1 i32)
+ (func $core/graphics/palette/writeColorPaletteToMemory (; 138 ;) (type $FUNCSIG$vii) (param $0 i32) (param $1 i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
-  global.get $core/graphics/palette/Palette.memoryLocationSpritePaletteData
-  local.set $3
-  global.get $core/graphics/palette/Palette.memoryLocationBackgroundPaletteData
+  i32.const 1
+  i32.const 65387
+  local.tee $3
   local.get $0
   i32.eq
-  local.tee $2
-  i32.eqz
-  if
-   local.get $0
-   local.get $3
-   i32.eq
-   local.set $2
-  end
-  local.get $2
+  local.get $0
+  i32.const 65385
+  i32.eq
+  select
   if
    local.get $0
    i32.const 1
@@ -7872,27 +10573,19 @@
    end
   end
  )
- (func $core/timers/timers/_getTimerCounterMaskBit (; 111 ;) (type $ii) (param $0 i32) (result i32)
-  (local $1 i32)
+ (func $core/timers/timers/_getTimerCounterMaskBit (; 139 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   block $break|0
    block $case3|0
     block $case2|0
      block $case1|0
       local.get $0
       if
-       local.get $0
-       local.tee $1
-       i32.const 1
-       i32.eq
-       br_if $case1|0
-       local.get $1
-       i32.const 2
-       i32.eq
-       br_if $case2|0
-       local.get $1
-       i32.const 3
-       i32.eq
-       br_if $case3|0
+       block $tablify|0
+        local.get $0
+        i32.const 1
+        i32.sub
+        br_table $case1|0 $case2|0 $case3|0 $tablify|0
+       end
        br $break|0
       end
       i32.const 9
@@ -7909,30 +10602,26 @@
   end
   i32.const 0
  )
- (func $core/timers/timers/_checkDividerRegisterFallingEdgeDetector (; 112 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
-  (local $2 i32)
+ (func $core/timers/timers/_checkDividerRegisterFallingEdgeDetector (; 140 ;) (type $FUNCSIG$iii) (param $0 i32) (param $1 i32) (result i32)
+  local.get $0
   i32.const 1
   global.get $core/timers/timers/Timers.timerInputClock
   call $core/timers/timers/_getTimerCounterMaskBit
-  local.tee $2
-  i32.shl
-  local.get $0
-  i32.and
-  i32.const 0
-  i32.ne
   local.tee $0
+  i32.shl
+  i32.and
   if (result i32)
    i32.const 1
-   local.get $2
+   local.get $0
    i32.shl
    local.get $1
    i32.and
    i32.eqz
-  else   
-   local.get $0
+  else
+   i32.const 0
   end
  )
- (func $core/timers/timers/updateTimers (; 113 ;) (type $i_) (param $0 i32)
+ (func $core/timers/timers/updateTimers (; 141 ;) (type $FUNCSIG$vi) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -7970,7 +10659,7 @@
       global.set $core/timers/timers/Timers.timerCounterOverflowDelay
       i32.const 1
       global.set $core/timers/timers/Timers.timerCounterWasReset
-     else      
+     else
       local.get $4
       if
        i32.const 0
@@ -8001,13 +10690,13 @@
    end
   end
  )
- (func $core/timers/timers/batchProcessTimers (; 114 ;) (type $_)
+ (func $core/timers/timers/batchProcessTimers (; 142 ;) (type $FUNCSIG$v)
   global.get $core/timers/timers/Timers.currentCycles
   call $core/timers/timers/updateTimers
   i32.const 0
   global.set $core/timers/timers/Timers.currentCycles
  )
- (func $core/timers/timers/Timers.updateDividerRegister (; 115 ;) (type $_)
+ (func $core/timers/timers/Timers.updateDividerRegister (; 143 ;) (type $FUNCSIG$v)
   (local $0 i32)
   global.get $core/timers/timers/Timers.dividerRegister
   local.set $0
@@ -8021,8 +10710,8 @@
    local.get $0
    i32.const 0
    call $core/timers/timers/_checkDividerRegisterFallingEdgeDetector
-  else   
-   global.get $core/timers/timers/Timers.timerEnabled
+  else
+   i32.const 0
   end
   if
    global.get $core/timers/timers/Timers.timerCounter
@@ -8041,12 +10730,11 @@
    global.set $core/timers/timers/Timers.timerCounter
   end
  )
- (func $core/timers/timers/Timers.updateTimerControl (; 116 ;) (type $i_) (param $0 i32)
+ (func $core/timers/timers/Timers.updateTimerControl (; 144 ;) (type $FUNCSIG$vi) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
   global.get $core/timers/timers/Timers.timerEnabled
-  local.set $1
   local.get $0
   i32.const 4
   i32.and
@@ -8057,42 +10745,36 @@
   i32.const 3
   i32.and
   local.set $2
-  local.get $1
   i32.eqz
   if
    global.get $core/timers/timers/Timers.timerInputClock
    call $core/timers/timers/_getTimerCounterMaskBit
-   local.set $0
+   local.set $1
    local.get $2
    call $core/timers/timers/_getTimerCounterMaskBit
    local.set $3
    global.get $core/timers/timers/Timers.dividerRegister
-   local.set $1
+   local.set $0
    global.get $core/timers/timers/Timers.timerEnabled
    if (result i32)
     i32.const 1
-    local.get $0
-    i32.shl
     local.get $1
+    i32.shl
+    local.get $0
     i32.and
-   else    
+   else
     i32.const 1
-    local.get $0
+    local.get $3
     i32.shl
-    local.get $1
+    local.get $0
     i32.and
     i32.const 0
-    i32.ne
-    local.tee $0
-    if (result i32)
-     i32.const 1
-     local.get $3
-     i32.shl
-     local.get $1
-     i32.and
-    else     
-     local.get $0
-    end
+    i32.const 1
+    local.get $1
+    i32.shl
+    local.get $0
+    i32.and
+    select
    end
    if
     global.get $core/timers/timers/Timers.timerCounter
@@ -8114,9 +10796,8 @@
   local.get $2
   global.set $core/timers/timers/Timers.timerInputClock
  )
- (func $core/memory/writeTraps/checkWriteTraps (; 117 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/memory/writeTraps/checkWriteTraps (; 145 ;) (type $FUNCSIG$iii) (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
-  (local $3 i32)
   block $folding-inner1
    block $folding-inner0
     local.get $0
@@ -8133,9 +10814,8 @@
     local.get $0
     i32.const 65360
     i32.eq
+    i32.const 0
     global.get $core/cpu/cpu/Cpu.BootROMEnabled
-    local.tee $2
-    local.get $2
     select
     if
      i32.const 0
@@ -8154,28 +10834,22 @@
      br $folding-inner0
     end
     local.get $0
+    i32.const 40960
+    i32.lt_s
+    i32.const 0
+    local.get $0
     i32.const 32768
     i32.ge_s
-    local.tee $2
-    if
-     local.get $0
-     i32.const 40960
-     i32.lt_s
-     local.set $2
-    end
-    local.get $2
+    select
     br_if $folding-inner1
+    local.get $0
+    i32.const 65024
+    i32.lt_s
+    i32.const 0
     local.get $0
     i32.const 57344
     i32.ge_s
-    local.tee $2
-    if
-     local.get $0
-     i32.const 65024
-     i32.lt_s
-     local.set $2
-    end
-    local.get $2
+    select
     if
      local.get $0
      i32.const -8192
@@ -8185,16 +10859,13 @@
      br $folding-inner1
     end
     local.get $0
+    i32.const 65183
+    i32.le_s
+    i32.const 0
+    local.get $0
     i32.const 65024
     i32.ge_s
-    local.tee $2
-    if
-     local.get $0
-     i32.const 65183
-     i32.le_s
-     local.set $2
-    end
-    local.get $2
+    select
     if
      global.get $core/graphics/lcd/Lcd.currentLcdMode
      i32.const 2
@@ -8202,16 +10873,13 @@
      return
     end
     local.get $0
+    i32.const 65279
+    i32.le_s
+    i32.const 0
+    local.get $0
     i32.const 65184
     i32.ge_s
-    local.tee $2
-    if
-     local.get $0
-     i32.const 65279
-     i32.le_s
-     local.set $2
-    end
-    local.get $2
+    select
     br_if $folding-inner0
     local.get $0
     i32.const 65282
@@ -8239,16 +10907,13 @@
      return
     end
     local.get $0
+    i32.const 65318
+    i32.le_s
+    i32.const 0
+    local.get $0
     i32.const 65296
     i32.ge_s
-    local.tee $2
-    if
-     local.get $0
-     i32.const 65318
-     i32.le_s
-     local.set $2
-    end
-    local.get $2
+    select
     if
      call $core/sound/sound/batchProcessAudio
      local.get $0
@@ -8257,31 +10922,36 @@
      return
     end
     local.get $0
+    i32.const 65343
+    i32.le_s
+    i32.const 0
+    local.get $0
     i32.const 65328
     i32.ge_s
-    local.tee $2
-    if
-     local.get $0
-     i32.const 65343
-     i32.le_s
-     local.set $2
-    end
-    local.get $2
+    select
     if
      call $core/sound/sound/batchProcessAudio
+     global.get $core/sound/channel3/Channel3.isEnabled
+     if
+      global.get $core/sound/channel3/Channel3.waveTablePosition
+      i32.const 1
+      i32.shr_s
+      i32.const 65328
+      i32.add
+      local.get $1
+      call $core/memory/store/eightBitStoreIntoGBMemory
+      br $folding-inner0
+     end
      br $folding-inner1
     end
     local.get $0
+    i32.const 65355
+    i32.le_s
+    i32.const 0
+    local.get $0
     i32.const 65344
     i32.ge_s
-    local.tee $2
-    if
-     local.get $0
-     i32.const 65355
-     i32.le_s
-     local.set $2
-    end
-    local.get $2
+    select
     if
      local.get $0
      i32.const 65344
@@ -8341,11 +11011,10 @@
        block $case2|0
         block $case1|0
          local.get $0
-         local.tee $2
          i32.const 65347
          i32.ne
          if
-          local.get $2
+          local.get $0
           i32.const 65346
           i32.sub
           br_table $case1|0 $break|0 $break|0 $break|0 $break|0 $break|0 $break|0 $break|0 $case3|0 $case2|0 $break|0
@@ -8368,71 +11037,59 @@
      end
      br $folding-inner1
     end
-    global.get $core/memory/memory/Memory.memoryLocationHdmaTrigger
     local.get $0
+    i32.const 65365
     i32.eq
     if
      local.get $1
      call $core/memory/dma/startHdmaTransfer
      br $folding-inner0
     end
-    global.get $core/memory/memory/Memory.memoryLocationGBCWRAMBank
+    i32.const 1
     local.get $0
+    i32.const 65359
     i32.eq
-    local.tee $2
-    i32.eqz
-    if
-     global.get $core/memory/memory/Memory.memoryLocationGBCVRAMBank
-     local.get $0
-     i32.eq
-     local.set $2
-    end
-    local.get $2
+    local.get $0
+    i32.const 65392
+    i32.eq
+    select
     if
      global.get $core/memory/memory/Memory.isHblankHdmaActive
      if
-      block (result i32)
-       global.get $core/memory/memory/Memory.hblankHdmaSource
-       local.tee $2
-       i32.const 16384
-       i32.ge_s
-       local.tee $3
-       if
-        local.get $2
-        i32.const 32767
-        i32.le_s
-        local.set $3
-       end
-       local.get $3
-       i32.eqz
+      global.get $core/memory/memory/Memory.hblankHdmaSource
+      local.tee $2
+      i32.const 16384
+      i32.ge_s
+      if (result i32)
+       local.get $2
+       i32.const 32767
+       i32.le_s
+      else
+       i32.const 0
       end
-      if
+      if (result i32)
+       i32.const 1
+      else
+       local.get $2
+       i32.const 57343
+       i32.le_s
+       i32.const 0
        local.get $2
        i32.const 53248
        i32.ge_s
-       local.tee $3
-       if
-        local.get $2
-        i32.const 57343
-        i32.le_s
-        local.set $3
-       end
+       select
       end
-      local.get $3
       br_if $folding-inner0
      end
     end
     local.get $0
-    global.get $core/graphics/palette/Palette.memoryLocationBackgroundPaletteIndex
+    i32.const 65387
+    i32.le_s
+    i32.const 0
+    local.get $0
+    i32.const 65384
     i32.ge_s
-    local.tee $2
-    if
-     local.get $0
-     global.get $core/graphics/palette/Palette.memoryLocationSpritePaletteData
-     i32.le_s
-     local.set $2
-    end
-    local.get $2
+    select
     if
      local.get $0
      local.get $1
@@ -8440,16 +11097,13 @@
      br $folding-inner1
     end
     local.get $0
+    i32.const 65287
+    i32.le_s
+    i32.const 0
+    local.get $0
     i32.const 65284
     i32.ge_s
-    local.tee $2
-    if
-     local.get $0
-     i32.const 65287
-     i32.le_s
-     local.set $2
-    end
-    local.get $2
+    select
     if
      call $core/timers/timers/batchProcessTimers
      block $break|1
@@ -8457,11 +11111,10 @@
        block $case2|1
         block $case1|1
          local.get $0
-         local.tee $2
          i32.const 65284
          i32.ne
          if
-          local.get $2
+          local.get $0
           i32.const 65285
           i32.sub
           br_table $case1|1 $case2|1 $case3|1 $break|1
@@ -8488,9 +11141,8 @@
        local.get $1
        global.set $core/timers/timers/Timers.timerModulo
        global.get $core/timers/timers/Timers.timerCounterWasReset
+       i32.const 0
        global.get $core/timers/timers/Timers.timerEnabled
-       local.tee $0
-       local.get $0
        select
        if
         local.get $1
@@ -8552,7 +11204,7 @@
   end
   i32.const 1
  )
- (func $core/memory/store/eightBitStoreIntoGBMemoryWithTraps (; 118 ;) (type $ii_) (param $0 i32) (param $1 i32)
+ (func $core/memory/store/eightBitStoreIntoGBMemoryWithTraps (; 146 ;) (type $FUNCSIG$vii) (param $0 i32) (param $1 i32)
   global.get $core/debug/breakpoints/Breakpoints.writeGbMemory
   local.get $0
   i32.eq
@@ -8569,11 +11221,11 @@
    call $core/memory/store/eightBitStoreIntoGBMemory
   end
  )
- (func $core/memory/dma/hdmaTransfer (; 119 ;) (type $iii_) (param $0 i32) (param $1 i32) (param $2 i32)
+ (func $core/memory/dma/hdmaTransfer (; 147 ;) (type $FUNCSIG$viii) (param $0 i32) (param $1 i32) (param $2 i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
-  loop $repeat|0
+  loop $loop|0
    block $break|0
     local.get $3
     local.get $2
@@ -8591,7 +11243,8 @@
     loop $continue|1
      local.get $4
      i32.const 40959
-     i32.gt_s
+     i32.le_s
+     i32.eqz
      if
       local.get $4
       i32.const -8192
@@ -8607,7 +11260,7 @@
     i32.const 1
     i32.add
     local.set $3
-    br $repeat|0
+    br $loop|0
    end
   end
   global.get $core/memory/memory/Memory.DMACycles
@@ -8621,7 +11274,7 @@
   i32.add
   global.set $core/memory/memory/Memory.DMACycles
  )
- (func $core/memory/dma/updateHblankHdma (; 120 ;) (type $_)
+ (func $core/memory/dma/updateHblankHdma (; 148 ;) (type $FUNCSIG$v)
   (local $0 i32)
   (local $1 i32)
   global.get $core/memory/memory/Memory.isHblankHdmaActive
@@ -8633,17 +11286,15 @@
   local.set $0
   global.get $core/memory/memory/Memory.hblankHdmaSource
   global.get $core/memory/memory/Memory.hblankHdmaDestination
-  block (result i32)
-   global.get $core/memory/memory/Memory.hblankHdmaTransferLengthRemaining
-   local.tee $1
-   i32.const 16
-   i32.lt_s
-   if
-    local.get $1
-    local.set $0
-   end
-   local.get $0
+  global.get $core/memory/memory/Memory.hblankHdmaTransferLengthRemaining
+  local.tee $1
+  i32.const 16
+  i32.lt_s
+  if
+   local.get $1
+   local.set $0
   end
+  local.get $0
   call $core/memory/dma/hdmaTransfer
   global.get $core/memory/memory/Memory.hblankHdmaSource
   local.get $0
@@ -8656,22 +11307,22 @@
   local.get $1
   local.get $0
   i32.sub
-  local.tee $1
+  local.tee $0
   global.set $core/memory/memory/Memory.hblankHdmaTransferLengthRemaining
-  global.get $core/memory/memory/Memory.memoryLocationHdmaTrigger
-  local.set $0
-  local.get $1
+  i32.const 65365
+  local.set $1
+  local.get $0
   i32.const 0
   i32.le_s
   if
    i32.const 0
    global.set $core/memory/memory/Memory.isHblankHdmaActive
-   local.get $0
+   local.get $1
    i32.const 255
    call $core/memory/store/eightBitStoreIntoGBMemory
-  else   
-   local.get $0
+  else
    local.get $1
+   local.get $0
    i32.const 4
    i32.shr_s
    i32.const 1
@@ -8681,28 +11332,18 @@
    call $core/memory/store/eightBitStoreIntoGBMemory
   end
  )
- (func $core/graphics/lcd/checkCoincidence (; 121 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
-  (local $2 i32)
-  block (result i32)
-   local.get $0
-   i32.eqz
-   local.tee $2
-   i32.eqz
-   if
-    local.get $0
-    i32.const 1
-    i32.eq
-    local.set $2
-   end
-   local.get $2
-  end
-  if (result i32)
-   global.get $core/graphics/graphics/Graphics.scanlineRegister
-   global.get $core/graphics/lcd/Lcd.coincidenceCompare
-   i32.eq
-  else   
-   local.get $2
-  end
+ (func $core/graphics/lcd/checkCoincidence (; 149 ;) (type $FUNCSIG$iii) (param $0 i32) (param $1 i32) (result i32)
+  global.get $core/graphics/graphics/Graphics.scanlineRegister
+  global.get $core/graphics/lcd/Lcd.coincidenceCompare
+  i32.eq
+  i32.const 0
+  local.get $0
+  i32.const 1
+  i32.eq
+  i32.const 1
+  local.get $0
+  select
+  select
   if
    local.get $1
    i32.const 4
@@ -8713,7 +11354,7 @@
    if
     call $core/interrupts/interrupts/requestLcdInterrupt
    end
-  else   
+  else
    local.get $1
    i32.const -5
    i32.and
@@ -8721,7 +11362,7 @@
   end
   local.get $1
  )
- (func $core/graphics/lcd/setLcdStatus (; 122 ;) (type $_)
+ (func $core/graphics/lcd/setLcdStatus (; 150 ;) (type $FUNCSIG$v)
   (local $0 i32)
   (local $1 i32)
   (local $2 i32)
@@ -8733,29 +11374,29 @@
    return
   end
   global.get $core/graphics/lcd/Lcd.currentLcdMode
-  local.set $3
-  local.get $3
   global.get $core/graphics/graphics/Graphics.scanlineRegister
-  local.tee $4
+  local.tee $2
   i32.const 144
   i32.ge_s
   if (result i32)
    i32.const 1
-  else   
-   global.get $core/graphics/graphics/Graphics.scanlineCycleCounter
-   local.tee $2
+  else
    i32.const 376
    global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
    i32.shl
-   local.tee $0
+   local.tee $1
+   local.set $3
+   global.get $core/graphics/graphics/Graphics.scanlineCycleCounter
+   local.tee $4
+   local.get $1
    i32.ge_s
    if (result i32)
     i32.const 2
-   else    
+   else
     i32.const 3
     i32.const 0
-    local.get $2
-    local.get $0
+    local.get $4
+    local.get $3
     i32.ge_s
     select
    end
@@ -8846,8 +11487,8 @@
    local.get $0
    call $core/graphics/lcd/checkCoincidence
    call $core/memory/store/eightBitStoreIntoGBMemory
-  else   
-   local.get $4
+  else
+   local.get $2
    i32.const 153
    i32.eq
    if
@@ -8860,7 +11501,7 @@
    end
   end
  )
- (func $core/graphics/graphics/updateGraphics (; 123 ;) (type $i_) (param $0 i32)
+ (func $core/graphics/graphics/updateGraphics (; 151 ;) (type $FUNCSIG$vi) (param $0 i32)
   (local $1 i32)
   global.get $core/graphics/lcd/Lcd.enabled
   if
@@ -8907,7 +11548,7 @@
       local.get $1
       if
        call $core/graphics/graphics/_renderEntireFrame
-      else       
+      else
        local.get $0
        call $core/graphics/graphics/_drawScanline
       end
@@ -8916,7 +11557,7 @@
       global.set $core/graphics/tiles/TileCache.tileId
       i32.const -1
       global.set $core/graphics/tiles/TileCache.nextXIndexToPerformCacheCheck
-     else      
+     else
       local.get $0
       i32.const 144
       i32.lt_s
@@ -8944,7 +11585,7 @@
   end
   call $core/graphics/lcd/setLcdStatus
  )
- (func $core/graphics/graphics/batchProcessGraphics (; 124 ;) (type $_)
+ (func $core/graphics/graphics/batchProcessGraphics (; 152 ;) (type $FUNCSIG$v)
   (local $0 i32)
   i32.const 4
   global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
@@ -8973,11 +11614,10 @@
    end
   end
  )
- (func $core/serial/serial/updateSerial (; 125 ;) (type $i_) (param $0 i32)
+ (func $core/serial/serial/updateSerial (; 153 ;) (type $FUNCSIG$vi) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
-  (local $4 i32)
   global.get $core/serial/serial/Serial.transferStartFlag
   i32.eqz
   if
@@ -8992,45 +11632,40 @@
     i32.const 4
     i32.add
     local.set $3
-    block (result i32)
-     global.get $core/serial/serial/Serial.currentCycles
-     local.tee $2
-     i32.const 4
-     i32.add
-     local.tee $1
-     i32.const 65535
-     i32.gt_s
-     if
-      local.get $1
-      i32.const 65536
-      i32.sub
-      local.set $1
-     end
+    global.get $core/serial/serial/Serial.currentCycles
+    local.tee $2
+    i32.const 4
+    i32.add
+    local.tee $1
+    i32.const 65535
+    i32.gt_s
+    if
      local.get $1
+     i32.const 65536
+     i32.sub
+     local.set $1
     end
+    local.get $1
     global.set $core/serial/serial/Serial.currentCycles
+    local.get $2
     i32.const 1
     i32.const 2
     i32.const 7
     global.get $core/serial/serial/Serial.isClockSpeedFast
     select
-    local.tee $4
-    i32.shl
-    local.get $2
-    i32.and
-    i32.const 0
-    i32.ne
     local.tee $2
-    if
+    i32.shl
+    i32.and
+    if (result i32)
      i32.const 1
-     local.get $4
+     local.get $2
      i32.shl
      local.get $1
      i32.and
      i32.eqz
-     local.set $2
+    else
+     i32.const 0
     end
-    local.get $2
     if
      i32.const 65281
      i32.const 65281
@@ -9063,7 +11698,7 @@
       call $core/memory/store/eightBitStoreIntoGBMemory
       i32.const 0
       global.set $core/serial/serial/Serial.transferStartFlag
-     else      
+     else
       local.get $1
       global.set $core/serial/serial/Serial.numberOfBitsTransferred
      end
@@ -9072,7 +11707,7 @@
    end
   end
  )
- (func $core/cycles/syncCycles (; 126 ;) (type $i_) (param $0 i32)
+ (func $core/cycles/syncCycles (; 154 ;) (type $FUNCSIG$vi) (param $0 i32)
   global.get $core/memory/memory/Memory.DMACycles
   i32.const 0
   i32.gt_s
@@ -9098,7 +11733,7 @@
     i32.add
     global.set $core/graphics/graphics/Graphics.currentCycles
     call $core/graphics/graphics/batchProcessGraphics
-   else    
+   else
     local.get $0
     call $core/graphics/graphics/updateGraphics
    end
@@ -9109,7 +11744,7 @@
     i32.add
     global.set $core/sound/sound/Sound.currentCycles
     call $core/sound/sound/batchProcessAudio
-   else    
+   else
     local.get $0
     call $core/sound/sound/updateSound
    end
@@ -9123,7 +11758,7 @@
    i32.add
    global.set $core/timers/timers/Timers.currentCycles
    call $core/timers/timers/batchProcessTimers
-  else   
+  else
    local.get $0
    call $core/timers/timers/updateTimers
   end
@@ -9146,13 +11781,13 @@
   local.get $0
   global.set $core/cycles/Cycles.cycles
  )
- (func $core/cpu/opcodes/getDataByteOne (; 127 ;) (type $i) (result i32)
+ (func $core/cpu/opcodes/getDataByteOne (; 155 ;) (type $FUNCSIG$i) (result i32)
   i32.const 4
   call $core/cycles/syncCycles
   global.get $core/cpu/cpu/Cpu.programCounter
   call $core/memory/load/eightBitLoadFromGBMemory
  )
- (func $core/cpu/opcodes/getConcatenatedDataByte (; 128 ;) (type $i) (result i32)
+ (func $core/cpu/opcodes/getConcatenatedDataByte (; 156 ;) (type $FUNCSIG$i) (result i32)
   (local $0 i32)
   i32.const 4
   call $core/cycles/syncCycles
@@ -9173,46 +11808,45 @@
   i32.shl
   i32.or
  )
- (func $core/cpu/opcodes/eightBitStoreSyncCycles (; 129 ;) (type $ii_) (param $0 i32) (param $1 i32)
+ (func $core/cpu/opcodes/eightBitStoreSyncCycles (; 157 ;) (type $FUNCSIG$vii) (param $0 i32) (param $1 i32)
   i32.const 4
   call $core/cycles/syncCycles
   local.get $0
   local.get $1
   call $core/memory/store/eightBitStoreIntoGBMemoryWithTraps
  )
- (func $core/cpu/flags/setFlagBit (; 130 ;) (type $FUNCSIG$vii) (param $0 i32) (param $1 i32)
-  (local $2 i32)
+ (func $core/cpu/flags/setFlagBit (; 158 ;) (type $FUNCSIG$vii) (param $0 i32) (param $1 i32)
   i32.const 1
   local.get $0
   i32.shl
   i32.const 255
   i32.and
-  local.set $2
+  local.set $0
   local.get $1
   i32.const 0
   i32.gt_s
   if
    global.get $core/cpu/cpu/Cpu.registerF
-   local.get $2
+   local.get $0
    i32.or
    i32.const 255
    i32.and
    global.set $core/cpu/cpu/Cpu.registerF
-  else   
+  else
    global.get $core/cpu/cpu/Cpu.registerF
-   local.get $2
+   local.get $0
    i32.const 255
    i32.xor
    i32.and
    global.set $core/cpu/cpu/Cpu.registerF
   end
  )
- (func $core/cpu/flags/setHalfCarryFlag (; 131 ;) (type $i_) (param $0 i32)
+ (func $core/cpu/flags/setHalfCarryFlag (; 159 ;) (type $FUNCSIG$vi) (param $0 i32)
   i32.const 5
   local.get $0
   call $core/cpu/flags/setFlagBit
  )
- (func $core/cpu/flags/checkAndSetEightBitHalfCarryFlag (; 132 ;) (type $ii_) (param $0 i32) (param $1 i32)
+ (func $core/cpu/flags/checkAndSetEightBitHalfCarryFlag (; 160 ;) (type $FUNCSIG$vii) (param $0 i32) (param $1 i32)
   (local $2 i32)
   local.get $1
   i32.const 0
@@ -9230,7 +11864,7 @@
    i32.const 0
    i32.ne
    call $core/cpu/flags/setHalfCarryFlag
-  else   
+  else
    local.get $1
    i32.const 31
    i32.shr_s
@@ -9248,38 +11882,41 @@
    call $core/cpu/flags/setHalfCarryFlag
   end
  )
- (func $core/cpu/flags/setZeroFlag (; 133 ;) (type $i_) (param $0 i32)
+ (func $core/cpu/flags/setZeroFlag (; 161 ;) (type $FUNCSIG$vi) (param $0 i32)
   i32.const 7
   local.get $0
   call $core/cpu/flags/setFlagBit
  )
- (func $core/cpu/flags/setSubtractFlag (; 134 ;) (type $i_) (param $0 i32)
+ (func $core/cpu/flags/setSubtractFlag (; 162 ;) (type $FUNCSIG$vi) (param $0 i32)
   i32.const 6
   local.get $0
   call $core/cpu/flags/setFlagBit
  )
- (func $core/cpu/flags/setCarryFlag (; 135 ;) (type $i_) (param $0 i32)
+ (func $core/cpu/flags/setCarryFlag (; 163 ;) (type $FUNCSIG$vi) (param $0 i32)
   i32.const 4
   local.get $0
   call $core/cpu/flags/setFlagBit
  )
- (func $core/memory/store/sixteenBitStoreIntoGBMemoryWithTraps (; 136 ;) (type $ii_) (param $0 i32) (param $1 i32)
+ (func $core/memory/store/sixteenBitStoreIntoGBMemoryWithTraps (; 164 ;) (type $FUNCSIG$vii) (param $0 i32) (param $1 i32)
   (local $2 i32)
+  (local $3 i32)
   local.get $1
   i32.const 65280
   i32.and
   i32.const 8
   i32.shr_s
   local.set $2
-  local.get $0
   local.get $1
   i32.const 255
   i32.and
   local.tee $1
+  local.set $3
+  local.get $0
+  local.get $1
   call $core/memory/writeTraps/checkWriteTraps
   if
    local.get $0
-   local.get $1
+   local.get $3
    call $core/memory/store/eightBitStoreIntoGBMemory
   end
   local.get $0
@@ -9294,39 +11931,39 @@
    call $core/memory/store/eightBitStoreIntoGBMemory
   end
  )
- (func $core/cpu/opcodes/sixteenBitStoreSyncCycles (; 137 ;) (type $ii_) (param $0 i32) (param $1 i32)
+ (func $core/cpu/opcodes/sixteenBitStoreSyncCycles (; 165 ;) (type $FUNCSIG$vii) (param $0 i32) (param $1 i32)
   i32.const 8
   call $core/cycles/syncCycles
   local.get $0
   local.get $1
   call $core/memory/store/sixteenBitStoreIntoGBMemoryWithTraps
  )
- (func $core/cpu/flags/checkAndSetSixteenBitFlagsAddOverflow (; 138 ;) (type $iii_) (param $0 i32) (param $1 i32) (param $2 i32)
+ (func $core/cpu/flags/checkAndSetSixteenBitFlagsAddOverflow (; 166 ;) (type $FUNCSIG$viii) (param $0 i32) (param $1 i32) (param $2 i32)
   local.get $2
   if
-   local.get $1
    local.get $0
    i32.const 65535
    i32.and
    local.tee $0
+   local.get $1
    i32.add
    local.get $0
    local.get $1
    i32.xor
    i32.xor
-   local.tee $2
+   local.tee $0
    i32.const 16
    i32.and
    i32.const 0
    i32.ne
    call $core/cpu/flags/setHalfCarryFlag
-   local.get $2
+   local.get $0
    i32.const 256
    i32.and
    i32.const 0
    i32.ne
    call $core/cpu/flags/setCarryFlag
-  else   
+  else
    local.get $0
    local.get $1
    i32.add
@@ -9350,13 +11987,13 @@
    call $core/cpu/flags/setHalfCarryFlag
   end
  )
- (func $core/cpu/opcodes/eightBitLoadSyncCycles (; 139 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/eightBitLoadSyncCycles (; 167 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   i32.const 4
   call $core/cycles/syncCycles
   local.get $0
   call $core/memory/load/eightBitLoadFromGBMemoryWithTraps
  )
- (func $core/cpu/opcodes/handleOpcode0x (; 140 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcode0x (; 168 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   (local $1 i32)
   block $folding-inner6
    block $folding-inner5
@@ -9385,8 +12022,15 @@
                          if
                           local.get $0
                           i32.const 1
-                          i32.sub
-                          br_table $case1|0 $case2|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $case9|0 $case10|0 $case11|0 $case12|0 $case13|0 $case14|0 $case15|0 $break|0
+                          i32.eq
+                          br_if $case1|0
+                          block $tablify|0
+                           local.get $0
+                           i32.const 2
+                           i32.sub
+                           br_table $case2|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $case9|0 $case10|0 $case11|0 $case12|0 $case13|0 $case14|0 $case15|0 $tablify|0
+                          end
+                          br $break|0
                          end
                          br $folding-inner5
                         end
@@ -9679,7 +12323,7 @@
   global.set $core/cpu/cpu/Cpu.registerC
   i32.const 8
  )
- (func $core/cpu/opcodes/handleOpcode1x (; 141 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcode1x (; 169 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   (local $1 i32)
   block $folding-inner3
    block $folding-inner2
@@ -9707,8 +12351,15 @@
                       if
                        local.get $0
                        i32.const 17
-                       i32.sub
-                       br_table $case1|0 $case2|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $case9|0 $case10|0 $case11|0 $case12|0 $case13|0 $case14|0 $case15|0 $break|0
+                       i32.eq
+                       br_if $case1|0
+                       block $tablify|0
+                        local.get $0
+                        i32.const 18
+                        i32.sub
+                        br_table $case2|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $case9|0 $case10|0 $case11|0 $case12|0 $case13|0 $case14|0 $case15|0 $tablify|0
+                       end
+                       br $break|0
                       end
                       global.get $core/cpu/cpu/Cpu.GBCEnabled
                       if
@@ -9733,7 +12384,7 @@
                          local.get $0
                          i32.const -129
                          i32.and
-                        else                         
+                        else
                          i32.const 1
                          global.set $core/cpu/cpu/Cpu.GBCDoubleSpeed
                          local.get $0
@@ -10056,7 +12707,7 @@
   global.set $core/cpu/cpu/Cpu.registerE
   i32.const 8
  )
- (func $core/cpu/opcodes/handleOpcode2x (; 142 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcode2x (; 170 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   block $folding-inner5
@@ -10087,8 +12738,15 @@
                         if
                          local.get $0
                          i32.const 33
-                         i32.sub
-                         br_table $case1|0 $case2|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $case9|0 $case10|0 $case11|0 $case12|0 $case13|0 $case14|0 $case15|0 $break|0
+                         i32.eq
+                         br_if $case1|0
+                         block $tablify|0
+                          local.get $0
+                          i32.const 34
+                          i32.sub
+                          br_table $case2|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $case9|0 $case10|0 $case11|0 $case12|0 $case13|0 $case14|0 $case15|0 $tablify|0
+                         end
+                         br $break|0
                         end
                         global.get $core/cpu/cpu/Cpu.registerF
                         i32.const 7
@@ -10102,7 +12760,7 @@
                          i32.const 65535
                          i32.and
                          global.set $core/cpu/cpu/Cpu.programCounter
-                        else                         
+                        else
                          call $core/cpu/opcodes/getDataByteOne
                          local.set $0
                          global.get $core/cpu/cpu/Cpu.programCounter
@@ -10222,10 +12880,10 @@
                  i32.const 0
                  i32.gt_u
                  select
-                 local.tee $1
+                 local.tee $0
                  i32.const 96
                  i32.or
-                 local.get $1
+                 local.get $0
                  local.get $2
                  i32.const 4
                  i32.shr_u
@@ -10234,9 +12892,9 @@
                  i32.const 0
                  i32.gt_u
                  select
-                 local.set $1
-                 global.get $core/cpu/cpu/Cpu.registerA
                  local.set $0
+                 global.get $core/cpu/cpu/Cpu.registerA
+                 local.set $1
                  local.get $2
                  i32.const 6
                  i32.shr_u
@@ -10245,40 +12903,40 @@
                  i32.const 0
                  i32.gt_u
                  if (result i32)
-                  local.get $0
                   local.get $1
+                  local.get $0
                   i32.sub
                   i32.const 255
                   i32.and
-                 else                  
-                  local.get $1
-                  i32.const 6
-                  i32.or
+                 else
                   local.get $1
                   local.get $0
+                  i32.const 6
+                  i32.or
+                  local.get $0
+                  local.get $1
                   i32.const 15
                   i32.and
                   i32.const 9
                   i32.gt_u
                   select
-                  local.tee $1
+                  local.tee $0
                   i32.const 96
                   i32.or
-                  local.get $1
                   local.get $0
+                  local.get $1
                   i32.const 153
                   i32.gt_u
                   select
-                  local.tee $1
-                  local.get $0
+                  local.tee $0
                   i32.add
                   i32.const 255
                   i32.and
                  end
-                 local.tee $0
+                 local.tee $1
                  i32.eqz
                  call $core/cpu/flags/setZeroFlag
-                 local.get $1
+                 local.get $0
                  i32.const 96
                  i32.and
                  i32.const 0
@@ -10286,7 +12944,7 @@
                  call $core/cpu/flags/setCarryFlag
                  i32.const 0
                  call $core/cpu/flags/setHalfCarryFlag
-                 local.get $0
+                 local.get $1
                  global.set $core/cpu/cpu/Cpu.registerA
                  br $folding-inner5
                 end
@@ -10314,7 +12972,7 @@
                  i32.const 65535
                  i32.and
                  global.set $core/cpu/cpu/Cpu.programCounter
-                else                 
+                else
                  global.get $core/cpu/cpu/Cpu.programCounter
                  i32.const 1
                  i32.add
@@ -10491,7 +13149,7 @@
   end
   i32.const 4
  )
- (func $core/cpu/opcodes/handleOpcode3x (; 143 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcode3x (; 171 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   (local $1 i32)
   block $folding-inner2
    block $folding-inner1
@@ -10518,8 +13176,15 @@
                      if
                       local.get $0
                       i32.const 49
-                      i32.sub
-                      br_table $case1|0 $case2|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $case9|0 $case10|0 $case11|0 $case12|0 $case13|0 $case14|0 $case15|0 $break|0
+                      i32.eq
+                      br_if $case1|0
+                      block $tablify|0
+                       local.get $0
+                       i32.const 50
+                       i32.sub
+                       br_table $case2|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $case9|0 $case10|0 $case11|0 $case12|0 $case13|0 $case14|0 $case15|0 $tablify|0
+                      end
+                      br $break|0
                      end
                      global.get $core/cpu/cpu/Cpu.registerF
                      i32.const 4
@@ -10533,7 +13198,7 @@
                       i32.const 65535
                       i32.and
                       global.set $core/cpu/cpu/Cpu.programCounter
-                     else                      
+                     else
                       call $core/cpu/opcodes/getDataByteOne
                       local.set $0
                       global.get $core/cpu/cpu/Cpu.programCounter
@@ -10598,23 +13263,23 @@
                  i32.const 8
                  i32.shl
                  i32.or
-                 local.tee $1
-                 call $core/cpu/opcodes/eightBitLoadSyncCycles
                  local.tee $0
+                 call $core/cpu/opcodes/eightBitLoadSyncCycles
+                 local.tee $1
                  i32.const 1
                  call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
-                 local.get $0
+                 local.get $1
                  i32.const 1
                  i32.add
                  i32.const 255
                  i32.and
-                 local.tee $0
+                 local.tee $1
                  i32.eqz
                  call $core/cpu/flags/setZeroFlag
                  i32.const 0
                  call $core/cpu/flags/setSubtractFlag
-                 local.get $1
                  local.get $0
+                 local.get $1
                  call $core/cpu/opcodes/eightBitStoreSyncCycles
                  br $folding-inner2
                 end
@@ -10627,23 +13292,23 @@
                 i32.const 8
                 i32.shl
                 i32.or
-                local.tee $1
-                call $core/cpu/opcodes/eightBitLoadSyncCycles
                 local.tee $0
+                call $core/cpu/opcodes/eightBitLoadSyncCycles
+                local.tee $1
                 i32.const -1
                 call $core/cpu/flags/checkAndSetEightBitHalfCarryFlag
-                local.get $0
+                local.get $1
                 i32.const 1
                 i32.sub
                 i32.const 255
                 i32.and
-                local.tee $0
+                local.tee $1
                 i32.eqz
                 call $core/cpu/flags/setZeroFlag
                 i32.const 1
                 call $core/cpu/flags/setSubtractFlag
-                local.get $1
                 local.get $0
+                local.get $1
                 call $core/cpu/opcodes/eightBitStoreSyncCycles
                 br $folding-inner2
                end
@@ -10694,7 +13359,7 @@
               i32.const 65535
               i32.and
               global.set $core/cpu/cpu/Cpu.programCounter
-             else              
+             else
               global.get $core/cpu/cpu/Cpu.programCounter
               i32.const 1
               i32.add
@@ -10848,7 +13513,7 @@
   end
   i32.const 4
  )
- (func $core/cpu/opcodes/handleOpcode4x (; 144 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcode4x (; 172 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   block $folding-inner0
    block $break|0
     block $case15|0
@@ -10966,7 +13631,7 @@
   end
   i32.const 4
  )
- (func $core/cpu/opcodes/handleOpcode5x (; 145 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcode5x (; 173 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   block $folding-inner0
    block $break|0
     block $case15|0
@@ -11081,7 +13746,7 @@
   end
   i32.const 4
  )
- (func $core/cpu/opcodes/handleOpcode6x (; 146 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcode6x (; 174 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   block $folding-inner0
    block $break|0
     block $case15|0
@@ -11196,7 +13861,7 @@
   end
   i32.const 4
  )
- (func $core/cpu/opcodes/handleOpcode7x (; 147 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcode7x (; 175 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   block $folding-inner0
    block $break|0
     block $case14|0
@@ -11391,7 +14056,7 @@
   end
   i32.const 4
  )
- (func $core/cpu/flags/checkAndSetEightBitCarryFlag (; 148 ;) (type $ii_) (param $0 i32) (param $1 i32)
+ (func $core/cpu/flags/checkAndSetEightBitCarryFlag (; 176 ;) (type $FUNCSIG$vii) (param $0 i32) (param $1 i32)
   (local $2 i32)
   local.get $1
   i32.const 0
@@ -11407,7 +14072,7 @@
    i32.and
    i32.gt_u
    call $core/cpu/flags/setCarryFlag
-  else   
+  else
    local.get $1
    i32.const 31
    i32.shr_s
@@ -11423,7 +14088,7 @@
    call $core/cpu/flags/setCarryFlag
   end
  )
- (func $core/cpu/instructions/addARegister (; 149 ;) (type $i_) (param $0 i32)
+ (func $core/cpu/instructions/addARegister (; 177 ;) (type $FUNCSIG$vi) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   global.get $core/cpu/cpu/Cpu.registerA
@@ -11441,15 +14106,15 @@
   i32.add
   i32.const 255
   i32.and
-  local.tee $1
+  local.tee $0
   global.set $core/cpu/cpu/Cpu.registerA
-  local.get $1
+  local.get $0
   i32.eqz
   call $core/cpu/flags/setZeroFlag
   i32.const 0
   call $core/cpu/flags/setSubtractFlag
  )
- (func $core/cpu/instructions/addAThroughCarryRegister (; 150 ;) (type $i_) (param $0 i32)
+ (func $core/cpu/instructions/addAThroughCarryRegister (; 178 ;) (type $FUNCSIG$vi) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   global.get $core/cpu/cpu/Cpu.registerA
@@ -11498,8 +14163,7 @@
   i32.const 0
   call $core/cpu/flags/setSubtractFlag
  )
- (func $core/cpu/opcodes/handleOpcode8x (; 151 ;) (type $ii) (param $0 i32) (result i32)
-  (local $1 i32)
+ (func $core/cpu/opcodes/handleOpcode8x (; 179 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   block $folding-inner0
    block $break|0
     block $case15|0
@@ -11518,14 +14182,20 @@
                  block $case2|0
                   block $case1|0
                    local.get $0
-                   local.tee $1
                    i32.const 128
                    i32.ne
                    if
-                    local.get $1
+                    local.get $0
                     i32.const 129
-                    i32.sub
-                    br_table $case1|0 $case2|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $case9|0 $case10|0 $case11|0 $case12|0 $case13|0 $case14|0 $case15|0 $break|0
+                    i32.eq
+                    br_if $case1|0
+                    block $tablify|0
+                     local.get $0
+                     i32.const 130
+                     i32.sub
+                     br_table $case2|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $case9|0 $case10|0 $case11|0 $case12|0 $case13|0 $case14|0 $case15|0 $tablify|0
+                    end
+                    br $break|0
                    end
                    global.get $core/cpu/cpu/Cpu.registerB
                    call $core/cpu/instructions/addARegister
@@ -11614,7 +14284,7 @@
   end
   i32.const 4
  )
- (func $core/cpu/instructions/subARegister (; 152 ;) (type $i_) (param $0 i32)
+ (func $core/cpu/instructions/subARegister (; 180 ;) (type $FUNCSIG$vi) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   global.get $core/cpu/cpu/Cpu.registerA
@@ -11634,15 +14304,15 @@
   i32.sub
   i32.const 255
   i32.and
-  local.tee $1
+  local.tee $0
   global.set $core/cpu/cpu/Cpu.registerA
-  local.get $1
+  local.get $0
   i32.eqz
   call $core/cpu/flags/setZeroFlag
   i32.const 1
   call $core/cpu/flags/setSubtractFlag
  )
- (func $core/cpu/instructions/subAThroughCarryRegister (; 153 ;) (type $i_) (param $0 i32)
+ (func $core/cpu/instructions/subAThroughCarryRegister (; 181 ;) (type $FUNCSIG$vi) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   global.get $core/cpu/cpu/Cpu.registerA
@@ -11691,8 +14361,7 @@
   i32.const 1
   call $core/cpu/flags/setSubtractFlag
  )
- (func $core/cpu/opcodes/handleOpcode9x (; 154 ;) (type $ii) (param $0 i32) (result i32)
-  (local $1 i32)
+ (func $core/cpu/opcodes/handleOpcode9x (; 182 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   block $folding-inner0
    block $break|0
     block $case15|0
@@ -11711,14 +14380,20 @@
                  block $case2|0
                   block $case1|0
                    local.get $0
-                   local.tee $1
                    i32.const 144
                    i32.ne
                    if
-                    local.get $1
+                    local.get $0
                     i32.const 145
-                    i32.sub
-                    br_table $case1|0 $case2|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $case9|0 $case10|0 $case11|0 $case12|0 $case13|0 $case14|0 $case15|0 $break|0
+                    i32.eq
+                    br_if $case1|0
+                    block $tablify|0
+                     local.get $0
+                     i32.const 146
+                     i32.sub
+                     br_table $case2|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $case9|0 $case10|0 $case11|0 $case12|0 $case13|0 $case14|0 $case15|0 $tablify|0
+                    end
+                    br $break|0
                    end
                    global.get $core/cpu/cpu/Cpu.registerB
                    call $core/cpu/instructions/subARegister
@@ -11807,14 +14482,13 @@
   end
   i32.const 4
  )
- (func $core/cpu/instructions/andARegister (; 155 ;) (type $i_) (param $0 i32)
-  (local $1 i32)
+ (func $core/cpu/instructions/andARegister (; 183 ;) (type $FUNCSIG$vi) (param $0 i32)
   global.get $core/cpu/cpu/Cpu.registerA
   local.get $0
   i32.and
-  local.tee $1
+  local.tee $0
   global.set $core/cpu/cpu/Cpu.registerA
-  local.get $1
+  local.get $0
   i32.eqz
   call $core/cpu/flags/setZeroFlag
   i32.const 0
@@ -11824,16 +14498,15 @@
   i32.const 0
   call $core/cpu/flags/setCarryFlag
  )
- (func $core/cpu/instructions/xorARegister (; 156 ;) (type $i_) (param $0 i32)
-  (local $1 i32)
+ (func $core/cpu/instructions/xorARegister (; 184 ;) (type $FUNCSIG$vi) (param $0 i32)
   global.get $core/cpu/cpu/Cpu.registerA
   local.get $0
   i32.xor
   i32.const 255
   i32.and
-  local.tee $1
+  local.tee $0
   global.set $core/cpu/cpu/Cpu.registerA
-  local.get $1
+  local.get $0
   i32.eqz
   call $core/cpu/flags/setZeroFlag
   i32.const 0
@@ -11843,8 +14516,7 @@
   i32.const 0
   call $core/cpu/flags/setCarryFlag
  )
- (func $core/cpu/opcodes/handleOpcodeAx (; 157 ;) (type $ii) (param $0 i32) (result i32)
-  (local $1 i32)
+ (func $core/cpu/opcodes/handleOpcodeAx (; 185 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   block $folding-inner0
    block $break|0
     block $case15|0
@@ -11863,14 +14535,20 @@
                  block $case2|0
                   block $case1|0
                    local.get $0
-                   local.tee $1
                    i32.const 160
                    i32.ne
                    if
-                    local.get $1
+                    local.get $0
                     i32.const 161
-                    i32.sub
-                    br_table $case1|0 $case2|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $case9|0 $case10|0 $case11|0 $case12|0 $case13|0 $case14|0 $case15|0 $break|0
+                    i32.eq
+                    br_if $case1|0
+                    block $tablify|0
+                     local.get $0
+                     i32.const 162
+                     i32.sub
+                     br_table $case2|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $case9|0 $case10|0 $case11|0 $case12|0 $case13|0 $case14|0 $case15|0 $tablify|0
+                    end
+                    br $break|0
                    end
                    global.get $core/cpu/cpu/Cpu.registerB
                    call $core/cpu/instructions/andARegister
@@ -11959,7 +14637,7 @@
   end
   i32.const 4
  )
- (func $core/cpu/instructions/orARegister (; 158 ;) (type $i_) (param $0 i32)
+ (func $core/cpu/instructions/orARegister (; 186 ;) (type $FUNCSIG$vi) (param $0 i32)
   global.get $core/cpu/cpu/Cpu.registerA
   local.get $0
   i32.or
@@ -11977,7 +14655,7 @@
   i32.const 0
   call $core/cpu/flags/setCarryFlag
  )
- (func $core/cpu/instructions/cpARegister (; 159 ;) (type $i_) (param $0 i32)
+ (func $core/cpu/instructions/cpARegister (; 187 ;) (type $FUNCSIG$vi) (param $0 i32)
   (local $1 i32)
   global.get $core/cpu/cpu/Cpu.registerA
   local.tee $1
@@ -11999,8 +14677,7 @@
   i32.const 1
   call $core/cpu/flags/setSubtractFlag
  )
- (func $core/cpu/opcodes/handleOpcodeBx (; 160 ;) (type $ii) (param $0 i32) (result i32)
-  (local $1 i32)
+ (func $core/cpu/opcodes/handleOpcodeBx (; 188 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   block $folding-inner0
    block $break|0
     block $case15|0
@@ -12019,14 +14696,20 @@
                  block $case2|0
                   block $case1|0
                    local.get $0
-                   local.tee $1
                    i32.const 176
                    i32.ne
                    if
-                    local.get $1
+                    local.get $0
                     i32.const 177
-                    i32.sub
-                    br_table $case1|0 $case2|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $case9|0 $case10|0 $case11|0 $case12|0 $case13|0 $case14|0 $case15|0 $break|0
+                    i32.eq
+                    br_if $case1|0
+                    block $tablify|0
+                     local.get $0
+                     i32.const 178
+                     i32.sub
+                     br_table $case2|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $case9|0 $case10|0 $case11|0 $case12|0 $case13|0 $case14|0 $case15|0 $tablify|0
+                    end
+                    br $break|0
                    end
                    global.get $core/cpu/cpu/Cpu.registerB
                    call $core/cpu/instructions/orARegister
@@ -12115,7 +14798,7 @@
   end
   i32.const 4
  )
- (func $core/memory/load/sixteenBitLoadFromGBMemory (; 161 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/memory/load/sixteenBitLoadFromGBMemory (; 189 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   (local $1 i32)
   local.get $0
   call $core/memory/readTraps/checkReadTraps
@@ -12125,7 +14808,7 @@
   if (result i32)
    local.get $0
    call $core/memory/load/eightBitLoadFromGBMemory
-  else   
+  else
    local.get $1
   end
   i32.const 255
@@ -12141,7 +14824,7 @@
   if (result i32)
    local.get $1
    call $core/memory/load/eightBitLoadFromGBMemory
-  else   
+  else
    local.get $0
   end
   i32.const 255
@@ -12150,13 +14833,13 @@
   i32.shl
   i32.or
  )
- (func $core/cpu/opcodes/sixteenBitLoadSyncCycles (; 162 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/sixteenBitLoadSyncCycles (; 190 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   i32.const 8
   call $core/cycles/syncCycles
   local.get $0
   call $core/memory/load/sixteenBitLoadFromGBMemory
  )
- (func $core/cpu/instructions/rotateRegisterLeft (; 163 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/instructions/rotateRegisterLeft (; 191 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   local.get $0
   i32.const 128
   i32.and
@@ -12183,7 +14866,7 @@
   call $core/cpu/flags/setHalfCarryFlag
   local.get $0
  )
- (func $core/cpu/instructions/rotateRegisterRight (; 164 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/instructions/rotateRegisterRight (; 192 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   local.get $0
   i32.const 1
   i32.and
@@ -12210,7 +14893,7 @@
   call $core/cpu/flags/setHalfCarryFlag
   local.get $0
  )
- (func $core/cpu/instructions/rotateRegisterLeftThroughCarry (; 165 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/instructions/rotateRegisterLeftThroughCarry (; 193 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   (local $1 i32)
   global.get $core/cpu/cpu/Cpu.registerF
   i32.const 4
@@ -12231,16 +14914,15 @@
   i32.eq
   call $core/cpu/flags/setCarryFlag
   local.get $1
-  local.tee $0
   i32.eqz
   call $core/cpu/flags/setZeroFlag
   i32.const 0
   call $core/cpu/flags/setSubtractFlag
   i32.const 0
   call $core/cpu/flags/setHalfCarryFlag
-  local.get $0
+  local.get $1
  )
- (func $core/cpu/instructions/rotateRegisterRightThroughCarry (; 166 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/instructions/rotateRegisterRightThroughCarry (; 194 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   (local $1 i32)
   global.get $core/cpu/cpu/Cpu.registerF
   i32.const 4
@@ -12263,16 +14945,15 @@
   i32.eq
   call $core/cpu/flags/setCarryFlag
   local.get $1
-  local.tee $0
   i32.eqz
   call $core/cpu/flags/setZeroFlag
   i32.const 0
   call $core/cpu/flags/setSubtractFlag
   i32.const 0
   call $core/cpu/flags/setHalfCarryFlag
-  local.get $0
+  local.get $1
  )
- (func $core/cpu/instructions/shiftLeftRegister (; 167 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/instructions/shiftLeftRegister (; 195 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   local.get $0
   i32.const 128
   i32.and
@@ -12293,44 +14974,39 @@
   call $core/cpu/flags/setHalfCarryFlag
   local.get $0
  )
- (func $core/cpu/instructions/shiftRightArithmeticRegister (; 168 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/instructions/shiftRightArithmeticRegister (; 196 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   (local $1 i32)
-  (local $2 i32)
-  local.get $0
-  i32.const 1
-  i32.and
-  i32.const 1
-  i32.eq
-  local.set $1
-  local.get $0
-  i32.const 128
-  i32.and
-  i32.const 128
-  i32.eq
-  local.set $2
   local.get $0
   i32.const 255
   i32.and
   i32.const 1
   i32.shr_u
-  local.tee $0
+  local.tee $1
   i32.const 128
   i32.or
+  local.get $1
   local.get $0
-  local.get $2
+  i32.const 128
+  i32.and
+  i32.const 128
+  i32.eq
   select
-  local.tee $0
+  local.tee $1
   i32.eqz
   call $core/cpu/flags/setZeroFlag
   i32.const 0
   call $core/cpu/flags/setSubtractFlag
   i32.const 0
   call $core/cpu/flags/setHalfCarryFlag
-  local.get $1
-  call $core/cpu/flags/setCarryFlag
   local.get $0
+  i32.const 1
+  i32.and
+  i32.const 1
+  i32.eq
+  call $core/cpu/flags/setCarryFlag
+  local.get $1
  )
- (func $core/cpu/instructions/swapNibblesOnRegister (; 169 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/instructions/swapNibblesOnRegister (; 197 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   local.get $0
   i32.const 15
   i32.and
@@ -12353,31 +15029,29 @@
   call $core/cpu/flags/setCarryFlag
   local.get $0
  )
- (func $core/cpu/instructions/shiftRightLogicalRegister (; 170 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/instructions/shiftRightLogicalRegister (; 198 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   (local $1 i32)
-  local.get $0
-  i32.const 1
-  i32.and
-  i32.const 1
-  i32.eq
-  local.set $1
   local.get $0
   i32.const 255
   i32.and
   i32.const 1
   i32.shr_u
-  local.tee $0
+  local.tee $1
   i32.eqz
   call $core/cpu/flags/setZeroFlag
   i32.const 0
   call $core/cpu/flags/setSubtractFlag
   i32.const 0
   call $core/cpu/flags/setHalfCarryFlag
-  local.get $1
-  call $core/cpu/flags/setCarryFlag
   local.get $0
+  i32.const 1
+  i32.and
+  i32.const 1
+  i32.eq
+  call $core/cpu/flags/setCarryFlag
+  local.get $1
  )
- (func $core/cpu/instructions/testBitOnRegister (; 171 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/cpu/instructions/testBitOnRegister (; 199 ;) (type $FUNCSIG$iii) (param $0 i32) (param $1 i32) (result i32)
   i32.const 1
   local.get $0
   i32.shl
@@ -12393,13 +15067,12 @@
   call $core/cpu/flags/setHalfCarryFlag
   local.get $1
  )
- (func $core/cpu/cbOpcodes/handleCbOpcode (; 172 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/cbOpcodes/handleCbOpcode (; 200 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
-  (local $6 i32)
   block $break|0
    block $case7|0
     block $case6|0
@@ -12411,13 +15084,19 @@
           local.get $0
           i32.const 7
           i32.and
-          local.tee $6
-          local.tee $5
+          local.tee $4
           if
-           local.get $5
+           local.get $4
            i32.const 1
-           i32.sub
-           br_table $case1|0 $case2|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $break|0
+           i32.eq
+           br_if $case1|0
+           block $tablify|0
+            local.get $4
+            i32.const 2
+            i32.sub
+            br_table $case2|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $tablify|0
+           end
+           br $break|0
           end
           global.get $core/cpu/cpu/Cpu.registerB
           local.set $1
@@ -12481,31 +15160,37 @@
                   i32.const 4
                   i32.shr_s
                   local.tee $5
-                  local.tee $4
                   if
-                   local.get $4
+                   local.get $5
                    i32.const 1
-                   i32.sub
-                   br_table $case1|1 $case2|1 $case3|1 $case4|1 $case5|1 $case6|1 $case7|1 $case8|1 $case9|1 $case10|1 $case11|1 $case12|1 $case13|1 $case14|1 $case15|1 $break|1
+                   i32.eq
+                   br_if $case1|1
+                   block $tablify|00
+                    local.get $5
+                    i32.const 2
+                    i32.sub
+                    br_table $case2|1 $case3|1 $case4|1 $case5|1 $case6|1 $case7|1 $case8|1 $case9|1 $case10|1 $case11|1 $case12|1 $case13|1 $case14|1 $case15|1 $tablify|00
+                   end
+                   br $break|1
                   end
                   local.get $0
                   i32.const 7
                   i32.le_s
                   if (result i32)
-                   i32.const 1
-                   local.set $2
                    local.get $1
                    call $core/cpu/instructions/rotateRegisterLeft
-                  else                   
+                   local.set $2
+                   i32.const 1
+                  else
                    local.get $0
                    i32.const 15
                    i32.le_s
                    if (result i32)
-                    i32.const 1
-                    local.set $2
                     local.get $1
                     call $core/cpu/instructions/rotateRegisterRight
-                   else                    
+                    local.set $2
+                    i32.const 1
+                   else
                     i32.const 0
                    end
                   end
@@ -12516,20 +15201,20 @@
                  i32.const 23
                  i32.le_s
                  if (result i32)
-                  i32.const 1
-                  local.set $2
                   local.get $1
                   call $core/cpu/instructions/rotateRegisterLeftThroughCarry
-                 else                  
+                  local.set $2
+                  i32.const 1
+                 else
                   local.get $0
                   i32.const 31
                   i32.le_s
                   if (result i32)
-                   i32.const 1
-                   local.set $2
                    local.get $1
                    call $core/cpu/instructions/rotateRegisterRightThroughCarry
-                  else                   
+                   local.set $2
+                   i32.const 1
+                  else
                    i32.const 0
                   end
                  end
@@ -12540,20 +15225,20 @@
                 i32.const 39
                 i32.le_s
                 if (result i32)
-                 i32.const 1
-                 local.set $2
                  local.get $1
                  call $core/cpu/instructions/shiftLeftRegister
-                else                 
+                 local.set $2
+                 i32.const 1
+                else
                  local.get $0
                  i32.const 47
                  i32.le_s
                  if (result i32)
-                  i32.const 1
-                  local.set $2
                   local.get $1
                   call $core/cpu/instructions/shiftRightArithmeticRegister
-                 else                  
+                  local.set $2
+                  i32.const 1
+                 else
                   i32.const 0
                  end
                 end
@@ -12564,20 +15249,20 @@
                i32.const 55
                i32.le_s
                if (result i32)
-                i32.const 1
-                local.set $2
                 local.get $1
                 call $core/cpu/instructions/swapNibblesOnRegister
-               else                
+                local.set $2
+                i32.const 1
+               else
                 local.get $0
                 i32.const 63
                 i32.le_s
                 if (result i32)
-                 i32.const 1
-                 local.set $2
                  local.get $1
                  call $core/cpu/instructions/shiftRightLogicalRegister
-                else                 
+                 local.set $2
+                 i32.const 1
+                else
                  i32.const 0
                 end
                end
@@ -12588,22 +15273,22 @@
               i32.const 71
               i32.le_s
               if (result i32)
-               i32.const 1
-               local.set $2
                i32.const 0
                local.get $1
                call $core/cpu/instructions/testBitOnRegister
-              else               
+               local.set $2
+               i32.const 1
+              else
                local.get $0
                i32.const 79
                i32.le_s
                if (result i32)
                 i32.const 1
-                local.set $2
-                i32.const 1
                 local.get $1
                 call $core/cpu/instructions/testBitOnRegister
-               else                
+                local.set $2
+                i32.const 1
+               else
                 i32.const 0
                end
               end
@@ -12614,22 +15299,22 @@
              i32.const 87
              i32.le_s
              if (result i32)
-              i32.const 1
-              local.set $2
               i32.const 2
               local.get $1
               call $core/cpu/instructions/testBitOnRegister
-             else              
+              local.set $2
+              i32.const 1
+             else
               local.get $0
               i32.const 95
               i32.le_s
               if (result i32)
-               i32.const 1
-               local.set $2
                i32.const 3
                local.get $1
                call $core/cpu/instructions/testBitOnRegister
-              else               
+               local.set $2
+               i32.const 1
+              else
                i32.const 0
               end
              end
@@ -12640,22 +15325,22 @@
             i32.const 103
             i32.le_s
             if (result i32)
-             i32.const 1
-             local.set $2
              i32.const 4
              local.get $1
              call $core/cpu/instructions/testBitOnRegister
-            else             
+             local.set $2
+             i32.const 1
+            else
              local.get $0
              i32.const 111
              i32.le_s
              if (result i32)
-              i32.const 1
-              local.set $2
               i32.const 5
               local.get $1
               call $core/cpu/instructions/testBitOnRegister
-             else              
+              local.set $2
+              i32.const 1
+             else
               i32.const 0
              end
             end
@@ -12666,22 +15351,22 @@
            i32.const 119
            i32.le_s
            if (result i32)
-            i32.const 1
-            local.set $2
             i32.const 6
             local.get $1
             call $core/cpu/instructions/testBitOnRegister
-           else            
+            local.set $2
+            i32.const 1
+           else
             local.get $0
             i32.const 127
             i32.le_s
             if (result i32)
-             i32.const 1
-             local.set $2
              i32.const 7
              local.get $1
              call $core/cpu/instructions/testBitOnRegister
-            else             
+             local.set $2
+             i32.const 1
+            else
              i32.const 0
             end
            end
@@ -12692,22 +15377,22 @@
           i32.const 135
           i32.le_s
           if (result i32)
-           i32.const 1
-           local.set $2
            local.get $1
            i32.const -2
            i32.and
-          else           
+           local.set $2
+           i32.const 1
+          else
            local.get $0
            i32.const 143
            i32.le_s
            if (result i32)
-            i32.const 1
-            local.set $2
             local.get $1
             i32.const -3
             i32.and
-           else            
+            local.set $2
+            i32.const 1
+           else
             i32.const 0
            end
           end
@@ -12718,22 +15403,22 @@
          i32.const 151
          i32.le_s
          if (result i32)
-          i32.const 1
-          local.set $2
           local.get $1
           i32.const -5
           i32.and
-         else          
+          local.set $2
+          i32.const 1
+         else
           local.get $0
           i32.const 159
           i32.le_s
           if (result i32)
-           i32.const 1
-           local.set $2
            local.get $1
            i32.const -9
            i32.and
-          else           
+           local.set $2
+           i32.const 1
+          else
            i32.const 0
           end
          end
@@ -12744,22 +15429,22 @@
         i32.const 167
         i32.le_s
         if (result i32)
-         i32.const 1
-         local.set $2
          local.get $1
          i32.const -17
          i32.and
-        else         
+         local.set $2
+         i32.const 1
+        else
          local.get $0
          i32.const 175
          i32.le_s
          if (result i32)
-          i32.const 1
-          local.set $2
           local.get $1
           i32.const -33
           i32.and
-         else          
+          local.set $2
+          i32.const 1
+         else
           i32.const 0
          end
         end
@@ -12770,22 +15455,22 @@
        i32.const 183
        i32.le_s
        if (result i32)
-        i32.const 1
-        local.set $2
         local.get $1
         i32.const -65
         i32.and
-       else        
+        local.set $2
+        i32.const 1
+       else
         local.get $0
         i32.const 191
         i32.le_s
         if (result i32)
-         i32.const 1
-         local.set $2
          local.get $1
          i32.const -129
          i32.and
-        else         
+         local.set $2
+         i32.const 1
+        else
          i32.const 0
         end
        end
@@ -12796,22 +15481,22 @@
       i32.const 199
       i32.le_s
       if (result i32)
-       i32.const 1
-       local.set $2
        local.get $1
        i32.const 1
        i32.or
-      else       
+       local.set $2
+       i32.const 1
+      else
        local.get $0
        i32.const 207
        i32.le_s
        if (result i32)
-        i32.const 1
-        local.set $2
         local.get $1
         i32.const 2
         i32.or
-       else        
+        local.set $2
+        i32.const 1
+       else
         i32.const 0
        end
       end
@@ -12822,22 +15507,22 @@
      i32.const 215
      i32.le_s
      if (result i32)
-      i32.const 1
-      local.set $2
       local.get $1
       i32.const 4
       i32.or
-     else      
+      local.set $2
+      i32.const 1
+     else
       local.get $0
       i32.const 223
       i32.le_s
       if (result i32)
-       i32.const 1
-       local.set $2
        local.get $1
        i32.const 8
        i32.or
-      else       
+       local.set $2
+       i32.const 1
+      else
        i32.const 0
       end
      end
@@ -12848,22 +15533,22 @@
     i32.const 231
     i32.le_s
     if (result i32)
-     i32.const 1
-     local.set $2
      local.get $1
      i32.const 16
      i32.or
-    else     
+     local.set $2
+     i32.const 1
+    else
      local.get $0
      i32.const 239
      i32.le_s
      if (result i32)
-      i32.const 1
-      local.set $2
       local.get $1
       i32.const 32
       i32.or
-     else      
+      local.set $2
+      i32.const 1
+     else
       i32.const 0
      end
     end
@@ -12874,22 +15559,22 @@
    i32.const 247
    i32.le_s
    if (result i32)
-    i32.const 1
-    local.set $2
     local.get $1
     i32.const 64
     i32.or
-   else    
+    local.set $2
+    i32.const 1
+   else
     local.get $0
     i32.const 255
     i32.le_s
     if (result i32)
-     i32.const 1
-     local.set $2
      local.get $1
      i32.const 128
      i32.or
-    else     
+     local.set $2
+     i32.const 1
+    else
      i32.const 0
     end
    end
@@ -12903,49 +15588,52 @@
        block $case3|2
         block $case2|2
          block $case1|2
-          local.get $6
-          local.tee $4
+          local.get $4
           if
            local.get $4
            i32.const 1
-           i32.sub
-           br_table $case1|2 $case2|2 $case3|2 $case4|2 $case5|2 $case6|2 $case7|2 $break|2
+           i32.eq
+           br_if $case1|2
+           block $tablify|01
+            local.get $4
+            i32.const 2
+            i32.sub
+            br_table $case2|2 $case3|2 $case4|2 $case5|2 $case6|2 $case7|2 $tablify|01
+           end
+           br $break|2
           end
-          local.get $3
+          local.get $2
           global.set $core/cpu/cpu/Cpu.registerB
           br $break|2
          end
-         local.get $3
+         local.get $2
          global.set $core/cpu/cpu/Cpu.registerC
          br $break|2
         end
-        local.get $3
+        local.get $2
         global.set $core/cpu/cpu/Cpu.registerD
         br $break|2
        end
-       local.get $3
+       local.get $2
        global.set $core/cpu/cpu/Cpu.registerE
        br $break|2
       end
-      local.get $3
+      local.get $2
       global.set $core/cpu/cpu/Cpu.registerH
       br $break|2
      end
-     local.get $3
+     local.get $2
      global.set $core/cpu/cpu/Cpu.registerL
      br $break|2
     end
+    i32.const 1
+    local.get $5
+    i32.const 7
+    i32.gt_s
     local.get $5
     i32.const 4
     i32.lt_s
-    local.tee $4
-    if (result i32)
-     local.get $4
-    else     
-     local.get $5
-     i32.const 7
-     i32.gt_s
-    end
+    select
     if
      global.get $core/cpu/cpu/Cpu.registerL
      i32.const 255
@@ -12956,20 +15644,20 @@
      i32.const 8
      i32.shl
      i32.or
-     local.get $3
+     local.get $2
      call $core/cpu/opcodes/eightBitStoreSyncCycles
     end
     br $break|2
    end
-   local.get $3
+   local.get $2
    global.set $core/cpu/cpu/Cpu.registerA
   end
   i32.const 4
   i32.const -1
-  local.get $2
+  local.get $3
   select
  )
- (func $core/cpu/opcodes/handleOpcodeCx (; 173 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcodeCx (; 201 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   block $folding-inner5
    block $folding-inner4
     block $folding-inner3
@@ -12996,8 +15684,15 @@
                       if
                        local.get $0
                        i32.const 193
-                       i32.sub
-                       br_table $case1|0 $case2|0 $folding-inner2 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $case9|0 $case10|0 $case11|0 $case12|0 $folding-inner1 $case14|0 $case15|0 $break|0
+                       i32.eq
+                       br_if $case1|0
+                       block $tablify|0
+                        local.get $0
+                        i32.const 194
+                        i32.sub
+                        br_table $case2|0 $folding-inner2 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $case9|0 $case10|0 $case11|0 $case12|0 $folding-inner1 $case14|0 $case15|0 $tablify|0
+                       end
+                       br $break|0
                       end
                       global.get $core/cpu/cpu/Cpu.registerF
                       i32.const 7
@@ -13123,14 +15818,12 @@
             i32.const 255
             i32.and
             call $core/cpu/cbOpcodes/handleCbOpcode
-            local.set $0
             global.get $core/cpu/cpu/Cpu.programCounter
             i32.const 1
             i32.add
             i32.const 65535
             i32.and
             global.set $core/cpu/cpu/Cpu.programCounter
-            local.get $0
             return
            end
            global.get $core/cpu/cpu/Cpu.registerF
@@ -13233,186 +15926,178 @@
   global.set $core/cpu/cpu/Cpu.programCounter
   i32.const 12
  )
- (func $core/cpu/opcodes/handleOpcodeDx (; 174 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcodeDx (; 202 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   (local $1 i32)
-  block $folding-inner3
-   block $folding-inner2
-    block $folding-inner1
-     block $folding-inner0
-      block $break|0
-       block $case12|0
-        block $case11|0
-         block $case10|0
-          block $case9|0
-           block $case8|0
-            block $case7|0
-             block $case6|0
-              block $case5|0
-               block $case4|0
-                block $case3|0
-                 block $case2|0
-                  block $case1|0
-                   local.get $0
-                   i32.const 208
-                   i32.ne
-                   if
+  block $folding-inner4
+   block $folding-inner3
+    block $folding-inner2
+     block $folding-inner1
+      block $folding-inner0
+       block $break|0
+        block $case12|0
+         block $case11|0
+          block $case10|0
+           block $case9|0
+            block $case8|0
+             block $case7|0
+              block $case6|0
+               block $case5|0
+                block $case4|0
+                 block $case3|0
+                  block $case2|0
+                   block $case1|0
                     local.get $0
-                    i32.const 209
-                    i32.sub
-                    br_table $case1|0 $case2|0 $break|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $case9|0 $break|0 $case10|0 $break|0 $case11|0 $case12|0 $break|0
+                    i32.const 208
+                    i32.ne
+                    if
+                     local.get $0
+                     i32.const 209
+                     i32.eq
+                     br_if $case1|0
+                     block $tablify|0
+                      local.get $0
+                      i32.const 210
+                      i32.sub
+                      br_table $case2|0 $tablify|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $case9|0 $tablify|0 $case10|0 $tablify|0 $case11|0 $case12|0 $tablify|0
+                     end
+                     br $break|0
+                    end
+                    global.get $core/cpu/cpu/Cpu.registerF
+                    i32.const 4
+                    i32.shr_u
+                    i32.const 1
+                    i32.and
+                    br_if $folding-inner2
+                    br $folding-inner0
                    end
-                   global.get $core/cpu/cpu/Cpu.registerF
-                   i32.const 4
-                   i32.shr_u
-                   i32.const 1
-                   i32.and
-                   br_if $folding-inner2
                    global.get $core/cpu/cpu/Cpu.stackPointer
-                   local.tee $0
+                   local.tee $1
                    call $core/cpu/opcodes/sixteenBitLoadSyncCycles
                    i32.const 65535
                    i32.and
-                   global.set $core/cpu/cpu/Cpu.programCounter
-                   local.get $0
+                   local.set $0
+                   local.get $1
                    i32.const 2
                    i32.add
                    i32.const 65535
                    i32.and
                    global.set $core/cpu/cpu/Cpu.stackPointer
-                   i32.const 12
+                   local.get $0
+                   i32.const 65280
+                   i32.and
+                   i32.const 8
+                   i32.shr_s
+                   global.set $core/cpu/cpu/Cpu.registerD
+                   local.get $0
+                   i32.const 255
+                   i32.and
+                   global.set $core/cpu/cpu/Cpu.registerE
+                   i32.const 4
                    return
                   end
-                  global.get $core/cpu/cpu/Cpu.stackPointer
-                  local.tee $0
-                  call $core/cpu/opcodes/sixteenBitLoadSyncCycles
-                  i32.const 65535
-                  i32.and
-                  local.set $1
-                  local.get $0
-                  i32.const 2
-                  i32.add
-                  i32.const 65535
-                  i32.and
-                  global.set $core/cpu/cpu/Cpu.stackPointer
-                  local.get $1
-                  i32.const 65280
-                  i32.and
-                  i32.const 8
-                  i32.shr_s
-                  global.set $core/cpu/cpu/Cpu.registerD
-                  local.get $1
-                  i32.const 255
-                  i32.and
-                  global.set $core/cpu/cpu/Cpu.registerE
+                  global.get $core/cpu/cpu/Cpu.registerF
                   i32.const 4
-                  return
+                  i32.shr_u
+                  i32.const 1
+                  i32.and
+                  br_if $folding-inner4
+                  br $folding-inner1
                  end
                  global.get $core/cpu/cpu/Cpu.registerF
                  i32.const 4
                  i32.shr_u
                  i32.const 1
                  i32.and
-                 br_if $folding-inner0
+                 br_if $folding-inner4
+                 global.get $core/cpu/cpu/Cpu.stackPointer
+                 i32.const 2
+                 i32.sub
+                 i32.const 65535
+                 i32.and
+                 local.tee $0
+                 global.set $core/cpu/cpu/Cpu.stackPointer
+                 local.get $0
+                 global.get $core/cpu/cpu/Cpu.programCounter
+                 i32.const 2
+                 i32.add
+                 i32.const 65535
+                 i32.and
+                 call $core/cpu/opcodes/sixteenBitStoreSyncCycles
                  br $folding-inner1
                 end
-                global.get $core/cpu/cpu/Cpu.registerF
-                i32.const 4
-                i32.shr_u
-                i32.const 1
-                i32.and
-                br_if $folding-inner0
                 global.get $core/cpu/cpu/Cpu.stackPointer
                 i32.const 2
                 i32.sub
                 i32.const 65535
                 i32.and
-                local.tee $1
+                local.tee $0
                 global.set $core/cpu/cpu/Cpu.stackPointer
-                local.get $1
-                global.get $core/cpu/cpu/Cpu.programCounter
-                i32.const 2
-                i32.add
-                i32.const 65535
+                local.get $0
+                global.get $core/cpu/cpu/Cpu.registerE
+                i32.const 255
                 i32.and
+                global.get $core/cpu/cpu/Cpu.registerD
+                i32.const 255
+                i32.and
+                i32.const 8
+                i32.shl
+                i32.or
                 call $core/cpu/opcodes/sixteenBitStoreSyncCycles
-                br $folding-inner1
+                br $folding-inner2
                end
-               global.get $core/cpu/cpu/Cpu.stackPointer
-               i32.const 2
-               i32.sub
-               i32.const 65535
-               i32.and
-               local.tee $1
-               global.set $core/cpu/cpu/Cpu.stackPointer
-               local.get $1
-               global.get $core/cpu/cpu/Cpu.registerE
-               i32.const 255
-               i32.and
-               global.get $core/cpu/cpu/Cpu.registerD
-               i32.const 255
-               i32.and
-               i32.const 8
-               i32.shl
-               i32.or
-               call $core/cpu/opcodes/sixteenBitStoreSyncCycles
-               br $folding-inner2
+               call $core/cpu/opcodes/getDataByteOne
+               call $core/cpu/instructions/subARegister
+               br $folding-inner3
               end
-              call $core/cpu/opcodes/getDataByteOne
-              call $core/cpu/instructions/subARegister
-              br $folding-inner3
+              global.get $core/cpu/cpu/Cpu.stackPointer
+              i32.const 2
+              i32.sub
+              i32.const 65535
+              i32.and
+              local.tee $0
+              global.set $core/cpu/cpu/Cpu.stackPointer
+              local.get $0
+              global.get $core/cpu/cpu/Cpu.programCounter
+              call $core/cpu/opcodes/sixteenBitStoreSyncCycles
+              i32.const 16
+              global.set $core/cpu/cpu/Cpu.programCounter
+              br $folding-inner2
              end
-             global.get $core/cpu/cpu/Cpu.stackPointer
-             i32.const 2
-             i32.sub
-             i32.const 65535
+             global.get $core/cpu/cpu/Cpu.registerF
+             i32.const 4
+             i32.shr_u
+             i32.const 1
              i32.and
-             local.tee $1
-             global.set $core/cpu/cpu/Cpu.stackPointer
-             local.get $1
-             global.get $core/cpu/cpu/Cpu.programCounter
-             call $core/cpu/opcodes/sixteenBitStoreSyncCycles
-             i32.const 16
-             global.set $core/cpu/cpu/Cpu.programCounter
-             br $folding-inner2
+             i32.const 1
+             i32.ne
+             br_if $folding-inner2
+             br $folding-inner0
             end
-            global.get $core/cpu/cpu/Cpu.registerF
-            i32.const 4
-            i32.shr_u
-            i32.const 1
-            i32.and
-            i32.const 1
-            i32.ne
-            br_if $folding-inner2
             global.get $core/cpu/cpu/Cpu.stackPointer
-            local.tee $1
+            local.tee $0
             call $core/cpu/opcodes/sixteenBitLoadSyncCycles
             i32.const 65535
             i32.and
             global.set $core/cpu/cpu/Cpu.programCounter
-            local.get $1
+            i32.const 1
+            global.set $core/interrupts/interrupts/Interrupts.masterInterruptSwitchDelay
+            local.get $0
             i32.const 2
             i32.add
             i32.const 65535
             i32.and
             global.set $core/cpu/cpu/Cpu.stackPointer
-            i32.const 12
-            return
+            br $folding-inner2
            end
-           global.get $core/cpu/cpu/Cpu.stackPointer
-           local.tee $1
-           call $core/cpu/opcodes/sixteenBitLoadSyncCycles
-           i32.const 65535
-           i32.and
-           global.set $core/cpu/cpu/Cpu.programCounter
+           global.get $core/cpu/cpu/Cpu.registerF
+           i32.const 4
+           i32.shr_u
            i32.const 1
-           global.set $core/interrupts/interrupts/Interrupts.masterInterruptSwitchDelay
-           local.get $1
-           i32.const 2
-           i32.add
-           i32.const 65535
            i32.and
-           global.set $core/cpu/cpu/Cpu.stackPointer
-           br $folding-inner2
+           i32.const 1
+           i32.eq
+           br_if $folding-inner1
+           br $folding-inner4
           end
           global.get $core/cpu/cpu/Cpu.registerF
           i32.const 4
@@ -13420,81 +16105,86 @@
           i32.const 1
           i32.and
           i32.const 1
-          i32.eq
-          br_if $folding-inner1
-          br $folding-inner0
+          i32.ne
+          br_if $folding-inner4
+          global.get $core/cpu/cpu/Cpu.stackPointer
+          i32.const 2
+          i32.sub
+          i32.const 65535
+          i32.and
+          local.tee $0
+          global.set $core/cpu/cpu/Cpu.stackPointer
+          local.get $0
+          global.get $core/cpu/cpu/Cpu.programCounter
+          i32.const 2
+          i32.add
+          i32.const 65535
+          i32.and
+          call $core/cpu/opcodes/sixteenBitStoreSyncCycles
+          br $folding-inner1
          end
-         global.get $core/cpu/cpu/Cpu.registerF
-         i32.const 4
-         i32.shr_u
-         i32.const 1
-         i32.and
-         i32.const 1
-         i32.ne
-         br_if $folding-inner0
-         global.get $core/cpu/cpu/Cpu.stackPointer
-         i32.const 2
-         i32.sub
-         i32.const 65535
-         i32.and
-         local.tee $1
-         global.set $core/cpu/cpu/Cpu.stackPointer
-         local.get $1
-         global.get $core/cpu/cpu/Cpu.programCounter
-         i32.const 2
-         i32.add
-         i32.const 65535
-         i32.and
-         call $core/cpu/opcodes/sixteenBitStoreSyncCycles
-         br $folding-inner1
+         call $core/cpu/opcodes/getDataByteOne
+         call $core/cpu/instructions/subAThroughCarryRegister
+         br $folding-inner3
         end
-        call $core/cpu/opcodes/getDataByteOne
-        call $core/cpu/instructions/subAThroughCarryRegister
-        br $folding-inner3
+        global.get $core/cpu/cpu/Cpu.stackPointer
+        i32.const 2
+        i32.sub
+        i32.const 65535
+        i32.and
+        local.tee $0
+        global.set $core/cpu/cpu/Cpu.stackPointer
+        local.get $0
+        global.get $core/cpu/cpu/Cpu.programCounter
+        call $core/cpu/opcodes/sixteenBitStoreSyncCycles
+        i32.const 24
+        global.set $core/cpu/cpu/Cpu.programCounter
+        br $folding-inner2
        end
-       global.get $core/cpu/cpu/Cpu.stackPointer
-       i32.const 2
-       i32.sub
-       i32.const 65535
-       i32.and
-       local.tee $1
-       global.set $core/cpu/cpu/Cpu.stackPointer
-       local.get $1
-       global.get $core/cpu/cpu/Cpu.programCounter
-       call $core/cpu/opcodes/sixteenBitStoreSyncCycles
-       i32.const 24
-       global.set $core/cpu/cpu/Cpu.programCounter
-       br $folding-inner2
+       i32.const -1
+       return
       end
-      i32.const -1
+      global.get $core/cpu/cpu/Cpu.stackPointer
+      local.tee $0
+      call $core/cpu/opcodes/sixteenBitLoadSyncCycles
+      i32.const 65535
+      i32.and
+      global.set $core/cpu/cpu/Cpu.programCounter
+      local.get $0
+      i32.const 2
+      i32.add
+      i32.const 65535
+      i32.and
+      global.set $core/cpu/cpu/Cpu.stackPointer
+      i32.const 12
       return
      end
-     global.get $core/cpu/cpu/Cpu.programCounter
-     i32.const 2
-     i32.add
+     call $core/cpu/opcodes/getConcatenatedDataByte
      i32.const 65535
      i32.and
      global.set $core/cpu/cpu/Cpu.programCounter
-     i32.const 12
-     return
     end
-    call $core/cpu/opcodes/getConcatenatedDataByte
-    i32.const 65535
-    i32.and
-    global.set $core/cpu/cpu/Cpu.programCounter
+    i32.const 8
+    return
    end
-   i32.const 8
+   global.get $core/cpu/cpu/Cpu.programCounter
+   i32.const 1
+   i32.add
+   i32.const 65535
+   i32.and
+   global.set $core/cpu/cpu/Cpu.programCounter
+   i32.const 4
    return
   end
   global.get $core/cpu/cpu/Cpu.programCounter
-  i32.const 1
+  i32.const 2
   i32.add
   i32.const 65535
   i32.and
   global.set $core/cpu/cpu/Cpu.programCounter
-  i32.const 4
+  i32.const 12
  )
- (func $core/cpu/opcodes/handleOpcodeEx (; 175 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcodeEx (; 203 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   (local $1 i32)
   block $folding-inner0
    block $break|0
@@ -13514,8 +16204,15 @@
               if
                local.get $0
                i32.const 225
-               i32.sub
-               br_table $case1|0 $case2|0 $break|0 $break|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $break|0 $break|0 $break|0 $case9|0 $case10|0 $break|0
+               i32.eq
+               br_if $case1|0
+               block $tablify|0
+                local.get $0
+                i32.const 226
+                i32.sub
+                br_table $case2|0 $tablify|0 $tablify|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $tablify|0 $tablify|0 $tablify|0 $case9|0 $case10|0 $tablify|0
+               end
+               br $break|0
               end
               call $core/cpu/opcodes/getDataByteOne
               i32.const 255
@@ -13527,24 +16224,24 @@
               br $folding-inner0
              end
              global.get $core/cpu/cpu/Cpu.stackPointer
-             local.tee $0
+             local.tee $1
              call $core/cpu/opcodes/sixteenBitLoadSyncCycles
              i32.const 65535
              i32.and
-             local.set $1
-             local.get $0
+             local.set $0
+             local.get $1
              i32.const 2
              i32.add
              i32.const 65535
              i32.and
              global.set $core/cpu/cpu/Cpu.stackPointer
-             local.get $1
+             local.get $0
              i32.const 65280
              i32.and
              i32.const 8
              i32.shr_s
              global.set $core/cpu/cpu/Cpu.registerH
-             local.get $1
+             local.get $0
              i32.const 255
              i32.and
              global.set $core/cpu/cpu/Cpu.registerL
@@ -13564,9 +16261,9 @@
            i32.sub
            i32.const 65535
            i32.and
-           local.tee $1
+           local.tee $0
            global.set $core/cpu/cpu/Cpu.stackPointer
-           local.get $1
+           local.get $0
            global.get $core/cpu/cpu/Cpu.registerL
            i32.const 255
            i32.and
@@ -13589,9 +16286,9 @@
          i32.sub
          i32.const 65535
          i32.and
-         local.tee $1
+         local.tee $0
          global.set $core/cpu/cpu/Cpu.stackPointer
-         local.get $1
+         local.get $0
          global.get $core/cpu/cpu/Cpu.programCounter
          call $core/cpu/opcodes/sixteenBitStoreSyncCycles
          i32.const 32
@@ -13604,13 +16301,13 @@
         i32.shl
         i32.const 24
         i32.shr_s
-        local.set $1
+        local.set $0
         global.get $core/cpu/cpu/Cpu.stackPointer
-        local.get $1
+        local.get $0
         i32.const 1
         call $core/cpu/flags/checkAndSetSixteenBitFlagsAddOverflow
         global.get $core/cpu/cpu/Cpu.stackPointer
-        local.get $1
+        local.get $0
         i32.add
         i32.const 65535
         i32.and
@@ -13664,9 +16361,9 @@
     i32.sub
     i32.const 65535
     i32.and
-    local.tee $1
+    local.tee $0
     global.set $core/cpu/cpu/Cpu.stackPointer
-    local.get $1
+    local.get $0
     global.get $core/cpu/cpu/Cpu.programCounter
     call $core/cpu/opcodes/sixteenBitStoreSyncCycles
     i32.const 40
@@ -13685,7 +16382,7 @@
   global.set $core/cpu/cpu/Cpu.programCounter
   i32.const 4
  )
- (func $core/cpu/opcodes/handleOpcodeFx (; 176 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/handleOpcodeFx (; 204 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   (local $1 i32)
   block $folding-inner1
    block $folding-inner0
@@ -13708,8 +16405,15 @@
                  if
                   local.get $0
                   i32.const 241
-                  i32.sub
-                  br_table $case1|0 $case2|0 $case3|0 $break|0 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $case9|0 $case10|0 $break|0 $break|0 $case11|0 $case12|0 $break|0
+                  i32.eq
+                  br_if $case1|0
+                  block $tablify|0
+                   local.get $0
+                   i32.const 242
+                   i32.sub
+                   br_table $case2|0 $case3|0 $tablify|0 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $case9|0 $case10|0 $tablify|0 $tablify|0 $case11|0 $case12|0 $tablify|0
+                  end
+                  br $break|0
                  end
                  call $core/cpu/opcodes/getDataByteOne
                  i32.const 255
@@ -13723,24 +16427,24 @@
                  br $folding-inner0
                 end
                 global.get $core/cpu/cpu/Cpu.stackPointer
-                local.tee $0
+                local.tee $1
                 call $core/cpu/opcodes/sixteenBitLoadSyncCycles
                 i32.const 65535
                 i32.and
-                local.set $1
-                local.get $0
+                local.set $0
+                local.get $1
                 i32.const 2
                 i32.add
                 i32.const 65535
                 i32.and
                 global.set $core/cpu/cpu/Cpu.stackPointer
-                local.get $1
+                local.get $0
                 i32.const 65280
                 i32.and
                 i32.const 8
                 i32.shr_s
                 global.set $core/cpu/cpu/Cpu.registerA
-                local.get $1
+                local.get $0
                 i32.const 255
                 i32.and
                 global.set $core/cpu/cpu/Cpu.registerF
@@ -13764,9 +16468,9 @@
              i32.sub
              i32.const 65535
              i32.and
-             local.tee $1
+             local.tee $0
              global.set $core/cpu/cpu/Cpu.stackPointer
-             local.get $1
+             local.get $0
              global.get $core/cpu/cpu/Cpu.registerF
              i32.const 255
              i32.and
@@ -13789,9 +16493,9 @@
            i32.sub
            i32.const 65535
            i32.and
-           local.tee $1
+           local.tee $0
            global.set $core/cpu/cpu/Cpu.stackPointer
-           local.get $1
+           local.get $0
            global.get $core/cpu/cpu/Cpu.programCounter
            call $core/cpu/opcodes/sixteenBitStoreSyncCycles
            i32.const 48
@@ -13804,15 +16508,15 @@
           i32.shl
           i32.const 24
           i32.shr_s
-          local.set $1
-          global.get $core/cpu/cpu/Cpu.stackPointer
           local.set $0
+          global.get $core/cpu/cpu/Cpu.stackPointer
+          local.set $1
           i32.const 0
           call $core/cpu/flags/setZeroFlag
           i32.const 0
           call $core/cpu/flags/setSubtractFlag
-          local.get $0
           local.get $1
+          local.get $0
           i32.const 1
           call $core/cpu/flags/checkAndSetSixteenBitFlagsAddOverflow
           local.get $0
@@ -13902,7 +16606,7 @@
   end
   i32.const 4
  )
- (func $core/cpu/opcodes/executeOpcode (; 177 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/cpu/opcodes/executeOpcode (; 205 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   (local $1 i32)
   global.get $core/cpu/cpu/Cpu.programCounter
   i32.const 1
@@ -13945,15 +16649,8 @@
                  if
                   local.get $1
                   i32.const 1
-                  i32.eq
-                  br_if $case1|0
-                  block $tablify|0
-                   local.get $1
-                   i32.const 2
-                   i32.sub
-                   br_table $case2|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $case9|0 $case10|0 $case11|0 $case12|0 $case13|0 $case14|0 $tablify|0
-                  end
-                  br $case15|0
+                  i32.sub
+                  br_table $case1|0 $case2|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $case8|0 $case9|0 $case10|0 $case11|0 $case12|0 $case13|0 $case14|0 $case15|0
                  end
                  local.get $0
                  call $core/cpu/opcodes/handleOpcode0x
@@ -14018,7 +16715,7 @@
   local.get $0
   call $core/cpu/opcodes/handleOpcodeFx
  )
- (func $core/interrupts/interrupts/_handleInterrupt (; 178 ;) (type $i_) (param $0 i32)
+ (func $core/interrupts/interrupts/_handleInterrupt (; 206 ;) (type $FUNCSIG$vi) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   i32.const 0
@@ -14107,10 +16804,9 @@
    global.set $core/cpu/cpu/Cpu.programCounter
   end
  )
- (func $core/interrupts/interrupts/checkInterrupts (; 179 ;) (type $i) (result i32)
+ (func $core/interrupts/interrupts/checkInterrupts (; 207 ;) (type $FUNCSIG$i) (result i32)
   (local $0 i32)
   (local $1 i32)
-  (local $2 i32)
   global.get $core/interrupts/interrupts/Interrupts.masterInterruptSwitchDelay
   if
    i32.const 1
@@ -14128,75 +16824,68 @@
   if
    global.get $core/cpu/cpu/Cpu.isHaltNoJump
    i32.eqz
+   i32.const 0
    global.get $core/interrupts/interrupts/Interrupts.masterInterruptSwitch
-   local.tee $2
-   local.get $2
    select
    if (result i32)
     global.get $core/interrupts/interrupts/Interrupts.isVBlankInterruptRequested
+    i32.const 0
     global.get $core/interrupts/interrupts/Interrupts.isVBlankInterruptEnabled
-    local.tee $0
-    local.get $0
     select
     if (result i32)
      i32.const 0
      call $core/interrupts/interrupts/_handleInterrupt
      i32.const 1
-    else     
+    else
      global.get $core/interrupts/interrupts/Interrupts.isLcdInterruptRequested
+     i32.const 0
      global.get $core/interrupts/interrupts/Interrupts.isLcdInterruptEnabled
-     local.tee $0
-     local.get $0
      select
      if (result i32)
       i32.const 1
       call $core/interrupts/interrupts/_handleInterrupt
       i32.const 1
-     else      
+     else
       global.get $core/interrupts/interrupts/Interrupts.isTimerInterruptRequested
+      i32.const 0
       global.get $core/interrupts/interrupts/Interrupts.isTimerInterruptEnabled
-      local.tee $0
-      local.get $0
       select
       if (result i32)
        i32.const 2
        call $core/interrupts/interrupts/_handleInterrupt
        i32.const 1
-      else       
+      else
        global.get $core/interrupts/interrupts/Interrupts.isSerialInterruptRequested
+       i32.const 0
        global.get $core/interrupts/interrupts/Interrupts.isSerialInterruptEnabled
-       local.tee $0
-       local.get $0
        select
        if (result i32)
         i32.const 3
         call $core/interrupts/interrupts/_handleInterrupt
         i32.const 1
-       else        
+       else
         global.get $core/interrupts/interrupts/Interrupts.isJoypadInterruptRequested
+        i32.const 0
         global.get $core/interrupts/interrupts/Interrupts.isJoypadInterruptEnabled
-        local.tee $0
-        local.get $0
         select
         if (result i32)
          i32.const 4
          call $core/interrupts/interrupts/_handleInterrupt
          i32.const 1
-        else         
+        else
          i32.const 0
         end
        end
       end
      end
     end
-   else    
+   else
     i32.const 0
    end
    if
-    global.get $core/cpu/cpu/Cpu.isHaltNormal
-    local.tee $0
+    i32.const 1
     global.get $core/cpu/cpu/Cpu.isHaltNoJump
-    local.get $0
+    global.get $core/cpu/cpu/Cpu.isHaltNormal
     select
     if (result i32)
      i32.const 0
@@ -14208,15 +16897,14 @@
      i32.const 0
      global.set $core/cpu/cpu/Cpu.isStopped
      i32.const 24
-    else     
+    else
      i32.const 20
     end
-    local.set $1
+    local.set $0
    end
-   global.get $core/cpu/cpu/Cpu.isHaltNormal
-   local.tee $0
+   i32.const 1
    global.get $core/cpu/cpu/Cpu.isHaltNoJump
-   local.get $0
+   global.get $core/cpu/cpu/Cpu.isHaltNormal
    select
    if
     i32.const 0
@@ -14228,12 +16916,12 @@
     i32.const 0
     global.set $core/cpu/cpu/Cpu.isStopped
    end
-   local.get $1
+   local.get $0
    return
   end
   i32.const 0
  )
- (func $core/execute/executeStep (; 180 ;) (type $i) (result i32)
+ (func $core/execute/executeStep (; 208 ;) (type $FUNCSIG$i) (result i32)
   (local $0 i32)
   (local $1 i32)
   i32.const 1
@@ -14264,45 +16952,40 @@
    call $core/cycles/syncCycles
   end
   i32.const 4
-  local.set $1
-  global.get $core/cpu/cpu/Cpu.isHaltNormal
-  local.tee $0
-  global.get $core/cpu/cpu/Cpu.isHaltNoJump
-  local.get $0
-  select
+  local.set $0
+  i32.const 0
+  global.get $core/cpu/cpu/Cpu.isStopped
   i32.eqz
-  local.tee $0
-  if (result i32)
-   global.get $core/cpu/cpu/Cpu.isStopped
-   i32.eqz
-  else   
-   local.get $0
-  end
+  i32.const 1
+  global.get $core/cpu/cpu/Cpu.isHaltNoJump
+  global.get $core/cpu/cpu/Cpu.isHaltNormal
+  select
+  select
   if
    global.get $core/cpu/cpu/Cpu.programCounter
    call $core/memory/load/eightBitLoadFromGBMemory
    i32.const 255
    i32.and
    call $core/cpu/opcodes/executeOpcode
-   local.set $1
+   local.set $0
   end
   global.get $core/cpu/cpu/Cpu.registerF
   i32.const 240
   i32.and
   global.set $core/cpu/cpu/Cpu.registerF
-  local.get $1
+  local.get $0
   i32.const 0
   i32.le_s
   if
-   local.get $1
+   local.get $0
    return
   end
-  local.get $1
+  local.get $0
   call $core/cycles/syncCycles
   global.get $core/execute/Execute.steps
   i32.const 1
   i32.add
-  local.tee $0
+  local.tee $1
   global.get $core/execute/Execute.stepsPerStepSet
   i32.ge_s
   if (result i32)
@@ -14310,11 +16993,11 @@
    i32.const 1
    i32.add
    global.set $core/execute/Execute.stepSets
-   local.get $0
+   local.get $1
    global.get $core/execute/Execute.stepsPerStepSet
    i32.sub
-  else   
-   local.get $0
+  else
+   local.get $1
   end
   global.set $core/execute/Execute.steps
   global.get $core/cpu/cpu/Cpu.programCounter
@@ -14324,16 +17007,15 @@
    i32.const 1
    global.set $core/debug/breakpoints/Breakpoints.reachedBreakpoint
   end
-  local.get $1
+  local.get $0
  )
- (func $core/sound/sound/getNumberOfSamplesInAudioBuffer (; 181 ;) (type $i) (result i32)
+ (func $core/sound/sound/getNumberOfSamplesInAudioBuffer (; 209 ;) (type $FUNCSIG$i) (result i32)
   global.get $core/sound/sound/Sound.audioQueueIndex
  )
- (func $core/execute/executeUntilCondition (; 182 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
+ (func $core/execute/executeUntilCondition (; 210 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
-  (local $4 i32)
   local.get $0
   i32.const -1
   i32.const 1024
@@ -14345,43 +17027,31 @@
   i32.const 0
   i32.gt_s
   select
-  local.set $3
+  local.set $2
   i32.const 0
   local.set $0
   loop $continue|0
-   block (result i32)
-    block (result i32)
-     local.get $4
-     i32.eqz
-     local.tee $1
-     if
-      local.get $0
-      i32.eqz
-      local.set $1
-     end
-     local.get $1
-    end
-    if
-     local.get $2
-     i32.eqz
-     local.set $1
-    end
-    local.get $1
-   end
-   if
-    global.get $core/debug/breakpoints/Breakpoints.reachedBreakpoint
-    i32.eqz
-    local.set $1
-   end
+   global.get $core/debug/breakpoints/Breakpoints.reachedBreakpoint
+   i32.eqz
+   i32.const 0
    local.get $1
+   i32.eqz
+   i32.const 0
+   i32.const 0
+   local.get $0
+   i32.eqz
+   local.get $3
+   select
+   select
+   select
    if
     call $core/execute/executeStep
     i32.const 0
     i32.lt_s
     if
      i32.const 1
-     local.set $4
-    else     
+     local.set $3
+    else
      global.get $core/cpu/cpu/Cpu.currentCycles
      i32.const 70224
      global.get $core/cpu/cpu/Cpu.GBCDoubleSpeed
@@ -14390,22 +17060,19 @@
      if
       i32.const 1
       local.set $0
-     else      
-      local.get $3
+     else
+      i32.const 1
+      local.get $1
+      global.get $core/sound/sound/Sound.audioQueueIndex
+      local.get $2
+      i32.ge_s
+      i32.const 0
+      local.get $2
       i32.const -1
       i32.gt_s
-      local.tee $1
-      if
-       global.get $core/sound/sound/Sound.audioQueueIndex
-       local.get $3
-       i32.ge_s
-       local.set $1
-      end
-      i32.const 1
-      local.get $2
-      local.get $1
       select
-      local.set $2
+      select
+      local.set $1
      end
     end
     br $continue|0
@@ -14419,19 +17086,19 @@
    i32.shl
    i32.sub
    global.set $core/cpu/cpu/Cpu.currentCycles
-   global.get $core/execute/Execute.RESPONSE_CONDITION_FRAME
+   i32.const 0
    return
   end
-  local.get $2
+  local.get $1
   if
-   global.get $core/execute/Execute.RESPONSE_CONDITION_AUDIO
+   i32.const 1
    return
   end
   global.get $core/debug/breakpoints/Breakpoints.reachedBreakpoint
   if
    i32.const 0
    global.set $core/debug/breakpoints/Breakpoints.reachedBreakpoint
-   global.get $core/execute/Execute.RESPONSE_CONDITION_BREAKPOINT
+   i32.const 2
    return
   end
   global.get $core/cpu/cpu/Cpu.programCounter
@@ -14442,26 +17109,22 @@
   global.set $core/cpu/cpu/Cpu.programCounter
   i32.const -1
  )
- (func $core/execute/executeFrame (; 183 ;) (type $i) (result i32)
+ (func $core/execute/executeFrame (; 211 ;) (type $FUNCSIG$i) (result i32)
   i32.const -1
   call $core/execute/executeUntilCondition
  )
- (func $core/execute/executeMultipleFrames (; 184 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/execute/executeMultipleFrames (; 212 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
-  (local $3 i32)
   loop $continue|0
+   local.get $1
+   i32.const 0
+   i32.ge_s
+   i32.const 0
    local.get $2
    local.get $0
    i32.lt_s
-   local.tee $3
-   if (result i32)
-    local.get $1
-    i32.const 0
-    i32.ge_s
-   else    
-    local.get $3
-   end
+   select
    if
     i32.const -1
     call $core/execute/executeUntilCondition
@@ -14482,17 +17145,16 @@
   end
   i32.const 0
  )
- (func $core/cycles/getCyclesPerCycleSet (; 185 ;) (type $i) (result i32)
+ (func $core/cycles/getCyclesPerCycleSet (; 213 ;) (type $FUNCSIG$i) (result i32)
   global.get $core/cycles/Cycles.cyclesPerCycleSet
  )
- (func $core/cycles/getCycleSets (; 186 ;) (type $i) (result i32)
+ (func $core/cycles/getCycleSets (; 214 ;) (type $FUNCSIG$i) (result i32)
   global.get $core/cycles/Cycles.cycleSets
  )
- (func $core/cycles/getCycles (; 187 ;) (type $i) (result i32)
+ (func $core/cycles/getCycles (; 215 ;) (type $FUNCSIG$i) (result i32)
   global.get $core/cycles/Cycles.cycles
  )
- (func $core/joypad/joypad/_getJoypadButtonStateFromButtonId (; 188 ;) (type $ii) (param $0 i32) (result i32)
-  (local $1 i32)
+ (func $core/joypad/joypad/_getJoypadButtonStateFromButtonId (; 216 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   block $case8|0
    block $case7|0
     block $case6|0
@@ -14504,12 +17166,11 @@
           local.get $0
           if
            local.get $0
-           local.tee $1
            i32.const 1
            i32.eq
            br_if $case1|0
            block $tablify|0
-            local.get $1
+            local.get $0
             i32.const 2
             i32.sub
             br_table $case2|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $tablify|0
@@ -14542,8 +17203,7 @@
   end
   i32.const 0
  )
- (func $core/joypad/joypad/_setJoypadButtonStateFromButtonId (; 189 ;) (type $ii_) (param $0 i32) (param $1 i32)
-  (local $2 i32)
+ (func $core/joypad/joypad/_setJoypadButtonStateFromButtonId (; 217 ;) (type $FUNCSIG$vii) (param $0 i32) (param $1 i32)
   block $break|0
    block $case7|0
     block $case6|0
@@ -14555,12 +17215,11 @@
           local.get $0
           if
            local.get $0
-           local.tee $2
            i32.const 1
            i32.eq
            br_if $case1|0
            block $tablify|0
-            local.get $2
+            local.get $0
             i32.const 2
             i32.sub
             br_table $case2|0 $case3|0 $case4|0 $case5|0 $case6|0 $case7|0 $tablify|0
@@ -14615,7 +17274,7 @@
    global.set $core/joypad/joypad/Joypad.start
   end
  )
- (func $core/joypad/joypad/_pressJoypadButton (; 190 ;) (type $i_) (param $0 i32)
+ (func $core/joypad/joypad/_pressJoypadButton (; 218 ;) (type $FUNCSIG$vi) (param $0 i32)
   (local $1 i32)
   i32.const 0
   global.set $core/cpu/cpu/Cpu.isStopped
@@ -14640,17 +17299,15 @@
    i32.const 3
    i32.le_s
    select
-   local.tee $1
+   local.tee $0
+   i32.const 0
    global.get $core/joypad/joypad/Joypad.isDpadType
-   local.tee $0
+   select
+   select
    local.get $0
-   select
-   select
-   local.get $1
    i32.eqz
+   i32.const 0
    global.get $core/joypad/joypad/Joypad.isButtonType
-   local.tee $0
-   local.get $0
    select
    select
    if
@@ -14661,19 +17318,19 @@
    end
   end
  )
- (func $core/joypad/joypad/_releaseJoypadButton (; 191 ;) (type $i_) (param $0 i32)
+ (func $core/joypad/joypad/_releaseJoypadButton (; 219 ;) (type $FUNCSIG$vi) (param $0 i32)
   local.get $0
   i32.const 0
   call $core/joypad/joypad/_setJoypadButtonStateFromButtonId
  )
- (func $core/joypad/joypad/setJoypadState (; 192 ;) (type $iiiiiiii_) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (param $7 i32)
+ (func $core/joypad/joypad/setJoypadState (; 220 ;) (type $FUNCSIG$viiiiiiii) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (param $4 i32) (param $5 i32) (param $6 i32) (param $7 i32)
   local.get $0
   i32.const 0
   i32.gt_s
   if
    i32.const 0
    call $core/joypad/joypad/_pressJoypadButton
-  else   
+  else
    i32.const 0
    call $core/joypad/joypad/_releaseJoypadButton
   end
@@ -14683,7 +17340,7 @@
   if
    i32.const 1
    call $core/joypad/joypad/_pressJoypadButton
-  else   
+  else
    i32.const 1
    call $core/joypad/joypad/_releaseJoypadButton
   end
@@ -14693,7 +17350,7 @@
   if
    i32.const 2
    call $core/joypad/joypad/_pressJoypadButton
-  else   
+  else
    i32.const 2
    call $core/joypad/joypad/_releaseJoypadButton
   end
@@ -14703,7 +17360,7 @@
   if
    i32.const 3
    call $core/joypad/joypad/_pressJoypadButton
-  else   
+  else
    i32.const 3
    call $core/joypad/joypad/_releaseJoypadButton
   end
@@ -14713,7 +17370,7 @@
   if
    i32.const 4
    call $core/joypad/joypad/_pressJoypadButton
-  else   
+  else
    i32.const 4
    call $core/joypad/joypad/_releaseJoypadButton
   end
@@ -14723,7 +17380,7 @@
   if
    i32.const 5
    call $core/joypad/joypad/_pressJoypadButton
-  else   
+  else
    i32.const 5
    call $core/joypad/joypad/_releaseJoypadButton
   end
@@ -14733,7 +17390,7 @@
   if
    i32.const 6
    call $core/joypad/joypad/_pressJoypadButton
-  else   
+  else
    i32.const 6
    call $core/joypad/joypad/_releaseJoypadButton
   end
@@ -14743,75 +17400,75 @@
   if
    i32.const 7
    call $core/joypad/joypad/_pressJoypadButton
-  else   
+  else
    i32.const 7
    call $core/joypad/joypad/_releaseJoypadButton
   end
  )
- (func $core/debug/breakpoints/setProgramCounterBreakpoint (; 193 ;) (type $i_) (param $0 i32)
+ (func $core/debug/breakpoints/setProgramCounterBreakpoint (; 221 ;) (type $FUNCSIG$vi) (param $0 i32)
   local.get $0
   global.set $core/debug/breakpoints/Breakpoints.programCounter
  )
- (func $core/debug/breakpoints/resetProgramCounterBreakpoint (; 194 ;) (type $_)
+ (func $core/debug/breakpoints/resetProgramCounterBreakpoint (; 222 ;) (type $FUNCSIG$v)
   i32.const -1
   global.set $core/debug/breakpoints/Breakpoints.programCounter
  )
- (func $core/debug/breakpoints/setReadGbMemoryBreakpoint (; 195 ;) (type $i_) (param $0 i32)
+ (func $core/debug/breakpoints/setReadGbMemoryBreakpoint (; 223 ;) (type $FUNCSIG$vi) (param $0 i32)
   local.get $0
   global.set $core/debug/breakpoints/Breakpoints.readGbMemory
  )
- (func $core/debug/breakpoints/resetReadGbMemoryBreakpoint (; 196 ;) (type $_)
+ (func $core/debug/breakpoints/resetReadGbMemoryBreakpoint (; 224 ;) (type $FUNCSIG$v)
   i32.const -1
   global.set $core/debug/breakpoints/Breakpoints.readGbMemory
  )
- (func $core/debug/breakpoints/setWriteGbMemoryBreakpoint (; 197 ;) (type $i_) (param $0 i32)
+ (func $core/debug/breakpoints/setWriteGbMemoryBreakpoint (; 225 ;) (type $FUNCSIG$vi) (param $0 i32)
   local.get $0
   global.set $core/debug/breakpoints/Breakpoints.writeGbMemory
  )
- (func $core/debug/breakpoints/resetWriteGbMemoryBreakpoint (; 198 ;) (type $_)
+ (func $core/debug/breakpoints/resetWriteGbMemoryBreakpoint (; 226 ;) (type $FUNCSIG$v)
   i32.const -1
   global.set $core/debug/breakpoints/Breakpoints.writeGbMemory
  )
- (func $core/debug/debug-cpu/getRegisterA (; 199 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterA (; 227 ;) (type $FUNCSIG$i) (result i32)
   global.get $core/cpu/cpu/Cpu.registerA
  )
- (func $core/debug/debug-cpu/getRegisterB (; 200 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterB (; 228 ;) (type $FUNCSIG$i) (result i32)
   global.get $core/cpu/cpu/Cpu.registerB
  )
- (func $core/debug/debug-cpu/getRegisterC (; 201 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterC (; 229 ;) (type $FUNCSIG$i) (result i32)
   global.get $core/cpu/cpu/Cpu.registerC
  )
- (func $core/debug/debug-cpu/getRegisterD (; 202 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterD (; 230 ;) (type $FUNCSIG$i) (result i32)
   global.get $core/cpu/cpu/Cpu.registerD
  )
- (func $core/debug/debug-cpu/getRegisterE (; 203 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterE (; 231 ;) (type $FUNCSIG$i) (result i32)
   global.get $core/cpu/cpu/Cpu.registerE
  )
- (func $core/debug/debug-cpu/getRegisterH (; 204 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterH (; 232 ;) (type $FUNCSIG$i) (result i32)
   global.get $core/cpu/cpu/Cpu.registerH
  )
- (func $core/debug/debug-cpu/getRegisterL (; 205 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterL (; 233 ;) (type $FUNCSIG$i) (result i32)
   global.get $core/cpu/cpu/Cpu.registerL
  )
- (func $core/debug/debug-cpu/getRegisterF (; 206 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getRegisterF (; 234 ;) (type $FUNCSIG$i) (result i32)
   global.get $core/cpu/cpu/Cpu.registerF
  )
- (func $core/debug/debug-cpu/getProgramCounter (; 207 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getProgramCounter (; 235 ;) (type $FUNCSIG$i) (result i32)
   global.get $core/cpu/cpu/Cpu.programCounter
  )
- (func $core/debug/debug-cpu/getStackPointer (; 208 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getStackPointer (; 236 ;) (type $FUNCSIG$i) (result i32)
   global.get $core/cpu/cpu/Cpu.stackPointer
  )
- (func $core/debug/debug-cpu/getOpcodeAtProgramCounter (; 209 ;) (type $i) (result i32)
+ (func $core/debug/debug-cpu/getOpcodeAtProgramCounter (; 237 ;) (type $FUNCSIG$i) (result i32)
   global.get $core/cpu/cpu/Cpu.programCounter
   call $core/memory/load/eightBitLoadFromGBMemory
   i32.const 255
   i32.and
  )
- (func $core/debug/debug-graphics/getLY (; 210 ;) (type $i) (result i32)
+ (func $core/debug/debug-graphics/getLY (; 238 ;) (type $FUNCSIG$i) (result i32)
   global.get $core/graphics/graphics/Graphics.scanlineRegister
  )
- (func $core/debug/debug-graphics/drawBackgroundMapToWasmMemory (; 211 ;) (type $i_) (param $0 i32)
+ (func $core/debug/debug-graphics/drawBackgroundMapToWasmMemory (; 239 ;) (type $FUNCSIG$vi) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   (local $3 i32)
@@ -14826,73 +17483,70 @@
   i32.const 34816
   global.get $core/graphics/lcd/Lcd.bgWindowTileDataSelect
   select
-  local.set $9
+  local.set $8
   i32.const 39936
   i32.const 38912
   global.get $core/graphics/lcd/Lcd.bgTileMapDisplaySelect
   select
-  local.set $10
-  loop $repeat|0
-   local.get $6
+  local.set $9
+  loop $loop|0
+   local.get $5
    i32.const 256
    i32.lt_s
    if
     i32.const 0
-    local.set $5
-    loop $repeat|1
-     local.get $5
+    local.set $4
+    loop $loop|1
+     local.get $4
      i32.const 256
      i32.lt_s
      if
-      local.get $9
-      local.get $6
+      local.get $8
+      local.get $5
       i32.const 3
       i32.shr_s
       i32.const 5
       i32.shl
-      local.get $10
+      local.get $9
       i32.add
-      local.get $5
+      local.get $4
       i32.const 3
       i32.shr_s
       i32.add
-      local.tee $3
+      local.tee $2
       i32.const -30720
       i32.add
       i32.load8_u
       call $core/graphics/tiles/getTileDataAddress
-      local.set $8
-      local.get $6
+      local.set $6
+      local.get $5
       i32.const 8
       i32.rem_s
       local.set $1
       i32.const 7
-      local.get $5
+      local.get $4
       i32.const 8
       i32.rem_s
       i32.sub
       local.set $7
       i32.const 0
-      local.set $2
-      block (result i32)
-       local.get $0
-       i32.const 0
-       i32.gt_s
-       global.get $core/cpu/cpu/Cpu.GBCEnabled
-       local.tee $4
-       local.get $4
-       select
-       if
-        local.get $3
-        i32.const -22528
-        i32.add
-        i32.load8_u
-        local.set $2
-       end
+      local.set $3
+      local.get $0
+      i32.const 0
+      i32.gt_s
+      i32.const 0
+      global.get $core/cpu/cpu/Cpu.GBCEnabled
+      select
+      if
        local.get $2
-       i32.const 64
-       i32.and
+       i32.const -22528
+       i32.add
+       i32.load8_u
+       local.set $3
       end
+      local.get $3
+      i32.const 64
+      i32.and
       if
        i32.const 7
        local.get $1
@@ -14900,37 +17554,33 @@
        local.set $1
       end
       i32.const 0
-      local.set $4
+      local.set $2
       local.get $1
       i32.const 1
       i32.shl
-      local.get $8
+      local.get $6
       i32.add
-      local.tee $3
+      local.tee $6
       i32.const -30720
       i32.add
       i32.const 1
       i32.const 0
-      local.get $2
+      local.get $3
       i32.const 8
       i32.and
       select
-      local.tee $4
-      i32.const 1
-      i32.and
+      local.tee $2
       i32.const 13
       i32.shl
       i32.add
       i32.load8_u
-      local.set $8
+      local.set $10
       i32.const 0
       local.set $1
-      local.get $3
+      local.get $6
       i32.const -30719
       i32.add
-      local.get $4
-      i32.const 1
-      i32.and
+      local.get $2
       i32.const 13
       i32.shl
       i32.add
@@ -14950,27 +17600,30 @@
       i32.const 1
       local.get $7
       i32.shl
-      local.get $8
+      local.get $10
       i32.and
       select
       local.set $1
-      local.get $6
+      local.get $5
       i32.const 8
       i32.shl
-      local.get $5
+      local.get $4
       i32.add
       i32.const 3
       i32.mul
-      local.set $7
+      local.set $2
       local.get $0
       i32.const 0
       i32.gt_s
+      i32.const 0
       global.get $core/cpu/cpu/Cpu.GBCEnabled
-      local.tee $3
-      local.get $3
       select
       if
        local.get $2
+       i32.const 184448
+       i32.add
+       local.tee $2
+       local.get $3
        i32.const 7
        i32.and
        local.get $1
@@ -14981,7 +17634,10 @@
        i32.and
        i32.const 3
        i32.shl
-       local.set $4
+       i32.store8
+       local.get $2
+       i32.const 1
+       i32.add
        local.get $1
        i32.const 992
        i32.and
@@ -14989,7 +17645,10 @@
        i32.shr_s
        i32.const 3
        i32.shl
-       local.set $3
+       i32.store8
+       local.get $2
+       i32.const 2
+       i32.add
        local.get $1
        i32.const 31744
        i32.and
@@ -14997,28 +17656,12 @@
        i32.shr_s
        i32.const 3
        i32.shl
-       local.set $2
-       local.get $7
-       i32.const 184448
-       i32.add
-       local.tee $1
-       local.get $4
        i32.store8
-       local.get $1
-       i32.const 1
-       i32.add
-       local.get $3
-       i32.store8
-       local.get $1
-       i32.const 2
-       i32.add
+      else
        local.get $2
-       i32.store8
-      else       
-       local.get $7
        i32.const 184448
        i32.add
-       local.tee $2
+       local.tee $3
        local.get $1
        i32.const 65351
        call $core/graphics/palette/getColorizedGbHexColorFromPalette
@@ -15028,7 +17671,7 @@
        i32.const 16
        i32.shr_s
        i32.store8
-       local.get $2
+       local.get $3
        i32.const 1
        i32.add
        local.get $1
@@ -15037,28 +17680,28 @@
        i32.const 8
        i32.shr_s
        i32.store8
-       local.get $2
+       local.get $3
        i32.const 2
        i32.add
        local.get $1
        i32.store8
       end
-      local.get $5
+      local.get $4
       i32.const 1
       i32.add
-      local.set $5
-      br $repeat|1
+      local.set $4
+      br $loop|1
      end
     end
-    local.get $6
+    local.get $5
     i32.const 1
     i32.add
-    local.set $6
-    br $repeat|0
+    local.set $5
+    br $loop|0
    end
   end
  )
- (func $core/debug/debug-graphics/drawTileDataToWasmMemory (; 212 ;) (type $_)
+ (func $core/debug/debug-graphics/drawTileDataToWasmMemory (; 240 ;) (type $FUNCSIG$v)
   (local $0 i32)
   (local $1 i32)
   (local $2 i32)
@@ -15071,72 +17714,70 @@
   (local $9 i32)
   (local $10 i32)
   (local $11 i32)
-  loop $repeat|0
-   local.get $3
+  loop $loop|0
+   local.get $4
    i32.const 23
    i32.ge_s
    i32.eqz
    if
     i32.const 0
-    local.set $2
-    loop $repeat|1
-     local.get $2
+    local.set $3
+    loop $loop|1
+     local.get $3
      i32.const 31
      i32.lt_s
      if
       i32.const 1
       i32.const 0
-      local.get $2
+      local.get $3
       i32.const 15
       i32.gt_s
+      local.tee $7
       select
       local.set $9
-      local.get $3
+      local.get $4
       i32.const 15
       i32.sub
-      local.get $3
-      local.get $3
+      local.get $4
+      local.get $4
       i32.const 15
       i32.gt_s
+      local.tee $0
       select
       i32.const 4
       i32.shl
-      local.tee $7
-      local.get $2
+      local.tee $5
+      local.get $3
       i32.const 15
       i32.sub
       i32.add
-      local.get $2
-      local.get $7
+      local.get $3
+      local.get $5
       i32.add
-      local.get $2
-      i32.const 15
-      i32.gt_s
+      local.get $7
       select
-      local.set $7
+      local.set $8
       i32.const 34816
       i32.const 32768
-      local.get $3
-      i32.const 15
-      i32.gt_s
+      local.get $0
       select
-      local.set $11
-      i32.const 65351
       local.set $10
+      i32.const 65351
+      local.set $7
       i32.const -1
-      local.set $1
+      local.set $6
       i32.const -1
-      local.set $8
+      local.set $5
       i32.const 0
-      local.set $4
-      loop $repeat|2
-       local.get $4
+      local.set $1
+      loop $loop|2
+       local.get $1
        i32.const 8
        i32.lt_s
        if
         i32.const 0
         local.set $0
-        loop $repeat|3
+        loop $loop|3
          local.get $0
          i32.const 5
          i32.lt_s
@@ -15144,30 +17785,28 @@
           local.get $0
           i32.const 3
           i32.shl
-          local.get $4
+          local.get $1
           i32.add
           i32.const 2
           i32.shl
-          local.tee $5
+          local.tee $2
           i32.const 65026
           i32.add
           call $core/memory/load/eightBitLoadFromGBMemory
-          local.get $7
+          local.get $8
           i32.eq
           if
-           local.get $5
+           local.get $2
            i32.const 65027
            i32.add
            call $core/memory/load/eightBitLoadFromGBMemory
-           local.set $6
+           local.set $2
            i32.const 1
            i32.const 0
-           local.get $6
+           local.get $2
            i32.const 8
            i32.and
            i32.const 0
-           i32.ne
-           global.get $core/cpu/cpu/Cpu.GBCEnabled
            global.get $core/cpu/cpu/Cpu.GBCEnabled
            select
            select
@@ -15175,97 +17814,96 @@
            i32.eq
            if
             i32.const 8
-            local.set $4
+            local.set $1
             i32.const 5
             local.set $0
-            local.get $6
-            local.tee $8
+            local.get $2
+            local.tee $5
             i32.const 16
             i32.and
             if (result i32)
              i32.const 65353
-            else             
+            else
              i32.const 65352
             end
-            local.set $10
+            local.set $7
            end
           end
           local.get $0
           i32.const 1
           i32.add
           local.set $0
-          br $repeat|3
+          br $loop|3
          end
         end
-        local.get $4
+        local.get $1
         i32.const 1
         i32.add
-        local.set $4
-        br $repeat|2
+        local.set $1
+        br $loop|2
        end
       end
-      local.get $8
+      local.get $5
       i32.const 0
       i32.lt_s
+      i32.const 0
       global.get $core/cpu/cpu/Cpu.GBCEnabled
-      local.tee $6
-      local.get $6
       select
       if
        i32.const 39936
        i32.const 38912
        global.get $core/graphics/lcd/Lcd.bgTileMapDisplaySelect
        select
-       local.set $4
+       local.set $11
        i32.const -1
        local.set $0
        i32.const 0
-       local.set $1
-       loop $repeat|4
-        local.get $1
+       local.set $2
+       loop $loop|4
+        local.get $2
         i32.const 32
         i32.lt_s
         if
          i32.const 0
-         local.set $5
-         loop $repeat|5
-          local.get $5
+         local.set $1
+         loop $loop|5
+          local.get $1
           i32.const 32
           i32.lt_s
           if
-           local.get $5
+           local.get $1
            i32.const 5
            i32.shl
-           local.get $4
+           local.get $11
            i32.add
-           local.get $1
+           local.get $2
            i32.add
            local.tee $6
            i32.const -30720
            i32.add
            i32.load8_u
-           local.get $7
+           local.get $8
            i32.eq
            if
             i32.const 32
-            local.set $5
-            local.get $6
-            local.set $0
+            local.set $2
             i32.const 32
             local.set $1
+            local.get $6
+            local.set $0
            end
-           local.get $5
+           local.get $1
            i32.const 1
            i32.add
-           local.set $5
-           br $repeat|5
+           local.set $1
+           br $loop|5
           end
          end
-         local.get $1
+         local.get $2
          i32.const 1
          i32.add
-         local.set $1
-         br $repeat|4
+         local.set $2
+         br $loop|4
         end
        end
        local.get $0
@@ -15276,62 +17914,62 @@
         i32.const -22528
         i32.add
         i32.load8_u
-       else        
+       else
         i32.const -1
        end
-       local.set $1
+       local.set $6
       end
       i32.const 0
       local.set $0
-      loop $repeat|6
+      loop $loop|6
        local.get $0
        i32.const 8
        i32.lt_s
        if
-        local.get $7
-        local.get $11
+        local.get $8
+        local.get $10
         local.get $9
         i32.const 0
         i32.const 7
         local.get $0
-        local.get $2
+        local.get $3
         i32.const 3
         i32.shl
-        local.get $3
+        local.get $4
         i32.const 3
         i32.shl
         local.get $0
         i32.add
         i32.const 248
         i32.const 381056
-        local.get $10
-        local.get $1
-        local.get $8
+        local.get $7
+        local.get $6
+        local.get $5
         call $core/graphics/tiles/drawPixelsFromLineOfTile
         drop
         local.get $0
         i32.const 1
         i32.add
         local.set $0
-        br $repeat|6
+        br $loop|6
        end
       end
-      local.get $2
+      local.get $3
       i32.const 1
       i32.add
-      local.set $2
-      br $repeat|1
+      local.set $3
+      br $loop|1
      end
     end
-    local.get $3
+    local.get $4
     i32.const 1
     i32.add
-    local.set $3
-    br $repeat|0
+    local.set $4
+    br $loop|0
    end
   end
  )
- (func $core/debug/debug-graphics/drawOamToWasmMemory (; 213 ;) (type $_)
+ (func $core/debug/debug-graphics/drawOamToWasmMemory (; 241 ;) (type $FUNCSIG$v)
   (local $0 i32)
   (local $1 i32)
   (local $2 i32)
@@ -15341,7 +17979,7 @@
   (local $6 i32)
   (local $7 i32)
   (local $8 i32)
-  loop $repeat|0
+  loop $loop|0
    local.get $4
    i32.const 8
    i32.ge_s
@@ -15349,7 +17987,7 @@
    if
     i32.const 0
     local.set $1
-    loop $repeat|1
+    loop $loop|1
      local.get $1
      i32.const 5
      i32.lt_s
@@ -15407,8 +18045,6 @@
       i32.const 8
       i32.and
       i32.const 0
-      i32.ne
-      global.get $core/cpu/cpu/Cpu.GBCEnabled
       global.get $core/cpu/cpu/Cpu.GBCEnabled
       select
       select
@@ -15424,14 +18060,14 @@
       local.set $8
       i32.const 0
       local.set $0
-      loop $repeat|2
+      loop $loop|2
        local.get $0
        local.get $5
        i32.lt_s
        if
         i32.const 0
         local.set $3
-        loop $repeat|3
+        loop $loop|3
          local.get $3
          i32.const 8
          i32.lt_s
@@ -15467,41 +18103,41 @@
           i32.const 1
           i32.add
           local.set $3
-          br $repeat|3
+          br $loop|3
          end
         end
         local.get $0
         i32.const 1
         i32.add
         local.set $0
-        br $repeat|2
+        br $loop|2
        end
       end
       local.get $1
       i32.const 1
       i32.add
       local.set $1
-      br $repeat|1
+      br $loop|1
      end
     end
     local.get $4
     i32.const 1
     i32.add
     local.set $4
-    br $repeat|0
+    br $loop|0
    end
   end
  )
- (func $core/debug/debug-timer/getDIV (; 214 ;) (type $i) (result i32)
+ (func $core/debug/debug-timer/getDIV (; 242 ;) (type $FUNCSIG$i) (result i32)
   global.get $core/timers/timers/Timers.dividerRegister
  )
- (func $core/debug/debug-timer/getTIMA (; 215 ;) (type $i) (result i32)
+ (func $core/debug/debug-timer/getTIMA (; 243 ;) (type $FUNCSIG$i) (result i32)
   global.get $core/timers/timers/Timers.timerCounter
  )
- (func $core/debug/debug-timer/getTMA (; 216 ;) (type $i) (result i32)
+ (func $core/debug/debug-timer/getTMA (; 244 ;) (type $FUNCSIG$i) (result i32)
   global.get $core/timers/timers/Timers.timerModulo
  )
- (func $core/debug/debug-timer/getTAC (; 217 ;) (type $i) (result i32)
+ (func $core/debug/debug-timer/getTAC (; 245 ;) (type $FUNCSIG$i) (result i32)
   (local $0 i32)
   global.get $core/timers/timers/Timers.timerInputClock
   local.set $0
@@ -15514,9 +18150,9 @@
   end
   local.get $0
  )
- (func $core/debug/debug-memory/updateDebugGBMemory (; 218 ;) (type $_)
+ (func $core/debug/debug-memory/updateDebugGBMemory (; 246 ;) (type $FUNCSIG$v)
   (local $0 i32)
-  loop $repeat|0
+  loop $loop|0
    block $break|0
     local.get $0
     i32.const 65535
@@ -15532,29 +18168,163 @@
     i32.const 1
     i32.add
     local.set $0
-    br $repeat|0
+    br $loop|0
    end
   end
   i32.const 0
   global.set $core/debug/breakpoints/Breakpoints.reachedBreakpoint
  )
- (func $start (; 219 ;) (type $_)
+ (func $start (; 247 ;) (type $FUNCSIG$v)
   call $start:core/graphics/colors
-  current_memory
+  memory.size
   i32.const 148
   i32.lt_s
   if
    i32.const 148
-   current_memory
+   memory.size
    i32.sub
-   grow_memory
+   memory.grow
    drop
   end
  )
- (func $null (; 220 ;) (type $_)
+ (func $~lib/rt/pure/__visit (; 248 ;) (type $FUNCSIG$vii) (param $0 i32) (param $1 i32)
+  local.get $0
+  i32.const 284
+  i32.lt_u
+  if
+   return
+  end
+  local.get $0
+  i32.const 16
+  i32.sub
+  local.set $0
+  block $break|0
+   block $case5|0
+    block $case4|0
+     block $case3|0
+      block $case2|0
+       block $case1|0
+        local.get $1
+        i32.const 1
+        i32.ne
+        if
+         local.get $1
+         i32.const 2
+         i32.eq
+         br_if $case1|0
+         block $tablify|0
+          local.get $1
+          i32.const 3
+          i32.sub
+          br_table $case2|0 $case3|0 $case4|0 $tablify|0
+         end
+         br $case5|0
+        end
+        local.get $0
+        call $~lib/rt/pure/decrement
+        br $break|0
+       end
+       local.get $0
+       i32.load offset=4
+       i32.const 268435455
+       i32.and
+       i32.const 0
+       i32.le_u
+       if
+        i32.const 0
+        i32.const 128
+        i32.const 75
+        i32.const 17
+        call $~lib/builtins/abort
+        unreachable
+       end
+       local.get $0
+       local.get $0
+       i32.load offset=4
+       i32.const 1
+       i32.sub
+       i32.store offset=4
+       local.get $0
+       call $~lib/rt/pure/markGray
+       br $break|0
+      end
+      local.get $0
+      call $~lib/rt/pure/scan
+      br $break|0
+     end
+     local.get $0
+     i32.load offset=4
+     local.tee $1
+     i32.const -268435456
+     i32.and
+     local.get $1
+     i32.const 1
+     i32.add
+     i32.const -268435456
+     i32.and
+     i32.ne
+     if
+      i32.const 0
+      i32.const 128
+      i32.const 86
+      i32.const 6
+      call $~lib/builtins/abort
+      unreachable
+     end
+     local.get $0
+     local.get $1
+     i32.const 1
+     i32.add
+     i32.store offset=4
+     local.get $1
+     i32.const 1879048192
+     i32.and
+     if
+      local.get $0
+      call $~lib/rt/pure/scanBlack
+     end
+     br $break|0
+    end
+    local.get $0
+    call $~lib/rt/pure/collectWhite
+    br $break|0
+   end
+   i32.const 0
+   i32.const 128
+   i32.const 97
+   i32.const 24
+   call $~lib/builtins/abort
+   unreachable
+  end
+ )
+ (func $~lib/rt/__visit_members (; 249 ;) (type $FUNCSIG$vii) (param $0 i32) (param $1 i32)
+  block $switch$1$default
+   block $switch$1$case$4
+    block $switch$1$case$2
+     local.get $0
+     i32.const 8
+     i32.sub
+     i32.load
+     br_table $switch$1$case$2 $switch$1$case$2 $switch$1$case$4 $switch$1$default
+    end
+    return
+   end
+   local.get $0
+   i32.load
+   local.tee $0
+   if
+    local.get $0
+    local.get $1
+    call $~lib/rt/pure/__visit
+   end
+   return
+  end
+  unreachable
+ )
+ (func $null (; 250 ;) (type $FUNCSIG$v)
   nop
  )
- (func $core/execute/executeFrameAndCheckAudio|trampoline (; 221 ;) (type $ii) (param $0 i32) (result i32)
+ (func $core/execute/executeFrameAndCheckAudio|trampoline (; 251 ;) (type $FUNCSIG$ii) (param $0 i32) (result i32)
   block $1of1
    block $0of1
     block $outOfRange
@@ -15569,11 +18339,11 @@
   local.get $0
   call $core/execute/executeUntilCondition
  )
- (func $~lib/setargc (; 222 ;) (type $i_) (param $0 i32)
+ (func $~lib/setargc (; 252 ;) (type $FUNCSIG$vi) (param $0 i32)
   local.get $0
   global.set $~lib/argc
  )
- (func $core/execute/executeUntilCondition|trampoline (; 223 ;) (type $iii) (param $0 i32) (param $1 i32) (result i32)
+ (func $core/execute/executeUntilCondition|trampoline (; 253 ;) (type $FUNCSIG$iii) (param $0 i32) (param $1 i32) (result i32)
   block $2of2
    block $1of2
     block $0of2
