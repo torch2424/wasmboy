@@ -1,11 +1,12 @@
 // Convinience functions for our CLI
 
 import { Console } from 'as-wasi';
-import { GREEN, CYAN, RED, RESET, printColor } from './ansi';
+import { GREEN, CYAN, RED, printColor } from './ansi';
 
 export function showHelp(): void {
   Console.log('');
-  printColor('wasm(er)boy', GREEN);
+  printColor('wasm(er)boy help', GREEN);
+  Console.log('');
   Console.log('');
 
   printColor('USAGE:', CYAN);
@@ -18,7 +19,7 @@ export function showHelp(): void {
   Console.log('');
 
   Console.log('-s, --speed');
-  Console.log('Speed in frames per second to run the emulation');
+  Console.log('Speed in frames per second to run the emulation. Must be an integer greater than 1.');
   Console.log('Suggested: 60, Default: 60');
   Console.log('');
 
@@ -26,7 +27,7 @@ export function showHelp(): void {
   Console.log('Show this help message.');
   Console.log('');
 
-  printColor('Controls:', CYAN);
+  printColor('CONTROLS:', CYAN);
   Console.log('');
 
   Console.log('Dpad:');

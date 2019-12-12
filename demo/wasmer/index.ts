@@ -4,6 +4,8 @@ import { config, executeFrame, clearAudioBuffer, setJoypadState, CARTRIDGE_ROM_L
 // Import all of our utils and things
 import { showHelp } from './cli/cli';
 
+import { GREEN, CYAN, RED, printColor } from './cli/ansi';
+
 // Import our CommandLine for grabbing args
 import { CommandLine, FileSystem, Descriptor, Console, Time, Date } from 'as-wasi';
 
@@ -16,6 +18,7 @@ import {
 
 let GAMEBOY_CAMERA_WIDTH = 160;
 let GAMEBOY_CAMERA_HEIGHT = 144;
+let FRAMES_PER_SECOND = 60;
 let whence: u8 = 2;
 
 function update(): void {
@@ -78,24 +81,53 @@ export function _start(): void {
   let commandLine = new CommandLine();
   let args: Array<string> = commandLine.all();
 
-  if (args.length <= 1) {
+  if (args.length <= 1 || args.includes('--help') || args.includes('-h')) {
     showHelp();
     return;
   }
 
-  let arg: string = args[1];
+  // Check if we have a sleep flag
+  for (let i = 1; i < args.length - 1; i++) {
+    if (args[i] == '--speed' || args[i] == '-s') {
+      FRAMES_PER_SECOND = I32.parseInt(args[i + 1]);
+      if (FRAMES_PER_SECOND < 1) {
+        FRAMES_PER_SECOND = 1;
+      }
 
-  Console.log('Loading Rom: ' + arg);
+      // Remove these arguments from the args
+      args.splice(i, 2);
+
+      // Reset i
+      i = 0;
+    }
+  }
+
+  // Finally, we should have parsed all flags, the last remaining arg should be the rom.
+  let romArg: string = args[1];
+
+  printColor('Loading Rom: ', CYAN);
+  Console.log(romArg);
+  Console.log('');
+
+  // Check if the Rom Exists
+  if (!FileSystem.exists(romArg)) {
+    printColor('Rom File not found', RED);
+    Console.log('');
+    Console.log('');
+
+    return;
+  }
 
   // Read the ROM, place into memory
-  let rom: Descriptor = FileSystem.open(arg) as Descriptor;
-  Console.log('Rom Fd: ' + rom.rawfd.toString());
+  let rom: Descriptor = FileSystem.open(romArg) as Descriptor;
   let romBytes = rom.readAll() as Array<u8>;
   for (let i: i32 = 0; i < romBytes.length; i++) {
     store<u8>(CARTRIDGE_ROM_LOCATION + i, romBytes[i]);
   }
 
-  Console.log('Configuring WasmBoy...');
+  printColor('Configuring WasmBoy...', CYAN);
+  Console.log('');
+  Console.log('');
 
   // Configure the core
   config(
@@ -111,7 +143,12 @@ export function _start(): void {
     0 // enableAudioDebugging: i32
   );
 
-  Console.log('Starting!');
+  printColor('Running WasmBoy!', GREEN);
+  Console.log('');
+  Console.log('');
+
+  // Get how much time we want to spend on each frame to get our frames per second
+  let timePerFrame: i32 = 1000 / FRAMES_PER_SECOND;
 
   // Open a framebuffer
   let frameBuffer: Descriptor = openFrameBufferWindow(GAMEBOY_CAMERA_WIDTH, GAMEBOY_CAMERA_HEIGHT, 0);
@@ -126,10 +163,9 @@ export function _start(): void {
     draw(frameBuffer);
 
     let loopTime: i32 = <i32>(Date.now() - startTime) / 1000;
-    let millisecondsToWaitForNextLoop: i32 = 16 - loopTime;
+    let millisecondsToWaitForNextLoop: i32 = timePerFrame - loopTime;
     if (millisecondsToWaitForNextLoop > 0) {
       Time.sleep(millisecondsToWaitForNextLoop * Time.MILLISECOND);
-      // Time.sleep(1 * Time.MILLISECOND);
     }
   }
 }
