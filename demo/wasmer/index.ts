@@ -32,6 +32,8 @@ function update(): void {
   let buttonSelect: bool = isKeyPressed('KeyShift');
   let buttonStart: bool = isKeyPressed('KeySpace');
 
+  Console.log('Dpad Left! ' + dpadLeft.toString());
+
   setJoypadState(
     dpadUp ? 1 : 0, // up
     dpadRight ? 1 : 0, // right
