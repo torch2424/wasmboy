@@ -1,5 +1,5 @@
 // Import WasmBoy
-import { config, executeFrame, clearAudioBuffer, CARTRIDGE_ROM_LOCATION, FRAME_LOCATION } from '../../core/index';
+import { config, executeFrame, clearAudioBuffer, setJoypadState, CARTRIDGE_ROM_LOCATION, FRAME_LOCATION } from '../../core/index';
 
 // Import all of our utils and things
 import { showHelp } from './cli/cli';
@@ -11,7 +11,7 @@ import {
   openFrameBufferWindow,
   drawRgbaArrayToFrameBuffer,
   updateInput,
-  getKeyPressState
+  isKeyPressed
 } from '../../node_modules/@wasmer/io-devices-lib-assemblyscript/assemblyscript/lib/lib';
 
 let GAMEBOY_CAMERA_WIDTH = 160;
@@ -23,6 +23,25 @@ function update(): void {
   updateInput();
 
   // Get the keys we care about
+  let dpadUp: bool = isKeyPressed('KeyUp');
+  let dpadRight: bool = isKeyPressed('KeyRight');
+  let dpadDown: bool = isKeyPressed('KeyDown');
+  let dpadLeft: bool = isKeyPressed('KeyLeft');
+  let buttonA: bool = isKeyPressed('KeyX');
+  let buttonB: bool = isKeyPressed('KeyZ');
+  let buttonSelect: bool = isKeyPressed('KeyShift');
+  let buttonStart: bool = isKeyPressed('KeySpace');
+
+  setJoypadState(
+    dpadUp ? 1 : 0, // up
+    dpadRight ? 1 : 0, // right
+    dpadDown ? 1 : 0, // down
+    dpadLeft ? 1 : 0, // left
+    buttonA ? 1 : 0, // a
+    buttonB ? 1 : 0, // b
+    buttonSelect ? 1 : 0, // select
+    buttonStart ? 1 : 0 // start
+  );
 
   // Run a frame a wasmboy
   executeFrame();
@@ -110,6 +129,7 @@ export function _start(): void {
     let millisecondsToWaitForNextLoop: i32 = 16 - loopTime;
     if (millisecondsToWaitForNextLoop > 0) {
       Time.sleep(millisecondsToWaitForNextLoop * Time.MILLISECOND);
+      // Time.sleep(1 * Time.MILLISECOND);
     }
   }
 }
