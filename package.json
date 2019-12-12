@@ -78,13 +78,14 @@
     "amp:build:skiplib": "npx rollup -c --environment PROD,TS,AMP,SKIP_LIB",
     "amp:dev": "npm run amp:watch",
     "amp:watch": "npx rollup -c -w --environment AMP,SERVE",
-    "wasmerfb:build": "npx asc demo/wasmerfb/index.ts -b dist/wasmerfb/wasmerfb.wasm -O3 --validate --use abort=wasi_abort --memoryBase 8324096",
     "demo:build": "npx run-s core:build lib:build demo:build:apps",
     "demo:build:apps": "npx run-s debugger:build benchmark:build:skiplib amp:build:skiplib",
     "demo:cname": "echo 'wasmboy.app' > build/CNAME",
     "demo:dist": "cp -r dist/ build/dist",
     "demo:gh-pages": "npx gh-pages -d build",
-    "demo:deploy": "npx run-s demo:build demo:dist demo:cname demo:gh-pages"
+    "demo:deploy": "npx run-s demo:build demo:dist demo:cname demo:gh-pages",
+    "wasmer:build": "npx asc demo/wasmer/index.ts -b dist/wasmer/wasmboy-wasmer.wasm -O3 --validate --use abort=wasi_abort --runtime stub --memoryBase 8324096",
+    "wasmer:run": "../wasmer/target/release/wasmer run --enable-experimental-framebuffer dist/wasmer/wasmboy-wasmer.wasm --mapdir=rom:test/performance/testroms/tobutobugirl -- rom/tobutobugirl.gb"
   },
   "files": [
     "dist",
@@ -108,6 +109,8 @@
     "@phosphor/default-theme": "^0.1.0",
     "@phosphor/messaging": "^1.2.2",
     "@phosphor/widgets": "^1.6.0",
+    "@wasmer/io-devices-lib-assemblyscript": "git+https://github.com/wasmerio/io-devices-lib.git",
+    "as-wasi": "git+https://github.com/jedisct1/as-wasi.git",
     "assemblyscript": "^0.8.1",
     "babel-plugin-filter-imports": "^2.0.3",
     "babel-preset-env": "^1.6.1",

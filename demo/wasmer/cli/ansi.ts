@@ -1,6 +1,6 @@
 // Ansi Sequences and convenience functions
 
-import { Console } from '../wasa';
+import { Console } from 'as-wasi';
 
 // ANSI Escape
 const ESC: string = '\u001b[';
