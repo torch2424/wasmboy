@@ -23,14 +23,14 @@ function update(): void {
   updateInput();
 
   // Get the keys we care about
-  let dpadUp: bool = isKeyPressed('KeyUp');
-  let dpadRight: bool = isKeyPressed('KeyRight');
-  let dpadDown: bool = isKeyPressed('KeyDown');
-  let dpadLeft: bool = isKeyPressed('KeyLeft');
-  let buttonA: bool = isKeyPressed('KeyX');
-  let buttonB: bool = isKeyPressed('KeyZ');
-  let buttonSelect: bool = isKeyPressed('KeyShift');
-  let buttonStart: bool = isKeyPressed('KeySpace');
+  let dpadUp: bool = isKeyPressed('KeyUp') || isKeyPressed('KeyW');
+  let dpadRight: bool = isKeyPressed('KeyRight') || isKeyPressed('KeyD');
+  let dpadDown: bool = isKeyPressed('KeyDown') || isKeyPressed('KeyS');
+  let dpadLeft: bool = isKeyPressed('KeyLeft') || isKeyPressed('KeyA');
+  let buttonA: bool = isKeyPressed('KeyX') || isKeyPressed('KeySemicolon');
+  let buttonB: bool = isKeyPressed('KeyZ') || isKeyPressed('KeyBackspace');
+  let buttonSelect: bool = isKeyPressed('KeyShift') || isKeyPressed('KeyTab');
+  let buttonStart: bool = isKeyPressed('KeySpace') || isKeyPressed('KeyEnter');
 
   setJoypadState(
     dpadUp ? 1 : 0, // up
