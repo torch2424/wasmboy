@@ -51,7 +51,7 @@ function update(): void {
   clearAudioBuffer();
 }
 
-function draw(frameBuffer: Descriptor): void {
+function draw(): void {
   let imageDataArray = new Array<u8>(160 * 144 * 4);
 
   for (let y = 0; y < GAMEBOY_CAMERA_HEIGHT; ++y) {
@@ -72,7 +72,7 @@ function draw(frameBuffer: Descriptor): void {
     }
   }
 
-  drawRgbaArrayToFrameBuffer(imageDataArray, frameBuffer, 0);
+  drawRgbaArrayToFrameBuffer(imageDataArray, 0);
 }
 
 // Entry point into WASI Module
@@ -151,7 +151,7 @@ export function _start(): void {
   let timePerFrame: i32 = 1000 / FRAMES_PER_SECOND;
 
   // Open a framebuffer
-  let frameBuffer: Descriptor = openFrameBufferWindow(GAMEBOY_CAMERA_WIDTH, GAMEBOY_CAMERA_HEIGHT, 0);
+  openFrameBufferWindow(GAMEBOY_CAMERA_WIDTH, GAMEBOY_CAMERA_HEIGHT, 0);
 
   while (true) {
     let startTime = Date.now();
@@ -160,7 +160,7 @@ export function _start(): void {
     update();
 
     // Draw the frame from wasmboy
-    draw(frameBuffer);
+    draw();
 
     let loopTime: i32 = <i32>(Date.now() - startTime) / 1000;
     let millisecondsToWaitForNextLoop: i32 = timePerFrame - loopTime;
