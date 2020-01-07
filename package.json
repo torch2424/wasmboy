@@ -67,6 +67,8 @@
     "test:perf": "npm run test:performance",
     "test:performance": "npx run-s build test:performance:nobuild",
     "test:performance:nobuild": "node --experimental-worker node_modules/mocha/bin/_mocha test/performance/performance-test.js --exit",
+    "test:integration": "npx run-s build test:integration:nobuild",
+    "test:integration:nobuild": "node --experimental-worker node_modules/mocha/bin/_mocha test/integration/integration-test.js --exit",
     "debugger:dev": "npm run debugger:watch",
     "debugger:watch": "npx rollup -c -w --environment DEBUGGER,SERVE",
     "debugger:build": "npx rollup -c --environment DEBUGGER",
