@@ -23,7 +23,7 @@ let whence: u8 = 2;
 
 function update(): void {
   // Update the input from the io-devices
-  updateInput();
+  updateInput(0);
 
   // Get the keys we care about
   let dpadUp: bool = isKeyPressed('KeyUp') || isKeyPressed('KeyW');
