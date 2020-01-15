@@ -14,7 +14,7 @@ import {
   drawRgbaArrayToFrameBuffer,
   updateInput,
   isKeyPressed
-} from '../../node_modules/@wasmer/io-devices-lib-assemblyscript/assemblyscript/lib/lib';
+} from '../../node_modules/@wasmer/io-devices-lib-assemblyscript/lib/lib';
 
 let GAMEBOY_CAMERA_WIDTH = 160;
 let GAMEBOY_CAMERA_HEIGHT = 144;
