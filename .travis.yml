@@ -10,4 +10,5 @@ script:
   - npm run prettier:lint
   - npm run demo:build:apps
   - npm run test:accuracy:nobuild
+  - npm run test:integration:nobuild
   - npm run wasmerboy:build
