@@ -10,6 +10,7 @@ import { GREEN, CYAN, RED, printColor } from './cli/ansi';
 import { CommandLine, FileSystem, Descriptor, Console, Time, Date } from 'as-wasi';
 
 import {
+  isIoDevicesEnabled,
   openFrameBufferWindow,
   drawRgbaArrayToFrameBuffer,
   updateInput,
@@ -77,6 +78,9 @@ function draw(): void {
 
 // Entry point into WASI Module
 export function _start(): void {
+  // Check if IO Devices is enabled. Throw if not.
+  isIoDevicesEnabled(true);
+
   // Parse command line arguments
   let commandLine = new CommandLine();
   let args: Array<string> = commandLine.all();
