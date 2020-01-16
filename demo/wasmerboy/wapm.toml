@@ -8,7 +8,7 @@ wasmer-extra-flags = "--enable-experimental-io-devices"
 
 [[module]]
 name = "wasmerboy"
-source = "../../dist/wasmerboy/wasmerboy.wasm"
+source = "dist/wasmerboy.wasm"
 abi = "wasi"
 
 [module.interfaces]
