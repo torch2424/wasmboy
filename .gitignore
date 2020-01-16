@@ -1,10 +1,14 @@
 # Ignore system files
 **/.DS_Store
 
+# Ignore WAPM Files
+**/wapm_packages
+
 # Ignore game files
 games/*
 *.gb
 !test/**/*.gb
+!demo/wasmerboy/tobutobugirl/*.gb
 *.gbc
 !test/**/*.gbc
 *.sav

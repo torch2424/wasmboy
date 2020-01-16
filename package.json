@@ -85,7 +85,7 @@
     "demo:gh-pages": "npx gh-pages -d build",
     "demo:deploy": "npx run-s demo:build demo:dist demo:cname demo:gh-pages",
     "wasmerboy:build": "npx asc demo/wasmerboy/index.ts -b dist/wasmerboy/wasmerboy.wasm -O3 --validate --use abort=wasi_abort --runtime stub --memoryBase 8324096",
-    "wasmerboy:start": "wasmer run --enable-experimental-io-devices dist/wasmerboy/wasmerboy.wasm --mapdir=rom:test/performance/testroms/tobutobugirl -- rom/tobutobugirl.gb"
+    "wasmerboy:start": "cd demo/wasmerboy && wapm run wasmerboy --dir=tobutobugirl tobutobugirl/tobutobugirl.gb && cd .."
   },
   "files": [
     "dist",
