@@ -85,7 +85,9 @@
     "demo:cname": "echo 'wasmboy.app' > build/CNAME",
     "demo:dist": "cp -r dist/ build/dist",
     "demo:gh-pages": "npx gh-pages -d build",
-    "demo:deploy": "npx run-s demo:build demo:dist demo:cname demo:gh-pages"
+    "demo:deploy": "npx run-s demo:build demo:dist demo:cname demo:gh-pages",
+    "wasmerboy:build": "npx asc demo/wasmerboy/index.ts -b demo/wasmerboy/dist/wasmerboy.wasm -O3 --validate --use abort=wasi_abort --runtime stub --memoryBase 8324096",
+    "wasmerboy:start": "cd demo/wasmerboy && wapm run wasmerboy --dir=tobutobugirl tobutobugirl/tobutobugirl.gb && cd .."
   },
   "files": [
     "dist",
@@ -109,6 +111,8 @@
     "@phosphor/default-theme": "^0.1.0",
     "@phosphor/messaging": "^1.2.2",
     "@phosphor/widgets": "^1.6.0",
+    "@wasmer/io-devices-lib-assemblyscript": "^0.1.1",
+    "as-wasi": "git+https://github.com/jedisct1/as-wasi.git",
     "assemblyscript": "^0.8.1",
     "babel-plugin-filter-imports": "^2.0.3",
     "babel-preset-env": "^1.6.1",
