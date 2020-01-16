@@ -5,14 +5,14 @@ import { GREEN, CYAN, RED, printColor } from './ansi';
 
 export function showHelp(): void {
   Console.log('');
-  printColor('wasm(er)boy help', GREEN);
+  printColor('wasmerboy help', GREEN);
   Console.log('');
   Console.log('');
 
   printColor('USAGE:', CYAN);
   Console.log('');
 
-  Console.log('[wapm run] wasmboy [my-rom.gb]');
+  Console.log('[wapm run] wasmerboy [--dir=my-rom-dir] [my-rom-dir/my-rom.gb]');
   Console.log('');
 
   printColor('FLAGS:', CYAN);
