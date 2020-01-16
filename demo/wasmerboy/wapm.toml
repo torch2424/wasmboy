@@ -1,10 +1,11 @@
 [package]
 name = "torch2424/wasmerboy"
-version = "0.0.1"
+version = "0.1.0"
 description = "Game Boy / Game Boy Color Emulator Library, 🎮written for WebAssembly using AssemblyScript. 🚀Built for Wasmer using the Experimental I/O Devices!"
 license = "GPL-3.0"
 repository = "https://github.com/torch2424/wasmboy"
 wasmer-extra-flags = "--enable-experimental-io-devices"
+readme = "./README.md"
 
 [[module]]
 name = "wasmerboy"
