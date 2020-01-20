@@ -5,6 +5,7 @@
 [![Build Status](https://travis-ci.org/torch2424/wasmBoy.svg?branch=master)](https://travis-ci.org/torch2424/wasmBoy)
 ![npm version](https://img.shields.io/npm/v/wasmboy.svg)
 ![npm bundle size (minified)](https://img.shields.io/bundlephobia/min/wasmboy.svg)
+[![wapm version](https://wapm.io/package/torch2424/wasmerboy/badge.svg?style=flat)](https://wapm.io/package/torch2424/wasmerboy)
 ![npm](https://img.shields.io/npm/dt/wasmboy.svg)
 ![GitHub](https://img.shields.io/github/license/torch2424/wasmboy.svg)
 
