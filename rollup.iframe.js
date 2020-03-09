@@ -1,99 +1,93 @@
 // Bundle for the iframe embed app
 
+import svelte from 'rollup-plugin-svelte';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
-import babel from 'rollup-plugin-babel';
-import compiler from '@ampproject/rollup-plugin-closure-compiler';
-import url from 'rollup-plugin-url';
-import json from 'rollup-plugin-json';
-import serve from 'rollup-plugin-serve';
+import livereload from 'rollup-plugin-livereload';
+import { terser } from 'rollup-plugin-terser';
 import bundleSize from 'rollup-plugin-bundle-size';
-import postcss from 'rollup-plugin-postcss';
 import copy from 'rollup-plugin-copy-glob';
-import hash from 'rollup-plugin-hash';
-import pkg from './package.json';
 
+const production = !process.env.SERVE;
+
+const hashGenerator = require('hash-generator');
+const bundleHash = hashGenerator(10);
 const fs = require('fs');
 
-const writeIndexHtmlToBuild = bundleName => {
-  let indexHtml = fs.readFileSync('demo/iframe/index.html', 'utf8');
-  indexHtml = indexHtml.replace('<%BUNDLE%>', bundleName.replace('build/iframe/', ''));
-  fs.writeFileSync('build/iframe/index.html', indexHtml, 'utf8');
+let jsBundle = 'bundle.js';
+let cssBundle = 'bundle.css';
+if (production) {
+  jsBundle = `bundle.${bundleHash}.js`;
+  cssBundle = `bundle.${bundleHash}.css`;
+}
+
+const serve = () => {
+  let started = false;
+
+  return {
+    generateBundle() {
+      if (!started) {
+        started = true;
+
+        require('child_process').spawn('npm', ['run', 'iframe:serve'], {
+          stdio: ['ignore', 'inherit', 'inherit'],
+          shell: true
+        });
+      }
+    }
+  };
 };
 
-const babelPluginConfig = {
-  plugins: [
-    ['@babel/plugin-proposal-class-properties'],
-    ['@babel/plugin-proposal-object-rest-spread'],
-    ['@babel/plugin-transform-react-jsx', { pragma: 'h' }],
-    ['@babel/plugin-proposal-export-default-from']
-  ]
+const writeIndexToBuild = () => {
+  return {
+    generateBundle() {
+      let indexHtml = fs.readFileSync('demo/iframe/index.html', 'utf8');
+      indexHtml = indexHtml.replace('%CSS_BUNDLE%', cssBundle);
+      indexHtml = indexHtml.replace('%JS_BUNDLE%', jsBundle);
+      fs.writeFileSync('build/iframe/index.html', indexHtml, 'utf8');
+    }
+  };
 };
 
-let plugins = [
-  postcss({
-    extensions: ['.css']
+const plugins = [
+  svelte({
+    dev: !production,
+    css: css => {
+      css.write(`build/iframe/${cssBundle}`);
+    }
   }),
   resolve({
-    preferBuiltins: false
+    browser: true,
+    dedupe: ['svelte']
   }),
-  babel(babelPluginConfig),
   commonjs(),
-  json(),
-  url({
-    limit: 1000000 * 1024, // Always inline
-    include: ['**/*.png'],
-    // Don't emit files, this will replace the worker build output
-    emitFiles: false
-  })
-];
-
-let sourcemap = false;
-if (process.env.IFRAME && process.env.SERVE) {
-  plugins = [
-    ...plugins,
-    serve({
-      contentBase: ['dist/', 'build/iframe/', 'demo/iframe/', 'demo/iframe/'],
-      port: 8080
-    })
-  ];
-  writeIndexHtmlToBuild('index.iife.js');
-  sourcemap = 'inline';
-} else if (process.env.IFRAME) {
-  // Not running through closure to show difference between
-  // Closure and non closure.
-  plugins = [
-    ...plugins,
+  !production && serve(),
+  !production && livereload('build/iframe'),
+  production && terser(),
+  bundleSize(),
+  production &&
     copy([
       {
         files: 'demo/iframe/assets/**/*',
-        dest: 'build/iframe/assets'
+        dest: 'build/iframe/assets/'
       }
     ]),
-    compiler(),
-    hash({
-      dest: 'build/iframe/bundle.[hash].js',
-      callback: bundleName => {
-        writeIndexHtmlToBuild(bundleName);
-      }
-    })
-  ];
-}
-
-plugins = [...plugins, bundleSize()];
+  writeIndexToBuild()
+];
 
 const iframeBundles = [
   {
     input: 'demo/iframe/index.js',
     output: {
-      name: 'WasmBoyIframe',
-      file: 'build/iframe/index.iife.js',
+      sourcemap: true,
       format: 'iife',
-      sourcemap: sourcemap
+      name: 'WasmBoyIframe',
+      file: `build/iframe/${jsBundle}`
     },
-    context: 'window',
-    plugins: plugins,
-    sourcemap: true
+    plugins,
+    watch: {
+      clearScreen: false
+    }
   }
 ];
 
