@@ -33,6 +33,18 @@ const serve = () => {
           stdio: ['ignore', 'inherit', 'inherit'],
           shell: true
         });
+
+        setTimeout(() => {
+          console.log(`
+-------
+
+Click this URL for all embed query params pre-filled:
+
+http://localhost:8080/?rom-name=Tobu%20Tobu%20Girl&play-poster=https://gbhh.avivace.com/database/entries/tobutobugirl/screenshot1.bmp&rom-url=https://gbhh.avivace.com/database/entries/tobutobugirl/tobu.gb
+
+-------
+          `);
+        }, 500);
       }
     }
   };
@@ -86,6 +98,7 @@ const iframeBundles = [
     },
     plugins,
     watch: {
+      chokidar: false,
       clearScreen: false
     }
   }
