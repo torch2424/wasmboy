@@ -106,7 +106,7 @@
     "responsive-gamepad": "1.1.0"
   },
   "devDependencies": {
-    "@ampproject/rollup-plugin-closure-compiler": "^0.7.2",
+    "@ampproject/rollup-plugin-closure-compiler": "^0.24.0",
     "@babel/core": "^7.1.2",
     "@babel/plugin-proposal-class-properties": "^7.1.0",
     "@babel/plugin-proposal-export-default-from": "^7.2.0",
