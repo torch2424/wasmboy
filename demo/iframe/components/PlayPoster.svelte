@@ -1,5 +1,6 @@
 <script>
   import {isStarted, playPoster} from '../stores.js';
+  import PlayIcon from './icons/PlayIcon.svelte';
 
   function handlePlay() {
     isStarted.set(true);
@@ -14,12 +15,7 @@
   <div class="play-poster__shade"></div>
 
   <button class="play-poster__play-button" on:click={handlePlay}>
-    <!-- Google Material Play Icon -->
-    <!-- https://material.io/resources/icons -->
-    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
-      <path d="M8 5v14l11-7z" fill="#fff" />
-      <path d="M0 0h24v24H0z" fill="none"/>
-    </svg>
+    <PlayIcon />
   </button>
 </div>
 

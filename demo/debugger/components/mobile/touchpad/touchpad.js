@@ -144,7 +144,7 @@ export default class Touchpad extends Component {
 
   togglePlayPause() {
     if (!WasmBoy.isLoadedAndStarted()) {
-      Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Please load a ROM first. 💾');
+      Pubx.get(PUBX_KEYS.NOTIFICATION).showNotification('Please load a ROM first. 📁');
       return;
     }
 
@@ -185,7 +185,7 @@ export default class Touchpad extends Component {
 
         <div class="debugger-input">
           <button class="remove-default-button" onClick={() => this.openROM()}>
-            💾
+            📁
           </button>
           <button class="remove-default-button" onClick={() => this.togglePlayPause()}>
             ⏯️

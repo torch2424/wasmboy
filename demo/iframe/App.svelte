@@ -4,7 +4,7 @@
   import WasmBoy from './components/WasmBoy.svelte'; 
   import ControlsBar from './components/ControlsBar.svelte'; 
 
-  import {isStarted} from './stores.js';
+  import {isStarted, isLoaded} from './stores.js';
 </script>
 
 <main class="app">
@@ -12,7 +12,9 @@
     <PlayPoster />
   {:else}
     <WasmBoy />
-    <ControlsBar />
+    {#if $isLoaded}
+      <ControlsBar />
+    {/if}
   {/if}
 </main>
 

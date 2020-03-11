@@ -1,7 +1,38 @@
-import { writable } from 'svelte/store';
+import { writable, readable } from 'svelte/store';
 
 export const isStarted = writable(false);
+export const isLoaded = writable(false);
 export const isPlaying = writable(false);
+
+export const saveState = writable(0);
+export const triggerSaveState = () => saveState.update(value => value + 1);
+
+// Set the current status message
+let statusMessage;
+let statusTimeout;
+let statusReadableSet;
+export const status = readable(
+  {
+    message: statusMessage,
+    timeout: statusTimeout
+  },
+  set => {
+    statusReadableSet = set;
+    return () => {};
+  }
+);
+export const setStatus = (message, timeout) => {
+  if (!timeout) {
+    timeout = 2000;
+  }
+
+  if (statusReadableSet) {
+    statusReadableSet({
+      message,
+      timeout
+    });
+  }
+};
 
 // Get our search params
 const params = new URLSearchParams(document.location.search.substring(1));

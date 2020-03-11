@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import {isStarted, isPlaying, romUrl, romName} from '../stores.js';
+  import {isStarted, isLoaded, isPlaying, romUrl, romName, saveState, setStatus} from '../stores.js';
   import {WasmBoy} from '../../../dist/wasmboy.wasm.esm.js';
 
   let mountResolve;
@@ -11,7 +11,6 @@
 
   let canvasStyle = 'display: none';
 
-  let loaded = false;
   const loadWasmBoy = async () => {
     await mountPromise;
 
@@ -22,20 +21,46 @@
       isGbcColorizationEnabled: true,
       isAudioEnabled: true,
       gameboyFrameRate: 60,
-      maxNumberOfAutoSaveStates: 3
+      maxNumberOfAutoSaveStates: 3,
+      onPlay: () => {
+        isPlaying.set(true);
+      },
+      onPause: () => {
+        isPlaying.set(false);
+        setStatus('Paused', -1);
+      }
     });
 
     await WasmBoy.setCanvas(wasmBoyCanvas);
     await WasmBoy.loadROM($romUrl);
     await WasmBoy.play();
 
-    loaded = true;
     canvasStyle = 'display: block';
+    isLoaded.set(true)
     isPlaying.set(true);
   }
   const wasmBoyPromise = loadWasmBoy().catch(error => {
     console.error(error);
     throw error;
+  });
+
+  isPlaying.subscribe(async (value) => {
+    if(!WasmBoy.isPlaying() && value) {
+      await WasmBoy.play();
+    } else if (WasmBoy.isPlaying() && !value) {
+      await WasmBoy.pause();
+    }
+  });
+
+  saveState.subscribe(() => {
+    if ($isStarted && $isLoaded) {
+      WasmBoy.saveState().then(() => {
+        WasmBoy.play();
+        setStatus('State Saved!');
+      }).catch(() => {
+        setStatus('Error saving the state...')
+      });
+    }
   });
 </script>
 
@@ -43,7 +68,7 @@
   <canvas />
 </div>
 
-{#if loaded === false}
+{#if $isLoaded === false}
 <div class="status">
   {#await wasmBoyPromise}
     {#if $romName}
