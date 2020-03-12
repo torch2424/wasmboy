@@ -4,6 +4,11 @@ export const isStarted = writable(false);
 export const isLoaded = writable(false);
 export const isPlaying = writable(false);
 
+export const modalStore = writable(0);
+export const hideModal = () => modalStore.set(0);
+export const showLoadState = () => modalStore.set(1);
+export const showAbout = () => modalStore.set(2);
+
 export const saveState = writable(0);
 export const triggerSaveState = () => saveState.update(value => value + 1);
 

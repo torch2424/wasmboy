@@ -16,22 +16,30 @@
 
     const wasmBoyCanvas = document.querySelector('.canvas-container > canvas');
 
+    const EmbedPlugin = {
+      name: 'EmbedPlugin',
+      saveState: saveStateObject => {
+        if (wasmBoyCanvas) {
+          saveStateObject.screenshotCanvasDataURL = wasmBoyCanvas.toDataURL();
+        }
+      },
+      play: () => isPlaying.set(true),
+      pause: () => {
+        isPlaying.set(false);
+        setStatus('Paused', -1);
+      }
+    };
+
     await WasmBoy.config({
       isGbcEnabled: true,
       isGbcColorizationEnabled: true,
       isAudioEnabled: true,
       gameboyFrameRate: 60,
-      maxNumberOfAutoSaveStates: 3,
-      onPlay: () => {
-        isPlaying.set(true);
-      },
-      onPause: () => {
-        isPlaying.set(false);
-        setStatus('Paused', -1);
-      }
+      maxNumberOfAutoSaveStates: 3
     });
 
     await WasmBoy.setCanvas(wasmBoyCanvas);
+    WasmBoy.addPlugin(EmbedPlugin);
     await WasmBoy.loadROM($romUrl);
     await WasmBoy.play();
 
@@ -111,29 +119,5 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-  }
-
-  /* https://www.30secondsofcode.org/css/s/donut-spinner/ */
-  @keyframes donut-spin {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-
-  .donut {
-    display: inline-block;
-    border: 4px solid rgba(0, 0, 0, 0.1);
-    border-left-color: #654ff0;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    animation: donut-spin 1.2s linear infinite;
-  }
-
-  .error {
-    color: red;
   }
 </style>

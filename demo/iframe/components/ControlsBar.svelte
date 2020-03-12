@@ -1,5 +1,5 @@
 <script>
-  import {isPlaying, setStatus, status, triggerSaveState} from '../stores.js';
+  import {isPlaying, setStatus, status, triggerSaveState, showLoadState, showAbout} from '../stores.js';
   import PlayIcon from './icons/PlayIcon.svelte';
   import PauseIcon from './icons/PauseIcon.svelte';
   import SaveIcon from './icons/SaveIcon.svelte';
@@ -44,11 +44,11 @@
   };
 
   const handleLoad = () => {
-  
+    showLoadState();
   };
 
   const handleAbout = () => {
-  
+    showAbout();
   };
 </script>
 
@@ -137,13 +137,5 @@
     width: 100%;
     margin: 0px;
     padding: 0px;
-  }
-
-  .icon-button {
-    width: 50px;
-    height: 50px;
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
   }
 </style>
