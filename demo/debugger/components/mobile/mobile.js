@@ -84,7 +84,7 @@ export default class Mobile extends Component {
           {/* Getting Started */}
           <h3>Getting Started</h3>
           <div>
-            To try a ROM / Game, click the 💾 button, to open the ROM loader. To Play/Pause emulation, click the ⏯️ button. For more
+            To try a ROM / Game, click the 📁 button, to open the ROM loader. To Play/Pause emulation, click the ⏯️ button. For more
             information on WasmBoy, click the ℹ️ button. To reload this demo, click the ♻️ button.
           </div>
         </div>
