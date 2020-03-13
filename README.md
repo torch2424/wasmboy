@@ -11,7 +11,7 @@
 
 <!--- Short Description-->
 
-🎮👾🕹️ Gameboy Emulator Library written in Web Assembly using [AssemblyScript](https://github.com/AssemblyScript/assemblyscript), Debugger/Shell in Preact 🎮👾🕹️
+🎮👾🕹️ Gameboy Emulator Library written in Web Assembly using [AssemblyScript](https://github.com/AssemblyScript/assemblyscript), Demos in [Preact](https://preactjs.com/) and [Svelte](https://svelte.dev/) 🎮👾🕹️
 
 **Project is still < 1.0.0. Most games are playable, but the emulator is still not very accurate. Expect bugs.**
 
@@ -36,6 +36,7 @@
 - [Demo Applications](#demo-applications)
   - [Debugger](#debugger)
   - [Benchmark](#benchmark)
+  - [Iframe](#iframe)
 - [Tests](#tests)
   - [Blarrg](#blarrg)
   - [Mooneye](#mooneye)
@@ -148,6 +149,16 @@ Analytics is used on this application simply for performance monitoring, and tra
 **Example**
 
 ![WasmBoy Benchmark Runner Section on Safari](./docs/images/benchmarkSafariBackToColorRunner.png)
+
+### Iframe
+
+[Iframe Embed Link](https://wasmboy.app/iframe/)
+
+[Example Tobu Tobu Girl, Homebrew Hub Iframe](https://wasmboy.app/iframe/?rom-name=Tobu%20Tobu%20Girl&play-poster=https://gbhh.avivace.com/database/entries/tobutobugirl/screenshot1.bmp&rom-url=https://gbhh.avivace.com/database/entries/tobutobugirl/tobu.gb)
+
+**Anaytics / Privacy**
+
+Analytics is used on this application simply for performance monitoring, and tracking popularity of the application. The analytics provider used is [Google Analytics](https://analytics.google.com/analytics/web/). Only basic user visit data is recorded / used.
 
 # Tests
 
@@ -325,3 +336,5 @@ Using the [gh-pages](https://www.npmjs.com/package/gh-pages) for debugger/demo d
 - [The Cycle Accurate Game Boy Docs](https://github.com/AntonioND/giibiiadvance/blob/master/docs/TCAGBD.pdf)
 
 - [Demos for perf testing GB/GBC](http://privat.bahnhof.se/wb800787/gb/demos/)
+
+- [Homebrew Hub - Collection of GameBoy Homebrew](https://gbhh.avivace.com/)

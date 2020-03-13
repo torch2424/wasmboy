@@ -109,7 +109,7 @@
     position: absolute;
     bottom: 0;
     right: 0;
-    background-color: rgba(0,0,0,0.75);
+    background-color: rgba(0,0,0,0.85);
   }
 
   .status {

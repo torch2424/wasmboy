@@ -54,7 +54,7 @@
     justify-content: flex-start;
     align-items: center;
 
-    background-color: rgba(0,0,0,0.75);
+    background-color: rgba(0,0,0,0.85);
 
     border-radius: 5px;
   }

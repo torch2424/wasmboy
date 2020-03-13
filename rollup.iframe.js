@@ -7,6 +7,7 @@ import livereload from 'rollup-plugin-livereload';
 import { terser } from 'rollup-plugin-terser';
 import bundleSize from 'rollup-plugin-bundle-size';
 import copy from 'rollup-plugin-copy-glob';
+import json from 'rollup-plugin-json';
 
 const production = !process.env.SERVE;
 
@@ -73,6 +74,7 @@ const plugins = [
     dedupe: ['svelte']
   }),
   commonjs(),
+  json(),
   !production && serve(),
   !production && livereload('build/iframe'),
   production && terser(),
