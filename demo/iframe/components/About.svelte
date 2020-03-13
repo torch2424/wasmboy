@@ -1,5 +1,6 @@
 <script>
-  import packageJson from "../../../package.json"
+  import {playPoster, romName, romUrl} from '../stores.js';
+  import packageJson from "../../../package.json";
 </script>
 
 <div class="about">
@@ -12,7 +13,18 @@
     <li><a href="https://github.com/torch2424/wasmboy" target="_blank">Github Repo</a></li> 
     <li><a href="https://www.npmjs.com/package/wasmboy" target="_blank">NPM Package</a></li>
   </ul>
-
+  <h1>Embed Configuration</h1>
+  <ul>
+    {#if $romName}
+      <li><b>ROM Name:</b> {$romName}</li>
+    {/if}
+    {#if $romUrl}
+      <li><b>ROM URL:</b> <a href={$romUrl} target="_blank">{$romUrl}</a></li>
+    {/if}
+    {#if $playPoster}
+      <li><b>Play Poster:</b> <a href={$playPoster} target="_blank">{$playPoster}</a></li>
+    {/if}
+  </ul>
   <h1>Help</h1>
   <h2>Controls</h2>
   <p>This player supports Keyboard and Gamepad input per the default <a href="https://github.com/torch2424/responsive-gamepad" target="_blank">Responsive Gamepad</a> configuration. For keyboard controls: Directional (Dpad) controls are handled by the arrows keys, or WASD on your keyboard. The A button is controlled by the "Z" key. The B button is controlled by the "X" key. Start is handled by the "Enter" key. Select is handled by the "Shift" key.</p>

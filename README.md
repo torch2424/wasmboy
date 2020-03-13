@@ -36,7 +36,7 @@
 - [Demo Applications](#demo-applications)
   - [Debugger](#debugger)
   - [Benchmark](#benchmark)
-  - [Iframe](#iframe)
+  - [Iframe Embed](#iframe-embed)
 - [Tests](#tests)
   - [Blarrg](#blarrg)
   - [Mooneye](#mooneye)
@@ -110,6 +110,12 @@ A full debugger meant for analyzing the internals of the gameboy. Great for Home
 - Saved Layouts between sessions. 💠
 - Help widget with tips on how to be effective in the debugger. 🙋
 
+**Mobile Demo**
+
+For UI/UX reasons, on mobile the debugger is simply a web app for testing the lib. This is useful for testing a ROM on the go. For playing games, I would suggest [VaporBoy](https://vaporboy.net/). Below is an example of the mobile demo:
+
+![Pokemon Crystal Wasmboy Mobile Demo](./docs/images/debuggerMobileDemo.gif)
+
 **Anaytics / Privacy**
 
 [Analytics Wrapper Service](./demo/debugger/analytics.js)
@@ -124,12 +130,6 @@ Analytics is used on this application simply for performance monitoring, and tra
 - Whenever the Google Drive option is selected.
 - Whenever the mobile demo is manually reloaded.
 
-**Mobile Demo**
-
-For UI/UX reasons, on mobile the debugger is simply a web app for testing the lib. This is useful for testing a ROM on the go. For playing games, I would suggest [VaporBoy](https://vaporboy.net/). Below is an example of the mobile demo:
-
-![Pokemon Crystal Wasmboy Mobile Demo](./docs/images/debuggerMobileDemo.gif)
-
 ### Benchmark
 
 [Application Link](https://wasmboy.app/benchmark/)
@@ -137,6 +137,10 @@ For UI/UX reasons, on mobile the debugger is simply a web app for testing the li
 [Medium Article](https://medium.com/@torch2424/webassembly-is-fast-a-real-world-benchmark-of-webassembly-vs-es6-d85a23f8e193)
 
 Since WasmBoy is built in AssemblyScript, it can also run it's core through the Typescript compiler if we mock out some of the WebAssembly interface. The benchmarking tool was built as a way to compare WebAssembly performance to Javascript / ES6 performance, after compiling the core to both WebAssembly and Javascript. It includes detailed stats, live running output, and multiple graphs. Also great for comparing the performance of devices that run WasmBoy.
+
+**Example**
+
+![WasmBoy Benchmark Runner Section on Safari](./docs/images/benchmarkSafariBackToColorRunner.png)
 
 **Anaytics / Privacy**
 
@@ -146,15 +150,31 @@ Analytics is used on this application simply for performance monitoring, and tra
 - Whenever the benchmark is ran.
 - Whenever results are rendered for the benchmark.
 
+### Iframe Embed
+
+An Iframe embeddable version of WasmBoy. Simply provide information through [URL Query Params](https://en.wikipedia.org/wiki/Query_string), and embed a ROM on your website! Great for embedding your HomeBrew Game Boy / Game Boy Color games on your website, (WordPress) blog, and game hosting services such as [itch.io](https://itch.io/).
+
 **Example**
 
-![WasmBoy Benchmark Runner Section on Safari](./docs/images/benchmarkSafariBackToColorRunner.png)
-
-### Iframe
-
-[Iframe Embed Link](https://wasmboy.app/iframe/)
-
 [Example Tobu Tobu Girl, Homebrew Hub Iframe](https://wasmboy.app/iframe/?rom-name=Tobu%20Tobu%20Girl&play-poster=https://gbhh.avivace.com/database/entries/tobutobugirl/screenshot1.bmp&rom-url=https://gbhh.avivace.com/database/entries/tobutobugirl/tobu.gb)
+
+![Gif of the Tobu Tobu Girl, Home brew hub example](./docs/images/iframeEmbed.gif)
+
+**Usage**
+
+Add an iframe to your website like the following:
+
+```html
+<iframe title="WasmBoy Iframe Embed" width="160" height="144" src="https://wasmboy.app/iframe/?[QUERY_PARAMS_GO_HERE]"> </iframe>
+```
+
+The iframe is configured by adding [URL Query Params](https://en.wikipedia.org/wiki/Query_string). The configuration params are:
+
+- `rom-url` - **(Required)** The URL to the `.gb` or `.gbc` ROM that will be loaded, fetched, and played.
+- `rom-name` - The name of the ROM being played.
+- `play-poster` - The URL to the image shown at the intial "click to play", play poster.
+
+Please ensure all assets that are being loaded by the iframe embed, such as ROMs and images, will work with [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS). The WasmBoy Iframe Embed will take the full width and height (100%) of it's iframe container. Thus, it will be up to your styling to ensure the iframe preserves the GameBoy 160x144 resolution.
 
 **Anaytics / Privacy**
 
