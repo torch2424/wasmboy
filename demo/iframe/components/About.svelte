@@ -6,7 +6,7 @@
 <div class="about">
 
   <h1>WasmBoy Embed Player</h1>
-  <p>This is a dynamic GameBoy / GameBoy color ROM player powered by WasmBoy. WasmBoy is a Game Boy / Game Boy Color emulation library, 🎮written for WebAssembly using <a href="https://github.com/AssemblyScript/assemblyscript" target="_blank">AssemblyScript</a>. 🚀 This embed is built with <a href="https://svelte.dev/" target="_blank">Svelte</a>, and input is handled by <a href="https://github.com/torch2424/responsive-gamepad" target="_blank">Responsive Gamepad</a>. WasmBoy is written by <a href="https://github.com/torch2424" target="_blank">Aaron Turner (torch2424)</a>, and Licensed under <a href="https://github.com/torch2424/wasmboy/blob/master/LICENSE" target="_blank">GPL 3.0</a>.</p>
+  <p>This is a dynamic GameBoy / GameBoy color ROM player powered by WasmBoy. WasmBoy is a Game Boy / Game Boy Color emulation library, 🎮written for WebAssembly using <a href="https://github.com/AssemblyScript/assemblyscript" target="_blank">AssemblyScript</a>. 🚀 This embed is built with <a href="https://svelte.dev/" target="_blank">Svelte</a>, and input is handled by <a href="https://github.com/torch2424/responsive-gamepad" target="_blank">Responsive Gamepad</a>. WasmBoy is written by <a href="https://github.com/torch2424" target="_blank">Aaron Turner (torch2424)</a>, and Licensed under <a href="https://github.com/torch2424/wasmboy/blob/master/LICENSE" target="_blank">GPL 3.0</a>. Also, shoutout to fred-dim ikenna (evillizard) for requesting this feature for WasmBoy, and helping with the general direction!</p>
   <div>WasmBoy Version: {packageJson.version}</div>
   <h1>WasmBoy Links</h1>
   <ul>
