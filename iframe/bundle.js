@@ -2165,8 +2165,8 @@ var WasmBoyIframe = (function () {
     			b.textContent = "ROM Name:";
     			t1 = space();
     			t2 = text(/*$romName*/ ctx[0]);
-    			add_location(b, file$4, 18, 10, 1226);
-    			add_location(li, file$4, 18, 6, 1222);
+    			add_location(b, file$4, 18, 10, 1354);
+    			add_location(li, file$4, 18, 6, 1350);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, li, anchor);
@@ -2209,12 +2209,12 @@ var WasmBoyIframe = (function () {
     			t1 = space();
     			a = element("a");
     			t2 = text(/*$romUrl*/ ctx[1]);
-    			add_location(b, file$4, 21, 10, 1297);
+    			add_location(b, file$4, 21, 10, 1425);
     			attr_dev(a, "href", /*$romUrl*/ ctx[1]);
     			attr_dev(a, "target", "_blank");
     			attr_dev(a, "class", "svelte-iqykeu");
-    			add_location(a, file$4, 21, 26, 1313);
-    			add_location(li, file$4, 21, 6, 1293);
+    			add_location(a, file$4, 21, 26, 1441);
+    			add_location(li, file$4, 21, 6, 1421);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, li, anchor);
@@ -2262,12 +2262,12 @@ var WasmBoyIframe = (function () {
     			t1 = space();
     			a = element("a");
     			t2 = text(/*$playPoster*/ ctx[2]);
-    			add_location(b, file$4, 24, 10, 1408);
+    			add_location(b, file$4, 24, 10, 1536);
     			attr_dev(a, "href", /*$playPoster*/ ctx[2]);
     			attr_dev(a, "target", "_blank");
     			attr_dev(a, "class", "svelte-iqykeu");
-    			add_location(a, file$4, 24, 30, 1428);
-    			add_location(li, file$4, 24, 6, 1404);
+    			add_location(a, file$4, 24, 30, 1556);
+    			add_location(li, file$4, 24, 6, 1532);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, li, anchor);
@@ -2378,7 +2378,7 @@ var WasmBoyIframe = (function () {
     			t10 = text(", and Licensed under ");
     			a4 = element("a");
     			a4.textContent = "GPL 3.0";
-    			t12 = text(".");
+    			t12 = text(". Also, shoutout to fred-dim ikenna (evillizard) for requesting this feature for WasmBoy, and helping with the general direction!");
     			t13 = space();
     			div0 = element("div");
     			div0.textContent = `WasmBoy Version: ${packageJson.version}`;
@@ -2453,36 +2453,36 @@ var WasmBoyIframe = (function () {
     			attr_dev(a4, "class", "svelte-iqykeu");
     			add_location(a4, file$4, 8, 597, 781);
     			add_location(p0, file$4, 8, 2, 186);
-    			add_location(div0, file$4, 9, 2, 883);
-    			add_location(h11, file$4, 10, 2, 935);
+    			add_location(div0, file$4, 9, 2, 1011);
+    			add_location(h11, file$4, 10, 2, 1063);
     			attr_dev(a5, "href", "https://github.com/torch2424/wasmboy");
     			attr_dev(a5, "target", "_blank");
     			attr_dev(a5, "class", "svelte-iqykeu");
-    			add_location(a5, file$4, 12, 8, 973);
-    			add_location(li0, file$4, 12, 4, 969);
+    			add_location(a5, file$4, 12, 8, 1101);
+    			add_location(li0, file$4, 12, 4, 1097);
     			attr_dev(a6, "href", "https://www.npmjs.com/package/wasmboy");
     			attr_dev(a6, "target", "_blank");
     			attr_dev(a6, "class", "svelte-iqykeu");
-    			add_location(a6, file$4, 13, 8, 1066);
-    			add_location(li1, file$4, 13, 4, 1062);
-    			add_location(ul0, file$4, 11, 2, 960);
-    			add_location(h12, file$4, 15, 2, 1161);
-    			add_location(ul1, file$4, 16, 2, 1192);
-    			add_location(h13, file$4, 27, 2, 1509);
-    			add_location(h20, file$4, 28, 2, 1525);
+    			add_location(a6, file$4, 13, 8, 1194);
+    			add_location(li1, file$4, 13, 4, 1190);
+    			add_location(ul0, file$4, 11, 2, 1088);
+    			add_location(h12, file$4, 15, 2, 1289);
+    			add_location(ul1, file$4, 16, 2, 1320);
+    			add_location(h13, file$4, 27, 2, 1637);
+    			add_location(h20, file$4, 28, 2, 1653);
     			attr_dev(a7, "href", "https://github.com/torch2424/responsive-gamepad");
     			attr_dev(a7, "target", "_blank");
     			attr_dev(a7, "class", "svelte-iqykeu");
-    			add_location(a7, file$4, 29, 69, 1612);
-    			add_location(p1, file$4, 29, 2, 1545);
-    			add_location(h21, file$4, 30, 2, 2000);
-    			add_location(p2, file$4, 31, 2, 2041);
-    			add_location(h22, file$4, 32, 2, 2624);
+    			add_location(a7, file$4, 29, 69, 1740);
+    			add_location(p1, file$4, 29, 2, 1673);
+    			add_location(h21, file$4, 30, 2, 2128);
+    			add_location(p2, file$4, 31, 2, 2169);
+    			add_location(h22, file$4, 32, 2, 2752);
     			attr_dev(a8, "href", "https://github.com/torch2424/wasmboy");
     			attr_dev(a8, "target", "_blank");
     			attr_dev(a8, "class", "svelte-iqykeu");
-    			add_location(a8, file$4, 33, 74, 2743);
-    			add_location(p3, file$4, 33, 2, 2671);
+    			add_location(a8, file$4, 33, 74, 2871);
+    			add_location(p3, file$4, 33, 2, 2799);
     			attr_dev(div1, "class", "about svelte-iqykeu");
     			add_location(div1, file$4, 5, 0, 131);
     		},
