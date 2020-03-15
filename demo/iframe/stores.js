@@ -47,4 +47,6 @@ export const romName = writable(params.get('rom-name'));
 
 // Handle showing and hiding the mobile controls
 const isUserAgentMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-export const showTouchPad = writable(!!isUserAgentMobile);
+export const isTouchPadVisible = writable(!!isUserAgentMobile);
+
+export const isFullScreen = writable(false);

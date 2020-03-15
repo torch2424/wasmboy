@@ -50,14 +50,17 @@ const handleLayoutChange = () => {
 
   // Add all Media query based on mobile vs desktop
   documentClassList.add('mobile');
-  if (landscape || isWide) {
+
+  if (landscape) {
     documentClassList.add('landscape');
-  } else {
+    documentClassList.remove('portrait');
+  } else if (portrait) {
+    documentClassList.add('portrait');
     documentClassList.remove('landscape');
   }
-  if (portrait) {
-    documentClassList.add('portrait');
-  } else {
+
+  if (!landscape && !portrait && isWide) {
+    documentClassList.add('landscape');
     documentClassList.remove('portrait');
   }
 };

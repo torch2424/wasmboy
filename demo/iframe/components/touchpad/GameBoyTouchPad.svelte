@@ -1,6 +1,6 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
-  import {modalStore, showTouchPad} from '../../stores.js';
+  import {modalStore, isTouchPadVisible} from '../../stores.js';
 
   import GameBoyDpad from './GameBoyDpad.svelte'; 
   import GameBoyLetterButton from './GameBoyLetterButton.svelte';
@@ -14,8 +14,20 @@
   });
   onMount(mountResolve);
 
-  const removeInputCallbacks = [];
+  // Subscribe to whether or not the touchpad is shown
+  isTouchPadVisible.subscribe((value) => {
+    // Get our document class list
+    const documentClassList = document.documentElement.classList;
+    
+    if (value) {
+      documentClassList.add('touchpad-visible');
+    } else {
+      documentClassList.remove('touchpad-visible');
+    }
+  });
 
+
+  const removeInputCallbacks = [];
   const addWasmBoyInputs = async () => {
 
     // Wait to mount
@@ -54,17 +66,15 @@
   })
 </script>
 
-{#if $modalStore === 0 && $showTouchPad === true}
-  <div class="mobile-controls">
-    <div class="gameboy-input">
-      <div id="gameboy-dpad"><GameBoyDpad /></div>
-      <div id="gameboy-a"><GameBoyLetterButton content="A" /></div>
-      <div id="gameboy-b"><GameBoyLetterButton content="B" /></div>
-      <div id="gameboy-start"><GameBoyWordButton content="start" /></div>
-      <div id="gameboy-select"><GameBoyWordButton content="select" /></div>
-    </div>
+<div class="mobile-controls" style={$modalStore === 0 && $isTouchPadVisible === true ? '': 'display: none'}>
+  <div class="gameboy-input">
+    <div id="gameboy-dpad"><GameBoyDpad /></div>
+    <div id="gameboy-a"><GameBoyLetterButton content="A" /></div>
+    <div id="gameboy-b"><GameBoyLetterButton content="B" /></div>
+    <div id="gameboy-start"><GameBoyWordButton content="start" /></div>
+    <div id="gameboy-select"><GameBoyWordButton content="select" /></div>
   </div>
-{/if}
+</div>
 
 <style>
   /*GENERAL*/
@@ -189,7 +199,7 @@
     position: absolute;
     z-index: 1;
     top: calc(50% - 13vw);
-    left: 5%;
+    left: 3%;
   }
 
   :global(html.landscape) #gameboy-b {
@@ -198,7 +208,7 @@
     position: absolute;
     z-index: 1;
     top: calc(50% - 5vw);
-    right: 15%;
+    right: 18%;
   }
 
   :global(html.landscape) #gameboy-a {
@@ -207,7 +217,7 @@
     position: absolute;
     z-index: 1;
     top: calc(50% - 13vw);
-    right: 1%;
+    right: 3%;
   }
 
   :global(html.landscape) #gameboy-select {
