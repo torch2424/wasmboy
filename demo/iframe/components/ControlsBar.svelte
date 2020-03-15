@@ -74,8 +74,8 @@
 
   const handleFullScreen = async () => {
     if ($isFullScreen) {
-      document.exitFullscreen();
       isFullScreen.set(false);
+      document.exitFullscreen();
     } else {
       try {
         await document.documentElement.requestFullscreen();

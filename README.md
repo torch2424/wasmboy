@@ -159,7 +159,6 @@ An Iframe embeddable version of WasmBoy. Simply provide information through [URL
 [Example Tobu Tobu Girl, Homebrew Hub Iframe](https://wasmboy.app/iframe/?rom-name=Tobu%20Tobu%20Girl&play-poster=https://gbhh.avivace.com/database/entries/tobutobugirl/screenshot1.bmp&rom-url=https://gbhh.avivace.com/database/entries/tobutobugirl/tobu.gb)
 
 ![Gif of the Tobu Tobu Girl, Home brew hub example](./docs/images/iframeEmbed.gif)
-![Gif of the Tobu Tobu Girl, Home brew hub example on mobile](./docs/images/iframeEmbedMobile.gif)
 
 **Usage**
 
