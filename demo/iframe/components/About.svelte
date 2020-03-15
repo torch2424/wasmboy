@@ -43,5 +43,6 @@
 
   .about a, .about a:visited {
     color: #b5cbfc;
+    word-break: break-all;
   }
 </style>

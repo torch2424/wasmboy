@@ -1,10 +1,23 @@
 <script>
-  import {isPlaying, setStatus, status, triggerSaveState, showLoadState, showAbout} from '../stores.js';
+  import {
+    isPlaying, 
+    setStatus, 
+    status, 
+    triggerSaveState, 
+    showLoadState, 
+    showAbout, 
+    isTouchPadVisible,
+    isFullScreen
+  } from '../stores.js';
   import PlayIcon from './icons/PlayIcon.svelte';
   import PauseIcon from './icons/PauseIcon.svelte';
   import SaveIcon from './icons/SaveIcon.svelte';
   import LoadIcon from './icons/LoadIcon.svelte';
   import AboutIcon from './icons/AboutIcon.svelte';
+  import ShowGamePadIcon from './icons/ShowGamePadIcon.svelte';
+  import HideGamePadIcon from './icons/HideGamePadIcon.svelte';
+  import FullScreenIcon from './icons/FullScreenIcon.svelte';
+  import ExitFullScreenIcon from './icons/ExitFullScreenIcon.svelte';
 
   // Subscribe to our current status
   let displayStatus = false;
@@ -47,8 +60,31 @@
     showLoadState();
   };
 
+  const handleGamePad = () => {
+    if ($isTouchPadVisible) {
+      isTouchPadVisible.set(false);
+    } else {
+      isTouchPadVisible.set(true);
+    }
+  };
+
   const handleAbout = () => {
     showAbout();
+  };
+
+  const handleFullScreen = async () => {
+    if ($isFullScreen) {
+      document.exitFullscreen();
+      isFullScreen.set(false);
+    } else {
+      try {
+        await document.documentElement.requestFullscreen();
+        isFullScreen.set(true);
+      } catch(e) {
+        console.error(e);
+        setStatus('Error, could not fullscreen!');
+      } 
+    }
   };
 </script>
 
@@ -81,8 +117,28 @@
     </li>
 
     <li>
+      <button class="icon-button" on:click={handleGamePad}>
+        {#if $isTouchPadVisible}
+          <HideGamePadIcon />
+        {:else}
+          <ShowGamePadIcon />
+        {/if}
+      </button>
+    </li>
+
+    <li>
       <button class="icon-button" on:click={handleAbout}>
         <AboutIcon />
+      </button>
+    </li>
+
+    <li>
+      <button class="icon-button" on:click={handleFullScreen}>
+        {#if $isFullScreen}
+          <FullScreenIcon />
+        {:else}
+          <ExitFullScreenIcon />
+        {/if}
       </button>
     </li>
   </ul>
@@ -101,7 +157,9 @@
     transition: transform 0.5s;
   }
 
-  :global(html):hover .controls-bar, :global(body):hover .controls-bar {
+  :global(html):hover .controls-bar, 
+  :global(body):hover .controls-bar, 
+  :global(.touchpad-visible) .controls-bar {
     transform: translateY(-50px);
   }
 

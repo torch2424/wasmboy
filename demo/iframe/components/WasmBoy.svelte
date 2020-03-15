@@ -102,11 +102,23 @@
   .canvas-container {
     width: 100%;
     height: 100%;
+
+    background-color: #000;
   }
 
   .canvas-container > canvas {
     width: 100%;
     height: 100%;
+  }
+
+  :global(.touchpad-visible.portrait) .canvas-container > canvas {
+    width: 100%;
+    height: 300px;
+  }
+
+  :global(.touchpad-visible.landscape) .canvas-container > canvas {
+    width: 100%;
+    height: calc(100% - 50px);
   }
 
   .status {

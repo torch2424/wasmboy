@@ -39,7 +39,7 @@ export default class Touchpad extends Component {
 
     // Add touch controls
     WasmBoy.ResponsiveGamepad.TouchInput.addDpadInput(dpadElement, {
-      allowMultipleDirections: true
+      allowMultipleDirections: false
     });
     WasmBoy.ResponsiveGamepad.TouchInput.addButtonInput(aElement, WasmBoy.ResponsiveGamepad.RESPONSIVE_GAMEPAD_INPUTS.A);
     WasmBoy.ResponsiveGamepad.TouchInput.addButtonInput(bElement, WasmBoy.ResponsiveGamepad.RESPONSIVE_GAMEPAD_INPUTS.B);

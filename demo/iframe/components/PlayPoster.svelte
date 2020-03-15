@@ -1,8 +1,11 @@
 <script>
   import {isStarted, playPoster} from '../stores.js';
   import PlayIcon from './icons/PlayIcon.svelte';
+  import {WasmBoy} from '../../../dist/wasmboy.wasm.esm.js';
 
   function handlePlay() {
+    // Calling resume Audio Context here, as it is always touched on mobile
+    WasmBoy.resumeAudioContext();
     isStarted.set(true);
   }
 </script>

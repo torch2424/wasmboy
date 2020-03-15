@@ -36,11 +36,11 @@
 
 <style>
   dialog {
-    width: 100%;
+    width: calc(100% - 50px);
     height: 800px;
     max-width: 800px;
     max-height: calc(100% - 100px);
-    margin: 10px;
+    margin-top: 10px;
     margin-left: auto;
     margin-right: auto;
 
