@@ -44,3 +44,7 @@ const params = new URLSearchParams(document.location.search.substring(1));
 export const playPoster = writable(params.get('play-poster'));
 export const romUrl = writable(params.get('rom-url'));
 export const romName = writable(params.get('rom-name'));
+
+// Handle showing and hiding the mobile controls
+const isUserAgentMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+export const showTouchPad = writable(!!isUserAgentMobile);

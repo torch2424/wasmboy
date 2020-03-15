@@ -2,27 +2,17 @@
   import PlayPoster from './components/PlayPoster.svelte'; 
   import WasmBoy from './components/WasmBoy.svelte'; 
   import Modal from './components/Modal.svelte';
-  import ControlsBar from './components/ControlsBar.svelte'; 
+  import ControlsBar from './components/ControlsBar.svelte';
+  import GameBoyTouchPad from './components/touchpad/GameBoyTouchPad.svelte';
   import {isStarted, isLoaded} from './stores.js';
 
-  import loadScript from 'load-script';
+  import {setupLayoutChange} from './scripts/layout-change.js';
+  import {setupHotkeys} from './scripts/hotkeys.js';
+  import {loadAnalytics} from './scripts/load-analytics.js';
 
-  // Load our analytics
-  if (typeof window !== 'undefined') {
-    loadScript('https://www.googletagmanager.com/gtag/js?id=UA-125276735-3', (err, script) => {
-      if (err) {
-        console.error(err);
-        return;
-      }
-
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        window.dataLayer.push(arguments);
-      }
-      gtag('js', new Date());
-      gtag('config', 'UA-125276735-3');
-    });
-  }
+  setupLayoutChange();
+  setupHotkeys();
+  loadAnalytics();
 </script>
 
 <main class="app">
@@ -33,6 +23,7 @@
     {#if $isLoaded}
       <Modal />
       <ControlsBar />
+      <GameBoyTouchPad />
     {/if}
   {/if}
 </main>
