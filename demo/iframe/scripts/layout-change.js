@@ -50,6 +50,7 @@ const handleLayoutChange = () => {
 
   // Add all Media query based on mobile vs desktop
   documentClassList.add('mobile');
+
   if (landscape) {
     documentClassList.add('landscape');
     documentClassList.remove('portrait');
