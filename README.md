@@ -165,7 +165,7 @@ An Iframe embeddable version of WasmBoy. Simply provide information through [URL
 Add an iframe to your website like the following:
 
 ```html
-<iframe title="WasmBoy Iframe Embed" width="160" height="144" src="https://wasmboy.app/iframe/?[QUERY_PARAMS_GO_HERE]"> </iframe>
+<iframe title="WasmBoy Iframe Embed" width="160" height="144" allowfullscreen="true" src="https://wasmboy.app/iframe/?[QUERY_PARAMS_GO_HERE]"> </iframe>
 ```
 
 The iframe is configured by adding [URL Query Params](https://en.wikipedia.org/wiki/Query_string). The configuration params are:
