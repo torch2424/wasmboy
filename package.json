@@ -97,6 +97,8 @@
   },
   "files": [
     "dist",
+    "core",
+    "lib",
     "README.md",
     "LICENSE"
   ],
