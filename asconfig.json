@@ -1,0 +1,21 @@
+{
+  "targets": {
+    "untouched": {
+      "binaryFile": "dist/core/core.untouched.wasm",
+      "textFile": "dist/core/core.untouched.wat",
+      "sourceMap": "core/dist/core/core.untouched.wasm.map",
+      "debug": true
+    },
+    "release": {
+      "binaryFile": "dist/core/core.optimized.wasm",
+      "textFile": "dist/core/core.optimized.wat",
+      "sourceMap": "core/dist/core/core.optimized.wasm.map",
+      "shrinkLevel": 1,
+      "optimizeLevel": 3
+    }
+  },
+  "options": {
+    "memoryBase": 0
+  },
+  "entries": ["core/index.ts"]
+}
