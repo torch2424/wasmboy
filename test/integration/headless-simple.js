@@ -39,7 +39,7 @@ const WasmBoyJoypadState = {
   START: false
 };
 
-const timeout = time => {
+const wait = time => {
   new Promise(resolve => {
     setTimeout(resolve, time);
   });
@@ -47,7 +47,9 @@ const timeout = time => {
 
 describe('WasmBoy Headless Simple', () => {
   it('Should be able to run a simple headless example', async () => {
-    await timeout(7500);
+    // Wait a little bit to let the wasm module to load?
+    // I have this in the other tests. Though, I am sure the config would handle this? :thinking:
+    await wait(7500);
 
     // Read the test rom a a Uint8Array and pass to wasmBoy
     const testRomArray = new Uint8Array(fs.readFileSync(`${testRomsPath}/tobutobugirl/tobutobugirl.gb`));
