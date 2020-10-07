@@ -41,8 +41,6 @@ const goldenFileCompareOrCreate = (goldenFile, currentArray) => {
     const goldenArray = JSON.parse(goldenOuput);
 
     goldenArrayCompare(goldenArray, currentArray);
-
-    return false;
   }
 
   // Either we didn't have it because this is the first time running this test rom,
@@ -53,8 +51,6 @@ const goldenFileCompareOrCreate = (goldenFile, currentArray) => {
   // Stringify our image data
   const arrayStringified = JSON.stringify(currentArray);
   fs.writeFileSync(goldenFile, arrayStringified);
-
-  return true;
 };
 
 const goldenImageDataArrayCompare = async (goldenFile, imageDataArray, directory, testRom) => {
