@@ -39,6 +39,8 @@ const playWasmBoy = () => {
 
 // Path to roms we want to test
 const testRomsPath = './test/performance/testroms';
+// Read the test rom a a Uint8Array and pass to wasmBoy
+const getTestRomArray = () => new Uint8Array(fs.readFileSync(`${testRomsPath}/back-to-color/back-to-color.gbc`));
 
 // Print our version
 console.log(`WasmBoy version: ${WasmBoy.getVersion()}`);
@@ -48,15 +50,12 @@ describe('WasmBoy Lib', () => {
   // Not using arrow functions, as arrow function timeouts were acting up
   beforeEach(function(done) {
     // Set a timeout of 5000, takes a while for wasm module to parse
-    this.timeout(75000);
-
-    // Read the test rom a a Uint8Array and pass to wasmBoy
-    const testRomArray = new Uint8Array(fs.readFileSync(`${testRomsPath}/back-to-color/back-to-color.gbc`));
+    this.timeout(7500);
 
     // Reset WasmBoy, and then load the rom
-    WasmBoy.reset(WASMBOY_INITIALIZE_OPTIONS)
+    WasmBoy.config(WASMBOY_INITIALIZE_OPTIONS)
       .then(() => {
-        return WasmBoy.loadROM(testRomArray);
+        return WasmBoy.loadROM(getTestRomArray());
       })
       .then(() => {
         done();
@@ -82,6 +81,8 @@ describe('WasmBoy Lib', () => {
     // Save State should be the same
     const saveStateInternalState = new Uint8Array(saveState.wasmboyMemory.wasmBoyInternalState);
     const saveStateTwoInternalState = new Uint8Array(saveState.wasmboyMemory.wasmBoyInternalState);
-    assert(saveStateInternalState[0] === saveStateTwoInternalState[0], true);
+    for (let i = 0; i < saveStateInternalState.length; i++) {
+      assert(saveStateInternalState[i] === saveStateTwoInternalState[i], true);
+    }
   });
 });

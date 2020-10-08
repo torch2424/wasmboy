@@ -11,4 +11,5 @@ script:
   - npm run demo:build:apps
   - npm run test:accuracy:nobuild
   - npm run test:integration:nobuild
-    #TODO: - npm run wasmerboy:build
+  - npm run test:core:nobuild
+  #TODO: - npm run wasmerboy:build
