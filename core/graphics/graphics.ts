@@ -9,7 +9,13 @@ import { resetTileCache } from './tiles';
 import { initializeColors } from './colors';
 import { Cpu } from '../cpu/index';
 import { Config } from '../config';
-import { Memory, eightBitLoadFromGBMemory, eightBitStoreIntoGBMemory } from '../memory/index';
+import {
+  Memory,
+  eightBitLoadFromGBMemory,
+  eightBitStoreIntoGBMemory,
+  loadBooleanDirectlyFromWasmMemory,
+  storeBooleanDirectlyToWasmMemory
+} from '../memory/index';
 
 export class Graphics {
   // Current cycles
@@ -87,19 +93,40 @@ export class Graphics {
 
   // Function to save the state of the class
   static saveState(): void {
+    // Graphics
     store<i32>(getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot), Graphics.scanlineCycleCounter);
-    store<u8>(getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot), <u8>Lcd.currentLcdMode);
-
     eightBitStoreIntoGBMemory(Graphics.memoryLocationScanlineRegister, Graphics.scanlineRegister);
+
+    // LCD
+    store<u8>(getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot), <u8>Lcd.currentLcdMode);
+    store<u8>(getSaveStateMemoryOffset(0x05, Graphics.saveStateSlot), <u8>Lcd.coincidenceCompare);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x06, Graphics.saveStateSlot), Lcd.enabled);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x07, Graphics.saveStateSlot), Lcd.windowTileMapDisplaySelect);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x08, Graphics.saveStateSlot), Lcd.windowDisplayEnabled);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x09, Graphics.saveStateSlot), Lcd.bgWindowTileDataSelect);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0a, Graphics.saveStateSlot), Lcd.bgTileMapDisplaySelect);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0b, Graphics.saveStateSlot), Lcd.tallSpriteSize);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0c, Graphics.saveStateSlot), Lcd.spriteDisplayEnable);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0d, Graphics.saveStateSlot), Lcd.bgDisplayEnabled);
   }
 
   // Function to load the save state from memory
   static loadState(): void {
+    // Graphics
     Graphics.scanlineCycleCounter = load<i32>(getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot));
-    Lcd.currentLcdMode = load<u8>(getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot));
-
     Graphics.scanlineRegister = eightBitLoadFromGBMemory(Graphics.memoryLocationScanlineRegister);
-    Lcd.updateLcdControl(eightBitLoadFromGBMemory(Lcd.memoryLocationLcdControl));
+
+    // LCD
+    Lcd.currentLcdMode = load<u8>(getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot));
+    Lcd.coincidenceCompare = load<u8>(getSaveStateMemoryOffset(0x05, Graphics.saveStateSlot));
+    Lcd.enabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x06, Graphics.saveStateSlot));
+    Lcd.windowTileMapDisplaySelect = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x07, Graphics.saveStateSlot));
+    Lcd.windowDisplayEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x08, Graphics.saveStateSlot));
+    Lcd.bgWindowTileDataSelect = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x09, Graphics.saveStateSlot));
+    Lcd.bgTileMapDisplaySelect = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0a, Graphics.saveStateSlot));
+    Lcd.tallSpriteSize = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0b, Graphics.saveStateSlot));
+    Lcd.spriteDisplayEnable = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0c, Graphics.saveStateSlot));
+    Lcd.bgDisplayEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0d, Graphics.saveStateSlot));
   }
 }
 

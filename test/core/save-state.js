@@ -34,7 +34,7 @@ describe('WasmBoy Core Save State', () => {
 
     const asyncTask = async () => {
       // Save Load State loop
-      for (let i = 0; i < 200; i++) {
+      for (let i = 0; i < 400; i++) {
         // Load the Wasm module
         const wasmboyCore = await getWasmBoyCore();
         const wasmboy = wasmboyCore.instance.exports;
@@ -67,6 +67,20 @@ describe('WasmBoy Core Save State', () => {
           wasmboy.loadState();
         }
 
+        // Testing input
+        if (i === -1) {
+          wasmboy.setJoypadState(
+            0, // up: i32,
+            0, // right: i32,
+            0, // down: i32,
+            0, // left: i32,
+            0, // a: i32,
+            0, // b: i32,
+            0, // select: i32,
+            1 // start: i32
+          );
+        }
+
         // Run some frames
         wasmboy.executeMultipleFrames(2);
         wasmboy.clearAudioBuffer();
@@ -74,15 +88,24 @@ describe('WasmBoy Core Save State', () => {
         wasmboy.saveState();
 
         // Save the state
-        cartridgeRam = wasmByteMemoryArray.slice(wasmboy.CARTRIDGE_RAM_LOCATION, wasmboy.CARTRIDGE_RAM_SIZE);
-        gameboyMemory = wasmByteMemoryArray.slice(wasmboy.GAMEBOY_INTERNAL_MEMORY_LOCATION, wasmboy.GAMEBOY_INTERNAL_MEMORY_SIZE);
-        paletteMemory = wasmByteMemoryArray.slice(wasmboy.GBC_PALETTE_LOCATION, wasmboy.GBC_PALETTE_SIZE);
-        wasmboyState = wasmByteMemoryArray.slice(wasmboy.WASMBOY_STATE_LOCATION, wasmboy.WASMBOY_STATE_SIZE);
+        cartridgeRam = wasmByteMemoryArray.slice(
+          wasmboy.CARTRIDGE_RAM_LOCATION,
+          wasmboy.CARTRIDGE_RAM_LOCATION + wasmboy.CARTRIDGE_RAM_SIZE
+        );
+        gameboyMemory = wasmByteMemoryArray.slice(
+          wasmboy.GAMEBOY_INTERNAL_MEMORY_LOCATION,
+          wasmboy.GAMEBOY_INTERNAL_MEMORY_LOCATION + wasmboy.GAMEBOY_INTERNAL_MEMORY_SIZE
+        );
+        paletteMemory = wasmByteMemoryArray.slice(wasmboy.GBC_PALETTE_LOCATION, wasmboy.GBC_PALETTE_LOCATION + wasmboy.GBC_PALETTE_SIZE);
+        wasmboyState = wasmByteMemoryArray.slice(
+          wasmboy.WASMBOY_STATE_LOCATION,
+          wasmboy.WASMBOY_STATE_LOCATION + wasmboy.WASMBOY_STATE_SIZE
+        );
 
         // Output some frames
         if (i % 20 === 0) {
           // Get the frame inspired by common-test.js
-          const frameInProgressMemory = wasmByteMemoryArray.slice(wasmboy.FRAME_LOCATION, wasmboy.FRAME_SIZE);
+          const frameInProgressMemory = wasmByteMemoryArray.slice(wasmboy.FRAME_LOCATION, wasmboy.FRAME_LOCATION + wasmboy.FRAME_SIZE);
 
           const imageDataArray = [];
           const rgbColor = [];

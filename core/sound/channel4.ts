@@ -156,24 +156,76 @@ export class Channel4 {
 
   // Function to save the state of the class
   static saveState(): void {
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x00, Channel4.saveStateSlot), Channel4.isEnabled);
-    store<i32>(getSaveStateMemoryOffset(0x01, Channel4.saveStateSlot), Channel4.frequencyTimer);
-    store<i32>(getSaveStateMemoryOffset(0x05, Channel4.saveStateSlot), Channel4.envelopeCounter);
-    store<i32>(getSaveStateMemoryOffset(0x09, Channel4.saveStateSlot), Channel4.lengthCounter);
-    store<i32>(getSaveStateMemoryOffset(0x0e, Channel4.saveStateSlot), Channel4.volume);
-    store<u16>(getSaveStateMemoryOffset(0x13, Channel4.saveStateSlot), Channel4.linearFeedbackShiftRegister);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x15, Channel4.saveStateSlot), Channel4.isEnvelopeAutomaticUpdating);
+    // Cycle Counter
+    store<i32>(getSaveStateMemoryOffset(0x00, Channel4.saveStateSlot), Channel4.cycleCounter);
+
+    // NRx0
+    // No NRx0 Properties
+
+    // NRx1
+    store<u16>(getSaveStateMemoryOffset(0x04, Channel4.saveStateSlot), <u16>Channel4.NRx1LengthLoad);
+
+    // NRx2
+    store<u8>(getSaveStateMemoryOffset(0x06, Channel4.saveStateSlot), <u8>Channel4.NRx2StartingVolume);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x07, Channel4.saveStateSlot), Channel4.NRx2EnvelopeAddMode);
+    store<u8>(getSaveStateMemoryOffset(0x08, Channel4.saveStateSlot), <u8>Channel4.NRx2EnvelopePeriod);
+
+    // NRx3
+    store<u8>(getSaveStateMemoryOffset(0x09, Channel4.saveStateSlot), <u8>Channel4.NRx3ClockShift);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0a, Channel4.saveStateSlot), Channel4.NRx3WidthMode);
+    store<u8>(getSaveStateMemoryOffset(0x0b, Channel4.saveStateSlot), <u8>Channel4.NRx3DivisorCode);
+
+    // NRx4
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0d, Channel4.saveStateSlot), Channel4.NRx4LengthEnabled);
+
+    // Channel Properties
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0f, Channel4.saveStateSlot), Channel4.isEnabled);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x10, Channel4.saveStateSlot), Channel4.isDacEnabled);
+    store<i32>(getSaveStateMemoryOffset(0x15, Channel4.saveStateSlot), Channel4.frequencyTimer);
+    store<i32>(getSaveStateMemoryOffset(0x19, Channel4.saveStateSlot), Channel4.envelopeCounter);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x1d, Channel4.saveStateSlot), Channel4.isEnvelopeAutomaticUpdating);
+    store<i32>(getSaveStateMemoryOffset(0x1e, Channel4.saveStateSlot), Channel4.lengthCounter);
+    store<i32>(getSaveStateMemoryOffset(0x22, Channel4.saveStateSlot), Channel4.volume);
+
+    // LSFR
+    store<u16>(getSaveStateMemoryOffset(0x26, Channel4.saveStateSlot), <u16>Channel4.linearFeedbackShiftRegister);
   }
 
   // Function to load the save state from memory
   static loadState(): void {
-    Channel4.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x00, Channel4.saveStateSlot));
-    Channel4.frequencyTimer = load<i32>(getSaveStateMemoryOffset(0x01, Channel4.saveStateSlot));
-    Channel4.envelopeCounter = load<i32>(getSaveStateMemoryOffset(0x05, Channel4.saveStateSlot));
-    Channel4.lengthCounter = load<i32>(getSaveStateMemoryOffset(0x09, Channel4.saveStateSlot));
-    Channel4.volume = load<i32>(getSaveStateMemoryOffset(0x0e, Channel4.saveStateSlot));
-    Channel4.linearFeedbackShiftRegister = load<u16>(getSaveStateMemoryOffset(0x13, Channel4.saveStateSlot));
-    Channel4.isEnvelopeAutomaticUpdating = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x15, Channel4.saveStateSlot));
+    // Cycle Counter
+    Channel4.cycleCounter = load<i32>(getSaveStateMemoryOffset(0x00, Channel4.cycleCounter));
+
+    // NRx0
+    // No NRx0
+
+    // NRx1
+    Channel4.NRx1LengthLoad = load<u8>(getSaveStateMemoryOffset(0x04, Channel4.saveStateSlot));
+
+    // NRx2
+    Channel4.NRx2StartingVolume = load<u8>(getSaveStateMemoryOffset(0x06, Channel4.saveStateSlot));
+    Channel4.NRx2EnvelopeAddMode = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x07, Channel4.saveStateSlot));
+    Channel4.NRx2EnvelopePeriod = load<u8>(getSaveStateMemoryOffset(0x08, Channel4.saveStateSlot));
+
+    // NRx3
+    Channel4.NRx3ClockShift = load<u8>(getSaveStateMemoryOffset(0x09, Channel4.saveStateSlot));
+    Channel4.NRx3WidthMode = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0a, Channel4.saveStateSlot));
+    Channel4.NRx3DivisorCode = load<u8>(getSaveStateMemoryOffset(0x0b, Channel4.saveStateSlot));
+
+    // NRx4
+    Channel4.NRx4LengthEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0d, Channel4.saveStateSlot));
+
+    // Channel Properties
+    Channel4.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0f, Channel4.saveStateSlot));
+    Channel4.isDacEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x10, Channel4.saveStateSlot));
+    Channel4.frequencyTimer = load<i32>(getSaveStateMemoryOffset(0x15, Channel4.saveStateSlot));
+    Channel4.envelopeCounter = load<i32>(getSaveStateMemoryOffset(0x19, Channel4.saveStateSlot));
+    Channel4.isEnvelopeAutomaticUpdating = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x1d, Channel4.saveStateSlot));
+    Channel4.lengthCounter = load<i32>(getSaveStateMemoryOffset(0x1e, Channel4.saveStateSlot));
+    Channel4.volume = load<i32>(getSaveStateMemoryOffset(0x22, Channel4.saveStateSlot));
+
+    // LSFR
+    Channel4.linearFeedbackShiftRegister = load<u16>(getSaveStateMemoryOffset(0x26, Channel4.saveStateSlot));
   }
 
   static initialize(): void {

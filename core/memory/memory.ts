@@ -91,6 +91,12 @@ export class Memory {
     storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x08, Memory.saveStateSlot), Memory.isMBC2);
     storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x09, Memory.saveStateSlot), Memory.isMBC3);
     storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0a, Memory.saveStateSlot), Memory.isMBC5);
+
+    store<i32>(getSaveStateMemoryOffset(0x0b, Memory.saveStateSlot), Memory.DMACycles);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0f, Memory.saveStateSlot), Memory.isHblankHdmaActive);
+    store<i32>(getSaveStateMemoryOffset(0x10, Memory.saveStateSlot), Memory.hblankHdmaTransferLengthRemaining);
+    store<i32>(getSaveStateMemoryOffset(0x14, Memory.saveStateSlot), Memory.hblankHdmaSource);
+    store<i32>(getSaveStateMemoryOffset(0x18, Memory.saveStateSlot), Memory.hblankHdmaDestination);
   }
 
   // Function to load the save state from memory
@@ -106,6 +112,12 @@ export class Memory {
     Memory.isMBC2 = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x08, Memory.saveStateSlot));
     Memory.isMBC3 = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x09, Memory.saveStateSlot));
     Memory.isMBC5 = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0a, Memory.saveStateSlot));
+
+    Memory.DMACycles = load<i32>(getSaveStateMemoryOffset(0x0b, Memory.saveStateSlot));
+    Memory.isHblankHdmaActive = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0f, Memory.saveStateSlot));
+    Memory.hblankHdmaTransferLengthRemaining = load<i32>(getSaveStateMemoryOffset(0x10, Memory.saveStateSlot));
+    Memory.hblankHdmaSource = load<i32>(getSaveStateMemoryOffset(0x14, Memory.saveStateSlot));
+    Memory.hblankHdmaDestination = load<i32>(getSaveStateMemoryOffset(0x18, Memory.saveStateSlot));
   }
 }
 

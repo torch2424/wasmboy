@@ -22,7 +22,7 @@ export class SoundAccumulator {
   static mixerVolumeChanged: boolean = false;
   static mixerEnabledChanged: boolean = false;
 
-  //If a channel was updated, need to also track if we need to need to mix them again
+  // If a channel was updated, need to also track if we need to need to mix them again
   static needToRemixSamples: boolean = false;
 }
 
