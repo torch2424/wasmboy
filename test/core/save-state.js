@@ -136,6 +136,9 @@ describe('WasmBoy Core Save State', () => {
           const imageFile = `./test/core/save-state.${i}.png`;
           await commonTest.createImageFromFrame(imageDataArray, imageFile);
           console.log(`Screenshot created at: ${imageFile}`);
+
+          // TODO: Golden Compare Screenshots as we make them
+          // Make sure Golden Compare function is parsing JSON correctly as well
         }
       }
     };
