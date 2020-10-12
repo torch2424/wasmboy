@@ -4,6 +4,7 @@ import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
 import compiler from '@ampproject/rollup-plugin-closure-compiler';
+import { terser } from 'rollup-plugin-terser';
 import url from 'rollup-plugin-url';
 import json from 'rollup-plugin-json';
 import serve from 'rollup-plugin-serve';
@@ -77,8 +78,14 @@ if (process.env.DEBUGGER && process.env.SERVE) {
   // For restoring debugger layout
   plugins = [
     ...plugins,
+    // TODO: Compiler gives Out of memory errors in node :(
+    /*
     compiler({
       compilation_level: 'WHITESPACE_ONLY'
+    }),
+    */
+    terser({
+      mangle: false
     }),
     copy([
       {
