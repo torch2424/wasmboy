@@ -137,24 +137,49 @@ export class Timers {
   // Function to save the state of the class
   // TODO: Save state for new properties on Timers
   static saveState(): void {
+    // Batch Processing
     store<i32>(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot), Timers.currentCycles);
-    store<i32>(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot), Timers.dividerRegister);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x08, Timers.saveStateSlot), Timers.timerCounterOverflowDelay);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0b, Timers.saveStateSlot), Timers.timerCounterWasReset);
 
+    // Divider Register
+    store<i32>(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot), Timers.dividerRegister);
+
+    // Timer Counter
+    store<i32>(getSaveStateMemoryOffset(0x08, Timers.saveStateSlot), Timers.timerCounter);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0c, Timers.saveStateSlot), Timers.timerCounterOverflowDelay);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0d, Timers.saveStateSlot), Timers.timerCounterWasReset);
+    store<i32>(getSaveStateMemoryOffset(0x0e, Timers.saveStateSlot), Timers.timerCounterMask);
+
+    // Timer Modulo
+    store<i32>(getSaveStateMemoryOffset(0x12, Timers.saveStateSlot), Timers.timerModulo);
+
+    // Timer Control
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x16, Timers.saveStateSlot), Timers.timerEnabled);
+    store<i32>(getSaveStateMemoryOffset(0x17, Timers.saveStateSlot), Timers.timerInputClock);
+
+    // Old Not too sture
     eightBitStoreIntoGBMemory(Timers.memoryLocationTimerCounter, Timers.timerCounter);
   }
 
   // Function to load the save state from memory
   static loadState(): void {
+    // Batch Processing
     Timers.currentCycles = load<i32>(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot));
-    Timers.dividerRegister = load<i32>(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot));
-    Timers.timerCounterOverflowDelay = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x08, Timers.saveStateSlot));
-    Timers.timerCounterWasReset = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0b, Timers.saveStateSlot));
 
-    Timers.timerCounter = eightBitLoadFromGBMemory(Timers.memoryLocationTimerCounter);
-    Timers.timerModulo = eightBitLoadFromGBMemory(Timers.memoryLocationTimerModulo);
-    Timers.timerInputClock = eightBitLoadFromGBMemory(Timers.memoryLocationTimerControl);
+    // Divider Register
+    Timers.dividerRegister = load<i32>(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot));
+
+    // Timer Counter
+    Timers.timerCounter = load<i32>(getSaveStateMemoryOffset(0x08, Timers.saveStateSlot));
+    Timers.timerCounterOverflowDelay = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0c, Timers.saveStateSlot));
+    Timers.timerCounterWasReset = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0d, Timers.saveStateSlot));
+    Timers.timerCounterMask = load<i32>(getSaveStateMemoryOffset(0x0e, Timers.saveStateSlot));
+
+    // Timer Modulo
+    Timers.timerModulo = load<i32>(getSaveStateMemoryOffset(0x12, Timers.saveStateSlot));
+
+    // Timer Control
+    Timers.timerEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x16, Timers.saveStateSlot));
+    Timers.timerInputClock = load<i32>(getSaveStateMemoryOffset(0x17, Timers.saveStateSlot));
   }
 }
 

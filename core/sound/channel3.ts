@@ -141,6 +141,8 @@ export class Channel3 {
   static frequency: i32 = 0;
   static frequencyTimer: i32 = 0x00;
   static lengthCounter: i32 = 0x00;
+
+  // WaveTable Properties
   static waveTablePosition: i32 = 0x00;
   static volumeCode: i32 = 0x00;
   static volumeCodeChanged: boolean = false;
@@ -152,18 +154,74 @@ export class Channel3 {
 
   // Function to save the state of the class
   static saveState(): void {
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x00, Channel3.saveStateSlot), Channel3.isEnabled);
-    store<i32>(getSaveStateMemoryOffset(0x01, Channel3.saveStateSlot), Channel3.frequencyTimer);
-    store<i32>(getSaveStateMemoryOffset(0x05, Channel3.saveStateSlot), Channel3.lengthCounter);
-    store<u16>(getSaveStateMemoryOffset(0x09, Channel3.saveStateSlot), Channel3.waveTablePosition);
+    // Cycle Counter
+    store<i32>(getSaveStateMemoryOffset(0x00, Channel3.saveStateSlot), Channel3.cycleCounter);
+
+    // NRx0
+    // No NRx0 Properties
+
+    // NRx1
+    store<u16>(getSaveStateMemoryOffset(0x08, Channel3.saveStateSlot), <u16>Channel3.NRx1LengthLoad);
+
+    // NRx2
+    store<u8>(getSaveStateMemoryOffset(0x0a, Channel3.saveStateSlot), <u8>Channel3.NRx2VolumeCode);
+
+    // NRx3
+    store<u8>(getSaveStateMemoryOffset(0x0c, Channel3.saveStateSlot), <u8>Channel3.NRx3FrequencyLSB);
+
+    // NRx4
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0d, Channel3.saveStateSlot), Channel3.NRx4LengthEnabled);
+    store<u8>(getSaveStateMemoryOffset(0x0e, Channel3.saveStateSlot), <u8>Channel3.NRx4FrequencyMSB);
+
+    // Channel Properties
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0f, Channel3.saveStateSlot), Channel3.isEnabled);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x10, Channel3.saveStateSlot), Channel3.isDacEnabled);
+    store<i32>(getSaveStateMemoryOffset(0x11, Channel3.saveStateSlot), Channel3.frequency);
+    store<i32>(getSaveStateMemoryOffset(0x15, Channel3.saveStateSlot), Channel3.frequencyTimer);
+    // No Envelope
+    store<i32>(getSaveStateMemoryOffset(0x19, Channel3.saveStateSlot), Channel3.lengthCounter);
+
+    // WaveTable Properties
+    store<i32>(getSaveStateMemoryOffset(0x21, Channel3.saveStateSlot), Channel3.waveTablePosition);
+    store<u8>(getSaveStateMemoryOffset(0x25, Channel3.saveStateSlot), Channel3.volumeCode);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x26, Channel3.saveStateSlot), Channel3.volumeCodeChanged);
+    store<i32>(getSaveStateMemoryOffset(0x27, Channel3.saveStateSlot), Channel3.sampleBuffer);
   }
 
   // Function to load the save state from memory
   static loadState(): void {
-    Channel3.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x00, Channel3.saveStateSlot));
-    Channel3.frequencyTimer = load<i32>(getSaveStateMemoryOffset(0x01, Channel3.saveStateSlot));
-    Channel3.lengthCounter = load<i32>(getSaveStateMemoryOffset(0x05, Channel3.saveStateSlot));
-    Channel3.waveTablePosition = load<u16>(getSaveStateMemoryOffset(0x09, Channel3.saveStateSlot));
+    // Cycle Counter
+    Channel3.cycleCounter = load<i32>(getSaveStateMemoryOffset(0x00, Channel3.cycleCounter));
+
+    // NRx0
+    // No NRx0
+
+    // NRx1
+    Channel3.NRx1LengthLoad = load<u16>(getSaveStateMemoryOffset(0x08, Channel3.saveStateSlot));
+
+    // NRx2
+    Channel3.NRx2VolumeCode = load<u8>(getSaveStateMemoryOffset(0x0a, Channel3.saveStateSlot));
+
+    // NRx3
+    Channel3.NRx3FrequencyLSB = load<u8>(getSaveStateMemoryOffset(0x0c, Channel3.saveStateSlot));
+
+    // NRx4
+    Channel3.NRx4LengthEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0d, Channel3.saveStateSlot));
+    Channel3.NRx4FrequencyMSB = load<u8>(getSaveStateMemoryOffset(0x0e, Channel3.saveStateSlot));
+
+    // Channel Properties
+    Channel3.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0f, Channel3.saveStateSlot));
+    Channel3.isDacEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x10, Channel3.saveStateSlot));
+    Channel3.frequency = load<i32>(getSaveStateMemoryOffset(0x11, Channel3.saveStateSlot));
+    Channel3.frequencyTimer = load<i32>(getSaveStateMemoryOffset(0x15, Channel3.saveStateSlot));
+    // No Envelope
+    Channel3.lengthCounter = load<i32>(getSaveStateMemoryOffset(0x19, Channel3.saveStateSlot));
+
+    // Wave Table Properties
+    Channel3.waveTablePosition = load<i32>(getSaveStateMemoryOffset(0x21, Channel3.saveStateSlot));
+    Channel3.volumeCode = load<i32>(getSaveStateMemoryOffset(0x25, Channel3.saveStateSlot));
+    Channel3.volumeCodeChanged = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x26, Channel3.saveStateSlot));
+    Channel3.sampleBuffer = load<i32>(getSaveStateMemoryOffset(0x27, Channel3.saveStateSlot));
   }
 
   // Memory Read Trap

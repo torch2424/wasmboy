@@ -5,7 +5,7 @@ const fs = require('fs');
 const assert = require('assert');
 
 // Common test functions
-const commonTest = require('../common-test');
+const commonTest = require('./common-test');
 
 const goldenArrayCompare = (goldenArray, currentArray) => {
   if (goldenArray.length !== currentArray.length) {
@@ -42,7 +42,8 @@ const goldenFileCompareOrCreate = (goldenFile, currentArray) => {
 
     goldenArrayCompare(goldenArray, currentArray);
 
-    return false;
+    // Return so we don't re-create the file
+    return;
   }
 
   // Either we didn't have it because this is the first time running this test rom,
@@ -53,8 +54,6 @@ const goldenFileCompareOrCreate = (goldenFile, currentArray) => {
   // Stringify our image data
   const arrayStringified = JSON.stringify(currentArray);
   fs.writeFileSync(goldenFile, arrayStringified);
-
-  return true;
 };
 
 const goldenImageDataArrayCompare = async (goldenFile, imageDataArray, directory, testRom) => {

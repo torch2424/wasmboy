@@ -4,6 +4,7 @@ import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
 import compiler from '@ampproject/rollup-plugin-closure-compiler';
+import { terser } from 'rollup-plugin-terser';
 import url from 'rollup-plugin-url';
 import json from 'rollup-plugin-json';
 import serve from 'rollup-plugin-serve';
@@ -66,7 +67,9 @@ if (process.env.BENCHMARK && process.env.SERVE) {
         dest: 'build/benchmark/'
       }
     ]),
-    compiler()
+    // TODO: Compiler gives Out of memory errors in node :(
+    // compiler()
+    terser()
   ];
 }
 
@@ -82,8 +85,7 @@ const benchmarkBundles = [
       sourcemap: sourcemap
     },
     context: 'window',
-    plugins: plugins,
-    sourcemap: true
+    plugins: plugins
   }
 ];
 

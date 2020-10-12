@@ -152,7 +152,7 @@ directories.forEach((directory, directoryIndex) => {
                 for (let iterations = 0; iterations < PERFORMANCE_OPTION_ITERATIONS; iterations++) {
                   const start = now();
 
-                  await WasmBoy._runWasmExport('executeMultipleFrames', [NUMBER_OF_FRAMES]);
+                  await WasmBoy._runWasmExport('executeMultipleFrames', [NUMBER_OF_FRAMES], 20000);
 
                   const end = now();
 

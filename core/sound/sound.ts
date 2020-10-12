@@ -23,7 +23,7 @@ import { Channel3 } from './channel3';
 import { Channel4 } from './channel4';
 import { Cpu } from '../cpu/index';
 import { Config } from '../config';
-import { eightBitStoreIntoGBMemory } from '../memory/index';
+import { eightBitStoreIntoGBMemory, loadBooleanDirectlyFromWasmMemory, storeBooleanDirectlyToWasmMemory } from '../memory/index';
 import { checkBitOnByte, concatenateBytes, splitLowByte, splitHighByte, log } from '../helpers/index';
 import { i32Portable } from '../portable/portable';
 
@@ -95,6 +95,11 @@ export class Sound {
     return 8192 << (<i32>Cpu.GBCDoubleSpeed);
   }
 
+  // Frame sequencer controls what should be updated and and ticked
+  // Every time the sound is updated :) It is updated everytime the
+  // Cycle counter reaches the max cycle
+  static frameSequencer: i32 = 0x00;
+
   // Also need to downsample our audio to average audio qualty
   // https://www.reddit.com/r/EmuDev/comments/5gkwi5/gb_apu_sound_emulation/
   // Want to do 44100hz, so CpuRate / Sound Rate, 4194304 / 44100 ~ 91 cycles
@@ -103,11 +108,6 @@ export class Sound {
   static maxDownSampleCycles(): i32 {
     return Cpu.CLOCK_SPEED() / Sound.sampleRate;
   }
-
-  // Frame sequencer controls what should be updated and and ticked
-  // Every time the sound is updated :) It is updated everytime the
-  // Cycle counter reaches the max cycle
-  static frameSequencer: i32 = 0x00;
 
   // Our current sample number we are passing back to the wasmboy memory map
   // Found that a static number of samples doesn't work well on mobile
@@ -122,17 +122,86 @@ export class Sound {
 
   // Function to save the state of the class
   static saveState(): void {
-    store<i32>(getSaveStateMemoryOffset(0x00, Sound.saveStateSlot), Sound.frameSequenceCycleCounter);
-    store<u8>(getSaveStateMemoryOffset(0x04, Sound.saveStateSlot), Sound.downSampleCycleCounter);
-    store<u8>(getSaveStateMemoryOffset(0x05, Sound.saveStateSlot), Sound.frameSequencer);
+    // NR50
+    store<i32>(getSaveStateMemoryOffset(0x00, Sound.saveStateSlot), Sound.NR50LeftMixerVolume);
+    store<i32>(getSaveStateMemoryOffset(0x04, Sound.saveStateSlot), Sound.NR50RightMixerVolume);
+
+    // NR51
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x08, Sound.saveStateSlot), Sound.NR51IsChannel1EnabledOnLeftOutput);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x09, Sound.saveStateSlot), Sound.NR51IsChannel2EnabledOnLeftOutput);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0a, Sound.saveStateSlot), Sound.NR51IsChannel3EnabledOnLeftOutput);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0b, Sound.saveStateSlot), Sound.NR51IsChannel4EnabledOnLeftOutput);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0c, Sound.saveStateSlot), Sound.NR51IsChannel1EnabledOnRightOutput);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0d, Sound.saveStateSlot), Sound.NR51IsChannel2EnabledOnRightOutput);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0e, Sound.saveStateSlot), Sound.NR51IsChannel3EnabledOnRightOutput);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0f, Sound.saveStateSlot), Sound.NR51IsChannel4EnabledOnRightOutput);
+
+    // NR52
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x10, Sound.saveStateSlot), Sound.NR52IsSoundEnabled);
+
+    // Frame Sequencer
+    store<i32>(getSaveStateMemoryOffset(0x11, Sound.saveStateSlot), Sound.frameSequenceCycleCounter);
+    store<u8>(getSaveStateMemoryOffset(0x16, Sound.saveStateSlot), Sound.frameSequencer);
+
+    // Down Sampler
+    store<u8>(getSaveStateMemoryOffset(0x17, Sound.saveStateSlot), Sound.downSampleCycleCounter);
+
+    // Sound Accumulator
+    store<u8>(getSaveStateMemoryOffset(0x18, Sound.saveStateSlot), SoundAccumulator.channel1Sample);
+    store<u8>(getSaveStateMemoryOffset(0x19, Sound.saveStateSlot), SoundAccumulator.channel2Sample);
+    store<u8>(getSaveStateMemoryOffset(0x1a, Sound.saveStateSlot), SoundAccumulator.channel3Sample);
+    store<u8>(getSaveStateMemoryOffset(0x1b, Sound.saveStateSlot), SoundAccumulator.channel4Sample);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x1c, Sound.saveStateSlot), SoundAccumulator.channel1DacEnabled);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x1d, Sound.saveStateSlot), SoundAccumulator.channel2DacEnabled);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x1e, Sound.saveStateSlot), SoundAccumulator.channel3DacEnabled);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x1f, Sound.saveStateSlot), SoundAccumulator.channel4DacEnabled);
+    store<u8>(getSaveStateMemoryOffset(0x20, Sound.saveStateSlot), SoundAccumulator.leftChannelSampleUnsignedByte);
+    store<u8>(getSaveStateMemoryOffset(0x21, Sound.saveStateSlot), SoundAccumulator.rightChannelSampleUnsignedByte);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x22, Sound.saveStateSlot), SoundAccumulator.mixerVolumeChanged);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x23, Sound.saveStateSlot), SoundAccumulator.mixerEnabledChanged);
   }
 
   // Function to load the save state from memory
   static loadState(): void {
-    Sound.frameSequenceCycleCounter = load<i32>(getSaveStateMemoryOffset(0x00, Sound.saveStateSlot));
-    Sound.downSampleCycleCounter = load<u8>(getSaveStateMemoryOffset(0x04, Sound.saveStateSlot));
-    Sound.frameSequencer = load<u8>(getSaveStateMemoryOffset(0x05, Sound.saveStateSlot));
+    // NR50
+    Sound.NR50LeftMixerVolume = load<i32>(getSaveStateMemoryOffset(0x00, Sound.saveStateSlot));
+    Sound.NR50RightMixerVolume = load<i32>(getSaveStateMemoryOffset(0x04, Sound.saveStateSlot));
 
+    // NR51
+    Sound.NR51IsChannel1EnabledOnLeftOutput = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x08, Sound.saveStateSlot));
+    Sound.NR51IsChannel2EnabledOnLeftOutput = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x09, Sound.saveStateSlot));
+    Sound.NR51IsChannel3EnabledOnLeftOutput = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0a, Sound.saveStateSlot));
+    Sound.NR51IsChannel4EnabledOnLeftOutput = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0b, Sound.saveStateSlot));
+    Sound.NR51IsChannel1EnabledOnRightOutput = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0c, Sound.saveStateSlot));
+    Sound.NR51IsChannel2EnabledOnRightOutput = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0d, Sound.saveStateSlot));
+    Sound.NR51IsChannel3EnabledOnRightOutput = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0e, Sound.saveStateSlot));
+    Sound.NR51IsChannel4EnabledOnRightOutput = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0f, Sound.saveStateSlot));
+
+    // NR52
+    Sound.NR52IsSoundEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x10, Sound.saveStateSlot));
+
+    // Frame Sequencer
+    Sound.frameSequenceCycleCounter = load<i32>(getSaveStateMemoryOffset(0x11, Sound.saveStateSlot));
+    Sound.frameSequencer = load<u8>(getSaveStateMemoryOffset(0x16, Sound.saveStateSlot));
+
+    // DownSampler
+    Sound.downSampleCycleCounter = load<u8>(getSaveStateMemoryOffset(0x17, Sound.saveStateSlot));
+
+    // Sound Accumulator
+    SoundAccumulator.channel1Sample = load<u8>(getSaveStateMemoryOffset(0x18, Sound.saveStateSlot));
+    SoundAccumulator.channel2Sample = load<u8>(getSaveStateMemoryOffset(0x19, Sound.saveStateSlot));
+    SoundAccumulator.channel3Sample = load<u8>(getSaveStateMemoryOffset(0x1a, Sound.saveStateSlot));
+    SoundAccumulator.channel4Sample = load<u8>(getSaveStateMemoryOffset(0x1b, Sound.saveStateSlot));
+    SoundAccumulator.channel1DacEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x1c, Sound.saveStateSlot));
+    SoundAccumulator.channel2DacEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x1d, Sound.saveStateSlot));
+    SoundAccumulator.channel3DacEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x1e, Sound.saveStateSlot));
+    SoundAccumulator.channel4DacEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x1f, Sound.saveStateSlot));
+    SoundAccumulator.leftChannelSampleUnsignedByte = load<u8>(getSaveStateMemoryOffset(0x20, Sound.saveStateSlot));
+    SoundAccumulator.rightChannelSampleUnsignedByte = load<u8>(getSaveStateMemoryOffset(0x21, Sound.saveStateSlot));
+    SoundAccumulator.mixerVolumeChanged = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x22, Sound.saveStateSlot));
+    SoundAccumulator.mixerEnabledChanged = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x23, Sound.saveStateSlot));
+
+    // Finally clear the audio buffer
     clearAudioBuffer();
   }
 }

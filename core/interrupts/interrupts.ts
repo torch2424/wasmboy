@@ -73,6 +73,7 @@ export class Interrupts {
     storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x01, Interrupts.saveStateSlot), Interrupts.masterInterruptSwitchDelay);
 
     // Interrupts enabled and requested are stored in actual GB memory, thus, don't need to be saved
+    // Other classes have special logic on write, but this just checks bits on bytes, so should be fine
   }
 
   // Function to load the save state from memory

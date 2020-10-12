@@ -194,36 +194,101 @@ export class Channel1 {
 
   // Function to save the state of the class
   static saveState(): void {
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x00, Channel1.saveStateSlot), Channel1.isEnabled);
-    store<i32>(getSaveStateMemoryOffset(0x01, Channel1.saveStateSlot), Channel1.frequencyTimer);
-    store<i32>(getSaveStateMemoryOffset(0x05, Channel1.saveStateSlot), Channel1.envelopeCounter);
-    store<i32>(getSaveStateMemoryOffset(0x09, Channel1.saveStateSlot), Channel1.lengthCounter);
-    store<i32>(getSaveStateMemoryOffset(0x0e, Channel1.saveStateSlot), Channel1.volume);
+    // Cycle Counter
+    store<i32>(getSaveStateMemoryOffset(0x00, Channel1.saveStateSlot), Channel1.cycleCounter);
 
-    store<u8>(getSaveStateMemoryOffset(0x13, Channel1.saveStateSlot), Channel1.dutyCycle);
-    store<u8>(getSaveStateMemoryOffset(0x14, Channel1.saveStateSlot), <u8>Channel1.waveFormPositionOnDuty);
+    // NRx0
+    store<u8>(getSaveStateMemoryOffset(0x04, Channel1.saveStateSlot), <u8>Channel1.NRx0SweepPeriod);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x05, Channel1.saveStateSlot), Channel1.NRx0Negate);
+    store<u8>(getSaveStateMemoryOffset(0x06, Channel1.saveStateSlot), <u8>Channel1.NRx0SweepShift);
 
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x19, Channel1.saveStateSlot), Channel1.isSweepEnabled);
-    store<i32>(getSaveStateMemoryOffset(0x1a, Channel1.saveStateSlot), Channel1.sweepCounter);
-    store<u16>(getSaveStateMemoryOffset(0x1f, Channel1.saveStateSlot), Channel1.sweepShadowFrequency);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x21, Channel1.saveStateSlot), Channel1.isEnvelopeAutomaticUpdating);
+    // NRx1
+    store<u8>(getSaveStateMemoryOffset(0x07, Channel1.saveStateSlot), <u8>Channel1.NRx1Duty);
+    store<u16>(getSaveStateMemoryOffset(0x09, Channel1.saveStateSlot), <u16>Channel1.NRx1LengthLoad);
+
+    // NRx2
+    store<u8>(getSaveStateMemoryOffset(0x0a, Channel1.saveStateSlot), <u8>Channel1.NRx2StartingVolume);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0b, Channel1.saveStateSlot), Channel1.NRx2EnvelopeAddMode);
+    store<u8>(getSaveStateMemoryOffset(0x0c, Channel1.saveStateSlot), <u8>Channel1.NRx2EnvelopePeriod);
+
+    // NRx3
+    store<u8>(getSaveStateMemoryOffset(0x0d, Channel1.saveStateSlot), <u8>Channel1.NRx3FrequencyLSB);
+
+    // NRx4
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0e, Channel1.saveStateSlot), Channel1.NRx4LengthEnabled);
+    store<u8>(getSaveStateMemoryOffset(0x0f, Channel1.saveStateSlot), <u8>Channel1.NRx4FrequencyMSB);
+
+    // Channel Properties
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x10, Channel1.saveStateSlot), Channel1.isEnabled);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x11, Channel1.saveStateSlot), Channel1.isDacEnabled);
+    store<i32>(getSaveStateMemoryOffset(0x12, Channel1.saveStateSlot), Channel1.frequency);
+    store<i32>(getSaveStateMemoryOffset(0x16, Channel1.saveStateSlot), Channel1.frequencyTimer);
+    store<i32>(getSaveStateMemoryOffset(0x1a, Channel1.saveStateSlot), Channel1.envelopeCounter);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x1e, Channel1.saveStateSlot), Channel1.isEnvelopeAutomaticUpdating);
+    store<i32>(getSaveStateMemoryOffset(0x1f, Channel1.saveStateSlot), Channel1.lengthCounter);
+    store<i32>(getSaveStateMemoryOffset(0x23, Channel1.saveStateSlot), Channel1.volume);
+
+    // Square Duty
+    store<u8>(getSaveStateMemoryOffset(0x27, Channel1.saveStateSlot), Channel1.dutyCycle);
+    store<u8>(getSaveStateMemoryOffset(0x28, Channel1.saveStateSlot), <u8>Channel1.waveFormPositionOnDuty);
+
+    // Square Sweep
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x29, Channel1.saveStateSlot), Channel1.isSweepEnabled);
+    store<i32>(getSaveStateMemoryOffset(0x2a, Channel1.saveStateSlot), Channel1.sweepCounter);
+    store<u16>(getSaveStateMemoryOffset(0x2e, Channel1.saveStateSlot), Channel1.sweepShadowFrequency);
+    storeBooleanDirectlyToWasmMemory(
+      getSaveStateMemoryOffset(0x31, Channel1.saveStateSlot),
+      Channel1.sweepNegateShouldDisableChannelOnClear
+    );
   }
 
   // Function to load the save state from memory
   static loadState(): void {
-    Channel1.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x00, Channel1.saveStateSlot));
-    Channel1.frequencyTimer = load<i32>(getSaveStateMemoryOffset(0x01, Channel1.saveStateSlot));
-    Channel1.envelopeCounter = load<i32>(getSaveStateMemoryOffset(0x05, Channel1.saveStateSlot));
-    Channel1.lengthCounter = load<i32>(getSaveStateMemoryOffset(0x09, Channel1.saveStateSlot));
-    Channel1.volume = load<i32>(getSaveStateMemoryOffset(0x0e, Channel1.saveStateSlot));
+    // Cycle Counter
+    Channel1.cycleCounter = load<i32>(getSaveStateMemoryOffset(0x00, Channel1.cycleCounter));
 
-    Channel1.dutyCycle = load<u8>(getSaveStateMemoryOffset(0x13, Channel1.saveStateSlot));
-    Channel1.waveFormPositionOnDuty = load<u8>(getSaveStateMemoryOffset(0x14, Channel1.saveStateSlot));
+    // NRx0
+    Channel1.NRx0SweepPeriod = load<u8>(getSaveStateMemoryOffset(0x04, Channel1.saveStateSlot));
+    Channel1.NRx0Negate = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x05, Channel1.saveStateSlot));
+    Channel1.NRx0SweepShift = load<u8>(getSaveStateMemoryOffset(0x06, Channel1.saveStateSlot));
 
-    Channel1.isSweepEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x19, Channel1.saveStateSlot));
-    Channel1.sweepCounter = load<i32>(getSaveStateMemoryOffset(0x1a, Channel1.saveStateSlot));
-    Channel1.sweepShadowFrequency = load<u16>(getSaveStateMemoryOffset(0x1f, Channel1.saveStateSlot));
-    Channel1.isEnvelopeAutomaticUpdating = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x21, Channel1.saveStateSlot));
+    // NRx1
+    Channel1.NRx1Duty = load<u8>(getSaveStateMemoryOffset(0x07, Channel1.saveStateSlot));
+    Channel1.NRx1LengthLoad = load<u16>(getSaveStateMemoryOffset(0x09, Channel1.saveStateSlot));
+
+    // NRx2
+    Channel1.NRx2StartingVolume = load<u8>(getSaveStateMemoryOffset(0x0a, Channel1.saveStateSlot));
+    Channel1.NRx2EnvelopeAddMode = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0b, Channel1.saveStateSlot));
+    Channel1.NRx2EnvelopePeriod = load<u8>(getSaveStateMemoryOffset(0x0c, Channel1.saveStateSlot));
+
+    // NRx3
+    Channel1.NRx3FrequencyLSB = load<u8>(getSaveStateMemoryOffset(0x0d, Channel1.saveStateSlot));
+
+    // NRx4
+    Channel1.NRx4LengthEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0e, Channel1.saveStateSlot));
+    Channel1.NRx4FrequencyMSB = load<u8>(getSaveStateMemoryOffset(0x0f, Channel1.saveStateSlot));
+
+    // Channel Properties
+    Channel1.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x10, Channel1.saveStateSlot));
+    Channel1.isDacEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x11, Channel1.saveStateSlot));
+    Channel1.frequency = load<i32>(getSaveStateMemoryOffset(0x12, Channel1.saveStateSlot));
+    Channel1.frequencyTimer = load<i32>(getSaveStateMemoryOffset(0x16, Channel1.saveStateSlot));
+    Channel1.envelopeCounter = load<i32>(getSaveStateMemoryOffset(0x1a, Channel1.saveStateSlot));
+    Channel1.isEnvelopeAutomaticUpdating = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x1e, Channel1.saveStateSlot));
+    Channel1.lengthCounter = load<i32>(getSaveStateMemoryOffset(0x1f, Channel1.saveStateSlot));
+    Channel1.volume = load<i32>(getSaveStateMemoryOffset(0x23, Channel1.saveStateSlot));
+
+    // Square Duty
+    Channel1.dutyCycle = load<u8>(getSaveStateMemoryOffset(0x27, Channel1.saveStateSlot));
+    Channel1.waveFormPositionOnDuty = load<u8>(getSaveStateMemoryOffset(0x28, Channel1.saveStateSlot));
+
+    // Square Sweep
+    Channel1.isSweepEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x29, Channel1.saveStateSlot));
+    Channel1.sweepCounter = load<u8>(getSaveStateMemoryOffset(0x2a, Channel1.saveStateSlot));
+    Channel1.sweepShadowFrequency = load<u8>(getSaveStateMemoryOffset(0x2e, Channel1.saveStateSlot));
+    Channel1.sweepNegateShouldDisableChannelOnClear = loadBooleanDirectlyFromWasmMemory(
+      getSaveStateMemoryOffset(0x31, Channel1.saveStateSlot)
+    );
   }
 
   static initialize(): void {

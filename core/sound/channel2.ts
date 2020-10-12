@@ -164,28 +164,80 @@ export class Channel2 {
 
   // Function to save the state of the class
   static saveState(): void {
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x00, Channel2.saveStateSlot), Channel2.isEnabled);
-    store<i32>(getSaveStateMemoryOffset(0x01, Channel2.saveStateSlot), Channel2.frequencyTimer);
-    store<i32>(getSaveStateMemoryOffset(0x05, Channel2.saveStateSlot), Channel2.envelopeCounter);
-    store<i32>(getSaveStateMemoryOffset(0x09, Channel2.saveStateSlot), Channel2.lengthCounter);
-    store<i32>(getSaveStateMemoryOffset(0x0e, Channel2.saveStateSlot), Channel2.volume);
+    // Cycle Counter
+    store<i32>(getSaveStateMemoryOffset(0x00, Channel2.saveStateSlot), Channel2.cycleCounter);
 
-    store<u8>(getSaveStateMemoryOffset(0x13, Channel2.saveStateSlot), Channel2.dutyCycle);
-    store<u8>(getSaveStateMemoryOffset(0x14, Channel2.saveStateSlot), <u8>Channel2.waveFormPositionOnDuty);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x15, Channel2.saveStateSlot), Channel2.isEnvelopeAutomaticUpdating);
+    // NRx0
+    // No NRx0 Properties
+
+    // NRx1
+    store<u8>(getSaveStateMemoryOffset(0x07, Channel2.saveStateSlot), <u8>Channel2.NRx1Duty);
+    store<u16>(getSaveStateMemoryOffset(0x08, Channel2.saveStateSlot), <u16>Channel2.NRx1LengthLoad);
+
+    // NRx2
+    store<u8>(getSaveStateMemoryOffset(0x0a, Channel2.saveStateSlot), <u8>Channel2.NRx2StartingVolume);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0b, Channel2.saveStateSlot), Channel2.NRx2EnvelopeAddMode);
+    store<u8>(getSaveStateMemoryOffset(0x0c, Channel2.saveStateSlot), <u8>Channel2.NRx2EnvelopePeriod);
+
+    // NRx3
+    store<u8>(getSaveStateMemoryOffset(0x0d, Channel2.saveStateSlot), <u8>Channel2.NRx3FrequencyLSB);
+
+    // NRx4
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0e, Channel2.saveStateSlot), Channel2.NRx4LengthEnabled);
+    store<u8>(getSaveStateMemoryOffset(0x0f, Channel2.saveStateSlot), <u8>Channel2.NRx4FrequencyMSB);
+
+    // Channel Properties
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x10, Channel2.saveStateSlot), Channel2.isEnabled);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x11, Channel2.saveStateSlot), Channel2.isDacEnabled);
+    store<i32>(getSaveStateMemoryOffset(0x12, Channel2.saveStateSlot), Channel2.frequency);
+    store<i32>(getSaveStateMemoryOffset(0x16, Channel2.saveStateSlot), Channel2.frequencyTimer);
+    store<i32>(getSaveStateMemoryOffset(0x1a, Channel2.saveStateSlot), Channel2.envelopeCounter);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x1e, Channel2.saveStateSlot), Channel2.isEnvelopeAutomaticUpdating);
+    store<i32>(getSaveStateMemoryOffset(0x1f, Channel2.saveStateSlot), Channel2.lengthCounter);
+    store<i32>(getSaveStateMemoryOffset(0x23, Channel2.saveStateSlot), Channel2.volume);
+
+    // Square Duty
+    store<u8>(getSaveStateMemoryOffset(0x27, Channel2.saveStateSlot), Channel2.dutyCycle);
+    store<u8>(getSaveStateMemoryOffset(0x28, Channel2.saveStateSlot), <u8>Channel2.waveFormPositionOnDuty);
   }
 
   // Function to load the save state from memory
   static loadState(): void {
-    Channel2.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x00, Channel2.saveStateSlot));
-    Channel2.frequencyTimer = load<i32>(getSaveStateMemoryOffset(0x01, Channel2.saveStateSlot));
-    Channel2.envelopeCounter = load<i32>(getSaveStateMemoryOffset(0x05, Channel2.saveStateSlot));
-    Channel2.lengthCounter = load<i32>(getSaveStateMemoryOffset(0x09, Channel2.saveStateSlot));
-    Channel2.volume = load<i32>(getSaveStateMemoryOffset(0x0e, Channel2.saveStateSlot));
+    // Cycle Counter
+    Channel2.cycleCounter = load<i32>(getSaveStateMemoryOffset(0x00, Channel2.cycleCounter));
 
-    Channel2.dutyCycle = load<u8>(getSaveStateMemoryOffset(0x13, Channel2.saveStateSlot));
-    Channel2.waveFormPositionOnDuty = load<u8>(getSaveStateMemoryOffset(0x14, Channel2.saveStateSlot));
-    Channel2.isEnvelopeAutomaticUpdating = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x21, Channel2.saveStateSlot));
+    // NRx0
+    // No NRx0
+
+    // NRx1
+    Channel2.NRx1Duty = load<u8>(getSaveStateMemoryOffset(0x07, Channel2.saveStateSlot));
+    Channel2.NRx1LengthLoad = load<u16>(getSaveStateMemoryOffset(0x08, Channel2.saveStateSlot));
+
+    // NRx2
+    Channel2.NRx2StartingVolume = load<u8>(getSaveStateMemoryOffset(0xa, Channel2.saveStateSlot));
+    Channel2.NRx2EnvelopeAddMode = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0b, Channel2.saveStateSlot));
+    Channel2.NRx2EnvelopePeriod = load<u8>(getSaveStateMemoryOffset(0x0c, Channel2.saveStateSlot));
+
+    // NRx3
+    Channel2.NRx3FrequencyLSB = load<u8>(getSaveStateMemoryOffset(0x0d, Channel2.saveStateSlot));
+
+    // NRx4
+    Channel2.NRx4LengthEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0e, Channel2.saveStateSlot));
+    Channel2.NRx4FrequencyMSB = load<u8>(getSaveStateMemoryOffset(0x0f, Channel2.saveStateSlot));
+
+    // Channel Properties
+    Channel2.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x10, Channel2.saveStateSlot));
+    Channel2.isDacEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x11, Channel2.saveStateSlot));
+    Channel2.frequency = load<i32>(getSaveStateMemoryOffset(0x12, Channel2.saveStateSlot));
+    Channel2.frequencyTimer = load<i32>(getSaveStateMemoryOffset(0x16, Channel2.saveStateSlot));
+    Channel2.envelopeCounter = load<i32>(getSaveStateMemoryOffset(0x1a, Channel2.saveStateSlot));
+    Channel2.isEnvelopeAutomaticUpdating = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x1e, Channel2.saveStateSlot));
+    Channel2.lengthCounter = load<i32>(getSaveStateMemoryOffset(0x1f, Channel2.saveStateSlot));
+    Channel2.volume = load<i32>(getSaveStateMemoryOffset(0x23, Channel2.saveStateSlot));
+
+    // Square Duty
+    Channel2.dutyCycle = load<u8>(getSaveStateMemoryOffset(0x27, Channel2.saveStateSlot));
+    Channel2.waveFormPositionOnDuty = load<u8>(getSaveStateMemoryOffset(0x28, Channel2.saveStateSlot));
   }
 
   static initialize(): void {
