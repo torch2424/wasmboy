@@ -10,6 +10,7 @@ import serve from 'rollup-plugin-serve';
 import bundleSize from 'rollup-plugin-bundle-size';
 import postcss from 'rollup-plugin-postcss';
 import copy from 'rollup-plugin-copy-glob';
+import { terser } from 'rollup-plugin-terser';
 import pkg from './package.json';
 
 const babelPluginConfig = {
@@ -66,7 +67,9 @@ if (process.env.BENCHMARK && process.env.SERVE) {
         dest: 'build/benchmark/'
       }
     ]),
-    compiler()
+    // TODO: Compiler gives Out of memory errors in node :(
+    // compiler()
+    terser()
   ];
 }
 
@@ -82,8 +85,7 @@ const benchmarkBundles = [
       sourcemap: sourcemap
     },
     context: 'window',
-    plugins: plugins,
-    sourcemap: true
+    plugins: plugins
   }
 ];
 
