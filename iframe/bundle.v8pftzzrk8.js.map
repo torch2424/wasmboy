@@ -1,1 +1,0 @@
-{"version":3,"file":"bundle.v8pftzzrk8.js","sources":["../../demo/iframe/index.js"],"sourcesContent":["console.log('Yoo! Dude!');\n\n/*\nimport App from './App.svelte';\n\nconst app = new App({\n\ttarget: document.body,\n\tprops: {\n\t\tname: 'world'\n\t}\n});\n\nexport default app;\n*/\n"],"names":["console","log"],"mappings":"yBAAAA,QAAQC,IAAI"}

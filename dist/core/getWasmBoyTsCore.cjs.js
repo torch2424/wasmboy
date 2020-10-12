@@ -1963,32 +1963,80 @@ function () {
 
 
   Channel1.saveState = function () {
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x00, Channel1.saveStateSlot), Channel1.isEnabled);
-    store(getSaveStateMemoryOffset(0x01, Channel1.saveStateSlot), Channel1.frequencyTimer);
-    store(getSaveStateMemoryOffset(0x05, Channel1.saveStateSlot), Channel1.envelopeCounter);
-    store(getSaveStateMemoryOffset(0x09, Channel1.saveStateSlot), Channel1.lengthCounter);
-    store(getSaveStateMemoryOffset(0x0e, Channel1.saveStateSlot), Channel1.volume);
-    store(getSaveStateMemoryOffset(0x13, Channel1.saveStateSlot), Channel1.dutyCycle);
-    store(getSaveStateMemoryOffset(0x14, Channel1.saveStateSlot), Channel1.waveFormPositionOnDuty);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x19, Channel1.saveStateSlot), Channel1.isSweepEnabled);
-    store(getSaveStateMemoryOffset(0x1a, Channel1.saveStateSlot), Channel1.sweepCounter);
-    store(getSaveStateMemoryOffset(0x1f, Channel1.saveStateSlot), Channel1.sweepShadowFrequency);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x21, Channel1.saveStateSlot), Channel1.isEnvelopeAutomaticUpdating);
+    // Cycle Counter
+    store(getSaveStateMemoryOffset(0x00, Channel1.saveStateSlot), Channel1.cycleCounter); // NRx0
+
+    store(getSaveStateMemoryOffset(0x04, Channel1.saveStateSlot), Channel1.NRx0SweepPeriod);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x05, Channel1.saveStateSlot), Channel1.NRx0Negate);
+    store(getSaveStateMemoryOffset(0x06, Channel1.saveStateSlot), Channel1.NRx0SweepShift); // NRx1
+
+    store(getSaveStateMemoryOffset(0x07, Channel1.saveStateSlot), Channel1.NRx1Duty);
+    store(getSaveStateMemoryOffset(0x09, Channel1.saveStateSlot), Channel1.NRx1LengthLoad); // NRx2
+
+    store(getSaveStateMemoryOffset(0x0a, Channel1.saveStateSlot), Channel1.NRx2StartingVolume);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0b, Channel1.saveStateSlot), Channel1.NRx2EnvelopeAddMode);
+    store(getSaveStateMemoryOffset(0x0c, Channel1.saveStateSlot), Channel1.NRx2EnvelopePeriod); // NRx3
+
+    store(getSaveStateMemoryOffset(0x0d, Channel1.saveStateSlot), Channel1.NRx3FrequencyLSB); // NRx4
+
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0e, Channel1.saveStateSlot), Channel1.NRx4LengthEnabled);
+    store(getSaveStateMemoryOffset(0x0f, Channel1.saveStateSlot), Channel1.NRx4FrequencyMSB); // Channel Properties
+
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x10, Channel1.saveStateSlot), Channel1.isEnabled);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x11, Channel1.saveStateSlot), Channel1.isDacEnabled);
+    store(getSaveStateMemoryOffset(0x12, Channel1.saveStateSlot), Channel1.frequency);
+    store(getSaveStateMemoryOffset(0x16, Channel1.saveStateSlot), Channel1.frequencyTimer);
+    store(getSaveStateMemoryOffset(0x1a, Channel1.saveStateSlot), Channel1.envelopeCounter);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x1e, Channel1.saveStateSlot), Channel1.isEnvelopeAutomaticUpdating);
+    store(getSaveStateMemoryOffset(0x1f, Channel1.saveStateSlot), Channel1.lengthCounter);
+    store(getSaveStateMemoryOffset(0x23, Channel1.saveStateSlot), Channel1.volume); // Square Duty
+
+    store(getSaveStateMemoryOffset(0x27, Channel1.saveStateSlot), Channel1.dutyCycle);
+    store(getSaveStateMemoryOffset(0x28, Channel1.saveStateSlot), Channel1.waveFormPositionOnDuty); // Square Sweep
+
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x29, Channel1.saveStateSlot), Channel1.isSweepEnabled);
+    store(getSaveStateMemoryOffset(0x2a, Channel1.saveStateSlot), Channel1.sweepCounter);
+    store(getSaveStateMemoryOffset(0x2e, Channel1.saveStateSlot), Channel1.sweepShadowFrequency);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x31, Channel1.saveStateSlot), Channel1.sweepNegateShouldDisableChannelOnClear);
   }; // Function to load the save state from memory
 
 
   Channel1.loadState = function () {
-    Channel1.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x00, Channel1.saveStateSlot));
-    Channel1.frequencyTimer = load(getSaveStateMemoryOffset(0x01, Channel1.saveStateSlot));
-    Channel1.envelopeCounter = load(getSaveStateMemoryOffset(0x05, Channel1.saveStateSlot));
-    Channel1.lengthCounter = load(getSaveStateMemoryOffset(0x09, Channel1.saveStateSlot));
-    Channel1.volume = load(getSaveStateMemoryOffset(0x0e, Channel1.saveStateSlot));
-    Channel1.dutyCycle = load(getSaveStateMemoryOffset(0x13, Channel1.saveStateSlot));
-    Channel1.waveFormPositionOnDuty = load(getSaveStateMemoryOffset(0x14, Channel1.saveStateSlot));
-    Channel1.isSweepEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x19, Channel1.saveStateSlot));
-    Channel1.sweepCounter = load(getSaveStateMemoryOffset(0x1a, Channel1.saveStateSlot));
-    Channel1.sweepShadowFrequency = load(getSaveStateMemoryOffset(0x1f, Channel1.saveStateSlot));
-    Channel1.isEnvelopeAutomaticUpdating = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x21, Channel1.saveStateSlot));
+    // Cycle Counter
+    Channel1.cycleCounter = load(getSaveStateMemoryOffset(0x00, Channel1.cycleCounter)); // NRx0
+
+    Channel1.NRx0SweepPeriod = load(getSaveStateMemoryOffset(0x04, Channel1.saveStateSlot));
+    Channel1.NRx0Negate = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x05, Channel1.saveStateSlot));
+    Channel1.NRx0SweepShift = load(getSaveStateMemoryOffset(0x06, Channel1.saveStateSlot)); // NRx1
+
+    Channel1.NRx1Duty = load(getSaveStateMemoryOffset(0x07, Channel1.saveStateSlot));
+    Channel1.NRx1LengthLoad = load(getSaveStateMemoryOffset(0x09, Channel1.saveStateSlot)); // NRx2
+
+    Channel1.NRx2StartingVolume = load(getSaveStateMemoryOffset(0x0a, Channel1.saveStateSlot));
+    Channel1.NRx2EnvelopeAddMode = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0b, Channel1.saveStateSlot));
+    Channel1.NRx2EnvelopePeriod = load(getSaveStateMemoryOffset(0x0c, Channel1.saveStateSlot)); // NRx3
+
+    Channel1.NRx3FrequencyLSB = load(getSaveStateMemoryOffset(0x0d, Channel1.saveStateSlot)); // NRx4
+
+    Channel1.NRx4LengthEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0e, Channel1.saveStateSlot));
+    Channel1.NRx4FrequencyMSB = load(getSaveStateMemoryOffset(0x0f, Channel1.saveStateSlot)); // Channel Properties
+
+    Channel1.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x10, Channel1.saveStateSlot));
+    Channel1.isDacEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x11, Channel1.saveStateSlot));
+    Channel1.frequency = load(getSaveStateMemoryOffset(0x12, Channel1.saveStateSlot));
+    Channel1.frequencyTimer = load(getSaveStateMemoryOffset(0x16, Channel1.saveStateSlot));
+    Channel1.envelopeCounter = load(getSaveStateMemoryOffset(0x1a, Channel1.saveStateSlot));
+    Channel1.isEnvelopeAutomaticUpdating = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x1e, Channel1.saveStateSlot));
+    Channel1.lengthCounter = load(getSaveStateMemoryOffset(0x1f, Channel1.saveStateSlot));
+    Channel1.volume = load(getSaveStateMemoryOffset(0x23, Channel1.saveStateSlot)); // Square Duty
+
+    Channel1.dutyCycle = load(getSaveStateMemoryOffset(0x27, Channel1.saveStateSlot));
+    Channel1.waveFormPositionOnDuty = load(getSaveStateMemoryOffset(0x28, Channel1.saveStateSlot)); // Square Sweep
+
+    Channel1.isSweepEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x29, Channel1.saveStateSlot));
+    Channel1.sweepCounter = load(getSaveStateMemoryOffset(0x2a, Channel1.saveStateSlot));
+    Channel1.sweepShadowFrequency = load(getSaveStateMemoryOffset(0x2e, Channel1.saveStateSlot));
+    Channel1.sweepNegateShouldDisableChannelOnClear = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x31, Channel1.saveStateSlot));
   };
 
   Channel1.initialize = function () {
@@ -2432,26 +2480,66 @@ function () {
 
 
   Channel2.saveState = function () {
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x00, Channel2.saveStateSlot), Channel2.isEnabled);
-    store(getSaveStateMemoryOffset(0x01, Channel2.saveStateSlot), Channel2.frequencyTimer);
-    store(getSaveStateMemoryOffset(0x05, Channel2.saveStateSlot), Channel2.envelopeCounter);
-    store(getSaveStateMemoryOffset(0x09, Channel2.saveStateSlot), Channel2.lengthCounter);
-    store(getSaveStateMemoryOffset(0x0e, Channel2.saveStateSlot), Channel2.volume);
-    store(getSaveStateMemoryOffset(0x13, Channel2.saveStateSlot), Channel2.dutyCycle);
-    store(getSaveStateMemoryOffset(0x14, Channel2.saveStateSlot), Channel2.waveFormPositionOnDuty);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x15, Channel2.saveStateSlot), Channel2.isEnvelopeAutomaticUpdating);
+    // Cycle Counter
+    store(getSaveStateMemoryOffset(0x00, Channel2.saveStateSlot), Channel2.cycleCounter); // NRx0
+    // No NRx0 Properties
+    // NRx1
+
+    store(getSaveStateMemoryOffset(0x07, Channel2.saveStateSlot), Channel2.NRx1Duty);
+    store(getSaveStateMemoryOffset(0x08, Channel2.saveStateSlot), Channel2.NRx1LengthLoad); // NRx2
+
+    store(getSaveStateMemoryOffset(0x0a, Channel2.saveStateSlot), Channel2.NRx2StartingVolume);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0b, Channel2.saveStateSlot), Channel2.NRx2EnvelopeAddMode);
+    store(getSaveStateMemoryOffset(0x0c, Channel2.saveStateSlot), Channel2.NRx2EnvelopePeriod); // NRx3
+
+    store(getSaveStateMemoryOffset(0x0d, Channel2.saveStateSlot), Channel2.NRx3FrequencyLSB); // NRx4
+
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0e, Channel2.saveStateSlot), Channel2.NRx4LengthEnabled);
+    store(getSaveStateMemoryOffset(0x0f, Channel2.saveStateSlot), Channel2.NRx4FrequencyMSB); // Channel Properties
+
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x10, Channel2.saveStateSlot), Channel2.isEnabled);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x11, Channel2.saveStateSlot), Channel2.isDacEnabled);
+    store(getSaveStateMemoryOffset(0x12, Channel2.saveStateSlot), Channel2.frequency);
+    store(getSaveStateMemoryOffset(0x16, Channel2.saveStateSlot), Channel2.frequencyTimer);
+    store(getSaveStateMemoryOffset(0x1a, Channel2.saveStateSlot), Channel2.envelopeCounter);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x1e, Channel2.saveStateSlot), Channel2.isEnvelopeAutomaticUpdating);
+    store(getSaveStateMemoryOffset(0x1f, Channel2.saveStateSlot), Channel2.lengthCounter);
+    store(getSaveStateMemoryOffset(0x23, Channel2.saveStateSlot), Channel2.volume); // Square Duty
+
+    store(getSaveStateMemoryOffset(0x27, Channel2.saveStateSlot), Channel2.dutyCycle);
+    store(getSaveStateMemoryOffset(0x28, Channel2.saveStateSlot), Channel2.waveFormPositionOnDuty);
   }; // Function to load the save state from memory
 
 
   Channel2.loadState = function () {
-    Channel2.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x00, Channel2.saveStateSlot));
-    Channel2.frequencyTimer = load(getSaveStateMemoryOffset(0x01, Channel2.saveStateSlot));
-    Channel2.envelopeCounter = load(getSaveStateMemoryOffset(0x05, Channel2.saveStateSlot));
-    Channel2.lengthCounter = load(getSaveStateMemoryOffset(0x09, Channel2.saveStateSlot));
-    Channel2.volume = load(getSaveStateMemoryOffset(0x0e, Channel2.saveStateSlot));
-    Channel2.dutyCycle = load(getSaveStateMemoryOffset(0x13, Channel2.saveStateSlot));
-    Channel2.waveFormPositionOnDuty = load(getSaveStateMemoryOffset(0x14, Channel2.saveStateSlot));
-    Channel2.isEnvelopeAutomaticUpdating = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x21, Channel2.saveStateSlot));
+    // Cycle Counter
+    Channel2.cycleCounter = load(getSaveStateMemoryOffset(0x00, Channel2.cycleCounter)); // NRx0
+    // No NRx0
+    // NRx1
+
+    Channel2.NRx1Duty = load(getSaveStateMemoryOffset(0x07, Channel2.saveStateSlot));
+    Channel2.NRx1LengthLoad = load(getSaveStateMemoryOffset(0x08, Channel2.saveStateSlot)); // NRx2
+
+    Channel2.NRx2StartingVolume = load(getSaveStateMemoryOffset(0xa, Channel2.saveStateSlot));
+    Channel2.NRx2EnvelopeAddMode = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0b, Channel2.saveStateSlot));
+    Channel2.NRx2EnvelopePeriod = load(getSaveStateMemoryOffset(0x0c, Channel2.saveStateSlot)); // NRx3
+
+    Channel2.NRx3FrequencyLSB = load(getSaveStateMemoryOffset(0x0d, Channel2.saveStateSlot)); // NRx4
+
+    Channel2.NRx4LengthEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0e, Channel2.saveStateSlot));
+    Channel2.NRx4FrequencyMSB = load(getSaveStateMemoryOffset(0x0f, Channel2.saveStateSlot)); // Channel Properties
+
+    Channel2.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x10, Channel2.saveStateSlot));
+    Channel2.isDacEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x11, Channel2.saveStateSlot));
+    Channel2.frequency = load(getSaveStateMemoryOffset(0x12, Channel2.saveStateSlot));
+    Channel2.frequencyTimer = load(getSaveStateMemoryOffset(0x16, Channel2.saveStateSlot));
+    Channel2.envelopeCounter = load(getSaveStateMemoryOffset(0x1a, Channel2.saveStateSlot));
+    Channel2.isEnvelopeAutomaticUpdating = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x1e, Channel2.saveStateSlot));
+    Channel2.lengthCounter = load(getSaveStateMemoryOffset(0x1f, Channel2.saveStateSlot));
+    Channel2.volume = load(getSaveStateMemoryOffset(0x23, Channel2.saveStateSlot)); // Square Duty
+
+    Channel2.dutyCycle = load(getSaveStateMemoryOffset(0x27, Channel2.saveStateSlot));
+    Channel2.waveFormPositionOnDuty = load(getSaveStateMemoryOffset(0x28, Channel2.saveStateSlot));
   };
 
   Channel2.initialize = function () {
@@ -2766,18 +2854,60 @@ function () {
 
 
   Channel3.saveState = function () {
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x00, Channel3.saveStateSlot), Channel3.isEnabled);
-    store(getSaveStateMemoryOffset(0x01, Channel3.saveStateSlot), Channel3.frequencyTimer);
-    store(getSaveStateMemoryOffset(0x05, Channel3.saveStateSlot), Channel3.lengthCounter);
-    store(getSaveStateMemoryOffset(0x09, Channel3.saveStateSlot), Channel3.waveTablePosition);
+    // Cycle Counter
+    store(getSaveStateMemoryOffset(0x00, Channel3.saveStateSlot), Channel3.cycleCounter); // NRx0
+    // No NRx0 Properties
+    // NRx1
+
+    store(getSaveStateMemoryOffset(0x08, Channel3.saveStateSlot), Channel3.NRx1LengthLoad); // NRx2
+
+    store(getSaveStateMemoryOffset(0x0a, Channel3.saveStateSlot), Channel3.NRx2VolumeCode); // NRx3
+
+    store(getSaveStateMemoryOffset(0x0c, Channel3.saveStateSlot), Channel3.NRx3FrequencyLSB); // NRx4
+
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0d, Channel3.saveStateSlot), Channel3.NRx4LengthEnabled);
+    store(getSaveStateMemoryOffset(0x0e, Channel3.saveStateSlot), Channel3.NRx4FrequencyMSB); // Channel Properties
+
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0f, Channel3.saveStateSlot), Channel3.isEnabled);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x10, Channel3.saveStateSlot), Channel3.isDacEnabled);
+    store(getSaveStateMemoryOffset(0x11, Channel3.saveStateSlot), Channel3.frequency);
+    store(getSaveStateMemoryOffset(0x15, Channel3.saveStateSlot), Channel3.frequencyTimer); // No Envelope
+
+    store(getSaveStateMemoryOffset(0x19, Channel3.saveStateSlot), Channel3.lengthCounter); // WaveTable Properties
+
+    store(getSaveStateMemoryOffset(0x21, Channel3.saveStateSlot), Channel3.waveTablePosition);
+    store(getSaveStateMemoryOffset(0x25, Channel3.saveStateSlot), Channel3.volumeCode);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x26, Channel3.saveStateSlot), Channel3.volumeCodeChanged);
+    store(getSaveStateMemoryOffset(0x27, Channel3.saveStateSlot), Channel3.sampleBuffer);
   }; // Function to load the save state from memory
 
 
   Channel3.loadState = function () {
-    Channel3.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x00, Channel3.saveStateSlot));
-    Channel3.frequencyTimer = load(getSaveStateMemoryOffset(0x01, Channel3.saveStateSlot));
-    Channel3.lengthCounter = load(getSaveStateMemoryOffset(0x05, Channel3.saveStateSlot));
-    Channel3.waveTablePosition = load(getSaveStateMemoryOffset(0x09, Channel3.saveStateSlot));
+    // Cycle Counter
+    Channel3.cycleCounter = load(getSaveStateMemoryOffset(0x00, Channel3.cycleCounter)); // NRx0
+    // No NRx0
+    // NRx1
+
+    Channel3.NRx1LengthLoad = load(getSaveStateMemoryOffset(0x08, Channel3.saveStateSlot)); // NRx2
+
+    Channel3.NRx2VolumeCode = load(getSaveStateMemoryOffset(0x0a, Channel3.saveStateSlot)); // NRx3
+
+    Channel3.NRx3FrequencyLSB = load(getSaveStateMemoryOffset(0x0c, Channel3.saveStateSlot)); // NRx4
+
+    Channel3.NRx4LengthEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0d, Channel3.saveStateSlot));
+    Channel3.NRx4FrequencyMSB = load(getSaveStateMemoryOffset(0x0e, Channel3.saveStateSlot)); // Channel Properties
+
+    Channel3.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0f, Channel3.saveStateSlot));
+    Channel3.isDacEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x10, Channel3.saveStateSlot));
+    Channel3.frequency = load(getSaveStateMemoryOffset(0x11, Channel3.saveStateSlot));
+    Channel3.frequencyTimer = load(getSaveStateMemoryOffset(0x15, Channel3.saveStateSlot)); // No Envelope
+
+    Channel3.lengthCounter = load(getSaveStateMemoryOffset(0x19, Channel3.saveStateSlot)); // Wave Table Properties
+
+    Channel3.waveTablePosition = load(getSaveStateMemoryOffset(0x21, Channel3.saveStateSlot));
+    Channel3.volumeCode = load(getSaveStateMemoryOffset(0x25, Channel3.saveStateSlot));
+    Channel3.volumeCodeChanged = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x26, Channel3.saveStateSlot));
+    Channel3.sampleBuffer = load(getSaveStateMemoryOffset(0x27, Channel3.saveStateSlot));
   }; // Memory Read Trap
 
 
@@ -2992,7 +3122,8 @@ function () {
   Channel3.isDacEnabled = false;
   Channel3.frequency = 0;
   Channel3.frequencyTimer = 0x00;
-  Channel3.lengthCounter = 0x00;
+  Channel3.lengthCounter = 0x00; // WaveTable Properties
+
   Channel3.waveTablePosition = 0x00;
   Channel3.volumeCode = 0x00;
   Channel3.volumeCodeChanged = false;
@@ -3131,24 +3262,62 @@ function () {
 
 
   Channel4.saveState = function () {
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x00, Channel4.saveStateSlot), Channel4.isEnabled);
-    store(getSaveStateMemoryOffset(0x01, Channel4.saveStateSlot), Channel4.frequencyTimer);
-    store(getSaveStateMemoryOffset(0x05, Channel4.saveStateSlot), Channel4.envelopeCounter);
-    store(getSaveStateMemoryOffset(0x09, Channel4.saveStateSlot), Channel4.lengthCounter);
-    store(getSaveStateMemoryOffset(0x0e, Channel4.saveStateSlot), Channel4.volume);
-    store(getSaveStateMemoryOffset(0x13, Channel4.saveStateSlot), Channel4.linearFeedbackShiftRegister);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x15, Channel4.saveStateSlot), Channel4.isEnvelopeAutomaticUpdating);
+    // Cycle Counter
+    store(getSaveStateMemoryOffset(0x00, Channel4.saveStateSlot), Channel4.cycleCounter); // NRx0
+    // No NRx0 Properties
+    // NRx1
+
+    store(getSaveStateMemoryOffset(0x04, Channel4.saveStateSlot), Channel4.NRx1LengthLoad); // NRx2
+
+    store(getSaveStateMemoryOffset(0x06, Channel4.saveStateSlot), Channel4.NRx2StartingVolume);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x07, Channel4.saveStateSlot), Channel4.NRx2EnvelopeAddMode);
+    store(getSaveStateMemoryOffset(0x08, Channel4.saveStateSlot), Channel4.NRx2EnvelopePeriod); // NRx3
+
+    store(getSaveStateMemoryOffset(0x09, Channel4.saveStateSlot), Channel4.NRx3ClockShift);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0a, Channel4.saveStateSlot), Channel4.NRx3WidthMode);
+    store(getSaveStateMemoryOffset(0x0b, Channel4.saveStateSlot), Channel4.NRx3DivisorCode); // NRx4
+
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0d, Channel4.saveStateSlot), Channel4.NRx4LengthEnabled); // Channel Properties
+
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0f, Channel4.saveStateSlot), Channel4.isEnabled);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x10, Channel4.saveStateSlot), Channel4.isDacEnabled);
+    store(getSaveStateMemoryOffset(0x15, Channel4.saveStateSlot), Channel4.frequencyTimer);
+    store(getSaveStateMemoryOffset(0x19, Channel4.saveStateSlot), Channel4.envelopeCounter);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x1d, Channel4.saveStateSlot), Channel4.isEnvelopeAutomaticUpdating);
+    store(getSaveStateMemoryOffset(0x1e, Channel4.saveStateSlot), Channel4.lengthCounter);
+    store(getSaveStateMemoryOffset(0x22, Channel4.saveStateSlot), Channel4.volume); // LSFR
+
+    store(getSaveStateMemoryOffset(0x26, Channel4.saveStateSlot), Channel4.linearFeedbackShiftRegister);
   }; // Function to load the save state from memory
 
 
   Channel4.loadState = function () {
-    Channel4.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x00, Channel4.saveStateSlot));
-    Channel4.frequencyTimer = load(getSaveStateMemoryOffset(0x01, Channel4.saveStateSlot));
-    Channel4.envelopeCounter = load(getSaveStateMemoryOffset(0x05, Channel4.saveStateSlot));
-    Channel4.lengthCounter = load(getSaveStateMemoryOffset(0x09, Channel4.saveStateSlot));
-    Channel4.volume = load(getSaveStateMemoryOffset(0x0e, Channel4.saveStateSlot));
-    Channel4.linearFeedbackShiftRegister = load(getSaveStateMemoryOffset(0x13, Channel4.saveStateSlot));
-    Channel4.isEnvelopeAutomaticUpdating = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x15, Channel4.saveStateSlot));
+    // Cycle Counter
+    Channel4.cycleCounter = load(getSaveStateMemoryOffset(0x00, Channel4.cycleCounter)); // NRx0
+    // No NRx0
+    // NRx1
+
+    Channel4.NRx1LengthLoad = load(getSaveStateMemoryOffset(0x04, Channel4.saveStateSlot)); // NRx2
+
+    Channel4.NRx2StartingVolume = load(getSaveStateMemoryOffset(0x06, Channel4.saveStateSlot));
+    Channel4.NRx2EnvelopeAddMode = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x07, Channel4.saveStateSlot));
+    Channel4.NRx2EnvelopePeriod = load(getSaveStateMemoryOffset(0x08, Channel4.saveStateSlot)); // NRx3
+
+    Channel4.NRx3ClockShift = load(getSaveStateMemoryOffset(0x09, Channel4.saveStateSlot));
+    Channel4.NRx3WidthMode = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0a, Channel4.saveStateSlot));
+    Channel4.NRx3DivisorCode = load(getSaveStateMemoryOffset(0x0b, Channel4.saveStateSlot)); // NRx4
+
+    Channel4.NRx4LengthEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0d, Channel4.saveStateSlot)); // Channel Properties
+
+    Channel4.isEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0f, Channel4.saveStateSlot));
+    Channel4.isDacEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x10, Channel4.saveStateSlot));
+    Channel4.frequencyTimer = load(getSaveStateMemoryOffset(0x15, Channel4.saveStateSlot));
+    Channel4.envelopeCounter = load(getSaveStateMemoryOffset(0x19, Channel4.saveStateSlot));
+    Channel4.isEnvelopeAutomaticUpdating = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x1d, Channel4.saveStateSlot));
+    Channel4.lengthCounter = load(getSaveStateMemoryOffset(0x1e, Channel4.saveStateSlot));
+    Channel4.volume = load(getSaveStateMemoryOffset(0x22, Channel4.saveStateSlot)); // LSFR
+
+    Channel4.linearFeedbackShiftRegister = load(getSaveStateMemoryOffset(0x26, Channel4.saveStateSlot));
   };
 
   Channel4.initialize = function () {
@@ -3389,7 +3558,7 @@ function () {
   SoundAccumulator.leftChannelSampleUnsignedByte = 127;
   SoundAccumulator.rightChannelSampleUnsignedByte = 127;
   SoundAccumulator.mixerVolumeChanged = false;
-  SoundAccumulator.mixerEnabledChanged = false; //If a channel was updated, need to also track if we need to need to mix them again
+  SoundAccumulator.mixerEnabledChanged = false; // If a channel was updated, need to also track if we need to need to mix them again
 
   SoundAccumulator.needToRemixSamples = false;
   return SoundAccumulator;
@@ -3566,16 +3735,75 @@ function () {
 
 
   Sound.saveState = function () {
-    store(getSaveStateMemoryOffset(0x00, Sound.saveStateSlot), Sound.frameSequenceCycleCounter);
-    store(getSaveStateMemoryOffset(0x04, Sound.saveStateSlot), Sound.downSampleCycleCounter);
-    store(getSaveStateMemoryOffset(0x05, Sound.saveStateSlot), Sound.frameSequencer);
+    // NR50
+    store(getSaveStateMemoryOffset(0x00, Sound.saveStateSlot), Sound.NR50LeftMixerVolume);
+    store(getSaveStateMemoryOffset(0x04, Sound.saveStateSlot), Sound.NR50RightMixerVolume); // NR51
+
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x08, Sound.saveStateSlot), Sound.NR51IsChannel1EnabledOnLeftOutput);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x09, Sound.saveStateSlot), Sound.NR51IsChannel2EnabledOnLeftOutput);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0a, Sound.saveStateSlot), Sound.NR51IsChannel3EnabledOnLeftOutput);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0b, Sound.saveStateSlot), Sound.NR51IsChannel4EnabledOnLeftOutput);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0c, Sound.saveStateSlot), Sound.NR51IsChannel1EnabledOnRightOutput);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0d, Sound.saveStateSlot), Sound.NR51IsChannel2EnabledOnRightOutput);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0e, Sound.saveStateSlot), Sound.NR51IsChannel3EnabledOnRightOutput);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0f, Sound.saveStateSlot), Sound.NR51IsChannel4EnabledOnRightOutput); // NR52
+
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x10, Sound.saveStateSlot), Sound.NR52IsSoundEnabled); // Frame Sequencer
+
+    store(getSaveStateMemoryOffset(0x11, Sound.saveStateSlot), Sound.frameSequenceCycleCounter);
+    store(getSaveStateMemoryOffset(0x16, Sound.saveStateSlot), Sound.frameSequencer); // Down Sampler
+
+    store(getSaveStateMemoryOffset(0x17, Sound.saveStateSlot), Sound.downSampleCycleCounter); // Sound Accumulator
+
+    store(getSaveStateMemoryOffset(0x18, Sound.saveStateSlot), SoundAccumulator.channel1Sample);
+    store(getSaveStateMemoryOffset(0x19, Sound.saveStateSlot), SoundAccumulator.channel2Sample);
+    store(getSaveStateMemoryOffset(0x1a, Sound.saveStateSlot), SoundAccumulator.channel3Sample);
+    store(getSaveStateMemoryOffset(0x1b, Sound.saveStateSlot), SoundAccumulator.channel4Sample);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x1c, Sound.saveStateSlot), SoundAccumulator.channel1DacEnabled);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x1d, Sound.saveStateSlot), SoundAccumulator.channel2DacEnabled);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x1e, Sound.saveStateSlot), SoundAccumulator.channel3DacEnabled);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x1f, Sound.saveStateSlot), SoundAccumulator.channel4DacEnabled);
+    store(getSaveStateMemoryOffset(0x20, Sound.saveStateSlot), SoundAccumulator.leftChannelSampleUnsignedByte);
+    store(getSaveStateMemoryOffset(0x21, Sound.saveStateSlot), SoundAccumulator.rightChannelSampleUnsignedByte);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x22, Sound.saveStateSlot), SoundAccumulator.mixerVolumeChanged);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x23, Sound.saveStateSlot), SoundAccumulator.mixerEnabledChanged);
   }; // Function to load the save state from memory
 
 
   Sound.loadState = function () {
-    Sound.frameSequenceCycleCounter = load(getSaveStateMemoryOffset(0x00, Sound.saveStateSlot));
-    Sound.downSampleCycleCounter = load(getSaveStateMemoryOffset(0x04, Sound.saveStateSlot));
-    Sound.frameSequencer = load(getSaveStateMemoryOffset(0x05, Sound.saveStateSlot));
+    // NR50
+    Sound.NR50LeftMixerVolume = load(getSaveStateMemoryOffset(0x00, Sound.saveStateSlot));
+    Sound.NR50RightMixerVolume = load(getSaveStateMemoryOffset(0x04, Sound.saveStateSlot)); // NR51
+
+    Sound.NR51IsChannel1EnabledOnLeftOutput = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x08, Sound.saveStateSlot));
+    Sound.NR51IsChannel2EnabledOnLeftOutput = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x09, Sound.saveStateSlot));
+    Sound.NR51IsChannel3EnabledOnLeftOutput = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0a, Sound.saveStateSlot));
+    Sound.NR51IsChannel4EnabledOnLeftOutput = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0b, Sound.saveStateSlot));
+    Sound.NR51IsChannel1EnabledOnRightOutput = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0c, Sound.saveStateSlot));
+    Sound.NR51IsChannel2EnabledOnRightOutput = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0d, Sound.saveStateSlot));
+    Sound.NR51IsChannel3EnabledOnRightOutput = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0e, Sound.saveStateSlot));
+    Sound.NR51IsChannel4EnabledOnRightOutput = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0f, Sound.saveStateSlot)); // NR52
+
+    Sound.NR52IsSoundEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x10, Sound.saveStateSlot)); // Frame Sequencer
+
+    Sound.frameSequenceCycleCounter = load(getSaveStateMemoryOffset(0x11, Sound.saveStateSlot));
+    Sound.frameSequencer = load(getSaveStateMemoryOffset(0x16, Sound.saveStateSlot)); // DownSampler
+
+    Sound.downSampleCycleCounter = load(getSaveStateMemoryOffset(0x17, Sound.saveStateSlot)); // Sound Accumulator
+
+    SoundAccumulator.channel1Sample = load(getSaveStateMemoryOffset(0x18, Sound.saveStateSlot));
+    SoundAccumulator.channel2Sample = load(getSaveStateMemoryOffset(0x19, Sound.saveStateSlot));
+    SoundAccumulator.channel3Sample = load(getSaveStateMemoryOffset(0x1a, Sound.saveStateSlot));
+    SoundAccumulator.channel4Sample = load(getSaveStateMemoryOffset(0x1b, Sound.saveStateSlot));
+    SoundAccumulator.channel1DacEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x1c, Sound.saveStateSlot));
+    SoundAccumulator.channel2DacEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x1d, Sound.saveStateSlot));
+    SoundAccumulator.channel3DacEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x1e, Sound.saveStateSlot));
+    SoundAccumulator.channel4DacEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x1f, Sound.saveStateSlot));
+    SoundAccumulator.leftChannelSampleUnsignedByte = load(getSaveStateMemoryOffset(0x20, Sound.saveStateSlot));
+    SoundAccumulator.rightChannelSampleUnsignedByte = load(getSaveStateMemoryOffset(0x21, Sound.saveStateSlot));
+    SoundAccumulator.mixerVolumeChanged = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x22, Sound.saveStateSlot));
+    SoundAccumulator.mixerEnabledChanged = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x23, Sound.saveStateSlot)); // Finally clear the audio buffer
+
     clearAudioBuffer();
   }; // Current cycles
   // This will be used for batch processing
@@ -3605,16 +3833,16 @@ function () {
   Sound.memoryLocationChannel3LoadRegisterStart = 0xff30; // Need to count how often we need to increment our frame sequencer
   // Which you can read about below
 
-  Sound.frameSequenceCycleCounter = 0x0000; // Also need to downsample our audio to average audio qualty
+  Sound.frameSequenceCycleCounter = 0x0000; // Frame sequencer controls what should be updated and and ticked
+  // Every time the sound is updated :) It is updated everytime the
+  // Cycle counter reaches the max cycle
+
+  Sound.frameSequencer = 0x00; // Also need to downsample our audio to average audio qualty
   // https://www.reddit.com/r/EmuDev/comments/5gkwi5/gb_apu_sound_emulation/
   // Want to do 44100hz, so CpuRate / Sound Rate, 4194304 / 44100 ~ 91 cycles
 
   Sound.downSampleCycleCounter = 0x00;
-  Sound.sampleRate = 44100; // Frame sequencer controls what should be updated and and ticked
-  // Every time the sound is updated :) It is updated everytime the
-  // Cycle counter reaches the max cycle
-
-  Sound.frameSequencer = 0x00; // Our current sample number we are passing back to the wasmboy memory map
+  Sound.sampleRate = 44100; // Our current sample number we are passing back to the wasmboy memory map
   // Found that a static number of samples doesn't work well on mobile
   // Will just update the queue index, grab as much as we can whenever we need more audio, then reset
   // NOTE: Giving a really large sample rate gives more latency, but less pops!
@@ -4324,6 +4552,7 @@ function () {
   Interrupts.saveState = function () {
     storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x00, Interrupts.saveStateSlot), Interrupts.masterInterruptSwitch);
     storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x01, Interrupts.saveStateSlot), Interrupts.masterInterruptSwitchDelay); // Interrupts enabled and requested are stored in actual GB memory, thus, don't need to be saved
+    // Other classes have special logic on write, but this just checks bits on bytes, so should be fine
   }; // Function to load the save state from memory
 
 
@@ -4631,22 +4860,40 @@ function () {
 
 
   Timers.saveState = function () {
-    store(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot), Timers.currentCycles);
-    store(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot), Timers.dividerRegister);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x08, Timers.saveStateSlot), Timers.timerCounterOverflowDelay);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0b, Timers.saveStateSlot), Timers.timerCounterWasReset);
+    // Batch Processing
+    store(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot), Timers.currentCycles); // Divider Register
+
+    store(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot), Timers.dividerRegister); // Timer Counter
+
+    store(getSaveStateMemoryOffset(0x08, Timers.saveStateSlot), Timers.timerCounter);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0c, Timers.saveStateSlot), Timers.timerCounterOverflowDelay);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0d, Timers.saveStateSlot), Timers.timerCounterWasReset);
+    store(getSaveStateMemoryOffset(0x0e, Timers.saveStateSlot), Timers.timerCounterMask); // Timer Modulo
+
+    store(getSaveStateMemoryOffset(0x12, Timers.saveStateSlot), Timers.timerModulo); // Timer Control
+
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x16, Timers.saveStateSlot), Timers.timerEnabled);
+    store(getSaveStateMemoryOffset(0x17, Timers.saveStateSlot), Timers.timerInputClock); // Old Not too sture
+
     eightBitStoreIntoGBMemory(Timers.memoryLocationTimerCounter, Timers.timerCounter);
   }; // Function to load the save state from memory
 
 
   Timers.loadState = function () {
-    Timers.currentCycles = load(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot));
-    Timers.dividerRegister = load(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot));
-    Timers.timerCounterOverflowDelay = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x08, Timers.saveStateSlot));
-    Timers.timerCounterWasReset = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0b, Timers.saveStateSlot));
-    Timers.timerCounter = eightBitLoadFromGBMemory(Timers.memoryLocationTimerCounter);
-    Timers.timerModulo = eightBitLoadFromGBMemory(Timers.memoryLocationTimerModulo);
-    Timers.timerInputClock = eightBitLoadFromGBMemory(Timers.memoryLocationTimerControl);
+    // Batch Processing
+    Timers.currentCycles = load(getSaveStateMemoryOffset(0x00, Timers.saveStateSlot)); // Divider Register
+
+    Timers.dividerRegister = load(getSaveStateMemoryOffset(0x04, Timers.saveStateSlot)); // Timer Counter
+
+    Timers.timerCounter = load(getSaveStateMemoryOffset(0x08, Timers.saveStateSlot));
+    Timers.timerCounterOverflowDelay = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0c, Timers.saveStateSlot));
+    Timers.timerCounterWasReset = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0d, Timers.saveStateSlot));
+    Timers.timerCounterMask = load(getSaveStateMemoryOffset(0x0e, Timers.saveStateSlot)); // Timer Modulo
+
+    Timers.timerModulo = load(getSaveStateMemoryOffset(0x12, Timers.saveStateSlot)); // Timer Control
+
+    Timers.timerEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x16, Timers.saveStateSlot));
+    Timers.timerInputClock = load(getSaveStateMemoryOffset(0x17, Timers.saveStateSlot));
   }; // Current cycles
   // This will be used for batch processing
 
@@ -6713,17 +6960,38 @@ function () {
 
 
   Graphics.saveState = function () {
+    // Graphics
     store(getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot), Graphics.scanlineCycleCounter);
+    eightBitStoreIntoGBMemory(Graphics.memoryLocationScanlineRegister, Graphics.scanlineRegister); // LCD
+
     store(getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot), Lcd.currentLcdMode);
-    eightBitStoreIntoGBMemory(Graphics.memoryLocationScanlineRegister, Graphics.scanlineRegister);
+    store(getSaveStateMemoryOffset(0x05, Graphics.saveStateSlot), Lcd.coincidenceCompare);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x06, Graphics.saveStateSlot), Lcd.enabled);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x07, Graphics.saveStateSlot), Lcd.windowTileMapDisplaySelect);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x08, Graphics.saveStateSlot), Lcd.windowDisplayEnabled);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x09, Graphics.saveStateSlot), Lcd.bgWindowTileDataSelect);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0a, Graphics.saveStateSlot), Lcd.bgTileMapDisplaySelect);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0b, Graphics.saveStateSlot), Lcd.tallSpriteSize);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0c, Graphics.saveStateSlot), Lcd.spriteDisplayEnable);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0d, Graphics.saveStateSlot), Lcd.bgDisplayEnabled);
   }; // Function to load the save state from memory
 
 
   Graphics.loadState = function () {
+    // Graphics
     Graphics.scanlineCycleCounter = load(getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot));
+    Graphics.scanlineRegister = eightBitLoadFromGBMemory(Graphics.memoryLocationScanlineRegister); // LCD
+
     Lcd.currentLcdMode = load(getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot));
-    Graphics.scanlineRegister = eightBitLoadFromGBMemory(Graphics.memoryLocationScanlineRegister);
-    Lcd.updateLcdControl(eightBitLoadFromGBMemory(Lcd.memoryLocationLcdControl));
+    Lcd.coincidenceCompare = load(getSaveStateMemoryOffset(0x05, Graphics.saveStateSlot));
+    Lcd.enabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x06, Graphics.saveStateSlot));
+    Lcd.windowTileMapDisplaySelect = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x07, Graphics.saveStateSlot));
+    Lcd.windowDisplayEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x08, Graphics.saveStateSlot));
+    Lcd.bgWindowTileDataSelect = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x09, Graphics.saveStateSlot));
+    Lcd.bgTileMapDisplaySelect = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0a, Graphics.saveStateSlot));
+    Lcd.tallSpriteSize = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0b, Graphics.saveStateSlot));
+    Lcd.spriteDisplayEnable = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0c, Graphics.saveStateSlot));
+    Lcd.bgDisplayEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0d, Graphics.saveStateSlot));
   }; // Current cycles
   // This will be used for batch processing
 
@@ -7139,6 +7407,11 @@ function () {
     storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x08, Memory.saveStateSlot), Memory.isMBC2);
     storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x09, Memory.saveStateSlot), Memory.isMBC3);
     storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0a, Memory.saveStateSlot), Memory.isMBC5);
+    store(getSaveStateMemoryOffset(0x0b, Memory.saveStateSlot), Memory.DMACycles);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0f, Memory.saveStateSlot), Memory.isHblankHdmaActive);
+    store(getSaveStateMemoryOffset(0x10, Memory.saveStateSlot), Memory.hblankHdmaTransferLengthRemaining);
+    store(getSaveStateMemoryOffset(0x14, Memory.saveStateSlot), Memory.hblankHdmaSource);
+    store(getSaveStateMemoryOffset(0x18, Memory.saveStateSlot), Memory.hblankHdmaDestination);
   }; // Function to load the save state from memory
 
 
@@ -7152,6 +7425,11 @@ function () {
     Memory.isMBC2 = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x08, Memory.saveStateSlot));
     Memory.isMBC3 = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x09, Memory.saveStateSlot));
     Memory.isMBC5 = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0a, Memory.saveStateSlot));
+    Memory.DMACycles = load(getSaveStateMemoryOffset(0x0b, Memory.saveStateSlot));
+    Memory.isHblankHdmaActive = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0f, Memory.saveStateSlot));
+    Memory.hblankHdmaTransferLengthRemaining = load(getSaveStateMemoryOffset(0x10, Memory.saveStateSlot));
+    Memory.hblankHdmaSource = load(getSaveStateMemoryOffset(0x14, Memory.saveStateSlot));
+    Memory.hblankHdmaDestination = load(getSaveStateMemoryOffset(0x18, Memory.saveStateSlot));
   }; // ----------------------------------
   // Gameboy Memory Map
   // ----------------------------------
