@@ -11,7 +11,7 @@ const fs = require('fs');
 const assert = require('assert');
 
 // Golden file handling
-const { goldenFileCompareOrCreate, goldenImageDataArrayCompare } = require('./goldenCompare');
+const { goldenFileCompareOrCreate, goldenImageDataArrayCompare } = require('../golden-compare');
 
 // Some Timeouts for specified test roms
 const TEST_ROM_DEFAULT_TIMEOUT = 7500;
@@ -224,7 +224,7 @@ commonTest.getDirectories(testRomsPath).forEach(directory => {
             const wasmboyOutputImageTest = async () => {
               await WasmBoy.pause();
 
-              const testDataPath = testRom.replace('.gb', '.golden.output');
+              const testDataPath = testRom.replace('.gb', '.golden.output.json');
               const goldenFile = `${directory}/${testDataPath}`;
 
               console.log(`Checking results for the following test rom: ${goldenFile}`);

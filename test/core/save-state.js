@@ -13,7 +13,7 @@ const getWasmBoyCore = require('../../dist/core/getWasmBoyWasmCore.cjs.js');
 const commonTest = require('../common-test');
 
 // Golden file handling
-const { goldenFileCompareOrCreate } = require('../accuracy/goldenCompare');
+const { goldenFileCompareOrCreate } = require('../golden-compare');
 
 // Path to roms we want to test
 const testRomsPath = './test/performance/testroms';
@@ -133,12 +133,14 @@ describe('WasmBoy Core Save State', () => {
           }
 
           // Output to a file
-          const imageFile = `./test/core/save-state.${i}.png`;
+          const imageFile = `./test/core/save-state/save-state.${i}.png`;
           await commonTest.createImageFromFrame(imageDataArray, imageFile);
           console.log(`Screenshot created at: ${imageFile}`);
 
-          // TODO: Golden Compare Screenshots as we make them
+          // Golden Compare Screenshots as we make them
           // Make sure Golden Compare function is parsing JSON correctly as well
+          const goldenJSONFile = `./test/core/save-state/save-state.${i}.golden.json`;
+          goldenFileCompareOrCreate(goldenJSONFile, imageDataArray);
         }
       }
     };

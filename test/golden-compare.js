@@ -5,7 +5,7 @@ const fs = require('fs');
 const assert = require('assert');
 
 // Common test functions
-const commonTest = require('../common-test');
+const commonTest = require('./common-test');
 
 const goldenArrayCompare = (goldenArray, currentArray) => {
   if (goldenArray.length !== currentArray.length) {
@@ -41,6 +41,9 @@ const goldenFileCompareOrCreate = (goldenFile, currentArray) => {
     const goldenArray = JSON.parse(goldenOuput);
 
     goldenArrayCompare(goldenArray, currentArray);
+
+    // Return so we don't re-create the file
+    return;
   }
 
   // Either we didn't have it because this is the first time running this test rom,
