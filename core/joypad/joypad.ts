@@ -2,6 +2,14 @@ import { Cpu } from '../cpu/index';
 import { eightBitLoadFromGBMemory } from '../memory/load';
 import { requestJoypadInterrupt } from '../interrupts/index';
 import { checkBitOnByte, setBitOnByte, resetBitOnByte } from '../helpers/index';
+import { getSaveStateMemoryOffset } from '../core';
+import {
+  eightBitLoadFromGBMemory,
+  eightBitStoreIntoGBMemory,
+  sixteenBitStoreIntoGBMemory,
+  loadBooleanDirectlyFromWasmMemory,
+  storeBooleanDirectlyToWasmMemory
+} from '../memory/index';
 
 // http://www.codeslinger.co.uk/pages/projects/gameboy/joypad.html
 // Joypad Register
@@ -52,11 +60,19 @@ export class Joypad {
   static readonly saveStateSlot: i32 = 3;
 
   // Function to save the state of the class
-  static saveState(): void {}
+  static saveState(): void {
+    store<i32>(getSaveStateMemoryOffset(0x00, Joypad.saveStateSlot), Joypad.joypadRegisterFlipped);
+
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x01, Joypad.saveStateSlot), Joypad.isDpadType);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x02, Joypad.saveStateSlot), Joypad.isButtonType);
+  }
 
   // Function to load the save state from memory
   static loadState(): void {
-    Joypad.updateJoypad(eightBitLoadFromGBMemory(Joypad.memoryLocationJoypadRegister));
+    Joypad.joypadRegisterFlipped = load<i32>(getSaveStateMemoryOffset(0x00, Joypad.saveStateSlot));
+
+    Joypad.isDpadType = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x01, Joypad.saveStateSlot));
+    Joypad.isButtonType = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x02, Joypad.saveStateSlot));
   }
 }
 

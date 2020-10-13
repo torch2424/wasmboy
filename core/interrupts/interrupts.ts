@@ -69,20 +69,48 @@ export class Interrupts {
 
   // Function to save the state of the class
   static saveState(): void {
+    // Interrupt Master Interrupt Switch
     storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x00, Interrupts.saveStateSlot), Interrupts.masterInterruptSwitch);
     storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x01, Interrupts.saveStateSlot), Interrupts.masterInterruptSwitchDelay);
 
-    // Interrupts enabled and requested are stored in actual GB memory, thus, don't need to be saved
-    // Other classes have special logic on write, but this just checks bits on bytes, so should be fine
+    // Interrupt Enabled
+    store<u8>(getSaveStateMemoryOffset(0x10, Interrupts.saveStateSlot), <u8>Interrupts.interruptsEnabledValue);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x11, Interrupts.saveStateSlot), Interrupts.isVBlankInterruptEnabled);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x12, Interrupts.saveStateSlot), Interrupts.isLcdInterruptEnabled);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x13, Interrupts.saveStateSlot), Interrupts.isTimerInterruptEnabled);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x14, Interrupts.saveStateSlot), Interrupts.isSerialInterruptEnabled);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x15, Interrupts.saveStateSlot), Interrupts.isJoypadInterruptEnabled);
+
+    // Interrupt Request
+    store<u8>(getSaveStateMemoryOffset(0x20, Interrupts.saveStateSlot), <u8>Interrupts.interruptsRequestedValue);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x21, Interrupts.saveStateSlot), Interrupts.isVBlankInterruptRequested);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x22, Interrupts.saveStateSlot), Interrupts.isLcdInterruptRequested);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x23, Interrupts.saveStateSlot), Interrupts.isTimerInterruptRequested);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x24, Interrupts.saveStateSlot), Interrupts.isSerialInterruptRequested);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x25, Interrupts.saveStateSlot), Interrupts.isJoypadInterruptRequested);
   }
 
   // Function to load the save state from memory
   static loadState(): void {
+    // Interrupt Master Interrupt Switch
     Interrupts.masterInterruptSwitch = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x00, Interrupts.saveStateSlot));
     Interrupts.masterInterruptSwitchDelay = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x01, Interrupts.saveStateSlot));
 
-    Interrupts.updateInterruptEnabled(eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptEnabled));
-    Interrupts.updateInterruptRequested(eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptRequest));
+    // Interrupt Enabled
+    Interrupts.interruptsEnabledValue = load<u8>(getSaveStateMemoryOffset(0x10, Interrupts.saveStateSlot));
+    Interrupts.isVBlankInterruptEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x11, Interrupts.saveStateSlot));
+    Interrupts.isLcdInterruptEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x12, Interrupts.saveStateSlot));
+    Interrupts.isTimerInterruptEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x13, Interrupts.saveStateSlot));
+    Interrupts.isSerialInterruptEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x14, Interrupts.saveStateSlot));
+    Interrupts.isJoypadInterruptEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x15, Interrupts.saveStateSlot));
+
+    // Interrupt Request
+    Interrupts.interruptsRequestedValue = load<u8>(getSaveStateMemoryOffset(0x20, Interrupts.saveStateSlot));
+    Interrupts.isVBlankInterruptRequested = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x21, Interrupts.saveStateSlot));
+    Interrupts.isLcdInterruptRequested = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x22, Interrupts.saveStateSlot));
+    Interrupts.isTimerInterruptRequested = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x23, Interrupts.saveStateSlot));
+    Interrupts.isSerialInterruptRequested = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x24, Interrupts.saveStateSlot));
+    Interrupts.isJoypadInterruptRequested = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x25, Interrupts.saveStateSlot));
   }
 }
 
