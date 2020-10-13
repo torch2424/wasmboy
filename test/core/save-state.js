@@ -107,9 +107,6 @@ describe('WasmBoy Core Save State', () => {
         wasmboy.executeMultipleFrames(5);
         wasmboy.clearAudioBuffer();
 
-        console.log(wasmboy.getScrollX());
-        console.log(wasmboy.getWindowX());
-
         wasmboy.saveState();
 
         // Save the state
@@ -165,7 +162,7 @@ describe('WasmBoy Core Save State', () => {
           // Golden Compare Screenshots as we make them
           // Make sure Golden Compare function is parsing JSON correctly as well
           const goldenJSONFile = `./test/core/save-state/save-state.${i}.golden.json`;
-          // goldenFileCompareOrCreate(goldenJSONFile, imageDataArray);
+          goldenFileCompareOrCreate(goldenJSONFile, imageDataArray);
         }
       }
     };
