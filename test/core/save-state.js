@@ -53,7 +53,7 @@ describe('WasmBoy Core Save State', () => {
           0, // graphicsDisableScanlineRendering: i32,
           1, // audioAccumulateSamples: i32,
           0, // tileRendering: i32,
-          1, // tileCaching: i32,
+          0, // tileCaching: i32,
           0 // enableAudioDebugging: i32
         );
 
@@ -68,7 +68,7 @@ describe('WasmBoy Core Save State', () => {
         }
 
         // Testing input
-        if (i === -1) {
+        if (i === 160) {
           wasmboy.setJoypadState(
             0, // up: i32,
             0, // right: i32,
@@ -79,10 +79,32 @@ describe('WasmBoy Core Save State', () => {
             0, // select: i32,
             1 // start: i32
           );
+        } else if (i === 220) {
+          wasmboy.setJoypadState(
+            0, // up: i32,
+            0, // right: i32,
+            0, // down: i32,
+            0, // left: i32,
+            0, // a: i32,
+            0, // b: i32,
+            0, // select: i32,
+            1 // start: i32
+          );
+        } else if (i === 260) {
+          wasmboy.setJoypadState(
+            0, // up: i32,
+            0, // right: i32,
+            0, // down: i32,
+            0, // left: i32,
+            1, // a: i32,
+            0, // b: i32,
+            0, // select: i32,
+            0 // start: i32
+          );
         }
 
         // Run some frames
-        wasmboy.executeMultipleFrames(2);
+        wasmboy.executeMultipleFrames(5);
         wasmboy.clearAudioBuffer();
 
         wasmboy.saveState();

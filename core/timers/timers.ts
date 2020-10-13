@@ -155,9 +155,6 @@ export class Timers {
     // Timer Control
     storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x16, Timers.saveStateSlot), Timers.timerEnabled);
     store<i32>(getSaveStateMemoryOffset(0x17, Timers.saveStateSlot), Timers.timerInputClock);
-
-    // Old Not too sture
-    eightBitStoreIntoGBMemory(Timers.memoryLocationTimerCounter, Timers.timerCounter);
   }
 
   // Function to load the save state from memory

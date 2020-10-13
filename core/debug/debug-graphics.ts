@@ -23,6 +23,22 @@ export function getLY(): i32 {
   return Graphics.scanlineRegister;
 }
 
+export function getScrollX(): i32 {
+  return Graphics.scrollX;
+}
+
+export function getScrollY(): i32 {
+  return Graphics.scrollY;
+}
+
+export function getWindowX(): i32 {
+  return Graphics.windowX;
+}
+
+export function getWindowY(): i32 {
+  return Graphics.windowY;
+}
+
 // TODO: Render by tile, rather than by pixel
 export function drawBackgroundMapToWasmMemory(showColor: i32): void {
   // http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html

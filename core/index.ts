@@ -85,6 +85,15 @@ export {
   getStackPointer,
   getOpcodeAtProgramCounter
 } from './debug/debug-cpu';
-export { getLY, drawBackgroundMapToWasmMemory, drawTileDataToWasmMemory, drawOamToWasmMemory } from './debug/debug-graphics';
+export {
+  getLY,
+  getScrollX,
+  getScrollY,
+  getWindowX,
+  getWindowY,
+  drawBackgroundMapToWasmMemory,
+  drawTileDataToWasmMemory,
+  drawOamToWasmMemory
+} from './debug/debug-graphics';
 export { getDIV, getTIMA, getTMA, getTAC } from './debug/debug-timer';
 export { updateDebugGBMemory } from './debug/debug-memory';

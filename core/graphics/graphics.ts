@@ -95,38 +95,46 @@ export class Graphics {
   static saveState(): void {
     // Graphics
     store<i32>(getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot), Graphics.scanlineCycleCounter);
-    eightBitStoreIntoGBMemory(Graphics.memoryLocationScanlineRegister, Graphics.scanlineRegister);
+    store<u8>(getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot), <u8>Graphics.scanlineRegister);
+    store<u8>(getSaveStateMemoryOffset(0x05, Graphics.saveStateSlot), <u8>Graphics.scrollX);
+    store<u8>(getSaveStateMemoryOffset(0x06, Graphics.saveStateSlot), <u8>Graphics.scrollY);
+    store<u8>(getSaveStateMemoryOffset(0x07, Graphics.saveStateSlot), <u8>Graphics.windowX);
+    store<u8>(getSaveStateMemoryOffset(0x08, Graphics.saveStateSlot), <u8>Graphics.windowY);
 
     // LCD
-    store<u8>(getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot), <u8>Lcd.currentLcdMode);
-    store<u8>(getSaveStateMemoryOffset(0x05, Graphics.saveStateSlot), <u8>Lcd.coincidenceCompare);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x06, Graphics.saveStateSlot), Lcd.enabled);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x07, Graphics.saveStateSlot), Lcd.windowTileMapDisplaySelect);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x08, Graphics.saveStateSlot), Lcd.windowDisplayEnabled);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x09, Graphics.saveStateSlot), Lcd.bgWindowTileDataSelect);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0a, Graphics.saveStateSlot), Lcd.bgTileMapDisplaySelect);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0b, Graphics.saveStateSlot), Lcd.tallSpriteSize);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0c, Graphics.saveStateSlot), Lcd.spriteDisplayEnable);
-    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0d, Graphics.saveStateSlot), Lcd.bgDisplayEnabled);
+    store<u8>(getSaveStateMemoryOffset(0x09, Graphics.saveStateSlot), <u8>Lcd.currentLcdMode);
+    store<u8>(getSaveStateMemoryOffset(0x0a, Graphics.saveStateSlot), <u8>Lcd.coincidenceCompare);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0b, Graphics.saveStateSlot), Lcd.enabled);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0c, Graphics.saveStateSlot), Lcd.windowTileMapDisplaySelect);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0d, Graphics.saveStateSlot), Lcd.windowDisplayEnabled);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0e, Graphics.saveStateSlot), Lcd.bgWindowTileDataSelect);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0f, Graphics.saveStateSlot), Lcd.bgTileMapDisplaySelect);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x10, Graphics.saveStateSlot), Lcd.tallSpriteSize);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x11, Graphics.saveStateSlot), Lcd.spriteDisplayEnable);
+    storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x12, Graphics.saveStateSlot), Lcd.bgDisplayEnabled);
   }
 
   // Function to load the save state from memory
   static loadState(): void {
     // Graphics
     Graphics.scanlineCycleCounter = load<i32>(getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot));
-    Graphics.scanlineRegister = eightBitLoadFromGBMemory(Graphics.memoryLocationScanlineRegister);
+    Graphics.scanlineRegister = load<u8>(getSaveStateMemoryOffset(0x04, Graphics.scanlineRegister));
+    Graphics.scrollX = load<u8>(getSaveStateMemoryOffset(0x05, Graphics.saveStateSlot));
+    Graphics.scrollY = load<u8>(getSaveStateMemoryOffset(0x06, Graphics.saveStateSlot));
+    Graphics.windowX = load<u8>(getSaveStateMemoryOffset(0x07, Graphics.saveStateSlot));
+    Graphics.windowY = load<u8>(getSaveStateMemoryOffset(0x08, Graphics.saveStateSlot));
 
     // LCD
-    Lcd.currentLcdMode = load<u8>(getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot));
-    Lcd.coincidenceCompare = load<u8>(getSaveStateMemoryOffset(0x05, Graphics.saveStateSlot));
-    Lcd.enabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x06, Graphics.saveStateSlot));
-    Lcd.windowTileMapDisplaySelect = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x07, Graphics.saveStateSlot));
-    Lcd.windowDisplayEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x08, Graphics.saveStateSlot));
-    Lcd.bgWindowTileDataSelect = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x09, Graphics.saveStateSlot));
-    Lcd.bgTileMapDisplaySelect = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0a, Graphics.saveStateSlot));
-    Lcd.tallSpriteSize = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0b, Graphics.saveStateSlot));
-    Lcd.spriteDisplayEnable = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0c, Graphics.saveStateSlot));
-    Lcd.bgDisplayEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0d, Graphics.saveStateSlot));
+    Lcd.currentLcdMode = load<u8>(getSaveStateMemoryOffset(0x09, Graphics.saveStateSlot));
+    Lcd.coincidenceCompare = load<u8>(getSaveStateMemoryOffset(0x0a, Graphics.saveStateSlot));
+    Lcd.enabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0b, Graphics.saveStateSlot));
+    Lcd.windowTileMapDisplaySelect = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0c, Graphics.saveStateSlot));
+    Lcd.windowDisplayEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0d, Graphics.saveStateSlot));
+    Lcd.bgWindowTileDataSelect = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0e, Graphics.saveStateSlot));
+    Lcd.bgTileMapDisplaySelect = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0f, Graphics.saveStateSlot));
+    Lcd.tallSpriteSize = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x10, Graphics.saveStateSlot));
+    Lcd.spriteDisplayEnable = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x11, Graphics.saveStateSlot));
+    Lcd.bgDisplayEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x12, Graphics.saveStateSlot));
   }
 }
 
