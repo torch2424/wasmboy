@@ -184,7 +184,9 @@ export function initializeGraphics(): void {
   // Scanline
   // Bgb says LY is 90 on boot
   Graphics.scanlineRegister = 0x90;
-  eightBitStoreIntoGBMemory(0xff40, 0x90);
+
+  // LCDC register
+  eightBitStoreIntoGBMemory(0xff40, 0x91);
 
   // GBC VRAM Banks
   eightBitStoreIntoGBMemory(0xff4f, 0x00);
