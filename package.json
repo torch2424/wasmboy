@@ -60,7 +60,7 @@
     "lib:build:ts:getcoreclosure": "rollup -c --environment PROD,TS,GET_CORE_CLOSURE",
     "lib:build:ts:getcoreclosure:closuredebug": "rollup -c --environment PROD,TS,GET_CORE_CLOSURE,CLOSURE_DEBUG",
     "lib:deploy": "run-s core:build lib:build:wasm lib:build:ts lib:deploy:np",
-    "lib:deploy:np": "np",
+    "lib:deploy:np": "np --no-cleanup",
     "test": "npm run test:accuracy",
     "test:accuracy": "run-s build test:accuracy:nobuild",
     "test:accuracy:nobuild": "node --experimental-worker node_modules/mocha/bin/_mocha test/accuracy/accuracy-test.js --exit",
