@@ -1,7 +1,7 @@
 (module
+ (type $none_=>_i32 (func (result i32)))
  (type $i32_=>_i32 (func (param i32) (result i32)))
  (type $i32_=>_none (func (param i32)))
- (type $none_=>_i32 (func (result i32)))
  (type $none_=>_none (func))
  (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))
  (type $i32_i32_=>_none (func (param i32 i32)))
@@ -393,6 +393,10 @@
  (export "getStackPointer" (func $core/debug/debug-cpu/getStackPointer))
  (export "getOpcodeAtProgramCounter" (func $core/debug/debug-cpu/getOpcodeAtProgramCounter))
  (export "getLY" (func $core/debug/debug-graphics/getLY))
+ (export "getScrollX" (func $core/debug/debug-graphics/getScrollX))
+ (export "getScrollY" (func $core/debug/debug-graphics/getScrollY))
+ (export "getWindowX" (func $core/debug/debug-graphics/getWindowX))
+ (export "getWindowY" (func $core/debug/debug-graphics/getWindowY))
  (export "drawBackgroundMapToWasmMemory" (func $core/debug/debug-graphics/drawBackgroundMapToWasmMemory))
  (export "drawTileDataToWasmMemory" (func $core/debug/debug-graphics/drawTileDataToWasmMemory))
  (export "drawOamToWasmMemory" (func $core/debug/debug-graphics/drawOamToWasmMemory))
@@ -2508,7 +2512,7 @@
   global.set $core/graphics/graphics/Graphics.scanlineRegister
   i32.const 65344
   call $core/memory/memoryMap/getWasmBoyOffsetFromGameBoyOffset
-  i32.const 144
+  i32.const 145
   i32.store8
   i32.const 65359
   call $core/memory/memoryMap/getWasmBoyOffsetFromGameBoyOffset
@@ -3406,7 +3410,6 @@
   i32.store8
  )
  (func $core/core/saveState
-  (local $0 i32)
   i32.const 1024
   global.get $core/cpu/cpu/Cpu.registerA
   i32.store8
@@ -3478,54 +3481,63 @@
   i32.const 1074
   global.get $core/graphics/graphics/Graphics.scanlineCycleCounter
   i32.store
-  global.get $core/graphics/graphics/Graphics.scanlineRegister
-  local.set $0
-  i32.const 65348
-  call $core/memory/memoryMap/getWasmBoyOffsetFromGameBoyOffset
-  local.get $0
-  i32.store8
   i32.const 1078
-  global.get $core/graphics/lcd/Lcd.currentLcdMode
+  global.get $core/graphics/graphics/Graphics.scanlineRegister
   i32.store8
   i32.const 1079
-  global.get $core/graphics/lcd/Lcd.coincidenceCompare
+  global.get $core/graphics/graphics/Graphics.scrollX
   i32.store8
   i32.const 1080
+  global.get $core/graphics/graphics/Graphics.scrollY
+  i32.store8
+  i32.const 1081
+  global.get $core/graphics/graphics/Graphics.windowX
+  i32.store8
+  i32.const 1082
+  global.get $core/graphics/graphics/Graphics.windowY
+  i32.store8
+  i32.const 1083
+  global.get $core/graphics/lcd/Lcd.currentLcdMode
+  i32.store8
+  i32.const 1084
+  global.get $core/graphics/lcd/Lcd.coincidenceCompare
+  i32.store8
+  i32.const 1085
   global.get $core/graphics/lcd/Lcd.enabled
   i32.const 0
   i32.ne
   i32.store8
-  i32.const 1081
+  i32.const 1086
   global.get $core/graphics/lcd/Lcd.windowTileMapDisplaySelect
   i32.const 0
   i32.ne
   i32.store8
-  i32.const 1082
+  i32.const 1087
   global.get $core/graphics/lcd/Lcd.windowDisplayEnabled
   i32.const 0
   i32.ne
   i32.store8
-  i32.const 1083
+  i32.const 1088
   global.get $core/graphics/lcd/Lcd.bgWindowTileDataSelect
   i32.const 0
   i32.ne
   i32.store8
-  i32.const 1084
+  i32.const 1089
   global.get $core/graphics/lcd/Lcd.bgTileMapDisplaySelect
   i32.const 0
   i32.ne
   i32.store8
-  i32.const 1085
+  i32.const 1090
   global.get $core/graphics/lcd/Lcd.tallSpriteSize
   i32.const 0
   i32.ne
   i32.store8
-  i32.const 1086
+  i32.const 1091
   global.get $core/graphics/lcd/Lcd.spriteDisplayEnable
   i32.const 0
   i32.ne
   i32.store8
-  i32.const 1087
+  i32.const 1092
   global.get $core/graphics/lcd/Lcd.bgDisplayEnabled
   i32.const 0
   i32.ne
@@ -3537,6 +3549,75 @@
   i32.store8
   i32.const 1125
   global.get $core/interrupts/interrupts/Interrupts.masterInterruptSwitchDelay
+  i32.const 0
+  i32.ne
+  i32.store8
+  i32.const 1140
+  global.get $core/interrupts/interrupts/Interrupts.interruptsEnabledValue
+  i32.store8
+  i32.const 1141
+  global.get $core/interrupts/interrupts/Interrupts.isVBlankInterruptEnabled
+  i32.const 0
+  i32.ne
+  i32.store8
+  i32.const 1142
+  global.get $core/interrupts/interrupts/Interrupts.isLcdInterruptEnabled
+  i32.const 0
+  i32.ne
+  i32.store8
+  i32.const 1143
+  global.get $core/interrupts/interrupts/Interrupts.isTimerInterruptEnabled
+  i32.const 0
+  i32.ne
+  i32.store8
+  i32.const 1144
+  global.get $core/interrupts/interrupts/Interrupts.isSerialInterruptEnabled
+  i32.const 0
+  i32.ne
+  i32.store8
+  i32.const 1145
+  global.get $core/interrupts/interrupts/Interrupts.isJoypadInterruptEnabled
+  i32.const 0
+  i32.ne
+  i32.store8
+  i32.const 1156
+  global.get $core/interrupts/interrupts/Interrupts.interruptsRequestedValue
+  i32.store8
+  i32.const 1157
+  global.get $core/interrupts/interrupts/Interrupts.isVBlankInterruptRequested
+  i32.const 0
+  i32.ne
+  i32.store8
+  i32.const 1158
+  global.get $core/interrupts/interrupts/Interrupts.isLcdInterruptRequested
+  i32.const 0
+  i32.ne
+  i32.store8
+  i32.const 1159
+  global.get $core/interrupts/interrupts/Interrupts.isTimerInterruptRequested
+  i32.const 0
+  i32.ne
+  i32.store8
+  i32.const 1160
+  global.get $core/interrupts/interrupts/Interrupts.isSerialInterruptRequested
+  i32.const 0
+  i32.ne
+  i32.store8
+  i32.const 1161
+  global.get $core/interrupts/interrupts/Interrupts.isJoypadInterruptRequested
+  i32.const 0
+  i32.ne
+  i32.store8
+  i32.const 1174
+  global.get $core/joypad/joypad/Joypad.joypadRegisterFlipped
+  i32.store
+  i32.const 1175
+  global.get $core/joypad/joypad/Joypad.isDpadType
+  i32.const 0
+  i32.ne
+  i32.store8
+  i32.const 1176
+  global.get $core/joypad/joypad/Joypad.isButtonType
   i32.const 0
   i32.ne
   i32.store8
@@ -3606,7 +3687,6 @@
   i32.store
   i32.const 1282
   global.get $core/timers/timers/Timers.timerCounter
-  local.tee $0
   i32.store
   i32.const 1286
   global.get $core/timers/timers/Timers.timerCounterOverflowDelay
@@ -3632,10 +3712,6 @@
   i32.const 1297
   global.get $core/timers/timers/Timers.timerInputClock
   i32.store
-  i32.const 65285
-  call $core/memory/memoryMap/getWasmBoyOffsetFromGameBoyOffset
-  local.get $0
-  i32.store8
   call $core/sound/sound/Sound.saveState
   call $core/sound/channel1/Channel1.saveState
   i32.const 1424
@@ -3823,89 +3899,6 @@
   i32.store16
   i32.const 0
   global.set $core/core/hasStarted
- )
- (func $core/interrupts/interrupts/Interrupts.loadState
-  (local $0 i32)
-  i32.const 1124
-  i32.load8_u
-  i32.const 0
-  i32.gt_u
-  global.set $core/interrupts/interrupts/Interrupts.masterInterruptSwitch
-  i32.const 1125
-  i32.load8_u
-  i32.const 0
-  i32.gt_u
-  global.set $core/interrupts/interrupts/Interrupts.masterInterruptSwitchDelay
-  i32.const 65535
-  call $core/memory/memoryMap/getWasmBoyOffsetFromGameBoyOffset
-  i32.load8_u
-  local.tee $0
-  i32.const 1
-  i32.and
-  i32.const 0
-  i32.ne
-  global.set $core/interrupts/interrupts/Interrupts.isVBlankInterruptEnabled
-  local.get $0
-  i32.const 2
-  i32.and
-  i32.const 0
-  i32.ne
-  global.set $core/interrupts/interrupts/Interrupts.isLcdInterruptEnabled
-  local.get $0
-  i32.const 4
-  i32.and
-  i32.const 0
-  i32.ne
-  global.set $core/interrupts/interrupts/Interrupts.isTimerInterruptEnabled
-  local.get $0
-  i32.const 8
-  i32.and
-  i32.const 0
-  i32.ne
-  global.set $core/interrupts/interrupts/Interrupts.isSerialInterruptEnabled
-  local.get $0
-  i32.const 16
-  i32.and
-  i32.const 0
-  i32.ne
-  global.set $core/interrupts/interrupts/Interrupts.isJoypadInterruptEnabled
-  local.get $0
-  global.set $core/interrupts/interrupts/Interrupts.interruptsEnabledValue
-  i32.const 65295
-  call $core/memory/memoryMap/getWasmBoyOffsetFromGameBoyOffset
-  i32.load8_u
-  local.tee $0
-  i32.const 1
-  i32.and
-  i32.const 0
-  i32.ne
-  global.set $core/interrupts/interrupts/Interrupts.isVBlankInterruptRequested
-  local.get $0
-  i32.const 2
-  i32.and
-  i32.const 0
-  i32.ne
-  global.set $core/interrupts/interrupts/Interrupts.isLcdInterruptRequested
-  local.get $0
-  i32.const 4
-  i32.and
-  i32.const 0
-  i32.ne
-  global.set $core/interrupts/interrupts/Interrupts.isTimerInterruptRequested
-  local.get $0
-  i32.const 8
-  i32.and
-  i32.const 0
-  i32.ne
-  global.set $core/interrupts/interrupts/Interrupts.isSerialInterruptRequested
-  local.get $0
-  i32.const 16
-  i32.and
-  i32.const 0
-  i32.ne
-  global.set $core/interrupts/interrupts/Interrupts.isJoypadInterruptRequested
-  local.get $0
-  global.set $core/interrupts/interrupts/Interrupts.interruptsRequestedValue
  )
  (func $core/sound/sound/clearAudioBuffer
   i32.const 0
@@ -4197,7 +4190,6 @@
   global.set $core/sound/channel2/Channel2.waveFormPositionOnDuty
  )
  (func $core/core/loadState
-  (local $0 i32)
   i32.const 1024
   i32.load8_u
   global.set $core/cpu/cpu/Cpu.registerA
@@ -4269,75 +4261,149 @@
   i32.const 1074
   i32.load
   global.set $core/graphics/graphics/Graphics.scanlineCycleCounter
-  i32.const 65348
-  call $core/memory/memoryMap/getWasmBoyOffsetFromGameBoyOffset
+  global.get $core/graphics/graphics/Graphics.scanlineRegister
+  i32.const 50
+  i32.mul
+  i32.const 1028
+  i32.add
   i32.load8_u
   global.set $core/graphics/graphics/Graphics.scanlineRegister
-  i32.const 1078
-  i32.load8_u
-  global.set $core/graphics/lcd/Lcd.currentLcdMode
   i32.const 1079
   i32.load8_u
-  global.set $core/graphics/lcd/Lcd.coincidenceCompare
+  global.set $core/graphics/graphics/Graphics.scrollX
   i32.const 1080
   i32.load8_u
-  i32.const 0
-  i32.gt_u
-  global.set $core/graphics/lcd/Lcd.enabled
+  global.set $core/graphics/graphics/Graphics.scrollY
   i32.const 1081
   i32.load8_u
-  i32.const 0
-  i32.gt_u
-  global.set $core/graphics/lcd/Lcd.windowTileMapDisplaySelect
+  global.set $core/graphics/graphics/Graphics.windowX
   i32.const 1082
   i32.load8_u
-  i32.const 0
-  i32.gt_u
-  global.set $core/graphics/lcd/Lcd.windowDisplayEnabled
+  global.set $core/graphics/graphics/Graphics.windowY
   i32.const 1083
   i32.load8_u
-  i32.const 0
-  i32.gt_u
-  global.set $core/graphics/lcd/Lcd.bgWindowTileDataSelect
+  global.set $core/graphics/lcd/Lcd.currentLcdMode
   i32.const 1084
   i32.load8_u
-  i32.const 0
-  i32.gt_u
-  global.set $core/graphics/lcd/Lcd.bgTileMapDisplaySelect
+  global.set $core/graphics/lcd/Lcd.coincidenceCompare
   i32.const 1085
   i32.load8_u
   i32.const 0
   i32.gt_u
-  global.set $core/graphics/lcd/Lcd.tallSpriteSize
+  global.set $core/graphics/lcd/Lcd.enabled
   i32.const 1086
   i32.load8_u
   i32.const 0
   i32.gt_u
-  global.set $core/graphics/lcd/Lcd.spriteDisplayEnable
+  global.set $core/graphics/lcd/Lcd.windowTileMapDisplaySelect
   i32.const 1087
   i32.load8_u
   i32.const 0
   i32.gt_u
-  global.set $core/graphics/lcd/Lcd.bgDisplayEnabled
-  call $core/interrupts/interrupts/Interrupts.loadState
-  i32.const 65280
-  call $core/memory/memoryMap/getWasmBoyOffsetFromGameBoyOffset
+  global.set $core/graphics/lcd/Lcd.windowDisplayEnabled
+  i32.const 1088
   i32.load8_u
-  i32.const 255
-  i32.xor
+  i32.const 0
+  i32.gt_u
+  global.set $core/graphics/lcd/Lcd.bgWindowTileDataSelect
+  i32.const 1089
+  i32.load8_u
+  i32.const 0
+  i32.gt_u
+  global.set $core/graphics/lcd/Lcd.bgTileMapDisplaySelect
+  i32.const 1090
+  i32.load8_u
+  i32.const 0
+  i32.gt_u
+  global.set $core/graphics/lcd/Lcd.tallSpriteSize
+  i32.const 1091
+  i32.load8_u
+  i32.const 0
+  i32.gt_u
+  global.set $core/graphics/lcd/Lcd.spriteDisplayEnable
+  i32.const 1092
+  i32.load8_u
+  i32.const 0
+  i32.gt_u
+  global.set $core/graphics/lcd/Lcd.bgDisplayEnabled
+  i32.const 1124
+  i32.load8_u
+  i32.const 0
+  i32.gt_u
+  global.set $core/interrupts/interrupts/Interrupts.masterInterruptSwitch
+  i32.const 1125
+  i32.load8_u
+  i32.const 0
+  i32.gt_u
+  global.set $core/interrupts/interrupts/Interrupts.masterInterruptSwitchDelay
+  i32.const 1140
+  i32.load8_u
+  global.set $core/interrupts/interrupts/Interrupts.interruptsEnabledValue
+  i32.const 1141
+  i32.load8_u
+  i32.const 0
+  i32.gt_u
+  global.set $core/interrupts/interrupts/Interrupts.isVBlankInterruptEnabled
+  i32.const 1142
+  i32.load8_u
+  i32.const 0
+  i32.gt_u
+  global.set $core/interrupts/interrupts/Interrupts.isLcdInterruptEnabled
+  i32.const 1143
+  i32.load8_u
+  i32.const 0
+  i32.gt_u
+  global.set $core/interrupts/interrupts/Interrupts.isTimerInterruptEnabled
+  i32.const 1144
+  i32.load8_u
+  i32.const 0
+  i32.gt_u
+  global.set $core/interrupts/interrupts/Interrupts.isSerialInterruptEnabled
+  i32.const 1145
+  i32.load8_u
+  i32.const 0
+  i32.gt_u
+  global.set $core/interrupts/interrupts/Interrupts.isJoypadInterruptEnabled
+  i32.const 1156
+  i32.load8_u
+  global.set $core/interrupts/interrupts/Interrupts.interruptsRequestedValue
+  i32.const 1157
+  i32.load8_u
+  i32.const 0
+  i32.gt_u
+  global.set $core/interrupts/interrupts/Interrupts.isVBlankInterruptRequested
+  i32.const 1158
+  i32.load8_u
+  i32.const 0
+  i32.gt_u
+  global.set $core/interrupts/interrupts/Interrupts.isLcdInterruptRequested
+  i32.const 1159
+  i32.load8_u
+  i32.const 0
+  i32.gt_u
+  global.set $core/interrupts/interrupts/Interrupts.isTimerInterruptRequested
+  i32.const 1160
+  i32.load8_u
+  i32.const 0
+  i32.gt_u
+  global.set $core/interrupts/interrupts/Interrupts.isSerialInterruptRequested
+  i32.const 1161
+  i32.load8_u
+  i32.const 0
+  i32.gt_u
+  global.set $core/interrupts/interrupts/Interrupts.isJoypadInterruptRequested
+  i32.const 1174
+  i32.load
   global.set $core/joypad/joypad/Joypad.joypadRegisterFlipped
-  global.get $core/joypad/joypad/Joypad.joypadRegisterFlipped
-  local.tee $0
-  i32.const 16
-  i32.and
+  i32.const 1175
+  i32.load8_u
   i32.const 0
-  i32.ne
+  i32.gt_u
   global.set $core/joypad/joypad/Joypad.isDpadType
-  local.get $0
-  i32.const 32
-  i32.and
+  i32.const 1176
+  i32.load8_u
   i32.const 0
-  i32.ne
+  i32.gt_u
   global.set $core/joypad/joypad/Joypad.isButtonType
   i32.const 1224
   i32.load16_u
@@ -19071,6 +19137,18 @@
  )
  (func $core/debug/debug-graphics/getLY (result i32)
   global.get $core/graphics/graphics/Graphics.scanlineRegister
+ )
+ (func $core/debug/debug-graphics/getScrollX (result i32)
+  global.get $core/graphics/graphics/Graphics.scrollX
+ )
+ (func $core/debug/debug-graphics/getScrollY (result i32)
+  global.get $core/graphics/graphics/Graphics.scrollY
+ )
+ (func $core/debug/debug-graphics/getWindowX (result i32)
+  global.get $core/graphics/graphics/Graphics.windowX
+ )
+ (func $core/debug/debug-graphics/getWindowY (result i32)
+  global.get $core/graphics/graphics/Graphics.windowY
  )
  (func $core/debug/debug-graphics/drawBackgroundMapToWasmMemory (param $0 i32)
   (local $1 i32)

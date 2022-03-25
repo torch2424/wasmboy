@@ -4061,17 +4061,43 @@ var Interrupts = /** @class */ (function () {
     };
     // Function to save the state of the class
     Interrupts.saveState = function () {
+        // Interrupt Master Interrupt Switch
         storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x00, Interrupts.saveStateSlot), Interrupts.masterInterruptSwitch);
         storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x01, Interrupts.saveStateSlot), Interrupts.masterInterruptSwitchDelay);
-        // Interrupts enabled and requested are stored in actual GB memory, thus, don't need to be saved
-        // Other classes have special logic on write, but this just checks bits on bytes, so should be fine
+        // Interrupt Enabled
+        store(getSaveStateMemoryOffset(0x10, Interrupts.saveStateSlot), Interrupts.interruptsEnabledValue);
+        storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x11, Interrupts.saveStateSlot), Interrupts.isVBlankInterruptEnabled);
+        storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x12, Interrupts.saveStateSlot), Interrupts.isLcdInterruptEnabled);
+        storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x13, Interrupts.saveStateSlot), Interrupts.isTimerInterruptEnabled);
+        storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x14, Interrupts.saveStateSlot), Interrupts.isSerialInterruptEnabled);
+        storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x15, Interrupts.saveStateSlot), Interrupts.isJoypadInterruptEnabled);
+        // Interrupt Request
+        store(getSaveStateMemoryOffset(0x20, Interrupts.saveStateSlot), Interrupts.interruptsRequestedValue);
+        storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x21, Interrupts.saveStateSlot), Interrupts.isVBlankInterruptRequested);
+        storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x22, Interrupts.saveStateSlot), Interrupts.isLcdInterruptRequested);
+        storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x23, Interrupts.saveStateSlot), Interrupts.isTimerInterruptRequested);
+        storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x24, Interrupts.saveStateSlot), Interrupts.isSerialInterruptRequested);
+        storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x25, Interrupts.saveStateSlot), Interrupts.isJoypadInterruptRequested);
     };
     // Function to load the save state from memory
     Interrupts.loadState = function () {
+        // Interrupt Master Interrupt Switch
         Interrupts.masterInterruptSwitch = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x00, Interrupts.saveStateSlot));
         Interrupts.masterInterruptSwitchDelay = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x01, Interrupts.saveStateSlot));
-        Interrupts.updateInterruptEnabled(eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptEnabled));
-        Interrupts.updateInterruptRequested(eightBitLoadFromGBMemory(Interrupts.memoryLocationInterruptRequest));
+        // Interrupt Enabled
+        Interrupts.interruptsEnabledValue = load(getSaveStateMemoryOffset(0x10, Interrupts.saveStateSlot));
+        Interrupts.isVBlankInterruptEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x11, Interrupts.saveStateSlot));
+        Interrupts.isLcdInterruptEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x12, Interrupts.saveStateSlot));
+        Interrupts.isTimerInterruptEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x13, Interrupts.saveStateSlot));
+        Interrupts.isSerialInterruptEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x14, Interrupts.saveStateSlot));
+        Interrupts.isJoypadInterruptEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x15, Interrupts.saveStateSlot));
+        // Interrupt Request
+        Interrupts.interruptsRequestedValue = load(getSaveStateMemoryOffset(0x20, Interrupts.saveStateSlot));
+        Interrupts.isVBlankInterruptRequested = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x21, Interrupts.saveStateSlot));
+        Interrupts.isLcdInterruptRequested = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x22, Interrupts.saveStateSlot));
+        Interrupts.isTimerInterruptRequested = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x23, Interrupts.saveStateSlot));
+        Interrupts.isSerialInterruptRequested = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x24, Interrupts.saveStateSlot));
+        Interrupts.isJoypadInterruptRequested = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x25, Interrupts.saveStateSlot));
     };
     Interrupts.masterInterruptSwitch = false;
     // According to mooneye, interrupts are not handled until AFTER
@@ -4341,8 +4367,6 @@ var Timers = /** @class */ (function () {
         // Timer Control
         storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x16, Timers.saveStateSlot), Timers.timerEnabled);
         store(getSaveStateMemoryOffset(0x17, Timers.saveStateSlot), Timers.timerInputClock);
-        // Old Not too sture
-        eightBitStoreIntoGBMemory(Timers.memoryLocationTimerCounter, Timers.timerCounter);
     };
     // Function to load the save state from memory
     Timers.loadState = function () {
@@ -4657,10 +4681,16 @@ var Joypad = /** @class */ (function () {
         Joypad.isButtonType = checkBitOnByte(5, Joypad.joypadRegisterFlipped);
     };
     // Function to save the state of the class
-    Joypad.saveState = function () { };
+    Joypad.saveState = function () {
+        store(getSaveStateMemoryOffset(0x00, Joypad.saveStateSlot), Joypad.joypadRegisterFlipped);
+        storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x01, Joypad.saveStateSlot), Joypad.isDpadType);
+        storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x02, Joypad.saveStateSlot), Joypad.isButtonType);
+    };
     // Function to load the save state from memory
     Joypad.loadState = function () {
-        Joypad.updateJoypad(eightBitLoadFromGBMemory(Joypad.memoryLocationJoypadRegister));
+        Joypad.joypadRegisterFlipped = load(getSaveStateMemoryOffset(0x00, Joypad.saveStateSlot));
+        Joypad.isDpadType = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x01, Joypad.saveStateSlot));
+        Joypad.isButtonType = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x02, Joypad.saveStateSlot));
     };
     Joypad.up = false;
     Joypad.down = false;
@@ -6221,35 +6251,43 @@ var Graphics = /** @class */ (function () {
     Graphics.saveState = function () {
         // Graphics
         store(getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot), Graphics.scanlineCycleCounter);
-        eightBitStoreIntoGBMemory(Graphics.memoryLocationScanlineRegister, Graphics.scanlineRegister);
+        store(getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot), Graphics.scanlineRegister);
+        store(getSaveStateMemoryOffset(0x05, Graphics.saveStateSlot), Graphics.scrollX);
+        store(getSaveStateMemoryOffset(0x06, Graphics.saveStateSlot), Graphics.scrollY);
+        store(getSaveStateMemoryOffset(0x07, Graphics.saveStateSlot), Graphics.windowX);
+        store(getSaveStateMemoryOffset(0x08, Graphics.saveStateSlot), Graphics.windowY);
         // LCD
-        store(getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot), Lcd.currentLcdMode);
-        store(getSaveStateMemoryOffset(0x05, Graphics.saveStateSlot), Lcd.coincidenceCompare);
-        storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x06, Graphics.saveStateSlot), Lcd.enabled);
-        storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x07, Graphics.saveStateSlot), Lcd.windowTileMapDisplaySelect);
-        storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x08, Graphics.saveStateSlot), Lcd.windowDisplayEnabled);
-        storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x09, Graphics.saveStateSlot), Lcd.bgWindowTileDataSelect);
-        storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0a, Graphics.saveStateSlot), Lcd.bgTileMapDisplaySelect);
-        storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0b, Graphics.saveStateSlot), Lcd.tallSpriteSize);
-        storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0c, Graphics.saveStateSlot), Lcd.spriteDisplayEnable);
-        storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0d, Graphics.saveStateSlot), Lcd.bgDisplayEnabled);
+        store(getSaveStateMemoryOffset(0x09, Graphics.saveStateSlot), Lcd.currentLcdMode);
+        store(getSaveStateMemoryOffset(0x0a, Graphics.saveStateSlot), Lcd.coincidenceCompare);
+        storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0b, Graphics.saveStateSlot), Lcd.enabled);
+        storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0c, Graphics.saveStateSlot), Lcd.windowTileMapDisplaySelect);
+        storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0d, Graphics.saveStateSlot), Lcd.windowDisplayEnabled);
+        storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0e, Graphics.saveStateSlot), Lcd.bgWindowTileDataSelect);
+        storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x0f, Graphics.saveStateSlot), Lcd.bgTileMapDisplaySelect);
+        storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x10, Graphics.saveStateSlot), Lcd.tallSpriteSize);
+        storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x11, Graphics.saveStateSlot), Lcd.spriteDisplayEnable);
+        storeBooleanDirectlyToWasmMemory(getSaveStateMemoryOffset(0x12, Graphics.saveStateSlot), Lcd.bgDisplayEnabled);
     };
     // Function to load the save state from memory
     Graphics.loadState = function () {
         // Graphics
         Graphics.scanlineCycleCounter = load(getSaveStateMemoryOffset(0x00, Graphics.saveStateSlot));
-        Graphics.scanlineRegister = eightBitLoadFromGBMemory(Graphics.memoryLocationScanlineRegister);
+        Graphics.scanlineRegister = load(getSaveStateMemoryOffset(0x04, Graphics.scanlineRegister));
+        Graphics.scrollX = load(getSaveStateMemoryOffset(0x05, Graphics.saveStateSlot));
+        Graphics.scrollY = load(getSaveStateMemoryOffset(0x06, Graphics.saveStateSlot));
+        Graphics.windowX = load(getSaveStateMemoryOffset(0x07, Graphics.saveStateSlot));
+        Graphics.windowY = load(getSaveStateMemoryOffset(0x08, Graphics.saveStateSlot));
         // LCD
-        Lcd.currentLcdMode = load(getSaveStateMemoryOffset(0x04, Graphics.saveStateSlot));
-        Lcd.coincidenceCompare = load(getSaveStateMemoryOffset(0x05, Graphics.saveStateSlot));
-        Lcd.enabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x06, Graphics.saveStateSlot));
-        Lcd.windowTileMapDisplaySelect = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x07, Graphics.saveStateSlot));
-        Lcd.windowDisplayEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x08, Graphics.saveStateSlot));
-        Lcd.bgWindowTileDataSelect = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x09, Graphics.saveStateSlot));
-        Lcd.bgTileMapDisplaySelect = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0a, Graphics.saveStateSlot));
-        Lcd.tallSpriteSize = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0b, Graphics.saveStateSlot));
-        Lcd.spriteDisplayEnable = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0c, Graphics.saveStateSlot));
-        Lcd.bgDisplayEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0d, Graphics.saveStateSlot));
+        Lcd.currentLcdMode = load(getSaveStateMemoryOffset(0x09, Graphics.saveStateSlot));
+        Lcd.coincidenceCompare = load(getSaveStateMemoryOffset(0x0a, Graphics.saveStateSlot));
+        Lcd.enabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0b, Graphics.saveStateSlot));
+        Lcd.windowTileMapDisplaySelect = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0c, Graphics.saveStateSlot));
+        Lcd.windowDisplayEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0d, Graphics.saveStateSlot));
+        Lcd.bgWindowTileDataSelect = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0e, Graphics.saveStateSlot));
+        Lcd.bgTileMapDisplaySelect = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x0f, Graphics.saveStateSlot));
+        Lcd.tallSpriteSize = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x10, Graphics.saveStateSlot));
+        Lcd.spriteDisplayEnable = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x11, Graphics.saveStateSlot));
+        Lcd.bgDisplayEnabled = loadBooleanDirectlyFromWasmMemory(getSaveStateMemoryOffset(0x12, Graphics.saveStateSlot));
     };
     // Current cycles
     // This will be used for batch processing
@@ -6332,7 +6370,8 @@ function initializeGraphics() {
     // Scanline
     // Bgb says LY is 90 on boot
     Graphics.scanlineRegister = 0x90;
-    eightBitStoreIntoGBMemory(0xff40, 0x90);
+    // LCDC register
+    eightBitStoreIntoGBMemory(0xff40, 0x91);
     // GBC VRAM Banks
     eightBitStoreIntoGBMemory(0xff4f, 0x00);
     eightBitStoreIntoGBMemory(0xff70, 0x01);
@@ -10109,6 +10148,18 @@ function getOpcodeAtProgramCounter() {
 function getLY() {
     return Graphics.scanlineRegister;
 }
+function getScrollX() {
+    return Graphics.scrollX;
+}
+function getScrollY() {
+    return Graphics.scrollY;
+}
+function getWindowX() {
+    return Graphics.windowX;
+}
+function getWindowY() {
+    return Graphics.windowY;
+}
 // TODO: Render by tile, rather than by pixel
 function drawBackgroundMapToWasmMemory(showColor) {
     // http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html
@@ -10446,4 +10497,4 @@ function updateDebugGBMemory() {
 
 // Public Exports
 
-export { config, hasCoreStarted, saveState, loadState, isGBC, getStepsPerStepSet, getStepSets, getSteps, executeMultipleFrames, executeFrame, executeFrameAndCheckAudio, executeUntilCondition, executeStep, getCyclesPerCycleSet, getCycleSets, getCycles, setJoypadState, getNumberOfSamplesInAudioBuffer, clearAudioBuffer, setManualColorizationPalette, WASMBOY_MEMORY_LOCATION, WASMBOY_MEMORY_SIZE, WASMBOY_WASM_PAGES, ASSEMBLYSCRIPT_MEMORY_LOCATION, ASSEMBLYSCRIPT_MEMORY_SIZE, WASMBOY_STATE_LOCATION, WASMBOY_STATE_SIZE, GAMEBOY_INTERNAL_MEMORY_LOCATION, GAMEBOY_INTERNAL_MEMORY_SIZE, VIDEO_RAM_LOCATION, VIDEO_RAM_SIZE, WORK_RAM_LOCATION, WORK_RAM_SIZE, OTHER_GAMEBOY_INTERNAL_MEMORY_LOCATION, OTHER_GAMEBOY_INTERNAL_MEMORY_SIZE, GRAPHICS_OUTPUT_LOCATION, GRAPHICS_OUTPUT_SIZE, GBC_PALETTE_LOCATION, GBC_PALETTE_SIZE, BG_PRIORITY_MAP_LOCATION, BG_PRIORITY_MAP_SIZE, FRAME_LOCATION, FRAME_SIZE, BACKGROUND_MAP_LOCATION, BACKGROUND_MAP_SIZE, TILE_DATA_LOCATION, TILE_DATA_SIZE, OAM_TILES_LOCATION, OAM_TILES_SIZE, AUDIO_BUFFER_LOCATION, AUDIO_BUFFER_SIZE, CHANNEL_1_BUFFER_LOCATION, CHANNEL_1_BUFFER_SIZE, CHANNEL_2_BUFFER_LOCATION, CHANNEL_2_BUFFER_SIZE, CHANNEL_3_BUFFER_LOCATION, CHANNEL_3_BUFFER_SIZE, CHANNEL_4_BUFFER_LOCATION, CHANNEL_4_BUFFER_SIZE, CARTRIDGE_RAM_LOCATION, CARTRIDGE_RAM_SIZE, BOOT_ROM_LOCATION, BOOT_ROM_SIZE, CARTRIDGE_ROM_LOCATION, CARTRIDGE_ROM_SIZE, DEBUG_GAMEBOY_MEMORY_LOCATION, DEBUG_GAMEBOY_MEMORY_SIZE, getWasmBoyOffsetFromGameBoyOffset, setProgramCounterBreakpoint, resetProgramCounterBreakpoint, setReadGbMemoryBreakpoint, resetReadGbMemoryBreakpoint, setWriteGbMemoryBreakpoint, resetWriteGbMemoryBreakpoint, getRegisterA, getRegisterB, getRegisterC, getRegisterD, getRegisterE, getRegisterH, getRegisterL, getRegisterF, getProgramCounter, getStackPointer, getOpcodeAtProgramCounter, getLY, drawBackgroundMapToWasmMemory, drawTileDataToWasmMemory, drawOamToWasmMemory, getDIV, getTIMA, getTMA, getTAC, updateDebugGBMemory };
+export { config, hasCoreStarted, saveState, loadState, isGBC, getStepsPerStepSet, getStepSets, getSteps, executeMultipleFrames, executeFrame, executeFrameAndCheckAudio, executeUntilCondition, executeStep, getCyclesPerCycleSet, getCycleSets, getCycles, setJoypadState, getNumberOfSamplesInAudioBuffer, clearAudioBuffer, setManualColorizationPalette, WASMBOY_MEMORY_LOCATION, WASMBOY_MEMORY_SIZE, WASMBOY_WASM_PAGES, ASSEMBLYSCRIPT_MEMORY_LOCATION, ASSEMBLYSCRIPT_MEMORY_SIZE, WASMBOY_STATE_LOCATION, WASMBOY_STATE_SIZE, GAMEBOY_INTERNAL_MEMORY_LOCATION, GAMEBOY_INTERNAL_MEMORY_SIZE, VIDEO_RAM_LOCATION, VIDEO_RAM_SIZE, WORK_RAM_LOCATION, WORK_RAM_SIZE, OTHER_GAMEBOY_INTERNAL_MEMORY_LOCATION, OTHER_GAMEBOY_INTERNAL_MEMORY_SIZE, GRAPHICS_OUTPUT_LOCATION, GRAPHICS_OUTPUT_SIZE, GBC_PALETTE_LOCATION, GBC_PALETTE_SIZE, BG_PRIORITY_MAP_LOCATION, BG_PRIORITY_MAP_SIZE, FRAME_LOCATION, FRAME_SIZE, BACKGROUND_MAP_LOCATION, BACKGROUND_MAP_SIZE, TILE_DATA_LOCATION, TILE_DATA_SIZE, OAM_TILES_LOCATION, OAM_TILES_SIZE, AUDIO_BUFFER_LOCATION, AUDIO_BUFFER_SIZE, CHANNEL_1_BUFFER_LOCATION, CHANNEL_1_BUFFER_SIZE, CHANNEL_2_BUFFER_LOCATION, CHANNEL_2_BUFFER_SIZE, CHANNEL_3_BUFFER_LOCATION, CHANNEL_3_BUFFER_SIZE, CHANNEL_4_BUFFER_LOCATION, CHANNEL_4_BUFFER_SIZE, CARTRIDGE_RAM_LOCATION, CARTRIDGE_RAM_SIZE, BOOT_ROM_LOCATION, BOOT_ROM_SIZE, CARTRIDGE_ROM_LOCATION, CARTRIDGE_ROM_SIZE, DEBUG_GAMEBOY_MEMORY_LOCATION, DEBUG_GAMEBOY_MEMORY_SIZE, getWasmBoyOffsetFromGameBoyOffset, setProgramCounterBreakpoint, resetProgramCounterBreakpoint, setReadGbMemoryBreakpoint, resetReadGbMemoryBreakpoint, setWriteGbMemoryBreakpoint, resetWriteGbMemoryBreakpoint, getRegisterA, getRegisterB, getRegisterC, getRegisterD, getRegisterE, getRegisterH, getRegisterL, getRegisterF, getProgramCounter, getStackPointer, getOpcodeAtProgramCounter, getLY, getScrollX, getScrollY, getWindowX, getWindowY, drawBackgroundMapToWasmMemory, drawTileDataToWasmMemory, drawOamToWasmMemory, getDIV, getTIMA, getTMA, getTAC, updateDebugGBMemory };

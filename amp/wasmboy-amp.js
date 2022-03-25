@@ -7116,8 +7116,9 @@
     // Bgb says LY is 90 on boot
 
 
-    Graphics.scanlineRegister = 0x90;
-    eightBitStoreIntoGBMemory(0xff40, 0x90); // GBC VRAM Banks
+    Graphics.scanlineRegister = 0x90; // LCDC register
+
+    eightBitStoreIntoGBMemory(0xff40, 0x91); // GBC VRAM Banks
 
     eightBitStoreIntoGBMemory(0xff4f, 0x00);
     eightBitStoreIntoGBMemory(0xff70, 0x01); // Override/reset some variables if the boot ROM is enabled
