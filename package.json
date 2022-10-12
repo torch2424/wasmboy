@@ -191,6 +191,6 @@
     "url-loader": "^1.0.1",
     "valoo": "^2.1.0",
     "watch": "^1.0.2",
-    "webpack-dev-server": "^3.11.0"
+    "webpack-dev-server": "^4.11.1"
   }
 }
