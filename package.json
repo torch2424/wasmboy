@@ -140,7 +140,7 @@
     "concurrently": "^3.5.1",
     "devtools-detect": "^2.2.0",
     "gb-instructions-opcodes": "0.0.4",
-    "gh-pages": "^1.1.0",
+    "gh-pages": "^4.0.0",
     "hash-generator": "^0.1.0",
     "husky": "^1.0.0-rc.8",
     "load-script": "^1.0.0",
